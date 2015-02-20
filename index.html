@@ -1,17 +1,30 @@
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="interface.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <h1>Soda Clicker Pro</h1>
+    <form>
+        <button onclick="save()">Save Game</button>
+        <input type="checkbox" name="autosave" value="autosave">Autosave
+        <br/>
+        <button onclick="delete_save()">Delete Save</button>
+    </form>
 </head>
 <body>
-<button onclick="cookieClick(1)">Click Me!</button>
+<img src="BonusSoda.png" width="100" height="100" onclick="sodaClick(1)" />
 <br />
-Cookies: <span id="cookies">0</span>
+Sips: <span id="sips">0</span>
 <br />
-<button onclick="buyCursor()">Buy Cursor</button>
+<button onclick="buyStraw()">Extra Straw</button>
 <br />
-Cursors: <span id="cursors">0</span>
+Straws: <span id="straws">0</span>
 <br />
-Cursor Cost: <span id="cursorCost">10</span>
+Straw Cost: <span id="strawCost">10</span>
+<br />
+<button onclick="buyCup()">Bigger Cup</button>
+<br />
+Cups: <span id="cups">0</span>
+<br />
+Cup Cost: <span id="cupCost">20</span>
 <script type="text/javascript" src="main.js"></script>
 </body>
 </html>
