@@ -1,19 +1,30 @@
 <html>
+<div id ="mainDiv">
 <head>
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <h1>Soda Clicker Pro</h1>
-    <form>
-        <button onclick="save()">Save Game</button>
-        <input type="checkbox" name="autosave" value="autosave">Autosave
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <div id="headDiv" class="center">
+    <h1>Soda Clicker
         <br/>
+        PRO!</h1>
+    <form class="center">
+        <button onclick="save()">Save Game</button>
         <button onclick="delete_save()">Delete Save</button>
     </form>
+        </div>
 </head>
 <body>
-<img src="BonusSoda.png" width="100" height="100" onclick="sodaClick(1)" />
+
+<div id="sodaDiv" class="center">
+<img src="images/BonusSoda.png" width="250" height="250" onclick="sodaClick(1)" />
 <br />
+    <div id="spsDiv" class="center">
 Sips: <span id="sips">0</span>
+<br/>
+Sips per second: <span id="sps">0</span>
 <br />
+        </div>
+</div>
+<div id="shopDiv"class="center">
 <button onclick="buyStraw()">Extra Straw</button>
 <br />
 Straws: <span id="straws">0</span>
@@ -25,6 +36,8 @@ Straw Cost: <span id="strawCost">10</span>
 Cups: <span id="cups">0</span>
 <br />
 Cup Cost: <span id="cupCost">20</span>
-<script type="text/javascript" src="main.js"></script>
+</div>
+</div>
+<script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>
