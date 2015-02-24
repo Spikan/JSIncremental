@@ -94,8 +94,8 @@ window.onload = function load() {
     document.getElementById('strawCost').innerHTML = strawCost;
     document.getElementById('cups').innerHTML = cups;
     document.getElementById('cupCost').innerHTML = cupCost;
-    document.getElementById('sips').innerHTML = sips;
-    document.getElementById('sps').innerHTML = sps;
+    document.getElementById('sips').innerHTML = prettify(sips);
+    document.getElementById('sps').innerHTML = prettify(sps);
 
 }
 
