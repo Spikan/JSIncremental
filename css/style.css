@@ -27,7 +27,8 @@ h1 {
 }
 
 #shopTable{
-    border: 1px solid black;
+    border: none;
+    empty-cells: hide;
 }
 
 #sodaButton:hover{

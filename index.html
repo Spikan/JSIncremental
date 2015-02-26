@@ -36,7 +36,7 @@
         <div id="spsDiv" class="center">
             Sips: <span id="sips">0</span>
             <br/>
-            Sips per second: <span id="sps">0</span>
+            Sips/s: <span id="sps">0</span>
             <br/>
         </div>
     </div>
@@ -44,24 +44,50 @@
         <table id="shopTable">
             <tr>
                 <td class="shop">
-            <button width="200" onclick="buyStraw()">Extra Straw</button>
+
+                </td>
+                <td class="shop">
+                    Amount Owned
+                </td>
+                <td class="shop">
+                    + Sips/s
+                </td>
+                <td class="shop">
+                    Total Sips/s
+                    </td>
+            </tr>
+            <tr>
+                <td class="shop">
+            <button width="200" onclick="buyStraw()"><span id="strawCost">10</span> Sips<br/> Extra Straw</button>
                     </td>
                 <td class="shop">
-            Straws: <span id="straws">0</span>
+            <span id="straws">0</span>
                     </td>
                 <td class="shop">
-            Straw Cost: <span id="strawCost">10</span>
+                    + <span id ="strawSPS">0.4</span> Sips/s
+                </td>
+                <td class="shop">
+                    <span id ="totalStrawSPS">0</span> Sips/s
+                </td>
+                <td class="shop">
+                    <button onclick="upgradeStraw()"><span id="strawUpCost">200</span> Sips<br/> Upgrade Straws </button>
                 </td>
                 </tr>
             <tr>
                 <td class="shop">
-            <button onclick="buyCup()">Bigger Cup</button>
+            <button onclick="buyCup()"><span id="cupCost">20</span> Sips<br/> Bigger Cup </button>
                     </td>
                 <td class="shop">
-            Cups: <span id="cups">0</span>
+            <span id="cups">0</span>
                     </td>
+                    <td class="shop">
+                + <span id ="cupSPS">1</span> Sips/s
+                </td>
                 <td class="shop">
-            Cup Cost: <span id="cupCost">20</span>
+                    <span id ="totalCupSPS">0</span> Sips/s
+                </td>
+                <td class="shop">
+                    <button onclick="upgradeCup()"><span id="cupUpCost">500</span> Sips<br/> Upgrade Cups</button>
                 </td>
             </tr>
         </table>
