@@ -19,7 +19,7 @@ function sodaClick(number) {
 
     setTimeout(function(){
         document.sodaButton.src = regSoda.src;
-    }, 120);
+    }, 90);
     document.sodaButton.src = clickSoda.src;
 };
 
