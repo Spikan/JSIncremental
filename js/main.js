@@ -21,7 +21,7 @@ function sodaClick(number) {
     sips = sips + number;
     document.getElementById("sips").innerHTML = prettify(sips);
 
-    setTimeout(function(){
+    setTimeout(function () {
         document.sodaButton.src = regSoda.src;
     }, 90);
     document.sodaButton.src = clickSoda.src;
@@ -48,9 +48,9 @@ function buyStraw() {
     document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
 }
 
-function upgradeStraw(){
+function upgradeStraw() {
     var strawUpCost = 200 * strawUpCounter;
-    if(sips >= strawUpCost) {
+    if (sips >= strawUpCost) {
         sips = sips - strawUpCost;
         strawUpCounter++;
         strawSPS = .4 * (strawUpCounter);
@@ -83,9 +83,9 @@ function buyCup() {
 
 }
 
-function upgradeCup(){
+function upgradeCup() {
     var cupUpCost = 500 * (cupUpCounter);
-    if(sips >= cupUpCost) {
+    if (sips >= cupUpCost) {
         sips = sips - cupUpCost;
         cupUpCounter++;
         cupSPS = cupUpCounter;
@@ -155,7 +155,7 @@ function delete_save() {
 }
 
 
-function prettify(input){
+function prettify(input) {
     return Math.round(input * 1000000) / 1000000;
 }
 
