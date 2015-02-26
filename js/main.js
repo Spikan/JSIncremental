@@ -6,6 +6,7 @@ var strawSPS = 0;
 var cupSPS = 0;
 var strawUpCounter = 1;
 var cupUpCounter = 1;
+var level = 1;
 var autosave = "on";
 var autosaveCounter = 0;
 
@@ -22,9 +23,9 @@ function sodaClick(number) {
     document.getElementById("sips").innerHTML = prettify(sips);
 
     setTimeout(function () {
-        document.sodaButton.src = regSoda.src;
+        document.getElementById("sodaButton").src = regSoda.src;
     }, 90);
-    document.sodaButton.src = clickSoda.src;
+    document.getElementById("sodaButton").src = clickSoda.src;
 }
 function spsClick(number) {
     sips = sips + number;
@@ -37,15 +38,15 @@ function buyStraw() {
     if (sips >= strawCost) {
         straws = straws + 1;
         sips = sips - strawCost;
+        sps = sps + strawSPS;
         document.getElementById('straws').innerHTML = straws;
         document.getElementById('sips').innerHTML = prettify(sips);
-
-        sps = sps + strawSPS;
         document.getElementById('sps').innerHTML = prettify(sps);
+        document.getElementById('strawCost').innerHTML = Math.floor(10 * Math.pow(1.1, straws));
+        document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
     }
 
-    document.getElementById('strawCost').innerHTML = Math.floor(10 * Math.pow(1.1, straws));
-    document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
+
 }
 
 function upgradeStraw() {
@@ -57,11 +58,12 @@ function upgradeStraw() {
         sps = 0;
         sps = sps + (strawSPS * straws);
         sps = sps + (cupSPS * cups);
-        document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
-        document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
         document.getElementById('strawUpCost').innerHTML = 200 * strawUpCounter;
-        document.getElementById("sips").innerHTML = prettify(sips);
-        document.getElementById("sps").innerHTML = prettify(sps);
+        document.getElementById('straws').innerHTML = straws;
+        document.getElementById('sips').innerHTML = prettify(sips);
+        document.getElementById('sps').innerHTML = prettify(sps);
+        document.getElementById('strawCost').innerHTML = Math.floor(10 * Math.pow(1.1, straws));
+        document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
     }
 }
 
@@ -71,15 +73,13 @@ function buyCup() {
     if (sips >= cupCost) {
         cups = cups + 1;
         sips = sips - cupCost;
+        sps = sps + cupSPS;
         document.getElementById('cups').innerHTML = cups;
         document.getElementById('sips').innerHTML = prettify(sips);
-
-        sps = sps + cupSPS;
         document.getElementById('sps').innerHTML = prettify(sps);
+        document.getElementById('cupCost').innerHTML = Math.floor(20 * Math.pow(1.2, cups));
+        document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
     }
-
-    document.getElementById('cupCost').innerHTML = Math.floor(20 * Math.pow(1.2, cups));
-    document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
 
 }
 
@@ -92,11 +92,36 @@ function upgradeCup() {
         sps = 0;
         sps = sps + (strawSPS * straws);
         sps = sps + (cupSPS * cups);
-        document.getElementById('cupSPS').innerHTML = prettify(cupSPS);
-        document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
         document.getElementById('cupUpCost').innerHTML = 500 * cupUpCounter;
+        document.getElementById('cups').innerHTML = cups;
+        document.getElementById('sips').innerHTML = prettify(sips);
+        document.getElementById('sps').innerHTML = prettify(sps);
+        document.getElementById('cupCost').innerHTML = Math.floor(20 * Math.pow(1.2, cups));
+        document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
+    }
+}
+
+function levelUp() {
+    var levelUpCost = 5000 * level;
+    if (sips >= levelUpCost) {
+        sips = sips - levelUpCost;
+        level++
+        sps = sps * level;
+
         document.getElementById("sips").innerHTML = prettify(sips);
         document.getElementById("sps").innerHTML = prettify(sps);
+        document.getElementById("levelNumber").innerHTML = level;
+    }
+}
+
+function changeLevel(i) {
+
+    var body = document.querySelector("body");
+
+    if(i==2)
+    {
+        document.getElementById("levelText").innerHTML = "On a Red Background";
+        body.style.backgroundColor = "#AE323B";
     }
 }
 
@@ -110,7 +135,8 @@ function save() {
         strawSPS: strawSPS,
         cupSPS: cupSPS,
         strawUpCounter: strawUpCounter,
-        cupUpCounter: cupUpCounter
+        cupUpCounter: cupUpCounter,
+        level: level
     };
 
     localStorage.setItem("save", JSON.stringify(save));
@@ -125,8 +151,9 @@ window.onload = function load() {
     if (typeof savegame.straws !== "undefined") straws = savegame.straws;
     if (typeof savegame.cups !== "undefined") cups = savegame.cups;
     if (typeof savegame.sps !== "undefined") sps = savegame.sps;
-    if (typeof savegame.sps !== "undefined") strawUpCounter = savegame.strawUpCounter;
-    if (typeof savegame.sps !== "undefined") cupUpCounter = savegame.cupUpCounter;
+    if (typeof savegame.strawUpCounter !== "undefined") strawUpCounter = savegame.strawUpCounter;
+    if (typeof savegame.cupUpCounter !== "undefined") cupUpCounter = savegame.cupUpCounter;
+    if (typeof savegame.level !== "undefined") level = savegame.level;
 
     var strawCost = Math.floor(10 * Math.pow(1.1, straws));
     var cupCost = Math.floor(20 * Math.pow(1.2, cups));
@@ -147,7 +174,7 @@ window.onload = function load() {
     document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
     document.getElementById('strawUpCost').innerHTML = 200 * strawUpCounter;
     document.getElementById('cupUpCost').innerHTML = 500 * cupUpCounter;
-
+    document.getElementById('levelNumber').innerHTML = level;
 };
 
 function delete_save() {
@@ -157,6 +184,23 @@ function delete_save() {
 
 function prettify(input) {
     return Math.round(input * 1000000) / 1000000;
+}
+
+
+function reload() {
+    document.getElementById('straws').innerHTML = straws;
+    document.getElementById('strawCost').innerHTML = strawCost;
+    document.getElementById('cups').innerHTML = cups;
+    document.getElementById('cupCost').innerHTML = cupCost;
+    document.getElementById('sips').innerHTML = prettify(sips);
+    document.getElementById('sps').innerHTML = prettify(sps);
+    document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
+    document.getElementById('cupSPS').innerHTML = prettify(cupSPS);
+    document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
+    document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
+    document.getElementById('strawUpCost').innerHTML = 200 * strawUpCounter;
+    document.getElementById('cupUpCost').innerHTML = 500 * cupUpCounter;
+    document.getElementById('levelNumber').innerHTML = level;
 }
 
 window.setInterval(function () {
