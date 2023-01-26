@@ -131,7 +131,7 @@ window.onload = function load() {
 
     let savegame = JSON.parse(localStorage.getItem("save"));
 
-    if (typeof savegame.sips !== "undefined"|| typeof savegame.sips !== null) sips = savegame.sips;
+    if (typeof savegame.sips !== "undefined" && savegame.sips !== null) sips = savegame.sips;
     if (typeof savegame.straws !== "undefined") straws = savegame.straws;
     if (typeof savegame.cups !== "undefined") cups = savegame.cups;
     if (typeof savegame.sps !== "undefined") sps = savegame.sps;
