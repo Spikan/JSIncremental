@@ -27,30 +27,28 @@ function sodaClick(number) {
     }, 90);
     document.getElementById("sodaButton").src = clickSoda.src;
 }
+
 function spsClick(number) {
     sips = sips + number;
     document.getElementById("sips").innerHTML = prettify(sips);
 
 }
+
 function buyStraw() {
-    var strawCost = Math.floor(10 * Math.pow(1.1, straws));
+    let strawCost = Math.floor(10 * Math.pow(1.1, straws));
     strawSPS = .4 * (strawUpCounter);
     if (sips >= strawCost) {
         straws = straws + 1;
         sips = sips - strawCost;
         sps = sps + strawSPS;
-        document.getElementById('straws').innerHTML = straws;
-        document.getElementById('sips').innerHTML = prettify(sips);
-        document.getElementById('sps').innerHTML = prettify(sps);
-        document.getElementById('strawCost').innerHTML = Math.floor(10 * Math.pow(1.1, straws));
-        document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
+        reload();
     }
 
 
 }
 
 function upgradeStraw() {
-    var strawUpCost = 200 * strawUpCounter;
+    let strawUpCost = 200 * strawUpCounter;
     if (sips >= strawUpCost) {
         sips = sips - strawUpCost;
         strawUpCounter++;
@@ -58,27 +56,18 @@ function upgradeStraw() {
         sps = 0;
         sps = sps + (strawSPS * straws);
         sps = sps + (cupSPS * cups);
-        document.getElementById('strawUpCost').innerHTML = 200 * strawUpCounter;
-        document.getElementById('straws').innerHTML = straws;
-        document.getElementById('sips').innerHTML = prettify(sips);
-        document.getElementById('sps').innerHTML = prettify(sps);
-        document.getElementById('strawCost').innerHTML = Math.floor(10 * Math.pow(1.1, straws));
-        document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
+        reload();
     }
 }
 
 function buyCup() {
-    var cupCost = Math.floor(20 * Math.pow(1.2, cups));
+    let cupCost = Math.floor(20 * Math.pow(1.2, cups));
     cupSPS = cupUpCounter;
     if (sips >= cupCost) {
         cups = cups + 1;
         sips = sips - cupCost;
         sps = sps + cupSPS;
-        document.getElementById('cups').innerHTML = cups;
-        document.getElementById('sips').innerHTML = prettify(sips);
-        document.getElementById('sps').innerHTML = prettify(sps);
-        document.getElementById('cupCost').innerHTML = Math.floor(20 * Math.pow(1.2, cups));
-        document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
+        reload();
     }
 
 }
@@ -92,12 +81,7 @@ function upgradeCup() {
         sps = 0;
         sps = sps + (strawSPS * straws);
         sps = sps + (cupSPS * cups);
-        document.getElementById('cupUpCost').innerHTML = 500 * cupUpCounter;
-        document.getElementById('cups').innerHTML = cups;
-        document.getElementById('sips').innerHTML = prettify(sips);
-        document.getElementById('sps').innerHTML = prettify(sps);
-        document.getElementById('cupCost').innerHTML = Math.floor(20 * Math.pow(1.2, cups));
-        document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
+        reload();
     }
 }
 
@@ -118,8 +102,7 @@ function changeLevel(i) {
 
     let body = document.querySelector("body");
 
-    if(i===2)
-    {
+    if (i === 2) {
         document.getElementById("levelText").innerHTML = "On a Red Background";
         body.style.backgroundColor = "#AE323B";
     }
@@ -156,7 +139,6 @@ window.onload = function load() {
     if (typeof savegame.level !== "undefined") level = savegame.level;
 
 
-
     strawSPS = .4 * (strawUpCounter);
     cupSPS = cupUpCounter;
 
@@ -179,17 +161,17 @@ function reload() {
     let cupCost = Math.floor(20 * Math.pow(1.2, cups));
 
     document.getElementById('straws').innerHTML = straws;
-    document.getElementById('strawCost').innerHTML = strawCost;
+    document.getElementById('strawCost').innerHTML = strawCost.toString();
     document.getElementById('cups').innerHTML = cups;
-    document.getElementById('cupCost').innerHTML = cupCost;
+    document.getElementById('cupCost').innerHTML = cupCost.toString();
     document.getElementById('sips').innerHTML = prettify(sips);
     document.getElementById('sps').innerHTML = prettify(sps);
     document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
     document.getElementById('cupSPS').innerHTML = prettify(cupSPS);
     document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
     document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
-    document.getElementById('strawUpCost').innerHTML = 200 * strawUpCounter;
-    document.getElementById('cupUpCost').innerHTML = 500 * cupUpCounter;
+    document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter).toString();
+    document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter).toString();
     document.getElementById('levelNumber').innerHTML = level;
 }
 
