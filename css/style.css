@@ -10,6 +10,7 @@ html {
 body {
     background-color: #001789;
     color: #02D97F;
+    height: 100vh;
 }
 
 h1 {

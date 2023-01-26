@@ -95,6 +95,7 @@ function levelUp() {
         document.getElementById("sips").innerHTML = prettify(sips);
         document.getElementById("sps").innerHTML = prettify(sps);
         document.getElementById("levelNumber").innerHTML = level;
+        changeLevel(level);
     }
 }
 
@@ -130,7 +131,7 @@ window.onload = function load() {
 
     let savegame = JSON.parse(localStorage.getItem("save"));
 
-    if (typeof savegame.sips !== "undefined") sips = savegame.sips;
+    if (typeof savegame.sips !== "undefined"|| typeof savegame.sips !== null) sips = savegame.sips;
     if (typeof savegame.straws !== "undefined") straws = savegame.straws;
     if (typeof savegame.cups !== "undefined") cups = savegame.cups;
     if (typeof savegame.sps !== "undefined") sps = savegame.sps;
