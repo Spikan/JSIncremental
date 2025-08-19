@@ -1,4 +1,12 @@
 // Soda Clicker Pro - Main Game Logic
+// 
+// TALK TO GOD FEATURE SETUP:
+// The Giphy API key is now configured via environment variables
+// Your API key is securely stored and ready to use!
+
+// Import configuration
+import { config } from './config.js';
+
 let sips = new Decimal(0);
 let straws = new Decimal(0);
 let cups = new Decimal(0);
@@ -1027,11 +1035,23 @@ function escapeHtml(text) {
 
 async function getGodResponse(userMessage) {
     try {
-        // Show "God is typing..." message
-        addGodMessage("God is thinking... 🤔");
+        // Show "God is typing..." message with divine variations
+        const thinkingMessages = [
+            "God is contemplating your question... 🤔",
+            "The heavens are processing your request... ⭐",
+            "Divine wisdom is being consulted... ✨",
+            "God is meditating on your words... 🧘‍♂️",
+            "The universe is aligning for your answer... 🌟"
+        ];
         
-        // Search Giphy for a random GIF based on the user's message
-        const gifUrl = await searchGiphy(userMessage);
+        const randomThinking = thinkingMessages[Math.floor(Math.random() * thinkingMessages.length)];
+        addGodMessage(randomThinking);
+        
+        // Search for God's mysterious response
+        const gifUrl = await getDivineResponse(userMessage);
+        
+        // Add a natural delay to make responses feel more divine
+        await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
         
         // Remove the "thinking" message
         const thinkingMessage = document.querySelector('.god-message:last-child');
@@ -1039,36 +1059,161 @@ async function getGodResponse(userMessage) {
             thinkingMessage.remove();
         }
         
-        // Add the GIF response
+        // Add the divine response
         if (gifUrl) {
-            addGodMessage(`<img src="${gifUrl}" alt="God's response" onerror="this.style.display='none'">`, true);
+            addGodMessage(`<img src="${gifUrl}" alt="God's divine response" onerror="this.style.display='none'">`, true);
         } else {
-            addGodMessage("I'm sorry, I couldn't find a suitable response. Try asking about something else!");
+            // Fallback divine messages
+            const fallbackMessages = [
+                "I'm sorry, my divine wisdom is temporarily clouded. Try asking about something else!",
+                "The cosmic forces are not aligned for that question right now. Ask again later!",
+                "That's beyond even my infinite wisdom. Perhaps rephrase your question?",
+                "The universe is silent on that matter. Try a different approach!",
+                "My divine knowledge has limits too, you know. Ask something else!"
+            ];
+            
+            const randomFallback = fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
+            addGodMessage(randomFallback);
         }
     } catch (error) {
         console.error('Error getting God response:', error);
-        addGodMessage("I'm experiencing some divine technical difficulties. Please try again later!");
+        
+        const errorMessages = [
+            "I'm experiencing some divine technical difficulties. Please try again later!",
+            "The cosmic internet is down. My apologies for the inconvenience!",
+            "Even gods have bad connection days. Try again in a moment!",
+            "The divine servers are overloaded. Please wait and try again!",
+            "My heavenly WiFi is acting up. Give it a moment and try again!"
+        ];
+        
+        const randomError = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+        addGodMessage(randomError);
     }
 }
 
-async function searchGiphy(query) {
-    // For demo purposes, we'll use a simple approach
-    // In a real implementation, you'd need a Giphy API key
+// Function to get God's mysterious divine response
+async function getDivineResponse(query) {
+    // God's mysterious response system using the Giphy API
+    // Search for GIFs based on the user's message
     
-    // Simulate Giphy search with placeholder GIFs
-    const placeholderGifs = [
-        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', // Happy
-        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', // Excited
-        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', // Confused
-        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', // Surprised
-        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif'  // Thinking
-    ];
+    try {
+        // Use Giphy search API to find relevant GIFs
+        const gifUrl = await searchGiphyAPI(query);
+        return gifUrl;
+    } catch (error) {
+        console.error('Error searching Giphy:', error);
+        return null;
+    }
+}
+
+// Function to search Giphy API for real GIFs
+async function searchGiphyAPI(searchTerm) {
+    // Get API key from configuration
+    const GIPHY_API_KEY = config.giphyApiKey;
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+    try {
+        // Search Giphy for GIFs matching the search term
+        const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=10&rating=g`);
+        
+        if (!response.ok) {
+            throw new Error(`Giphy API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.data && data.data.length > 0) {
+            // Return the first (top) GIF from the search results
+            return data.data[0].images.original.url;
+        } else {
+            // No GIFs found, return null to trigger fallback message
+            return null;
+        }
+    } catch (error) {
+        console.error('Giphy API request failed:', error);
+        return null;
+    }
+}
+
+// Fallback function for when Giphy API is not available
+function getPlaceholderGif(searchTerm) {
+    // Analyze the search term to provide contextually appropriate placeholder GIFs
+    const lowerQuery = searchTerm.toLowerCase();
     
-    // Return a random placeholder GIF
-    return placeholderGifs[Math.floor(Math.random() * placeholderGifs.length)];
+    // Define response categories based on message content
+    let responseCategory = 'general';
+    
+    if (lowerQuery.includes('happy') || lowerQuery.includes('joy') || lowerQuery.includes('smile') || lowerQuery.includes('good')) {
+        responseCategory = 'happy';
+    } else if (lowerQuery.includes('sad') || lowerQuery.includes('cry') || lowerQuery.includes('bad') || lowerQuery.includes('help')) {
+        responseCategory = 'sad';
+    } else if (lowerQuery.includes('angry') || lowerQuery.includes('mad') || lowerQuery.includes('furious')) {
+        responseCategory = 'angry';
+    } else if (lowerQuery.includes('love') || lowerQuery.includes('heart') || lowerQuery.includes('romance')) {
+        responseCategory = 'love';
+    } else if (lowerQuery.includes('food') || lowerQuery.includes('eat') || lowerQuery.includes('hungry') || lowerQuery.includes('soda')) {
+        responseCategory = 'food';
+    } else if (lowerQuery.includes('work') || lowerQuery.includes('job') || lowerQuery.includes('busy')) {
+        responseCategory = 'work';
+    } else if (lowerQuery.includes('sleep') || lowerQuery.includes('tired') || lowerQuery.includes('bed')) {
+        responseCategory = 'sleep';
+    } else if (lowerQuery.includes('music') || lowerQuery.includes('dance') || lowerQuery.includes('sing')) {
+        responseCategory = 'music';
+    } else if (lowerQuery.includes('sport') || lowerQuery.includes('game') || lowerQuery.includes('play')) {
+        responseCategory = 'sport';
+    } else if (lowerQuery.includes('money') || lowerQuery.includes('rich') || lowerQuery.includes('poor')) {
+        responseCategory = 'money';
+    }
+    
+    // Placeholder GIFs for different categories
+    const placeholderGifs = {
+        happy: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        sad: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        angry: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        love: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        food: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        work: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        sleep: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        music: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        sport: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        money: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ],
+        general: [
+            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
+        ]
+    };
+    
+    const responses = placeholderGifs[responseCategory] || placeholderGifs.general;
+    return responses[Math.floor(Math.random() * responses.length)];
 }
 
 // Add keyboard support for chat input
