@@ -673,9 +673,15 @@ function sodaClick(number) {
     // Track the click
     trackClick();
     
+    console.log('sodaClick called with number:', number);
+    console.log('Current suctionClickBonus:', suctionClickBonus.toString());
+    
     // Calculate total sips gained from this click
     const baseSips = new Decimal(number);
     const totalSipsGained = baseSips.plus(suctionClickBonus);
+    
+    console.log('Base sips:', baseSips.toString());
+    console.log('Total sips gained:', totalSipsGained.toString());
     
     // Add to total sips earned
     totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
@@ -807,28 +813,53 @@ function upgradeCup() {
 }
 
 function buySuction() {
+    console.log('buySuction called');
+    console.log('Current suctions:', suctions.toString());
+    console.log('Current suctionClickBonus:', suctionClickBonus.toString());
+    
     let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+    console.log('Suction cost:', suctionCost);
+    console.log('Current sips:', sips.toString());
+    
     if (sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
         sips = sips.minus(suctionCost);
         suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
+        
+        console.log('After purchase - suctions:', suctions.toString());
+        console.log('After purchase - suctionClickBonus:', suctionClickBonus.toString());
         
         // Show purchase feedback
         showPurchaseFeedback('Improved Suction', suctionCost);
         
         reload();
         checkUpgradeAffordability();
+    } else {
+        console.log('Not enough sips for suction upgrade');
     }
 }
 
 function upgradeSuction() {
+    console.log('upgradeSuction called');
+    console.log('Current suctionUpCounter:', suctionUpCounter.toString());
+    console.log('Current suctionClickBonus:', suctionClickBonus.toString());
+    
     let suctionUpCost = 1000 * suctionUpCounter.toNumber();
+    console.log('Suction upgrade cost:', suctionUpCost);
+    console.log('Current sips:', sips.toString());
+    
     if (sips.gte(suctionUpCost)) {
         sips = sips.minus(suctionUpCost);
         suctionUpCounter = suctionUpCounter.plus(1);
         suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
+        
+        console.log('After upgrade - suctionUpCounter:', suctionUpCounter.toString());
+        console.log('After upgrade - suctionClickBonus:', suctionClickBonus.toString());
+        
         reload();
         checkUpgradeAffordability();
+    } else {
+        console.log('Not enough sips for suction upgrade');
     }
 }
 
