@@ -2,13 +2,14 @@
 // 
 // TALK TO GOD FEATURE SETUP:
 // To enable real Giphy GIFs in the "Talk to God" tab:
-// 1. Go to https://developers.giphy.com/
-// 2. Sign up for a free account
-// 3. Create a new app to get your API key
-// 4. Replace 'YOUR_GIPHY_API_KEY_HERE' in the searchGiphyAPI function
-// 5. The feature will automatically use real GIFs based on user messages
+// 1. Copy config.local.template.js to config.local.js
+// 2. Add your Giphy API key to config.local.js
+// 3. The feature will automatically use real GIFs based on user messages
 //
 // Without an API key, the feature will use placeholder GIFs as a fallback.
+
+// Import configuration
+import { config } from './config.js';
 
 let sips = new Decimal(0);
 let straws = new Decimal(0);
@@ -1113,9 +1114,9 @@ async function getDivineResponse(query) {
 async function searchGiphyAPI(searchTerm) {
     // You'll need to get a free API key from https://developers.giphy.com/
     // For now, I'll use a placeholder that you can replace
-    const GIPHY_API_KEY = 'YOUR_GIPHY_API_KEY_HERE'; // Replace with your actual API key
+    const GIPHY_API_KEY = config.giphyApiKey; // Use the key from config.local.js
     
-    if (GIPHY_API_KEY === 'YOUR_GIPHY_API_KEY_HERE') {
+    if (!GIPHY_API_KEY) {
         // Fallback to placeholder GIFs if no API key is set
         console.warn('Giphy API key not set. Using placeholder GIFs. Get a free key at https://developers.giphy.com/');
         return getPlaceholderGif(searchTerm);
