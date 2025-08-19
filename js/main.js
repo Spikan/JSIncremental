@@ -1,15 +1,15 @@
-let sips = 0;
-let straws = 0;
-let cups = 0;
-let suctions = 0;
-let sps = 0;
-let strawSPS = 0;
-let cupSPS = 0;
-let suctionClickBonus = 0;
-let strawUpCounter = 1;
-let cupUpCounter = 1;
-let suctionUpCounter = 1;
-let level = 1;
+let sips = new Decimal(0);
+let straws = new Decimal(0);
+let cups = new Decimal(0);
+let suctions = new Decimal(0);
+let sps = new Decimal(0);
+let strawSPS = new Decimal(0);
+let cupSPS = new Decimal(0);
+let suctionClickBonus = new Decimal(0);
+let strawUpCounter = new Decimal(1);
+let cupUpCounter = new Decimal(1);
+let suctionUpCounter = new Decimal(1);
+let level = new Decimal(1);
 const autosave = "on";
 let autosaveCounter = 0;
 
@@ -62,31 +62,31 @@ function switchTab(tabName) {
 
 // Check if upgrades are affordable and update UI accordingly
 function checkUpgradeAffordability() {
-    const strawCost = Math.floor(10 * Math.pow(1.1, straws));
-    const cupCost = Math.floor(20 * Math.pow(1.2, cups));
-    const suctionCost = Math.floor(50 * Math.pow(1.15, suctions));
-    const strawUpCost = 200 * strawUpCounter;
-    const cupUpCost = 500 * cupUpCounter;
-    const suctionUpCost = 1000 * suctionUpCounter;
-    const levelUpCost = 5000 * level;
+    const strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
+    const cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
+    const suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+    const strawUpCost = 200 * strawUpCounter.toNumber();
+    const cupUpCost = 500 * cupUpCounter.toNumber();
+    const suctionUpCost = 1000 * suctionUpCounter.toNumber();
+    const levelUpCost = 5000 * level.toNumber();
     
     // Update button states based on affordability
-    updateButtonState('buyStraw', sips >= strawCost, strawCost);
-    updateButtonState('buyCup', sips >= cupCost, cupCost);
-    updateButtonState('buySuction', sips >= suctionCost, suctionCost);
-    updateButtonState('upgradeStraw', sips >= strawUpCost, strawUpCost);
-    updateButtonState('upgradeCup', sips >= cupUpCost, cupUpCost);
-    updateButtonState('upgradeSuction', sips >= suctionUpCost, suctionUpCost);
-    updateButtonState('levelUp', sips >= levelUpCost, levelUpCost);
+    updateButtonState('buyStraw', sips.gte(strawCost), strawCost);
+    updateButtonState('buyCup', sips.gte(cupCost), cupCost);
+    updateButtonState('buySuction', sips.gte(suctionCost), suctionCost);
+    updateButtonState('upgradeStraw', sips.gte(strawUpCost), strawUpCost);
+    updateButtonState('upgradeCup', sips.gte(cupUpCost), cupUpCost);
+    updateButtonState('upgradeSuction', sips.gte(suctionUpCost), suctionUpCost);
+    updateButtonState('levelUp', sips.gte(levelUpCost), levelUpCost);
     
     // Update cost displays with affordability indicators
-    updateCostDisplay('strawCost', strawCost, sips >= strawCost);
-    updateCostDisplay('cupCost', cupCost, sips >= cupCost);
-    updateCostDisplay('suctionCost', suctionCost, sips >= suctionCost);
-    updateCostDisplay('strawUpCost', strawUpCost, sips >= strawUpCost);
-    updateCostDisplay('cupUpCost', cupUpCost, sips >= cupUpCost);
-    updateCostDisplay('suctionUpCost', suctionUpCost, sips >= suctionUpCost);
-    updateCostDisplay('levelCost', levelUpCost, sips >= levelUpCost);
+    updateCostDisplay('strawCost', strawCost, sips.gte(strawCost));
+    updateCostDisplay('cupCost', cupCost, sips.gte(cupCost));
+    updateCostDisplay('suctionCost', suctionCost, sips.gte(suctionCost));
+    updateCostDisplay('strawUpCost', strawUpCost, sips.gte(strawUpCost));
+    updateCostDisplay('cupUpCost', cupUpCost, sips.gte(cupUpCost));
+    updateCostDisplay('suctionUpCost', suctionUpCost, sips.gte(suctionUpCost));
+    updateCostDisplay('levelCost', levelUpCost, sips.gte(levelUpCost));
 }
 
 // Update button state based on affordability
@@ -124,21 +124,21 @@ function initGame() {
     let savegame = JSON.parse(localStorage.getItem("save"));
     
     if (savegame && typeof savegame.sips !== "undefined" && savegame.sips !== null) {
-        sips = savegame.sips;
-        straws = savegame.straws || 0;
-        cups = savegame.cups || 0;
-        suctions = savegame.suctions || 0;
-        sps = savegame.sps || 0;
-        strawUpCounter = savegame.strawUpCounter || 1;
-        cupUpCounter = savegame.cupUpCounter || 1;
-        suctionUpCounter = savegame.suctionUpCounter || 1;
-        suctionClickBonus = savegame.suctionClickBonus || 0;
-        level = savegame.level || 1;
+        sips = new Decimal(savegame.sips);
+        straws = new Decimal(savegame.straws || 0);
+        cups = new Decimal(savegame.cups || 0);
+        suctions = new Decimal(savegame.suctions || 0);
+        sps = new Decimal(savegame.sps || 0);
+        strawUpCounter = new Decimal(savegame.strawUpCounter || 1);
+        cupUpCounter = new Decimal(savegame.cupUpCounter || 1);
+        suctionUpCounter = new Decimal(savegame.suctionUpCounter || 1);
+        suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
+        level = new Decimal(savegame.level || 1);
     }
     
-    strawSPS = .4 * (strawUpCounter);
-    cupSPS = cupUpCounter;
-    suctionClickBonus = 0.2 * suctionUpCounter;
+    strawSPS = new Decimal(.4 * strawUpCounter.toNumber());
+    cupSPS = new Decimal(cupUpCounter.toNumber());
+    suctionClickBonus = new Decimal(0.2 * suctionUpCounter.toNumber());
     
     reload();
     
@@ -169,8 +169,8 @@ clickSoda.src = "images/clickSoda.png";
 
 
 function sodaClick(number) {
-    let totalClickBonus = number + (suctionClickBonus * suctions);
-    sips = sips + totalClickBonus;
+    let totalClickBonus = number.plus(suctionClickBonus.times(suctions));
+    sips = sips.plus(totalClickBonus);
     document.getElementById("sips").innerHTML = prettify(sips);
 
     setTimeout(function () {
@@ -183,7 +183,7 @@ function sodaClick(number) {
 }
 
 function spsClick(number) {
-    sips = sips + number;
+    sips = sips.plus(number);
     document.getElementById("sips").innerHTML = prettify(sips);
     
     // Check affordability after passive income
@@ -191,90 +191,90 @@ function spsClick(number) {
 }
 
 function buyStraw() {
-    let strawCost = Math.floor(10 * Math.pow(1.1, straws));
-    strawSPS = .4 * (strawUpCounter);
-    if (sips >= strawCost) {
-        straws = straws + 1;
-        sips = sips - strawCost;
-        sps = sps + strawSPS;
+    let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
+    strawSPS = new Decimal(.4 * strawUpCounter.toNumber());
+    if (sips.gte(strawCost)) {
+        straws = straws.plus(1);
+        sips = sips.minus(strawCost);
+        sps = sps.plus(strawSPS);
         reload();
         checkUpgradeAffordability();
     }
 }
 
 function upgradeStraw() {
-    let strawUpCost = 200 * strawUpCounter;
-    if (sips >= strawUpCost) {
-        sips = sips - strawUpCost;
-        strawUpCounter++;
-        strawSPS = .4 * (strawUpCounter);
-        sps = 0;
-        sps = sps + (strawSPS * straws);
-        sps = sps + (cupSPS * cups);
+    let strawUpCost = 200 * strawUpCounter.toNumber();
+    if (sips.gte(strawUpCost)) {
+        sips = sips.minus(strawUpCost);
+        strawUpCounter = strawUpCounter.plus(1);
+        strawSPS = new Decimal(.4 * strawUpCounter.toNumber());
+        sps = new Decimal(0);
+        sps = sps.plus(strawSPS.times(straws));
+        sps = sps.plus(cupSPS.times(cups));
         reload();
         checkUpgradeAffordability();
     }
 }
 
 function buyCup() {
-    let cupCost = Math.floor(20 * Math.pow(1.2, cups));
-    cupSPS = cupUpCounter;
-    if (sips >= cupCost) {
-        cups = cups + 1;
-        sips = sips - cupCost;
-        sps = sps + cupSPS;
+    let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
+    cupSPS = new Decimal(cupUpCounter.toNumber());
+    if (sips.gte(cupCost)) {
+        cups = cups.plus(1);
+        sips = sips.minus(cupCost);
+        sps = sps.plus(cupSPS);
         reload();
         checkUpgradeAffordability();
     }
 }
 
 function upgradeCup() {
-    let cupUpCost = 500 * cupUpCounter;
-    if (sips >= cupUpCost) {
-        sips = sips - cupUpCost;
-        cupUpCounter++;
-        cupSPS = cupUpCounter;
-        sps = 0;
-        sps = sps + (strawSPS * straws);
-        sps = sps + (cupSPS * cups);
+    let cupUpCost = 500 * cupUpCounter.toNumber();
+    if (sips.gte(cupUpCost)) {
+        sips = sips.minus(cupUpCost);
+        cupUpCounter = cupUpCounter.plus(1);
+        cupSPS = new Decimal(cupUpCounter.toNumber());
+        sps = new Decimal(0);
+        sps = sps.plus(strawSPS.times(straws));
+        sps = sps.plus(cupSPS.times(cups));
         reload();
         checkUpgradeAffordability();
     }
 }
 
 function buySuction() {
-    let suctionCost = Math.floor(50 * Math.pow(1.15, suctions));
-    suctionClickBonus = 0.2 * suctionUpCounter;
-    if (sips >= suctionCost) {
-        suctions = suctions + 1;
-        sips = sips - suctionCost;
+    let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+    suctionClickBonus = new Decimal(0.2 * suctionUpCounter.toNumber());
+    if (sips.gte(suctionCost)) {
+        suctions = suctions.plus(1);
+        sips = sips.minus(suctionCost);
         reload();
         checkUpgradeAffordability();
     }
 }
 
 function upgradeSuction() {
-    let suctionUpCost = 1000 * suctionUpCounter;
-    if (sips >= suctionUpCost) {
-        sips = sips - suctionUpCost;
-        suctionUpCounter++;
-        suctionClickBonus = 0.2 * suctionUpCounter;
+    let suctionUpCost = 1000 * suctionUpCounter.toNumber();
+    if (sips.gte(suctionUpCost)) {
+        sips = sips.minus(suctionUpCost);
+        suctionUpCounter = suctionUpCounter.plus(1);
+        suctionClickBonus = new Decimal(0.2 * suctionUpCounter.toNumber());
         reload();
         checkUpgradeAffordability();
     }
 }
 
 function levelUp() {
-    let levelUpCost = 5000 * level;
-    if (sips >= levelUpCost) {
-        sips = sips - levelUpCost;
-        level++
-        sps = sps * level;
+    let levelUpCost = 5000 * level.toNumber();
+    if (sips.gte(levelUpCost)) {
+        sips = sips.minus(levelUpCost);
+        level = level.plus(1);
+        sps = sps.times(level);
 
         document.getElementById("sips").innerHTML = prettify(sips);
         document.getElementById("sps").innerHTML = prettify(sips);
-        document.getElementById("levelNumber").innerHTML = level;
-        changeLevel(level);
+        document.getElementById("levelNumber").innerHTML = level.toNumber();
+        changeLevel(level.toNumber());
         checkUpgradeAffordability();
     }
 }
@@ -292,18 +292,18 @@ function changeLevel(i) {
 function save() {
 
     let save = {
-        sips: sips,
-        straws: straws,
-        cups: cups,
-        suctions: suctions,
-        sps: sps,
-        strawSPS: strawSPS,
-        cupSPS: cupSPS,
-        suctionClickBonus: suctionClickBonus,
-        strawUpCounter: strawUpCounter,
-        cupUpCounter: cupUpCounter,
-        suctionUpCounter: suctionUpCounter,
-        level: level
+        sips: sips.toString(),
+        straws: straws.toString(),
+        cups: cups.toString(),
+        suctions: suctions.toString(),
+        sps: sps.toString(),
+        strawSPS: strawSPS.toString(),
+        cupSPS: cupSPS.toString(),
+        suctionClickBonus: suctionClickBonus.toString(),
+        strawUpCounter: strawUpCounter.toString(),
+        cupUpCounter: cupUpCounter.toString(),
+        suctionUpCounter: suctionUpCounter.toString(),
+        level: level.toString()
     };
 
     localStorage.setItem("save", JSON.stringify(save));
@@ -315,33 +315,58 @@ function delete_save() {
 
 
 function prettify(input) {
-    return Math.round(input * 1000000) / 1000000;
+    if (input instanceof Decimal) {
+        if (input.lt(1000)) {
+            return input.toFixed(2);
+        } else if (input.lt(1e6)) {
+            return input.toFixed(1);
+        } else if (input.lt(1e9)) {
+            return (input.toNumber() / 1e6).toFixed(2) + "M";
+        } else if (input.lt(1e12)) {
+            return (input.toNumber() / 1e9).toFixed(2) + "B";
+        } else if (input.lt(1e15)) {
+            return (input.toNumber() / 1e12).toFixed(2) + "T";
+        } else if (input.lt(1e18)) {
+            return (input.toNumber() / 1e15).toFixed(2) + "Qa";
+        } else if (input.lt(1e21)) {
+            return (input.toNumber() / 1e18).toFixed(2) + "Qi";
+        } else if (input.lt(1e24)) {
+            return (input.toNumber() / 1e21).toFixed(2) + "Sx";
+        } else if (input.lt(1e27)) {
+            return (input.toNumber() / 1e24).toFixed(2) + "Sp";
+        } else if (input.lt(1e30)) {
+            return (input.toNumber() / 1e27).toFixed(2) + "Oc";
+        } else {
+            return input.toExponential(2);
+        }
+    }
+    return input.toFixed(2);
 }
 
 
 function reload() {
-    let strawCost = Math.floor(10 * Math.pow(1.1, straws));
-    let cupCost = Math.floor(20 * Math.pow(1.2, cups));
-    let suctionCost = Math.floor(50 * Math.pow(1.15, suctions));
+    let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
+    let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
+    let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
 
-    document.getElementById('straws').innerHTML = straws;
+    document.getElementById('straws').innerHTML = straws.toNumber();
     document.getElementById('strawCost').innerHTML = strawCost.toString();
-    document.getElementById('cups').innerHTML = cups;
+    document.getElementById('cups').innerHTML = cups.toNumber();
     document.getElementById('cupCost').innerHTML = cupCost.toString();
-    document.getElementById('suctions').innerHTML = suctions;
+    document.getElementById('suctions').innerHTML = suctions.toNumber();
     document.getElementById('suctionCost').innerHTML = suctionCost.toString();
     document.getElementById('sips').innerHTML = prettify(sips);
     document.getElementById('sps').innerHTML = prettify(sps);
     document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
     document.getElementById('cupSPS').innerHTML = prettify(cupSPS);
     document.getElementById('suctionClickBonus').innerHTML = prettify(suctionClickBonus);
-    document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
-    document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
-    document.getElementById('totalSuctionBonus').innerHTML = prettify(suctionClickBonus * suctions);
-    document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter).toString();
-    document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter).toString();
-    document.getElementById('suctionUpCost').innerHTML = (1000 * suctionUpCounter).toString();
-    document.getElementById('levelNumber').innerHTML = level;
+    document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS.times(straws));
+    document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS.times(cups));
+    document.getElementById('totalSuctionBonus').innerHTML = prettify(suctionClickBonus.times(suctions));
+    document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter.toNumber()).toString();
+    document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter.toNumber()).toString();
+    document.getElementById('suctionUpCost').innerHTML = (1000 * suctionUpCounter.toNumber()).toString();
+    document.getElementById('levelNumber').innerHTML = level.toNumber();
     
     // Check affordability after reloading all values
     checkUpgradeAffordability();
