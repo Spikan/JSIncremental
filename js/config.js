@@ -1,13 +1,14 @@
 // Configuration file for Soda Clicker Pro
 // 
 // TALK TO GOD FEATURE SETUP:
-// The Giphy API key is now set via environment variables for security
+// The Giphy API key is now configured for browser use
 // Your API key is: 3VLc3MMzckOZbH8i605UV0m1dDjRaYt6
 
 export const config = {
     // Giphy API key for the "Talk to God" feature
-    // Set via environment variable or use the provided key
-    giphyApiKey: process.env.GIPHY_API_KEY || '3VLc3MMzckOZbH8i605UV0m1dDjRaYt6',
+    // For production, you would set this via environment variables on your server
+    // For now, using the provided key directly
+    giphyApiKey: '3VLc3MMzckOZbH8i605UV0m1dDjRaYt6',
     
     // Game configuration
     GAME_VERSION: '1.0.0',
