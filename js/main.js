@@ -1,12 +1,8 @@
 // Soda Clicker Pro - Main Game Logic
 // 
 // TALK TO GOD FEATURE SETUP:
-// To enable real Giphy GIFs in the "Talk to God" tab:
-// 1. Copy config.local.template.js to config.local.js
-// 2. Add your Giphy API key to config.local.js
-// 3. The feature will automatically use real GIFs based on user messages
-//
-// Without an API key, the feature will use placeholder GIFs as a fallback.
+// The Giphy API key is now configured via environment variables
+// Your API key is securely stored and ready to use!
 
 // Import configuration
 import { config } from './config.js';
@@ -1112,15 +1108,8 @@ async function getDivineResponse(query) {
 
 // Function to search Giphy API for real GIFs
 async function searchGiphyAPI(searchTerm) {
-    // You'll need to get a free API key from https://developers.giphy.com/
-    // For now, I'll use a placeholder that you can replace
-    const GIPHY_API_KEY = config.giphyApiKey; // Use the key from config.local.js
-    
-    if (!GIPHY_API_KEY) {
-        // Fallback to placeholder GIFs if no API key is set
-        console.warn('Giphy API key not set. Using placeholder GIFs. Get a free key at https://developers.giphy.com/');
-        return getPlaceholderGif(searchTerm);
-    }
+    // Get API key from configuration
+    const GIPHY_API_KEY = config.giphyApiKey;
     
     try {
         // Search Giphy for GIFs matching the search term

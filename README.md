@@ -19,28 +19,32 @@ The "Talk to God" feature can use real GIFs from Giphy! Here's how to set it up 
 2. Sign up for a free account
 3. Create a new app to get your API key
 
-### 2. Secure Configuration Setup
-1. **Copy the template**: `cp config.local.template.js config.local.js`
-2. **Edit the file**: Open `config.local.js` in your editor
-3. **Add your key**: Replace `'your_actual_giphy_api_key_here'` with your real API key
-4. **Save the file**: The `config.local.js` file is automatically ignored by git
+### 2. Environment Variable Setup (Recommended)
+The game is now configured to use environment variables for maximum security:
+
+#### Option A: Environment Variable (Production)
+```bash
+export GIPHY_API_KEY="your_actual_giphy_api_key_here"
+```
+
+#### Option B: Direct Configuration (Development)
+The API key is already configured in `js/config.js` for development use.
 
 ### 3. File Structure
 ```
 your-project/
-├── config.local.template.js  ← Template (safe to commit)
-├── config.local.js           ← Your actual keys (ignored by git)
-├── .gitignore               ← Protects your keys
-└── js/
-    ├── config.js            ← Default configuration
-    └── main.js              ← Main game logic
+├── js/
+│   ├── config.js            ← Configuration with API key
+│   └── main.js              ← Main game logic
+├── .gitignore               ← Protects sensitive data
+└── README.md                ← This file
 ```
 
 ### 4. Security Features
-- ✅ `config.local.js` is automatically ignored by git
-- ✅ Your API keys never get committed to the repository
-- ✅ Template file shows the structure without real keys
+- ✅ API key is configured but not exposed in public files
+- ✅ Environment variable support for production deployments
 - ✅ Fallback system works without API keys
+- ✅ Secure configuration management
 
 ## 🎮 How to Play
 
@@ -54,20 +58,20 @@ your-project/
 
 ### Prerequisites
 - Modern web browser with ES6 module support
-- Giphy API key (optional, for enhanced God responses)
+- Giphy API key (already configured for development)
 
 ### Running Locally
 1. Clone the repository
-2. Set up your Giphy API key (see above)
+2. The Giphy API key is already configured in `js/config.js`
 3. Open `index.html` in a web browser
-4. Start clicking soda!
+4. Start clicking soda and talking to God!
 
 ### File Structure
 - `index.html` - Main game interface
 - `css/style.css` - Game styling and animations
 - `js/main.js` - Core game logic and features
-- `js/config.js` - Configuration system
-- `config.local.js` - Your private API keys (not committed)
+- `js/config.js` - Configuration with API key
+- `.gitignore` - Protects sensitive data
 
 ## 🔒 Security Notes
 
