@@ -4,6 +4,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Soda Clicker Pro!</title>
     <meta name="description" content="Soda Clicker Pro">
     <meta name="author" content="Spikan">
@@ -36,11 +37,9 @@
 
 <div id="topDiv" class="center">
     <div id="levelDiv">
-
         <h2>
             Level <span id="levelNumber">1</span>
         </h2>
-
         <h3>
             Clicking Soda
             <br/>
@@ -53,103 +52,104 @@
         PRO!
     </h1>
 
-    <form class="center">
-        <table id="saveTable">
-            <tr>
-                <td>
-                    <button onclick="save()">Save Game</button>
-                </td>
-                <td>
-                    <button onclick="delete_save()">Delete Save</button>
-                </td>
-            </tr>
-        </table>
-        <br/>
-    </form>
-</div>
-
-
-<div id="sodaDiv" class="center">
-    <table id="sodaImgTable">
-        <tr>
-            <td id="sodaTD">
-                <img src="images/regSoda.png" id="sodaButton" onclick="sodaClick(1)"
-                     alt="a picture of soda for you to click"/>
-            </td>
-        </tr>
-    </table>
-    <br/>
-
-    <div id="spsDiv" class="center">
-        Sips: <span id="sips">0</span>
-        <br/>
-        Sips/s: <span id="sps">0</span>
-        <br/>
+    <div class="save-controls">
+        <button onclick="save()" class="save-btn">Save Game</button>
+        <button onclick="delete_save()" class="save-btn">Delete Save</button>
     </div>
 </div>
-<br/>
+
+<div id="sodaDiv" class="center">
+    <div class="soda-container">
+        <img src="images/regSoda.png" id="sodaButton" onclick="sodaClick(1)"
+             alt="a picture of soda for you to click"/>
+    </div>
+
+    <div id="spsDiv" class="center">
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Sips:</span>
+                <span id="sips" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Sips/s:</span>
+                <span id="sps" class="stat-value">0</span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="levelUpDiv" class="center">
-    <button onclick="levelUp()"><span id="levelCost">5000</span> Sips<br/> Level Up <br/>(+ 100% Sips/s)</button>
+    <button onclick="levelUp()" class="level-up-btn">
+        <span id="levelCost">5000</span> Sips<br/> 
+        Level Up <br/>
+        (+ 100% Sips/s)
+    </button>
 </div>
-<br/>
 
 <div id="shopDiv" class="center">
-    <table id="shopTable">
-        <tr>
-            <td class="shop">
+    <div class="shop-container">
+        <div class="shop-item">
+            <div class="shop-header">
+                <button onclick="buyStraw()" class="shop-btn">
+                    <span id="strawCost">10</span> Sips<br/> 
+                    Extra Straw
+                </button>
+            </div>
+            <div class="shop-stats">
+                <div class="shop-stat">
+                    <span class="stat-label">Owned:</span>
+                    <span id="straws" class="stat-value">0</span>
+                </div>
+                <div class="shop-stat">
+                    <span class="stat-label">+ Sips/s:</span>
+                    <span id="strawSPS" class="stat-value">0.4</span>
+                </div>
+                <div class="shop-stat">
+                    <span class="stat-label">Total:</span>
+                    <span id="totalStrawSPS" class="stat-value">0</span> Sips/s
+                </div>
+            </div>
+            <div class="shop-upgrade">
+                <button onclick="upgradeStraw()" class="upgrade-btn">
+                    <span id="strawUpCost">200</span> Sips<br/> 
+                    Upgrade Straws
+                </button>
+            </div>
+        </div>
 
-            </td>
-            <td class="shop">
-                &nbsp;Amount Owned
-            </td>
-            <td class="shop">
-                &nbsp;+ Sips/s
-            </td>
-            <td class="shop">
-                &nbsp;Total Sips/s
-            </td>
-            <td class="shop">
+        <div class="shop-item">
+            <div class="shop-header">
+                <button onclick="buyCup()" class="shop-btn">
+                    <span id="cupCost">20</span> Sips<br/> 
+                    Bigger Cup
+                </button>
+            </div>
+            <div class="shop-stats">
+                <div class="shop-stat">
+                    <span class="stat-label">Owned:</span>
+                    <span id="cups" class="stat-value">0</span>
+                </div>
+                <div class="shop-stat">
+                    <span class="stat-label">+ Sips/s:</span>
+                    <span id="cupSPS" class="stat-value">1</span>
+                </div>
+                <div class="shop-stat">
+                    <span class="stat-label">Total:</span>
+                    <span id="totalCupSPS" class="stat-value">0</span> Sips/s
+                </div>
+            </div>
+            <div class="shop-upgrade">
+                <button onclick="upgradeCup()" class="upgrade-btn">
+                    <span id="cupUpCost">500</span> Sips<br/> 
+                    Upgrade Cups
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-            </td>
-        </tr>
-        <tr>
-            <td class="shop">
-                <button onclick="buyStraw()"><span id="strawCost">10</span> Sips<br/> Extra Straw</button>
-            </td>
-            <td class="shop">
-                &nbsp;<span id="straws">0</span>
-            </td>
-            <td class="shop">
-                &nbsp; + <span id="strawSPS">0.4</span> Sips/s
-            </td>
-            <td class="shop">
-                &nbsp;<span id="totalStrawSPS">0</span> Sips/s
-            </td>
-            <td class="shop">
-                <button onclick="upgradeStraw()"><span id="strawUpCost">200</span> Sips<br/> Upgrade Straws</button>
-            </td>
-        </tr>
-        <tr>
-            <td class="shop">
-                <button onclick="buyCup()"><span id="cupCost">20</span> Sips<br/> Bigger Cup</button>
-            </td>
-            <td class="shop">
-                &nbsp;<span id="cups">0</span>
-            </td>
-            <td class="shop">
-                &nbsp;+ <span id="cupSPS">1</span> Sips/s
-            </td>
-            <td class="shop">
-                &nbsp;<span id="totalCupSPS">0</span> Sips/s
-            </td>
-            <td class="shop">
-                <button onclick="upgradeCup()"><span id="cupUpCost">500</span> Sips<br/> Upgrade Cups</button>
-            </td>
-        </tr>
-    </table>
 </div>
-</div>
+
 <script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>
