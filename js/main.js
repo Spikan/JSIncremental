@@ -587,6 +587,9 @@ function sodaClick(number) {
     // Update display
     document.getElementById("sips").innerHTML = prettify(sips);
     
+    // Show click feedback
+    showClickFeedback(totalSipsGained);
+    
     // Visual feedback
     setTimeout(function () {
         document.getElementById("sodaButton").src = regSoda.src;
@@ -598,6 +601,35 @@ function sodaClick(number) {
     
     // Update upgrade affordability
     checkUpgradeAffordability();
+}
+
+// Function to show click feedback numbers
+function showClickFeedback(sipsGained) {
+    const sodaContainer = document.querySelector('.soda-container');
+    if (!sodaContainer) return;
+    
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.className = 'click-feedback';
+    feedback.textContent = '+' + prettify(sipsGained);
+    
+    // Position randomly around the click area for variety
+    const containerRect = sodaContainer.getBoundingClientRect();
+    const randomX = (Math.random() - 0.5) * 100; // -50px to +50px
+    const randomY = (Math.random() - 0.5) * 60;  // -30px to +30px
+    
+    feedback.style.left = (containerRect.width / 2 + randomX) + 'px';
+    feedback.style.top = (containerRect.height / 2 + randomY) + 'px';
+    
+    // Add to container
+    sodaContainer.appendChild(feedback);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.parentNode.removeChild(feedback);
+        }
+    }, 1000);
 }
 
 function spsClick(amount) {
@@ -621,7 +653,11 @@ function buyStraw() {
         straws = straws.plus(1);
         sips = sips.minus(strawCost);
         strawSPS = new Decimal(0.4).times(strawUpCounter);
-        sps = sps.plus(strawSPS);
+        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
+        
+        // Show purchase feedback
+        showPurchaseFeedback('Extra Straw', strawCost);
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -647,7 +683,11 @@ function buyCup() {
         cups = cups.plus(1);
         sips = sips.minus(cupCost);
         cupSPS = new Decimal(cupUpCounter.toNumber());
-        sps = sps.plus(cupSPS);
+        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
+        
+        // Show purchase feedback
+        showPurchaseFeedback('Bigger Cup', cupCost);
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -673,6 +713,10 @@ function buySuction() {
         suctions = suctions.plus(1);
         sips = sips.minus(suctionCost);
         suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
+        
+        // Show purchase feedback
+        showPurchaseFeedback('Improved Suction', suctionCost);
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -695,6 +739,10 @@ function buyFasterDrinks() {
         fasterDrinks = fasterDrinks.plus(1);
         sips = sips.minus(fasterDrinksCost);
         updateDrinkRate();
+        
+        // Show purchase feedback
+        showPurchaseFeedback('Faster Drinks', fasterDrinksCost);
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -716,14 +764,50 @@ function levelUp() {
     if (sips.gte(levelUpCost)) {
         sips = sips.minus(levelUpCost);
         level = level.plus(1);
-        sps = sps.times(level);
-
+        
+        // Calculate sips gained from level up (100% increase)
+        const sipsGained = sps;
+        
+        // Update displays
         document.getElementById("sips").innerHTML = prettify(sips);
-        document.getElementById("sps").innerHTML = prettify(sips);
         document.getElementById("levelNumber").innerHTML = level.toNumber();
-        changeLevel(level.toNumber());
+        document.getElementById("sps").innerHTML = prettify(sps);
+        
+        // Show level up feedback
+        showLevelUpFeedback(sipsGained);
+        
+        // Check affordability after level up
         checkUpgradeAffordability();
     }
+}
+
+// Function to show level up feedback
+function showLevelUpFeedback(sipsGained) {
+    const levelUpDiv = document.getElementById('levelUpDiv');
+    if (!levelUpDiv) return;
+    
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.className = 'click-feedback level-up-feedback';
+    feedback.textContent = 'LEVEL UP! +' + prettify(sipsGained) + '/d';
+    
+    // Position above the level up button
+    const buttonRect = levelUpDiv.getBoundingClientRect();
+    feedback.style.position = 'absolute';
+    feedback.style.left = (buttonRect.width / 2) + 'px';
+    feedback.style.top = '-20px';
+    feedback.style.transform = 'translateX(-50%)';
+    
+    // Add to level up div
+    levelUpDiv.style.position = 'relative';
+    levelUpDiv.appendChild(feedback);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.parentNode.removeChild(feedback);
+        }
+    }, 1000);
 }
 
 function changeLevel(i) {
@@ -839,3 +923,31 @@ window.onload = function() {
     loadOptions(); // Load options on page load
     updatePlayTime(); // Start play time tracking
 };
+
+// Function to show purchase feedback
+function showPurchaseFeedback(itemName, cost) {
+    const shopDiv = document.getElementById('shopDiv');
+    if (!shopDiv) return;
+    
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.className = 'click-feedback purchase-feedback';
+    feedback.textContent = 'Bought ' + itemName + ' (-' + prettify(cost) + ')';
+    
+    // Position at the top of the shop area
+    feedback.style.position = 'absolute';
+    feedback.style.left = '50%';
+    feedback.style.top = '20px';
+    feedback.style.transform = 'translateX(-50%)';
+    
+    // Add to shop div
+    shopDiv.style.position = 'relative';
+    shopDiv.appendChild(feedback);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.parentNode.removeChild(feedback);
+        }
+    }, 2000);
+}
