@@ -35,11 +35,24 @@ body {
     z-index: 9999;
     cursor: pointer;
     pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.splash-overlay:hover {
+    background-color: #0024b3;
+}
+
+.splash-overlay:active {
+    background-color: #001f9e;
 }
 
 .splash-content {
     text-align: center;
     animation: fadeIn 2s ease-in;
+    pointer-events: none;
 }
 
 .splash-title {

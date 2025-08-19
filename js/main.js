@@ -1,3 +1,7 @@
+// Test to verify JavaScript is loading
+console.log('Soda Clicker Pro JavaScript loaded successfully!');
+alert('JavaScript loaded! Click OK to continue.');
+
 let sips = new Decimal(0);
 let straws = new Decimal(0);
 let cups = new Decimal(0);
@@ -48,29 +52,54 @@ function initSplashScreen() {
         return;
     }
     
-    // Hide splash screen and show game content when clicked
-    splashScreen.addEventListener('click', function() {
-        console.log('Splash screen clicked!');
+    console.log('Splash screen elements found, setting up event listeners...');
+    
+    // Function to start the game
+    function startGame() {
+        console.log('Starting game...');
         splashScreen.style.opacity = '0';
         splashScreen.style.transition = 'opacity 0.5s ease-out';
         
         setTimeout(function() {
             splashScreen.style.display = 'none';
             gameContent.style.display = 'block';
-            // Initialize the game after splash screen is hidden
+            console.log('Game content displayed, initializing game...');
             initGame();
         }, 500);
-    });
+    }
+    
+    // Multiple event listeners for maximum compatibility
+    splashScreen.addEventListener('click', function(e) {
+        console.log('Splash screen clicked!', e);
+        e.preventDefault();
+        e.stopPropagation();
+        startGame();
+    }, true);
+    
+    splashScreen.addEventListener('touchstart', function(e) {
+        console.log('Splash screen touched!', e);
+        e.preventDefault();
+        e.stopPropagation();
+        startGame();
+    }, true);
     
     // Also allow keyboard input to start
     document.addEventListener('keydown', function(event) {
         if (splashScreen.style.display !== 'none') {
-            console.log('Keyboard input detected, starting game...');
-            splashScreen.click();
+            console.log('Keyboard input detected, starting game...', event.key);
+            startGame();
         }
     });
     
-    console.log('Splash screen initialized successfully');
+    // Add a fallback - if nothing else works, start after 10 seconds
+    setTimeout(function() {
+        if (splashScreen.style.display !== 'none') {
+            console.log('Fallback: Auto-starting game after 10 seconds');
+            startGame();
+        }
+    }, 10000);
+    
+    console.log('Splash screen initialized successfully with multiple event listeners');
 }
 
 // Tab switching functionality
@@ -826,6 +855,8 @@ function reload() {
 
 // Initialize splash screen when page loads
 window.onload = function() {
+    console.log('Window loaded, initializing splash screen...');
+    alert('Splash screen initializing... Click OK to continue.');
     initSplashScreen();
     loadOptions(); // Load options on page load
     updatePlayTime(); // Start play time tracking
