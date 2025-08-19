@@ -78,13 +78,6 @@ function checkUpgradeAffordability() {
     updateCostDisplay('strawUpCost', strawUpCost, sips >= strawUpCost);
     updateCostDisplay('cupUpCost', cupUpCost, sips >= cupUpCost);
     updateCostDisplay('levelCost', levelUpCost, sips >= levelUpCost);
-    
-    // Update progress bars
-    updateProgressBar('strawProgressFill', 'strawProgressText', sips, strawCost);
-    updateProgressBar('cupProgressFill', 'cupProgressText', sips, cupCost);
-    updateProgressBar('strawUpProgressFill', 'strawUpProgressText', sips, strawUpCost);
-    updateProgressBar('cupUpProgressFill', 'cupUpProgressText', sips, cupUpCost);
-    updateProgressBar('levelProgressFill', 'levelProgressText', sips, levelUpCost);
 }
 
 // Update button state based on affordability
@@ -113,33 +106,6 @@ function updateCostDisplay(elementId, cost, isAffordable) {
         } else {
             element.classList.remove('cost-affordable');
             element.classList.add('cost-too-high');
-        }
-    }
-}
-
-// Update progress bar based on affordability
-function updateProgressBar(fillId, textId, currentSips, targetCost) {
-    const fillElement = document.getElementById(fillId);
-    const textElement = document.getElementById(textId);
-    
-    if (fillElement && textElement) {
-        const progress = Math.min((currentSips / targetCost) * 100, 100);
-        fillElement.style.width = progress + '%';
-        
-        // Update progress text
-        textElement.textContent = `${prettify(currentSips)} / ${prettify(targetCost)} Sips`;
-        
-        // Update progress bar color based on affordability
-        fillElement.classList.remove('affordable', 'nearly-affordable', 'far-from-affordable');
-        
-        if (progress >= 100) {
-            fillElement.classList.add('affordable');
-        } else if (progress >= 75) {
-            fillElement.classList.add('nearly-affordable');
-        } else if (progress >= 50) {
-            fillElement.classList.add('nearly-affordable');
-        } else {
-            fillElement.classList.add('far-from-affordable');
         }
     }
 }
