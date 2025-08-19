@@ -155,7 +155,7 @@ function initSplashScreen() {
 }
 
 // Tab switching functionality
-function switchTab(tabName) {
+function switchTab(tabName, event) {
     // Hide all tab contents
     const tabContents = document.querySelectorAll('.tab-content');
     tabContents.forEach(tab => tab.classList.remove('active'));
@@ -909,6 +909,24 @@ function showLevelUpFeedback(sipsGained) {
     }, 1000);
 }
 
+// Function to check if level up is possible
+function checkLevelUp() {
+    // This function checks if the player can afford to level up
+    // It's called after each click to update the level up button state
+    const levelUpCost = 5000 * level.toNumber();
+    const levelUpButton = document.querySelector('button[onclick*="levelUp"]');
+    
+    if (levelUpButton) {
+        if (sips.gte(levelUpCost)) {
+            levelUpButton.classList.remove('disabled');
+            levelUpButton.classList.add('affordable');
+        } else {
+            levelUpButton.classList.remove('affordable');
+            levelUpButton.classList.add('disabled');
+        }
+    }
+}
+
 function changeLevel(i) {
 
     let body = document.querySelector("body");
@@ -1393,6 +1411,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Make all other functions globally available for HTML onclick attributes
 window.sodaClick = sodaClick;
 window.levelUp = levelUp;
+window.checkLevelUp = checkLevelUp;
 window.buyStraw = buyStraw;
 window.upgradeStraw = upgradeStraw;
 window.buyCup = buyCup;
@@ -1404,3 +1423,24 @@ window.upgradeFasterDrinks = upgradeFasterDrinks;
 window.save = save;
 window.delete_save = delete_save;
 window.sendMessage = sendMessage;
+
+// Make all other functions globally available to prevent undefined errors
+window.updateAllStats = updateAllStats;
+window.updateDrinkRate = updateDrinkRate;
+window.updateDrinkSpeedDisplay = updateDrinkSpeedDisplay;
+window.loadOptions = loadOptions;
+window.updatePlayTime = updatePlayTime;
+window.updateLastSaveTime = updateLastSaveTime;
+window.trackClick = trackClick;
+window.showClickFeedback = showClickFeedback;
+window.showPurchaseFeedback = showPurchaseFeedback;
+window.addUserMessage = addUserMessage;
+window.addGodMessage = addGodMessage;
+window.scrollToBottom = scrollToBottom;
+window.escapeHtml = escapeHtml;
+window.getDivineResponse = getDivineResponse;
+window.searchGiphyAPI = searchGiphyAPI;
+window.getPlaceholderGif = getPlaceholderGif;
+window.toggleAutosave = toggleAutosave;
+window.changeAutosaveInterval = changeAutosaveInterval;
+window.getGodResponse = getGodResponse;
