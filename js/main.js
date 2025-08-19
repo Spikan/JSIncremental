@@ -1,4 +1,15 @@
 // Soda Clicker Pro - Main Game Logic
+// 
+// TALK TO GOD FEATURE SETUP:
+// To enable real Giphy GIFs in the "Talk to God" tab:
+// 1. Go to https://developers.giphy.com/
+// 2. Sign up for a free account
+// 3. Create a new app to get your API key
+// 4. Replace 'YOUR_GIPHY_API_KEY_HERE' in the searchGiphyAPI function
+// 5. The feature will automatically use real GIFs based on user messages
+//
+// Without an API key, the feature will use placeholder GIFs as a fallback.
+
 let sips = new Decimal(0);
 let straws = new Decimal(0);
 let cups = new Decimal(0);
@@ -1042,6 +1053,9 @@ async function getGodResponse(userMessage) {
         // Search for God's mysterious response
         const gifUrl = await getDivineResponse(userMessage);
         
+        // Add a natural delay to make responses feel more divine
+        await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+        
         // Remove the "thinking" message
         const thinkingMessage = document.querySelector('.god-message:last-child');
         if (thinkingMessage) {
@@ -1082,10 +1096,58 @@ async function getGodResponse(userMessage) {
 
 // Function to get God's mysterious divine response
 async function getDivineResponse(query) {
-    // God's mysterious response system
-    // Analyze the user's message to provide appropriate divine responses
+    // God's mysterious response system using the Giphy API
+    // Search for GIFs based on the user's message
     
-    const lowerQuery = query.toLowerCase();
+    try {
+        // Use Giphy search API to find relevant GIFs
+        const gifUrl = await searchGiphyAPI(query);
+        return gifUrl;
+    } catch (error) {
+        console.error('Error searching Giphy:', error);
+        return null;
+    }
+}
+
+// Function to search Giphy API for real GIFs
+async function searchGiphyAPI(searchTerm) {
+    // You'll need to get a free API key from https://developers.giphy.com/
+    // For now, I'll use a placeholder that you can replace
+    const GIPHY_API_KEY = 'YOUR_GIPHY_API_KEY_HERE'; // Replace with your actual API key
+    
+    if (GIPHY_API_KEY === 'YOUR_GIPHY_API_KEY_HERE') {
+        // Fallback to placeholder GIFs if no API key is set
+        console.warn('Giphy API key not set. Using placeholder GIFs. Get a free key at https://developers.giphy.com/');
+        return getPlaceholderGif(searchTerm);
+    }
+    
+    try {
+        // Search Giphy for GIFs matching the search term
+        const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=10&rating=g`);
+        
+        if (!response.ok) {
+            throw new Error(`Giphy API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.data && data.data.length > 0) {
+            // Return the first (top) GIF from the search results
+            return data.data[0].images.original.url;
+        } else {
+            // No GIFs found, return null to trigger fallback message
+            return null;
+        }
+    } catch (error) {
+        console.error('Giphy API request failed:', error);
+        return null;
+    }
+}
+
+// Fallback function for when Giphy API is not available
+function getPlaceholderGif(searchTerm) {
+    // Analyze the search term to provide contextually appropriate placeholder GIFs
+    const lowerQuery = searchTerm.toLowerCase();
     
     // Define response categories based on message content
     let responseCategory = 'general';
@@ -1112,18 +1174,15 @@ async function getDivineResponse(query) {
         responseCategory = 'money';
     }
     
-    // God's mysterious GIF collection
-    const divineResponses = {
+    // Placeholder GIFs for different categories
+    const placeholderGifs = {
         happy: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif',
             'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
             'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
         ],
         sad: [
             'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif',
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif'
+            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
         ],
         angry: [
             'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
@@ -1159,19 +1218,11 @@ async function getDivineResponse(query) {
         ],
         general: [
             'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif',
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
             'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
         ]
     };
     
-    // Get responses for the detected category
-    const responses = divineResponses[responseCategory] || divineResponses.general;
-    
-    // Simulate divine contemplation time
-    await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1200));
-    
-    // Return a random response from the appropriate category
+    const responses = placeholderGifs[responseCategory] || placeholderGifs.general;
     return responses[Math.floor(Math.random() * responses.length)];
 }
 
