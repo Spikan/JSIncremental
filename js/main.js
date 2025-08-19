@@ -658,11 +658,11 @@ function updateDrinkSpeedDisplay() {
     }
 }
 
-regSoda = new Image();
+let regSoda = new Image();
 regSoda.src = "images/regSoda.png";
-moSoda = new Image();
+let moSoda = new Image();
 moSoda.src = "images/moSoda.png";
-clickSoda = new Image();
+let clickSoda = new Image();
 clickSoda.src = "images/clickSoda.png";
 
 
