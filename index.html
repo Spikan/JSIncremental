@@ -58,91 +58,103 @@
     </div>
 </div>
 
-<div id="sodaDiv" class="center">
-    <div class="soda-container">
-        <img src="images/regSoda.png" id="sodaButton" onclick="sodaClick(1)"
-             alt="a picture of soda for you to click"/>
-    </div>
+<!-- Tab Navigation -->
+<div class="tab-navigation">
+    <button class="tab-btn active" onclick="switchTab('soda')">🍺 Soda Clicking</button>
+    <button class="tab-btn" onclick="switchTab('shop')">🛒 Shop & Upgrades</button>
+</div>
 
-    <div id="spsDiv" class="center">
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-label">Sips:</span>
-                <span id="sips" class="stat-value">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Sips/s:</span>
-                <span id="sps" class="stat-value">0</span>
+<!-- Soda Clicking Tab -->
+<div id="sodaTab" class="tab-content active">
+    <div id="sodaDiv" class="center">
+        <div class="soda-container">
+            <img src="images/regSoda.png" id="sodaButton" onclick="sodaClick(1)"
+                 alt="a picture of soda for you to click"/>
+        </div>
+
+        <div id="spsDiv" class="center">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Sips:</span>
+                    <span id="sips" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Sips/s:</span>
+                    <span id="sps" class="stat-value">0</span>
+                </div>
             </div>
         </div>
     </div>
+
+    <div id="levelUpDiv" class="center">
+        <button onclick="levelUp()" class="level-up-btn">
+            <span id="levelCost">5000</span> Sips<br/> 
+            Level Up <br/>
+            (+ 100% Sips/s)
+        </button>
+    </div>
 </div>
 
-<div id="levelUpDiv" class="center">
-    <button onclick="levelUp()" class="level-up-btn">
-        <span id="levelCost">5000</span> Sips<br/> 
-        Level Up <br/>
-        (+ 100% Sips/s)
-    </button>
-</div>
+<!-- Shop & Upgrades Tab -->
+<div id="shopTab" class="tab-content">
+    <div id="shopDiv" class="center">
+        <div class="shop-container">
+            <div class="shop-item">
+                <div class="shop-header">
+                    <button onclick="buyStraw()" class="shop-btn">
+                        <span id="strawCost">10</span> Sips<br/> 
+                        Extra Straw
+                    </button>
+                </div>
+                <div class="shop-stats">
+                    <div class="shop-stat">
+                        <span class="stat-label">Owned:</span>
+                        <span id="straws" class="stat-value">0</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">+ Sips/s:</span>
+                        <span id="strawSPS" class="stat-value">0.4</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">Total:</span>
+                        <span id="totalStrawSPS" class="stat-value">0</span> Sips/s
+                    </div>
+                </div>
+                <div class="shop-upgrade">
+                    <button onclick="upgradeStraw()" class="upgrade-btn">
+                        <span id="strawUpCost">200</span> Sips<br/> 
+                        Upgrade Straws
+                    </button>
+                </div>
+            </div>
 
-<div id="shopDiv" class="center">
-    <div class="shop-container">
-        <div class="shop-item">
-            <div class="shop-header">
-                <button onclick="buyStraw()" class="shop-btn">
-                    <span id="strawCost">10</span> Sips<br/> 
-                    Extra Straw
-                </button>
-            </div>
-            <div class="shop-stats">
-                <div class="shop-stat">
-                    <span class="stat-label">Owned:</span>
-                    <span id="straws" class="stat-value">0</span>
+            <div class="shop-item">
+                <div class="shop-header">
+                    <button onclick="buyCup()" class="shop-btn">
+                        <span id="cupCost">20</span> Sips<br/> 
+                        Bigger Cup
+                    </button>
                 </div>
-                <div class="shop-stat">
-                    <span class="stat-label">+ Sips/s:</span>
-                    <span id="strawSPS" class="stat-value">0.4</span>
+                <div class="shop-stats">
+                    <div class="shop-stat">
+                        <span class="stat-label">Owned:</span>
+                        <span id="cups" class="stat-value">0</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">+ Sips/s:</span>
+                        <span id="cupSPS" class="stat-value">1</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">Total:</span>
+                        <span id="totalCupSPS" class="stat-value">0</span> Sips/s
+                    </div>
                 </div>
-                <div class="shop-stat">
-                    <span class="stat-label">Total:</span>
-                    <span id="totalStrawSPS" class="stat-value">0</span> Sips/s
+                <div class="shop-upgrade">
+                    <button onclick="upgradeCup()" class="upgrade-btn">
+                        <span id="cupUpCost">500</span> Sips<br/> 
+                        Upgrade Cups
+                    </button>
                 </div>
-            </div>
-            <div class="shop-upgrade">
-                <button onclick="upgradeStraw()" class="upgrade-btn">
-                    <span id="strawUpCost">200</span> Sips<br/> 
-                    Upgrade Straws
-                </button>
-            </div>
-        </div>
-
-        <div class="shop-item">
-            <div class="shop-header">
-                <button onclick="buyCup()" class="shop-btn">
-                    <span id="cupCost">20</span> Sips<br/> 
-                    Bigger Cup
-                </button>
-            </div>
-            <div class="shop-stats">
-                <div class="shop-stat">
-                    <span class="stat-label">Owned:</span>
-                    <span id="cups" class="stat-value">0</span>
-                </div>
-                <div class="shop-stat">
-                    <span class="stat-label">+ Sips/s:</span>
-                    <span id="cupSPS" class="stat-value">1</span>
-                </div>
-                <div class="shop-stat">
-                    <span class="stat-label">Total:</span>
-                    <span id="totalCupSPS" class="stat-value">0</span> Sips/s
-                </div>
-            </div>
-            <div class="shop-upgrade">
-                <button onclick="upgradeCup()" class="upgrade-btn">
-                    <span id="cupUpCost">500</span> Sips<br/> 
-                    Upgrade Cups
-                </button>
             </div>
         </div>
     </div>
