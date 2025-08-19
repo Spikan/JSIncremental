@@ -68,12 +68,24 @@ function initSplashScreen() {
     function startGame() {
         console.log('startGame called');
         
-        // Simple, direct transition without complex animations
-        splashScreen.style.display = 'none';
-        gameContent.style.display = 'block';
+        // Super simple approach - just hide splash and show game
+        const splashScreen = document.getElementById('splashScreen');
+        const gameContent = document.getElementById('gameContent');
         
-        // Initialize game immediately
-        initGame();
+        if (splashScreen && gameContent) {
+            console.log('Hiding splash, showing game...');
+            splashScreen.style.display = 'none';
+            gameContent.style.display = 'block';
+            
+            // Try to initialize game, but don't let it fail
+            try {
+                initGame();
+            } catch (error) {
+                console.error('Game init failed, but showing game anyway:', error);
+            }
+        } else {
+            console.error('Could not find splash or game elements');
+        }
     }
     
     // Multiple event listeners for maximum compatibility
@@ -194,39 +206,63 @@ function updateCostDisplay(elementId, cost, isAffordable) {
 }
 
 function initGame() {
-    // Load saved game data
-    let savegame = JSON.parse(localStorage.getItem("save"));
+    console.log('initGame called');
     
-    if (savegame && typeof savegame.sips !== "undefined" && savegame.sips !== null) {
-        sips = new Decimal(savegame.sips);
-        straws = new Decimal(savegame.straws || 0);
-        cups = new Decimal(savegame.cups || 0);
-        suctions = new Decimal(savegame.suctions || 0);
-        fasterDrinks = new Decimal(savegame.fasterDrinks || 0);
-        sps = new Decimal(savegame.sps || 0);
-        strawUpCounter = new Decimal(savegame.strawUpCounter || 1);
-        cupUpCounter = new Decimal(savegame.cupUpCounter || 1);
-        suctionUpCounter = new Decimal(savegame.suctionUpCounter || 1);
-        fasterDrinksUpCounter = new Decimal(savegame.fasterDrinksUpCounter || 1);
-        suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
-        level = new Decimal(savegame.level || 1);
-        totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
-        gameStartDate = savegame.gameStartDate || Date.now();
-        lastClickTime = savegame.lastClickTime || 0;
-        clickTimes = savegame.clickTimes || [];
+    try {
+        // Load saved game data
+        let savegame = JSON.parse(localStorage.getItem("save"));
+        
+        if (savegame && typeof savegame.sips !== "undefined" && savegame.sips !== null) {
+            sips = new Decimal(savegame.sips);
+            straws = new Decimal(savegame.straws || 0);
+            cups = new Decimal(savegame.cups || 0);
+            suctions = new Decimal(savegame.suctions || 0);
+            fasterDrinks = new Decimal(savegame.fasterDrinks || 0);
+            sps = new Decimal(savegame.sps || 0);
+            strawUpCounter = new Decimal(savegame.strawUpCounter || 1);
+            cupUpCounter = new Decimal(savegame.cupUpCounter || 1);
+            suctionUpCounter = new Decimal(savegame.suctionUpCounter || 1);
+            fasterDrinksUpCounter = new Decimal(savegame.fasterDrinksUpCounter || 1);
+            suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
+            level = new Decimal(savegame.level || 1);
+            totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
+            gameStartDate = savegame.gameStartDate || Date.now();
+            lastClickTime = savegame.lastClickTime || 0;
+            clickTimes = savegame.clickTimes || [];
+        }
+        
+        strawSPS = new Decimal(0.4).times(strawUpCounter);
+        cupSPS = new Decimal(cupUpCounter.toNumber());
+        suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
+        
+        // Initialize drink rate based on upgrades
+        updateDrinkRate();
+        
+        console.log('Game variables initialized, calling reload...');
+        
+        // Only call reload if we're sure the DOM is ready
+        if (document.getElementById('sips')) {
+            reload();
+        } else {
+            console.log('DOM not ready yet, skipping reload');
+        }
+        
+        console.log('Starting game loop...');
+        // Start the game loop
+        startGameLoop();
+        
+        console.log('Game initialization complete!');
+        
+    } catch (error) {
+        console.error('Error in initGame:', error);
+        // Fallback: just show the game content even if initialization fails
+        const splashScreen = document.getElementById('splashScreen');
+        const gameContent = document.getElementById('gameContent');
+        if (splashScreen && gameContent) {
+            splashScreen.style.display = 'none';
+            gameContent.style.display = 'block';
+        }
     }
-    
-    strawSPS = new Decimal(0.4).times(strawUpCounter);
-    cupSPS = new Decimal(cupUpCounter.toNumber());
-    suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
-    
-    // Initialize drink rate based on upgrades
-    updateDrinkRate();
-    
-    reload();
-    
-    // Start the game loop
-    startGameLoop();
 }
 
 function startGameLoop() {
@@ -903,38 +939,56 @@ function prettify(input) {
 
 
 function reload() {
-    let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
-    let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
-    let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
-    let fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
+    try {
+        let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
+        let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
+        let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+        let fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
 
-    document.getElementById('straws').innerHTML = straws.toNumber();
-    document.getElementById('strawCost').innerHTML = strawCost.toString();
-    document.getElementById('cups').innerHTML = cups.toNumber();
-    document.getElementById('cupCost').innerHTML = cupCost.toString();
-    document.getElementById('suctions').innerHTML = suctions.toNumber();
-    document.getElementById('suctionCost').innerHTML = suctionCost.toString();
-    document.getElementById('fasterDrinks').innerHTML = fasterDrinks.toNumber();
-    document.getElementById('fasterDrinksCost').innerHTML = fasterDrinksCost.toString();
-    document.getElementById('sips').innerHTML = prettify(sips);
-    document.getElementById('sps').innerHTML = prettify(sps);
-    document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
-    document.getElementById('cupSPS').innerHTML = prettify(cupSPS);
-    document.getElementById('suctionClickBonus').innerHTML = prettify(suctionClickBonus);
-    document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS.times(straws));
-    document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS.times(cups));
-    document.getElementById('totalSuctionBonus').innerHTML = prettify(suctionClickBonus.times(suctions));
-    document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter.toNumber()).toString();
-    document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter.toNumber()).toString();
-    document.getElementById('suctionUpCost').innerHTML = (1000 * suctionUpCounter.toNumber()).toString();
-    document.getElementById('fasterDrinksUpCost').innerHTML = (2000 * fasterDrinksUpCounter.toNumber()).toString();
-    document.getElementById('levelNumber').innerHTML = level.toNumber();
-    
-    // Update drink speed display
-    updateDrinkSpeedDisplay();
-    
-    // Check affordability after reloading all values
-    checkUpgradeAffordability();
+        // Safely update DOM elements only if they exist
+        const elements = {
+            'straws': straws.toNumber(),
+            'strawCost': strawCost.toString(),
+            'cups': cups.toNumber(),
+            'cupCost': cupCost.toString(),
+            'suctions': suctions.toNumber(),
+            'suctionCost': suctionCost.toString(),
+            'fasterDrinks': fasterDrinks.toNumber(),
+            'fasterDrinksCost': fasterDrinksCost.toString(),
+            'sips': prettify(sips),
+            'sps': prettify(sps),
+            'strawSPS': prettify(strawSPS),
+            'cupSPS': prettify(cupSPS),
+            'suctionClickBonus': prettify(suctionClickBonus),
+            'totalStrawSPS': prettify(strawSPS.times(straws)),
+            'totalCupSPS': prettify(cupSPS.times(cups)),
+            'totalSuctionBonus': prettify(suctionClickBonus.times(suctions)),
+            'strawUpCost': (200 * strawUpCounter.toNumber()).toString(),
+            'cupUpCost': (500 * cupUpCounter.toNumber()).toString(),
+            'suctionUpCost': (1000 * suctionUpCounter.toNumber()).toString(),
+            'fasterDrinksUpCost': (2000 * fasterDrinksUpCounter.toNumber()).toString(),
+            'levelNumber': level.toNumber()
+        };
+
+        // Update each element safely
+        for (const [id, value] of Object.entries(elements)) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.innerHTML = value;
+            }
+        }
+        
+        // Update drink speed display
+        updateDrinkSpeedDisplay();
+        
+        // Check affordability after reloading all values
+        checkUpgradeAffordability();
+        
+        console.log('Reload completed successfully');
+        
+    } catch (error) {
+        console.error('Error in reload function:', error);
+    }
 }
 
 // Initialize splash screen when page loads
@@ -953,13 +1007,24 @@ document.addEventListener('DOMContentLoaded', function() {
 // Global function for splash screen button (backup method)
 window.startGameFromButton = function() {
     console.log('startGameFromButton called');
+    
+    // Super simple approach - just hide splash and show game
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     
     if (splashScreen && gameContent) {
+        console.log('Hiding splash, showing game...');
         splashScreen.style.display = 'none';
         gameContent.style.display = 'block';
-        initGame();
+        
+        // Try to initialize game, but don't let it fail
+        try {
+            initGame();
+        } catch (error) {
+            console.error('Game init failed, but showing game anyway:', error);
+        }
+    } else {
+        console.error('Could not find splash or game elements');
     }
 };
 
