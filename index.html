@@ -57,6 +57,7 @@
 <div class="tab-navigation">
     <button class="tab-btn active" onclick="switchTab('soda')">🍺 Soda Clicking</button>
     <button class="tab-btn" onclick="switchTab('shop')">🛒 Shop & Upgrades</button>
+    <button class="tab-btn" onclick="switchTab('stats')">📊 Statistics</button>
     <button class="tab-btn" onclick="switchTab('options')">⚙️ Options</button>
 </div>
 
@@ -275,6 +276,146 @@
                 <div class="info-item">
                     <span class="info-label">Play Time:</span>
                     <span class="info-value" id="playTime">0:00:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Tab -->
+<div id="statsTab" class="tab-content">
+    <div class="stats-container">
+        <div class="stats-section">
+            <h3>⏱️ Time & Progress</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⏰</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Play Time</div>
+                        <div class="stat-value" id="totalPlayTime">0:00:00</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Current Session</div>
+                        <div class="stat-value" id="sessionTime">0:00:00</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Days Since Start</div>
+                        <div class="stat-value" id="daysSinceStart">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <h3>🖱️ Clicking Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👆</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Clicks</div>
+                        <div class="stat-value" id="totalClicks">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Clicks Per Second</div>
+                        <div class="stat-value" id="clicksPerSecond">0.00</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Best Click Streak</div>
+                        <div class="stat-value" id="bestClickStreak">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <h3>💰 Economy & Progress</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">💧</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Sips Earned</div>
+                        <div class="stat-value" id="totalSipsEarned">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Current Sips/Second</div>
+                        <div class="stat-value" id="currentSipsPerSecond">0.00</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Highest Sips/Second</div>
+                        <div class="stat-value" id="highestSipsPerSecond">0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <h3>🛒 Shop & Upgrades</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🥤</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Straws Purchased</div>
+                        <div class="stat-value" id="strawsPurchased">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">☕</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Cups Purchased</div>
+                        <div class="stat-value" id="cupsPurchased">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💨</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Suctions Purchased</div>
+                        <div class="stat-value" id="suctionsPurchased">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <h3>🎉 Achievements & Milestones</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Current Level</div>
+                        <div class="stat-value" id="currentLevel">1</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔧</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Upgrades</div>
+                        <div class="stat-value" id="totalUpgrades">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💎</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Faster Ticks Owned</div>
+                        <div class="stat-value" id="fasterTicksOwned">0</div>
+                    </div>
                 </div>
             </div>
         </div>

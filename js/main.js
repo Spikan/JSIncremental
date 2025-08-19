@@ -30,6 +30,16 @@ let autosaveCounter = 0;
 let gameStartTime = Date.now();
 let lastSaveTime = null;
 
+// Statistics tracking variables
+let totalClicks = 0;
+let currentClickStreak = 0;
+let bestClickStreak = 0;
+let totalSipsEarned = new Decimal(0);
+let highestSipsPerSecond = new Decimal(0);
+let gameStartDate = Date.now();
+let lastClickTime = 0;
+let clickTimes = []; // For calculating clicks per second
+
 // Splash screen functionality
 function initSplashScreen() {
     const splashScreen = document.getElementById('splashScreen');
@@ -75,6 +85,11 @@ function switchTab(tabName) {
     // Add active class to clicked button
     const clickedButton = event.target;
     clickedButton.classList.add('active');
+
+    // Refresh stats when switching to the stats tab
+    if (tabName === 'stats') {
+        updateAllStats();
+    }
 }
 
 // Check if upgrades are affordable and update UI accordingly
@@ -159,6 +174,10 @@ function initGame() {
         fasterTicksUpCounter = new Decimal(savegame.fasterTicksUpCounter || 1);
         suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
         level = new Decimal(savegame.level || 1);
+        totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
+        gameStartDate = savegame.gameStartDate || Date.now();
+        lastClickTime = savegame.lastClickTime || 0;
+        clickTimes = savegame.clickTimes || [];
     }
     
     strawSPS = new Decimal(0.4).times(strawUpCounter);
@@ -185,10 +204,11 @@ function startGameLoop() {
         processTick();
     }, 100); // Check every 100ms for precise tick timing
     
-    // Update play time and last save time every second
+    // Update play time, last save time, and stats every second
     window.setInterval(function() {
         updatePlayTime();
         updateLastSaveTime();
+        updateAllStats();
     }, 1000);
 }
 
@@ -352,6 +372,160 @@ function updateLastSaveTime() {
     }
 }
 
+// Statistics update functions
+function updateAllStats() {
+    updateTimeStats();
+    updateClickStats();
+    updateEconomyStats();
+    updateShopStats();
+    updateAchievementStats();
+}
+
+function updateTimeStats() {
+    // Total play time (including previous sessions)
+    const totalPlayTimeElement = document.getElementById('totalPlayTime');
+    if (totalPlayTimeElement) {
+        const totalTime = Date.now() - gameStartDate;
+        const totalSeconds = Math.floor(totalTime / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        totalPlayTimeElement.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Current session time
+    const sessionTimeElement = document.getElementById('sessionTime');
+    if (sessionTimeElement) {
+        const sessionTime = Date.now() - gameStartTime;
+        const sessionSeconds = Math.floor(sessionTime / 1000);
+        const hours = Math.floor(sessionSeconds / 3600);
+        const minutes = Math.floor((sessionSeconds % 3600) / 60);
+        const seconds = sessionSeconds % 60;
+        sessionTimeElement.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Days since start
+    const daysSinceStartElement = document.getElementById('daysSinceStart');
+    if (daysSinceStartElement) {
+        const daysSinceStart = Math.floor((Date.now() - gameStartDate) / (1000 * 60 * 60 * 24));
+        daysSinceStartElement.textContent = daysSinceStart.toString();
+    }
+}
+
+function updateClickStats() {
+    // Total clicks
+    const totalClicksElement = document.getElementById('totalClicks');
+    if (totalClicksElement) {
+        totalClicksElement.textContent = prettify(totalClicks);
+    }
+    
+    // Clicks per second (last 10 seconds)
+    const clicksPerSecondElement = document.getElementById('clicksPerSecond');
+    if (clicksPerSecondElement) {
+        const now = Date.now();
+        const tenSecondsAgo = now - 10000;
+        const recentClicks = clickTimes.filter(time => time > tenSecondsAgo).length;
+        clicksPerSecondElement.textContent = (recentClicks / 10).toFixed(2);
+    }
+    
+    // Best click streak
+    const bestClickStreakElement = document.getElementById('bestClickStreak');
+    if (bestClickStreakElement) {
+        bestClickStreakElement.textContent = bestClickStreak.toString();
+    }
+}
+
+function updateEconomyStats() {
+    // Total sips earned
+    const totalSipsEarnedElement = document.getElementById('totalSipsEarned');
+    if (totalSipsEarnedElement) {
+        totalSipsEarnedElement.textContent = prettify(totalSipsEarned);
+    }
+    
+    // Current sips per second
+    const currentSipsPerSecondElement = document.getElementById('currentSipsPerSecond');
+    if (currentSipsPerSecondElement) {
+        const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
+        currentSipsPerSecondElement.textContent = prettify(currentSPS);
+    }
+    
+    // Highest sips per second achieved
+    const highestSipsPerSecondElement = document.getElementById('highestSipsPerSecond');
+    if (highestSipsPerSecondElement) {
+        highestSipsPerSecondElement.textContent = prettify(highestSipsPerSecond);
+    }
+}
+
+function updateShopStats() {
+    // Straws purchased
+    const strawsPurchasedElement = document.getElementById('strawsPurchased');
+    if (strawsPurchasedElement) {
+        strawsPurchasedElement.textContent = prettify(straws);
+    }
+    
+    // Cups purchased
+    const cupsPurchasedElement = document.getElementById('cupsPurchased');
+    if (cupsPurchasedElement) {
+        cupsPurchasedElement.textContent = prettify(cups);
+    }
+    
+    // Suctions purchased
+    const suctionsPurchasedElement = document.getElementById('suctionsPurchased');
+    if (suctionsPurchasedElement) {
+        suctionsPurchasedElement.textContent = prettify(suctions);
+    }
+}
+
+function updateAchievementStats() {
+    // Current level
+    const currentLevelElement = document.getElementById('currentLevel');
+    if (currentLevelElement) {
+        currentLevelElement.textContent = level.toString();
+    }
+    
+    // Total upgrades (sum of all upgrade counters)
+    const totalUpgradesElement = document.getElementById('totalUpgrades');
+    if (totalUpgradesElement) {
+        const totalUpgrades = strawUpCounter.plus(cupUpCounter).plus(suctionUpCounter).plus(fasterTicksUpCounter);
+        totalUpgradesElement.textContent = prettify(totalUpgrades);
+    }
+    
+    // Faster ticks owned
+    const fasterTicksOwnedElement = document.getElementById('fasterTicksOwned');
+    if (fasterTicksOwnedElement) {
+        fasterTicksOwnedElement.textContent = prettify(fasterTicks);
+    }
+}
+
+// Click tracking function
+function trackClick() {
+    totalClicks++;
+    const now = Date.now();
+    
+    // Track click streak
+    if (now - lastClickTime < 1000) { // Within 1 second
+        currentClickStreak++;
+        if (currentClickStreak > bestClickStreak) {
+            bestClickStreak = currentClickStreak;
+        }
+    } else {
+        currentClickStreak = 1;
+    }
+    
+    lastClickTime = now;
+    clickTimes.push(now);
+    
+    // Keep only last 100 clicks for performance
+    if (clickTimes.length > 100) {
+        clickTimes.shift();
+    }
+    
+    // Update stats display if stats tab is active
+    if (document.getElementById('statsTab').classList.contains('active')) {
+        updateClickStats();
+    }
+}
+
 // Function to update tick speed display
 function updateTickSpeedDisplay() {
     const currentTickSpeed = document.getElementById('currentTickSpeed');
@@ -377,26 +551,48 @@ clickSoda.src = "images/clickSoda.png";
 
 
 function sodaClick(number) {
-    let clickAmount = new Decimal(number);
-    let totalClickBonus = clickAmount.plus(suctionClickBonus.times(suctions));
-    sips = sips.plus(totalClickBonus);
+    // Track the click
+    trackClick();
+    
+    // Calculate total sips gained from this click
+    const baseSips = new Decimal(number);
+    const totalSipsGained = baseSips.plus(suctionClickBonus);
+    
+    // Add to total sips earned
+    totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
+    
+    // Update sips
+    sips = sips.plus(totalSipsGained);
+    
+    // Update display
     document.getElementById("sips").innerHTML = prettify(sips);
-
+    
+    // Visual feedback
     setTimeout(function () {
         document.getElementById("sodaButton").src = regSoda.src;
     }, 90);
     document.getElementById("sodaButton").src = clickSoda.src;
     
-    // Check affordability after each click
+    // Check if level up is possible
+    checkLevelUp();
+    
+    // Update upgrade affordability
     checkUpgradeAffordability();
 }
 
-function spsClick(number) {
-    sips = sips.plus(number);
-    document.getElementById("sips").innerHTML = prettify(sips);
+function spsClick(amount) {
+    sips = sips.plus(amount);
     
-    // Check affordability after passive income
-    checkUpgradeAffordability();
+    // Track passive income in total sips earned
+    totalSipsEarned = totalSipsEarned.plus(amount);
+    
+    // Update highest SPS if current is higher
+    const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
+    if (currentSPS.gt(highestSipsPerSecond)) {
+        highestSipsPerSecond = currentSPS;
+    }
+    
+    document.getElementById("sips").innerHTML = prettify(sips);
 }
 
 function buyStraw() {
@@ -535,7 +731,11 @@ function save() {
         cupUpCounter: cupUpCounter.toString(),
         suctionUpCounter: suctionUpCounter.toString(),
         fasterTicksUpCounter: fasterTicksUpCounter.toString(),
-        level: level.toString()
+        level: level.toString(),
+        totalSipsEarned: totalSipsEarned.toString(),
+        gameStartDate: gameStartDate,
+        lastClickTime: lastClickTime,
+        clickTimes: clickTimes
     };
 
     localStorage.setItem("save", JSON.stringify(save));
