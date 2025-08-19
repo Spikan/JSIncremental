@@ -909,6 +909,24 @@ function showLevelUpFeedback(sipsGained) {
     }, 1000);
 }
 
+// Function to check if level up is possible
+function checkLevelUp() {
+    // This function checks if the player can afford to level up
+    // It's called after each click to update the level up button state
+    const levelUpCost = 5000 * level.toNumber();
+    const levelUpButton = document.querySelector('button[onclick*="levelUp"]');
+    
+    if (levelUpButton) {
+        if (sips.gte(levelUpCost)) {
+            levelUpButton.classList.remove('disabled');
+            levelUpButton.classList.add('affordable');
+        } else {
+            levelUpButton.classList.remove('affordable');
+            levelUpButton.classList.add('disabled');
+        }
+    }
+}
+
 function changeLevel(i) {
 
     let body = document.querySelector("body");
@@ -1393,6 +1411,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Make all other functions globally available for HTML onclick attributes
 window.sodaClick = sodaClick;
 window.levelUp = levelUp;
+window.checkLevelUp = checkLevelUp;
 window.buyStraw = buyStraw;
 window.upgradeStraw = upgradeStraw;
 window.buyCup = buyCup;
