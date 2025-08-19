@@ -127,24 +127,20 @@ function save() {
 }
 
 window.onload = function load() {
-
-
     let savegame = JSON.parse(localStorage.getItem("save"));
 
-    if (typeof savegame.sips !== "undefined"|| typeof savegame.sips !== null) sips = savegame.sips;
-    if (typeof savegame.straws !== "undefined") straws = savegame.straws;
-    if (typeof savegame.cups !== "undefined") cups = savegame.cups;
-    if (typeof savegame.sps !== "undefined") sps = savegame.sps;
-    if (typeof savegame.strawUpCounter !== "undefined") strawUpCounter = savegame.strawUpCounter;
-    if (typeof savegame.cupUpCounter !== "undefined") cupUpCounter = savegame.cupUpCounter;
-    if (typeof savegame.level !== "undefined") level = savegame.level;
-
+    if (savegame && typeof savegame.sips !== "undefined") sips = savegame.sips;
+    if (savegame && typeof savegame.straws !== "undefined") straws = savegame.straws;
+    if (savegame && typeof savegame.cups !== "undefined") cups = savegame.cups;
+    if (savegame && typeof savegame.sps !== "undefined") sps = savegame.sps;
+    if (savegame && typeof savegame.strawUpCounter !== "undefined") strawUpCounter = savegame.strawUpCounter;
+    if (savegame && typeof savegame.cupUpCounter !== "undefined") cupUpCounter = savegame.cupUpCounter;
+    if (savegame && typeof savegame.level !== "undefined") level = savegame.level;
 
     strawSPS = .4 * (strawUpCounter);
     cupSPS = cupUpCounter;
 
-
-    reload()
+    reload();
 };
 
 function delete_save() {
