@@ -51,22 +51,41 @@ let clickTimes = []; // For calculating clicks per second
 function initSplashScreen() {
     console.log('initSplashScreen called');
     
+    // Eruda debugging for mobile
+    if (typeof eruda !== 'undefined') {
+        eruda.get('console').log('initSplashScreen called');
+    }
+    
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     
     console.log('Splash screen element:', splashScreen);
     console.log('Game content element:', gameContent);
     
+    if (typeof eruda !== 'undefined') {
+        eruda.get('console').log('Splash screen element:', splashScreen);
+        eruda.get('console').log('Game content element:', gameContent);
+    }
+    
     if (!splashScreen || !gameContent) {
         console.error('Splash screen elements not found!');
+        if (typeof eruda !== 'undefined') {
+            eruda.get('console').error('Splash screen elements not found!');
+        }
         return;
     }
     
     console.log('Setting up splash screen event listeners...');
+    if (typeof eruda !== 'undefined') {
+        eruda.get('console').log('Setting up splash screen event listeners...');
+    }
     
     // Function to start the game
     function startGame() {
         console.log('startGame called');
+        if (typeof eruda !== 'undefined') {
+            eruda.get('console').log('startGame called');
+        }
         
         // Super simple approach - just hide splash and show game
         const splashScreen = document.getElementById('splashScreen');
@@ -74,6 +93,9 @@ function initSplashScreen() {
         
         if (splashScreen && gameContent) {
             console.log('Hiding splash, showing game...');
+            if (typeof eruda !== 'undefined') {
+                eruda.get('console').log('Hiding splash, showing game...');
+            }
             splashScreen.style.display = 'none';
             gameContent.style.display = 'block';
             
@@ -82,15 +104,24 @@ function initSplashScreen() {
                 initGame();
             } catch (error) {
                 console.error('Game init failed, but showing game anyway:', error);
+                if (typeof eruda !== 'undefined') {
+                    eruda.get('console').error('Game init failed, but showing game anyway:', error);
+                }
             }
         } else {
             console.error('Could not find splash or game elements');
+            if (typeof eruda !== 'undefined') {
+                eruda.get('console').error('Could not find splash or game elements');
+            }
         }
     }
     
     // Multiple event listeners for maximum compatibility
     splashScreen.addEventListener('click', function(e) {
         console.log('Splash screen clicked!');
+        if (typeof eruda !== 'undefined') {
+            eruda.get('console').log('Splash screen clicked!');
+        }
         e.preventDefault();
         e.stopPropagation();
         startGame();
@@ -98,6 +129,9 @@ function initSplashScreen() {
     
     splashScreen.addEventListener('touchstart', function(e) {
         console.log('Splash screen touched!');
+        if (typeof eruda !== 'undefined') {
+            eruda.get('console').log('Splash screen touched!');
+        }
         e.preventDefault();
         e.stopPropagation();
         startGame();
@@ -107,11 +141,17 @@ function initSplashScreen() {
     document.addEventListener('keydown', function(event) {
         if (splashScreen.style.display !== 'none') {
             console.log('Keyboard input detected, starting game...');
+            if (typeof eruda !== 'undefined') {
+                eruda.get('console').log('Keyboard input detected, starting game...');
+            }
             startGame();
         }
     });
     
     console.log('Splash screen event listeners set up successfully');
+    if (typeof eruda !== 'undefined') {
+        eruda.get('console').log('Splash screen event listeners set up successfully');
+    }
 }
 
 // Tab switching functionality
@@ -995,12 +1035,21 @@ function reload() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing splash screen...');
     
+    // Eruda debugging for mobile
+    if (typeof eruda !== 'undefined') {
+        eruda.get('console').log('DOM loaded, initializing splash screen...');
+    }
+    
     // Small delay to ensure everything is ready
     setTimeout(() => {
         initSplashScreen();
         loadOptions(); // Load options on page load
         updatePlayTime(); // Start play time tracking
         console.log('Splash screen initialization complete');
+        
+        if (typeof eruda !== 'undefined') {
+            eruda.get('console').log('Splash screen initialization complete');
+        }
     }, 100);
 });
 
@@ -1008,12 +1057,20 @@ document.addEventListener('DOMContentLoaded', function() {
 window.startGameFromButton = function() {
     console.log('startGameFromButton called');
     
+    // Eruda debugging for mobile
+    if (typeof eruda !== 'undefined') {
+        eruda.get('console').log('startGameFromButton called');
+    }
+    
     // Super simple approach - just hide splash and show game
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     
     if (splashScreen && gameContent) {
         console.log('Hiding splash, showing game...');
+        if (typeof eruda !== 'undefined') {
+            eruda.get('console').log('Hiding splash, showing game...');
+        }
         splashScreen.style.display = 'none';
         gameContent.style.display = 'block';
         
@@ -1022,9 +1079,15 @@ window.startGameFromButton = function() {
             initGame();
         } catch (error) {
             console.error('Game init failed, but showing game anyway:', error);
+            if (typeof eruda !== 'undefined') {
+                eruda.get('console').error('Game init failed, but showing game anyway:', error);
+            }
         }
     } else {
         console.error('Could not find splash or game elements');
+        if (typeof eruda !== 'undefined') {
+            eruda.get('console').error('Could not find splash or game elements');
+        }
     }
 };
 
