@@ -49,16 +49,24 @@ let clickTimes = []; // For calculating clicks per second
 
 // Splash screen functionality
 function initSplashScreen() {
+    console.log('initSplashScreen called');
+    
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
+    
+    console.log('Splash screen element:', splashScreen);
+    console.log('Game content element:', gameContent);
     
     if (!splashScreen || !gameContent) {
         console.error('Splash screen elements not found!');
         return;
     }
     
+    console.log('Setting up splash screen event listeners...');
+    
     // Function to start the game
     function startGame() {
+        console.log('startGame called');
         splashScreen.style.opacity = '0';
         splashScreen.style.transition = 'opacity 0.5s ease-out';
         
@@ -71,12 +79,14 @@ function initSplashScreen() {
     
     // Multiple event listeners for maximum compatibility
     splashScreen.addEventListener('click', function(e) {
+        console.log('Splash screen clicked!');
         e.preventDefault();
         e.stopPropagation();
         startGame();
     }, true);
     
     splashScreen.addEventListener('touchstart', function(e) {
+        console.log('Splash screen touched!');
         e.preventDefault();
         e.stopPropagation();
         startGame();
@@ -85,9 +95,12 @@ function initSplashScreen() {
     // Also allow keyboard input to start
     document.addEventListener('keydown', function(event) {
         if (splashScreen.style.display !== 'none') {
+            console.log('Keyboard input detected, starting game...');
             startGame();
         }
     });
+    
+    console.log('Splash screen event listeners set up successfully');
 }
 
 // Tab switching functionality
@@ -926,11 +939,17 @@ function reload() {
 }
 
 // Initialize splash screen when page loads
-window.onload = function() {
-    initSplashScreen();
-    loadOptions(); // Load options on page load
-    updatePlayTime(); // Start play time tracking
-};
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing splash screen...');
+    
+    // Small delay to ensure everything is ready
+    setTimeout(() => {
+        initSplashScreen();
+        loadOptions(); // Load options on page load
+        updatePlayTime(); // Start play time tracking
+        console.log('Splash screen initialization complete');
+    }, 100);
+});
 
 // Function to show purchase feedback
 function showPurchaseFeedback(itemName, cost) {
