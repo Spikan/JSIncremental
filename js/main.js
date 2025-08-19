@@ -19,6 +19,10 @@ let tickRate = DEFAULT_TICK_RATE;
 let tickProgress = 0;
 let lastTickTime = Date.now();
 
+// Faster Ticks upgrade variables
+let fasterTicks = new Decimal(0);
+let fasterTicksUpCounter = new Decimal(1);
+
 // Splash screen functionality
 function initSplashScreen() {
     const splashScreen = document.getElementById('splashScreen');
@@ -71,27 +75,33 @@ function checkUpgradeAffordability() {
     const strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
     const cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
     const suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+    const fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
     const strawUpCost = 200 * strawUpCounter.toNumber();
     const cupUpCost = 500 * cupUpCounter.toNumber();
     const suctionUpCost = 1000 * suctionUpCounter.toNumber();
+    const fasterTicksUpCost = 2000 * fasterTicksUpCounter.toNumber();
     const levelUpCost = 5000 * level.toNumber();
     
     // Update button states based on affordability
     updateButtonState('buyStraw', sips.gte(strawCost), strawCost);
     updateButtonState('buyCup', sips.gte(cupCost), cupCost);
     updateButtonState('buySuction', sips.gte(suctionCost), suctionCost);
+    updateButtonState('buyFasterTicks', sips.gte(fasterTicksCost), fasterTicksCost);
     updateButtonState('upgradeStraw', sips.gte(strawUpCost), strawUpCost);
     updateButtonState('upgradeCup', sips.gte(cupUpCost), cupUpCost);
     updateButtonState('upgradeSuction', sips.gte(suctionUpCost), suctionUpCost);
+    updateButtonState('upgradeFasterTicks', sips.gte(fasterTicksUpCost), fasterTicksUpCost);
     updateButtonState('levelUp', sips.gte(levelUpCost), levelUpCost);
     
     // Update cost displays with affordability indicators
     updateCostDisplay('strawCost', strawCost, sips.gte(strawCost));
     updateCostDisplay('cupCost', cupCost, sips.gte(cupCost));
     updateCostDisplay('suctionCost', suctionCost, sips.gte(suctionCost));
+    updateCostDisplay('fasterTicksCost', fasterTicksCost, sips.gte(fasterTicksCost));
     updateCostDisplay('strawUpCost', strawUpCost, sips.gte(strawUpCost));
     updateCostDisplay('cupUpCost', cupUpCost, sips.gte(cupUpCost));
     updateCostDisplay('suctionUpCost', suctionUpCost, sips.gte(suctionUpCost));
+    updateCostDisplay('fasterTicksUpCost', fasterTicksUpCost, sips.gte(fasterTicksUpCost));
     updateCostDisplay('levelCost', levelUpCost, sips.gte(levelUpCost));
 }
 
@@ -134,10 +144,12 @@ function initGame() {
         straws = new Decimal(savegame.straws || 0);
         cups = new Decimal(savegame.cups || 0);
         suctions = new Decimal(savegame.suctions || 0);
+        fasterTicks = new Decimal(savegame.fasterTicks || 0);
         sps = new Decimal(savegame.sps || 0);
         strawUpCounter = new Decimal(savegame.strawUpCounter || 1);
         cupUpCounter = new Decimal(savegame.cupUpCounter || 1);
         suctionUpCounter = new Decimal(savegame.suctionUpCounter || 1);
+        fasterTicksUpCounter = new Decimal(savegame.fasterTicksUpCounter || 1);
         suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
         level = new Decimal(savegame.level || 1);
     }
@@ -145,6 +157,9 @@ function initGame() {
     strawSPS = new Decimal(0.4).times(strawUpCounter);
     cupSPS = new Decimal(cupUpCounter.toNumber());
     suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
+    
+    // Initialize tick rate based on upgrades
+    updateTickRate();
     
     reload();
     
@@ -217,9 +232,38 @@ function setTickRate(newTickRate) {
     lastTickTime = Date.now();
 }
 
+// Function to calculate and update tick rate based on upgrades
+function updateTickRate() {
+    // Each faster tick reduces time by 1%
+    // Each upgrade increases the effectiveness
+    let totalReduction = fasterTicks.times(fasterTicksUpCounter).times(0.01);
+    let newTickRate = DEFAULT_TICK_RATE * (1 - totalReduction.toNumber());
+    
+    // Ensure tick rate doesn't go below 0.5 seconds
+    newTickRate = Math.max(500, newTickRate);
+    
+    setTickRate(newTickRate);
+}
+
 // Function to get current tick rate in seconds
 function getTickRateSeconds() {
     return tickRate / 1000;
+}
+
+// Function to update tick speed display
+function updateTickSpeedDisplay() {
+    const currentTickSpeed = document.getElementById('currentTickSpeed');
+    const tickSpeedBonus = document.getElementById('tickSpeedBonus');
+    
+    if (currentTickSpeed && tickSpeedBonus) {
+        // Show current tick time
+        currentTickSpeed.textContent = getTickRateSeconds().toFixed(2) + 's';
+        
+        // Calculate and show speed bonus percentage
+        let totalReduction = fasterTicks.times(fasterTicksUpCounter).times(0.01);
+        let speedBonusPercent = totalReduction.times(100);
+        tickSpeedBonus.textContent = speedBonusPercent.toFixed(1) + '%';
+    }
 }
 
 regSoda = new Image();
@@ -327,6 +371,28 @@ function upgradeSuction() {
     }
 }
 
+function buyFasterTicks() {
+    let fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
+    if (sips.gte(fasterTicksCost)) {
+        fasterTicks = fasterTicks.plus(1);
+        sips = sips.minus(fasterTicksCost);
+        updateTickRate();
+        reload();
+        checkUpgradeAffordability();
+    }
+}
+
+function upgradeFasterTicks() {
+    let fasterTicksUpCost = 2000 * fasterTicksUpCounter.toNumber();
+    if (sips.gte(fasterTicksUpCost)) {
+        sips = sips.minus(fasterTicksUpCost);
+        fasterTicksUpCounter = fasterTicksUpCounter.plus(1);
+        updateTickRate();
+        reload();
+        checkUpgradeAffordability();
+    }
+}
+
 function levelUp() {
     let levelUpCost = 5000 * level.toNumber();
     if (sips.gte(levelUpCost)) {
@@ -359,6 +425,7 @@ function save() {
         straws: straws.toString(),
         cups: cups.toString(),
         suctions: suctions.toString(),
+        fasterTicks: fasterTicks.toString(),
         sps: sps.toString(),
         strawSPS: strawSPS.toString(),
         cupSPS: cupSPS.toString(),
@@ -366,6 +433,7 @@ function save() {
         strawUpCounter: strawUpCounter.toString(),
         cupUpCounter: cupUpCounter.toString(),
         suctionUpCounter: suctionUpCounter.toString(),
+        fasterTicksUpCounter: fasterTicksUpCounter.toString(),
         level: level.toString()
     };
 
@@ -411,6 +479,7 @@ function reload() {
     let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
     let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
     let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+    let fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
 
     document.getElementById('straws').innerHTML = straws.toNumber();
     document.getElementById('strawCost').innerHTML = strawCost.toString();
@@ -418,6 +487,8 @@ function reload() {
     document.getElementById('cupCost').innerHTML = cupCost.toString();
     document.getElementById('suctions').innerHTML = suctions.toNumber();
     document.getElementById('suctionCost').innerHTML = suctionCost.toString();
+    document.getElementById('fasterTicks').innerHTML = fasterTicks.toNumber();
+    document.getElementById('fasterTicksCost').innerHTML = fasterTicksCost.toString();
     document.getElementById('sips').innerHTML = prettify(sips);
     document.getElementById('sps').innerHTML = prettify(sps);
     document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
@@ -429,7 +500,11 @@ function reload() {
     document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter.toNumber()).toString();
     document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter.toNumber()).toString();
     document.getElementById('suctionUpCost').innerHTML = (1000 * suctionUpCounter.toNumber()).toString();
+    document.getElementById('fasterTicksUpCost').innerHTML = (2000 * fasterTicksUpCounter.toNumber()).toString();
     document.getElementById('levelNumber').innerHTML = level.toNumber();
+    
+    // Update tick speed display
+    updateTickSpeedDisplay();
     
     // Check affordability after reloading all values
     checkUpgradeAffordability();
