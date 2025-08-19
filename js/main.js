@@ -155,7 +155,7 @@ function initSplashScreen() {
 }
 
 // Tab switching functionality
-function switchTab(tabName) {
+function switchTab(tabName, event) {
     // Hide all tab contents
     const tabContents = document.querySelectorAll('.tab-content');
     tabContents.forEach(tab => tab.classList.remove('active'));
@@ -1423,3 +1423,24 @@ window.upgradeFasterDrinks = upgradeFasterDrinks;
 window.save = save;
 window.delete_save = delete_save;
 window.sendMessage = sendMessage;
+
+// Make all other functions globally available to prevent undefined errors
+window.updateAllStats = updateAllStats;
+window.updateDrinkRate = updateDrinkRate;
+window.updateDrinkSpeedDisplay = updateDrinkSpeedDisplay;
+window.loadOptions = loadOptions;
+window.updatePlayTime = updatePlayTime;
+window.updateLastSaveTime = updateLastSaveTime;
+window.trackClick = trackClick;
+window.showClickFeedback = showClickFeedback;
+window.showPurchaseFeedback = showPurchaseFeedback;
+window.addUserMessage = addUserMessage;
+window.addGodMessage = addGodMessage;
+window.scrollToBottom = scrollToBottom;
+window.escapeHtml = escapeHtml;
+window.getDivineResponse = getDivineResponse;
+window.searchGiphyAPI = searchGiphyAPI;
+window.getPlaceholderGif = getPlaceholderGif;
+window.toggleAutosave = toggleAutosave;
+window.changeAutosaveInterval = changeAutosaveInterval;
+window.getGodResponse = getGodResponse;
