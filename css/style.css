@@ -433,68 +433,61 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Tick Progress Bar */
-.tick-progress-container {
+/* Drink Progress Bar */
+.drink-progress-container {
     background: rgba(0, 23, 137, 0.3);
     border: 2px solid #02D97F;
     border-radius: 12px;
+    margin: 1rem 0.5rem;
     padding: 1rem;
-    margin: 1rem auto;
-    max-width: 600px;
     box-shadow: 0 4px 12px rgba(2, 217, 127, 0.2);
 }
 
-.tick-info {
+.drink-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.75rem;
-}
-
-.tick-label {
     color: #02D97F;
     font-weight: bold;
+}
+
+.drink-label {
     font-size: 1.1rem;
 }
 
-.tick-countdown {
-    color: #FF3D02;
-    font-weight: bold;
+.drink-countdown {
     font-size: 1.2rem;
-    text-shadow: 0 0 8px rgba(255, 61, 2, 0.5);
+    color: #FF8E53;
 }
 
-.tick-progress-bar {
+.drink-progress-bar {
     width: 100%;
     height: 12px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 23, 137, 0.5);
     border-radius: 6px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
+    border: 1px solid #02D97F;
 }
 
-.tick-progress-fill {
+.drink-progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #02D97F, #00FF88);
-    border-radius: 6px;
-    transition: width 0.1s ease;
     width: 0%;
-    box-shadow: 0 0 10px rgba(2, 217, 127, 0.6);
+    transition: width 0.1s ease;
+    border-radius: 6px;
 }
 
-.tick-progress-fill.nearly-complete {
-    background: linear-gradient(90deg, #FF8E53, #FFB347);
-    box-shadow: 0 0 15px rgba(255, 142, 83, 0.7);
+.drink-progress-fill.nearly-complete {
+    background: linear-gradient(90deg, #FF8E53, #FF6B6B);
 }
 
-.tick-progress-fill.complete {
+.drink-progress-fill.complete {
     background: linear-gradient(90deg, #FF3D02, #FF6B6B);
-    box-shadow: 0 0 20px rgba(255, 61, 2, 0.8);
-    animation: tickComplete 0.5s ease-out;
+    animation: drinkComplete 0.5s ease;
 }
 
-@keyframes tickComplete {
+@keyframes drinkComplete {
     0% { transform: scaleX(1); }
     50% { transform: scaleX(1.05); }
     100% { transform: scaleX(1); }
@@ -671,45 +664,45 @@ h3 {
 .shop-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .shop-item {
     background: rgba(0, 23, 137, 0.4);
     border: 2px solid #02D97F;
-    border-radius: 16px;
-    padding: 1.5rem;
+    border-radius: 12px;
+    padding: 1rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(2, 217, 127, 0.1);
 }
 
 .shop-item:hover {
     background: rgba(0, 23, 137, 0.5);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(2, 217, 127, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(2, 217, 127, 0.2);
 }
 
 .shop-header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .shop-btn {
-    min-width: 200px;
-    min-height: 80px;
-    padding: 1rem 1.5rem;
-    font-size: 1.1rem;
+    min-width: 180px;
+    min-height: 70px;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
     font-weight: bold;
     border: 3px solid #02D97F;
     background-color: #001789;
     color: #02D97F;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
-    line-height: 1.3;
+    line-height: 1.2;
     white-space: nowrap;
 }
 
@@ -740,37 +733,37 @@ h3 {
 
 .shop-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
     background: rgba(2, 217, 127, 0.1);
-    border-radius: 10px;
+    border-radius: 8px;
     border: 1px solid rgba(2, 217, 127, 0.3);
 }
 
 .shop-stat {
     text-align: center;
-    padding: 0.75rem;
+    padding: 0.5rem;
     background: rgba(0, 23, 137, 0.3);
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid rgba(2, 217, 127, 0.2);
 }
 
 .stat-label {
     display: block;
     color: #02D97F;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 }
 
 .stat-value {
     display: block;
     color: #FF8E53;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
 }
 
@@ -779,18 +772,18 @@ h3 {
 }
 
 .upgrade-btn {
-    min-width: 180px;
-    min-height: 70px;
-    padding: 0.875rem 1.25rem;
-    font-size: 1rem;
+    min-width: 160px;
+    min-height: 60px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
     font-weight: bold;
     border: 2px solid #FF3D02;
     background-color: #001789;
     color: #FF3D02;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    line-height: 1.3;
+    line-height: 1.2;
     white-space: nowrap;
 }
 
@@ -884,6 +877,21 @@ h3 {
     }
     
     .tick-countdown {
+        font-size: 1.1rem;
+    }
+    
+    .drink-progress-container {
+        margin: 1rem 0.5rem;
+        padding: 0.75rem;
+    }
+    
+    .drink-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .drink-countdown {
         font-size: 1.1rem;
     }
     

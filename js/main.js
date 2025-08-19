@@ -12,15 +12,15 @@ let cupUpCounter = new Decimal(1);
 let suctionUpCounter = new Decimal(1);
 let level = new Decimal(1);
 
-// Tick system variables
-const DEFAULT_TICK_RATE = 5000; // 5 seconds in milliseconds
-let tickRate = DEFAULT_TICK_RATE;
-let tickProgress = 0;
-let lastTickTime = Date.now();
+// Drink system variables
+const DEFAULT_DRINK_RATE = 5000; // 5 seconds in milliseconds
+let drinkRate = DEFAULT_DRINK_RATE;
+let drinkProgress = 0;
+let lastDrinkTime = Date.now();
 
-// Faster Ticks upgrade variables
-let fasterTicks = new Decimal(0);
-let fasterTicksUpCounter = new Decimal(1);
+// Faster Drinks upgrade variables
+let fasterDrinks = new Decimal(0);
+let fasterDrinksUpCounter = new Decimal(1);
 
 // Auto-save and options variables
 let autosaveEnabled = true;
@@ -113,33 +113,33 @@ function checkUpgradeAffordability() {
     const strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
     const cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
     const suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
-    const fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
+    const fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
     const strawUpCost = 200 * strawUpCounter.toNumber();
     const cupUpCost = 500 * cupUpCounter.toNumber();
     const suctionUpCost = 1000 * suctionUpCounter.toNumber();
-    const fasterTicksUpCost = 2000 * fasterTicksUpCounter.toNumber();
+    const fasterDrinksUpCost = 2000 * fasterDrinksUpCounter.toNumber();
     const levelUpCost = 5000 * level.toNumber();
     
     // Update button states based on affordability
     updateButtonState('buyStraw', sips.gte(strawCost), strawCost);
     updateButtonState('buyCup', sips.gte(cupCost), cupCost);
     updateButtonState('buySuction', sips.gte(suctionCost), suctionCost);
-    updateButtonState('buyFasterTicks', sips.gte(fasterTicksCost), fasterTicksCost);
+    updateButtonState('buyFasterDrinks', sips.gte(fasterDrinksCost), fasterDrinksCost);
     updateButtonState('upgradeStraw', sips.gte(strawUpCost), strawUpCost);
     updateButtonState('upgradeCup', sips.gte(cupUpCost), cupUpCost);
     updateButtonState('upgradeSuction', sips.gte(suctionUpCost), suctionUpCost);
-    updateButtonState('upgradeFasterTicks', sips.gte(fasterTicksUpCost), fasterTicksUpCost);
+    updateButtonState('upgradeFasterDrinks', sips.gte(fasterDrinksUpCost), fasterDrinksUpCost);
     updateButtonState('levelUp', sips.gte(levelUpCost), levelUpCost);
     
     // Update cost displays with affordability indicators
     updateCostDisplay('strawCost', strawCost, sips.gte(strawCost));
     updateCostDisplay('cupCost', cupCost, sips.gte(cupCost));
     updateCostDisplay('suctionCost', suctionCost, sips.gte(suctionCost));
-    updateCostDisplay('fasterTicksCost', fasterTicksCost, sips.gte(fasterTicksCost));
+    updateCostDisplay('fasterDrinksCost', fasterDrinksCost, sips.gte(fasterDrinksCost));
     updateCostDisplay('strawUpCost', strawUpCost, sips.gte(strawUpCost));
     updateCostDisplay('cupUpCost', cupUpCost, sips.gte(cupUpCost));
     updateCostDisplay('suctionUpCost', suctionUpCost, sips.gte(suctionUpCost));
-    updateCostDisplay('fasterTicksUpCost', fasterTicksUpCost, sips.gte(fasterTicksUpCost));
+    updateCostDisplay('fasterDrinksUpCost', fasterDrinksUpCost, sips.gte(fasterDrinksUpCost));
     updateCostDisplay('levelCost', levelUpCost, sips.gte(levelUpCost));
 }
 
@@ -182,12 +182,12 @@ function initGame() {
         straws = new Decimal(savegame.straws || 0);
         cups = new Decimal(savegame.cups || 0);
         suctions = new Decimal(savegame.suctions || 0);
-        fasterTicks = new Decimal(savegame.fasterTicks || 0);
+        fasterDrinks = new Decimal(savegame.fasterDrinks || 0);
         sps = new Decimal(savegame.sps || 0);
         strawUpCounter = new Decimal(savegame.strawUpCounter || 1);
         cupUpCounter = new Decimal(savegame.cupUpCounter || 1);
         suctionUpCounter = new Decimal(savegame.suctionUpCounter || 1);
-        fasterTicksUpCounter = new Decimal(savegame.fasterTicksUpCounter || 1);
+        fasterDrinksUpCounter = new Decimal(savegame.fasterDrinksUpCounter || 1);
         suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
         level = new Decimal(savegame.level || 1);
         totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
@@ -200,8 +200,8 @@ function initGame() {
     cupSPS = new Decimal(cupUpCounter.toNumber());
     suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
     
-    // Initialize tick rate based on upgrades
-    updateTickRate();
+    // Initialize drink rate based on upgrades
+    updateDrinkRate();
     
     reload();
     
@@ -210,15 +210,15 @@ function initGame() {
 }
 
 function startGameLoop() {
-    // Update tick progress every 100ms for smooth animation
+    // Update drink progress every 100ms for smooth animation
     window.setInterval(function() {
-        updateTickProgress();
+        updateDrinkProgress();
     }, 100);
     
-    // Main tick interval for game logic
+    // Main drink interval for game logic
     window.setInterval(function() {
-        processTick();
-    }, 100); // Check every 100ms for precise tick timing
+        processDrink();
+    }, 100); // Check every 100ms for precise drink timing
     
     // Update play time, last save time, and stats every second
     window.setInterval(function() {
@@ -228,48 +228,48 @@ function startGameLoop() {
     }, 1000);
 }
 
-function updateTickProgress() {
+function updateDrinkProgress() {
     const currentTime = Date.now();
-    const timeSinceLastTick = currentTime - lastTickTime;
-    tickProgress = (timeSinceLastTick / tickRate) * 100;
+    const timeSinceLastDrink = currentTime - lastDrinkTime;
+    drinkProgress = (timeSinceLastDrink / drinkRate) * 100;
     
     // Update progress bar
-    const progressFill = document.getElementById('tickProgressFill');
-    const countdown = document.getElementById('tickCountdown');
+    const progressFill = document.getElementById('drinkProgressFill');
+    const countdown = document.getElementById('drinkCountdown');
     
     if (progressFill && countdown) {
-        progressFill.style.width = Math.min(tickProgress, 100) + '%';
+        progressFill.style.width = Math.min(drinkProgress, 100) + '%';
         
         // Update countdown text
-        const remainingTime = Math.max(0, (tickRate - timeSinceLastTick) / 1000);
+        const remainingTime = Math.max(0, (drinkRate - timeSinceLastDrink) / 1000);
         countdown.textContent = remainingTime.toFixed(1) + 's';
         
         // Update progress bar colors based on completion
         progressFill.classList.remove('nearly-complete', 'complete');
-        if (tickProgress >= 100) {
+        if (drinkProgress >= 100) {
             progressFill.classList.add('complete');
-        } else if (tickProgress >= 75) {
+        } else if (drinkProgress >= 75) {
             progressFill.classList.add('nearly-complete');
         }
     }
 }
 
-function processTick() {
+function processDrink() {
     const currentTime = Date.now();
-    if (currentTime - lastTickTime >= tickRate) {
-        // Process the tick
+    if (currentTime - lastDrinkTime >= drinkRate) {
+        // Process the drink
         spsClick(sps);
-        lastTickTime = currentTime;
-        tickProgress = 0;
+        lastDrinkTime = currentTime;
+        drinkProgress = 0;
         
         // Update auto-save counter based on configurable interval
         if (autosaveEnabled) {
             autosaveCounter += 1;
-            // Convert tick rate to seconds and calculate how many ticks equal the auto-save interval
-            const ticksPerSecond = 1000 / tickRate;
-            const ticksForAutosave = Math.ceil(autosaveInterval * ticksPerSecond);
+            // Convert drink rate to seconds and calculate how many drinks equal the auto-save interval
+            const drinksPerSecond = 1000 / drinkRate;
+            const drinksForAutosave = Math.ceil(autosaveInterval * drinksPerSecond);
             
-            if (autosaveCounter >= ticksForAutosave) {
+            if (autosaveCounter >= drinksForAutosave) {
                 save();
                 autosaveCounter = 1;
             }
@@ -277,30 +277,30 @@ function processTick() {
     }
 }
 
-// Function to adjust tick rate (for future upgrades)
-function setTickRate(newTickRate) {
-    tickRate = newTickRate;
-    // Reset progress when changing tick rate
-    tickProgress = 0;
-    lastTickTime = Date.now();
+// Function to adjust drink rate (for future upgrades)
+function setDrinkRate(newDrinkRate) {
+    drinkRate = newDrinkRate;
+    // Reset progress when changing drink rate
+    drinkProgress = 0;
+    lastDrinkTime = Date.now();
 }
 
-// Function to calculate and update tick rate based on upgrades
-function updateTickRate() {
-    // Each faster tick reduces time by 1%
+// Function to calculate and update drink rate based on upgrades
+function updateDrinkRate() {
+    // Each faster drink reduces time by 1%
     // Each upgrade increases the effectiveness
-    let totalReduction = fasterTicks.times(fasterTicksUpCounter).times(0.01);
-    let newTickRate = DEFAULT_TICK_RATE * (1 - totalReduction.toNumber());
+    let totalReduction = fasterDrinks.times(fasterDrinksUpCounter).times(0.01);
+    let newDrinkRate = DEFAULT_DRINK_RATE * (1 - totalReduction.toNumber());
     
-    // Ensure tick rate doesn't go below 0.5 seconds
-    newTickRate = Math.max(500, newTickRate);
+    // Ensure drink rate doesn't go below 0.5 seconds
+    newDrinkRate = Math.max(500, newDrinkRate);
     
-    setTickRate(newTickRate);
+    setDrinkRate(newDrinkRate);
 }
 
-// Function to get current tick rate in seconds
-function getTickRateSeconds() {
-    return tickRate / 1000;
+// Function to get current drink rate in seconds
+function getDrinkRateSeconds() {
+    return drinkRate / 1000;
 }
 
 // Auto-save management functions
@@ -506,14 +506,14 @@ function updateAchievementStats() {
     // Total upgrades (sum of all upgrade counters)
     const totalUpgradesElement = document.getElementById('totalUpgrades');
     if (totalUpgradesElement) {
-        const totalUpgrades = strawUpCounter.plus(cupUpCounter).plus(suctionUpCounter).plus(fasterTicksUpCounter);
+        const totalUpgrades = strawUpCounter.plus(cupUpCounter).plus(suctionUpCounter).plus(fasterDrinksUpCounter);
         totalUpgradesElement.textContent = prettify(totalUpgrades);
     }
     
-    // Faster ticks owned
-    const fasterTicksOwnedElement = document.getElementById('fasterTicksOwned');
-    if (fasterTicksOwnedElement) {
-        fasterTicksOwnedElement.textContent = prettify(fasterTicks);
+    // Faster drinks owned
+    const fasterDrinksOwnedElement = document.getElementById('fasterDrinksOwned');
+    if (fasterDrinksOwnedElement) {
+        fasterDrinksOwnedElement.textContent = prettify(fasterDrinks);
     }
 }
 
@@ -546,19 +546,19 @@ function trackClick() {
     }
 }
 
-// Function to update tick speed display
-function updateTickSpeedDisplay() {
-    const currentTickSpeed = document.getElementById('currentTickSpeed');
-    const tickSpeedBonus = document.getElementById('tickSpeedBonus');
+// Function to update drink speed display
+function updateDrinkSpeedDisplay() {
+    const currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
+    const drinkSpeedBonus = document.getElementById('drinkSpeedBonus');
     
-    if (currentTickSpeed && tickSpeedBonus) {
-        // Show current tick time
-        currentTickSpeed.textContent = getTickRateSeconds().toFixed(2) + 's';
+    if (currentDrinkSpeed && drinkSpeedBonus) {
+        // Show current drink time
+        currentDrinkSpeed.textContent = getDrinkRateSeconds().toFixed(2) + 's';
         
         // Calculate and show speed bonus percentage
-        let totalReduction = fasterTicks.times(fasterTicksUpCounter).times(0.01);
+        let totalReduction = fasterDrinks.times(fasterDrinksUpCounter).times(0.01);
         let speedBonusPercent = totalReduction.times(100);
-        tickSpeedBonus.textContent = speedBonusPercent.toFixed(1) + '%';
+        drinkSpeedBonus.textContent = speedBonusPercent.toFixed(1) + '%';
     }
 }
 
@@ -689,23 +689,23 @@ function upgradeSuction() {
     }
 }
 
-function buyFasterTicks() {
-    let fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
-    if (sips.gte(fasterTicksCost)) {
-        fasterTicks = fasterTicks.plus(1);
-        sips = sips.minus(fasterTicksCost);
-        updateTickRate();
+function buyFasterDrinks() {
+    let fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
+    if (sips.gte(fasterDrinksCost)) {
+        fasterDrinks = fasterDrinks.plus(1);
+        sips = sips.minus(fasterDrinksCost);
+        updateDrinkRate();
         reload();
         checkUpgradeAffordability();
     }
 }
 
-function upgradeFasterTicks() {
-    let fasterTicksUpCost = 2000 * fasterTicksUpCounter.toNumber();
-    if (sips.gte(fasterTicksUpCost)) {
-        sips = sips.minus(fasterTicksUpCost);
-        fasterTicksUpCounter = fasterTicksUpCounter.plus(1);
-        updateTickRate();
+function upgradeFasterDrinks() {
+    let fasterDrinksUpCost = 2000 * fasterDrinksUpCounter.toNumber();
+    if (sips.gte(fasterDrinksUpCost)) {
+        sips = sips.minus(fasterDrinksUpCost);
+        fasterDrinksUpCounter = fasterDrinksUpCounter.plus(1);
+        updateDrinkRate();
         reload();
         checkUpgradeAffordability();
     }
@@ -742,7 +742,7 @@ function save() {
         straws: straws.toString(),
         cups: cups.toString(),
         suctions: suctions.toString(),
-        fasterTicks: fasterTicks.toString(),
+        fasterDrinks: fasterDrinks.toString(),
         sps: sps.toString(),
         strawSPS: strawSPS.toString(),
         cupSPS: cupSPS.toString(),
@@ -750,7 +750,7 @@ function save() {
         strawUpCounter: strawUpCounter.toString(),
         cupUpCounter: cupUpCounter.toString(),
         suctionUpCounter: suctionUpCounter.toString(),
-        fasterTicksUpCounter: fasterTicksUpCounter.toString(),
+        fasterDrinksUpCounter: fasterDrinksUpCounter.toString(),
         level: level.toString(),
         totalSipsEarned: totalSipsEarned.toString(),
         gameStartDate: gameStartDate,
@@ -802,7 +802,7 @@ function reload() {
     let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
     let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
     let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
-    let fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
+    let fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
 
     document.getElementById('straws').innerHTML = straws.toNumber();
     document.getElementById('strawCost').innerHTML = strawCost.toString();
@@ -810,8 +810,8 @@ function reload() {
     document.getElementById('cupCost').innerHTML = cupCost.toString();
     document.getElementById('suctions').innerHTML = suctions.toNumber();
     document.getElementById('suctionCost').innerHTML = suctionCost.toString();
-    document.getElementById('fasterTicks').innerHTML = fasterTicks.toNumber();
-    document.getElementById('fasterTicksCost').innerHTML = fasterTicksCost.toString();
+    document.getElementById('fasterDrinks').innerHTML = fasterDrinks.toNumber();
+    document.getElementById('fasterDrinksCost').innerHTML = fasterDrinksCost.toString();
     document.getElementById('sips').innerHTML = prettify(sips);
     document.getElementById('sps').innerHTML = prettify(sps);
     document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
@@ -823,11 +823,11 @@ function reload() {
     document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter.toNumber()).toString();
     document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter.toNumber()).toString();
     document.getElementById('suctionUpCost').innerHTML = (1000 * suctionUpCounter.toNumber()).toString();
-    document.getElementById('fasterTicksUpCost').innerHTML = (2000 * fasterTicksUpCounter.toNumber()).toString();
+    document.getElementById('fasterDrinksUpCost').innerHTML = (2000 * fasterDrinksUpCounter.toNumber()).toString();
     document.getElementById('levelNumber').innerHTML = level.toNumber();
     
-    // Update tick speed display
-    updateTickSpeedDisplay();
+    // Update drink speed display
+    updateDrinkSpeedDisplay();
     
     // Check affordability after reloading all values
     checkUpgradeAffordability();

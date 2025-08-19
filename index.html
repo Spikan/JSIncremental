@@ -61,14 +61,14 @@
     <button class="tab-btn" onclick="switchTab('options')">⚙️ Options</button>
 </div>
 
-<!-- Tick Progress Bar -->
-<div class="tick-progress-container">
-    <div class="tick-info">
-        <span class="tick-label">Next Tick:</span>
-        <span class="tick-countdown" id="tickCountdown">5.0s</span>
+<!-- Drink Progress Bar -->
+<div class="drink-progress-container">
+    <div class="drink-info">
+        <span class="drink-label">Next Drink:</span>
+        <span class="drink-countdown" id="drinkCountdown">5.0s</span>
     </div>
-    <div class="tick-progress-bar">
-        <div class="tick-progress-fill" id="tickProgressFill"></div>
+    <div class="drink-progress-bar">
+        <div class="drink-progress-fill" id="drinkProgressFill"></div>
     </div>
 </div>
 
@@ -87,7 +87,7 @@
                     <span id="sips" class="stat-value">0</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Sips/s:</span>
+                    <span class="stat-label">Sips/d:</span>
                     <span id="sps" class="stat-value">0</span>
                 </div>
             </div>
@@ -120,12 +120,12 @@
                         <span id="straws" class="stat-value">0</span>
                     </div>
                     <div class="shop-stat">
-                        <span class="stat-label">+ Sips/s:</span>
+                        <span class="stat-label">+ Sips/d:</span>
                         <span id="strawSPS" class="stat-value">0.4</span>
                     </div>
                     <div class="shop-stat">
                         <span class="stat-label">Total:</span>
-                        <span id="totalStrawSPS" class="stat-value">0</span> Sips/s
+                        <span id="totalStrawSPS" class="stat-value">0</span> Sips/d
                     </div>
                 </div>
                 <div class="shop-upgrade">
@@ -149,12 +149,12 @@
                         <span id="cups" class="stat-value">0</span>
                     </div>
                     <div class="shop-stat">
-                        <span class="stat-label">+ Sips/s:</span>
+                        <span class="stat-label">+ Sips/d:</span>
                         <span id="cupSPS" class="stat-value">1</span>
                     </div>
                     <div class="shop-stat">
                         <span class="stat-label">Total:</span>
-                        <span id="totalCupSPS" class="stat-value">0</span> Sips/s
+                        <span id="totalCupSPS" class="stat-value">0</span> Sips/d
                     </div>
                 </div>
                 <div class="shop-upgrade">
@@ -196,29 +196,29 @@
 
             <div class="shop-item">
                 <div class="shop-header">
-                    <button onclick="buyFasterTicks()" class="shop-btn">
-                        <span id="fasterTicksCost">100</span> Sips<br/> 
-                        Faster Ticks
+                    <button onclick="buyFasterDrinks()" class="shop-btn">
+                        <span id="fasterDrinksCost">100</span> Sips<br/> 
+                        Faster Drinks
                     </button>
                 </div>
                 <div class="shop-stats">
                     <div class="shop-stat">
                         <span class="stat-label">Owned:</span>
-                        <span id="fasterTicks" class="stat-value">0</span>
+                        <span id="fasterDrinks" class="stat-value">0</span>
                     </div>
                     <div class="shop-stat">
-                        <span class="stat-label">Tick Speed:</span>
-                        <span id="currentTickSpeed" class="stat-value">5.00s</span>
+                        <span class="stat-label">Drink Speed:</span>
+                        <span id="currentDrinkSpeed" class="stat-value">5.00s</span>
                     </div>
                     <div class="shop-stat">
                         <span class="stat-label">Speed Bonus:</span>
-                        <span id="tickSpeedBonus" class="stat-value">0%</span>
+                        <span id="drinkSpeedBonus" class="stat-value">0%</span>
                     </div>
                 </div>
                 <div class="shop-upgrade">
-                    <button onclick="upgradeFasterTicks()" class="upgrade-btn">
-                        <span id="fasterTicksUpCost">2000</span> Sips<br/> 
-                        Upgrade Faster Ticks
+                    <button onclick="upgradeFasterDrinks()" class="upgrade-btn">
+                        <span id="fasterDrinksUpCost">2000</span> Sips<br/> 
+                        Upgrade Faster Drinks
                     </button>
                 </div>
             </div>
