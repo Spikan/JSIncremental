@@ -57,6 +57,93 @@ function switchTab(tabName) {
     clickedButton.classList.add('active');
 }
 
+// Check if upgrades are affordable and update UI accordingly
+function checkUpgradeAffordability() {
+    const strawCost = Math.floor(10 * Math.pow(1.1, straws));
+    const cupCost = Math.floor(20 * Math.pow(1.2, cups));
+    const strawUpCost = 200 * strawUpCounter;
+    const cupUpCost = 500 * cupUpCounter;
+    const levelUpCost = 5000 * level;
+    
+    // Update button states based on affordability
+    updateButtonState('buyStraw', sips >= strawCost, strawCost);
+    updateButtonState('buyCup', sips >= cupCost, cupCost);
+    updateButtonState('upgradeStraw', sips >= strawUpCost, strawUpCost);
+    updateButtonState('upgradeCup', sips >= cupUpCost, cupUpCost);
+    updateButtonState('levelUp', sips >= levelUpCost, levelUpCost);
+    
+    // Update cost displays with affordability indicators
+    updateCostDisplay('strawCost', strawCost, sips >= strawCost);
+    updateCostDisplay('cupCost', cupCost, sips >= cupCost);
+    updateCostDisplay('strawUpCost', strawUpCost, sips >= strawUpCost);
+    updateCostDisplay('cupUpCost', cupUpCost, sips >= cupUpCost);
+    updateCostDisplay('levelCost', levelUpCost, sips >= levelUpCost);
+    
+    // Update progress bars
+    updateProgressBar('strawProgressFill', 'strawProgressText', sips, strawCost);
+    updateProgressBar('cupProgressFill', 'cupProgressText', sips, cupCost);
+    updateProgressBar('strawUpProgressFill', 'strawUpProgressText', sips, strawUpCost);
+    updateProgressBar('cupUpProgressFill', 'cupUpProgressText', sips, cupUpCost);
+    updateProgressBar('levelProgressFill', 'levelProgressText', sips, levelUpCost);
+}
+
+// Update button state based on affordability
+function updateButtonState(buttonId, isAffordable, cost) {
+    const button = document.querySelector(`button[onclick*="${buttonId}"]`);
+    if (button) {
+        if (isAffordable) {
+            button.classList.remove('disabled');
+            button.classList.add('affordable');
+            button.title = `Click to purchase for ${prettify(cost)} Sips`;
+        } else {
+            button.classList.remove('affordable');
+            button.classList.add('disabled');
+            button.title = `Costs ${prettify(cost)} Sips (You have ${prettify(sips)})`;
+        }
+    }
+}
+
+// Update cost display with affordability indicators
+function updateCostDisplay(elementId, cost, isAffordable) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        if (isAffordable) {
+            element.classList.remove('cost-too-high');
+            element.classList.add('cost-affordable');
+        } else {
+            element.classList.remove('cost-affordable');
+            element.classList.add('cost-too-high');
+        }
+    }
+}
+
+// Update progress bar based on affordability
+function updateProgressBar(fillId, textId, currentSips, targetCost) {
+    const fillElement = document.getElementById(fillId);
+    const textElement = document.getElementById(textId);
+    
+    if (fillElement && textElement) {
+        const progress = Math.min((currentSips / targetCost) * 100, 100);
+        fillElement.style.width = progress + '%';
+        
+        // Update progress text
+        textElement.textContent = `${prettify(currentSips)} / ${prettify(targetCost)} Sips`;
+        
+        // Update progress bar color based on affordability
+        fillElement.classList.remove('affordable', 'nearly-affordable', 'far-from-affordable');
+        
+        if (progress >= 100) {
+            fillElement.classList.add('affordable');
+        } else if (progress >= 75) {
+            fillElement.classList.add('nearly-affordable');
+        } else if (progress >= 50) {
+            fillElement.classList.add('nearly-affordable');
+        } else {
+            fillElement.classList.add('far-from-affordable');
+        }
+    }
+}
+
 function initGame() {
     // Load saved game data
     let savegame = JSON.parse(localStorage.getItem("save"));
@@ -110,12 +197,17 @@ function sodaClick(number) {
         document.getElementById("sodaButton").src = regSoda.src;
     }, 90);
     document.getElementById("sodaButton").src = clickSoda.src;
+    
+    // Check affordability after each click
+    checkUpgradeAffordability();
 }
 
 function spsClick(number) {
     sips = sips + number;
     document.getElementById("sips").innerHTML = prettify(sips);
-
+    
+    // Check affordability after passive income
+    checkUpgradeAffordability();
 }
 
 function buyStraw() {
@@ -126,9 +218,8 @@ function buyStraw() {
         sips = sips - strawCost;
         sps = sps + strawSPS;
         reload();
+        checkUpgradeAffordability();
     }
-
-
 }
 
 function upgradeStraw() {
@@ -141,6 +232,7 @@ function upgradeStraw() {
         sps = sps + (strawSPS * straws);
         sps = sps + (cupSPS * cups);
         reload();
+        checkUpgradeAffordability();
     }
 }
 
@@ -152,8 +244,8 @@ function buyCup() {
         sips = sips - cupCost;
         sps = sps + cupSPS;
         reload();
+        checkUpgradeAffordability();
     }
-
 }
 
 function upgradeCup() {
@@ -166,6 +258,7 @@ function upgradeCup() {
         sps = sps + (strawSPS * straws);
         sps = sps + (cupSPS * cups);
         reload();
+        checkUpgradeAffordability();
     }
 }
 
@@ -180,6 +273,7 @@ function levelUp() {
         document.getElementById("sps").innerHTML = prettify(sips);
         document.getElementById("levelNumber").innerHTML = level;
         changeLevel(level);
+        checkUpgradeAffordability();
     }
 }
 
@@ -237,6 +331,9 @@ function reload() {
     document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter).toString();
     document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter).toString();
     document.getElementById('levelNumber').innerHTML = level;
+    
+    // Check affordability after reloading all values
+    checkUpgradeAffordability();
 }
 
 // Initialize splash screen when page loads

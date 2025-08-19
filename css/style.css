@@ -438,6 +438,102 @@ h3 {
     transform: scale(0.95);
 }
 
+/* Affordability Indicators */
+.shop-btn.affordable,
+.upgrade-btn.affordable,
+.level-up-btn.affordable {
+    border-color: #02D97F;
+    background-color: #02D97F;
+    color: #001789;
+    box-shadow: 0 4px 12px rgba(2, 217, 127, 0.4);
+    animation: affordableGlow 2s ease-in-out infinite alternate;
+}
+
+.shop-btn.disabled,
+.upgrade-btn.disabled,
+.level-up-btn.disabled {
+    border-color: #666;
+    background-color: #333;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.shop-btn.disabled:hover,
+.upgrade-btn.disabled:hover,
+.level-up-btn.disabled:hover {
+    background-color: #333;
+    color: #999;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Cost Display Affordability */
+.cost-affordable {
+    color: #02D97F !important;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(2, 217, 127, 0.5);
+}
+
+.cost-too-high {
+    color: #FF6B6B !important;
+    opacity: 0.8;
+}
+
+/* Progress Bars */
+.upgrade-progress {
+    margin: 0.5rem 0;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FF6B6B, #FF8E53, #02D97F);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.progress-text {
+    font-size: 0.8rem;
+    color: #999;
+    font-weight: bold;
+}
+
+/* Progress Bar States */
+.progress-fill.affordable {
+    background: linear-gradient(90deg, #02D97F, #00FF88);
+    box-shadow: 0 0 8px rgba(2, 217, 127, 0.6);
+}
+
+.progress-fill.nearly-affordable {
+    background: linear-gradient(90deg, #FF8E53, #FFB347);
+}
+
+.progress-fill.far-from-affordable {
+    background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+}
+
+/* Affordable Glow Animation */
+@keyframes affordableGlow {
+    from {
+        box-shadow: 0 4px 12px rgba(2, 217, 127, 0.4);
+    }
+    to {
+        box-shadow: 0 4px 20px rgba(2, 217, 127, 0.6), 0 0 30px rgba(2, 217, 127, 0.3);
+    }
+}
+
 /* Mobile-specific optimizations */
 @media (max-width: 768px) {
     html {
@@ -534,6 +630,12 @@ h3 {
     }
     
     .tab-btn:hover {
+        transform: none;
+    }
+    
+    .shop-btn.affordable:hover,
+    .upgrade-btn.affordable:hover,
+    .level-up-btn.affordable:hover {
         transform: none;
     }
 }
