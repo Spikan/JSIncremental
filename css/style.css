@@ -120,6 +120,67 @@ body {
     min-height: 100vh;
 }
 
+/* Tab Navigation */
+.tab-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    padding: 0 1rem;
+}
+
+.tab-btn {
+    min-width: 150px;
+    min-height: 50px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #02D97F;
+    background-color: #001789;
+    color: #02D97F;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.tab-btn:hover {
+    background-color: #02D97F;
+    color: #001789;
+    transform: translateY(-2px);
+}
+
+.tab-btn.active {
+    background-color: #02D97F;
+    color: #001789;
+    border-color: #FF3D02;
+    box-shadow: 0 4px 8px rgba(2, 217, 127, 0.3);
+}
+
+.tab-btn:active {
+    transform: scale(0.95);
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+    animation: fadeInTab 0.3s ease-in;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeInTab {
+    from { 
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 h1 {
     color: #FF3D02;
     font-size: clamp(2rem, 8vw, 3.125rem);
@@ -209,6 +270,7 @@ h3 {
     justify-content: center;
     align-items: center;
     margin: 1rem 0;
+    min-height: 300px; /* Prevent layout jumping */
 }
 
 #sodaButton {
@@ -399,6 +461,16 @@ h3 {
         max-width: 200px;
     }
     
+    .tab-navigation {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tab-btn {
+        width: 100%;
+        max-width: 250px;
+    }
+    
     #sodaButton {
         max-height: 40vh;
     }
@@ -440,6 +512,11 @@ h3 {
         min-height: 56px;
         font-size: 1rem;
     }
+    
+    .tab-btn {
+        min-height: 48px;
+        font-size: 0.9rem;
+    }
 }
 
 /* Touch device optimizations */
@@ -453,6 +530,10 @@ h3 {
     }
     
     button:hover {
+        transform: none;
+    }
+    
+    .tab-btn:hover {
         transform: none;
     }
 }

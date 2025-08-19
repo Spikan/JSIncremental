@@ -36,6 +36,27 @@ function initSplashScreen() {
     });
 }
 
+// Tab switching functionality
+function switchTab(tabName) {
+    // Hide all tab contents
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(tab => tab.classList.remove('active'));
+    
+    // Remove active class from all tab buttons
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected tab content
+    const selectedTab = document.getElementById(tabName + 'Tab');
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+    
+    // Add active class to clicked button
+    const clickedButton = event.target;
+    clickedButton.classList.add('active');
+}
+
 function initGame() {
     // Load saved game data
     let savegame = JSON.parse(localStorage.getItem("save"));
@@ -156,7 +177,7 @@ function levelUp() {
         sps = sps * level;
 
         document.getElementById("sips").innerHTML = prettify(sips);
-        document.getElementById("sps").innerHTML = prettify(sps);
+        document.getElementById("sps").innerHTML = prettify(sips);
         document.getElementById("levelNumber").innerHTML = level;
         changeLevel(level);
     }
