@@ -13,6 +13,23 @@ let level = new Decimal(1);
 const autosave = "on";
 let autosaveCounter = 0;
 
+// Tick system variables
+const DEFAULT_TICK_RATE = 5000; // 5 seconds in milliseconds
+let tickRate = DEFAULT_TICK_RATE;
+let tickProgress = 0;
+let lastTickTime = Date.now();
+
+// Faster Ticks upgrade variables
+let fasterTicks = new Decimal(0);
+let fasterTicksUpCounter = new Decimal(1);
+
+// Auto-save and options variables
+let autosaveEnabled = true;
+let autosaveInterval = 10; // seconds
+let autosaveCounter = 0;
+let gameStartTime = Date.now();
+let lastSaveTime = null;
+
 // Splash screen functionality
 function initSplashScreen() {
     const splashScreen = document.getElementById('splashScreen');
@@ -65,27 +82,33 @@ function checkUpgradeAffordability() {
     const strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
     const cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
     const suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+    const fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
     const strawUpCost = 200 * strawUpCounter.toNumber();
     const cupUpCost = 500 * cupUpCounter.toNumber();
     const suctionUpCost = 1000 * suctionUpCounter.toNumber();
+    const fasterTicksUpCost = 2000 * fasterTicksUpCounter.toNumber();
     const levelUpCost = 5000 * level.toNumber();
     
     // Update button states based on affordability
     updateButtonState('buyStraw', sips.gte(strawCost), strawCost);
     updateButtonState('buyCup', sips.gte(cupCost), cupCost);
     updateButtonState('buySuction', sips.gte(suctionCost), suctionCost);
+    updateButtonState('buyFasterTicks', sips.gte(fasterTicksCost), fasterTicksCost);
     updateButtonState('upgradeStraw', sips.gte(strawUpCost), strawUpCost);
     updateButtonState('upgradeCup', sips.gte(cupUpCost), cupUpCost);
     updateButtonState('upgradeSuction', sips.gte(suctionUpCost), suctionUpCost);
+    updateButtonState('upgradeFasterTicks', sips.gte(fasterTicksUpCost), fasterTicksUpCost);
     updateButtonState('levelUp', sips.gte(levelUpCost), levelUpCost);
     
     // Update cost displays with affordability indicators
     updateCostDisplay('strawCost', strawCost, sips.gte(strawCost));
     updateCostDisplay('cupCost', cupCost, sips.gte(cupCost));
     updateCostDisplay('suctionCost', suctionCost, sips.gte(suctionCost));
+    updateCostDisplay('fasterTicksCost', fasterTicksCost, sips.gte(fasterTicksCost));
     updateCostDisplay('strawUpCost', strawUpCost, sips.gte(strawUpCost));
     updateCostDisplay('cupUpCost', cupUpCost, sips.gte(cupUpCost));
     updateCostDisplay('suctionUpCost', suctionUpCost, sips.gte(suctionUpCost));
+    updateCostDisplay('fasterTicksUpCost', fasterTicksUpCost, sips.gte(fasterTicksUpCost));
     updateCostDisplay('levelCost', levelUpCost, sips.gte(levelUpCost));
 }
 
@@ -128,10 +151,12 @@ function initGame() {
         straws = new Decimal(savegame.straws || 0);
         cups = new Decimal(savegame.cups || 0);
         suctions = new Decimal(savegame.suctions || 0);
+        fasterTicks = new Decimal(savegame.fasterTicks || 0);
         sps = new Decimal(savegame.sps || 0);
         strawUpCounter = new Decimal(savegame.strawUpCounter || 1);
         cupUpCounter = new Decimal(savegame.cupUpCounter || 1);
         suctionUpCounter = new Decimal(savegame.suctionUpCounter || 1);
+        fasterTicksUpCounter = new Decimal(savegame.fasterTicksUpCounter || 1);
         suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
         level = new Decimal(savegame.level || 1);
     }
@@ -140,6 +165,9 @@ function initGame() {
     cupSPS = new Decimal(cupUpCounter.toNumber());
     suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
     
+    // Initialize tick rate based on upgrades
+    updateTickRate();
+    
     reload();
     
     // Start the game loop
@@ -147,17 +175,197 @@ function initGame() {
 }
 
 function startGameLoop() {
-    window.setInterval(function () {
-        spsClick(sps);
+    // Update tick progress every 100ms for smooth animation
+    window.setInterval(function() {
+        updateTickProgress();
+    }, 100);
+    
+    // Main tick interval for game logic
+    window.setInterval(function() {
+        processTick();
+    }, 100); // Check every 100ms for precise tick timing
+    
+    // Update play time and last save time every second
+    window.setInterval(function() {
+        updatePlayTime();
+        updateLastSaveTime();
+    }, 1000);
+}
+
+function updateTickProgress() {
+    const currentTime = Date.now();
+    const timeSinceLastTick = currentTime - lastTickTime;
+    tickProgress = (timeSinceLastTick / tickRate) * 100;
+    
+    // Update progress bar
+    const progressFill = document.getElementById('tickProgressFill');
+    const countdown = document.getElementById('tickCountdown');
+    
+    if (progressFill && countdown) {
+        progressFill.style.width = Math.min(tickProgress, 100) + '%';
         
-        if (autosave === "on") {
+        // Update countdown text
+        const remainingTime = Math.max(0, (tickRate - timeSinceLastTick) / 1000);
+        countdown.textContent = remainingTime.toFixed(1) + 's';
+        
+        // Update progress bar colors based on completion
+        progressFill.classList.remove('nearly-complete', 'complete');
+        if (tickProgress >= 100) {
+            progressFill.classList.add('complete');
+        } else if (tickProgress >= 75) {
+            progressFill.classList.add('nearly-complete');
+        }
+    }
+}
+
+function processTick() {
+    const currentTime = Date.now();
+    if (currentTime - lastTickTime >= tickRate) {
+        // Process the tick
+        spsClick(sps);
+        lastTickTime = currentTime;
+        tickProgress = 0;
+        
+        // Update auto-save counter based on configurable interval
+        if (autosaveEnabled) {
             autosaveCounter += 1;
-            if (autosaveCounter >= 60) {
+            // Convert tick rate to seconds and calculate how many ticks equal the auto-save interval
+            const ticksPerSecond = 1000 / tickRate;
+            const ticksForAutosave = Math.ceil(autosaveInterval * ticksPerSecond);
+            
+            if (autosaveCounter >= ticksForAutosave) {
                 save();
                 autosaveCounter = 1;
             }
         }
-    }, 1000);
+    }
+}
+
+// Function to adjust tick rate (for future upgrades)
+function setTickRate(newTickRate) {
+    tickRate = newTickRate;
+    // Reset progress when changing tick rate
+    tickProgress = 0;
+    lastTickTime = Date.now();
+}
+
+// Function to calculate and update tick rate based on upgrades
+function updateTickRate() {
+    // Each faster tick reduces time by 1%
+    // Each upgrade increases the effectiveness
+    let totalReduction = fasterTicks.times(fasterTicksUpCounter).times(0.01);
+    let newTickRate = DEFAULT_TICK_RATE * (1 - totalReduction.toNumber());
+    
+    // Ensure tick rate doesn't go below 0.5 seconds
+    newTickRate = Math.max(500, newTickRate);
+    
+    setTickRate(newTickRate);
+}
+
+// Function to get current tick rate in seconds
+function getTickRateSeconds() {
+    return tickRate / 1000;
+}
+
+// Auto-save management functions
+function toggleAutosave() {
+    const checkbox = document.getElementById('autosaveToggle');
+    autosaveEnabled = checkbox.checked;
+    updateAutosaveStatus();
+    saveOptions();
+}
+
+function changeAutosaveInterval() {
+    const select = document.getElementById('autosaveInterval');
+    autosaveInterval = parseInt(select.value);
+    autosaveCounter = 0; // Reset counter when changing interval
+    updateAutosaveStatus();
+    saveOptions();
+}
+
+function updateAutosaveStatus() {
+    const status = document.getElementById('autosaveStatus');
+    if (status) {
+        if (autosaveEnabled) {
+            status.textContent = `Auto-save enabled (${autosaveInterval}s)`;
+        } else {
+            status.textContent = 'Auto-save disabled';
+        }
+    }
+}
+
+function saveOptions() {
+    const options = {
+        autosaveEnabled: autosaveEnabled,
+        autosaveInterval: autosaveInterval
+    };
+    localStorage.setItem('gameOptions', JSON.stringify(options));
+}
+
+function loadOptions() {
+    const savedOptions = localStorage.getItem('gameOptions');
+    if (savedOptions) {
+        const options = JSON.parse(savedOptions);
+        autosaveEnabled = options.autosaveEnabled !== undefined ? options.autosaveEnabled : true;
+        autosaveInterval = options.autosaveInterval || 10;
+    }
+    
+    // Update UI to match loaded options
+    const checkbox = document.getElementById('autosaveToggle');
+    const select = document.getElementById('autosaveInterval');
+    
+    if (checkbox) checkbox.checked = autosaveEnabled;
+    if (select) select.value = autosaveInterval.toString();
+    
+    updateAutosaveStatus();
+}
+
+// Play time tracking
+function updatePlayTime() {
+    const playTimeElement = document.getElementById('playTime');
+    if (playTimeElement) {
+        const currentTime = Date.now();
+        const playTimeMs = currentTime - gameStartTime;
+        const playTimeSeconds = Math.floor(playTimeMs / 1000);
+        const hours = Math.floor(playTimeSeconds / 3600);
+        const minutes = Math.floor((playTimeSeconds % 3600) / 60);
+        const seconds = playTimeSeconds % 60;
+        playTimeElement.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+}
+
+function updateLastSaveTime() {
+    const lastSaveElement = document.getElementById('lastSaveTime');
+    if (lastSaveElement) {
+        if (lastSaveTime) {
+            const timeAgo = Math.floor((Date.now() - lastSaveTime) / 1000);
+            if (timeAgo < 60) {
+                lastSaveElement.textContent = `${timeAgo} seconds ago`;
+            } else if (timeAgo < 3600) {
+                lastSaveElement.textContent = `${Math.floor(timeAgo / 60)} minutes ago`;
+            } else {
+                lastSaveElement.textContent = `${Math.floor(timeAgo / 3600)} hours ago`;
+            }
+        } else {
+            lastSaveElement.textContent = 'Never';
+        }
+    }
+}
+
+// Function to update tick speed display
+function updateTickSpeedDisplay() {
+    const currentTickSpeed = document.getElementById('currentTickSpeed');
+    const tickSpeedBonus = document.getElementById('tickSpeedBonus');
+    
+    if (currentTickSpeed && tickSpeedBonus) {
+        // Show current tick time
+        currentTickSpeed.textContent = getTickRateSeconds().toFixed(2) + 's';
+        
+        // Calculate and show speed bonus percentage
+        let totalReduction = fasterTicks.times(fasterTicksUpCounter).times(0.01);
+        let speedBonusPercent = totalReduction.times(100);
+        tickSpeedBonus.textContent = speedBonusPercent.toFixed(1) + '%';
+    }
 }
 
 regSoda = new Image();
@@ -265,6 +473,28 @@ function upgradeSuction() {
     }
 }
 
+function buyFasterTicks() {
+    let fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
+    if (sips.gte(fasterTicksCost)) {
+        fasterTicks = fasterTicks.plus(1);
+        sips = sips.minus(fasterTicksCost);
+        updateTickRate();
+        reload();
+        checkUpgradeAffordability();
+    }
+}
+
+function upgradeFasterTicks() {
+    let fasterTicksUpCost = 2000 * fasterTicksUpCounter.toNumber();
+    if (sips.gte(fasterTicksUpCost)) {
+        sips = sips.minus(fasterTicksUpCost);
+        fasterTicksUpCounter = fasterTicksUpCounter.plus(1);
+        updateTickRate();
+        reload();
+        checkUpgradeAffordability();
+    }
+}
+
 function levelUp() {
     let levelUpCost = 5000 * level.toNumber();
     if (sips.gte(levelUpCost)) {
@@ -291,12 +521,12 @@ function changeLevel(i) {
 }
 
 function save() {
-
     let save = {
         sips: sips.toString(),
         straws: straws.toString(),
         cups: cups.toString(),
         suctions: suctions.toString(),
+        fasterTicks: fasterTicks.toString(),
         sps: sps.toString(),
         strawSPS: strawSPS.toString(),
         cupSPS: cupSPS.toString(),
@@ -304,10 +534,13 @@ function save() {
         strawUpCounter: strawUpCounter.toString(),
         cupUpCounter: cupUpCounter.toString(),
         suctionUpCounter: suctionUpCounter.toString(),
+        fasterTicksUpCounter: fasterTicksUpCounter.toString(),
         level: level.toString()
     };
 
     localStorage.setItem("save", JSON.stringify(save));
+    lastSaveTime = Date.now();
+    updateLastSaveTime();
 }
 
 function delete_save() {
@@ -349,6 +582,7 @@ function reload() {
     let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
     let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
     let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+    let fasterTicksCost = Math.floor(100 * Math.pow(1.12, fasterTicks.toNumber()));
 
     document.getElementById('straws').innerHTML = straws.toNumber();
     document.getElementById('strawCost').innerHTML = strawCost.toString();
@@ -356,6 +590,8 @@ function reload() {
     document.getElementById('cupCost').innerHTML = cupCost.toString();
     document.getElementById('suctions').innerHTML = suctions.toNumber();
     document.getElementById('suctionCost').innerHTML = suctionCost.toString();
+    document.getElementById('fasterTicks').innerHTML = fasterTicks.toNumber();
+    document.getElementById('fasterTicksCost').innerHTML = fasterTicksCost.toString();
     document.getElementById('sips').innerHTML = prettify(sips);
     document.getElementById('sps').innerHTML = prettify(sps);
     document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
@@ -367,7 +603,11 @@ function reload() {
     document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter.toNumber()).toString();
     document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter.toNumber()).toString();
     document.getElementById('suctionUpCost').innerHTML = (1000 * suctionUpCounter.toNumber()).toString();
+    document.getElementById('fasterTicksUpCost').innerHTML = (2000 * fasterTicksUpCounter.toNumber()).toString();
     document.getElementById('levelNumber').innerHTML = level.toNumber();
+    
+    // Update tick speed display
+    updateTickSpeedDisplay();
     
     // Check affordability after reloading all values
     checkUpgradeAffordability();
@@ -376,4 +616,6 @@ function reload() {
 // Initialize splash screen when page loads
 window.onload = function() {
     initSplashScreen();
+    loadOptions(); // Load options on page load
+    updatePlayTime(); // Start play time tracking
 };

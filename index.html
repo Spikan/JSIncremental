@@ -51,17 +51,24 @@
         <br/>
         PRO!
     </h1>
-
-    <div class="save-controls">
-        <button onclick="save()" class="save-btn">Save Game</button>
-        <button onclick="delete_save()" class="save-btn">Delete Save</button>
-    </div>
 </div>
 
 <!-- Tab Navigation -->
 <div class="tab-navigation">
     <button class="tab-btn active" onclick="switchTab('soda')">🍺 Soda Clicking</button>
     <button class="tab-btn" onclick="switchTab('shop')">🛒 Shop & Upgrades</button>
+    <button class="tab-btn" onclick="switchTab('options')">⚙️ Options</button>
+</div>
+
+<!-- Tick Progress Bar -->
+<div class="tick-progress-container">
+    <div class="tick-info">
+        <span class="tick-label">Next Tick:</span>
+        <span class="tick-countdown" id="tickCountdown">5.0s</span>
+    </div>
+    <div class="tick-progress-bar">
+        <div class="tick-progress-fill" id="tickProgressFill"></div>
+    </div>
 </div>
 
 <!-- Soda Clicking Tab -->
@@ -183,6 +190,91 @@
                         <span id="suctionUpCost">1000</span> Sips<br/> 
                         Upgrade Suction
                     </button>
+                </div>
+            </div>
+
+            <div class="shop-item">
+                <div class="shop-header">
+                    <button onclick="buyFasterTicks()" class="shop-btn">
+                        <span id="fasterTicksCost">100</span> Sips<br/> 
+                        Faster Ticks
+                    </button>
+                </div>
+                <div class="shop-stats">
+                    <div class="shop-stat">
+                        <span class="stat-label">Owned:</span>
+                        <span id="fasterTicks" class="stat-value">0</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">Tick Speed:</span>
+                        <span id="currentTickSpeed" class="stat-value">5.00s</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">Speed Bonus:</span>
+                        <span id="tickSpeedBonus" class="stat-value">0%</span>
+                    </div>
+                </div>
+                <div class="shop-upgrade">
+                    <button onclick="upgradeFasterTicks()" class="upgrade-btn">
+                        <span id="fasterTicksUpCost">2000</span> Sips<br/> 
+                        Upgrade Faster Ticks
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Options Tab -->
+<div id="optionsTab" class="tab-content">
+    <div class="options-container">
+        <div class="options-section">
+            <h3>💾 Save & Load</h3>
+            <div class="save-controls">
+                <button onclick="save()" class="save-btn">Save Game</button>
+                <button onclick="delete_save()" class="save-btn">Delete Save</button>
+            </div>
+        </div>
+        
+        <div class="options-section">
+            <h3>⏰ Auto-Save Settings</h3>
+            <div class="autosave-controls">
+                <label class="autosave-toggle">
+                    <input type="checkbox" id="autosaveToggle" onchange="toggleAutosave()">
+                    <span class="toggle-slider"></span>
+                    Enable Auto-Save
+                </label>
+                <div class="autosave-interval">
+                    <label for="autosaveInterval">Auto-Save Interval:</label>
+                    <select id="autosaveInterval" onchange="changeAutosaveInterval()">
+                        <option value="5">5 seconds</option>
+                        <option value="10" selected>10 seconds</option>
+                        <option value="15">15 seconds</option>
+                        <option value="30">30 seconds</option>
+                        <option value="60">1 minute</option>
+                        <option value="300">5 minutes</option>
+                    </select>
+                </div>
+                <div class="autosave-status">
+                    <span id="autosaveStatus">Auto-save enabled (10s)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="options-section">
+            <h3>🎮 Game Information</h3>
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="info-label">Version:</span>
+                    <span class="info-value">1.0.0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Last Save:</span>
+                    <span class="info-value" id="lastSaveTime">Never</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Play Time:</span>
+                    <span class="info-value" id="playTime">0:00:00</span>
                 </div>
             </div>
         </div>
