@@ -276,7 +276,7 @@ function initGame() {
         
         strawSPS = new Decimal(0.4).times(strawUpCounter);
         cupSPS = new Decimal(cupUpCounter.toNumber());
-        suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
+        suctionClickBonus = new Decimal(0.2).times(suctions);
         
         // Initialize drink rate based on upgrades
         updateDrinkRate();
@@ -824,7 +824,7 @@ function buySuction() {
     if (sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
         sips = sips.minus(suctionCost);
-        suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
+        suctionClickBonus = new Decimal(0.2).times(suctions);
         
         console.log('After purchase - suctions:', suctions.toString());
         console.log('After purchase - suctionClickBonus:', suctionClickBonus.toString());
