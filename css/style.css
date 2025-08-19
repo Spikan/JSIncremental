@@ -170,6 +170,73 @@ body {
     display: block;
 }
 
+/* Tick Progress Bar */
+.tick-progress-container {
+    background: rgba(0, 23, 137, 0.3);
+    border: 2px solid #02D97F;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(2, 217, 127, 0.2);
+}
+
+.tick-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.tick-label {
+    color: #02D97F;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.tick-countdown {
+    color: #FF3D02;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-shadow: 0 0 8px rgba(255, 61, 2, 0.5);
+}
+
+.tick-progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.tick-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #02D97F, #00FF88);
+    border-radius: 6px;
+    transition: width 0.1s ease;
+    width: 0%;
+    box-shadow: 0 0 10px rgba(2, 217, 127, 0.6);
+}
+
+.tick-progress-fill.nearly-complete {
+    background: linear-gradient(90deg, #FF8E53, #FFB347);
+    box-shadow: 0 0 15px rgba(255, 142, 83, 0.7);
+}
+
+.tick-progress-fill.complete {
+    background: linear-gradient(90deg, #FF3D02, #FF6B6B);
+    box-shadow: 0 0 20px rgba(255, 61, 2, 0.8);
+    animation: tickComplete 0.5s ease-out;
+}
+
+@keyframes tickComplete {
+    0% { transform: scaleX(1); }
+    50% { transform: scaleX(1.05); }
+    100% { transform: scaleX(1); }
+}
+
 @keyframes fadeInTab {
     from { 
         opacity: 0;
@@ -529,6 +596,21 @@ h3 {
     .tab-btn {
         width: 100%;
         max-width: 250px;
+    }
+    
+    .tick-progress-container {
+        margin: 1rem 0.5rem;
+        padding: 0.75rem;
+    }
+    
+    .tick-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .tick-countdown {
+        font-size: 1.1rem;
     }
     
     #sodaButton {

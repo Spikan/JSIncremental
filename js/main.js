@@ -13,6 +13,12 @@ let level = new Decimal(1);
 const autosave = "on";
 let autosaveCounter = 0;
 
+// Tick system variables
+const DEFAULT_TICK_RATE = 5000; // 5 seconds in milliseconds
+let tickRate = DEFAULT_TICK_RATE;
+let tickProgress = 0;
+let lastTickTime = Date.now();
+
 // Splash screen functionality
 function initSplashScreen() {
     const splashScreen = document.getElementById('splashScreen');
@@ -147,17 +153,73 @@ function initGame() {
 }
 
 function startGameLoop() {
-    window.setInterval(function () {
-        spsClick(sps);
+    // Update tick progress every 100ms for smooth animation
+    window.setInterval(function() {
+        updateTickProgress();
+    }, 100);
+    
+    // Main tick interval for game logic
+    window.setInterval(function() {
+        processTick();
+    }, 100); // Check every 100ms for precise tick timing
+}
+
+function updateTickProgress() {
+    const currentTime = Date.now();
+    const timeSinceLastTick = currentTime - lastTickTime;
+    tickProgress = (timeSinceLastTick / tickRate) * 100;
+    
+    // Update progress bar
+    const progressFill = document.getElementById('tickProgressFill');
+    const countdown = document.getElementById('tickCountdown');
+    
+    if (progressFill && countdown) {
+        progressFill.style.width = Math.min(tickProgress, 100) + '%';
         
+        // Update countdown text
+        const remainingTime = Math.max(0, (tickRate - timeSinceLastTick) / 1000);
+        countdown.textContent = remainingTime.toFixed(1) + 's';
+        
+        // Update progress bar colors based on completion
+        progressFill.classList.remove('nearly-complete', 'complete');
+        if (tickProgress >= 100) {
+            progressFill.classList.add('complete');
+        } else if (tickProgress >= 75) {
+            progressFill.classList.add('nearly-complete');
+        }
+    }
+}
+
+function processTick() {
+    const currentTime = Date.now();
+    if (currentTime - lastTickTime >= tickRate) {
+        // Process the tick
+        spsClick(sps);
+        lastTickTime = currentTime;
+        tickProgress = 0;
+        
+        // Update autosave counter
         if (autosave === "on") {
             autosaveCounter += 1;
-            if (autosaveCounter >= 60) {
+            if (autosaveCounter >= 12) { // 12 ticks = 1 minute (5s * 12)
                 save();
                 autosaveCounter = 1;
             }
         }
-    }, 1000);
+    }
+}
+
+// Function to adjust tick rate (for future upgrades)
+function setTickRate(newTickRate) {
+    tickRate = newTickRate;
+    // Reset progress when changing tick rate
+    tickProgress = 0;
+    lastTickTime = Date.now();
+}
+
+// Function to get current tick rate in seconds
+function getTickRateSeconds() {
+    return tickRate / 1000;
 }
 
 regSoda = new Image();
