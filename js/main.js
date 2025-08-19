@@ -23,6 +23,13 @@ let lastTickTime = Date.now();
 let fasterTicks = new Decimal(0);
 let fasterTicksUpCounter = new Decimal(1);
 
+// Auto-save and options variables
+let autosaveEnabled = true;
+let autosaveInterval = 10; // seconds
+let autosaveCounter = 0;
+let gameStartTime = Date.now();
+let lastSaveTime = null;
+
 // Splash screen functionality
 function initSplashScreen() {
     const splashScreen = document.getElementById('splashScreen');
@@ -177,6 +184,12 @@ function startGameLoop() {
     window.setInterval(function() {
         processTick();
     }, 100); // Check every 100ms for precise tick timing
+    
+    // Update play time and last save time every second
+    window.setInterval(function() {
+        updatePlayTime();
+        updateLastSaveTime();
+    }, 1000);
 }
 
 function updateTickProgress() {
@@ -213,10 +226,14 @@ function processTick() {
         lastTickTime = currentTime;
         tickProgress = 0;
         
-        // Update autosave counter
-        if (autosave === "on") {
+        // Update auto-save counter based on configurable interval
+        if (autosaveEnabled) {
             autosaveCounter += 1;
-            if (autosaveCounter >= 12) { // 12 ticks = 1 minute (5s * 12)
+            // Convert tick rate to seconds and calculate how many ticks equal the auto-save interval
+            const ticksPerSecond = 1000 / tickRate;
+            const ticksForAutosave = Math.ceil(autosaveInterval * ticksPerSecond);
+            
+            if (autosaveCounter >= ticksForAutosave) {
                 save();
                 autosaveCounter = 1;
             }
@@ -248,6 +265,91 @@ function updateTickRate() {
 // Function to get current tick rate in seconds
 function getTickRateSeconds() {
     return tickRate / 1000;
+}
+
+// Auto-save management functions
+function toggleAutosave() {
+    const checkbox = document.getElementById('autosaveToggle');
+    autosaveEnabled = checkbox.checked;
+    updateAutosaveStatus();
+    saveOptions();
+}
+
+function changeAutosaveInterval() {
+    const select = document.getElementById('autosaveInterval');
+    autosaveInterval = parseInt(select.value);
+    autosaveCounter = 0; // Reset counter when changing interval
+    updateAutosaveStatus();
+    saveOptions();
+}
+
+function updateAutosaveStatus() {
+    const status = document.getElementById('autosaveStatus');
+    if (status) {
+        if (autosaveEnabled) {
+            status.textContent = `Auto-save enabled (${autosaveInterval}s)`;
+        } else {
+            status.textContent = 'Auto-save disabled';
+        }
+    }
+}
+
+function saveOptions() {
+    const options = {
+        autosaveEnabled: autosaveEnabled,
+        autosaveInterval: autosaveInterval
+    };
+    localStorage.setItem('gameOptions', JSON.stringify(options));
+}
+
+function loadOptions() {
+    const savedOptions = localStorage.getItem('gameOptions');
+    if (savedOptions) {
+        const options = JSON.parse(savedOptions);
+        autosaveEnabled = options.autosaveEnabled !== undefined ? options.autosaveEnabled : true;
+        autosaveInterval = options.autosaveInterval || 10;
+    }
+    
+    // Update UI to match loaded options
+    const checkbox = document.getElementById('autosaveToggle');
+    const select = document.getElementById('autosaveInterval');
+    
+    if (checkbox) checkbox.checked = autosaveEnabled;
+    if (select) select.value = autosaveInterval.toString();
+    
+    updateAutosaveStatus();
+}
+
+// Play time tracking
+function updatePlayTime() {
+    const playTimeElement = document.getElementById('playTime');
+    if (playTimeElement) {
+        const currentTime = Date.now();
+        const playTimeMs = currentTime - gameStartTime;
+        const playTimeSeconds = Math.floor(playTimeMs / 1000);
+        const hours = Math.floor(playTimeSeconds / 3600);
+        const minutes = Math.floor((playTimeSeconds % 3600) / 60);
+        const seconds = playTimeSeconds % 60;
+        playTimeElement.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+}
+
+function updateLastSaveTime() {
+    const lastSaveElement = document.getElementById('lastSaveTime');
+    if (lastSaveElement) {
+        if (lastSaveTime) {
+            const timeAgo = Math.floor((Date.now() - lastSaveTime) / 1000);
+            if (timeAgo < 60) {
+                lastSaveElement.textContent = `${timeAgo} seconds ago`;
+            } else if (timeAgo < 3600) {
+                lastSaveElement.textContent = `${Math.floor(timeAgo / 60)} minutes ago`;
+            } else {
+                lastSaveElement.textContent = `${Math.floor(timeAgo / 3600)} hours ago`;
+            }
+        } else {
+            lastSaveElement.textContent = 'Never';
+        }
+    }
 }
 
 // Function to update tick speed display
@@ -419,7 +521,6 @@ function changeLevel(i) {
 }
 
 function save() {
-
     let save = {
         sips: sips.toString(),
         straws: straws.toString(),
@@ -438,6 +539,8 @@ function save() {
     };
 
     localStorage.setItem("save", JSON.stringify(save));
+    lastSaveTime = Date.now();
+    updateLastSaveTime();
 }
 
 function delete_save() {
@@ -513,4 +616,6 @@ function reload() {
 // Initialize splash screen when page loads
 window.onload = function() {
     initSplashScreen();
+    loadOptions(); // Load options on page load
+    updatePlayTime(); // Start play time tracking
 };

@@ -170,6 +170,174 @@ body {
     display: block;
 }
 
+/* Options Tab Styles */
+.options-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.options-section {
+    background: rgba(0, 23, 137, 0.3);
+    border: 2px solid #02D97F;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.options-section h3 {
+    color: #FF3D02;
+    margin: 0 0 1rem 0;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+.save-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.save-btn {
+    min-width: 120px;
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #02D97F;
+    background-color: #001789;
+    color: #02D97F;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+    background-color: #02D97F;
+    color: #001789;
+}
+
+.save-btn:active {
+    transform: scale(0.95);
+}
+
+/* Auto-save Controls */
+.autosave-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.autosave-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    color: #02D97F;
+    font-weight: bold;
+}
+
+.autosave-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    width: 50px;
+    height: 24px;
+    background-color: #333;
+    border-radius: 12px;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-slider:before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #666;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s ease;
+}
+
+.autosave-toggle input[type="checkbox"]:checked + .toggle-slider {
+    background-color: #02D97F;
+}
+
+.autosave-toggle input[type="checkbox"]:checked + .toggle-slider:before {
+    transform: translateX(26px);
+    background-color: #fff;
+}
+
+.autosave-interval {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.autosave-interval label {
+    color: #02D97F;
+    font-weight: bold;
+}
+
+.autosave-interval select {
+    padding: 0.5rem;
+    border: 2px solid #02D97F;
+    background-color: #001789;
+    color: #02D97F;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.autosave-interval select:focus {
+    outline: none;
+    border-color: #FF3D02;
+    box-shadow: 0 0 8px rgba(255, 61, 2, 0.3);
+}
+
+.autosave-status {
+    text-align: center;
+    padding: 0.5rem;
+    background: rgba(2, 217, 127, 0.1);
+    border-radius: 6px;
+    border: 1px solid #02D97F;
+}
+
+.autosave-status span {
+    color: #02D97F;
+    font-weight: bold;
+}
+
+/* Game Information */
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: rgba(2, 217, 127, 0.1);
+    border-radius: 6px;
+    border: 1px solid #02D97F;
+}
+
+.info-label {
+    color: #02D97F;
+    font-weight: bold;
+}
+
+.info-value {
+    color: #FF8E53;
+    font-weight: bold;
+}
+
 /* Tick Progress Bar */
 .tick-progress-container {
     background: rgba(0, 23, 137, 0.3);
@@ -295,36 +463,6 @@ h3 {
     left: 0.5rem;
     color: #BC00FF;
     z-index: 10;
-}
-
-.save-controls {
-    display: flex;
-    gap: 1rem;
-    margin: 1rem 0;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.save-btn {
-    min-width: 120px;
-    min-height: 44px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: 2px solid #02D97F;
-    background-color: #001789;
-    color: #02D97F;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.save-btn:hover {
-    background-color: #02D97F;
-    color: #001789;
-}
-
-.save-btn:active {
-    transform: scale(0.95);
 }
 
 #sodaDiv {
@@ -578,16 +716,6 @@ h3 {
         margin-bottom: 1rem;
     }
     
-    .save-controls {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .save-btn {
-        width: 100%;
-        max-width: 200px;
-    }
-    
     .tab-navigation {
         flex-direction: column;
         align-items: center;
@@ -611,6 +739,30 @@ h3 {
     
     .tick-countdown {
         font-size: 1.1rem;
+    }
+    
+    .options-container {
+        padding: 0.5rem;
+    }
+    
+    .options-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .save-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .save-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .autosave-interval select {
+        width: 100%;
+        max-width: 200px;
     }
     
     #sodaButton {
