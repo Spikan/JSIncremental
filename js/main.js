@@ -136,9 +136,9 @@ function initGame() {
         level = new Decimal(savegame.level || 1);
     }
     
-    strawSPS = new Decimal(.4 * strawUpCounter.toNumber());
+    strawSPS = new Decimal(0.4).times(strawUpCounter);
     cupSPS = new Decimal(cupUpCounter.toNumber());
-    suctionClickBonus = new Decimal(0.2 * suctionUpCounter.toNumber());
+    suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
     
     reload();
     
@@ -169,7 +169,8 @@ clickSoda.src = "images/clickSoda.png";
 
 
 function sodaClick(number) {
-    let totalClickBonus = number.plus(suctionClickBonus.times(suctions));
+    let clickAmount = new Decimal(number);
+    let totalClickBonus = clickAmount.plus(suctionClickBonus.times(suctions));
     sips = sips.plus(totalClickBonus);
     document.getElementById("sips").innerHTML = prettify(sips);
 
@@ -192,10 +193,10 @@ function spsClick(number) {
 
 function buyStraw() {
     let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
-    strawSPS = new Decimal(.4 * strawUpCounter.toNumber());
     if (sips.gte(strawCost)) {
         straws = straws.plus(1);
         sips = sips.minus(strawCost);
+        strawSPS = new Decimal(0.4).times(strawUpCounter);
         sps = sps.plus(strawSPS);
         reload();
         checkUpgradeAffordability();
@@ -207,7 +208,7 @@ function upgradeStraw() {
     if (sips.gte(strawUpCost)) {
         sips = sips.minus(strawUpCost);
         strawUpCounter = strawUpCounter.plus(1);
-        strawSPS = new Decimal(.4 * strawUpCounter.toNumber());
+        strawSPS = new Decimal(0.4).times(strawUpCounter);
         sps = new Decimal(0);
         sps = sps.plus(strawSPS.times(straws));
         sps = sps.plus(cupSPS.times(cups));
@@ -218,10 +219,10 @@ function upgradeStraw() {
 
 function buyCup() {
     let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
-    cupSPS = new Decimal(cupUpCounter.toNumber());
     if (sips.gte(cupCost)) {
         cups = cups.plus(1);
         sips = sips.minus(cupCost);
+        cupSPS = new Decimal(cupUpCounter.toNumber());
         sps = sps.plus(cupSPS);
         reload();
         checkUpgradeAffordability();
@@ -244,10 +245,10 @@ function upgradeCup() {
 
 function buySuction() {
     let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
-    suctionClickBonus = new Decimal(0.2 * suctionUpCounter.toNumber());
     if (sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
         sips = sips.minus(suctionCost);
+        suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
         reload();
         checkUpgradeAffordability();
     }
@@ -258,7 +259,7 @@ function upgradeSuction() {
     if (sips.gte(suctionUpCost)) {
         sips = sips.minus(suctionUpCost);
         suctionUpCounter = suctionUpCounter.plus(1);
-        suctionClickBonus = new Decimal(0.2 * suctionUpCounter.toNumber());
+        suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
         reload();
         checkUpgradeAffordability();
     }
