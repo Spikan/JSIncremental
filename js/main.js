@@ -67,14 +67,13 @@ function initSplashScreen() {
     // Function to start the game
     function startGame() {
         console.log('startGame called');
-        splashScreen.style.opacity = '0';
-        splashScreen.style.transition = 'opacity 0.5s ease-out';
         
-        setTimeout(function() {
-            splashScreen.style.display = 'none';
-            gameContent.style.display = 'block';
-            initGame();
-        }, 500);
+        // Simple, direct transition without complex animations
+        splashScreen.style.display = 'none';
+        gameContent.style.display = 'block';
+        
+        // Initialize game immediately
+        initGame();
     }
     
     // Multiple event listeners for maximum compatibility
@@ -950,6 +949,19 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Splash screen initialization complete');
     }, 100);
 });
+
+// Global function for splash screen button (backup method)
+window.startGameFromButton = function() {
+    console.log('startGameFromButton called');
+    const splashScreen = document.getElementById('splashScreen');
+    const gameContent = document.getElementById('gameContent');
+    
+    if (splashScreen && gameContent) {
+        splashScreen.style.display = 'none';
+        gameContent.style.display = 'block';
+        initGame();
+    }
+};
 
 // Function to show purchase feedback
 function showPurchaseFeedback(itemName, cost) {
