@@ -87,14 +87,44 @@ body {
 }
 
 .splash-instruction {
-    margin-bottom: 40px;
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.2rem;
+    color: #02D97F;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    animation: blink 2s infinite;
 }
 
-.splash-instruction p {
-    color: #02D97F;
-    font-size: clamp(1.2rem, 5vw, 24px);
-    margin: 0;
-    animation: blink 1.5s ease-in-out infinite;
+.splash-button {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.splash-start-btn {
+    background: linear-gradient(135deg, #02D97F, #00B36B);
+    border: 3px solid #00B36B;
+    border-radius: 15px;
+    padding: 15px 30px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #001789;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(2, 217, 127, 0.4);
+    min-width: 200px;
+    min-height: 60px;
+}
+
+.splash-start-btn:hover {
+    background: linear-gradient(135deg, #00B36B, #02D97F);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(2, 217, 127, 0.6);
+}
+
+.splash-start-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(2, 217, 127, 0.4);
 }
 
 .splash-version {
