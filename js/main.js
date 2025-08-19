@@ -10,6 +10,69 @@ let level = 1;
 const autosave = "on";
 let autosaveCounter = 0;
 
+// Splash screen functionality
+function initSplashScreen() {
+    const splashScreen = document.getElementById('splashScreen');
+    const gameContent = document.getElementById('gameContent');
+    
+    // Hide splash screen and show game content when clicked
+    splashScreen.addEventListener('click', function() {
+        splashScreen.style.opacity = '0';
+        splashScreen.style.transition = 'opacity 0.5s ease-out';
+        
+        setTimeout(function() {
+            splashScreen.style.display = 'none';
+            gameContent.style.display = 'block';
+            // Initialize the game after splash screen is hidden
+            initGame();
+        }, 500);
+    });
+    
+    // Also allow keyboard input to start
+    document.addEventListener('keydown', function(event) {
+        if (splashScreen.style.display !== 'none') {
+            splashScreen.click();
+        }
+    });
+}
+
+function initGame() {
+    // Load saved game data
+    let savegame = JSON.parse(localStorage.getItem("save"));
+    
+    if (savegame && typeof savegame.sips !== "undefined" && savegame.sips !== null) {
+        sips = savegame.sips;
+        straws = savegame.straws || 0;
+        cups = savegame.cups || 0;
+        sps = savegame.sps || 0;
+        strawUpCounter = savegame.strawUpCounter || 1;
+        cupUpCounter = savegame.cupUpCounter || 1;
+        level = savegame.level || 1;
+    }
+    
+    strawSPS = .4 * (strawUpCounter);
+    cupSPS = cupUpCounter;
+    
+    reload();
+    
+    // Start the game loop
+    startGameLoop();
+}
+
+function startGameLoop() {
+    window.setInterval(function () {
+        spsClick(sps);
+        
+        if (autosave === "on") {
+            autosaveCounter += 1;
+            if (autosaveCounter >= 60) {
+                save();
+                autosaveCounter = 1;
+            }
+        }
+    }, 1000);
+}
+
 regSoda = new Image();
 regSoda.src = "images/regSoda.png";
 moSoda = new Image();
@@ -126,27 +189,6 @@ function save() {
     localStorage.setItem("save", JSON.stringify(save));
 }
 
-window.onload = function load() {
-
-
-    let savegame = JSON.parse(localStorage.getItem("save"));
-
-    if (typeof savegame.sips !== "undefined"|| typeof savegame.sips !== null) sips = savegame.sips;
-    if (typeof savegame.straws !== "undefined") straws = savegame.straws;
-    if (typeof savegame.cups !== "undefined") cups = savegame.cups;
-    if (typeof savegame.sps !== "undefined") sps = savegame.sps;
-    if (typeof savegame.strawUpCounter !== "undefined") strawUpCounter = savegame.strawUpCounter;
-    if (typeof savegame.cupUpCounter !== "undefined") cupUpCounter = savegame.cupUpCounter;
-    if (typeof savegame.level !== "undefined") level = savegame.level;
-
-
-    strawSPS = .4 * (strawUpCounter);
-    cupSPS = cupUpCounter;
-
-
-    reload()
-};
-
 function delete_save() {
     localStorage.removeItem("save")
 }
@@ -176,18 +218,7 @@ function reload() {
     document.getElementById('levelNumber').innerHTML = level;
 }
 
-window.setInterval(function () {
-
-    spsClick(sps);
-
-
-    if (autosave === "on") {
-        autosaveCounter += 1;
-        if (autosaveCounter >= 60) {
-            save();
-            autosaveCounter = 1;
-        }
-    }
-
-
-}, 1000);
+// Initialize splash screen when page loads
+window.onload = function() {
+    initSplashScreen();
+};

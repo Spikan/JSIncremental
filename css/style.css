@@ -11,6 +11,108 @@ body {
     background-color: #001789;
     color: #02D97F;
     height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Splash Screen Styles */
+.splash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #001789;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.splash-content {
+    text-align: center;
+    animation: fadeIn 2s ease-in;
+}
+
+.splash-title {
+    margin-bottom: 40px;
+}
+
+.splash-main-title {
+    color: #FF3D02;
+    font-size: 72px;
+    margin: 0;
+    text-shadow: 3px 3px 0px #000;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+.splash-subtitle {
+    color: #02D97F;
+    font-size: 48px;
+    margin: 10px 0 0 0;
+    text-shadow: 2px 2px 0px #000;
+}
+
+.splash-subtitle-text {
+    margin-bottom: 60px;
+}
+
+.splash-subtitle-text p {
+    color: #BC00FF;
+    font-size: 18px;
+    margin: 0;
+    letter-spacing: 2px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.splash-instruction {
+    margin-bottom: 40px;
+}
+
+.splash-instruction p {
+    color: #02D97F;
+    font-size: 24px;
+    margin: 0;
+    animation: blink 1.5s ease-in-out infinite;
+}
+
+.splash-version {
+    margin-top: 60px;
+}
+
+.splash-version p {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes titleGlow {
+    from { text-shadow: 3px 3px 0px #000, 0 0 10px #FF3D02; }
+    to { text-shadow: 3px 3px 0px #000, 0 0 20px #FF3D02, 0 0 30px #FF3D02; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+/* Game Content */
+.game-content {
+    width: 100%;
+    height: 100vh;
 }
 
 h1 {
