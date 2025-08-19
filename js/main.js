@@ -10,8 +10,6 @@ let strawUpCounter = new Decimal(1);
 let cupUpCounter = new Decimal(1);
 let suctionUpCounter = new Decimal(1);
 let level = new Decimal(1);
-const autosave = "on";
-let autosaveCounter = 0;
 
 // Tick system variables
 const DEFAULT_TICK_RATE = 5000; // 5 seconds in milliseconds
@@ -45,8 +43,14 @@ function initSplashScreen() {
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     
+    if (!splashScreen || !gameContent) {
+        console.error('Splash screen elements not found!');
+        return;
+    }
+    
     // Hide splash screen and show game content when clicked
     splashScreen.addEventListener('click', function() {
+        console.log('Splash screen clicked!');
         splashScreen.style.opacity = '0';
         splashScreen.style.transition = 'opacity 0.5s ease-out';
         
@@ -61,9 +65,12 @@ function initSplashScreen() {
     // Also allow keyboard input to start
     document.addEventListener('keydown', function(event) {
         if (splashScreen.style.display !== 'none') {
+            console.log('Keyboard input detected, starting game...');
             splashScreen.click();
         }
     });
+    
+    console.log('Splash screen initialized successfully');
 }
 
 // Tab switching functionality
@@ -374,11 +381,15 @@ function updateLastSaveTime() {
 
 // Statistics update functions
 function updateAllStats() {
-    updateTimeStats();
-    updateClickStats();
-    updateEconomyStats();
-    updateShopStats();
-    updateAchievementStats();
+    // Only update stats if the stats tab is active and elements exist
+    const statsTab = document.getElementById('statsTab');
+    if (statsTab && statsTab.classList.contains('active')) {
+        updateTimeStats();
+        updateClickStats();
+        updateEconomyStats();
+        updateShopStats();
+        updateAchievementStats();
+    }
 }
 
 function updateTimeStats() {
