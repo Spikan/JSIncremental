@@ -180,6 +180,9 @@ function switchTab(tabName) {
     }
 }
 
+// Make switchTab globally available for HTML onclick attributes
+window.switchTab = switchTab;
+
 // Check if upgrades are affordable and update UI accordingly
 function checkUpgradeAffordability() {
     const strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
@@ -1386,3 +1389,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Make all other functions globally available for HTML onclick attributes
+window.sodaClick = sodaClick;
+window.levelUp = levelUp;
+window.buyStraw = buyStraw;
+window.upgradeStraw = upgradeStraw;
+window.buyCup = buyCup;
+window.upgradeCup = upgradeCup;
+window.buySuction = buySuction;
+window.upgradeSuction = upgradeSuction;
+window.buyFasterDrinks = buyFasterDrinks;
+window.upgradeFasterDrinks = upgradeFasterDrinks;
+window.save = save;
+window.delete_save = delete_save;
+window.sendMessage = sendMessage;
