@@ -995,6 +995,78 @@ h3 {
         font-size: 1rem;
     }
     
+    /* Talk to God mobile optimizations */
+    .god-container {
+        padding: 0.5rem;
+    }
+    
+    .god-header {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .god-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .god-subtitle {
+        font-size: 1rem;
+    }
+    
+    .chat-container {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .chat-messages {
+        max-height: 300px;
+        padding: 0.75rem;
+    }
+    
+    .message {
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .message-avatar {
+        font-size: 1.5rem;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .message-sender {
+        font-size: 0.8rem;
+    }
+    
+    .message-text {
+        font-size: 0.9rem;
+    }
+    
+    .chat-input-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .chat-input {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+    
+    .chat-send-btn {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+    
+    .god-info {
+        padding: 0.75rem;
+    }
+    
+    .god-info p {
+        font-size: 0.8rem;
+    }
+    
     #sodaButton {
         max-height: 40vh;
     }
@@ -1169,4 +1241,214 @@ h3 {
     justify-content: center;
     align-items: center;
     min-height: 200px;
+}
+
+/* Talk to God Tab Styles */
+.god-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.god-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+    border: 2px solid #FFD700;
+    border-radius: 16px;
+}
+
+.god-header h2 {
+    color: #FFD700;
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.god-subtitle {
+    color: #FFA500;
+    margin: 0;
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.chat-container {
+    background: rgba(0, 23, 137, 0.3);
+    border: 2px solid #02D97F;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 24px rgba(2, 217, 127, 0.2);
+}
+
+.chat-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(2, 217, 127, 0.3);
+}
+
+.message {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+.message:last-child {
+    margin-bottom: 0;
+}
+
+.message-avatar {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border: 2px solid #02D97F;
+    flex-shrink: 0;
+}
+
+.message-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.message-sender {
+    color: #02D97F;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.message-text {
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.god-message .message-avatar {
+    border-color: #FFD700;
+    background: rgba(255, 215, 0, 0.2);
+}
+
+.god-message .message-sender {
+    color: #FFD700;
+}
+
+.user-message {
+    flex-direction: row-reverse;
+}
+
+.user-message .message-avatar {
+    border-color: #FF3D02;
+    background: rgba(255, 61, 2, 0.2);
+}
+
+.user-message .message-sender {
+    color: #FF3D02;
+    text-align: right;
+}
+
+.user-message .message-text {
+    text-align: right;
+}
+
+.chat-input-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 0.875rem 1rem;
+    border: 2px solid #02D97F;
+    background-color: #001789;
+    color: #02D97F;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.chat-input:focus {
+    border-color: #FF3D02;
+    box-shadow: 0 0 12px rgba(255, 61, 2, 0.3);
+}
+
+.chat-input::placeholder {
+    color: rgba(2, 217, 127, 0.6);
+}
+
+.chat-send-btn {
+    padding: 0.875rem 1.5rem;
+    border: 2px solid #FFD700;
+    background-color: #001789;
+    color: #FFD700;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.chat-send-btn:hover {
+    background-color: #FFD700;
+    color: #001789;
+    transform: scale(1.02);
+}
+
+.chat-send-btn:active {
+    transform: scale(0.98);
+}
+
+.god-info {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 8px;
+}
+
+.god-info p {
+    color: #FFA500;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* GIF message styling */
+.gif-message .message-text {
+    text-align: center;
+}
+
+.gif-message img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    border: 2px solid rgba(2, 217, 127, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Message animation */
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

@@ -58,6 +58,7 @@
     <button class="tab-btn active" onclick="switchTab('soda')">🍺 Soda Clicking</button>
     <button class="tab-btn" onclick="switchTab('shop')">🛒 Shop & Upgrades</button>
     <button class="tab-btn" onclick="switchTab('stats')">📊 Statistics</button>
+    <button class="tab-btn" onclick="switchTab('god')">🙏 Talk to God</button>
     <button class="tab-btn" onclick="switchTab('options')">⚙️ Options</button>
 </div>
 
@@ -413,11 +414,42 @@
                 <div class="stat-card">
                     <div class="stat-icon">💎</div>
                     <div class="stat-content">
-                        <div class="stat-label">Faster Ticks Owned</div>
-                        <div class="stat-value" id="fasterTicksOwned">0</div>
+                        <div class="stat-label">Faster Drinks Owned</div>
+                        <div class="stat-value" id="fasterDrinksOwned">0</div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Talk to God Tab -->
+<div id="godTab" class="tab-content">
+    <div class="god-container">
+        <div class="god-header">
+            <h2>🙏 Talk to God</h2>
+            <p class="god-subtitle">Ask God anything... He responds with GIFs from Giphy</p>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message god-message">
+                    <div class="message-avatar">👑</div>
+                    <div class="message-content">
+                        <div class="message-sender">God</div>
+                        <div class="message-text">Greetings, mortal! I am listening to your prayers. What would you like to discuss?</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Type your message to God..." maxlength="100">
+                <button onclick="sendMessage()" class="chat-send-btn">🙏 Send</button>
+            </div>
+        </div>
+        
+        <div class="god-info">
+            <p>💡 <strong>Tip:</strong> God's responses are powered by Giphy. Try asking about emotions, actions, or anything!</p>
         </div>
     </div>
 </div>

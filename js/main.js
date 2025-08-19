@@ -951,3 +951,134 @@ function showPurchaseFeedback(itemName, cost) {
         }
     }, 2000);
 }
+
+// Talk to God functionality
+function sendMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const message = chatInput.value.trim();
+    
+    if (!message) return;
+    
+    // Add user message to chat
+    addUserMessage(message);
+    
+    // Clear input
+    chatInput.value = '';
+    
+    // Get God's response (GIF from Giphy)
+    getGodResponse(message);
+}
+
+function addUserMessage(message) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message user-message';
+    
+    messageDiv.innerHTML = `
+        <div class="message-avatar">👤</div>
+        <div class="message-content">
+            <div class="message-sender">You</div>
+            <div class="message-text">${escapeHtml(message)}</div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    scrollToBottom();
+}
+
+function addGodMessage(content, isGif = false) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message god-message';
+    
+    if (isGif) {
+        messageDiv.classList.add('gif-message');
+        messageDiv.innerHTML = `
+            <div class="message-avatar">👑</div>
+            <div class="message-content">
+                <div class="message-sender">God</div>
+                <div class="message-text">${content}</div>
+            </div>
+        `;
+    } else {
+        messageDiv.innerHTML = `
+            <div class="message-avatar">👑</div>
+            <div class="message-content">
+                <div class="message-sender">God</div>
+                <div class="message-text">${content}</div>
+            </div>
+        `;
+    }
+    
+    chatMessages.appendChild(messageDiv);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+async function getGodResponse(userMessage) {
+    try {
+        // Show "God is typing..." message
+        addGodMessage("God is thinking... 🤔");
+        
+        // Search Giphy for a random GIF based on the user's message
+        const gifUrl = await searchGiphy(userMessage);
+        
+        // Remove the "thinking" message
+        const thinkingMessage = document.querySelector('.god-message:last-child');
+        if (thinkingMessage) {
+            thinkingMessage.remove();
+        }
+        
+        // Add the GIF response
+        if (gifUrl) {
+            addGodMessage(`<img src="${gifUrl}" alt="God's response" onerror="this.style.display='none'">`, true);
+        } else {
+            addGodMessage("I'm sorry, I couldn't find a suitable response. Try asking about something else!");
+        }
+    } catch (error) {
+        console.error('Error getting God response:', error);
+        addGodMessage("I'm experiencing some divine technical difficulties. Please try again later!");
+    }
+}
+
+async function searchGiphy(query) {
+    // For demo purposes, we'll use a simple approach
+    // In a real implementation, you'd need a Giphy API key
+    
+    // Simulate Giphy search with placeholder GIFs
+    const placeholderGifs = [
+        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', // Happy
+        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', // Excited
+        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', // Confused
+        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif', // Surprised
+        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif'  // Thinking
+    ];
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+    
+    // Return a random placeholder GIF
+    return placeholderGifs[Math.floor(Math.random() * placeholderGifs.length)];
+}
+
+// Add keyboard support for chat input
+document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+});
