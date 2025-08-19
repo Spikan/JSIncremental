@@ -1,11 +1,14 @@
 let sips = 0;
 let straws = 0;
 let cups = 0;
+let suctions = 0;
 let sps = 0;
 let strawSPS = 0;
 let cupSPS = 0;
+let suctionClickBonus = 0;
 let strawUpCounter = 1;
 let cupUpCounter = 1;
+let suctionUpCounter = 1;
 let level = 1;
 const autosave = "on";
 let autosaveCounter = 0;
@@ -61,22 +64,28 @@ function switchTab(tabName) {
 function checkUpgradeAffordability() {
     const strawCost = Math.floor(10 * Math.pow(1.1, straws));
     const cupCost = Math.floor(20 * Math.pow(1.2, cups));
+    const suctionCost = Math.floor(50 * Math.pow(1.15, suctions));
     const strawUpCost = 200 * strawUpCounter;
     const cupUpCost = 500 * cupUpCounter;
+    const suctionUpCost = 1000 * suctionUpCounter;
     const levelUpCost = 5000 * level;
     
     // Update button states based on affordability
     updateButtonState('buyStraw', sips >= strawCost, strawCost);
     updateButtonState('buyCup', sips >= cupCost, cupCost);
+    updateButtonState('buySuction', sips >= suctionCost, suctionCost);
     updateButtonState('upgradeStraw', sips >= strawUpCost, strawUpCost);
     updateButtonState('upgradeCup', sips >= cupUpCost, cupUpCost);
+    updateButtonState('upgradeSuction', sips >= suctionUpCost, suctionUpCost);
     updateButtonState('levelUp', sips >= levelUpCost, levelUpCost);
     
     // Update cost displays with affordability indicators
     updateCostDisplay('strawCost', strawCost, sips >= strawCost);
     updateCostDisplay('cupCost', cupCost, sips >= cupCost);
+    updateCostDisplay('suctionCost', suctionCost, sips >= suctionCost);
     updateCostDisplay('strawUpCost', strawUpCost, sips >= strawUpCost);
     updateCostDisplay('cupUpCost', cupUpCost, sips >= cupUpCost);
+    updateCostDisplay('suctionUpCost', suctionUpCost, sips >= suctionUpCost);
     updateCostDisplay('levelCost', levelUpCost, sips >= levelUpCost);
 }
 
@@ -118,14 +127,18 @@ function initGame() {
         sips = savegame.sips;
         straws = savegame.straws || 0;
         cups = savegame.cups || 0;
+        suctions = savegame.suctions || 0;
         sps = savegame.sps || 0;
         strawUpCounter = savegame.strawUpCounter || 1;
         cupUpCounter = savegame.cupUpCounter || 1;
+        suctionUpCounter = savegame.suctionUpCounter || 1;
+        suctionClickBonus = savegame.suctionClickBonus || 0;
         level = savegame.level || 1;
     }
     
     strawSPS = .4 * (strawUpCounter);
     cupSPS = cupUpCounter;
+    suctionClickBonus = 0.2 * suctionUpCounter;
     
     reload();
     
@@ -156,7 +169,8 @@ clickSoda.src = "images/clickSoda.png";
 
 
 function sodaClick(number) {
-    sips = sips + number;
+    let totalClickBonus = number + (suctionClickBonus * suctions);
+    sips = sips + totalClickBonus;
     document.getElementById("sips").innerHTML = prettify(sips);
 
     setTimeout(function () {
@@ -228,6 +242,28 @@ function upgradeCup() {
     }
 }
 
+function buySuction() {
+    let suctionCost = Math.floor(50 * Math.pow(1.15, suctions));
+    suctionClickBonus = 0.2 * suctionUpCounter;
+    if (sips >= suctionCost) {
+        suctions = suctions + 1;
+        sips = sips - suctionCost;
+        reload();
+        checkUpgradeAffordability();
+    }
+}
+
+function upgradeSuction() {
+    let suctionUpCost = 1000 * suctionUpCounter;
+    if (sips >= suctionUpCost) {
+        sips = sips - suctionUpCost;
+        suctionUpCounter++;
+        suctionClickBonus = 0.2 * suctionUpCounter;
+        reload();
+        checkUpgradeAffordability();
+    }
+}
+
 function levelUp() {
     let levelUpCost = 5000 * level;
     if (sips >= levelUpCost) {
@@ -259,11 +295,14 @@ function save() {
         sips: sips,
         straws: straws,
         cups: cups,
+        suctions: suctions,
         sps: sps,
         strawSPS: strawSPS,
         cupSPS: cupSPS,
+        suctionClickBonus: suctionClickBonus,
         strawUpCounter: strawUpCounter,
         cupUpCounter: cupUpCounter,
+        suctionUpCounter: suctionUpCounter,
         level: level
     };
 
@@ -283,19 +322,25 @@ function prettify(input) {
 function reload() {
     let strawCost = Math.floor(10 * Math.pow(1.1, straws));
     let cupCost = Math.floor(20 * Math.pow(1.2, cups));
+    let suctionCost = Math.floor(50 * Math.pow(1.15, suctions));
 
     document.getElementById('straws').innerHTML = straws;
     document.getElementById('strawCost').innerHTML = strawCost.toString();
     document.getElementById('cups').innerHTML = cups;
     document.getElementById('cupCost').innerHTML = cupCost.toString();
+    document.getElementById('suctions').innerHTML = suctions;
+    document.getElementById('suctionCost').innerHTML = suctionCost.toString();
     document.getElementById('sips').innerHTML = prettify(sips);
     document.getElementById('sps').innerHTML = prettify(sps);
     document.getElementById('strawSPS').innerHTML = prettify(strawSPS);
     document.getElementById('cupSPS').innerHTML = prettify(cupSPS);
+    document.getElementById('suctionClickBonus').innerHTML = prettify(suctionClickBonus);
     document.getElementById('totalStrawSPS').innerHTML = prettify(strawSPS * straws);
     document.getElementById('totalCupSPS').innerHTML = prettify(cupSPS * cups);
+    document.getElementById('totalSuctionBonus').innerHTML = prettify(suctionClickBonus * suctions);
     document.getElementById('strawUpCost').innerHTML = (200 * strawUpCounter).toString();
     document.getElementById('cupUpCost').innerHTML = (500 * cupUpCounter).toString();
+    document.getElementById('suctionUpCost').innerHTML = (1000 * suctionUpCounter).toString();
     document.getElementById('levelNumber').innerHTML = level;
     
     // Check affordability after reloading all values
