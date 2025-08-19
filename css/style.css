@@ -504,8 +504,12 @@ body {
     height: 100%;
     background: linear-gradient(90deg, #02D97F, #00FF88);
     width: 0%;
-    transition: width 0.1s ease;
+    transition: width 0.2s ease; /* Increased from 0.1s for smoother animation */
     border-radius: 6px;
+    /* Prevent layout shifts */
+    will-change: width;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .drink-progress-fill.nearly-complete {
@@ -589,11 +593,19 @@ h3 {
 }
 
 .soda-container {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1rem 0;
-    min-height: 300px; /* Prevent layout jumping */
+    min-height: 300px;
+    /* Prevent layout shifts by maintaining consistent dimensions */
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    /* Ensure stable positioning for click feedback */
+    overflow: visible;
+    /* Prevent any potential layout shifts */
+    contain: layout style paint;
 }
 
 #sodaButton {
@@ -602,8 +614,12 @@ h3 {
     max-height: 60vh;
     width: auto;
     cursor: pointer;
-    transition: transform 0.1s ease;
+    transition: transform 0.1s ease, filter 0.15s ease;
     touch-action: manipulation;
+    /* Prevent layout shifts by maintaining consistent dimensions */
+    min-height: 200px;
+    min-width: 200px;
+    object-fit: contain;
 }
 
 #sodaButton:hover {
@@ -612,6 +628,22 @@ h3 {
 
 #sodaButton:active {
     transform: scale(0.95);
+}
+
+/* Smooth click effect without changing image source */
+#sodaButton.soda-clicked {
+    filter: brightness(1.2) saturate(1.3);
+    transform: scale(0.95);
+    transition: transform 0.1s ease, filter 0.15s ease;
+}
+
+/* Ensure smooth transitions for all state changes */
+#sodaButton {
+    will-change: transform, filter;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
 }
 
 .stats {
@@ -1193,6 +1225,12 @@ h3 {
     z-index: 1000;
     animation: clickFeedback 1s ease-out forwards;
     white-space: nowrap;
+    /* Prevent layout shifts */
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Ensure smooth positioning */
+    transform-origin: center center;
 }
 
 .level-up-feedback {
@@ -1271,6 +1309,11 @@ h3 {
     justify-content: center;
     align-items: center;
     min-height: 200px;
+    /* Additional optimizations to prevent layout shifts */
+    box-sizing: border-box;
+    /* Ensure stable positioning */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 /* Talk to God Tab Styles */

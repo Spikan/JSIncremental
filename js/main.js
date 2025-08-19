@@ -309,15 +309,15 @@ function initGame() {
 }
 
 function startGameLoop() {
-    // Update drink progress every 100ms for smooth animation
+    // Update drink progress every 200ms for smoother animation (reduced from 100ms)
     window.setInterval(function() {
         updateDrinkProgress();
-    }, 100);
+    }, 200);
     
     // Main drink interval for game logic
     window.setInterval(function() {
         processDrink();
-    }, 100); // Check every 100ms for precise drink timing
+    }, 200); // Check every 200ms for more stable timing (reduced from 100ms)
     
     // Update play time, last save time, and stats every second
     window.setInterval(function() {
@@ -332,24 +332,27 @@ function updateDrinkProgress() {
     const timeSinceLastDrink = currentTime - lastDrinkTime;
     drinkProgress = (timeSinceLastDrink / drinkRate) * 100;
     
-    // Update progress bar
+    // Cache DOM elements to reduce queries
     const progressFill = document.getElementById('drinkProgressFill');
     const countdown = document.getElementById('drinkCountdown');
     
     if (progressFill && countdown) {
-        progressFill.style.width = Math.min(drinkProgress, 100) + '%';
-        
-        // Update countdown text
-        const remainingTime = Math.max(0, (drinkRate - timeSinceLastDrink) / 1000);
-        countdown.textContent = remainingTime.toFixed(1) + 's';
-        
-        // Update progress bar colors based on completion
-        progressFill.classList.remove('nearly-complete', 'complete');
-        if (drinkProgress >= 100) {
-            progressFill.classList.add('complete');
-        } else if (drinkProgress >= 75) {
-            progressFill.classList.add('nearly-complete');
-        }
+        // Use requestAnimationFrame for smoother progress bar updates
+        requestAnimationFrame(() => {
+            progressFill.style.width = Math.min(drinkProgress, 100) + '%';
+            
+            // Update countdown text
+            const remainingTime = Math.max(0, (drinkRate - timeSinceLastDrink) / 1000);
+            countdown.textContent = remainingTime.toFixed(1) + 's';
+            
+            // Update progress bar colors based on completion
+            progressFill.classList.remove('nearly-complete', 'complete');
+            if (drinkProgress >= 100) {
+                progressFill.classList.add('complete');
+            } else if (drinkProgress >= 75) {
+                progressFill.classList.add('nearly-complete');
+            }
+        });
     }
 }
 
@@ -689,17 +692,29 @@ function sodaClick(number) {
     // Update sips
     sips = sips.plus(totalSipsGained);
     
-    // Update display
-    document.getElementById("sips").innerHTML = prettify(sips);
-    
-    // Show click feedback
-    showClickFeedback(totalSipsGained);
-    
-    // Visual feedback
-    setTimeout(function () {
-        document.getElementById("sodaButton").src = regSoda.src;
-    }, 90);
-    document.getElementById("sodaButton").src = clickSoda.src;
+    // Batch DOM updates to reduce layout thrashing
+    requestAnimationFrame(() => {
+        // Update display
+        const sipsElement = document.getElementById("sips");
+        if (sipsElement) {
+            sipsElement.innerHTML = prettify(sips);
+        }
+        
+        // Show click feedback
+        showClickFeedback(totalSipsGained);
+        
+        // Visual feedback with smoother image transition
+        const sodaButton = document.getElementById("sodaButton");
+        if (sodaButton) {
+            // Add a CSS class for the click effect instead of changing src
+            sodaButton.classList.add('soda-clicked');
+            
+            // Remove the class after animation completes
+            setTimeout(() => {
+                sodaButton.classList.remove('soda-clicked');
+            }, 150);
+        }
+    });
     
     // Check if level up is possible
     checkLevelUp();
@@ -718,23 +733,28 @@ function showClickFeedback(sipsGained) {
     feedback.className = 'click-feedback';
     feedback.textContent = '+' + prettify(sipsGained);
     
-    // Position randomly around the click area for variety
+    // Use more efficient positioning to avoid layout recalculations
     const containerRect = sodaContainer.getBoundingClientRect();
-    const randomX = (Math.random() - 0.5) * 100; // -50px to +50px
-    const randomY = (Math.random() - 0.5) * 60;  // -30px to +30px
+    const randomX = (Math.random() - 0.5) * 80; // -40px to +40px (reduced range)
+    const randomY = (Math.random() - 0.5) * 40;  // -20px to +20px (reduced range)
     
-    feedback.style.left = (containerRect.width / 2 + randomX) + 'px';
-    feedback.style.top = (containerRect.height / 2 + randomY) + 'px';
+    // Position relative to container center for more stable positioning
+    feedback.style.position = 'absolute';
+    feedback.style.left = '50%';
+    feedback.style.top = '50%';
+    feedback.style.transform = `translate(-50%, -50%) translate(${randomX}px, ${randomY}px)`;
     
     // Add to container
     sodaContainer.appendChild(feedback);
     
-    // Remove after animation completes
-    setTimeout(() => {
-        if (feedback.parentNode) {
-            feedback.parentNode.removeChild(feedback);
-        }
-    }, 1000);
+    // Use requestAnimationFrame for smoother removal
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.parentNode.removeChild(feedback);
+            }
+        }, 1000);
+    });
 }
 
 function spsClick(amount) {
