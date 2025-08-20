@@ -1975,7 +1975,21 @@ async function getGodResponse(userMessage) {
                 thinkingMessage.remove();
             }
             
-            // Add the secret geodude response with embedded YouTube video
+            // Randomly choose between the two geodude videos
+            const geodudeVideos = [
+                {
+                    id: 'Mhvl7X_as8I',
+                    title: 'Geodude Secret Video 1'
+                },
+                {
+                    id: 'ok7fOwdk2gc',
+                    title: 'Geodude Secret Video 2'
+                }
+            ];
+            
+            const randomVideo = geodudeVideos[Math.floor(Math.random() * geodudeVideos.length)];
+            
+            // Add the secret geodude response with embedded YouTube video (autoplay enabled)
             addGodMessage(`
                 <div style="text-align: center; margin: 1rem 0;">
                     <p style="color: #00B36B; font-weight: bold; margin-bottom: 1rem;">🎵 You've discovered a divine secret! 🎵</p>
@@ -1983,8 +1997,8 @@ async function getGodResponse(userMessage) {
                         <iframe 
                             width="100%" 
                             height="315" 
-                            src="https://www.youtube.com/embed/Mhvl7X_as8I" 
-                            title="Geodude Secret Video" 
+                            src="https://www.youtube.com/embed/${randomVideo.id}?autoplay=1&mute=0" 
+                            title="${randomVideo.title}" 
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen
