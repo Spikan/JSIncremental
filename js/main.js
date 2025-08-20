@@ -301,6 +301,19 @@ function initGame() {
         // Initialize music player
         initMusicPlayer();
         
+        // Initialize audio context for click sounds
+        initAudioContext();
+        
+        // Load click sounds preference
+        loadClickSoundsPreference();
+        
+        // Update click sounds button text to match current state
+        const clickSoundsToggle = document.getElementById('clickSoundsToggle');
+        if (clickSoundsToggle) {
+            clickSoundsToggle.textContent = clickSoundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
+            clickSoundsToggle.classList.toggle('sounds-off', !clickSoundsEnabled);
+        }
+        
         console.log('Game initialization complete!');
         
     } catch (error) {
@@ -649,9 +662,278 @@ function trackClick() {
         clickTimes.shift();
     }
     
+    // Play straw sip sound effect
+    playStrawSipSound();
+    
     // Update stats display if stats tab is active
     if (document.getElementById('statsTab').classList.contains('active')) {
         updateClickStats();
+    }
+}
+
+// Straw sip sound effect system
+let audioContext = null;
+let clickSoundsEnabled = true;
+
+// Initialize audio context for sound effects
+function initAudioContext() {
+    if (!audioContext) {
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            console.log('Audio context initialized for sound effects');
+        } catch (error) {
+            console.error('Failed to initialize audio context:', error);
+            clickSoundsEnabled = false;
+        }
+    }
+}
+
+// Generate a straw sip sound with random modulation
+function playStrawSipSound() {
+    if (!clickSoundsEnabled || !audioContext) {
+        return;
+    }
+    
+    // Randomly choose between the three sound types for variety
+    const soundChoice = Math.random();
+    if (soundChoice < 0.5) {
+        playBasicStrawSipSound();
+    } else if (soundChoice < 0.8) {
+        playAlternativeStrawSipSound();
+    } else {
+        playBubbleStrawSipSound();
+    }
+}
+
+// Basic straw sip sound
+function playBasicStrawSipSound() {
+    try {
+        // Create oscillator for the main sip sound
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        // Random modulation parameters for variety
+        const baseFreq = 200 + Math.random() * 100; // 200-300 Hz base frequency
+        const duration = 0.1 + Math.random() * 0.1; // 0.1-0.2 seconds
+        const volume = 0.3 + Math.random() * 0.2; // 0.3-0.5 volume
+        
+        // Set up oscillator
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+        
+        // Add frequency modulation for realistic straw sound
+        oscillator.frequency.exponentialRampToValueAtTime(
+            baseFreq * (0.8 + Math.random() * 0.4), 
+            audioContext.currentTime + duration
+        );
+        
+        // Set up gain envelope for natural sound
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        
+        // Connect nodes
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Start and stop the sound
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + duration);
+        
+        // Clean up
+        setTimeout(() => {
+            oscillator.disconnect();
+            gainNode.disconnect();
+        }, duration * 1000 + 100);
+        
+    } catch (error) {
+        console.error('Error playing basic straw sip sound:', error);
+    }
+}
+
+// Alternative straw sip sound with different characteristics
+function playAlternativeStrawSipSound() {
+    if (!clickSoundsEnabled || !audioContext) {
+        return;
+    }
+    
+    try {
+        // Create multiple oscillators for a richer sound
+        const oscillator1 = audioContext.createOscillator();
+        const oscillator2 = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        const filterNode = audioContext.createBiquadFilter();
+        
+        // Random parameters
+        const baseFreq1 = 150 + Math.random() * 80; // 150-230 Hz
+        const baseFreq2 = 300 + Math.random() * 120; // 300-420 Hz
+        const duration = 0.08 + Math.random() * 0.12; // 0.08-0.2 seconds
+        const volume = 0.25 + Math.random() * 0.15; // 0.25-0.4 volume
+        
+        // Set up oscillators
+        oscillator1.type = 'triangle';
+        oscillator2.type = 'sine';
+        
+        oscillator1.frequency.setValueAtTime(baseFreq1, audioContext.currentTime);
+        oscillator2.frequency.setValueAtTime(baseFreq2, audioContext.currentTime);
+        
+        // Add subtle frequency changes
+        oscillator1.frequency.exponentialRampToValueAtTime(
+            baseFreq1 * (0.9 + Math.random() * 0.2), 
+            audioContext.currentTime + duration
+        );
+        oscillator2.frequency.exponentialRampToValueAtTime(
+            baseFreq2 * (0.85 + Math.random() * 0.3), 
+            audioContext.currentTime + duration
+        );
+        
+        // Set up filter for more realistic straw sound
+        filterNode.type = 'lowpass';
+        filterNode.frequency.setValueAtTime(800 + Math.random() * 400, audioContext.currentTime);
+        filterNode.Q.setValueAtTime(2 + Math.random() * 3, audioContext.currentTime);
+        
+        // Set up gain envelope
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.005);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        
+        // Connect nodes
+        oscillator1.connect(filterNode);
+        oscillator2.connect(filterNode);
+        filterNode.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Start and stop sounds
+        oscillator1.start(audioContext.currentTime);
+        oscillator2.start(audioContext.currentTime);
+        oscillator1.stop(audioContext.currentTime + duration);
+        oscillator2.stop(audioContext.currentTime + duration);
+        
+        // Clean up
+        setTimeout(() => {
+            oscillator1.disconnect();
+            oscillator2.disconnect();
+            filterNode.disconnect();
+            gainNode.disconnect();
+        }, duration * 1000 + 100);
+        
+    } catch (error) {
+        console.error('Error playing alternative straw sip sound:', error);
+    }
+}
+
+// Bubble straw sip sound with more complex modulation
+function playBubbleStrawSipSound() {
+    if (!clickSoundsEnabled || !audioContext) {
+        return;
+    }
+    
+    try {
+        // Create multiple oscillators for a bubbly effect
+        const oscillator1 = audioContext.createOscillator();
+        const oscillator2 = audioContext.createOscillator();
+        const oscillator3 = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        const filterNode = audioContext.createBiquadFilter();
+        const delayNode = audioContext.createDelay();
+        
+        // Random parameters for variety
+        const baseFreq1 = 180 + Math.random() * 60; // 180-240 Hz
+        const baseFreq2 = 350 + Math.random() * 100; // 350-450 Hz
+        const baseFreq3 = 500 + Math.random() * 150; // 500-650 Hz
+        const duration = 0.12 + Math.random() * 0.08; // 0.12-0.2 seconds
+        const volume = 0.2 + Math.random() * 0.15; // 0.2-0.35 volume
+        
+        // Set up oscillators with different waveforms
+        oscillator1.type = 'sawtooth';
+        oscillator2.type = 'square';
+        oscillator3.type = 'sine';
+        
+        oscillator1.frequency.setValueAtTime(baseFreq1, audioContext.currentTime);
+        oscillator2.frequency.setValueAtTime(baseFreq2, audioContext.currentTime);
+        oscillator3.frequency.setValueAtTime(baseFreq3, audioContext.currentTime);
+        
+        // Add complex frequency modulation for bubbly effect
+        oscillator1.frequency.exponentialRampToValueAtTime(
+            baseFreq1 * (0.7 + Math.random() * 0.6), 
+            audioContext.currentTime + duration
+        );
+        oscillator2.frequency.exponentialRampToValueAtTime(
+            baseFreq2 * (0.6 + Math.random() * 0.8), 
+            audioContext.currentTime + duration
+        );
+        oscillator3.frequency.exponentialRampToValueAtTime(
+            baseFreq3 * (0.5 + Math.random() * 1.0), 
+            audioContext.currentTime + duration
+        );
+        
+        // Set up filter for bubbly character
+        filterNode.type = 'bandpass';
+        filterNode.frequency.setValueAtTime(600 + Math.random() * 300, audioContext.currentTime);
+        filterNode.Q.setValueAtTime(4 + Math.random() * 4, audioContext.currentTime);
+        
+        // Add subtle delay for depth
+        delayNode.delayTime.setValueAtTime(0.01 + Math.random() * 0.02, audioContext.currentTime);
+        
+        // Set up gain envelope with multiple stages
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.003);
+        gainNode.gain.setValueAtTime(volume * 0.8, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        
+        // Connect nodes with delay for depth
+        oscillator1.connect(filterNode);
+        oscillator2.connect(filterNode);
+        oscillator3.connect(filterNode);
+        filterNode.connect(gainNode);
+        gainNode.connect(delayNode);
+        delayNode.connect(audioContext.destination);
+        
+        // Start and stop sounds
+        oscillator1.start(audioContext.currentTime);
+        oscillator2.start(audioContext.currentTime);
+        oscillator3.start(audioContext.currentTime);
+        oscillator1.stop(audioContext.currentTime + duration);
+        oscillator2.stop(audioContext.currentTime + duration);
+        oscillator3.stop(audioContext.currentTime + duration);
+        
+        // Clean up
+        setTimeout(() => {
+            oscillator1.disconnect();
+            oscillator2.disconnect();
+            oscillator3.disconnect();
+            filterNode.disconnect();
+            gainNode.disconnect();
+            delayNode.disconnect();
+        }, duration * 1000 + 100);
+        
+    } catch (error) {
+        console.error('Error playing bubble straw sip sound:', error);
+    }
+}
+
+// Function to toggle click sounds on/off
+function toggleClickSounds() {
+    clickSoundsEnabled = !clickSoundsEnabled;
+    
+    // Save preference to localStorage
+    localStorage.setItem('clickSoundsEnabled', clickSoundsEnabled.toString());
+    
+    // Update UI if there's a toggle button
+    const toggleButton = document.getElementById('clickSoundsToggle');
+    if (toggleButton) {
+        toggleButton.textContent = clickSoundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
+        toggleButton.classList.toggle('sounds-off', !clickSoundsEnabled);
+    }
+    
+    console.log('Click sounds:', clickSoundsEnabled ? 'enabled' : 'disabled');
+}
+
+// Load click sounds preference from localStorage
+function loadClickSoundsPreference() {
+    const saved = localStorage.getItem('clickSoundsEnabled');
+    if (saved !== null) {
+        clickSoundsEnabled = saved === 'true';
     }
 }
 
@@ -1952,6 +2234,32 @@ window.updateStreamInfo = updateStreamInfo;
 window.getStreamDetails = getStreamDetails;
 window.activateTempleOSMode = activateTempleOSMode;
 window.getTempleOSResponse = getTempleOSResponse;
+window.toggleClickSounds = toggleClickSounds;
+window.testClickSounds = testClickSounds;
+
+// Function to test click sounds
+function testClickSounds() {
+    console.log('=== CLICK SOUNDS TEST ===');
+    
+    if (!audioContext) {
+        console.log('Audio context not initialized, creating...');
+        initAudioContext();
+    }
+    
+    if (!clickSoundsEnabled) {
+        console.log('Click sounds are disabled, enabling...');
+        clickSoundsEnabled = true;
+    }
+    
+    console.log('Testing all three sound variations...');
+    
+    // Test each sound type
+    setTimeout(() => playBasicStrawSipSound(), 100);
+    setTimeout(() => playAlternativeStrawSipSound(), 300);
+    setTimeout(() => playBubbleStrawSipSound(), 500);
+    
+    console.log('Sound test complete! Check console for any errors.');
+}
 
 // Debug function to test audio element
 window.testAudio = function() {

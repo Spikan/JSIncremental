@@ -515,8 +515,55 @@ body {
 
 .autosave-toggle input[type="checkbox"]:checked + .toggle-slider:before {
     transform: translateX(26px);
-    background-color: #fff;
+    background-color: white;
 }
+
+/* Sound Controls */
+.sound-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.sound-toggle-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 2px solid #00B36B;
+    background-color: #00B36B;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+}
+
+.sound-toggle-btn:hover {
+    background-color: #00D97F;
+    border-color: #00D97F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3);
+}
+
+.sound-toggle-btn.sounds-off {
+    background-color: #666;
+    border-color: #666;
+}
+
+.sound-toggle-btn.sounds-off:hover {
+    background-color: #888;
+    border-color: #888;
+}
+
+.sound-description {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+    font-style: italic;
+}
+
+
 
 .autosave-interval {
     display: flex;
