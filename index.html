@@ -69,30 +69,50 @@
     <button class="tab-btn" onclick="switchTab('options', event)">⚙️ Options</button>
 </div>
 
-<!-- Prominent Stats Header -->
-<div class="prominent-stats-header">
-    <div class="prominent-stat">
-        <div class="prominent-stat-icon">🥤</div>
-        <div class="prominent-stat-content">
-            <div class="prominent-stat-label">Total Sips</div>
-            <div class="prominent-stat-value" id="prominentSips">0</div>
+    <!-- Prominent Stats Header -->
+    <div class="prominent-stats-header">
+        <div class="prominent-stat">
+            <div class="prominent-stat-icon">🥤</div>
+            <div class="prominent-stat-content">
+                <div class="prominent-stat-label">Total Sips</div>
+                <div class="prominent-stat-value" id="prominentSips">0</div>
+            </div>
+        </div>
+        <div class="prominent-stat">
+            <div class="prominent-stat-icon">⚡</div>
+            <div class="prominent-stat-content">
+                <div class="prominent-stat-label">Sips per Drink</div>
+                <div class="prominent-stat-value" id="prominentSPS">0</div>
+            </div>
+        </div>
+        <div class="prominent-stat">
+            <div class="prominent-stat-icon">🎯</div>
+            <div class="prominent-stat-content">
+                <div class="prominent-stat-label">Sips per Click</div>
+                <div class="prominent-stat-value" id="prominentClickBonus">1</div>
+            </div>
         </div>
     </div>
-    <div class="prominent-stat">
-        <div class="prominent-stat-icon">⚡</div>
-        <div class="prominent-stat-content">
-            <div class="prominent-stat-label">Sips per Drink</div>
-            <div class="prominent-stat-value" id="prominentSPS">0</div>
+
+    <!-- Music Player -->
+    <div class="music-player">
+        <div class="music-player-header">
+            <div class="music-player-icon">🎵</div>
+            <div class="music-player-info">
+                <div class="music-player-title">Lofi Beats</div>
+                <div class="music-player-subtitle">ChilledCow Radio</div>
+            </div>
         </div>
-    </div>
-    <div class="prominent-stat">
-        <div class="prominent-stat-icon">🎯</div>
-        <div class="prominent-stat-content">
-            <div class="prominent-stat-label">Sips per Click</div>
-            <div class="prominent-stat-value" id="prominentClickBonus">1</div>
+        <div class="music-player-controls">
+            <button class="music-control-btn" id="musicToggleBtn" title="Play/Pause Music">
+                <span class="music-control-icon">▶️</span>
+            </button>
+            <button class="music-control-btn" id="musicMuteBtn" title="Mute/Unmute">
+                <span class="music-control-icon">🔊</span>
+            </button>
         </div>
+        <div class="music-player-status" id="musicStatus">Ready to play</div>
     </div>
-</div>
 
 <!-- Drink Progress Bar -->
 <div class="drink-progress-container">

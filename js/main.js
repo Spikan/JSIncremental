@@ -297,6 +297,9 @@ function initGame() {
         // Update prominent stats header with initial values
         updateProminentStats();
         
+        // Initialize music player
+        initMusicPlayer();
+        
         console.log('Game initialization complete!');
         
     } catch (error) {
@@ -1538,6 +1541,157 @@ window.save = save;
 window.delete_save = delete_save;
 window.sendMessage = sendMessage;
 
+// Music Player Functions
+function initMusicPlayer() {
+    const musicPlayer = document.querySelector('.music-player');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const musicMuteBtn = document.getElementById('musicMuteBtn');
+    const musicStatus = document.getElementById('musicStatus');
+    
+    if (!musicPlayer || !musicToggleBtn || !musicMuteBtn || !musicStatus) {
+        console.error('Music player elements not found');
+        return;
+    }
+    
+    // Initialize music player state
+    window.musicPlayerState = {
+        isPlaying: false,
+        isMuted: false,
+        audio: null
+    };
+    
+    // Create audio element for lofi stream
+    const audio = new Audio();
+    // Use a working lofi stream URL
+    audio.src = 'https://ice1.somafm.com/groovesalad-128-mp3';
+    audio.loop = true;
+    audio.volume = 0.3; // Start at 30% volume
+    
+    // Add error handling
+    audio.addEventListener('error', (e) => {
+        console.log('Audio error:', e);
+        musicStatus.textContent = 'Stream unavailable';
+        loadFallbackMusic();
+    });
+    
+    audio.addEventListener('loadstart', () => {
+        musicStatus.textContent = 'Loading stream...';
+    });
+    
+    audio.addEventListener('canplay', () => {
+        musicStatus.textContent = 'Ready to play';
+    });
+    
+    // Store audio reference
+    window.musicPlayerState.audio = audio;
+    
+    // Add event listeners
+    musicToggleBtn.addEventListener('click', toggleMusic);
+    musicMuteBtn.addEventListener('click', toggleMute);
+    
+    // Update initial button states
+    updateMusicPlayerUI();
+    
+    // Try to auto-play (may be blocked by browser)
+    setTimeout(() => {
+        if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+            toggleMusic();
+        }
+    }, 1000);
+    
+    console.log('Music player initialized');
+}
+
+function toggleMusic() {
+    const state = window.musicPlayerState;
+    if (!state || !state.audio) return;
+    
+    if (state.isPlaying) {
+        state.audio.pause();
+        state.isPlaying = false;
+        musicStatus.textContent = 'Paused';
+    } else {
+        // Try to play the audio
+        const playPromise = state.audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                state.isPlaying = true;
+                musicStatus.textContent = 'Playing lofi beats...';
+                updateMusicPlayerUI();
+            }).catch(error => {
+                console.log('Auto-play prevented:', error);
+                musicStatus.textContent = 'Click to start music';
+                // Fallback: try to load from a different source
+                loadFallbackMusic();
+            });
+        }
+    }
+    
+    updateMusicPlayerUI();
+}
+
+function toggleMute() {
+    const state = window.musicPlayerState;
+    if (!state || !state.audio) return;
+    
+    state.isMuted = !state.isMuted;
+    state.audio.muted = state.isMuted;
+    
+    if (state.isMuted) {
+        musicStatus.textContent = 'Muted';
+    } else {
+        musicStatus.textContent = state.isPlaying ? 'Playing lofi beats...' : 'Paused';
+    }
+    
+    updateMusicPlayerUI();
+}
+
+function updateMusicPlayerUI() {
+    const state = window.musicPlayerState;
+    const musicPlayer = document.querySelector('.music-player');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const musicMuteBtn = document.getElementById('musicMuteBtn');
+    
+    if (!musicPlayer || !musicToggleBtn || !musicMuteBtn) return;
+    
+    // Update play/pause button
+    const toggleIcon = musicToggleBtn.querySelector('.music-control-icon');
+    if (state.isPlaying) {
+        toggleIcon.textContent = '⏸️';
+        musicPlayer.classList.add('playing');
+        musicPlayer.classList.remove('muted');
+    } else {
+        toggleIcon.textContent = '▶️';
+        musicPlayer.classList.remove('playing');
+    }
+    
+    // Update mute button
+    const muteIcon = musicMuteBtn.querySelector('.music-control-icon');
+    if (state.isMuted) {
+        muteIcon.textContent = '🔇';
+        musicPlayer.classList.add('muted');
+    } else {
+        muteIcon.textContent = '🔊';
+        musicPlayer.classList.remove('muted');
+    }
+}
+
+function loadFallbackMusic() {
+    // Try alternative lofi sources if the main one fails
+    const fallbackSources = [
+        'https://stream.live.bbc.co.uk/mediaselector/6/redir/version/2.0/mediaset/audio-syndication/proto/http/vpid/p08bq3g3.mp3',
+        'https://ice1.somafm.com/groovesalad-128-mp3',
+        'https://ice1.somafm.com/defcon-128-mp3'
+    ];
+    
+    const state = window.musicPlayerState;
+    if (state && state.audio) {
+        const randomSource = fallbackSources[Math.floor(Math.random() * fallbackSources.length)];
+        state.audio.src = randomSource;
+        musicStatus.textContent = 'Trying alternative source...';
+    }
+}
+
 // Make all other functions globally available to prevent undefined errors
 window.updateAllStats = updateAllStats;
 window.updateDrinkRate = updateDrinkRate;
@@ -1559,3 +1713,6 @@ window.getPlaceholderGif = getPlaceholderGif;
 window.toggleAutosave = toggleAutosave;
 window.changeAutosaveInterval = changeAutosaveInterval;
 window.getGodResponse = getGodResponse;
+window.initMusicPlayer = initMusicPlayer;
+window.toggleMusic = toggleMusic;
+window.toggleMute = toggleMute;
