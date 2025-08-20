@@ -2372,20 +2372,30 @@ function initMusicPlayer() {
     // Add mobile-specific event listeners to pause music when window loses focus
     let wasPlayingBeforeBlur = false;
     
+    // Function to detect if user is on a mobile device
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               (window.innerWidth <= 768 && window.innerHeight <= 1024);
+    }
+    
     // Handle page visibility change (when user switches tabs or apps)
     document.addEventListener('visibilitychange', () => {
         const state = window.musicPlayerState;
         if (!state || !state.audio) return;
         
-        if (document.hidden) {
-            // Page became hidden - remember if music was playing and pause it
+        // Only pause on mobile devices
+        if (document.hidden && isMobileDevice()) {
+            // Page became hidden on mobile - remember if music was playing and pause it
             wasPlayingBeforeBlur = state.isPlaying;
             if (state.isPlaying) {
                 state.audio.pause();
                 state.isPlaying = false;
                 updateMusicPlayerUI();
-                console.log('Music paused due to page visibility change');
+                console.log('Music paused due to page visibility change on mobile');
             }
+        } else if (document.hidden) {
+            // Page became hidden on desktop - let music continue playing
+            console.log('Page became hidden on desktop, music continues playing');
         } else {
             // Page became visible again - don't auto-resume, let user decide
             console.log('Page became visible again, music remains paused');
@@ -2397,12 +2407,18 @@ function initMusicPlayer() {
         const state = window.musicPlayerState;
         if (!state || !state.audio) return;
         
-        wasPlayingBeforeBlur = state.isPlaying;
-        if (state.isPlaying) {
-            state.audio.pause();
-            state.isPlaying = false;
-            updateMusicPlayerUI();
-            console.log('Music paused due to window blur');
+        // Only pause on mobile devices
+        if (isMobileDevice()) {
+            wasPlayingBeforeBlur = state.isPlaying;
+            if (state.isPlaying) {
+                state.audio.pause();
+                state.isPlaying = false;
+                updateMusicPlayerUI();
+                console.log('Music paused due to window blur on mobile');
+            }
+        } else {
+            // Window lost focus on desktop - let music continue playing
+            console.log('Window lost focus on desktop, music continues playing');
         }
     });
     
