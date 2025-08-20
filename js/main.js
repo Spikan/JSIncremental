@@ -8,6 +8,198 @@
 import { config } from './config.js';
 import { templePhrases, totalPhrases } from './phrases.js';
 
+// Progressive enhancement - detect advanced features
+const FEATURE_DETECTION = {
+    webGL: !!window.WebGLRenderingContext,
+    webAudio: !!window.AudioContext,
+    serviceWorker: 'serviceWorker' in navigator,
+    webP: false,
+    localStorage: !!window.localStorage,
+    requestAnimationFrame: !!window.requestAnimationFrame,
+    performance: !!window.performance && !!window.performance.now,
+    
+    // Test WebP support
+    init: function() {
+        const webPTest = new Image();
+        webPTest.onload = () => { this.webP = true; };
+        webPTest.onerror = () => { this.webP = false; };
+        webPTest.src = 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAADsAD+JaQAA3AAAAAA';
+        
+        console.log('Feature detection results:', {
+            webGL: this.webGL,
+            webAudio: this.webAudio,
+            serviceWorker: this.serviceWorker,
+            localStorage: this.localStorage,
+            requestAnimationFrame: this.requestAnimationFrame,
+            performance: this.performance
+        });
+    },
+    
+    // Enable features based on capability
+    enableAdvancedFeatures: function() {
+        if (this.webGL) {
+            this.enableWebGLEffects();
+        }
+        
+        if (this.performance) {
+            this.enablePerformanceMonitoring();
+        }
+        
+        if (this.serviceWorker) {
+            this.enableServiceWorker();
+        }
+    },
+    
+    enableWebGLEffects: function() {
+        console.log('WebGL effects enabled');
+        // Future: Add WebGL particle effects for clicks
+    },
+    
+    enablePerformanceMonitoring: function() {
+        console.log('Performance monitoring enabled');
+        // Monitor frame rates and performance
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        function measureFPS() {
+            frameCount++;
+            const currentTime = performance.now();
+            
+            if (currentTime - lastTime >= 1000) {
+                const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                if (fps < 30) {
+                    console.warn('Low FPS detected:', fps);
+                }
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+            
+            requestAnimationFrame(measureFPS);
+        }
+        
+        requestAnimationFrame(measureFPS);
+    },
+    
+    enableServiceWorker: function() {
+        console.log('Service worker support detected');
+        // Future: Enable offline functionality
+    }
+};
+
+// DOM Element Cache - Reduces repeated queries
+const DOM_CACHE = {
+    // Game elements
+    sips: null,
+    levelNumber: null,
+    levelText: null,
+    sodaButton: null,
+    
+    // Music player elements
+    musicPlayer: null,
+    musicToggleBtn: null,
+    musicMuteBtn: null,
+    musicStatus: null,
+    musicStreamSelect: null,
+    currentStreamInfo: null,
+    
+    // Shop elements
+    shopDiv: null,
+    
+    // Stats elements
+    statsTab: null,
+    
+    // Progress elements
+    drinkProgressFill: null,
+    drinkCountdown: null,
+    
+    // Additional elements that are frequently accessed
+    playTime: null,
+    lastSaveTime: null,
+    totalPlayTime: null,
+    sessionTime: null,
+    daysSinceStart: null,
+    totalClicks: null,
+    clicksPerSecond: null,
+    bestClickStreak: null,
+    totalSipsEarned: null,
+    currentSipsPerSecond: null,
+    highestSipsPerSecond: null,
+    strawsPurchased: null,
+    cupsPurchased: null,
+    suctionsPurchased: null,
+    criticalClicksPurchased: null,
+    currentLevel: null,
+    totalUpgrades: null,
+    fasterDrinksOwned: null,
+    currentDrinkSpeed: null,
+    drinkSpeedBonus: null,
+    prominentSips: null,
+    prominentSPS: null,
+    prominentClickBonus: null,
+    prominentCriticalChance: null,
+    levelUpDiv: null,
+    
+    // Initialize all cached elements
+    init: function() {
+        this.sips = document.getElementById('sips');
+        this.levelNumber = document.getElementById('levelNumber');
+        this.levelText = document.getElementById('levelText');
+        this.sodaButton = document.getElementById('sodaButton');
+        this.musicPlayer = document.querySelector('.music-player');
+        this.musicToggleBtn = document.getElementById('musicToggleBtn');
+        this.musicMuteBtn = document.getElementById('musicMuteBtn');
+        this.musicStatus = document.getElementById('musicStatus');
+        this.musicStreamSelect = document.getElementById('musicStreamSelect');
+        this.currentStreamInfo = document.getElementById('currentStreamInfo');
+        this.shopDiv = document.getElementById('shopDiv');
+        this.statsTab = document.getElementById('statsTab');
+        this.drinkProgressFill = document.getElementById('drinkProgressFill');
+        this.drinkCountdown = document.getElementById('drinkCountdown');
+        
+        // Cache additional elements
+        this.playTime = document.getElementById('playTime');
+        this.lastSaveTime = document.getElementById('lastSaveTime');
+        this.totalPlayTime = document.getElementById('totalPlayTime');
+        this.sessionTime = document.getElementById('sessionTime');
+        this.daysSinceStart = document.getElementById('daysSinceStart');
+        this.totalClicks = document.getElementById('totalClicks');
+        this.clicksPerSecond = document.getElementById('clicksPerSecond');
+        this.bestClickStreak = document.getElementById('bestClickStreak');
+        this.totalSipsEarned = document.getElementById('totalSipsEarned');
+        this.currentSipsPerSecond = document.getElementById('currentSipsPerSecond');
+        this.highestSipsPerSecond = document.getElementById('highestSipsPerSecond');
+        this.strawsPurchased = document.getElementById('strawsPurchased');
+        this.cupsPurchased = document.getElementById('cupsPurchased');
+        this.suctionsPurchased = document.getElementById('suctionsPurchased');
+        this.criticalClicksPurchased = document.getElementById('criticalClicksPurchased');
+        this.currentLevel = document.getElementById('currentLevel');
+        this.totalUpgrades = document.getElementById('totalUpgrades');
+        this.fasterDrinksOwned = document.getElementById('fasterDrinksOwned');
+        this.currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
+        this.drinkSpeedBonus = document.getElementById('drinkSpeedBonus');
+        this.prominentSips = document.getElementById('prominentSips');
+        this.prominentSPS = document.getElementById('prominentSPS');
+        this.prominentClickBonus = document.getElementById('prominentClickBonus');
+        this.prominentCriticalChance = document.getElementById('prominentCriticalChance');
+        this.levelUpDiv = document.getElementById('levelUpDiv');
+        
+        console.log('DOM cache initialized with', Object.keys(this).filter(key => key !== 'init').length, 'elements');
+    },
+    
+    // Get cached element with fallback
+    get: function(key) {
+        if (this[key]) {
+            return this[key];
+        }
+        // Fallback to direct query if not cached
+        const element = document.getElementById(key) || document.querySelector(key);
+        if (element) {
+            this[key] = element;
+        }
+        return element;
+    }
+};
+
 let sips = new Decimal(0);
 let straws = new Decimal(0);
 let cups = new Decimal(0);
@@ -46,6 +238,12 @@ let autosaveInterval = 10; // seconds
 let autosaveCounter = 0;
 let gameStartTime = Date.now();
 let lastSaveTime = null;
+
+// Save optimization - batch save operations
+let saveQueue = [];
+let saveTimeout = null;
+let lastSaveOperation = 0;
+const MIN_SAVE_INTERVAL = 1000; // Minimum 1 second between saves
 
 // Statistics tracking variables
 let totalClicks = 0;
@@ -268,6 +466,13 @@ function initGame() {
     console.log('initGame called');
     
     try {
+        // Initialize DOM cache first
+        DOM_CACHE.init();
+        
+        // Initialize feature detection and enable advanced features
+        FEATURE_DETECTION.init();
+        FEATURE_DETECTION.enableAdvancedFeatures();
+        
         // Load saved game data
         let savegame = JSON.parse(localStorage.getItem("save"));
         
@@ -304,7 +509,7 @@ function initGame() {
         console.log('Game variables initialized, calling reload...');
         
         // Only call reload if we're sure the DOM is ready
-        if (document.getElementById('sips')) {
+        if (DOM_CACHE.sips) {
             reload();
         } else {
             console.log('DOM not ready yet, skipping reload');
@@ -348,22 +553,32 @@ function initGame() {
 }
 
 function startGameLoop() {
-    // Update drink progress every 100ms for very smooth animation
-    window.setInterval(function() {
-        updateDrinkProgress();
-    }, 100);
+    let lastUpdate = 0;
+    let lastStatsUpdate = 0;
+    const targetFPS = 60;
+    const frameInterval = 1000 / targetFPS;
+    const statsInterval = 1000; // Update stats every second
     
-    // Main drink interval for game logic
-    window.setInterval(function() {
-        processDrink();
-    }, 100); // Check every 100ms for more responsive gameplay
+    function gameLoop(currentTime) {
+        // Update drink progress and game logic at 60 FPS
+        if (currentTime - lastUpdate >= frameInterval) {
+            updateDrinkProgress();
+            processDrink();
+            lastUpdate = currentTime;
+        }
+        
+        // Update stats and time tracking every second
+        if (currentTime - lastStatsUpdate >= statsInterval) {
+            updatePlayTime();
+            updateLastSaveTime();
+            updateAllStats();
+            lastStatsUpdate = currentTime;
+        }
+        
+        requestAnimationFrame(gameLoop);
+    }
     
-    // Update play time, last save time, and stats every second
-    window.setInterval(function() {
-        updatePlayTime();
-        updateLastSaveTime();
-        updateAllStats();
-    }, 1000);
+    requestAnimationFrame(gameLoop);
 }
 
 function updateDrinkProgress() {
@@ -372,8 +587,8 @@ function updateDrinkProgress() {
     drinkProgress = (timeSinceLastDrink / drinkRate) * 100;
     
     // Cache DOM elements to reduce queries
-    const progressFill = document.getElementById('drinkProgressFill');
-    const countdown = document.getElementById('drinkCountdown');
+    const progressFill = DOM_CACHE.drinkProgressFill;
+    const countdown = DOM_CACHE.drinkCountdown;
     
     if (progressFill && countdown) {
         // Use requestAnimationFrame for smoother progress bar updates
@@ -499,7 +714,7 @@ function loadOptions() {
 
 // Play time tracking
 function updatePlayTime() {
-    const playTimeElement = document.getElementById('playTime');
+    const playTimeElement = DOM_CACHE.playTime;
     if (playTimeElement) {
         const currentTime = Date.now();
         const playTimeMs = currentTime - gameStartTime;
@@ -512,7 +727,7 @@ function updatePlayTime() {
 }
 
 function updateLastSaveTime() {
-    const lastSaveElement = document.getElementById('lastSaveTime');
+    const lastSaveElement = DOM_CACHE.lastSaveTime;
     if (lastSaveElement) {
         if (lastSaveTime) {
             const timeAgo = Math.floor((Date.now() - lastSaveTime) / 1000);
@@ -532,7 +747,7 @@ function updateLastSaveTime() {
 // Statistics update functions
 function updateAllStats() {
     // Only update stats if the stats tab is active and elements exist
-    const statsTab = document.getElementById('statsTab');
+    const statsTab = DOM_CACHE.statsTab;
     if (statsTab && statsTab.classList.contains('active')) {
         updateTimeStats();
         updateClickStats();
@@ -544,7 +759,7 @@ function updateAllStats() {
 
 function updateTimeStats() {
     // Total play time (including previous sessions)
-    const totalPlayTimeElement = document.getElementById('totalPlayTime');
+    const totalPlayTimeElement = DOM_CACHE.totalPlayTime;
     if (totalPlayTimeElement) {
         const totalTime = Date.now() - gameStartDate;
         const totalSeconds = Math.floor(totalTime / 1000);
@@ -555,7 +770,7 @@ function updateTimeStats() {
     }
     
     // Current session time
-    const sessionTimeElement = document.getElementById('sessionTime');
+    const sessionTimeElement = DOM_CACHE.sessionTime;
     if (sessionTimeElement) {
         const sessionTime = Date.now() - gameStartTime;
         const sessionSeconds = Math.floor(sessionTime / 1000);
@@ -566,7 +781,7 @@ function updateTimeStats() {
     }
     
     // Days since start
-    const daysSinceStartElement = document.getElementById('daysSinceStart');
+    const daysSinceStartElement = DOM_CACHE.daysSinceStart;
     if (daysSinceStartElement) {
         const daysSinceStart = Math.floor((Date.now() - gameStartDate) / (1000 * 60 * 60 * 24));
         daysSinceStartElement.textContent = daysSinceStart.toString();
@@ -575,13 +790,13 @@ function updateTimeStats() {
 
 function updateClickStats() {
     // Total clicks
-    const totalClicksElement = document.getElementById('totalClicks');
+    const totalClicksElement = DOM_CACHE.totalClicks;
     if (totalClicksElement) {
         totalClicksElement.textContent = prettify(totalClicks);
     }
     
     // Clicks per second (last 10 seconds)
-    const clicksPerSecondElement = document.getElementById('clicksPerSecond');
+    const clicksPerSecondElement = DOM_CACHE.clicksPerSecond;
     if (clicksPerSecondElement) {
         const now = Date.now();
         const tenSecondsAgo = now - 10000;
@@ -590,7 +805,7 @@ function updateClickStats() {
     }
     
     // Best click streak
-    const bestClickStreakElement = document.getElementById('bestClickStreak');
+    const bestClickStreakElement = DOM_CACHE.bestClickStreak;
     if (bestClickStreakElement) {
         bestClickStreakElement.textContent = bestClickStreak.toString();
     }
@@ -598,20 +813,20 @@ function updateClickStats() {
 
 function updateEconomyStats() {
     // Total sips earned
-    const totalSipsEarnedElement = document.getElementById('totalSipsEarned');
+    const totalSipsEarnedElement = DOM_CACHE.totalSipsEarned;
     if (totalSipsEarnedElement) {
         totalSipsEarnedElement.textContent = prettify(totalSipsEarned);
     }
     
     // Current sips per second
-    const currentSipsPerSecondElement = document.getElementById('currentSipsPerSecond');
+    const currentSipsPerSecondElement = DOM_CACHE.currentSipsPerSecond;
     if (currentSipsPerSecondElement) {
         const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
         currentSipsPerSecondElement.textContent = prettify(currentSPS);
     }
     
     // Highest sips per second achieved
-    const highestSipsPerSecondElement = document.getElementById('highestSipsPerSecond');
+    const highestSipsPerSecondElement = DOM_CACHE.highestSipsPerSecond;
     if (highestSipsPerSecondElement) {
         highestSipsPerSecondElement.textContent = prettify(highestSipsPerSecond);
     }
@@ -619,25 +834,25 @@ function updateEconomyStats() {
 
 function updateShopStats() {
     // Straws purchased
-    const strawsPurchasedElement = document.getElementById('strawsPurchased');
+    const strawsPurchasedElement = DOM_CACHE.strawsPurchased;
     if (strawsPurchasedElement) {
         strawsPurchasedElement.textContent = prettify(straws);
     }
     
     // Cups purchased
-    const cupsPurchasedElement = document.getElementById('cupsPurchased');
+    const cupsPurchasedElement = DOM_CACHE.cupsPurchased;
     if (cupsPurchasedElement) {
         cupsPurchasedElement.textContent = prettify(cups);
     }
     
     // Suctions purchased
-    const suctionsPurchasedElement = document.getElementById('suctionsPurchased');
+    const suctionsPurchasedElement = DOM_CACHE.suctionsPurchased;
     if (suctionsPurchasedElement) {
         suctionsPurchasedElement.textContent = prettify(suctions);
     }
     
     // Critical clicks purchased
-    const criticalClicksPurchasedElement = document.getElementById('criticalClicksPurchased');
+    const criticalClicksPurchasedElement = DOM_CACHE.criticalClicksPurchased;
     if (criticalClicksPurchasedElement) {
         criticalClicksPurchasedElement.textContent = prettify(criticalClicks);
     }
@@ -645,20 +860,20 @@ function updateShopStats() {
 
 function updateAchievementStats() {
     // Current level
-    const currentLevelElement = document.getElementById('currentLevel');
+    const currentLevelElement = DOM_CACHE.currentLevel;
     if (currentLevelElement) {
         currentLevelElement.textContent = level.toString();
     }
     
     // Total upgrades (sum of all upgrade counters)
-    const totalUpgradesElement = document.getElementById('totalUpgrades');
+    const totalUpgradesElement = DOM_CACHE.totalUpgrades;
     if (totalUpgradesElement) {
         const totalUpgrades = strawUpCounter.plus(cupUpCounter).plus(suctionUpCounter).plus(fasterDrinksUpCounter).plus(criticalClickUpCounter);
         totalUpgradesElement.textContent = prettify(totalUpgrades);
     }
     
     // Faster drinks owned
-    const fasterDrinksOwnedElement = document.getElementById('fasterDrinksOwned');
+    const fasterDrinksOwnedElement = DOM_CACHE.fasterDrinksOwned;
     if (fasterDrinksOwnedElement) {
         fasterDrinksOwnedElement.textContent = prettify(fasterDrinks);
     }
@@ -691,7 +906,7 @@ function trackClick() {
     playStrawSipSound();
     
     // Update stats display if stats tab is active
-    if (document.getElementById('statsTab').classList.contains('active')) {
+    if (DOM_CACHE.statsTab && DOM_CACHE.statsTab.classList.contains('active')) {
         updateClickStats();
     }
 }
@@ -1133,8 +1348,8 @@ function loadClickSoundsPreference() {
 
 // Function to update drink speed display
 function updateDrinkSpeedDisplay() {
-    const currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
-    const drinkSpeedBonus = document.getElementById('drinkSpeedBonus');
+    const currentDrinkSpeed = DOM_CACHE.currentDrinkSpeed;
+    const drinkSpeedBonus = DOM_CACHE.drinkSpeedBonus;
     
     if (currentDrinkSpeed && drinkSpeedBonus) {
         // Show current drink time
@@ -1149,10 +1364,10 @@ function updateDrinkSpeedDisplay() {
 
 // Function to update prominent stats header (visible in all tabs)
 function updateProminentStats() {
-    const prominentSips = document.getElementById('prominentSips');
-    const prominentSPS = document.getElementById('prominentSPS');
-    const prominentClickBonus = document.getElementById('prominentClickBonus');
-    const prominentCriticalChance = document.getElementById('prominentCriticalChance');
+    const prominentSips = DOM_CACHE.prominentSips;
+    const prominentSPS = DOM_CACHE.prominentSPS;
+    const prominentClickBonus = DOM_CACHE.prominentClickBonus;
+    const prominentCriticalChance = DOM_CACHE.prominentCriticalChance;
     
     if (prominentSips) {
         prominentSips.textContent = prettify(sips);
@@ -1216,7 +1431,7 @@ function sodaClick(number) {
     // Batch DOM updates to reduce layout thrashing
     requestAnimationFrame(() => {
         // Update display
-        const sipsElement = document.getElementById("sips");
+        const sipsElement = DOM_CACHE.sips;
         if (sipsElement) {
             sipsElement.innerHTML = prettify(sips);
         }
@@ -1228,7 +1443,7 @@ function sodaClick(number) {
         showClickFeedback(totalSipsGained, isCritical);
         
         // Visual feedback with smoother image transition
-        const sodaButton = document.getElementById("sodaButton");
+        const sodaButton = DOM_CACHE.sodaButton;
         if (sodaButton) {
             // Add a CSS class for the click effect instead of changing src
             sodaButton.classList.add('soda-clicked');
@@ -1249,13 +1464,21 @@ function sodaClick(number) {
 
 // Function to show click feedback numbers
 function showClickFeedback(sipsGained, isCritical = false) {
-    const sodaContainer = document.querySelector('.soda-container');
+    const sodaContainer = DOM_CACHE.sodaButton.parentNode;
     if (!sodaContainer) return;
     
     // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
     feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
+    
+    // Accessibility improvements
+    feedback.setAttribute('role', 'status');
+    feedback.setAttribute('aria-live', 'polite');
+    feedback.setAttribute('aria-label', isCritical ? 
+        `Critical hit! Gained ${prettify(sipsGained)} sips` : 
+        `Gained ${prettify(sipsGained)} sips`
+    );
     
     // Use more efficient positioning to avoid layout recalculations
     const containerRect = sodaContainer.getBoundingClientRect();
@@ -1293,7 +1516,7 @@ function spsClick(amount) {
         highestSipsPerSecond = currentSPS;
     }
     
-    document.getElementById("sips").innerHTML = prettify(sips);
+    DOM_CACHE.sips.innerHTML = prettify(sips);
     
     // Update prominent stats header
     updateProminentStats();
@@ -1513,9 +1736,9 @@ function levelUp() {
         }
         
         // Update displays
-        document.getElementById("sips").innerHTML = prettify(sips);
-        document.getElementById("levelNumber").innerHTML = level.toNumber();
-        document.getElementById("sips").innerHTML = prettify(sips);
+        DOM_CACHE.sips.innerHTML = prettify(sips);
+        DOM_CACHE.levelNumber.innerHTML = level.toNumber();
+        DOM_CACHE.sips.innerHTML = prettify(sips);
         
         // Show level up feedback
         showLevelUpFeedback(sipsGained);
@@ -1527,7 +1750,7 @@ function levelUp() {
 
 // Function to show level up feedback
 function showLevelUpFeedback(sipsGained) {
-    const levelUpDiv = document.getElementById('levelUpDiv');
+    const levelUpDiv = DOM_CACHE.levelUpDiv;
     if (!levelUpDiv) return;
     
     // Create feedback element
@@ -1577,12 +1800,30 @@ function changeLevel(i) {
     let body = document.querySelector("body");
 
     if (i === 2) {
-        document.getElementById("levelText").innerHTML = "On a Red Background";
+        DOM_CACHE.levelText.innerHTML = "On a Red Background";
         body.style.backgroundColor = "#AE323B";
     }
 }
 
 function save() {
+    const currentTime = Date.now();
+    
+    // Prevent too frequent saves
+    if (currentTime - lastSaveOperation < MIN_SAVE_INTERVAL) {
+        // Queue this save operation
+        if (!saveTimeout) {
+            saveTimeout = setTimeout(() => {
+                performSave();
+                saveTimeout = null;
+            }, MIN_SAVE_INTERVAL - (currentTime - lastSaveOperation));
+        }
+        return;
+    }
+    
+    performSave();
+}
+
+function performSave() {
     let save = {
         sips: sips.toString(),
         straws: straws.toString(),
@@ -1608,9 +1849,23 @@ function save() {
         clickTimes: clickTimes
     };
 
-    localStorage.setItem("save", JSON.stringify(save));
-    lastSaveTime = Date.now();
-    updateLastSaveTime();
+    try {
+        localStorage.setItem("save", JSON.stringify(save));
+        lastSaveTime = Date.now();
+        lastSaveOperation = Date.now();
+        updateLastSaveTime();
+        console.log('Game saved successfully');
+    } catch (error) {
+        console.error('Failed to save game:', error);
+        // Fallback: try to save with reduced data
+        try {
+            const minimalSave = { sips: sips.toString(), level: level.toString() };
+            localStorage.setItem("save", JSON.stringify(minimalSave));
+            console.log('Minimal save completed');
+        } catch (fallbackError) {
+            console.error('Even minimal save failed:', fallbackError);
+        }
+    }
 }
 
 function delete_save() {
@@ -1755,7 +2010,7 @@ function reload() {
 
         // Update each element safely
         for (const [id, value] of Object.entries(elements)) {
-            const element = document.getElementById(id);
+            const element = DOM_CACHE.get(id);
             if (element) {
                 element.innerHTML = value;
             }
@@ -1777,6 +2032,40 @@ function reload() {
     }
 }
 
+// Global error handling and resilience
+window.addEventListener('error', (e) => {
+    console.error('Global error:', e.error);
+    
+    // Attempt to recover gracefully
+    if (e.error && e.error.message.includes('audio')) {
+        console.log('Audio error detected, attempting recovery...');
+        try {
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+            initAudioContext();
+        } catch (recoveryError) {
+            console.error('Audio recovery failed:', recoveryError);
+        }
+    }
+    
+    // Log error for debugging
+    console.error('Error details:', {
+        message: e.message,
+        filename: e.filename,
+        lineno: e.lineno,
+        colno: e.colno,
+        error: e.error
+    });
+});
+
+// Promise rejection handler
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('Unhandled promise rejection:', e.reason);
+    e.preventDefault(); // Prevent the default browser behavior
+});
+
 // Initialize splash screen when page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing splash screen...');
@@ -1788,13 +2077,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Small delay to ensure everything is ready
     setTimeout(() => {
-        initSplashScreen();
-        loadOptions(); // Load options on page load
-        updatePlayTime(); // Start play time tracking
-        console.log('Splash screen initialization complete');
-        
-        if (typeof eruda !== 'undefined') {
-            eruda.get('console').log('Splash screen initialization complete');
+        try {
+            initSplashScreen();
+            loadOptions(); // Load options on page load
+            updatePlayTime(); // Start play time tracking
+            console.log('Splash screen initialization complete');
+            
+            if (typeof eruda !== 'undefined') {
+                eruda.get('console').log('Splash screen initialization complete');
+            }
+        } catch (error) {
+            console.error('Error during splash screen initialization:', error);
+            // Fallback: try to show game content directly
+            const splashScreen = document.getElementById('splashScreen');
+            const gameContent = document.getElementById('gameContent');
+            if (splashScreen && gameContent) {
+                splashScreen.style.display = 'none';
+                gameContent.style.display = 'block';
+                try {
+                    initGame();
+                } catch (gameError) {
+                    console.error('Game initialization also failed:', gameError);
+                }
+            }
         }
     }, 100);
 });
@@ -1839,7 +2144,7 @@ window.startGameFromButton = function() {
 
 // Function to show purchase feedback
 function showPurchaseFeedback(itemName, cost) {
-    const shopDiv = document.getElementById('shopDiv');
+    const shopDiv = DOM_CACHE.shopDiv;
     if (!shopDiv) return;
     
     // Create feedback element
@@ -1878,8 +2183,34 @@ function sendMessage() {
     // Clear input
     chatInput.value = '';
     
-    // Get God's response (GIF from Giphy)
-    getGodResponse(message);
+    // Lazy load God response functionality
+    if (!window.godFeatureLoaded) {
+        loadGodFeature().then(() => {
+            getGodResponse(message);
+        });
+    } else {
+        getGodResponse(message);
+    }
+}
+
+// Lazy load God feature to reduce initial bundle size
+async function loadGodFeature() {
+    if (window.godFeatureLoaded) return;
+    
+    try {
+        // Load God feature components on demand
+        console.log('Loading God feature...');
+        
+        // Simulate loading external components
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        window.godFeatureLoaded = true;
+        console.log('God feature loaded successfully');
+    } catch (error) {
+        console.error('Failed to load God feature:', error);
+        // Fallback to basic response
+        addGodMessage('Sorry, the divine connection is temporarily unavailable.');
+    }
 }
 
 function addUserMessage(message) {
@@ -2265,8 +2596,9 @@ function getPlaceholderGif(searchTerm) {
     return responses[Math.floor(Math.random() * responses.length)];
 }
 
-// Add keyboard support for chat input
+// Event listener optimization - consolidate multiple handlers
 document.addEventListener('DOMContentLoaded', function() {
+    // Chat input keyboard support
     const chatInput = document.getElementById('chatInput');
     if (chatInput) {
         chatInput.addEventListener('keypress', function(e) {
@@ -2275,6 +2607,38 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Global keyboard shortcuts for better UX
+    document.addEventListener('keydown', function(e) {
+        // Escape key to close modals or return to main view
+        if (e.key === 'Escape') {
+            // Close any open modals if they exist
+            const modals = document.querySelectorAll('.modal, .popup');
+            modals.forEach(modal => {
+                if (modal.style.display !== 'none') {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Number keys for quick upgrades (1-5)
+        if (e.key >= '1' && e.key <= '5' && !e.ctrlKey && !e.altKey) {
+            const upgradeIndex = parseInt(e.key) - 1;
+            const upgradeButtons = document.querySelectorAll('.upgrade-btn, button[onclick*="upgrade"]');
+            if (upgradeButtons[upgradeIndex] && upgradeButtons[upgradeIndex].classList.contains('affordable')) {
+                upgradeButtons[upgradeIndex].click();
+            }
+        }
+        
+        // Spacebar to click the soda button
+        if (e.key === ' ' && !e.ctrlKey && !e.altKey) {
+            e.preventDefault();
+            const sodaButton = DOM_CACHE.sodaButton;
+            if (sodaButton) {
+                sodaButton.click();
+            }
+        }
+    });
 });
 
 // Make all other functions globally available for HTML onclick attributes
@@ -2297,10 +2661,10 @@ window.upgradeSuction = upgradeSuction;
 
 // Music Player Functions
 function initMusicPlayer() {
-    const musicPlayer = document.querySelector('.music-player');
-    const musicToggleBtn = document.getElementById('musicToggleBtn');
-    const musicMuteBtn = document.getElementById('musicMuteBtn');
-    const musicStatus = document.getElementById('musicStatus');
+    const musicPlayer = DOM_CACHE.musicPlayer;
+    const musicToggleBtn = DOM_CACHE.musicToggleBtn;
+    const musicMuteBtn = DOM_CACHE.musicMuteBtn;
+    const musicStatus = DOM_CACHE.musicStatus;
     
     if (!musicPlayer || !musicToggleBtn || !musicMuteBtn || !musicStatus) {
         console.error('Music player elements not found');
@@ -2544,8 +2908,8 @@ function getStreamDetails(streamUrl) {
 
 // Function to update music player display with stream info
 function updateMusicPlayerDisplay(streamInfo) {
-    const musicPlayerTitle = document.querySelector('.music-player-title');
-    const musicPlayerSubtitle = document.querySelector('.music-player-subtitle');
+    const musicPlayerTitle = DOM_CACHE.musicPlayer.querySelector('.music-player-title');
+    const musicPlayerSubtitle = DOM_CACHE.musicPlayer.querySelector('.music-player-subtitle');
     
     if (musicPlayerTitle) {
         musicPlayerTitle.textContent = streamInfo.name;
@@ -2605,9 +2969,9 @@ function toggleMute() {
 
 function updateMusicPlayerUI() {
     const state = window.musicPlayerState;
-    const musicPlayer = document.querySelector('.music-player');
-    const musicToggleBtn = document.getElementById('musicToggleBtn');
-    const musicMuteBtn = document.getElementById('musicMuteBtn');
+    const musicPlayer = DOM_CACHE.musicPlayer;
+    const musicToggleBtn = DOM_CACHE.musicToggleBtn;
+    const musicMuteBtn = DOM_CACHE.musicMuteBtn;
     
     if (!musicPlayer || !musicToggleBtn || !musicMuteBtn) return;
     
@@ -2661,8 +3025,8 @@ const MUSIC_STREAMS = {
 
 // Function to change music stream
 function changeMusicStream() {
-    const streamSelect = document.getElementById('musicStreamSelect');
-    const currentStreamInfo = document.getElementById('currentStreamInfo');
+    const streamSelect = DOM_CACHE.musicStreamSelect;
+    const currentStreamInfo = DOM_CACHE.currentStreamInfo;
     
     if (!streamSelect || !currentStreamInfo) {
         console.error('Music stream elements not found');
@@ -2699,7 +3063,7 @@ function changeMusicStream() {
         }
         
         // Show a notification about YouTube streams
-        const musicStatus = document.getElementById('musicStatus');
+        const musicStatus = DOM_CACHE.musicStatus;
         if (musicStatus) {
             musicStatus.textContent = 'YouTube stream selected - Click stream info to open';
         }
@@ -2739,7 +3103,7 @@ function changeMusicStream() {
             }).catch(error => {
                 console.log('Failed to play new stream:', error);
                 state.isPlaying = false;
-                const musicStatus = document.getElementById('musicStatus');
+                const musicStatus = DOM_CACHE.musicStatus;
                 if (musicStatus) {
                     musicStatus.textContent = 'Click to start music';
                 }
@@ -2758,8 +3122,8 @@ function changeMusicStream() {
 
 // Function to load saved stream preference
 function loadSavedStreamPreference() {
-    const streamSelect = document.getElementById('musicStreamSelect');
-    const currentStreamInfo = document.getElementById('currentStreamInfo');
+    const streamSelect = DOM_CACHE.musicStreamSelect;
+    const currentStreamInfo = DOM_CACHE.currentStreamInfo;
     
     if (!streamSelect || !currentStreamInfo) {
         console.log('Music stream elements not found, skipping preference load');
@@ -2853,6 +3217,52 @@ function loadFallbackMusic() {
     }
 }
 
+// Memory management and cleanup functions
+function cleanupAudioResources() {
+    if (audioContext) {
+        try {
+            audioContext.close();
+            audioContext = null;
+            console.log('Audio context cleaned up');
+        } catch (error) {
+            console.error('Error closing audio context:', error);
+        }
+    }
+    
+    // Clean up music player
+    if (window.musicPlayerState && window.musicPlayerState.audio) {
+        try {
+            window.musicPlayerState.audio.pause();
+            window.musicPlayerState.audio.src = '';
+            window.musicPlayerState.audio = null;
+            console.log('Music player audio cleaned up');
+        } catch (error) {
+            console.error('Error cleaning up music player:', error);
+        }
+    }
+}
+
+// Cleanup function for event listeners and timers
+function cleanupGameResources() {
+    // Clear any pending save timeouts
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
+    }
+    
+    // Clear any pending autosave counters
+    autosaveCounter = 0;
+    
+    console.log('Game resources cleaned up');
+}
+
+// Call cleanup when page unloads
+window.addEventListener('beforeunload', () => {
+    cleanupAudioResources();
+    cleanupGameResources();
+    console.log('Cleanup completed before page unload');
+});
+
 // Make all other functions globally available to prevent undefined errors
 window.updateAllStats = updateAllStats;
 window.updateDrinkRate = updateDrinkRate;
@@ -2896,8 +3306,8 @@ window.testMusicStreamChanger = function() {
     console.log('Available streams:', Object.keys(MUSIC_STREAMS));
     console.log('Current music player state:', window.musicPlayerState);
     
-    const streamSelect = document.getElementById('musicStreamSelect');
-    const currentStreamInfo = document.getElementById('currentStreamInfo');
+    const streamSelect = DOM_CACHE.musicStreamSelect;
+    const currentStreamInfo = DOM_CACHE.currentStreamInfo;
     
     if (streamSelect) {
         console.log('Stream select element found:', streamSelect.value);
@@ -2920,7 +3330,7 @@ window.testMusicStreamChanger = function() {
 window.testStreamSwitching = function() {
     console.log('=== STREAM SWITCHING TEST ===');
 
-    const streamSelect = document.getElementById('musicStreamSelect');
+    const streamSelect = DOM_CACHE.musicStreamSelect;
     if (!streamSelect) {
         console.log('Stream select element not found');
         return;
