@@ -1252,7 +1252,7 @@ function addGodMessage(content, isGif = false, isTempleOS = false) {
         messageDiv.classList.add('templeos-message');
         messageDiv.innerHTML = `
             <div class="message-avatar">
-                <img src="images/templeos.jpg" alt="TempleOS God" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                <img src="images/TempleOS.jpg" alt="TempleOS God" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
             </div>
             <div class="message-content">
                 <div class="message-sender">TempleOS God</div>
