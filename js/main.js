@@ -1299,6 +1299,36 @@ function escapeHtml(text) {
 
 async function getGodResponse(userMessage) {
     try {
+        // Check for the secret "geodude" keyword (case-insensitive)
+        if (userMessage.toLowerCase().includes('geodude')) {
+            // Remove the thinking message if it exists
+            const thinkingMessage = document.querySelector('.god-message:last-child');
+            if (thinkingMessage) {
+                thinkingMessage.remove();
+            }
+            
+            // Add the secret geodude response with embedded YouTube video
+            addGodMessage(`
+                <div style="text-align: center; margin: 1rem 0;">
+                    <p style="color: #00B36B; font-weight: bold; margin-bottom: 1rem;">🎵 You've discovered a divine secret! 🎵</p>
+                    <div style="position: relative; width: 100%; max-width: 560px; margin: 0 auto;">
+                        <iframe 
+                            width="100%" 
+                            height="315" 
+                            src="https://www.youtube.com/embed/Mhvl7X_as8I" 
+                            title="Geodude Secret Video" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen
+                            style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 179, 107, 0.3);">
+                        </iframe>
+                    </div>
+                    <p style="color: #FF8E53; font-style: italic; margin-top: 1rem;">The heavens have blessed you with this sacred melody! 🌟</p>
+                </div>
+            `);
+            return; // Exit early for the secret response
+        }
+        
         // Show "God is typing..." message with divine variations
         const thinkingMessages = [
             "God is contemplating your question... 🤔",
