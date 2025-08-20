@@ -309,15 +309,15 @@ function initGame() {
 }
 
 function startGameLoop() {
-    // Update drink progress every 200ms for smoother animation (reduced from 100ms)
+    // Update drink progress every 100ms for very smooth animation
     window.setInterval(function() {
         updateDrinkProgress();
-    }, 200);
+    }, 100);
     
     // Main drink interval for game logic
     window.setInterval(function() {
         processDrink();
-    }, 200); // Check every 200ms for more stable timing (reduced from 100ms)
+    }, 100); // Check every 100ms for more responsive gameplay
     
     // Update play time, last save time, and stats every second
     window.setInterval(function() {
