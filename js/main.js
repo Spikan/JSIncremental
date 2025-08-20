@@ -398,6 +398,10 @@ function checkUpgradeAffordability() {
     const criticalClickUpCost = 1200 * criticalClickUpCounter.toNumber();
     const levelUpCost = 3000 * Math.pow(1.15, level.toNumber());
     
+
+    
+
+    
     // Update button states based on affordability
     updateButtonState('buyStraw', sips.gte(strawCost), strawCost);
     updateButtonState('buyCup', sips.gte(cupCost), cupCost);
@@ -434,7 +438,30 @@ function checkUpgradeAffordability() {
 
 // Update button state based on affordability
 function updateButtonState(buttonId, isAffordable, cost) {
-    const button = document.querySelector(`button[onclick*="${buttonId}"]`);
+    // Try multiple selectors to find the button
+    let button = null;
+    
+    // First try to find by onclick attribute
+    button = document.querySelector(`button[onclick*="${buttonId}"]`);
+    
+    // If not found, try to find by button text content or other attributes
+    if (!button) {
+        // For shop buttons, try to find by the cost span ID pattern
+        if (buttonId.startsWith('buy')) {
+            const costElementId = buttonId.replace('buy', '') + 'Cost';
+            const costElement = document.getElementById(costElementId);
+            if (costElement) {
+                button = costElement.closest('button');
+            }
+        } else if (buttonId.startsWith('upgrade')) {
+            const costElementId = buttonId.replace('upgrade', '') + 'UpCost';
+            const costElement = document.getElementById(costElementId);
+            if (costElement) {
+                button = costElement.closest('button');
+            }
+        }
+    }
+    
     if (button) {
         if (isAffordable) {
             button.classList.remove('disabled');
@@ -619,6 +646,10 @@ function startGameLoop() {
         if (currentTime - lastUpdate >= frameInterval) {
             updateDrinkProgress();
             processDrink();
+            // Check affordability more frequently for better responsiveness
+            if (currentTime - lastUpdate >= 200) { // Check every 200ms
+                checkUpgradeAffordability();
+            }
             lastUpdate = currentTime;
         }
         
@@ -627,6 +658,7 @@ function startGameLoop() {
             updatePlayTime();
             updateLastSaveTime();
             updateAllStats();
+            checkUpgradeAffordability(); // Check affordability every second
             lastStatsUpdate = currentTime;
         }
         

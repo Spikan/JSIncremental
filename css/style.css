@@ -1309,7 +1309,7 @@ h3 {
     left: 100%;
 }
 
-.shop-btn:hover {
+.shop-btn:hover:not(.affordable):not(.disabled) {
     background-color: #00B36B;
     color: #001789;
     transform: scale(1.02);
@@ -1320,9 +1320,9 @@ h3 {
 }
 
 .shop-btn.affordable {
-    background-color: #00B36B;
-    color: #FFFFFF;
-    box-shadow: 0 0 20px rgba(0, 179, 107, 0.6);
+    background-color: #00B36B !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 20px rgba(0, 179, 107, 0.6) !important;
     animation: affordableGlow 2s ease-in-out infinite alternate;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
@@ -1422,7 +1422,7 @@ h3 {
     left: 100%;
 }
 
-.upgrade-btn:hover {
+.upgrade-btn:hover:not(.affordable):not(.disabled) {
     background-color: #FF3D02;
     color: #001789;
     transform: scale(1.02);
@@ -1433,9 +1433,9 @@ h3 {
 }
 
 .upgrade-btn.affordable {
-    background-color: #FF3D02;
-    color: #FFFFFF;
-    box-shadow: 0 0 20px rgba(255, 61, 2, 0.6);
+    background-color: #FF3D02 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 20px rgba(255, 61, 2, 0.6) !important;
     animation: affordableGlow 2s ease-in-out infinite alternate;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
