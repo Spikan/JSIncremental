@@ -1536,8 +1536,8 @@ function initMusicPlayer() {
     
     // Create audio element for lofi stream
     const audio = new Audio();
-    // Use ChilledCow's Rumble stream for authentic lofi beats
-    audio.src = 'https://rumble.com/embed/v1b8v1o/?pub=4';
+    // Use Lofi Girl's direct stream for authentic lofi beats
+    audio.src = 'https://lofimusic.app/lofigirl';
     audio.loop = true;
     audio.volume = 0.3; // Start at 30% volume
     
@@ -1632,22 +1632,10 @@ function updateStreamInfo() {
 function getStreamDetails(streamUrl) {
     const url = streamUrl.toLowerCase();
     
-    // ChilledCow Rumble streams
-    if (url.includes('rumble.com') && url.includes('v1b8v1o')) {
+    // Lofi Girl streams
+    if (url.includes('lofimusic.app') && url.includes('lofigirl')) {
         return {
-            name: 'ChilledCow',
-            description: 'Lofi beats to study/relax to',
-            genre: 'Lofi Hip Hop',
-            quality: 'High Quality',
-            location: 'France',
-            type: 'Lofi Radio'
-        };
-    }
-    
-    // ChilledCow YouTube streams
-    if (url.includes('youtube.com') && url.includes('jfKfPfyJRdk')) {
-        return {
-            name: 'ChilledCow',
+            name: 'Lofi Girl',
             description: 'Lofi beats to study/relax to',
             genre: 'Lofi Hip Hop',
             quality: 'High Quality',
@@ -1816,8 +1804,7 @@ function updateMusicPlayerUI() {
 function loadFallbackMusic() {
     // Try alternative lofi sources if the main one fails
     const fallbackSources = [
-        'https://rumble.com/embed/v1b8v1o/?pub=4', // ChilledCow Rumble
-        'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1', // ChilledCow YouTube
+        'https://lofimusic.app/lofigirl', // Lofi Girl direct stream
         'https://ice1.somafm.com/groovesalad-128-mp3', // SomaFM Groove Salad
         'https://ice1.somafm.com/defcon-128-mp3', // SomaFM DEF CON
         'https://ice1.somafm.com/space-128-mp3' // SomaFM Space Station
