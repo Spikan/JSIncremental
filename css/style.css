@@ -2166,46 +2166,48 @@ h3 {
 
 
 
-/* TempleOS God Tab Styles */
+/* TempleOS God Tab Styles - Authentic TempleOS Theme */
 .god-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 1rem;
+    font-family: 'Courier New', monospace;
 }
 
 .god-header {
     text-align: center;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 100, 0, 0.3));
-    border: 2px solid #00FF00;
-    border-radius: 16px;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    background: #0000a8; /* TempleOS signature blue */
+    border: 3px solid #ffff57; /* TempleOS yellow accent */
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 168, 0.6);
 }
 
 .god-header h2 {
-    color: #00FF00;
+    color: #ffff57; /* TempleOS yellow */
     margin: 0 0 0.5rem 0;
     font-size: 2rem;
-    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+    text-shadow: 0 0 10px rgba(255, 255, 87, 0.8);
     font-family: 'Courier New', monospace;
+    font-weight: bold;
 }
 
 .god-subtitle {
-    color: #00FF00;
+    color: #ffffff; /* TempleOS white */
     margin: 0;
     font-size: 1.1rem;
     font-style: italic;
-    text-shadow: 0 0 5px rgba(0, 255, 0, 0.6);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
 }
 
 .chat-container {
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid #00FF00;
-    border-radius: 16px;
+    background: #101010; /* TempleOS dark background */
+    border: 3px solid #0000a8; /* TempleOS blue */
+    border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    box-shadow: 0 0 20px rgba(0, 0, 168, 0.4);
 }
 
 .chat-messages {
@@ -2213,9 +2215,9 @@ h3 {
     overflow-y: auto;
     margin-bottom: 1.5rem;
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
-    border: 1px solid rgba(0, 179, 107, 0.3);
+    background: #000000;
+    border-radius: 8px;
+    border: 2px solid #ffff57; /* TempleOS yellow */
 }
 
 .message {
@@ -2236,11 +2238,11 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 50%;
-    border: 2px solid #00FF00;
+    background: #0000a8; /* TempleOS blue */
+    border-radius: 8px;
+    border: 2px solid #ffff57; /* TempleOS yellow */
     flex-shrink: 0;
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 168, 0.5);
 }
 
 .message-content {
@@ -2249,17 +2251,17 @@ h3 {
 }
 
 .message-sender {
-    color: #00FF00;
+    color: #ffff57; /* TempleOS yellow */
     font-weight: bold;
     font-size: 0.9rem;
     margin-bottom: 0.25rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    text-shadow: 0 0 5px rgba(0, 255, 0, 0.6);
+    text-shadow: 0 0 5px rgba(255, 255, 87, 0.6);
 }
 
 .message-text {
-    color: #fff;
+    color: #ffffff; /* TempleOS white */
     font-size: 1rem;
     line-height: 1.4;
     word-wrap: break-word;
@@ -2302,66 +2304,115 @@ h3 {
 
 .chat-input {
     flex: 1;
-    padding: 0.875rem 1rem;
-    border: 2px solid #00FF00;
-    background-color: #000;
-    color: #00FF00;
+    padding: 0.75rem 1rem;
+    border: 2px solid #0000a8; /* TempleOS blue */
     border-radius: 8px;
+    background: #101010; /* TempleOS dark background */
+    color: #ffffff; /* TempleOS white */
+    font-family: 'Courier New', monospace;
     font-size: 1rem;
     outline: none;
-    transition: all 0.2s ease;
-    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
 }
 
 .chat-input:focus {
-    border-color: #00FF00;
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+    border-color: #ffff57; /* TempleOS yellow on focus */
+    box-shadow: 0 0 10px rgba(255, 255, 87, 0.4);
 }
 
 .chat-input::placeholder {
-    color: rgba(0, 255, 0, 0.6);
+    color: #a8a8a8; /* TempleOS muted color */
 }
 
 .chat-send-btn {
-    padding: 0.875rem 1.5rem;
-    border: 2px solid #00FF00;
-    background-color: #000;
-    color: #00FF00;
+    padding: 0.75rem 1.5rem;
+    background: #0000a8; /* TempleOS blue */
+    color: #ffffff; /* TempleOS white */
+    border: 2px solid #ffff57; /* TempleOS yellow */
     border-radius: 8px;
+    font-family: 'Courier New', monospace;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .chat-send-btn:hover {
-    background-color: #00FF00;
-    color: #000;
-    transform: scale(1.02);
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+    background: #ffff57; /* TempleOS yellow on hover */
+    color: #0000a8; /* TempleOS blue text on hover */
+    box-shadow: 0 0 15px rgba(255, 255, 87, 0.6);
 }
 
 .chat-send-btn:active {
-    transform: scale(0.98);
+    transform: translateY(1px);
 }
 
 .god-info {
-    text-align: center;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(0, 255, 0, 0.3);
+    background: #101010; /* TempleOS dark background */
+    border: 2px solid #0000a8; /* TempleOS blue */
     border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
 }
 
 .god-info p {
-    color: #FFA500;
-    margin: 0;
-    font-size: 0.9rem;
+    color: #ffffff; /* TempleOS white */
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
 }
 
-/* GIF message styling */
+.god-info p:last-child {
+    margin-bottom: 0;
+    color: #ffff57; /* TempleOS yellow for tribute text */
+    font-size: 0.9em;
+    font-style: italic;
+    border-top: 1px solid #0000a8; /* TempleOS blue separator */
+    padding-top: 1rem;
+}
+
+/* TempleOS God mobile optimizations */
+@media (max-width: 768px) {
+    .god-container {
+        padding: 0.5rem;
+    }
+    
+    .god-header {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .god-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .chat-container {
+        padding: 1rem;
+    }
+    
+    .chat-input-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .chat-input,
+    .chat-send-btn {
+        width: 100%;
+    }
+    
+    .message {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .message-avatar {
+        align-self: center;
+    }
+}
+
+/* GIF message styling - TempleOS themed */
 .gif-message .message-text {
     text-align: center;
 }
@@ -2370,8 +2421,8 @@ h3 {
     max-width: 100%;
     max-height: 200px;
     border-radius: 8px;
-    border: 2px solid rgba(0, 179, 107, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 2px solid #0000a8; /* TempleOS blue */
+    box-shadow: 0 4px 12px rgba(0, 0, 168, 0.4);
 }
 
 /* Message animation */
@@ -2385,3 +2436,7 @@ h3 {
         transform: translateY(0);
     }
 }
+
+/* Soda Clicker Pro - Main Stylesheet */
+
+/* Reset and base styles */
