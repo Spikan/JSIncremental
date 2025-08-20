@@ -294,6 +294,9 @@ function initGame() {
         // Start the game loop
         startGameLoop();
         
+        // Update prominent stats header with initial values
+        updateProminentStats();
+        
         console.log('Game initialization complete!');
         
     } catch (error) {
@@ -664,6 +667,27 @@ function updateDrinkSpeedDisplay() {
     }
 }
 
+// Function to update prominent stats header (visible in all tabs)
+function updateProminentStats() {
+    const prominentSips = document.getElementById('prominentSips');
+    const prominentSPS = document.getElementById('prominentSPS');
+    const prominentClickBonus = document.getElementById('prominentClickBonus');
+    
+    if (prominentSips) {
+        prominentSips.textContent = prettify(sips);
+    }
+    
+    if (prominentSPS) {
+        prominentSPS.textContent = prettify(sps);
+    }
+    
+    if (prominentClickBonus) {
+        // Calculate total click bonus (base 1 + suction bonus)
+        const totalClickBonus = new Decimal(1).plus(suctionClickBonus);
+        prominentClickBonus.textContent = prettify(totalClickBonus);
+    }
+}
+
 let regSoda = new Image();
 regSoda.src = "images/regSoda.png";
 let moSoda = new Image();
@@ -699,6 +723,9 @@ function sodaClick(number) {
         if (sipsElement) {
             sipsElement.innerHTML = prettify(sips);
         }
+        
+        // Update prominent stats header
+        updateProminentStats();
         
         // Show click feedback
         showClickFeedback(totalSipsGained);
@@ -770,6 +797,9 @@ function spsClick(amount) {
     }
     
     document.getElementById("sips").innerHTML = prettify(sips);
+    
+    // Update prominent stats header
+    updateProminentStats();
 }
 
 function buyStraw() {
@@ -1092,6 +1122,9 @@ function reload() {
         
         // Update drink speed display
         updateDrinkSpeedDisplay();
+        
+        // Update prominent stats header (visible in all tabs)
+        updateProminentStats();
         
         // Check affordability after reloading all values
         checkUpgradeAffordability();
@@ -1479,6 +1512,7 @@ window.sendMessage = sendMessage;
 window.updateAllStats = updateAllStats;
 window.updateDrinkRate = updateDrinkRate;
 window.updateDrinkSpeedDisplay = updateDrinkSpeedDisplay;
+window.updateProminentStats = updateProminentStats;
 window.loadOptions = loadOptions;
 window.updatePlayTime = updatePlayTime;
 window.updateLastSaveTime = updateLastSaveTime;
