@@ -363,6 +363,30 @@
         </div>
         
         <div class="options-section">
+            <h3>🎵 Music Stream Settings</h3>
+            <div class="music-stream-controls">
+                <label for="musicStreamSelect">Select Music Stream:</label>
+                <select id="musicStreamSelect" onchange="changeMusicStream()" class="stream-select">
+                    <option value="groovesalad">Groove Salad - Ambient beats and grooves</option>
+                    <option value="defcon">DEF CON - Dark ambient and industrial</option>
+                    <option value="dronezone">Drone Zone - Atmospheric textures and beats</option>
+                    <option value="illstreet">Ill Street - Lofi hip hop and chill beats</option>
+                    <option value="starcraft_terran">StarCraft - Terran Theme (Original OST)</option>
+                    <option value="starcraft_zerg">StarCraft - Zerg Theme (Original OST)</option>
+                    <option value="starcraft_protoss">StarCraft - Protoss Theme (Original OST)</option>
+                    <option value="starcraft_broodwar">StarCraft - Brood War Theme (Original OST)</option>
+                    <option value="starcraft1">StarCraft - Terran Theme (SomaFM Alternative)</option>
+                    <option value="starcraft2">StarCraft - Zerg Theme (SomaFM Alternative)</option>
+                    <option value="starcraft3">StarCraft - Protoss Theme (SomaFM Alternative)</option>
+                    <option value="starcraft4">StarCraft - Brood War Theme (SomaFM Alternative)</option>
+                </select>
+                <div class="stream-info">
+                    <span id="currentStreamInfo">Current: Groove Salad - Ambient beats and grooves</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="options-section">
             <h3>🎮 Game Information</h3>
             <div class="game-info">
                 <div class="info-item">

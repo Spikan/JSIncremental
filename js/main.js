@@ -2385,6 +2385,9 @@ function initMusicPlayer() {
     // Set initial stream info immediately for better UX
     updateStreamInfo();
     
+    // Load saved stream preference
+    loadSavedStreamPreference();
+    
     console.log('Music player initialized');
 }
 
@@ -2472,6 +2475,9 @@ function getStreamDetails(streamUrl) {
             };
         }
     }
+    
+    // StarCraft OST streams (using SomaFM streams for now)
+    // These will be handled by the UI display names, not by URL detection
     
     // Generic fallback
     return {
@@ -2575,6 +2581,214 @@ function updateMusicPlayerUI() {
     }
 }
 
+// Available music streams
+const MUSIC_STREAMS = {
+    // SomaFM Stations (Default Options)
+    groovesalad: {
+        url: 'https://ice1.somafm.com/groovesalad-128-mp3',
+        name: 'Groove Salad',
+        description: 'Ambient beats and grooves'
+    },
+    defcon: {
+        url: 'https://ice1.somafm.com/defcon-128-mp3',
+        name: 'DEF CON',
+        description: 'Dark ambient and industrial'
+    },
+    dronezone: {
+        url: 'https://ice1.somafm.com/dronezone-128-mp3',
+        name: 'Drone Zone',
+        description: 'Atmospheric textures and beats'
+    },
+    illstreet: {
+        url: 'https://ice1.somafm.com/illstreet-128-mp3',
+        name: 'Ill Street',
+        description: 'Lofi hip hop and chill beats'
+    },
+    // StarCraft OST Tracks (Race-Based Alternatives)
+    starcraft_terran: {
+        url: 'https://ia800504.us.archive.org/12/items/sc-teamliquid-edited/(edited%20remastered%20OST)%20StarCraft%201%20--%20Terran%201.mp3',
+        name: 'StarCraft - Terran Theme',
+        description: 'Epic Terran battle music from the original game'
+    },
+    starcraft_zerg: {
+        url: 'https://ia800504.us.archive.org/12/items/sc-teamliquid-edited/(edited%20remastered%20OST)%20StarCraft%201%20--%20Zerg%201.mp3',
+        name: 'StarCraft - Zerg Theme',
+        description: 'Dark Zerg swarm music from the original game'
+    },
+    starcraft_protoss: {
+        url: 'https://ia800504.us.archive.org/12/items/sc-teamliquid-edited/(edited%20remastered%20OST)%20StarCraft%201%20--%20Protoss%201.mp3',
+        name: 'StarCraft - Protoss Theme',
+        description: 'Mystical Protoss music from the original game'
+    },
+    starcraft_broodwar: {
+        url: 'https://ia800504.us.archive.org/12/items/sc-teamliquid-edited/(edited%20remastered%20OST)%20StarCraft%201%20--%20Protoss%202.mp3',
+        name: 'StarCraft - Brood War Theme',
+        description: 'Expansion pack music from Brood War'
+    },
+    // Legacy StarCraft Options (Using SomaFM as fallback)
+    starcraft1: {
+        url: 'https://ice1.somafm.com/groovesalad-128-mp3', // Using Groove Salad as Terran Theme
+        name: 'StarCraft - Terran Theme (SomaFM)',
+        description: 'Epic Terran battle music (SomaFM alternative)'
+    },
+    starcraft2: {
+        url: 'https://ice1.somafm.com/defcon-128-mp3', // Using DEF CON as Zerg Theme
+        name: 'StarCraft - Zerg Theme (SomaFM)',
+        description: 'Dark Zerg swarm music (SomaFM alternative)'
+    },
+    starcraft3: {
+        url: 'https://ice1.somafm.com/dronezone-128-mp3', // Using Drone Zone as Protoss Theme
+        name: 'StarCraft - Protoss Theme (SomaFM)',
+        description: 'Mystical Protoss music (SomaFM alternative)'
+    },
+    starcraft4: {
+        url: 'https://ice1.somafm.com/illstreet-128-mp3', // Using Ill Street as Brood War Theme
+        name: 'StarCraft - Brood War Theme (SomaFM)',
+        description: 'Expansion pack music (SomaFM alternative)'
+    }
+};
+
+// Function to change music stream
+function changeMusicStream() {
+    const streamSelect = document.getElementById('musicStreamSelect');
+    const currentStreamInfo = document.getElementById('currentStreamInfo');
+    
+    if (!streamSelect || !currentStreamInfo) {
+        console.error('Music stream elements not found');
+        return;
+    }
+    
+    const selectedStream = streamSelect.value;
+    const streamData = MUSIC_STREAMS[selectedStream];
+    
+    if (!streamData) {
+        console.error('Invalid stream selection:', selectedStream);
+        return;
+    }
+    
+    const state = window.musicPlayerState;
+    if (!state || !state.audio) {
+        console.error('Music player not initialized');
+        return;
+    }
+    
+    // Store current playing state
+    const wasPlaying = state.isPlaying;
+    
+    // Change the stream
+    state.audio.src = streamData.url;
+    state.currentStream = streamData.url;
+    
+    // Update the stream info display
+    currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
+    
+    // Update music player display with custom stream info for StarCraft themes
+    if (selectedStream.startsWith('starcraft')) {
+        const customStreamInfo = {
+            name: streamData.name,
+            description: streamData.description,
+            genre: 'Game OST',
+            quality: '128k MP3',
+            location: 'Blizzard Entertainment',
+            type: 'StarCraft Soundtrack'
+        };
+        updateMusicPlayerDisplay(customStreamInfo);
+        // Update the music player state with custom info
+        if (state.streamInfo) {
+            state.streamInfo = customStreamInfo;
+        }
+    } else {
+        updateStreamInfo();
+    }
+    
+    // If it was playing, try to continue playing
+    if (wasPlaying) {
+        const playPromise = state.audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                state.isPlaying = true;
+                updateMusicPlayerUI();
+            }).catch(error => {
+                console.log('Failed to play new stream:', error);
+                state.isPlaying = false;
+                musicStatus.textContent = 'Click to start music';
+                updateMusicPlayerUI();
+            });
+        }
+    }
+    
+    // Save the stream preference
+    const streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
+    streamPreferences.selectedStream = selectedStream;
+    localStorage.setItem('musicStreamPreferences', JSON.stringify(streamPreferences));
+    
+    console.log('Music stream changed to:', streamData.name);
+}
+
+// Function to load saved stream preference
+function loadSavedStreamPreference() {
+    const streamSelect = document.getElementById('musicStreamSelect');
+    const currentStreamInfo = document.getElementById('currentStreamInfo');
+    
+    if (!streamSelect || !currentStreamInfo) {
+        console.log('Music stream elements not found, skipping preference load');
+        return;
+    }
+    
+    try {
+        const streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
+        const savedStream = streamPreferences.selectedStream;
+        
+        if (savedStream && MUSIC_STREAMS[savedStream]) {
+            // Set the select dropdown to the saved value
+            streamSelect.value = savedStream;
+            
+            // Update the current stream info display
+            const streamData = MUSIC_STREAMS[savedStream];
+            currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
+            
+            // Update the music player to use the saved stream
+            const state = window.musicPlayerState;
+            if (state && state.audio) {
+                state.audio.src = streamData.url;
+                state.currentStream = streamData.url;
+                
+                // Handle custom stream info for StarCraft themes
+                if (savedStream.startsWith('starcraft')) {
+                    const customStreamInfo = {
+                        name: streamData.name,
+                        description: streamData.description,
+                        genre: 'Game OST',
+                        quality: '128k MP3',
+                        location: 'Blizzard Entertainment',
+                        type: 'StarCraft Soundtrack'
+                    };
+                    updateMusicPlayerDisplay(customStreamInfo);
+                    if (state.streamInfo) {
+                        state.streamInfo = customStreamInfo;
+                    }
+                } else {
+                    updateStreamInfo();
+                }
+            }
+            
+            console.log('Loaded saved stream preference:', savedStream);
+        } else {
+            // Set default to groovesalad if no valid preference
+            streamSelect.value = 'groovesalad';
+            const streamData = MUSIC_STREAMS.groovesalad;
+            currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
+            console.log('No valid stream preference found, using default');
+        }
+    } catch (error) {
+        console.error('Error loading stream preference:', error);
+        // Fallback to default
+        streamSelect.value = 'groovesalad';
+        const streamData = MUSIC_STREAMS.groovesalad;
+        currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
+    }
+}
+
 function loadFallbackMusic() {
     // Try alternative lofi sources if the main one fails
     const fallbackSources = [
@@ -2635,12 +2849,100 @@ window.updateStreamInfo = updateStreamInfo;
 window.getStreamDetails = getStreamDetails;
 window.activateTempleOSMode = activateTempleOSMode;
 window.getTempleOSResponse = getTempleOSResponse;
-    window.toggleClickSounds = toggleClickSounds;
-    window.testClickSounds = testClickSounds;
-    window.playCriticalClickSound = playCriticalClickSound;
-    window.playPurchaseSound = playPurchaseSound;
-    window.testPurchaseSound = testPurchaseSound;
-    window.testCriticalClickSound = testCriticalClickSound;
+window.toggleClickSounds = toggleClickSounds;
+window.testClickSounds = testClickSounds;
+window.playCriticalClickSound = playCriticalClickSound;
+window.playPurchaseSound = playPurchaseSound;
+window.testPurchaseSound = testPurchaseSound;
+window.testCriticalClickSound = testCriticalClickSound;
+window.changeMusicStream = changeMusicStream;
+window.loadSavedStreamPreference = loadSavedStreamPreference;
+
+// Test function for music stream changer
+window.testMusicStreamChanger = function() {
+    console.log('=== MUSIC STREAM CHANGER TEST ===');
+    console.log('Available streams:', Object.keys(MUSIC_STREAMS));
+    console.log('Current music player state:', window.musicPlayerState);
+    
+    const streamSelect = document.getElementById('musicStreamSelect');
+    const currentStreamInfo = document.getElementById('currentStreamInfo');
+    
+    if (streamSelect) {
+        console.log('Stream select element found:', streamSelect.value);
+    } else {
+        console.log('Stream select element NOT found');
+    }
+    
+    if (currentStreamInfo) {
+        console.log('Current stream info element found:', currentStreamInfo.textContent);
+    } else {
+        console.log('Current stream info element NOT found');
+    }
+    
+    console.log('Test complete!');
+};
+
+// Test function for StarCraft OST streams
+window.testStarCraftOST = function() {
+    console.log('=== STARCRAFT OST STREAMS TEST ===');
+    
+    const state = window.musicPlayerState;
+    if (!state || !state.audio) {
+        console.log('Music player not initialized');
+        return;
+    }
+    
+    console.log('Testing StarCraft OST streams...');
+    
+    // Test each StarCraft OST stream
+    const ostStreams = ['starcraft_terran', 'starcraft_zerg', 'starcraft_protoss', 'starcraft_broodwar'];
+    
+    ostStreams.forEach((streamKey, index) => {
+        setTimeout(() => {
+            console.log(`Testing ${streamKey}...`);
+            const streamData = MUSIC_STREAMS[streamKey];
+            if (streamData) {
+                console.log(`Stream data:`, streamData);
+                // Test if the URL is accessible
+                const testAudio = new Audio();
+                testAudio.src = streamData.url;
+                testAudio.addEventListener('loadstart', () => console.log(`${streamKey}: Load started`));
+                testAudio.addEventListener('canplay', () => console.log(`${streamKey}: Can play`));
+                testAudio.addEventListener('error', (e) => console.log(`${streamKey}: Error -`, e));
+            } else {
+                console.log(`Stream ${streamKey} not found in MUSIC_STREAMS`);
+            }
+        }, index * 1000); // Test each stream 1 second apart
+    });
+    
+    console.log('StarCraft OST test complete! Check console for results.');
+};
+
+// Test function for stream switching
+window.testStreamSwitching = function() {
+    console.log('=== STREAM SWITCHING TEST ===');
+    
+    const streamSelect = document.getElementById('musicStreamSelect');
+    if (!streamSelect) {
+        console.log('Stream select element not found');
+        return;
+    }
+    
+    console.log('Testing stream switching...');
+    
+    // Test switching to different stream types
+    const testStreams = ['groovesalad', 'starcraft_terran', 'defcon', 'starcraft_zerg'];
+    
+    testStreams.forEach((streamKey, index) => {
+        setTimeout(() => {
+            console.log(`Switching to ${streamKey}...`);
+            streamSelect.value = streamKey;
+            changeMusicStream();
+        }, index * 2000); // Switch every 2 seconds
+    });
+    
+    console.log('Stream switching test complete! Check console for results.');
+};
 
 // Function to test click sounds
 function testClickSounds() {
