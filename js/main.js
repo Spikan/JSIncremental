@@ -2369,6 +2369,43 @@ function initMusicPlayer() {
     musicToggleBtn.addEventListener('click', toggleMusic);
     musicMuteBtn.addEventListener('click', toggleMute);
     
+    // Add mobile-specific event listeners to pause music when window loses focus
+    let wasPlayingBeforeBlur = false;
+    
+    // Handle page visibility change (when user switches tabs or apps)
+    document.addEventListener('visibilitychange', () => {
+        const state = window.musicPlayerState;
+        if (!state || !state.audio) return;
+        
+        if (document.hidden) {
+            // Page became hidden - remember if music was playing and pause it
+            wasPlayingBeforeBlur = state.isPlaying;
+            if (state.isPlaying) {
+                state.audio.pause();
+                state.isPlaying = false;
+                updateMusicPlayerUI();
+                console.log('Music paused due to page visibility change');
+            }
+        } else {
+            // Page became visible again - don't auto-resume, let user decide
+            console.log('Page became visible again, music remains paused');
+        }
+    });
+    
+    // Handle window blur/focus events (additional mobile support)
+    window.addEventListener('blur', () => {
+        const state = window.musicPlayerState;
+        if (!state || !state.audio) return;
+        
+        wasPlayingBeforeBlur = state.isPlaying;
+        if (state.isPlaying) {
+            state.audio.pause();
+            state.isPlaying = false;
+            updateMusicPlayerUI();
+            console.log('Music paused due to window blur');
+        }
+    });
+    
     // Update initial button states
     updateMusicPlayerUI();
     
