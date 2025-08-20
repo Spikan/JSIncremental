@@ -83,6 +83,27 @@
         <div class="drink-progress-bar">
             <div class="drink-progress-fill" id="drinkProgressFill"></div>
         </div>
+        <!-- Drink Speed Upgrade Button - Compact layout below progress bar -->
+        <div class="drink-speed-upgrade-container">
+            <button onclick="buyFasterDrinks()" class="drink-speed-upgrade-btn">
+                <div class="drink-speed-upgrade-icon">⚡</div>
+                <div class="drink-speed-upgrade-info">
+                    <div class="drink-speed-upgrade-name">Faster Drinks</div>
+                    <div class="drink-speed-upgrade-cost"><span id="fasterDrinksCostCompact">80</span> Sips</div>
+                </div>
+            </button>
+            <div class="drink-speed-upgrade-stats">
+                <span class="drink-speed-stat">Speed: <span id="currentDrinkSpeedCompact">5.00s</span></span>
+                <span class="drink-speed-stat">Bonus: <span id="drinkSpeedBonusCompact">0%</span></span>
+            </div>
+            <button onclick="upgradeFasterDrinks()" class="drink-speed-upgrade-btn upgrade">
+                <div class="drink-speed-upgrade-icon">🔧</div>
+                <div class="drink-speed-upgrade-info">
+                    <div class="drink-speed-upgrade-name">Upgrade Faster Drinks</div>
+                    <div class="drink-speed-upgrade-cost"><span id="fasterDrinksUpCostCompact">1500</span> Sips</div>
+                </div>
+            </button>
+        </div>
     </div>
 
 <!-- Soda Clicking Tab -->
@@ -213,34 +234,7 @@
 
             
 
-            <div class="shop-item">
-                <div class="shop-header">
-                                         <button onclick="buyFasterDrinks()" class="shop-btn">
-                         <span id="fasterDrinksCost">80</span> Sips<br/> 
-                         Faster Drinks
-                     </button>
-                </div>
-                <div class="shop-stats">
-                    <div class="shop-stat">
-                        <span class="stat-label">Owned:</span>
-                        <span id="fasterDrinks" class="stat-value">0</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">Drink Speed:</span>
-                        <span id="currentDrinkSpeed" class="stat-value">5.00s</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">Speed Bonus:</span>
-                        <span id="drinkSpeedBonus" class="stat-value">0%</span>
-                    </div>
-                </div>
-                <div class="shop-upgrade">
-                    <button onclick="upgradeFasterDrinks()" class="upgrade-btn">
-                                                 <span id="fasterDrinksUpCost">1500</span> Sips<br/> 
-                         Upgrade Faster Drinks
-                    </button>
-                </div>
-            </div>
+            
 
             
         </div>

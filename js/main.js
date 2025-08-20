@@ -132,8 +132,6 @@ const DOM_CACHE = {
     currentLevel: null,
     totalUpgrades: null,
     fasterDrinksOwned: null,
-    currentDrinkSpeed: null,
-    drinkSpeedBonus: null,
     critChance: null,
     levelUpDiv: null,
     
@@ -174,8 +172,6 @@ const DOM_CACHE = {
         this.currentLevel = document.getElementById('currentLevel');
         this.totalUpgrades = document.getElementById('totalUpgrades');
         this.fasterDrinksOwned = document.getElementById('fasterDrinksOwned');
-        this.currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
-        this.drinkSpeedBonus = document.getElementById('drinkSpeedBonus');
         this.critChance = document.getElementById('critChance');
         this.levelUpDiv = document.getElementById('levelUpDiv');
         
@@ -431,6 +427,9 @@ function checkUpgradeAffordability() {
     // Update compact clicking upgrade displays
     updateCostDisplay('suctionCostCompact', suctionCost, sips.gte(suctionCost));
     updateCostDisplay('criticalClickCostCompact', criticalClickCost, sips.gte(criticalClickCost));
+    // Update compact drink speed upgrade displays
+    updateCostDisplay('fasterDrinksCostCompact', fasterDrinksCost, sips.gte(fasterDrinksCost));
+    updateCostDisplay('fasterDrinksUpCostCompact', fasterDrinksUpCost, sips.gte(fasterDrinksUpCost));
 }
 
 // Update button state based on affordability
@@ -464,6 +463,34 @@ function updateButtonState(buttonId, isAffordable, cost) {
     
     if (buttonId === 'buyCriticalClick') {
         const compactButton = document.querySelector('.clicking-upgrade-btn[onclick*="buyCriticalClick"]');
+        if (compactButton) {
+            if (isAffordable) {
+                compactButton.classList.remove('disabled');
+                compactButton.classList.add('affordable');
+            } else {
+                compactButton.classList.remove('affordable');
+                compactButton.classList.add('disabled');
+            }
+        }
+    }
+    
+    // Also update compact drink speed upgrade button if it exists
+    if (buttonId === 'buyFasterDrinks') {
+        const compactButton = document.querySelector('.drink-speed-upgrade-btn[onclick*="buyFasterDrinks"]');
+        if (compactButton) {
+            if (isAffordable) {
+                compactButton.classList.remove('disabled');
+                compactButton.classList.add('affordable');
+            } else {
+                compactButton.classList.remove('affordable');
+                compactButton.classList.add('disabled');
+            }
+        }
+    }
+    
+    // Also update compact drink speed upgrade button if it exists
+    if (buttonId === 'upgradeFasterDrinks') {
+        const compactButton = document.querySelector('.drink-speed-upgrade-btn[onclick*="upgradeFasterDrinks"]');
         if (compactButton) {
             if (isAffordable) {
                 compactButton.classList.remove('disabled');
@@ -1376,17 +1403,18 @@ function loadClickSoundsPreference() {
 
 // Function to update drink speed display
 function updateDrinkSpeedDisplay() {
-    const currentDrinkSpeed = DOM_CACHE.currentDrinkSpeed;
-    const drinkSpeedBonus = DOM_CACHE.drinkSpeedBonus;
+    // Update compact drink speed display elements
+    const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
+    const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
     
-    if (currentDrinkSpeed && drinkSpeedBonus) {
-        // Show current drink time
-        currentDrinkSpeed.textContent = getDrinkRateSeconds().toFixed(2) + 's';
-        
-        // Calculate and show speed bonus percentage
+    if (currentDrinkSpeedCompact) {
+        currentDrinkSpeedCompact.textContent = getDrinkRateSeconds().toFixed(2) + 's';
+    }
+    
+    if (drinkSpeedBonusCompact) {
         let totalReduction = fasterDrinks.times(fasterDrinksUpCounter).times(0.01);
         let speedBonusPercent = totalReduction.times(100);
-        drinkSpeedBonus.textContent = speedBonusPercent.toFixed(1) + '%';
+        drinkSpeedBonusCompact.textContent = speedBonusPercent.toFixed(1) + '%';
     }
 }
 
@@ -2054,7 +2082,12 @@ function reload() {
             'suctionCostCompact': suctionCost.toString(),
             'suctionClickBonusCompact': prettify(suctionClickBonus),
             'criticalClickCostCompact': criticalClickCost.toString(),
-            'criticalClickChanceCompact': (criticalClickChance.times(100)).toFixed(1)
+            'criticalClickChanceCompact': (criticalClickChance.times(100)).toFixed(1),
+            // Compact drink speed upgrade displays
+            'fasterDrinksCostCompact': fasterDrinksCost.toString(),
+            'currentDrinkSpeedCompact': updateDrinkSpeedDisplay(),
+            'drinkSpeedBonusCompact': (fasterDrinks.toNumber() * 10) + '%',
+            'fasterDrinksUpCostCompact': (1500 * fasterDrinksUpCounter.toNumber()).toString()
         };
 
         // Update each element safely
