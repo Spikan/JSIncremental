@@ -957,7 +957,7 @@ function showLevelUpFeedback(sipsGained) {
         if (feedback.parentNode) {
             feedback.parentNode.removeChild(feedback);
         }
-    }, 1000);
+    }, 800);
 }
 
 // Function to check if level up is possible
