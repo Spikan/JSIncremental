@@ -3101,23 +3101,16 @@ function changeMusicStream() {
     // Update music player display with stream info
     updateStreamInfo();
     
-    // If it was playing, try to continue playing
+    // Don't autostart - require user interaction to play
+    // If it was playing, pause it and require user to click play
     if (wasPlaying) {
-        const playPromise = state.audio.play();
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                state.isPlaying = true;
-                updateMusicPlayerUI();
-            }).catch(error => {
-                console.log('Failed to play new stream:', error);
-                state.isPlaying = false;
-                const musicStatus = DOM_CACHE.musicStatus;
-                if (musicStatus) {
-                    musicStatus.textContent = 'Click to start music';
-                }
-                updateMusicPlayerUI();
-            });
+        state.audio.pause();
+        state.isPlaying = false;
+        const musicStatus = DOM_CACHE.musicStatus;
+        if (musicStatus) {
+            musicStatus.textContent = 'Click to start music';
         }
+        updateMusicPlayerUI();
     }
     
     // Save the stream preference
@@ -3209,19 +3202,9 @@ function loadFallbackMusic() {
         state.audio.src = randomSource;
         musicStatus.textContent = 'Trying alternative source...';
         
-        // Try to play the new source
-        const playPromise = state.audio.play();
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                state.isPlaying = true;
-                // Only update stream info when switching to fallback source
-                updateStreamInfo();
-                updateMusicPlayerUI();
-            }).catch(error => {
-                console.log('Fallback source also failed:', error);
-                musicStatus.textContent = 'Click to start music';
-            });
-        }
+        // Don't autostart - just update the stream info and wait for user interaction
+        updateStreamInfo();
+        musicStatus.textContent = 'Click to start music';
     }
 }
 
