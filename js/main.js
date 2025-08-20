@@ -1614,7 +1614,74 @@ function save() {
 }
 
 function delete_save() {
-    localStorage.removeItem("save")
+    // Show confirmation dialog
+    if (confirm("Are you sure you want to delete your save? This will completely reset your game progress and cannot be undone.")) {
+        // Remove save from localStorage
+        localStorage.removeItem("save");
+        
+        // Reset all game variables to their initial values
+        sips = new Decimal(0);
+        straws = new Decimal(0);
+        cups = new Decimal(0);
+        suctions = new Decimal(0);
+        sps = new Decimal(0);
+        strawSPS = new Decimal(0);
+        cupSPS = new Decimal(0);
+        suctionClickBonus = new Decimal(0);
+        strawUpCounter = new Decimal(1);
+        cupUpCounter = new Decimal(1);
+        suctionUpCounter = new Decimal(1);
+        level = new Decimal(1);
+        
+        // Reset drink system variables
+        drinkRate = DEFAULT_DRINK_RATE;
+        drinkProgress = 0;
+        lastDrinkTime = Date.now();
+        
+        // Reset faster drinks upgrade variables
+        fasterDrinks = new Decimal(0);
+        fasterDrinksUpCounter = new Decimal(1);
+        
+        // Reset critical click system variables
+        criticalClickChance = new Decimal(0.0001);
+        criticalClickMultiplier = new Decimal(10);
+        criticalClicks = new Decimal(0);
+        criticalClickUpCounter = new Decimal(1);
+        
+        // Reset sound system variables
+        clickSoundsEnabled = true;
+        
+        // Reset auto-save and options variables
+        autosaveEnabled = true;
+        autosaveInterval = 10;
+        autosaveCounter = 0;
+        gameStartTime = Date.now();
+        lastSaveTime = null;
+        
+        // Reset statistics tracking variables
+        totalClicks = 0;
+        currentClickStreak = 0;
+        bestClickStreak = 0;
+        totalSipsEarned = new Decimal(0);
+        highestSipsPerSecond = new Decimal(0);
+        gameStartDate = Date.now();
+        lastClickTime = 0;
+        clickTimes = [];
+        
+        // Reset TempleOS mode
+        window.templeOSMode = false;
+        
+        // Update the UI to reflect the reset
+        reload();
+        updateProminentStats();
+        updateAllStats();
+        checkUpgradeAffordability();
+        
+        // Show success message
+        alert("Save deleted successfully! Your game has been reset to the beginning.");
+        
+        console.log('Game save deleted and all variables reset to initial values');
+    }
 }
 
 
@@ -2559,6 +2626,7 @@ window.getTempleOSResponse = getTempleOSResponse;
     window.playCriticalClickSound = playCriticalClickSound;
     window.playPurchaseSound = playPurchaseSound;
     window.testPurchaseSound = testPurchaseSound;
+    window.testCriticalClickSound = testCriticalClickSound;
 
 // Function to test click sounds
 function testClickSounds() {
@@ -2604,6 +2672,28 @@ function testPurchaseSound() {
     playPurchaseSound();
     
     console.log('Purchase sound test complete! Check console for any errors.');
+}
+
+// Function to test critical click sound
+function testCriticalClickSound() {
+    console.log('=== CRITICAL CLICK SOUND TEST ===');
+    
+    if (!audioContext) {
+        console.log('Audio context not initialized, creating...');
+        initAudioContext();
+    }
+    
+    if (!clickSoundsEnabled) {
+        console.log('Click sounds are disabled, enabling...');
+        clickSoundsEnabled = true;
+    }
+    
+    console.log('Testing critical click sound...');
+    
+    // Test critical click sound
+    playCriticalClickSound();
+    
+    console.log('Critical click sound test complete! Check console for any errors.');
 }
 
 // Debug function to test audio element
