@@ -237,6 +237,9 @@ let criticalClickMultiplier = new Decimal(5); // 5x multiplier (more balanced)
 let criticalClicks = new Decimal(0); // Total critical clicks achieved
 let criticalClickUpCounter = new Decimal(1); // Upgrade counter for critical chance
 
+// Suction upgrade system variables
+let suctionUpCounter = new Decimal(1); // Upgrade counter for suction upgrades
+
 // Sound system variables
 let clickSoundsEnabled = true;
 
