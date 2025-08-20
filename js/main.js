@@ -1536,14 +1536,15 @@ function initMusicPlayer() {
     
     // Create audio element for lofi stream
     const audio = new Audio();
-    // Use a more reliable lofi stream URL
-    audio.src = 'https://stream.live.bbc.co.uk/mediaselector/6/redir/version/2.0/mediaset/audio-syndication/proto/http/vpid/p08bq3g3.mp3';
+    // Use ChilledCow's Rumble stream for authentic lofi beats
+    audio.src = 'https://rumble.com/embed/v1b8v1o/?pub=4';
     audio.loop = true;
     audio.volume = 0.3; // Start at 30% volume
     
     // Add error handling
     audio.addEventListener('error', (e) => {
         console.log('Audio error:', e);
+        console.log('Failed stream URL:', audio.src);
         musicStatus.textContent = 'Stream unavailable - trying alternative...';
         loadFallbackMusic();
     });
@@ -1630,6 +1631,30 @@ function updateStreamInfo() {
 // Function to get detailed information about streams
 function getStreamDetails(streamUrl) {
     const url = streamUrl.toLowerCase();
+    
+    // ChilledCow Rumble streams
+    if (url.includes('rumble.com') && url.includes('v1b8v1o')) {
+        return {
+            name: 'ChilledCow',
+            description: 'Lofi beats to study/relax to',
+            genre: 'Lofi Hip Hop',
+            quality: 'High Quality',
+            location: 'France',
+            type: 'Lofi Radio'
+        };
+    }
+    
+    // ChilledCow YouTube streams
+    if (url.includes('youtube.com') && url.includes('jfKfPfyJRdk')) {
+        return {
+            name: 'ChilledCow',
+            description: 'Lofi beats to study/relax to',
+            genre: 'Lofi Hip Hop',
+            quality: 'High Quality',
+            location: 'France',
+            type: 'Lofi Radio'
+        };
+    }
     
     // BBC Radio streams
     if (url.includes('bbc.co.uk')) {
@@ -1791,14 +1816,17 @@ function updateMusicPlayerUI() {
 function loadFallbackMusic() {
     // Try alternative lofi sources if the main one fails
     const fallbackSources = [
-        'https://ice1.somafm.com/groovesalad-128-mp3',
-        'https://ice1.somafm.com/defcon-128-mp3',
-        'https://ice1.somafm.com/space-128-mp3'
+        'https://rumble.com/embed/v1b8v1o/?pub=4', // ChilledCow Rumble
+        'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1', // ChilledCow YouTube
+        'https://ice1.somafm.com/groovesalad-128-mp3', // SomaFM Groove Salad
+        'https://ice1.somafm.com/defcon-128-mp3', // SomaFM DEF CON
+        'https://ice1.somafm.com/space-128-mp3' // SomaFM Space Station
     ];
     
     const state = window.musicPlayerState;
     if (state && state.audio) {
         const randomSource = fallbackSources[Math.floor(Math.random() * fallbackSources.length)];
+        console.log('Trying fallback source:', randomSource);
         state.audio.src = randomSource;
         musicStatus.textContent = 'Trying alternative source...';
         
