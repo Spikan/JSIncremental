@@ -1529,7 +1529,9 @@ function initMusicPlayer() {
     window.musicPlayerState = {
         isPlaying: false,
         isMuted: false,
-        audio: null
+        audio: null,
+        currentStream: null,
+        streamInfo: {}
     };
     
     // Create audio element for lofi stream
@@ -1548,14 +1550,32 @@ function initMusicPlayer() {
     
     audio.addEventListener('loadstart', () => {
         musicStatus.textContent = 'Loading stream...';
+        updateStreamInfo();
     });
     
     audio.addEventListener('canplay', () => {
         musicStatus.textContent = 'Click to start music';
+        updateStreamInfo();
     });
     
     audio.addEventListener('waiting', () => {
         musicStatus.textContent = 'Buffering...';
+    });
+    
+    audio.addEventListener('load', () => {
+        updateStreamInfo();
+    });
+    
+    audio.addEventListener('loadeddata', () => {
+        updateStreamInfo();
+    });
+    
+    audio.addEventListener('playing', () => {
+        updateStreamInfo();
+    });
+    
+    audio.addEventListener('progress', () => {
+        updateStreamInfo();
     });
     
     // Store audio reference
@@ -1573,10 +1593,120 @@ function initMusicPlayer() {
         if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
             // Don't auto-play, just show ready state
             musicStatus.textContent = 'Click to start music';
+            updateStreamInfo();
         }
     }, 1000);
     
     console.log('Music player initialized');
+}
+
+// Function to update stream information and display
+function updateStreamInfo() {
+    const state = window.musicPlayerState;
+    if (!state || !state.audio) return;
+    
+    const audio = state.audio;
+    const currentSrc = audio.src;
+    
+    // Update current stream info
+    state.currentStream = currentSrc;
+    
+    // Get stream details based on URL
+    const streamDetails = getStreamDetails(currentSrc);
+    state.streamInfo = streamDetails;
+    
+    // Update status with more detailed information
+    if (state.isPlaying) {
+        const statusText = `${streamDetails.name} - ${streamDetails.description}`;
+        musicStatus.textContent = statusText;
+        
+        // Update music player title and subtitle if available
+        updateMusicPlayerDisplay(streamDetails);
+    }
+    
+    console.log('Stream info updated:', streamDetails);
+}
+
+// Function to get detailed information about streams
+function getStreamDetails(streamUrl) {
+    const url = streamUrl.toLowerCase();
+    
+    // BBC Radio streams
+    if (url.includes('bbc.co.uk')) {
+        return {
+            name: 'BBC Radio',
+            description: 'Live Radio Stream',
+            genre: 'Radio',
+            quality: 'High Quality',
+            location: 'UK',
+            type: 'Live Broadcast'
+        };
+    }
+    
+    // SomaFM streams
+    if (url.includes('somafm.com')) {
+        if (url.includes('groovesalad')) {
+            return {
+                name: 'Groove Salad',
+                description: 'Ambient beats and grooves',
+                genre: 'Ambient/Chill',
+                quality: '128k MP3',
+                location: 'San Francisco',
+                type: 'Lofi Radio'
+            };
+        } else if (url.includes('defcon')) {
+            return {
+                name: 'DEF CON',
+                description: 'Dark ambient and industrial',
+                genre: 'Dark Ambient',
+                quality: '128k MP3',
+                location: 'San Francisco',
+                type: 'Lofi Radio'
+            };
+        } else if (url.includes('space')) {
+            return {
+                name: 'Space Station',
+                description: 'Space music and ambient',
+                genre: 'Space/Ambient',
+                quality: '128k MP3',
+                location: 'San Francisco',
+                type: 'Lofi Radio'
+            };
+        } else {
+            return {
+                name: 'SomaFM',
+                description: 'Lofi internet radio',
+                genre: 'Various',
+                quality: '128k MP3',
+                location: 'San Francisco',
+                type: 'Lofi Radio'
+            };
+        }
+    }
+    
+    // Generic fallback
+    return {
+        name: 'Unknown Stream',
+        description: 'Audio stream',
+        genre: 'Unknown',
+        quality: 'Unknown',
+        location: 'Unknown',
+        type: 'Stream'
+    };
+}
+
+// Function to update music player display with stream info
+function updateMusicPlayerDisplay(streamInfo) {
+    const musicPlayerTitle = document.querySelector('.music-player-title');
+    const musicPlayerSubtitle = document.querySelector('.music-player-subtitle');
+    
+    if (musicPlayerTitle) {
+        musicPlayerTitle.textContent = streamInfo.name;
+    }
+    
+    if (musicPlayerSubtitle) {
+        musicPlayerSubtitle.textContent = streamInfo.description;
+    }
 }
 
 function toggleMusic() {
@@ -1593,7 +1723,8 @@ function toggleMusic() {
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 state.isPlaying = true;
-                musicStatus.textContent = 'Playing lofi beats...';
+                // Show detailed stream information
+                updateStreamInfo();
                 updateMusicPlayerUI();
             }).catch(error => {
                 console.log('Auto-play prevented:', error);
@@ -1617,7 +1748,11 @@ function toggleMute() {
     if (state.isMuted) {
         musicStatus.textContent = 'Muted';
     } else {
-        musicStatus.textContent = state.isPlaying ? 'Playing lofi beats...' : 'Paused';
+        if (state.isPlaying && state.streamInfo) {
+            musicStatus.textContent = `${state.streamInfo.name} - ${state.streamInfo.description}`;
+        } else {
+            musicStatus.textContent = 'Paused';
+        }
     }
     
     updateMusicPlayerUI();
@@ -1672,7 +1807,8 @@ function loadFallbackMusic() {
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 state.isPlaying = true;
-                musicStatus.textContent = 'Playing lofi beats...';
+                // Show detailed fallback stream information
+                updateStreamInfo();
                 updateMusicPlayerUI();
             }).catch(error => {
                 console.log('Fallback source also failed:', error);
@@ -1706,3 +1842,87 @@ window.getGodResponse = getGodResponse;
 window.initMusicPlayer = initMusicPlayer;
 window.toggleMusic = toggleMusic;
 window.toggleMute = toggleMute;
+window.updateStreamInfo = updateStreamInfo;
+window.getStreamDetails = getStreamDetails;
+
+// Debug function to test audio element
+window.testAudio = function() {
+    console.log('=== AUDIO DEBUG TEST ===');
+    
+    if (!window.musicPlayerState || !window.musicPlayerState.audio) {
+        console.error('No music player state or audio element found');
+        return;
+    }
+    
+    const audio = window.musicPlayerState.audio;
+    console.log('Audio element details:', {
+        src: audio.src,
+        readyState: audio.readyState,
+        networkState: audio.networkState,
+        paused: audio.paused,
+        ended: audio.ended,
+        duration: audio.duration,
+        currentTime: audio.currentTime,
+        volume: audio.volume,
+        muted: audio.muted
+    });
+    
+    // Show current stream information
+    if (window.musicPlayerState.streamInfo) {
+        console.log('Current stream info:', window.musicPlayerState.streamInfo);
+    }
+    
+    // Try to create a simple test audio
+    console.log('Creating test audio element...');
+    const testAudio = new Audio();
+    testAudio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT';
+    testAudio.volume = 0.1;
+    
+    console.log('Test audio created, attempting to play...');
+    const testPromise = testAudio.play();
+    if (testPromise !== undefined) {
+        testPromise.then(() => {
+            console.log('Test audio playing successfully!');
+            setTimeout(() => {
+                testAudio.pause();
+                console.log('Test audio stopped');
+            }, 2000);
+        }).catch(error => {
+            console.error('Test audio failed:', error);
+        });
+    }
+};
+
+// Debug function to show detailed stream information
+window.showStreamInfo = function() {
+    console.log('=== STREAM INFORMATION ===');
+    
+    if (!window.musicPlayerState) {
+        console.error('No music player state found');
+        return;
+    }
+    
+    const state = window.musicPlayerState;
+    console.log('Music player state:', {
+        isPlaying: state.isPlaying,
+        isMuted: state.isMuted,
+        currentStream: state.currentStream,
+        streamInfo: state.streamInfo
+    });
+    
+    if (state.audio) {
+        console.log('Audio details:', {
+            src: state.audio.src,
+            readyState: state.audio.readyState,
+            networkState: state.audio.networkState,
+            paused: state.audio.paused,
+            volume: state.audio.volume,
+            muted: state.audio.muted
+        });
+    }
+    
+    // Test stream details function
+    if (state.currentStream) {
+        console.log('Stream details for current URL:', getStreamDetails(state.currentStream));
+    }
+};
