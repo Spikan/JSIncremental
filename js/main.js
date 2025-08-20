@@ -2605,81 +2605,31 @@ const MUSIC_STREAMS = {
         description: 'Lofi hip hop and chill beats'
     },
     // StarCraft Remastered OST Tracks (KHInsider Direct Streams)
-    starcraft_terran: {
+    // Source: https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered
+    starcraft_main_title: {
         url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/01%20-%20Rebel%20Yell%20-%20Main%20Title.mp3',
-        name: 'StarCraft Remastered - Main Title (Rebel Yell)',
+        name: 'StarCraft Remastered - Main Title (2017)',
         description: 'Epic main title theme from StarCraft Remastered'
     },
-    starcraft_zerg: {
+    starcraft_terran: {
         url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/02%20-%20Rebel%20Yell%20-%20Terran%20One.mp3',
-        name: 'StarCraft Remastered - Terran One (Rebel Yell)',
+        name: 'StarCraft Remastered - Terran One (2017)',
         description: 'Epic Terran battle music from StarCraft Remastered'
     },
-    starcraft_protoss: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/03%20-%20Rebel%20Yell%20-%20Terran%20Ready%20Room.mp3',
-        name: 'StarCraft Remastered - Terran Ready Room (Rebel Yell)',
-        description: 'Atmospheric ready room music from StarCraft Remastered'
-    },
-    starcraft_broodwar: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/04%20-%20Rebel%20Yell%20-%20Terran%20Two.mp3',
-        name: 'StarCraft Remastered - Terran Two (Rebel Yell)',
-        description: 'Second Terran theme from StarCraft Remastered'
-    },
-    starcraft_terran_defeat: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/05%20-%20Rebel%20Yell%20-%20Terran%20Defeat.mp3',
-        name: 'StarCraft Remastered - Terran Defeat (Rebel Yell)',
-        description: 'Dramatic defeat music from StarCraft Remastered'
-    },
-    starcraft_terran_victory: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/06%20-%20Rebel%20Yell%20-%20Terran%20Victory.mp3',
-        name: 'StarCraft Remastered - Terran Victory (Rebel Yell)',
-        description: 'Triumphant victory music from StarCraft Remastered'
-    },
-    starcraft_zerg_theme: {
+    starcraft_zerg: {
         url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/07%20-%20Zerg%20Theme.mp3',
-        name: 'StarCraft Remastered - Zerg Theme',
+        name: 'StarCraft Remastered - Zerg Theme (2017)',
         description: 'Dark and menacing Zerg swarm music from StarCraft Remastered'
     },
-    starcraft_protoss_theme: {
+    starcraft_protoss: {
         url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/08%20-%20Protoss%20Theme.mp3',
-        name: 'StarCraft Remastered - Protoss Theme',
+        name: 'StarCraft Remastered - Protoss Theme (2017)',
         description: 'Mystical and ancient Protoss music from StarCraft Remastered'
     },
-    starcraft_broodwar_theme: {
+    starcraft_broodwar: {
         url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/09%20-%20Brood%20War%20Theme.mp3',
-        name: 'StarCraft Remastered - Brood War Theme',
+        name: 'StarCraft Remastered - Brood War Theme (2017)',
         description: 'Epic Brood War expansion theme from StarCraft Remastered'
-    },
-    starcraft_epilogue: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/24%20-%20Epilogue%20-%20The%20Ascension.mp3',
-        name: 'StarCraft Remastered - Epilogue: The Ascension',
-        description: 'Epic epilogue music from StarCraft Remastered'
-    },
-    starcraft_fury: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/26%20-%20Epilogue%20-%20Fury%20Of%20The%20Xel%27Naga.mp3',
-        name: 'StarCraft Remastered - Fury Of The Xel\'Naga',
-        description: 'Final epic track from StarCraft Remastered'
-    },
-    // Legacy StarCraft Options (Using SomaFM as fallback)
-    starcraft1: {
-        url: 'https://ice1.somafm.com/groovesalad-128-mp3', // Using Groove Salad as Terran Theme
-        name: 'StarCraft - Terran Theme (SomaFM)',
-        description: 'Epic Terran battle music (SomaFM alternative)'
-    },
-    starcraft2: {
-        url: 'https://ice1.somafm.com/defcon-128-mp3', // Using DEF CON as Zerg Theme
-        name: 'StarCraft - Zerg Theme (SomaFM)',
-        description: 'Dark Zerg swarm music (SomaFM alternative)'
-    },
-    starcraft3: {
-        url: 'https://ice1.somafm.com/dronezone-128-mp3', // Using Drone Zone as Protoss Theme
-        name: 'StarCraft - Protoss Theme (SomaFM)',
-        description: 'Mystical Protoss music (SomaFM alternative)'
-    },
-    starcraft4: {
-        url: 'https://ice1.somafm.com/illstreet-128-mp3', // Using Ill Street as Brood War Theme
-        name: 'StarCraft - Brood War Theme (SomaFM)',
-        description: 'Expansion pack music (SomaFM alternative)'
     }
 };
 
@@ -2982,7 +2932,13 @@ window.testStarCraftOST = function() {
     console.log('Testing StarCraft OST streams...');
     
     // Test each StarCraft OST stream
-    const ostStreams = ['starcraft_terran', 'starcraft_zerg', 'starcraft_protoss', 'starcraft_broodwar'];
+    const ostStreams = [
+        'starcraft_main_title',
+        'starcraft_terran', 
+        'starcraft_zerg', 
+        'starcraft_protoss',
+        'starcraft_broodwar'
+    ];
     
     ostStreams.forEach((streamKey, index) => {
         setTimeout(() => {
@@ -3018,7 +2974,7 @@ window.testStreamSwitching = function() {
     console.log('Testing stream switching...');
 
     // Test switching to different stream types
-    const testStreams = ['groovesalad', 'starcraft_terran', 'defcon', 'starcraft_zerg'];
+    const testStreams = ['groovesalad', 'starcraft_main_title', 'defcon', 'starcraft_terran', 'starcraft_zerg'];
 
     testStreams.forEach((streamKey, index) => {
         setTimeout(() => {
@@ -3031,44 +2987,7 @@ window.testStreamSwitching = function() {
     console.log('Stream switching test complete! Check console for results.');
 };
 
-// Test function for YouTube stream functionality (Legacy - now tests SomaFM alternatives)
-window.testYouTubeStreams = function() {
-    console.log('=== YOUTUBE STREAMS TEST (LEGACY - NOW TESTS SOMA FM ALTERNATIVES) ===');
-    
-    const streamSelect = document.getElementById('musicStreamSelect');
-    if (!streamSelect) {
-        console.log('Stream select element not found');
-        return;
-    }
-    
-    console.log('Testing SomaFM alternative streams (formerly YouTube)...');
-    
-    // Test SomaFM alternative streams
-    const somafmStreams = ['starcraft1', 'starcraft2', 'starcraft3', 'starcraft4'];
-    
-    somafmStreams.forEach((streamKey, index) => {
-        setTimeout(() => {
-            console.log(`Testing SomaFM alternative stream: ${streamKey}`);
-            streamSelect.value = streamKey;
-            changeMusicStream();
-            
-            // Check if the stream info is displayed correctly
-            setTimeout(() => {
-                const currentStreamInfo = document.getElementById('currentStreamInfo');
-                if (currentStreamInfo) {
-                    console.log(`Stream info for ${streamKey}:`, {
-                        text: currentStreamInfo.textContent,
-                        cursor: currentStreamInfo.style.cursor,
-                        hasClickableClass: currentStreamInfo.classList.contains('clickable'),
-                        onclick: currentStreamInfo.onclick ? 'Function set' : 'No function'
-                    });
-                }
-            }, 500);
-        }, index * 3000); // Test each stream 3 seconds apart
-    });
-    
-    console.log('SomaFM alternative streams test complete! Check console for results.');
-};
+
 
 // Function to test click sounds
 function testClickSounds() {
@@ -3234,17 +3153,11 @@ window.testKHInsiderStreams = function() {
     
     // Test each StarCraft Remastered stream
     const starcraftStreams = [
+        'starcraft_main_title',
         'starcraft_terran', 
         'starcraft_zerg', 
-        'starcraft_protoss', 
-        'starcraft_broodwar',
-        'starcraft_terran_defeat',
-        'starcraft_terran_victory',
-        'starcraft_zerg_theme',
-        'starcraft_protoss_theme',
-        'starcraft_broodwar_theme',
-        'starcraft_epilogue',
-        'starcraft_fury'
+        'starcraft_protoss',
+        'starcraft_broodwar'
     ];
     
     starcraftStreams.forEach((streamKey, index) => {
