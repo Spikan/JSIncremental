@@ -31,6 +31,15 @@ let lastDrinkTime = Date.now();
 let fasterDrinks = new Decimal(0);
 let fasterDrinksUpCounter = new Decimal(1);
 
+// Critical Click system variables
+let criticalClickChance = new Decimal(0.0001); // 0.01% base chance
+let criticalClickMultiplier = new Decimal(10); // 10x multiplier for critical hits
+let criticalClicks = new Decimal(0); // Total critical clicks achieved
+let criticalClickUpCounter = new Decimal(1); // Upgrade counter for critical chance
+
+// Sound system variables
+let clickSoundsEnabled = true;
+
 // Auto-save and options variables
 let autosaveEnabled = true;
 let autosaveInterval = 10; // seconds
@@ -190,10 +199,12 @@ function checkUpgradeAffordability() {
     const cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
     const suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
     const fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
+    const criticalClickCost = Math.floor(75 * Math.pow(1.15, criticalClicks.toNumber()));
     const strawUpCost = 200 * strawUpCounter.toNumber();
     const cupUpCost = 500 * cupUpCounter.toNumber();
     const suctionUpCost = 1000 * suctionUpCounter.toNumber();
     const fasterDrinksUpCost = 2000 * fasterDrinksUpCounter.toNumber();
+    const criticalClickUpCost = 1500 * criticalClickUpCounter.toNumber();
     const levelUpCost = 5000 * level.toNumber();
     
     // Update button states based on affordability
@@ -201,10 +212,12 @@ function checkUpgradeAffordability() {
     updateButtonState('buyCup', sips.gte(cupCost), cupCost);
     updateButtonState('buySuction', sips.gte(suctionCost), suctionCost);
     updateButtonState('buyFasterDrinks', sips.gte(fasterDrinksCost), fasterDrinksCost);
+    updateButtonState('buyCriticalClick', sips.gte(criticalClickCost), criticalClickCost);
     updateButtonState('upgradeStraw', sips.gte(strawUpCost), strawUpCost);
     updateButtonState('upgradeCup', sips.gte(cupUpCost), cupUpCost);
     updateButtonState('upgradeSuction', sips.gte(suctionUpCost), suctionUpCost);
     updateButtonState('upgradeFasterDrinks', sips.gte(fasterDrinksUpCost), fasterDrinksUpCost);
+    updateButtonState('upgradeCriticalClick', sips.gte(criticalClickUpCost), criticalClickUpCost);
     updateButtonState('levelUp', sips.gte(levelUpCost), levelUpCost);
     
     // Update cost displays with affordability indicators
@@ -212,10 +225,12 @@ function checkUpgradeAffordability() {
     updateCostDisplay('cupCost', cupCost, sips.gte(cupCost));
     updateCostDisplay('suctionCost', suctionCost, sips.gte(suctionCost));
     updateCostDisplay('fasterDrinksCost', fasterDrinksCost, sips.gte(fasterDrinksCost));
+    updateCostDisplay('criticalClickCost', criticalClickCost, sips.gte(criticalClickCost));
     updateCostDisplay('strawUpCost', strawUpCost, sips.gte(strawUpCost));
     updateCostDisplay('cupUpCost', cupUpCost, sips.gte(cupUpCost));
     updateCostDisplay('suctionUpCost', suctionUpCost, sips.gte(suctionUpCost));
     updateCostDisplay('fasterDrinksUpCost', fasterDrinksUpCost, sips.gte(fasterDrinksUpCost));
+    updateCostDisplay('criticalClickUpCost', criticalClickUpCost, sips.gte(criticalClickUpCost));
     updateCostDisplay('levelCost', levelUpCost, sips.gte(levelUpCost));
 }
 
@@ -267,6 +282,10 @@ function initGame() {
             cupUpCounter = new Decimal(savegame.cupUpCounter || 1);
             suctionUpCounter = new Decimal(savegame.suctionUpCounter || 1);
             fasterDrinksUpCounter = new Decimal(savegame.fasterDrinksUpCounter || 1);
+            criticalClickChance = new Decimal(savegame.criticalClickChance || 0.0001);
+            criticalClickMultiplier = new Decimal(savegame.criticalClickMultiplier || 10);
+            criticalClicks = new Decimal(savegame.criticalClicks || 0);
+            criticalClickUpCounter = new Decimal(savegame.criticalClickUpCounter || 1);
             suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
             level = new Decimal(savegame.level || 1);
             totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
@@ -616,6 +635,12 @@ function updateShopStats() {
     if (suctionsPurchasedElement) {
         suctionsPurchasedElement.textContent = prettify(suctions);
     }
+    
+    // Critical clicks purchased
+    const criticalClicksPurchasedElement = document.getElementById('criticalClicksPurchased');
+    if (criticalClicksPurchasedElement) {
+        criticalClicksPurchasedElement.textContent = prettify(criticalClicks);
+    }
 }
 
 function updateAchievementStats() {
@@ -628,7 +653,7 @@ function updateAchievementStats() {
     // Total upgrades (sum of all upgrade counters)
     const totalUpgradesElement = document.getElementById('totalUpgrades');
     if (totalUpgradesElement) {
-        const totalUpgrades = strawUpCounter.plus(cupUpCounter).plus(suctionUpCounter).plus(fasterDrinksUpCounter);
+        const totalUpgrades = strawUpCounter.plus(cupUpCounter).plus(suctionUpCounter).plus(fasterDrinksUpCounter).plus(criticalClickUpCounter);
         totalUpgradesElement.textContent = prettify(totalUpgrades);
     }
     
@@ -673,7 +698,6 @@ function trackClick() {
 
 // Straw sip sound effect system
 let audioContext = null;
-let clickSoundsEnabled = true;
 
 // Initialize audio context for sound effects
 function initAudioContext() {
@@ -912,6 +936,97 @@ function playBubbleStrawSipSound() {
     }
 }
 
+// Generate a critical click sound with dramatic effect
+function playCriticalClickSound() {
+    if (!clickSoundsEnabled || !audioContext) {
+        return;
+    }
+    
+    try {
+        // Create multiple oscillators for a dramatic critical sound
+        const oscillator1 = audioContext.createOscillator();
+        const oscillator2 = audioContext.createOscillator();
+        const oscillator3 = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        const filterNode = audioContext.createBiquadFilter();
+        const delayNode = audioContext.createDelay();
+        
+        // Critical sound parameters - more dramatic than regular sounds
+        const baseFreq1 = 400 + Math.random() * 200; // 400-600 Hz - higher pitch
+        const baseFreq2 = 800 + Math.random() * 300; // 800-1100 Hz - even higher
+        const baseFreq3 = 1200 + Math.random() * 400; // 1200-1600 Hz - highest
+        const duration = 0.3 + Math.random() * 0.2; // 0.3-0.5 seconds - longer
+        const volume = 0.4 + Math.random() * 0.2; // 0.4-0.6 volume - louder
+        
+        // Set up oscillators with different waveforms for dramatic effect
+        oscillator1.type = 'sawtooth'; // Rich harmonics
+        oscillator2.type = 'square'; // Strong presence
+        oscillator3.type = 'triangle'; // Smooth high end
+        
+        oscillator1.frequency.setValueAtTime(baseFreq1, audioContext.currentTime);
+        oscillator2.frequency.setValueAtTime(baseFreq2, audioContext.currentTime);
+        oscillator3.frequency.setValueAtTime(baseFreq3, audioContext.currentTime);
+        
+        // Add dramatic frequency sweeps for critical effect
+        oscillator1.frequency.exponentialRampToValueAtTime(
+            baseFreq1 * (0.5 + Math.random() * 1.0), 
+            audioContext.currentTime + duration
+        );
+        oscillator2.frequency.exponentialRampToValueAtTime(
+            baseFreq2 * (0.3 + Math.random() * 1.4), 
+            audioContext.currentTime + duration
+        );
+        oscillator3.frequency.exponentialRampToValueAtTime(
+            baseFreq3 * (0.2 + Math.random() * 1.8), 
+            audioContext.currentTime + duration
+        );
+        
+        // Set up filter for dramatic character
+        filterNode.type = 'highpass'; // Emphasize high frequencies
+        filterNode.frequency.setValueAtTime(300 + Math.random() * 200, audioContext.currentTime);
+        filterNode.Q.setValueAtTime(6 + Math.random() * 4, audioContext.currentTime);
+        
+        // Add delay for dramatic depth
+        delayNode.delayTime.setValueAtTime(0.02 + Math.random() * 0.03, audioContext.currentTime);
+        
+        // Set up gain envelope with dramatic attack and release
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.001); // Fast attack
+        gainNode.gain.setValueAtTime(volume, audioContext.currentTime + 0.05);
+        gainNode.gain.setValueAtTime(volume * 0.9, audioContext.currentTime + 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        
+        // Connect nodes with delay for dramatic depth
+        oscillator1.connect(filterNode);
+        oscillator2.connect(filterNode);
+        oscillator3.connect(filterNode);
+        filterNode.connect(gainNode);
+        gainNode.connect(delayNode);
+        delayNode.connect(audioContext.destination);
+        
+        // Start and stop sounds
+        oscillator1.start(audioContext.currentTime);
+        oscillator2.start(audioContext.currentTime);
+        oscillator3.start(audioContext.currentTime);
+        oscillator1.stop(audioContext.currentTime + duration);
+        oscillator2.stop(audioContext.currentTime + duration);
+        oscillator3.stop(audioContext.currentTime + duration);
+        
+        // Clean up
+        setTimeout(() => {
+            oscillator1.disconnect();
+            oscillator2.disconnect();
+            oscillator3.disconnect();
+            filterNode.disconnect();
+            gainNode.disconnect();
+            delayNode.disconnect();
+        }, duration * 1000 + 100);
+        
+    } catch (error) {
+        console.error('Error playing critical click sound:', error);
+    }
+}
+
 // Function to toggle click sounds on/off
 function toggleClickSounds() {
     clickSoundsEnabled = !clickSoundsEnabled;
@@ -958,6 +1073,7 @@ function updateProminentStats() {
     const prominentSips = document.getElementById('prominentSips');
     const prominentSPS = document.getElementById('prominentSPS');
     const prominentClickBonus = document.getElementById('prominentClickBonus');
+    const prominentCriticalChance = document.getElementById('prominentCriticalChance');
     
     if (prominentSips) {
         prominentSips.textContent = prettify(sips);
@@ -971,6 +1087,11 @@ function updateProminentStats() {
         // Calculate total click bonus (base 1 + suction bonus)
         const totalClickBonus = new Decimal(1).plus(suctionClickBonus);
         prominentClickBonus.textContent = prettify(totalClickBonus);
+    }
+    
+    if (prominentCriticalChance) {
+        // Display critical click chance as percentage
+        prominentCriticalChance.textContent = (criticalClickChance.times(100)).toFixed(4) + '%';
     }
 }
 
@@ -986,9 +1107,26 @@ function sodaClick(number) {
     // Track the click
     trackClick();
     
+    // Check for critical click
+    let isCritical = false;
+    let criticalMultiplier = new Decimal(1);
+    
+    if (Math.random() < criticalClickChance.toNumber()) {
+        isCritical = true;
+        criticalMultiplier = criticalClickMultiplier;
+        criticalClicks = criticalClicks.plus(1);
+        
+        // Play critical click sound
+        if (clickSoundsEnabled) {
+            playCriticalClickSound();
+        }
+        
+        console.log('CRITICAL CLICK! Multiplier: ' + criticalMultiplier.toString());
+    }
+    
     // Calculate total sips gained from this click
     const baseSips = new Decimal(number);
-    const totalSipsGained = baseSips.plus(suctionClickBonus);
+    const totalSipsGained = baseSips.plus(suctionClickBonus).times(criticalMultiplier);
     
     // Add to total sips earned
     totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
@@ -1008,7 +1146,7 @@ function sodaClick(number) {
         updateProminentStats();
         
         // Show click feedback
-        showClickFeedback(totalSipsGained);
+        showClickFeedback(totalSipsGained, isCritical);
         
         // Visual feedback with smoother image transition
         const sodaButton = document.getElementById("sodaButton");
@@ -1031,14 +1169,14 @@ function sodaClick(number) {
 }
 
 // Function to show click feedback numbers
-function showClickFeedback(sipsGained) {
+function showClickFeedback(sipsGained, isCritical = false) {
     const sodaContainer = document.querySelector('.soda-container');
     if (!sodaContainer) return;
     
     // Create feedback element
     const feedback = document.createElement('div');
-    feedback.className = 'click-feedback';
-    feedback.textContent = '+' + prettify(sipsGained);
+    feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
+    feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
     
     // Use more efficient positioning to avoid layout recalculations
     const containerRect = sodaContainer.getBoundingClientRect();
@@ -1060,7 +1198,7 @@ function showClickFeedback(sipsGained) {
             if (feedback.parentNode) {
                 feedback.parentNode.removeChild(feedback);
             }
-        }, 1000);
+        }, isCritical ? 2000 : 1000); // Critical feedback stays longer
     });
 }
 
@@ -1197,6 +1335,37 @@ function upgradeFasterDrinks() {
     }
 }
 
+function buyCriticalClick() {
+    let criticalClickCost = Math.floor(75 * Math.pow(1.15, criticalClicks.toNumber()));
+    if (sips.gte(criticalClickCost)) {
+        criticalClicks = criticalClicks.plus(1);
+        sips = sips.minus(criticalClickCost);
+        
+        // Increase critical click chance by 0.005% (0.00005) per purchase
+        criticalClickChance = criticalClickChance.plus(0.00005);
+        
+        // Show purchase feedback
+        showPurchaseFeedback('Critical Click', criticalClickCost);
+        
+        reload();
+        checkUpgradeAffordability();
+    }
+}
+
+function upgradeCriticalClick() {
+    let criticalClickUpCost = 1500 * criticalClickUpCounter.toNumber();
+    if (sips.gte(criticalClickUpCost)) {
+        sips = sips.minus(criticalClickUpCost);
+        criticalClickUpCounter = criticalClickUpCounter.plus(1);
+        
+        // Increase critical click multiplier by 2x per upgrade
+        criticalClickMultiplier = criticalClickMultiplier.plus(2);
+        
+        reload();
+        checkUpgradeAffordability();
+    }
+}
+
 function levelUp() {
     let levelUpCost = 5000 * level.toNumber();
     if (sips.gte(levelUpCost)) {
@@ -1291,6 +1460,10 @@ function save() {
         cupUpCounter: cupUpCounter.toString(),
         suctionUpCounter: suctionUpCounter.toString(),
         fasterDrinksUpCounter: fasterDrinksUpCounter.toString(),
+        criticalClickChance: criticalClickChance.toString(),
+        criticalClickMultiplier: criticalClickMultiplier.toString(),
+        criticalClicks: criticalClicks.toString(),
+        criticalClickUpCounter: criticalClickUpCounter.toString(),
         level: level.toString(),
         totalSipsEarned: totalSipsEarned.toString(),
         gameStartDate: gameStartDate,
@@ -1344,6 +1517,7 @@ function reload() {
         let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
         let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
         let fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
+        let criticalClickCost = Math.floor(75 * Math.pow(1.15, criticalClicks.toNumber()));
 
         // Safely update DOM elements only if they exist
         const elements = {
@@ -1355,6 +1529,10 @@ function reload() {
             'suctionCost': suctionCost.toString(),
             'fasterDrinks': fasterDrinks.toNumber(),
             'fasterDrinksCost': fasterDrinksCost.toString(),
+            'criticalClicks': criticalClicks.toNumber(),
+            'criticalClickCost': criticalClickCost.toString(),
+            'criticalClickChance': (criticalClickChance.times(100)).toFixed(4) + '%',
+            'criticalClickMultiplier': criticalClickMultiplier.toNumber() + 'x',
             'sips': prettify(sips),
             'sps': prettify(sps),
             'strawSPS': prettify(strawSPS),
@@ -1367,6 +1545,7 @@ function reload() {
             'cupUpCost': (500 * cupUpCounter.toNumber()).toString(),
             'suctionUpCost': (1000 * suctionUpCounter.toNumber()).toString(),
             'fasterDrinksUpCost': (2000 * fasterDrinksUpCounter.toNumber()).toString(),
+            'criticalClickUpCost': (1500 * criticalClickUpCounter.toNumber()).toString(),
             'levelNumber': level.toNumber()
         };
 
@@ -1890,11 +2069,13 @@ window.buyCup = buyCup;
 window.upgradeCup = upgradeCup;
 window.buySuction = buySuction;
 window.upgradeSuction = upgradeSuction;
-window.buyFasterDrinks = buyFasterDrinks;
-window.upgradeFasterDrinks = upgradeFasterDrinks;
-window.save = save;
-window.delete_save = delete_save;
-window.sendMessage = sendMessage;
+    window.buyFasterDrinks = buyFasterDrinks;
+    window.upgradeFasterDrinks = upgradeFasterDrinks;
+    window.buyCriticalClick = buyCriticalClick;
+    window.upgradeCriticalClick = upgradeCriticalClick;
+    window.save = save;
+    window.delete_save = delete_save;
+    window.sendMessage = sendMessage;
 
 // Music Player Functions
 function initMusicPlayer() {
@@ -2234,8 +2415,9 @@ window.updateStreamInfo = updateStreamInfo;
 window.getStreamDetails = getStreamDetails;
 window.activateTempleOSMode = activateTempleOSMode;
 window.getTempleOSResponse = getTempleOSResponse;
-window.toggleClickSounds = toggleClickSounds;
-window.testClickSounds = testClickSounds;
+    window.toggleClickSounds = toggleClickSounds;
+    window.testClickSounds = testClickSounds;
+    window.playCriticalClickSound = playCriticalClickSound;
 
 // Function to test click sounds
 function testClickSounds() {

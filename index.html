@@ -92,6 +92,13 @@
                 <div class="prominent-stat-value" id="prominentClickBonus">1</div>
             </div>
         </div>
+        <div class="prominent-stat">
+            <div class="prominent-stat-icon">💥</div>
+            <div class="prominent-stat-content">
+                <div class="prominent-stat-label">Critical Chance</div>
+                <div class="prominent-stat-value" id="prominentCriticalChance">0.01%</div>
+            </div>
+        </div>
     </div>
 
     <!-- Music Player -->
@@ -151,7 +158,7 @@
         <button onclick="levelUp()" class="level-up-btn">
             <span id="levelCost">5000</span> Sips<br/> 
             Level Up <br/>
-            (+ 100% Sips/s)
+            (+ 100% Sips/d)
         </button>
     </div>
 </div>
@@ -272,6 +279,35 @@
                     <button onclick="upgradeFasterDrinks()" class="upgrade-btn">
                         <span id="fasterDrinksUpCost">2000</span> Sips<br/> 
                         Upgrade Faster Drinks
+                    </button>
+                </div>
+            </div>
+
+            <div class="shop-item">
+                <div class="shop-header">
+                    <button onclick="buyCriticalClick()" class="shop-btn">
+                        <span id="criticalClickCost">75</span> Sips<br/> 
+                        Critical Click
+                    </button>
+                </div>
+                <div class="shop-stats">
+                    <div class="shop-stat">
+                        <span class="stat-label">Owned:</span>
+                        <span id="criticalClicks" class="stat-value">0</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">Chance:</span>
+                        <span id="criticalClickChance" class="stat-value">0.01%</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">Multiplier:</span>
+                        <span id="criticalClickMultiplier" class="stat-value">10x</span>
+                    </div>
+                </div>
+                <div class="shop-upgrade">
+                    <button onclick="upgradeCriticalClick()" class="upgrade-btn">
+                        <span id="criticalClickUpCost">1500</span> Sips<br/> 
+                        Upgrade Critical Click
                     </button>
                 </div>
             </div>
@@ -451,6 +487,13 @@
                     <div class="stat-content">
                         <div class="stat-label">Suctions Purchased</div>
                         <div class="stat-value" id="suctionsPurchased">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💥</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Critical Clicks</div>
+                        <div class="stat-value" id="criticalClicksPurchased">0</div>
                     </div>
                 </div>
             </div>
