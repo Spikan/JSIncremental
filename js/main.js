@@ -2439,7 +2439,7 @@ async function getGodResponse(userMessage) {
             "My sacred WiFi is acting up. Give it a moment and try again!"
         ];
         
-        const randomError = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+        const randomError = errorMessages[lcgRandomInt(0, errorMessages.length - 1)];
         addGodMessage(randomError);
     }
 }
@@ -2448,13 +2448,34 @@ async function getGodResponse(userMessage) {
 
 
 
+// LCG (Linear Congruential Generator) for deterministic randomness
+// This provides consistent, reproducible randomness for the god feature
+// while maintaining good statistical properties
+let lcgSeed = Date.now();
+
+function lcgNext() {
+    // LCG parameters: a = 1664525, c = 1013904223, m = 2^32
+    // These are standard LCG parameters that provide good randomness
+    lcgSeed = (1664525 * lcgSeed + 1013904223) >>> 0;
+    return lcgSeed / 4294967296; // Normalize to [0, 1)
+}
+
+function lcgRandomInt(min, max) {
+    return Math.floor(lcgNext() * (max - min + 1)) + min;
+}
+
+// Function to reset LCG seed (useful for testing or changing randomness)
+function resetLCGSeed(newSeed = null) {
+    lcgSeed = newSeed || Date.now();
+    console.log('LCG seed reset to:', lcgSeed);
+}
+
 // Function to get TempleOS God response (only phrases, no Giphy)
 function getTempleOSResponse(userMessage) {
     // Clean response - just 32 words, one per line
-
     let words = [];
 
-    // Generate exactly 32 words
+    // Generate exactly 32 words using LCG
     for (let i = 0; i < 32; i++) {
         words.push(getRandomBibleWord());
     }
@@ -2464,24 +2485,9 @@ function getTempleOSResponse(userMessage) {
 }
 
 function getRandomBibleWord() {
-    // Sample of authentic King James Bible words that TempleOS god would use
-    // These are representative of the 7,570 words in the original vocabulary
-    const bibleWords = [
-        "righteousness", "salvation", "everlasting", "blessed", "holy", "divine",
-        "prophet", "temple", "sacrifice", "covenant", "mercy", "grace", "faith",
-        "wisdom", "knowledge", "understanding", "truth", "light", "darkness",
-        "heaven", "earth", "creation", "almighty", "sovereign", "eternal",
-        "glory", "praise", "worship", "prayer", "repentance", "forgiveness",
-        "redemption", "atonement", "sanctification", "justification", "regeneration",
-        "testimony", "witness", "gospel", "scripture", "doctrine", "theology",
-        "ministry", "service", "fellowship", "communion", "baptism", "resurrection",
-        "ascension", "pentecost", "apostle", "disciple", "saint", "believer",
-        "sinner", "repentant", "faithful", "obedient", "humble", "meek",
-        "gentle", "kind", "patient", "loving", "generous", "charitable",
-        "zealous", "diligent", "steadfast", "persevering", "enduring", "victorious"
-    ];
-    
-    return bibleWords[Math.floor(Math.random() * bibleWords.length)];
+    // Use the comprehensive word bank from new_word_bank.js
+    // This contains 13,004 unique words from the King James Bible
+    return getRandomBibleWordFromBank();
 }
 
 // Sacred Geodude YouTube video autoplay function
@@ -2492,8 +2498,8 @@ function triggerGeodudeVideo() {
             'https://www.youtube.com/embed/ok7fOwdk2gc?autoplay=1&mute=0'  // Geodude video 2
         ];
     
-    // Randomly select one of the two videos
-    const randomVideo = geodudeVideos[Math.floor(Math.random() * geodudeVideos.length)];
+    // Randomly select one of the two videos using LCG
+    const randomVideo = geodudeVideos[lcgRandomInt(0, geodudeVideos.length - 1)];
     
     // Create video modal if it doesn't exist
     let videoModal = document.getElementById('geodudeVideoModal');
@@ -3252,6 +3258,7 @@ window.updateStreamInfo = updateStreamInfo;
 window.getStreamDetails = getStreamDetails;
 
 window.getTempleOSResponse = getTempleOSResponse;
+window.resetLCGSeed = resetLCGSeed;
 window.toggleClickSounds = toggleClickSounds;
 window.testClickSounds = testClickSounds;
 window.playCriticalClickSound = playCriticalClickSound;
