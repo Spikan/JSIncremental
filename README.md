@@ -1,6 +1,6 @@
 # Soda Clicker Pro! 🥤
 
-A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, upgrades, and a mysterious "Talk to God" feature.
+A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, upgrades, and a TempleOS God tribute feature honoring Terry A. Davis.
 
 ## 🚀 Features
 
@@ -8,14 +8,14 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 - **Upgrades**: Straws, cups, suction, and faster drinks
 - **Statistics**: Track your progress and achievements
 - **Options**: Configurable auto-save and game settings
-- **Talk to God**: Ask God anything and get responses! 🙏
+- **TempleOS God**: A tribute to Terry A. Davis - Divine wisdom in 32-bit precision! 🏛️
 
 ## 🎮 How to Play
 
 1. **Click the Soda**: Earn sips with each click
 2. **Buy Upgrades**: Invest in straws, cups, and suction
 3. **Level Up**: Reach milestones for bonus income
-4. **Talk to God**: Ask questions and get responses
+4. **TempleOS God**: Experience divine wisdom through sacred phrases
 5. **Track Progress**: Monitor your statistics and achievements
 
 ## 🛠️ Development

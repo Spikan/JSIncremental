@@ -1,11 +1,10 @@
 // Soda Clicker Pro - Main Game Logic
 // 
-// TALK TO GOD FEATURE SETUP:
-// The Giphy API key is now configured via environment variables
-// Your API key is securely stored and ready to use!
+// TEMPLEOS GOD FEATURE SETUP:
+// This is now a tribute to Terry A. Davis and TempleOS
+// No external API keys are needed for the TempleOS God feature
 
-// Import configuration
-import { config } from './config.js';
+
 import { templePhrases, totalPhrases } from './phrases.js';
 
 // Progressive enhancement - detect advanced features
@@ -2074,8 +2073,7 @@ function delete_save() {
         lastClickTime = 0;
         clickTimes = [];
         
-        // Reset TempleOS mode
-        window.templeOSMode = false;
+
         
         // Update the UI to reflect the reset
         reload();
@@ -2339,7 +2337,7 @@ function showPurchaseFeedback(itemName, cost) {
     }, 2000);
 }
 
-// Talk to God functionality
+        // TempleOS God functionality
 function sendMessage() {
     const chatInput = document.getElementById('chatInput');
     const message = chatInput.value.trim();
@@ -2352,35 +2350,11 @@ function sendMessage() {
     // Clear input
     chatInput.value = '';
     
-    // Lazy load God response functionality
-    if (!window.godFeatureLoaded) {
-        loadGodFeature().then(() => {
-            getGodResponse(message);
-        });
-    } else {
-        getGodResponse(message);
-    }
+    // Get TempleOS God response immediately
+    getGodResponse(message);
 }
 
-// Lazy load God feature to reduce initial bundle size
-async function loadGodFeature() {
-    if (window.godFeatureLoaded) return;
-    
-    try {
-        // Load God feature components on demand
-        console.log('Loading God feature...');
-        
-        // Simulate loading external components
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        window.godFeatureLoaded = true;
-        console.log('God feature loaded successfully');
-    } catch (error) {
-        console.error('Failed to load God feature:', error);
-        // Fallback to basic response
-        addGodMessage('Sorry, the divine connection is temporarily unavailable.');
-    }
-}
+
 
 function addUserMessage(message) {
     const chatMessages = document.getElementById('chatMessages');
@@ -2399,40 +2373,20 @@ function addUserMessage(message) {
     scrollToBottom();
 }
 
-function addGodMessage(content, isGif = false, isTempleOS = false) {
+function addGodMessage(content) {
     const chatMessages = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message god-message';
     
-    if (isGif) {
-        messageDiv.classList.add('gif-message');
-        messageDiv.innerHTML = `
-            <div class="message-avatar">👑</div>
-            <div class="message-content">
-                <div class="message-sender">God</div>
-                <div class="message-text">${content}</div>
-            </div>
-        `;
-    } else if (isTempleOS) {
-        messageDiv.classList.add('templeos-message');
-        messageDiv.innerHTML = `
-            <div class="message-avatar">
-                <img src="images/TempleOS.jpg" alt="TempleOS God" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-            </div>
-            <div class="message-content">
-                <div class="message-sender">TempleOS God</div>
-                <div class="message-text">${content}</div>
-            </div>
-        `;
-    } else {
-        messageDiv.innerHTML = `
-            <div class="message-avatar">👑</div>
-            <div class="message-content">
-                <div class="message-sender">God</div>
-                <div class="message-text">${content}</div>
-            </div>
-        `;
-    }
+    // Always use TempleOS styling for consistency
+    messageDiv.classList.add('templeos-message');
+    messageDiv.innerHTML = `
+        <div class="message-avatar">🏛️</div>
+        <div class="message-content">
+            <div class="message-sender">TempleOS God</div>
+            <div class="message-text">${content}</div>
+        </div>
+    `;
     
     chatMessages.appendChild(messageDiv);
     scrollToBottom();
@@ -2451,157 +2405,33 @@ function escapeHtml(text) {
 
 async function getGodResponse(userMessage) {
     try {
-        // Check if we're in TempleOS mode
-        if (window.templeOSMode) {
-            // TempleOS God only responds with phrases from the list
-            const templeResponse = getTempleOSResponse(userMessage);
-            addGodMessage(`
-                <div style="background: #000; color: #00FF00; font-family: 'Courier New', monospace; padding: 1rem; border-radius: 8px; text-align: left; max-height: 400px; overflow-y: auto;">
-                    <div style="color: #FFFF00;">> TEMPLEOS v1.0.0</div>
-                    <div style="color: #00FF00;">> Status: ONLINE</div>
-                    <div style="color: #00FF00;">> Mode: DIVINE COMMUNICATION</div>
-                    <div style="color: #00FF00;">> ------------------------</div>
-                    ${templeResponse}
-                </div>
-            `, false, true); // Pass true to indicate TempleOS mode
-            return; // Exit early for TempleOS mode
-        }
+        // TempleOS mode is now the default - always respond with phrases from the list
+        const templeResponse = getTempleOSResponse(userMessage);
+        addGodMessage(`
+            <div style="background: #000; color: #00FF00; font-family: 'Courier New', monospace; padding: 1rem; border-radius: 8px; text-align: left; max-height: 400px; overflow-y: auto;">
+                <div style="color: #FFFF00;">> TEMPLEOS v1.0.0</div>
+                <div style="color: #00FF00;">> Status: ONLINE</div>
+                <div style="color: #00FF00;">> Mode: DIVINE COMMUNICATION</div>
+                <div style="color: #00FF00;">> ------------------------</div>
+                ${templeResponse}
+            </div>
+        `);
+        return; // Exit early for TempleOS mode
         
-        // Check for the secret "geodude" keyword (case-insensitive)
-        if (userMessage.toLowerCase().includes('geodude')) {
-            // Remove the thinking message if it exists
-            const thinkingMessage = document.querySelector('.god-message:last-child');
-            if (thinkingMessage) {
-                thinkingMessage.remove();
-            }
-            
-            // Randomly choose between the two geodude videos
-            const geodudeVideos = [
-                {
-                    id: 'Mhvl7X_as8I',
-                    title: 'Geodude Secret Video 1'
-                },
-                {
-                    id: 'ok7fOwdk2gc',
-                    title: 'Geodude Secret Video 2'
-                }
-            ];
-            
-            const randomVideo = geodudeVideos[Math.floor(Math.random() * geodudeVideos.length)];
-            
-            // Add the secret geodude response with embedded YouTube video (autoplay enabled)
-            addGodMessage(`
-                <div style="text-align: center; margin: 1rem 0;">
-                    <p style="color: #00B36B; font-weight: bold; margin-bottom: 1rem;">🎵 You've discovered a divine secret! 🎵</p>
-                    <div style="position: relative; width: 100%; max-width: 560px; margin: 0 auto;">
-                        <iframe 
-                            width="100%" 
-                            height="315" 
-                            src="https://www.youtube.com/embed/${randomVideo.id}?autoplay=1&mute=0" 
-                            title="${randomVideo.title}" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen
-                            style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 179, 107, 0.3);">
-                        </iframe>
-                    </div>
-                    <p style="color: #FF8E53; font-style: italic; margin-top: 1rem;">The heavens have blessed you with this sacred melody! 🌟</p>
-                </div>
-            `);
-            return; // Exit early for the secret response
-        }
+
         
-        // Check for the secret "temple" keyword (case-insensitive) - TempleOS mode activation
-        if (userMessage.toLowerCase().includes('temple')) {
-            // Remove the thinking message if it exists
-            const thinkingMessage = document.querySelector('.god-message:last-child');
-            if (thinkingMessage) {
-                thinkingMessage.remove();
-            }
-            
-            // Activate TempleOS mode
-            window.templeOSMode = true;
-            const templeResponse = activateTempleOSMode();
-            addGodMessage(`
-                <div style="text-align: center; margin: 1rem 0;">
-                    <p style="color: #FFD700; font-weight: bold; margin-bottom: 1rem;">🏛️ TEMPLEOS MODE ACTIVATED 🏛️</p>
-                    <div style="background: #000; color: #00FF00; font-family: 'Courier New', monospace; padding: 1rem; border-radius: 8px; text-align: left; max-height: 400px; overflow-y: auto;">
-                        <div style="color: #FFFF00;">> TEMPLEOS v1.0.0</div>
-                        <div style="color: #00FF00;">> Loading divine phrases...</div>
-                        <div style="color: #00FF00;">> Status: ONLINE</div>
-                        <div style="color: #00FF00;">> Mode: DIVINE COMMUNICATION</div>
-                        <div style="color: #00FF00;">> ------------------------</div>
-                        ${templeResponse}
-                    </div>
-                    <p style="color: #FF8E53; font-style: italic; margin-top: 1rem;">TempleOS mode: Divine wisdom in 32-bit precision! 🏛️</p>
-                    <p style="color: #00FF00; font-size: 0.9em; margin-top: 0.5rem;">Type anything to get TempleOS God responses. Type "exit" to return to normal God.</p>
-                </div>
-            `, false, true); // Use TempleOS profile picture
-            return; // Exit early for the TempleOS response
-        }
+
         
-        // Check for exit command to return to normal God
-        if (window.templeOSMode && userMessage.toLowerCase().includes('exit')) {
-            window.templeOSMode = false;
-            addGodMessage(`
-                <div style="text-align: center; margin: 1rem 0;">
-                    <p style="color: #FFD700; font-weight: bold; margin-bottom: 1rem;">🏛️ TEMPLEOS MODE DEACTIVATED 🏛️</p>
-                    <p style="color: #00FF00;">> Returning to normal God mode...</p>
-                    <p style="color: #FF8E53; font-style: italic; margin-top: 1rem;">Normal God has been restored. Type "temple" to reactivate TempleOS mode.</p>
-                </div>
-            `, false, true); // Use TempleOS profile picture for the exit message
-            return; // Exit early for the exit response
-        }
-        
-        // Show "God is typing..." message with divine variations (only in normal mode)
-        const thinkingMessages = [
-            "God is contemplating your question... 🤔",
-            "The heavens are processing your request... ⭐",
-            "Divine wisdom is being consulted... ✨",
-            "God is meditating on your words... 🧘‍♂️",
-            "The universe is aligning for your answer... 🌟"
-        ];
-        
-        const randomThinking = thinkingMessages[Math.floor(Math.random() * thinkingMessages.length)];
-        addGodMessage(randomThinking);
-        
-        // Search for God's mysterious response
-        const gifUrl = await getDivineResponse(userMessage);
-        
-        // Add a natural delay to make responses feel more divine
-        await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
-        
-        // Remove the "thinking" message
-        const thinkingMessage = document.querySelector('.god-message:last-child');
-        if (thinkingMessage) {
-            thinkingMessage.remove();
-        }
-        
-        // Add the divine response
-        if (gifUrl) {
-            addGodMessage(`<img src="${gifUrl}" alt="God's divine response" onerror="this.style.display='none'">`, true);
-        } else {
-            // Fallback divine messages
-            const fallbackMessages = [
-                "I'm sorry, my divine wisdom is temporarily clouded. Try asking about something else!",
-                "The cosmic forces are not aligned for that question right now. Ask again later!",
-                "That's beyond even my infinite wisdom. Perhaps rephrase your question?",
-                "The universe is silent on that matter. Try a different approach!",
-                "My divine knowledge has limits too, you know. Ask something else!"
-            ];
-            
-            const randomFallback = fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
-            addGodMessage(randomFallback);
-        }
+
     } catch (error) {
-        console.error('Error getting God response:', error);
+        console.error('Error getting TempleOS God response:', error);
         
         const errorMessages = [
-            "I'm experiencing some divine technical difficulties. Please try again later!",
-            "The cosmic internet is down. My apologies for the inconvenience!",
-            "Even gods have bad connection days. Try again in a moment!",
-            "The divine servers are overloaded. Please wait and try again!",
-            "My heavenly WiFi is acting up. Give it a moment and try again!"
+            "TempleOS is experiencing divine technical difficulties. Please try again later!",
+            "The sacred system is temporarily offline. My apologies for the inconvenience!",
+            "Even divine operating systems have bad days. Try again in a moment!",
+            "The holy servers are overloaded. Please wait and try again!",
+            "My sacred WiFi is acting up. Give it a moment and try again!"
         ];
         
         const randomError = errorMessages[Math.floor(Math.random() * errorMessages.length)];
@@ -2609,64 +2439,9 @@ async function getGodResponse(userMessage) {
     }
 }
 
-// Function to get God's mysterious divine response
-async function getDivineResponse(query) {
-    // God's mysterious response system using the Giphy API
-    // Search for GIFs based on the user's message
-    
-    try {
-        // Use Giphy search API to find relevant GIFs
-        const gifUrl = await searchGiphyAPI(query);
-        return gifUrl;
-    } catch (error) {
-        console.error('Error searching Giphy:', error);
-        return null;
-    }
-}
 
-// Function to search Giphy API for real GIFs
-async function searchGiphyAPI(searchTerm) {
-    // Get API key from configuration
-    const GIPHY_API_KEY = config.giphyApiKey;
-    
-    try {
-        // Search Giphy for GIFs matching the search term
-        const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=10&rating=g`);
-        
-        if (!response.ok) {
-            throw new Error(`Giphy API error: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.data && data.data.length > 0) {
-            // Return the first (top) GIF from the search results
-            return data.data[0].images.original.url;
-        } else {
-            // No GIFs found, return null to trigger fallback message
-            return null;
-        }
-    } catch (error) {
-        console.error('Giphy API request failed:', error);
-        return null;
-    }
-}
 
-// Function to activate TempleOS mode with 32 random phrases from Happy.TXT
-function activateTempleOSMode() {
-    // Use imported phrases from phrases.js (originally from Happy.TXT)
-    // No need to redefine the array - it's imported from the module
-    
-    // Generate 32 random phrases from the imported array (total: ${totalPhrases} phrases)
-    let response = '';
-    for (let i = 0; i < 32; i++) {
-        const randomPhrase = templePhrases[Math.floor(Math.random() * templePhrases.length)];
-        const lineNumber = (i + 1).toString().padStart(2, '0');
-        response += `<div style="color: #00FF00;">> [${lineNumber}] ${randomPhrase}</div>`;
-    }
-    
-    return response;
-}
+
 
 // Function to get TempleOS God response (only phrases, no Giphy)
 function getTempleOSResponse(userMessage) {
@@ -2683,87 +2458,7 @@ function getTempleOSResponse(userMessage) {
     return response;
 }
 
-// Fallback function for when Giphy API is not available
-function getPlaceholderGif(searchTerm) {
-    // Analyze the search term to provide contextually appropriate placeholder GIFs
-    const lowerQuery = searchTerm.toLowerCase();
-    
-    // Define response categories based on message content
-    let responseCategory = 'general';
-    
-    if (lowerQuery.includes('happy') || lowerQuery.includes('joy') || lowerQuery.includes('smile') || lowerQuery.includes('good')) {
-        responseCategory = 'happy';
-    } else if (lowerQuery.includes('sad') || lowerQuery.includes('cry') || lowerQuery.includes('bad') || lowerQuery.includes('help')) {
-        responseCategory = 'sad';
-    } else if (lowerQuery.includes('angry') || lowerQuery.includes('mad') || lowerQuery.includes('furious')) {
-        responseCategory = 'angry';
-    } else if (lowerQuery.includes('love') || lowerQuery.includes('heart') || lowerQuery.includes('romance')) {
-        responseCategory = 'love';
-    } else if (lowerQuery.includes('food') || lowerQuery.includes('eat') || lowerQuery.includes('hungry') || lowerQuery.includes('soda')) {
-        responseCategory = 'food';
-    } else if (lowerQuery.includes('work') || lowerQuery.includes('job') || lowerQuery.includes('busy')) {
-        responseCategory = 'work';
-    } else if (lowerQuery.includes('sleep') || lowerQuery.includes('tired') || lowerQuery.includes('bed')) {
-        responseCategory = 'sleep';
-    } else if (lowerQuery.includes('music') || lowerQuery.includes('dance') || lowerQuery.includes('sing')) {
-        responseCategory = 'music';
-    } else if (lowerQuery.includes('sport') || lowerQuery.includes('game') || lowerQuery.includes('play')) {
-        responseCategory = 'sport';
-    } else if (lowerQuery.includes('money') || lowerQuery.includes('rich') || lowerQuery.includes('poor')) {
-        responseCategory = 'money';
-    }
-    
-    // Placeholder GIFs for different categories
-    const placeholderGifs = {
-        happy: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        sad: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        angry: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        love: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        food: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        work: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        sleep: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        music: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        sport: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        money: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ],
-        general: [
-            'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
-            'https://media.giphy.com/media/26ufcVAJHVlxvx8KI/giphy.gif'
-        ]
-    };
-    
-    const responses = placeholderGifs[responseCategory] || placeholderGifs.general;
-    return responses[Math.floor(Math.random() * responses.length)];
-}
+
 
 // Event listener optimization - consolidate multiple handlers
 document.addEventListener('DOMContentLoaded', function() {
@@ -3431,9 +3126,8 @@ window.addUserMessage = addUserMessage;
 window.addGodMessage = addGodMessage;
 window.scrollToBottom = scrollToBottom;
 window.escapeHtml = escapeHtml;
-window.getDivineResponse = getDivineResponse;
-window.searchGiphyAPI = searchGiphyAPI;
-window.getPlaceholderGif = getPlaceholderGif;
+
+
 window.toggleAutosave = toggleAutosave;
 window.changeAutosaveInterval = changeAutosaveInterval;
 window.getGodResponse = getGodResponse;
@@ -3442,7 +3136,7 @@ window.toggleMusic = toggleMusic;
 window.toggleMute = toggleMute;
 window.updateStreamInfo = updateStreamInfo;
 window.getStreamDetails = getStreamDetails;
-window.activateTempleOSMode = activateTempleOSMode;
+
 window.getTempleOSResponse = getTempleOSResponse;
 window.toggleClickSounds = toggleClickSounds;
 window.testClickSounds = testClickSounds;

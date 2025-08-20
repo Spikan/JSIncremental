@@ -1831,7 +1831,7 @@ h3 {
         font-size: 1rem;
     }
     
-    /* Talk to God mobile optimizations */
+    /* TempleOS God mobile optimizations */
     .god-container {
         padding: 0.5rem;
     }
@@ -2166,7 +2166,7 @@ h3 {
 
 
 
-/* Talk to God Tab Styles */
+/* TempleOS God Tab Styles */
 .god-container {
     max-width: 800px;
     margin: 0 auto;
@@ -2177,32 +2177,35 @@ h3 {
     text-align: center;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
-    border: 2px solid #FFD700;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 100, 0, 0.3));
+    border: 2px solid #00FF00;
     border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
 }
 
 .god-header h2 {
-    color: #FFD700;
+    color: #00FF00;
     margin: 0 0 0.5rem 0;
     font-size: 2rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+    font-family: 'Courier New', monospace;
 }
 
 .god-subtitle {
-    color: #FFA500;
+    color: #00FF00;
     margin: 0;
     font-size: 1.1rem;
     font-style: italic;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.6);
 }
 
 .chat-container {
-    background: rgba(0, 23, 137, 0.3);
-    border: 2px solid #00B36B;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00FF00;
     border-radius: 16px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 8px 24px rgba(0, 179, 107, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
 }
 
 .chat-messages {
@@ -2233,10 +2236,11 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 50%;
-    border: 2px solid #00B36B;
+    border: 2px solid #00FF00;
     flex-shrink: 0;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
 }
 
 .message-content {
@@ -2245,12 +2249,13 @@ h3 {
 }
 
 .message-sender {
-    color: #00B36B;
+    color: #00FF00;
     font-weight: bold;
     font-size: 0.9rem;
     margin-bottom: 0.25rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.6);
 }
 
 .message-text {
@@ -2261,12 +2266,14 @@ h3 {
 }
 
 .god-message .message-avatar {
-    border-color: #FFD700;
-    background: rgba(255, 215, 0, 0.2);
+    border-color: #00FF00;
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
 }
 
 .god-message .message-sender {
-    color: #FFD700;
+    color: #00FF00;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
 }
 
 .user-message {
@@ -2296,41 +2303,44 @@ h3 {
 .chat-input {
     flex: 1;
     padding: 0.875rem 1rem;
-    border: 2px solid #00B36B;
-    background-color: #001789;
-    color: #00B36B;
+    border: 2px solid #00FF00;
+    background-color: #000;
+    color: #00FF00;
     border-radius: 8px;
     font-size: 1rem;
     outline: none;
     transition: all 0.2s ease;
+    font-family: 'Courier New', monospace;
 }
 
 .chat-input:focus {
-    border-color: #FF3D02;
-    box-shadow: 0 0 12px rgba(255, 61, 2, 0.3);
+    border-color: #00FF00;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
 }
 
 .chat-input::placeholder {
-    color: rgba(0, 179, 107, 0.6);
+    color: rgba(0, 255, 0, 0.6);
 }
 
 .chat-send-btn {
     padding: 0.875rem 1.5rem;
-    border: 2px solid #FFD700;
-    background-color: #001789;
-    color: #FFD700;
+    border: 2px solid #00FF00;
+    background-color: #000;
+    color: #00FF00;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    font-family: 'Courier New', monospace;
 }
 
 .chat-send-btn:hover {
-    background-color: #FFD700;
-    color: #001789;
+    background-color: #00FF00;
+    color: #000;
     transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
 }
 
 .chat-send-btn:active {
@@ -2340,8 +2350,8 @@ h3 {
 .god-info {
     text-align: center;
     padding: 1rem;
-    background: rgba(255, 215, 0, 0.1);
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 255, 0, 0.3);
     border-radius: 8px;
 }
 
