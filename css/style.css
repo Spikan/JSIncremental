@@ -612,6 +612,18 @@ body {
     width: 100%;
 }
 
+.stream-info.clickable {
+    cursor: pointer;
+    background: rgba(255, 61, 2, 0.1);
+    border-color: #FF3D02;
+    transition: all 0.2s ease;
+}
+
+.stream-info.clickable:hover {
+    background: rgba(255, 61, 2, 0.2);
+    box-shadow: 0 2px 8px rgba(255, 61, 2, 0.3);
+}
+
 .stream-info span {
     color: #00B36B;
     font-weight: bold;

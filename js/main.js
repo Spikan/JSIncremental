@@ -2604,26 +2604,30 @@ const MUSIC_STREAMS = {
         name: 'Ill Street',
         description: 'Lofi hip hop and chill beats'
     },
-    // StarCraft OST Tracks (Race-Based Alternatives)
+    // StarCraft OST Tracks (YouTube Alternatives)
     starcraft_terran: {
-        url: 'https://ia800504.us.archive.org/12/items/sc-teamliquid-edited/(edited%20remastered%20OST)%20StarCraft%201%20--%20Terran%201.mp3',
+        url: 'https://www.youtube.com/watch?v=Mhvl7X_as8I',
         name: 'StarCraft - Terran Theme',
-        description: 'Epic Terran battle music from the original game'
+        description: 'Epic Terran battle music from the original game',
+        type: 'youtube'
     },
     starcraft_zerg: {
-        url: 'https://ia800504.us.archive.org/12/items/sc-teamliquid-edited/(edited%20remastered%20OST)%20StarCraft%201%20--%20Zerg%201.mp3',
+        url: 'https://www.youtube.com/watch?v=ok7fOwdk2gc',
         name: 'StarCraft - Zerg Theme',
-        description: 'Dark Zerg swarm music from the original game'
+        description: 'Dark Zerg swarm music from the original game',
+        type: 'youtube'
     },
     starcraft_protoss: {
-        url: 'https://ia800504.us.archive.org/12/items/sc-teamliquid-edited/(edited%20remastered%20OST)%20StarCraft%201%20--%20Protoss%201.mp3',
+        url: 'https://www.youtube.com/watch?v=Mhvl7X_as8I',
         name: 'StarCraft - Protoss Theme',
-        description: 'Mystical Protoss music from the original game'
+        description: 'Mystical Protoss music from the original game',
+        type: 'youtube'
     },
     starcraft_broodwar: {
-        url: 'https://ia800504.us.archive.org/12/items/sc-teamliquid-edited/(edited%20remastered%20OST)%20StarCraft%201%20--%20Protoss%202.mp3',
+        url: 'https://www.youtube.com/watch?v=ok7fOwdk2gc',
         name: 'StarCraft - Brood War Theme',
-        description: 'Expansion pack music from Brood War'
+        description: 'Expansion pack music from Brood War',
+        type: 'youtube'
     },
     // Legacy StarCraft Options (Using SomaFM as fallback)
     starcraft1: {
@@ -2672,7 +2676,37 @@ function changeMusicStream() {
         return;
     }
     
-    // Store current playing state
+    // Check if this is a YouTube stream
+    if (streamData.type === 'youtube') {
+        // For YouTube streams, show a message and don't try to play audio
+        currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description} (YouTube - Click to open in new tab)`;
+        currentStreamInfo.style.cursor = 'pointer';
+        currentStreamInfo.onclick = () => window.open(streamData.url, '_blank');
+        currentStreamInfo.classList.add('clickable');
+        
+        // Stop any currently playing audio
+        if (state.isPlaying) {
+            state.audio.pause();
+            state.isPlaying = false;
+            updateMusicPlayerUI();
+        }
+        
+        // Show a notification about YouTube streams
+        const musicStatus = document.getElementById('musicStatus');
+        if (musicStatus) {
+            musicStatus.textContent = 'YouTube stream selected - Click stream info to open';
+        }
+        
+        // Save the stream preference
+        const streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
+        streamPreferences.selectedStream = selectedStream;
+        localStorage.setItem('musicStreamPreferences', JSON.stringify(streamPreferences));
+        
+        console.log('YouTube stream selected:', streamData.name);
+        return;
+    }
+    
+    // Store current playing state for audio streams
     const wasPlaying = state.isPlaying;
     
     // Change the stream
@@ -2681,6 +2715,9 @@ function changeMusicStream() {
     
     // Update the stream info display
     currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
+    currentStreamInfo.style.cursor = 'default';
+    currentStreamInfo.onclick = null;
+    currentStreamInfo.classList.remove('clickable');
     
     // Update music player display with custom stream info for StarCraft themes
     if (selectedStream.startsWith('starcraft')) {
@@ -2711,7 +2748,10 @@ function changeMusicStream() {
             }).catch(error => {
                 console.log('Failed to play new stream:', error);
                 state.isPlaying = false;
-                musicStatus.textContent = 'Click to start music';
+                const musicStatus = document.getElementById('musicStatus');
+                if (musicStatus) {
+                    musicStatus.textContent = 'Click to start music';
+                }
                 updateMusicPlayerUI();
             });
         }
@@ -2745,7 +2785,23 @@ function loadSavedStreamPreference() {
             
             // Update the current stream info display
             const streamData = MUSIC_STREAMS[savedStream];
+            
+            // Check if this is a YouTube stream
+            if (streamData.type === 'youtube') {
+                currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description} (YouTube - Click to open in new tab)`;
+                currentStreamInfo.style.cursor = 'pointer';
+                currentStreamInfo.onclick = () => window.open(streamData.url, '_blank');
+                currentStreamInfo.classList.add('clickable');
+                
+                // Don't try to set audio source for YouTube streams
+                console.log('Loaded saved YouTube stream preference:', savedStream);
+                return;
+            }
+            
             currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
+            currentStreamInfo.style.cursor = 'default';
+            currentStreamInfo.onclick = null;
+            currentStreamInfo.classList.remove('clickable');
             
             // Update the music player to use the saved stream
             const state = window.musicPlayerState;
@@ -2921,18 +2977,18 @@ window.testStarCraftOST = function() {
 // Test function for stream switching
 window.testStreamSwitching = function() {
     console.log('=== STREAM SWITCHING TEST ===');
-    
+
     const streamSelect = document.getElementById('musicStreamSelect');
     if (!streamSelect) {
         console.log('Stream select element not found');
         return;
     }
-    
+
     console.log('Testing stream switching...');
-    
+
     // Test switching to different stream types
     const testStreams = ['groovesalad', 'starcraft_terran', 'defcon', 'starcraft_zerg'];
-    
+
     testStreams.forEach((streamKey, index) => {
         setTimeout(() => {
             console.log(`Switching to ${streamKey}...`);
@@ -2940,8 +2996,47 @@ window.testStreamSwitching = function() {
             changeMusicStream();
         }, index * 2000); // Switch every 2 seconds
     });
-    
+
     console.log('Stream switching test complete! Check console for results.');
+};
+
+// Test function for YouTube stream functionality
+window.testYouTubeStreams = function() {
+    console.log('=== YOUTUBE STREAMS TEST ===');
+    
+    const streamSelect = document.getElementById('musicStreamSelect');
+    if (!streamSelect) {
+        console.log('Stream select element not found');
+        return;
+    }
+    
+    console.log('Testing YouTube stream functionality...');
+    
+    // Test YouTube streams specifically
+    const youtubeStreams = ['starcraft_terran', 'starcraft_zerg', 'starcraft_protoss', 'starcraft_broodwar'];
+    
+    youtubeStreams.forEach((streamKey, index) => {
+        setTimeout(() => {
+            console.log(`Testing YouTube stream: ${streamKey}`);
+            streamSelect.value = streamKey;
+            changeMusicStream();
+            
+            // Check if the stream info becomes clickable
+            setTimeout(() => {
+                const currentStreamInfo = document.getElementById('currentStreamInfo');
+                if (currentStreamInfo) {
+                    console.log(`Stream info for ${streamKey}:`, {
+                        text: currentStreamInfo.textContent,
+                        cursor: currentStreamInfo.style.cursor,
+                        hasClickableClass: currentStreamInfo.classList.contains('clickable'),
+                        onclick: currentStreamInfo.onclick ? 'Function set' : 'No function'
+                    });
+                }
+            }, 500);
+        }, index * 3000); // Test each stream 3 seconds apart
+    });
+    
+    console.log('YouTube streams test complete! Check console for results.');
 };
 
 // Function to test click sounds
