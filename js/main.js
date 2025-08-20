@@ -1027,6 +1027,85 @@ function playCriticalClickSound() {
     }
 }
 
+// Generate a deep purchase sound for shop upgrades
+function playPurchaseSound() {
+    if (!clickSoundsEnabled || !audioContext) {
+        return;
+    }
+    
+    try {
+        // Create oscillators for a deep, satisfying purchase sound
+        const oscillator1 = audioContext.createOscillator();
+        const oscillator2 = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        const filterNode = audioContext.createBiquadFilter();
+        const delayNode = audioContext.createDelay();
+        
+        // Deep purchase sound parameters
+        const baseFreq1 = 80 + Math.random() * 40; // 80-120 Hz - very low, deep
+        const baseFreq2 = 160 + Math.random() * 60; // 160-220 Hz - low
+        const duration = 0.4 + Math.random() * 0.2; // 0.4-0.6 seconds - longer for satisfaction
+        const volume = 0.35 + Math.random() * 0.15; // 0.35-0.5 volume
+        
+        // Set up oscillators with deep waveforms
+        oscillator1.type = 'sine'; // Pure, deep tone
+        oscillator2.type = 'triangle'; // Rich harmonics
+        
+        oscillator1.frequency.setValueAtTime(baseFreq1, audioContext.currentTime);
+        oscillator2.frequency.setValueAtTime(baseFreq2, audioContext.currentTime);
+        
+        // Add subtle frequency modulation for depth
+        oscillator1.frequency.exponentialRampToValueAtTime(
+            baseFreq1 * (0.9 + Math.random() * 0.2), 
+            audioContext.currentTime + duration
+        );
+        oscillator2.frequency.exponentialRampToValueAtTime(
+            baseFreq2 * (0.85 + Math.random() * 0.3), 
+            audioContext.currentTime + duration
+        );
+        
+        // Set up low-pass filter for deep, warm character
+        filterNode.type = 'lowpass';
+        filterNode.frequency.setValueAtTime(300 + Math.random() * 200, audioContext.currentTime);
+        filterNode.Q.setValueAtTime(3 + Math.random() * 2, audioContext.currentTime);
+        
+        // Add subtle delay for depth
+        delayNode.delayTime.setValueAtTime(0.03 + Math.random() * 0.02, audioContext.currentTime);
+        
+        // Set up gain envelope with smooth attack and release
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.05); // Smooth attack
+        gainNode.gain.setValueAtTime(volume, audioContext.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(volume * 0.8, audioContext.currentTime + 0.2);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        
+        // Connect nodes for deep sound
+        oscillator1.connect(filterNode);
+        oscillator2.connect(filterNode);
+        filterNode.connect(gainNode);
+        gainNode.connect(delayNode);
+        delayNode.connect(audioContext.destination);
+        
+        // Start and stop sounds
+        oscillator1.start(audioContext.currentTime);
+        oscillator2.start(audioContext.currentTime);
+        oscillator1.stop(audioContext.currentTime + duration);
+        oscillator2.stop(audioContext.currentTime + duration);
+        
+        // Clean up
+        setTimeout(() => {
+            oscillator1.disconnect();
+            oscillator2.disconnect();
+            filterNode.disconnect();
+            gainNode.disconnect();
+            delayNode.disconnect();
+        }, duration * 1000 + 100);
+        
+    } catch (error) {
+        console.error('Error playing purchase sound:', error);
+    }
+}
+
 // Function to toggle click sounds on/off
 function toggleClickSounds() {
     clickSoundsEnabled = !clickSoundsEnabled;
@@ -1228,6 +1307,11 @@ function buyStraw() {
         strawSPS = new Decimal(0.4).times(strawUpCounter);
         sps = strawSPS.times(straws).plus(cupSPS.times(cups));
         
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
+        
         // Show purchase feedback
         showPurchaseFeedback('Extra Straw', strawCost);
         
@@ -1245,6 +1329,12 @@ function upgradeStraw() {
         sps = new Decimal(0);
         sps = sps.plus(strawSPS.times(straws));
         sps = sps.plus(cupSPS.times(cups));
+        
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -1257,6 +1347,11 @@ function buyCup() {
         sips = sips.minus(cupCost);
         cupSPS = new Decimal(cupUpCounter.toNumber());
         sps = strawSPS.times(straws).plus(cupSPS.times(cups));
+        
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
         
         // Show purchase feedback
         showPurchaseFeedback('Bigger Cup', cupCost);
@@ -1275,6 +1370,12 @@ function upgradeCup() {
         sps = new Decimal(0);
         sps = sps.plus(strawSPS.times(straws));
         sps = sps.plus(cupSPS.times(cups));
+        
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -1287,6 +1388,11 @@ function buySuction() {
         suctions = suctions.plus(1);
         sips = sips.minus(suctionCost);
         suctionClickBonus = new Decimal(0.2).times(suctions);
+        
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
         
         // Show purchase feedback
         showPurchaseFeedback('Improved Suction', suctionCost);
@@ -1304,6 +1410,11 @@ function upgradeSuction() {
         suctionUpCounter = suctionUpCounter.plus(1);
         suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
         
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -1315,6 +1426,11 @@ function buyFasterDrinks() {
         fasterDrinks = fasterDrinks.plus(1);
         sips = sips.minus(fasterDrinksCost);
         updateDrinkRate();
+        
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
         
         // Show purchase feedback
         showPurchaseFeedback('Faster Drinks', fasterDrinksCost);
@@ -1330,6 +1446,12 @@ function upgradeFasterDrinks() {
         sips = sips.minus(fasterDrinksUpCost);
         fasterDrinksUpCounter = fasterDrinksUpCounter.plus(1);
         updateDrinkRate();
+        
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -1343,6 +1465,11 @@ function buyCriticalClick() {
         
         // Increase critical click chance by 0.005% (0.00005) per purchase
         criticalClickChance = criticalClickChance.plus(0.00005);
+        
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
         
         // Show purchase feedback
         showPurchaseFeedback('Critical Click', criticalClickCost);
@@ -1361,6 +1488,11 @@ function upgradeCriticalClick() {
         // Increase critical click multiplier by 2x per upgrade
         criticalClickMultiplier = criticalClickMultiplier.plus(2);
         
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
+        
         reload();
         checkUpgradeAffordability();
     }
@@ -1375,10 +1507,15 @@ function levelUp() {
         // Calculate sips gained from level up (100% increase)
         const sipsGained = sps;
         
+        // Play purchase sound
+        if (clickSoundsEnabled) {
+            playPurchaseSound();
+        }
+        
         // Update displays
         document.getElementById("sips").innerHTML = prettify(sips);
         document.getElementById("levelNumber").innerHTML = level.toNumber();
-        document.getElementById("sps").innerHTML = prettify(sps);
+        document.getElementById("sips").innerHTML = prettify(sips);
         
         // Show level up feedback
         showLevelUpFeedback(sipsGained);
@@ -2115,11 +2252,11 @@ function initMusicPlayer() {
     
     audio.addEventListener('loadstart', () => {
         musicStatus.textContent = 'Loading stream...';
-        updateStreamInfo();
     });
     
     audio.addEventListener('canplay', () => {
         musicStatus.textContent = 'Click to start music';
+        // Only update stream info when stream actually changes
         updateStreamInfo();
     });
     
@@ -2128,19 +2265,20 @@ function initMusicPlayer() {
     });
     
     audio.addEventListener('load', () => {
+        // Only update stream info when stream actually changes
         updateStreamInfo();
     });
     
     audio.addEventListener('loadeddata', () => {
-        updateStreamInfo();
+        // Don't update stream info on every data load
     });
     
     audio.addEventListener('playing', () => {
-        updateStreamInfo();
+        // Don't update stream info on every play event
     });
     
     audio.addEventListener('progress', () => {
-        updateStreamInfo();
+        // Don't update stream info on every progress event
     });
     
     // Store audio reference
@@ -2158,6 +2296,7 @@ function initMusicPlayer() {
         if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
             // Don't auto-play, just show ready state
             musicStatus.textContent = 'Click to start music';
+            // Only update stream info once on initialization
             updateStreamInfo();
         }
     }, 1000);
@@ -2195,7 +2334,8 @@ function updateStreamInfo() {
         musicStatus.textContent = 'Click to start music';
     }
     
-    console.log('Stream info updated:', streamDetails);
+    // Only log stream info updates when debugging is needed
+    // console.log('Stream info updated:', streamDetails);
 }
 
 // Function to get detailed information about streams
@@ -2292,8 +2432,7 @@ function toggleMusic() {
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 state.isPlaying = true;
-                // Show detailed stream information
-                updateStreamInfo();
+                // Don't update stream info on every play - only when stream changes
                 updateMusicPlayerUI();
             }).catch(error => {
                 console.log('Auto-play prevented:', error);
@@ -2376,7 +2515,7 @@ function loadFallbackMusic() {
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 state.isPlaying = true;
-                // Show detailed fallback stream information
+                // Only update stream info when switching to fallback source
                 updateStreamInfo();
                 updateMusicPlayerUI();
             }).catch(error => {
@@ -2418,6 +2557,8 @@ window.getTempleOSResponse = getTempleOSResponse;
     window.toggleClickSounds = toggleClickSounds;
     window.testClickSounds = testClickSounds;
     window.playCriticalClickSound = playCriticalClickSound;
+    window.playPurchaseSound = playPurchaseSound;
+    window.testPurchaseSound = testPurchaseSound;
 
 // Function to test click sounds
 function testClickSounds() {
@@ -2441,6 +2582,28 @@ function testClickSounds() {
     setTimeout(() => playBubbleStrawSipSound(), 500);
     
     console.log('Sound test complete! Check console for any errors.');
+}
+
+// Function to test purchase sound
+function testPurchaseSound() {
+    console.log('=== PURCHASE SOUND TEST ===');
+    
+    if (!audioContext) {
+        console.log('Audio context not initialized, creating...');
+        initAudioContext();
+    }
+    
+    if (!clickSoundsEnabled) {
+        console.log('Click sounds are disabled, enabling...');
+        clickSoundsEnabled = true;
+    }
+    
+    console.log('Testing purchase sound...');
+    
+    // Test purchase sound
+    playPurchaseSound();
+    
+    console.log('Purchase sound test complete! Check console for any errors.');
 }
 
 // Debug function to test audio element
