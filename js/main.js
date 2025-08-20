@@ -219,9 +219,9 @@ let lastDrinkTime = Date.now();
 let fasterDrinks = new Decimal(0);
 let fasterDrinksUpCounter = new Decimal(1);
 
-// Critical Click system variables
-let criticalClickChance = new Decimal(0.0001); // 0.01% base chance
-let criticalClickMultiplier = new Decimal(10); // 10x multiplier for critical hits
+// Critical Click system variables - IMPROVED BALANCE
+let criticalClickChance = new Decimal(0.001); // 0.1% base chance (10x higher)
+let criticalClickMultiplier = new Decimal(5); // 5x multiplier (more balanced)
 let criticalClicks = new Decimal(0); // Total critical clicks achieved
 let criticalClickUpCounter = new Decimal(1); // Upgrade counter for critical chance
 
@@ -389,17 +389,18 @@ window.switchTab = switchTab;
 
 // Check if upgrades are affordable and update UI accordingly
 function checkUpgradeAffordability() {
-    const strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
-    const cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
-    const suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
-    const fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
-    const criticalClickCost = Math.floor(75 * Math.pow(1.15, criticalClicks.toNumber()));
-    const strawUpCost = 200 * strawUpCounter.toNumber();
-    const cupUpCost = 500 * cupUpCounter.toNumber();
-    const suctionUpCost = 1000 * suctionUpCounter.toNumber();
-    const fasterDrinksUpCost = 2000 * fasterDrinksUpCounter.toNumber();
-    const criticalClickUpCost = 1500 * criticalClickUpCounter.toNumber();
-    const levelUpCost = 5000 * level.toNumber();
+    // IMPROVED BALANCE: Updated costs to match new progression system
+    const strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber()));
+    const cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber()));
+    const suctionCost = Math.floor(40 * Math.pow(1.12, suctions.toNumber()));
+    const fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber()));
+    const criticalClickCost = Math.floor(60 * Math.pow(1.12, criticalClicks.toNumber()));
+    const strawUpCost = 150 * strawUpCounter.toNumber();
+    const cupUpCost = 400 * cupUpCounter.toNumber();
+    const suctionUpCost = 800 * suctionUpCounter.toNumber();
+    const fasterDrinksUpCost = 1500 * fasterDrinksUpCounter.toNumber();
+    const criticalClickUpCost = 1200 * criticalClickUpCounter.toNumber();
+    const levelUpCost = 3000 * Math.pow(1.15, level.toNumber());
     
     // Update button states based on affordability
     updateButtonState('buyStraw', sips.gte(strawCost), strawCost);
@@ -483,8 +484,8 @@ function initGame() {
             cupUpCounter = new Decimal(savegame.cupUpCounter || 1);
             suctionUpCounter = new Decimal(savegame.suctionUpCounter || 1);
             fasterDrinksUpCounter = new Decimal(savegame.fasterDrinksUpCounter || 1);
-            criticalClickChance = new Decimal(savegame.criticalClickChance || 0.0001);
-            criticalClickMultiplier = new Decimal(savegame.criticalClickMultiplier || 10);
+            criticalClickChance = new Decimal(savegame.criticalClickChance || 0.001);
+            criticalClickMultiplier = new Decimal(savegame.criticalClickMultiplier || 5);
             criticalClicks = new Decimal(savegame.criticalClicks || 0);
             criticalClickUpCounter = new Decimal(savegame.criticalClickUpCounter || 1);
             suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
@@ -1514,11 +1515,12 @@ function spsClick(amount) {
 }
 
 function buyStraw() {
-    let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
+    // IMPROVED BALANCE: Better early game progression
+    let strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber())); // Reduced from 10, gentler scaling
     if (sips.gte(strawCost)) {
         straws = straws.plus(1);
         sips = sips.minus(strawCost);
-        strawSPS = new Decimal(0.4).times(strawUpCounter);
+        strawSPS = new Decimal(0.6).times(strawUpCounter); // Increased from 0.4 for better early game
         sps = strawSPS.times(straws).plus(cupSPS.times(cups));
         
         // Play purchase sound
@@ -1535,11 +1537,12 @@ function buyStraw() {
 }
 
 function upgradeStraw() {
-    let strawUpCost = 200 * strawUpCounter.toNumber();
+    // IMPROVED BALANCE: More affordable upgrades
+    let strawUpCost = 150 * strawUpCounter.toNumber(); // Reduced from 200
     if (sips.gte(strawUpCost)) {
         sips = sips.minus(strawUpCost);
         strawUpCounter = strawUpCounter.plus(1);
-        strawSPS = new Decimal(0.4).times(strawUpCounter);
+        strawSPS = new Decimal(0.6).times(strawUpCounter); // Increased base value
         sps = new Decimal(0);
         sps = sps.plus(strawSPS.times(straws));
         sps = sps.plus(cupSPS.times(cups));
@@ -1555,11 +1558,12 @@ function upgradeStraw() {
 }
 
 function buyCup() {
-    let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
+    // IMPROVED BALANCE: Better mid-game progression
+    let cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber())); // Reduced from 20, gentler scaling
     if (sips.gte(cupCost)) {
         cups = cups.plus(1);
         sips = sips.minus(cupCost);
-        cupSPS = new Decimal(cupUpCounter.toNumber());
+        cupSPS = new Decimal(1.2).times(cupUpCounter.toNumber()); // Increased from 1.0 for better value
         sps = strawSPS.times(straws).plus(cupSPS.times(cups));
         
         // Play purchase sound
@@ -1576,11 +1580,12 @@ function buyCup() {
 }
 
 function upgradeCup() {
-    let cupUpCost = 500 * cupUpCounter.toNumber();
+    // IMPROVED BALANCE: More affordable upgrades
+    let cupUpCost = 400 * cupUpCounter.toNumber(); // Reduced from 500
     if (sips.gte(cupUpCost)) {
         sips = sips.minus(cupUpCost);
         cupUpCounter = cupUpCounter.plus(1);
-        cupSPS = new Decimal(cupUpCounter.toNumber());
+        cupSPS = new Decimal(1.2).times(cupUpCounter.toNumber()); // Increased base value
         sps = new Decimal(0);
         sps = sps.plus(strawSPS.times(straws));
         sps = sps.plus(cupSPS.times(cups));
@@ -1596,12 +1601,13 @@ function upgradeCup() {
 }
 
 function buySuction() {
-    let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
+    // IMPROVED BALANCE: Better click bonus progression
+    let suctionCost = Math.floor(40 * Math.pow(1.12, suctions.toNumber())); // Reduced from 50, gentler scaling
     
     if (sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
         sips = sips.minus(suctionCost);
-        suctionClickBonus = new Decimal(0.2).times(suctions);
+        suctionClickBonus = new Decimal(0.3).times(suctions); // Increased from 0.2 for better value
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1617,12 +1623,13 @@ function buySuction() {
 }
 
 function upgradeSuction() {
-    let suctionUpCost = 1000 * suctionUpCounter.toNumber();
+    // IMPROVED BALANCE: More affordable upgrades
+    let suctionUpCost = 800 * suctionUpCounter.toNumber(); // Reduced from 1000
     
     if (sips.gte(suctionUpCost)) {
         sips = sips.minus(suctionUpCost);
         suctionUpCounter = suctionUpCounter.plus(1);
-        suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
+        suctionClickBonus = new Decimal(0.3).times(suctionUpCounter); // Increased base value
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1635,7 +1642,8 @@ function upgradeSuction() {
 }
 
 function buyFasterDrinks() {
-    let fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
+    // IMPROVED BALANCE: Better drink speed progression
+    let fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber())); // Reduced from 100, gentler scaling
     if (sips.gte(fasterDrinksCost)) {
         fasterDrinks = fasterDrinks.plus(1);
         sips = sips.minus(fasterDrinksCost);
@@ -1655,7 +1663,8 @@ function buyFasterDrinks() {
 }
 
 function upgradeFasterDrinks() {
-    let fasterDrinksUpCost = 2000 * fasterDrinksUpCounter.toNumber();
+    // IMPROVED BALANCE: More affordable upgrades
+    let fasterDrinksUpCost = 1500 * fasterDrinksUpCounter.toNumber(); // Reduced from 2000
     if (sips.gte(fasterDrinksUpCost)) {
         sips = sips.minus(fasterDrinksUpCost);
         fasterDrinksUpCounter = fasterDrinksUpCounter.plus(1);
@@ -1672,13 +1681,14 @@ function upgradeFasterDrinks() {
 }
 
 function buyCriticalClick() {
-    let criticalClickCost = Math.floor(75 * Math.pow(1.15, criticalClicks.toNumber()));
+    // IMPROVED BALANCE: Better critical click progression
+    let criticalClickCost = Math.floor(60 * Math.pow(1.12, criticalClicks.toNumber())); // Reduced from 75, gentler scaling
     if (sips.gte(criticalClickCost)) {
         criticalClicks = criticalClicks.plus(1);
         sips = sips.minus(criticalClickCost);
         
-        // Increase critical click chance by 0.005% (0.00005) per purchase
-        criticalClickChance = criticalClickChance.plus(0.00005);
+        // Increase critical click chance by 0.01% (0.0001) per purchase - doubled from 0.005%
+        criticalClickChance = criticalClickChance.plus(0.0001);
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1694,7 +1704,8 @@ function buyCriticalClick() {
 }
 
 function upgradeCriticalClick() {
-    let criticalClickUpCost = 1500 * criticalClickUpCounter.toNumber();
+    // IMPROVED BALANCE: More affordable upgrades
+    let criticalClickUpCost = 1200 * criticalClickUpCounter.toNumber(); // Reduced from 1500
     if (sips.gte(criticalClickUpCost)) {
         sips = sips.minus(criticalClickUpCost);
         criticalClickUpCounter = criticalClickUpCounter.plus(1);
@@ -1713,13 +1724,17 @@ function upgradeCriticalClick() {
 }
 
 function levelUp() {
-    let levelUpCost = 5000 * level.toNumber();
+    // IMPROVED BALANCE: Better level up rewards and scaling
+    let levelUpCost = 3000 * Math.pow(1.15, level.toNumber()); // Reduced base cost, better scaling
     if (sips.gte(levelUpCost)) {
         sips = sips.minus(levelUpCost);
         level = level.plus(1);
         
-        // Calculate sips gained from level up (100% increase)
-        const sipsGained = sps;
+        // Calculate sips gained from level up (150% increase instead of 100%)
+        const sipsGained = sps.times(1.5);
+        
+        // Add bonus sips for leveling up
+        sips = sips.plus(sipsGained);
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1777,7 +1792,7 @@ function showLevelUpFeedback(sipsGained) {
 function checkLevelUp() {
     // This function checks if the player can afford to level up
     // It's called after each click to update the level up button state
-    const levelUpCost = 5000 * level.toNumber();
+    const levelUpCost = 3000 * Math.pow(1.15, level.toNumber()); // Updated to match new balance
     const levelUpButton = document.querySelector('button[onclick*="levelUp"]');
     
     if (levelUpButton) {
@@ -1894,8 +1909,8 @@ function delete_save() {
         fasterDrinksUpCounter = new Decimal(1);
         
         // Reset critical click system variables
-        criticalClickChance = new Decimal(0.0001);
-        criticalClickMultiplier = new Decimal(10);
+        criticalClickChance = new Decimal(0.001);
+        criticalClickMultiplier = new Decimal(5);
         criticalClicks = new Decimal(0);
         criticalClickUpCounter = new Decimal(1);
         
