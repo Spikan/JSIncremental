@@ -14,7 +14,7 @@ html {
 
 body {
     background-color: #001789;
-    color: #02D97F;
+    color: #00B36B;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -68,7 +68,7 @@ body {
 }
 
 .splash-subtitle {
-    color: #02D97F;
+    color: #00B36B;
     font-size: clamp(2rem, 10vw, 48px);
     margin: 10px 0 0 0;
     text-shadow: 2px 2px 0px #000;
@@ -90,7 +90,7 @@ body {
     text-align: center;
     margin: 20px 0;
     font-size: 1.2rem;
-    color: #02D97F;
+    color: #00B36B;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     animation: blink 2s infinite;
 }
@@ -101,8 +101,8 @@ body {
 }
 
 .splash-start-btn {
-    background: linear-gradient(135deg, #02D97F, #00B36B);
-    border: 3px solid #00B36B;
+    background: linear-gradient(135deg, #00B36B, #008F5A);
+    border: 3px solid #008F5A;
     border-radius: 15px;
     padding: 15px 30px;
     font-size: 1.5rem;
@@ -111,20 +111,20 @@ body {
     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(2, 217, 127, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 179, 107, 0.4);
     min-width: 200px;
     min-height: 60px;
 }
 
 .splash-start-btn:hover {
-    background: linear-gradient(135deg, #00B36B, #02D97F);
+    background: linear-gradient(135deg, #008F5A, #00B36B);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(2, 217, 127, 0.6);
+    box-shadow: 0 6px 20px rgba(0, 179, 107, 0.6);
 }
 
 .splash-start-btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(2, 217, 127, 0.4);
+    box-shadow: 0 2px 10px rgba(0, 179, 107, 0.4);
 }
 
 .splash-version {
@@ -178,9 +178,9 @@ body {
     min-height: 50px;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     background-color: #001789;
-    color: #02D97F;
+    color: #00B36B;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -188,16 +188,16 @@ body {
 }
 
 .tab-btn:hover {
-    background-color: #02D97F;
+    background-color: #00B36B;
     color: #001789;
     transform: translateY(-2px);
 }
 
 .tab-btn.active {
-    background-color: #02D97F;
+    background-color: #00B36B;
     color: #001789;
     border-color: #FF3D02;
-    box-shadow: 0 4px 8px rgba(2, 217, 127, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 179, 107, 0.3);
 }
 
 .tab-btn:active {
@@ -223,7 +223,7 @@ body {
 
 .options-section {
     background: rgba(0, 23, 137, 0.3);
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -248,16 +248,16 @@ body {
     min-height: 44px;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     background-color: #001789;
-    color: #02D97F;
+    color: #00B36B;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .save-btn:hover {
-    background-color: #02D97F;
+    background-color: #00B36B;
     color: #001789;
 }
 
@@ -277,7 +277,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
-    color: #02D97F;
+    color: #00B36B;
     font-weight: bold;
 }
 
@@ -307,7 +307,7 @@ body {
 }
 
 .autosave-toggle input[type="checkbox"]:checked + .toggle-slider {
-    background-color: #02D97F;
+    background-color: #00B36B;
 }
 
 .autosave-toggle input[type="checkbox"]:checked + .toggle-slider:before {
@@ -322,15 +322,15 @@ body {
 }
 
 .autosave-interval label {
-    color: #02D97F;
+    color: #00B36B;
     font-weight: bold;
 }
 
 .autosave-interval select {
     padding: 0.5rem;
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     background-color: #001789;
-    color: #02D97F;
+    color: #00B36B;
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
@@ -345,13 +345,13 @@ body {
 .autosave-status {
     text-align: center;
     padding: 0.5rem;
-    background: rgba(2, 217, 127, 0.1);
+    background: rgba(0, 179, 107, 0.1);
     border-radius: 6px;
-    border: 1px solid #02D97F;
+    border: 1px solid #00B36B;
 }
 
 .autosave-status span {
-    color: #02D97F;
+    color: #00B36B;
     font-weight: bold;
 }
 
@@ -367,13 +367,13 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem;
-    background: rgba(2, 217, 127, 0.1);
+    background: rgba(0, 179, 107, 0.1);
     border-radius: 6px;
-    border: 1px solid #02D97F;
+    border: 1px solid #00B36B;
 }
 
 .info-label {
-    color: #02D97F;
+    color: #00B36B;
     font-weight: bold;
 }
 
@@ -391,7 +391,7 @@ body {
 
 .stats-section {
     background: rgba(0, 23, 137, 0.3);
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -411,8 +411,8 @@ body {
 }
 
 .stat-card {
-    background: rgba(2, 217, 127, 0.1);
-    border: 1px solid #02D97F;
+    background: rgba(0, 179, 107, 0.1);
+    border: 1px solid #00B36B;
     border-radius: 8px;
     padding: 1rem;
     display: flex;
@@ -422,9 +422,9 @@ body {
 }
 
 .stat-card:hover {
-    background: rgba(2, 217, 127, 0.2);
+    background: rgba(0, 179, 107, 0.2);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(2, 217, 127, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3);
 }
 
 .stat-icon {
@@ -445,7 +445,7 @@ body {
 }
 
 .stat-label {
-    color: #02D97F;
+    color: #00B36B;
     font-size: 0.9rem;
     font-weight: bold;
     margin-bottom: 0.25rem;
@@ -466,11 +466,11 @@ body {
 /* Drink Progress Bar */
 .drink-progress-container {
     background: rgba(0, 23, 137, 0.3);
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     border-radius: 12px;
     margin: 1rem 0.5rem;
     padding: 1rem;
-    box-shadow: 0 4px 12px rgba(2, 217, 127, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.2);
 }
 
 .drink-info {
@@ -478,7 +478,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.75rem;
-    color: #02D97F;
+    color: #00B36B;
     font-weight: bold;
 }
 
@@ -497,12 +497,12 @@ body {
     background: rgba(0, 23, 137, 0.5);
     border-radius: 6px;
     overflow: hidden;
-    border: 1px solid #02D97F;
+    border: 1px solid #00B36B;
 }
 
 .drink-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #02D97F, #00FF88);
+    background: linear-gradient(90deg, #00B36B, #00D97F);
     width: 0%;
     transition: width 0.2s ease; /* Increased from 0.1s for smoother animation */
     border-radius: 6px;
@@ -658,14 +658,14 @@ h3 {
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 1rem;
-    background-color: rgba(2, 217, 127, 0.1);
+    background-color: rgba(0, 179, 107, 0.1);
     border-radius: 8px;
-    border: 1px solid #02D97F;
+    border: 1px solid #00B36B;
 }
 
 .stat-label {
     font-weight: bold;
-    color: #02D97F;
+    color: #00B36B;
 }
 
 .stat-value {
@@ -734,17 +734,17 @@ h3 {
 
 .shop-item {
     background: rgba(0, 23, 137, 0.4);
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     border-radius: 12px;
     padding: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(2, 217, 127, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.1);
 }
 
 .shop-item:hover {
     background: rgba(0, 23, 137, 0.5);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(2, 217, 127, 0.2);
+    box-shadow: 0 6px 16px rgba(0, 179, 107, 0.2);
 }
 
 .shop-header {
@@ -758,9 +758,9 @@ h3 {
     padding: 0.875rem 1.25rem;
     font-size: 1rem;
     font-weight: bold;
-    border: 3px solid #02D97F;
+    border: 3px solid #00B36B;
     background-color: #001789;
-    color: #02D97F;
+    color: #00B36B;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -769,7 +769,7 @@ h3 {
 }
 
 .shop-btn:hover {
-    background-color: #02D97F;
+    background-color: #00B36B;
     color: #001789;
     transform: scale(1.02);
 }
@@ -779,9 +779,9 @@ h3 {
 }
 
 .shop-btn.affordable {
-    background-color: #02D97F;
+    background-color: #00B36B;
     color: #001789;
-    box-shadow: 0 0 20px rgba(2, 217, 127, 0.6);
+    box-shadow: 0 0 20px rgba(0, 179, 107, 0.6);
     animation: affordableGlow 2s ease-in-out infinite alternate;
 }
 
@@ -799,9 +799,9 @@ h3 {
     gap: 0.75rem;
     margin-bottom: 1rem;
     padding: 0.75rem;
-    background: rgba(2, 217, 127, 0.1);
+    background: rgba(0, 179, 107, 0.1);
     border-radius: 8px;
-    border: 1px solid rgba(2, 217, 127, 0.3);
+    border: 1px solid rgba(0, 179, 107, 0.3);
 }
 
 .shop-stat {
@@ -809,12 +809,12 @@ h3 {
     padding: 0.5rem;
     background: rgba(0, 23, 137, 0.3);
     border-radius: 6px;
-    border: 1px solid rgba(2, 217, 127, 0.2);
+    border: 1px solid rgba(0, 179, 107, 0.2);
 }
 
 .stat-label {
     display: block;
-    color: #02D97F;
+    color: #00B36B;
     font-size: 0.8rem;
     font-weight: bold;
     margin-bottom: 0.25rem;
@@ -876,7 +876,7 @@ h3 {
 
 /* Cost display styling */
 .cost-affordable {
-    color: #02D97F !important;
+    color: #00B36B !important;
     font-weight: bold;
 }
 
@@ -897,10 +897,10 @@ h3 {
 /* Affordable Glow Animation */
 @keyframes affordableGlow {
     from {
-        box-shadow: 0 0 20px rgba(2, 217, 127, 0.6);
+        box-shadow: 0 0 20px rgba(0, 179, 107, 0.6);
     }
     to {
-        box-shadow: 0 0 30px rgba(2, 217, 127, 0.8), 0 0 40px rgba(2, 217, 127, 0.4);
+        box-shadow: 0 0 30px rgba(0, 179, 107, 0.8), 0 0 40px rgba(0, 179, 107, 0.4);
     }
 }
 
@@ -1217,7 +1217,7 @@ h3 {
 /* Click Feedback Animation */
 .click-feedback {
     position: absolute;
-    color: #02D97F;
+    color: #00B36B;
     font-size: 1.2rem;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
@@ -1348,11 +1348,11 @@ h3 {
 
 .chat-container {
     background: rgba(0, 23, 137, 0.3);
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     border-radius: 16px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 8px 24px rgba(2, 217, 127, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 179, 107, 0.2);
 }
 
 .chat-messages {
@@ -1362,7 +1362,7 @@ h3 {
     padding: 1rem;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 12px;
-    border: 1px solid rgba(2, 217, 127, 0.3);
+    border: 1px solid rgba(0, 179, 107, 0.3);
 }
 
 .message {
@@ -1385,7 +1385,7 @@ h3 {
     justify-content: center;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     flex-shrink: 0;
 }
 
@@ -1395,7 +1395,7 @@ h3 {
 }
 
 .message-sender {
-    color: #02D97F;
+    color: #00B36B;
     font-weight: bold;
     font-size: 0.9rem;
     margin-bottom: 0.25rem;
@@ -1446,9 +1446,9 @@ h3 {
 .chat-input {
     flex: 1;
     padding: 0.875rem 1rem;
-    border: 2px solid #02D97F;
+    border: 2px solid #00B36B;
     background-color: #001789;
-    color: #02D97F;
+    color: #00B36B;
     border-radius: 8px;
     font-size: 1rem;
     outline: none;
@@ -1461,7 +1461,7 @@ h3 {
 }
 
 .chat-input::placeholder {
-    color: rgba(2, 217, 127, 0.6);
+    color: rgba(0, 179, 107, 0.6);
 }
 
 .chat-send-btn {
@@ -1510,7 +1510,7 @@ h3 {
     max-width: 100%;
     max-height: 200px;
     border-radius: 8px;
-    border: 2px solid rgba(2, 217, 127, 0.3);
+    border: 2px solid rgba(0, 179, 107, 0.3);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
