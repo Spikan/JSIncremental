@@ -1234,7 +1234,7 @@ function addUserMessage(message) {
     scrollToBottom();
 }
 
-function addGodMessage(content, isGif = false) {
+function addGodMessage(content, isGif = false, isTempleOS = false) {
     const chatMessages = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message god-message';
@@ -1245,6 +1245,17 @@ function addGodMessage(content, isGif = false) {
             <div class="message-avatar">👑</div>
             <div class="message-content">
                 <div class="message-sender">God</div>
+                <div class="message-text">${content}</div>
+            </div>
+        `;
+    } else if (isTempleOS) {
+        messageDiv.classList.add('templeos-message');
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                <img src="images/templeos.jpg" alt="TempleOS God" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+            </div>
+            <div class="message-content">
+                <div class="message-sender">TempleOS God</div>
                 <div class="message-text">${content}</div>
             </div>
         `;
@@ -1287,7 +1298,7 @@ async function getGodResponse(userMessage) {
                     <div style="color: #00FF00;">> ------------------------</div>
                     ${templeResponse}
                 </div>
-            `);
+            `, false, true); // Pass true to indicate TempleOS mode
             return; // Exit early for TempleOS mode
         }
         
@@ -1346,7 +1357,7 @@ async function getGodResponse(userMessage) {
                     <p style="color: #FF8E53; font-style: italic; margin-top: 1rem;">TempleOS mode: Divine wisdom in 32-bit precision! 🏛️</p>
                     <p style="color: #00FF00; font-size: 0.9em; margin-top: 0.5rem;">Type anything to get TempleOS God responses. Type "exit" to return to normal God.</p>
                 </div>
-            `);
+            `, false, true); // Use TempleOS profile picture
             return; // Exit early for the TempleOS response
         }
         
@@ -1359,7 +1370,7 @@ async function getGodResponse(userMessage) {
                     <p style="color: #00FF00;">> Returning to normal God mode...</p>
                     <p style="color: #FF8E53; font-style: italic; margin-top: 1rem;">Normal God has been restored. Type "temple" to reactivate TempleOS mode.</p>
                 </div>
-            `);
+            `, false, true); // Use TempleOS profile picture for the exit message
             return; // Exit early for the exit response
         }
         
