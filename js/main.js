@@ -1536,8 +1536,8 @@ function initMusicPlayer() {
     
     // Create audio element for lofi stream
     const audio = new Audio();
-    // Use Lofi Girl's direct stream for authentic lofi beats
-    audio.src = 'https://lofimusic.app/lofigirl';
+    // Use a working lofi stream for authentic lofi beats
+    audio.src = 'https://ice1.somafm.com/groovesalad-128-mp3';
     audio.loop = true;
     audio.volume = 0.3; // Start at 30% volume
     
@@ -1632,30 +1632,6 @@ function updateStreamInfo() {
 function getStreamDetails(streamUrl) {
     const url = streamUrl.toLowerCase();
     
-    // Lofi Girl streams
-    if (url.includes('lofimusic.app') && url.includes('lofigirl')) {
-        return {
-            name: 'Lofi Girl',
-            description: 'Lofi beats to study/relax to',
-            genre: 'Lofi Hip Hop',
-            quality: 'High Quality',
-            location: 'France',
-            type: 'Lofi Radio'
-        };
-    }
-    
-    // BBC Radio streams
-    if (url.includes('bbc.co.uk')) {
-        return {
-            name: 'BBC Radio',
-            description: 'Live Radio Stream',
-            genre: 'Radio',
-            quality: 'High Quality',
-            location: 'UK',
-            type: 'Live Broadcast'
-        };
-    }
-    
     // SomaFM streams
     if (url.includes('somafm.com')) {
         if (url.includes('groovesalad')) {
@@ -1676,11 +1652,20 @@ function getStreamDetails(streamUrl) {
                 location: 'San Francisco',
                 type: 'Lofi Radio'
             };
-        } else if (url.includes('space')) {
+        } else if (url.includes('dronezone')) {
             return {
-                name: 'Space Station',
-                description: 'Space music and ambient',
-                genre: 'Space/Ambient',
+                name: 'Drone Zone',
+                description: 'Atmospheric textures and beats',
+                genre: 'Drone/Ambient',
+                quality: '128k MP3',
+                location: 'San Francisco',
+                type: 'Lofi Radio'
+            };
+        } else if (url.includes('illstreet')) {
+            return {
+                name: 'Ill Street',
+                description: 'Lofi hip hop and chill beats',
+                genre: 'Lofi Hip Hop',
                 quality: '128k MP3',
                 location: 'San Francisco',
                 type: 'Lofi Radio'
@@ -1804,10 +1789,10 @@ function updateMusicPlayerUI() {
 function loadFallbackMusic() {
     // Try alternative lofi sources if the main one fails
     const fallbackSources = [
-        'https://lofimusic.app/lofigirl', // Lofi Girl direct stream
         'https://ice1.somafm.com/groovesalad-128-mp3', // SomaFM Groove Salad
         'https://ice1.somafm.com/defcon-128-mp3', // SomaFM DEF CON
-        'https://ice1.somafm.com/space-128-mp3' // SomaFM Space Station
+        'https://ice1.somafm.com/dronezone-128-mp3', // SomaFM Drone Zone
+        'https://ice1.somafm.com/illstreet-128-mp3' // SomaFM Ill Street
     ];
     
     const state = window.musicPlayerState;
