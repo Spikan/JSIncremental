@@ -133,12 +133,8 @@ const DOM_CACHE = {
     fasterDrinksOwned: null,
     currentDrinkSpeed: null,
     drinkSpeedBonus: null,
-    prominentSips: null,
-    prominentSPS: null,
-    prominentClickBonus: null,
-    prominentCriticalChance: null,
+    critChance: null,
     levelUpDiv: null,
-    mainSipCounter: null,
     
     // Initialize all cached elements
     init: function() {
@@ -178,12 +174,8 @@ const DOM_CACHE = {
         this.fasterDrinksOwned = document.getElementById('fasterDrinksOwned');
         this.currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
         this.drinkSpeedBonus = document.getElementById('drinkSpeedBonus');
-        this.prominentSips = document.getElementById('prominentSips');
-        this.prominentSPS = document.getElementById('prominentSPS');
-        this.prominentClickBonus = document.getElementById('prominentClickBonus');
-        this.prominentCriticalChance = document.getElementById('prominentCriticalChance');
+        this.critChance = document.getElementById('critChance');
         this.levelUpDiv = document.getElementById('levelUpDiv');
-        this.mainSipCounter = document.getElementById('mainSipCounter');
         
         console.log('DOM cache initialized with', Object.keys(this).filter(key => key !== 'init').length, 'elements');
     },
@@ -521,8 +513,8 @@ function initGame() {
         // Start the game loop
         startGameLoop();
         
-        // Update prominent stats header with initial values
-        updateProminentStats();
+        // Update crit chance stat with initial value
+        updateCritChance();
         
         // Initialize music player
         initMusicPlayer();
@@ -1364,36 +1356,13 @@ function updateDrinkSpeedDisplay() {
     }
 }
 
-// Function to update prominent stats header (visible in all tabs)
-function updateProminentStats() {
-    const prominentSips = DOM_CACHE.prominentSips;
-    const prominentSPS = DOM_CACHE.prominentSPS;
-    const prominentClickBonus = DOM_CACHE.prominentClickBonus;
-    const prominentCriticalChance = DOM_CACHE.prominentCriticalChance;
-    const mainSipCounter = DOM_CACHE.mainSipCounter;
+// Function to update crit chance stat
+function updateCritChance() {
+    const critChance = DOM_CACHE.critChance;
     
-    if (prominentSips) {
-        prominentSips.textContent = prettify(sips);
-    }
-    
-    if (prominentSPS) {
-        prominentSPS.textContent = prettify(sps);
-    }
-    
-    if (prominentClickBonus) {
-        // Calculate total click bonus (base 1 + suction bonus)
-        const totalClickBonus = new Decimal(1).plus(suctionClickBonus);
-        prominentClickBonus.textContent = prettify(totalClickBonus);
-    }
-    
-    if (prominentCriticalChance) {
+    if (critChance) {
         // Display critical click chance as percentage
-        prominentCriticalChance.textContent = (criticalClickChance.times(100)).toFixed(4) + '%';
-    }
-    
-    // Update main sip counter (prominent display above soda button)
-    if (mainSipCounter) {
-        mainSipCounter.textContent = prettify(sips);
+        critChance.textContent = (criticalClickChance.times(100)).toFixed(4) + '%';
     }
 }
 
@@ -1444,8 +1413,8 @@ function sodaClick(number) {
             sipsElement.innerHTML = prettify(sips);
         }
         
-        // Update prominent stats header
-        updateProminentStats();
+        // Update crit chance stat
+        updateCritChance();
         
         // Show click feedback
         showClickFeedback(totalSipsGained, isCritical);
@@ -1526,8 +1495,8 @@ function spsClick(amount) {
     
     DOM_CACHE.sips.innerHTML = prettify(sips);
     
-    // Update prominent stats header
-    updateProminentStats();
+    // Update crit chance stat
+    updateCritChance();
 }
 
 function buyStraw() {
@@ -1936,7 +1905,7 @@ function delete_save() {
         
         // Update the UI to reflect the reset
         reload();
-        updateProminentStats();
+        updateCritChance();
         updateAllStats();
         checkUpgradeAffordability();
         
@@ -2027,8 +1996,8 @@ function reload() {
         // Update drink speed display
         updateDrinkSpeedDisplay();
         
-        // Update prominent stats header (visible in all tabs)
-        updateProminentStats();
+        // Update crit chance stat
+        updateCritChance();
         
         // Check affordability after reloading all values
         checkUpgradeAffordability();
@@ -3258,7 +3227,7 @@ window.addEventListener('beforeunload', () => {
 window.updateAllStats = updateAllStats;
 window.updateDrinkRate = updateDrinkRate;
 window.updateDrinkSpeedDisplay = updateDrinkSpeedDisplay;
-window.updateProminentStats = updateProminentStats;
+window.updateCritChance = updateCritChance;
 window.loadOptions = loadOptions;
 window.updatePlayTime = updatePlayTime;
 window.updateLastSaveTime = updateLastSaveTime;

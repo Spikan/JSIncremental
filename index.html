@@ -70,38 +70,6 @@
     <button class="tab-btn" onclick="switchTab('options', event)">⚙️ Options</button>
 </div>
 
-    <!-- Prominent Stats Header -->
-    <div class="prominent-stats-header">
-        <div class="prominent-stat">
-            <div class="prominent-stat-icon">🥤</div>
-            <div class="prominent-stat-content">
-                <div class="prominent-stat-label">Total Sips</div>
-                <div class="prominent-stat-value" id="prominentSips">0</div>
-            </div>
-        </div>
-        <div class="prominent-stat">
-            <div class="prominent-stat-icon">⚡</div>
-            <div class="prominent-stat-content">
-                <div class="prominent-stat-label">Sips per Drink</div>
-                <div class="prominent-stat-value" id="prominentSPS">0</div>
-            </div>
-        </div>
-        <div class="prominent-stat">
-            <div class="prominent-stat-icon">🎯</div>
-            <div class="prominent-stat-content">
-                <div class="prominent-stat-label">Sips per Click</div>
-                <div class="prominent-stat-value" id="prominentClickBonus">1</div>
-            </div>
-        </div>
-        <div class="prominent-stat">
-            <div class="prominent-stat-icon">💥</div>
-            <div class="prominent-stat-content">
-                <div class="prominent-stat-label">Critical Chance</div>
-                <div class="prominent-stat-value" id="prominentCriticalChance">0.01%</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Drink Progress Bar - Moved to Header -->
     <div class="drink-progress-container">
         <div class="drink-info">
@@ -116,12 +84,6 @@
 <!-- Soda Clicking Tab -->
 <div id="sodaTab" class="tab-content active">
     <div id="sodaDiv" class="center">
-        <!-- Prominent Sip Counter -->
-        <div class="prominent-sip-counter">
-            <div class="sip-counter-label">TOTAL SIPS</div>
-            <div class="sip-counter-value" id="mainSipCounter">0</div>
-        </div>
-        
         <div class="soda-container">
             <img src="images/regSoda.png" id="sodaButton" onclick="sodaClick(1)"
                  alt="a picture of soda for you to click"/>
@@ -136,6 +98,10 @@
                 <div class="stat-item">
                     <span class="stat-label">Sips/d:</span>
                     <span id="sps" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Crit Chance:</span>
+                    <span id="critChance" class="stat-value">0.01%</span>
                 </div>
             </div>
         </div>
