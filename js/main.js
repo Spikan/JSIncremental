@@ -89,11 +89,11 @@ const FEATURE_DETECTION = {
 // DOM Element Cache - Reduces repeated queries
 const DOM_CACHE = {
     // Game elements
-    sips: null,
     levelNumber: null,
     levelText: null,
     sodaButton: null,
     topSipValue: null,
+    topSipsPerDrink: null,
     
     // Music player elements
     musicPlayer: null,
@@ -132,16 +132,16 @@ const DOM_CACHE = {
     currentLevel: null,
     totalUpgrades: null,
     fasterDrinksOwned: null,
-    critChance: null,
     levelUpDiv: null,
     
     // Initialize all cached elements
     init: function() {
-        this.sips = document.getElementById('sips');
+
         this.levelNumber = document.getElementById('levelNumber');
         this.levelText = document.getElementById('levelText');
         this.sodaButton = document.getElementById('sodaButton');
         this.topSipValue = document.getElementById('topSipValue');
+        this.topSipsPerDrink = document.getElementById('topSipsPerDrink');
         this.musicPlayer = document.querySelector('.music-player');
         this.musicToggleBtn = document.getElementById('musicToggleBtn');
         this.musicMuteBtn = document.getElementById('musicMuteBtn');
@@ -172,7 +172,7 @@ const DOM_CACHE = {
         this.currentLevel = document.getElementById('currentLevel');
         this.totalUpgrades = document.getElementById('totalUpgrades');
         this.fasterDrinksOwned = document.getElementById('fasterDrinksOwned');
-        this.critChance = document.getElementById('critChance');
+
         this.levelUpDiv = document.getElementById('levelUpDiv');
         
         console.log('DOM cache initialized with', Object.keys(this).filter(key => key !== 'init').length, 'elements');
@@ -585,17 +585,16 @@ function initGame() {
         cupSPS = new Decimal(cupUpCounter.toNumber());
         suctionClickBonus = new Decimal(0.2).times(suctions);
         
-        // Initialize drink rate based on upgrades
-        updateDrinkRate();
+            // Initialize drink rate based on upgrades
+    updateDrinkRate();
+    
+    // Update the top sips per drink display
+    updateTopSipsPerDrink();
         
         console.log('Game variables initialized, calling reload...');
         
-        // Only call reload if we're sure the DOM is ready
-        if (DOM_CACHE.sips) {
-            reload();
-        } else {
-            console.log('DOM not ready yet, skipping reload');
-        }
+        // Call reload to initialize the game
+        reload();
         
         console.log('Starting game loop...');
         // Start the game loop
@@ -739,11 +738,34 @@ function updateDrinkRate() {
     newDrinkRate = Math.max(500, newDrinkRate);
     
     setDrinkRate(newDrinkRate);
+    
+    // Update the top sips per drink display
+    updateTopSipsPerDrink();
 }
 
 // Function to get current drink rate in seconds
 function getDrinkRateSeconds() {
     return drinkRate / 1000;
+}
+
+// Function to update the top sips per drink display
+function updateTopSipsPerDrink() {
+    const topSipsPerDrinkElement = DOM_CACHE.topSipsPerDrink;
+    if (topSipsPerDrinkElement) {
+        // Base sips per drink is 1, but this could be modified by future upgrades
+        const baseSipsPerDrink = 1;
+        topSipsPerDrinkElement.textContent = baseSipsPerDrink;
+    }
+}
+
+// Function to update the critical click chance display
+function updateCriticalClickDisplay() {
+    const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
+    if (criticalClickChanceCompact) {
+        // Display current critical click chance as percentage
+        const chancePercent = criticalClickChance.times(100).toFixed(3);
+        criticalClickChanceCompact.textContent = chancePercent;
+    }
 }
 
 // Auto-save management functions
@@ -1451,14 +1473,7 @@ function updateDrinkSpeedDisplay() {
 }
 
 // Function to update crit chance stat
-function updateCritChance() {
-    const critChance = DOM_CACHE.critChance;
-    
-    if (critChance) {
-        // Display critical click chance as percentage
-        critChance.textContent = (criticalClickChance.times(100)).toFixed(4) + '%';
-    }
-}
+
 
 let regSoda = new Image();
 regSoda.src = "images/regSoda.png";
@@ -1501,20 +1516,13 @@ function sodaClick(number) {
     
     // Batch DOM updates to reduce layout thrashing
     requestAnimationFrame(() => {
-        // Update display
-        const sipsElement = DOM_CACHE.sips;
-        if (sipsElement) {
-            sipsElement.innerHTML = prettify(sips);
-        }
+
         
         // Update top sip counter
         const topSipElement = DOM_CACHE.topSipValue;
         if (topSipElement) {
             topSipElement.innerHTML = prettify(sips);
         }
-        
-        // Update crit chance stat
-        updateCritChance();
         
         // Show click feedback
         showClickFeedback(totalSipsGained, isCritical);
@@ -1592,8 +1600,6 @@ function spsClick(amount) {
     if (currentSPS.gt(highestSipsPerSecond)) {
         highestSipsPerSecond = currentSPS;
     }
-    
-    DOM_CACHE.sips.innerHTML = prettify(sips);
     
     // Update top sip counter
     const topSipElement = DOM_CACHE.topSipValue;
@@ -1781,6 +1787,9 @@ function buyCriticalClick() {
         // Increase critical click chance by 0.01% (0.0001) per purchase - doubled from 0.005%
         criticalClickChance = criticalClickChance.plus(0.0001);
         
+        // Update critical click display
+        updateCriticalClickDisplay();
+        
         // Play purchase sound
         if (clickSoundsEnabled) {
             playPurchaseSound();
@@ -1833,7 +1842,6 @@ function levelUp() {
         }
         
         // Update displays
-        DOM_CACHE.sips.innerHTML = prettify(sips);
         DOM_CACHE.levelNumber.innerHTML = level.toNumber();
         
         // Update top sip counter
@@ -1992,7 +2000,14 @@ function delete_save() {
         
         // Reset drink system variables
         drinkRate = DEFAULT_DRINK_RATE;
-        drinkProgress = 0;
+    
+        // Update the top sips per drink display
+    updateTopSipsPerDrink();
+    
+    // Update critical click display
+    updateCriticalClickDisplay();
+    
+    drinkProgress = 0;
         lastDrinkTime = Date.now();
         
         // Reset faster drinks upgrade variables
@@ -2133,8 +2148,8 @@ function reload() {
         // Update drink speed display
         updateDrinkSpeedDisplay();
         
-        // Update crit chance stat
-        updateCritChance();
+        // Update critical click display
+        updateCriticalClickDisplay();
         
         // Check affordability after reloading all values
         checkUpgradeAffordability();
@@ -3363,8 +3378,9 @@ window.addEventListener('beforeunload', () => {
 // Make all other functions globally available to prevent undefined errors
 window.updateAllStats = updateAllStats;
 window.updateDrinkRate = updateDrinkRate;
+window.updateTopSipsPerDrink = updateTopSipsPerDrink;
+window.updateCriticalClickDisplay = updateCriticalClickDisplay;
 window.updateDrinkSpeedDisplay = updateDrinkSpeedDisplay;
-window.updateCritChance = updateCritChance;
 window.loadOptions = loadOptions;
 window.updatePlayTime = updatePlayTime;
 window.updateLastSaveTime = updateLastSaveTime;

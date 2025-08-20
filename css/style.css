@@ -881,6 +881,12 @@ h3 {
     color: #FF3D02;
 }
 
+.top-sip-separator {
+    margin: 0 0.5rem;
+    color: #00B36B;
+    font-weight: bold;
+}
+
 #sodaDiv {
     padding: 1rem;
     width: 100%;
