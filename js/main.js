@@ -703,15 +703,9 @@ function sodaClick(number) {
     // Track the click
     trackClick();
     
-    console.log('sodaClick called with number:', number);
-    console.log('Current suctionClickBonus:', suctionClickBonus.toString());
-    
     // Calculate total sips gained from this click
     const baseSips = new Decimal(number);
     const totalSipsGained = baseSips.plus(suctionClickBonus);
-    
-    console.log('Base sips:', baseSips.toString());
-    console.log('Total sips gained:', totalSipsGained.toString());
     
     // Add to total sips earned
     totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
@@ -866,53 +860,31 @@ function upgradeCup() {
 }
 
 function buySuction() {
-    console.log('buySuction called');
-    console.log('Current suctions:', suctions.toString());
-    console.log('Current suctionClickBonus:', suctionClickBonus.toString());
-    
     let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
-    console.log('Suction cost:', suctionCost);
-    console.log('Current sips:', sips.toString());
     
     if (sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
         sips = sips.minus(suctionCost);
         suctionClickBonus = new Decimal(0.2).times(suctions);
         
-        console.log('After purchase - suctions:', suctions.toString());
-        console.log('After purchase - suctionClickBonus:', suctionClickBonus.toString());
-        
         // Show purchase feedback
         showPurchaseFeedback('Improved Suction', suctionCost);
         
         reload();
         checkUpgradeAffordability();
-    } else {
-        console.log('Not enough sips for suction upgrade');
     }
 }
 
 function upgradeSuction() {
-    console.log('upgradeSuction called');
-    console.log('Current suctionUpCounter:', suctionUpCounter.toString());
-    console.log('Current suctionClickBonus:', suctionClickBonus.toString());
-    
     let suctionUpCost = 1000 * suctionUpCounter.toNumber();
-    console.log('Suction upgrade cost:', suctionUpCost);
-    console.log('Current sips:', sips.toString());
     
     if (sips.gte(suctionUpCost)) {
         sips = sips.minus(suctionUpCost);
         suctionUpCounter = suctionUpCounter.plus(1);
         suctionClickBonus = new Decimal(0.2).times(suctionUpCounter);
         
-        console.log('After upgrade - suctionUpCounter:', suctionUpCounter.toString());
-        console.log('After upgrade - suctionClickBonus:', suctionClickBonus.toString());
-        
         reload();
         checkUpgradeAffordability();
-    } else {
-        console.log('Not enough sips for suction upgrade');
     }
 }
 
@@ -1562,15 +1534,15 @@ function initMusicPlayer() {
     
     // Create audio element for lofi stream
     const audio = new Audio();
-    // Use a working lofi stream URL
-    audio.src = 'https://ice1.somafm.com/groovesalad-128-mp3';
+    // Use a more reliable lofi stream URL
+    audio.src = 'https://stream.live.bbc.co.uk/mediaselector/6/redir/version/2.0/mediaset/audio-syndication/proto/http/vpid/p08bq3g3.mp3';
     audio.loop = true;
     audio.volume = 0.3; // Start at 30% volume
     
     // Add error handling
     audio.addEventListener('error', (e) => {
         console.log('Audio error:', e);
-        musicStatus.textContent = 'Stream unavailable';
+        musicStatus.textContent = 'Stream unavailable - trying alternative...';
         loadFallbackMusic();
     });
     
@@ -1579,7 +1551,11 @@ function initMusicPlayer() {
     });
     
     audio.addEventListener('canplay', () => {
-        musicStatus.textContent = 'Ready to play';
+        musicStatus.textContent = 'Click to start music';
+    });
+    
+    audio.addEventListener('waiting', () => {
+        musicStatus.textContent = 'Buffering...';
     });
     
     // Store audio reference
@@ -1595,7 +1571,8 @@ function initMusicPlayer() {
     // Try to auto-play (may be blocked by browser)
     setTimeout(() => {
         if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
-            toggleMusic();
+            // Don't auto-play, just show ready state
+            musicStatus.textContent = 'Click to start music';
         }
     }, 1000);
     
@@ -1679,9 +1656,9 @@ function updateMusicPlayerUI() {
 function loadFallbackMusic() {
     // Try alternative lofi sources if the main one fails
     const fallbackSources = [
-        'https://stream.live.bbc.co.uk/mediaselector/6/redir/version/2.0/mediaset/audio-syndication/proto/http/vpid/p08bq3g3.mp3',
         'https://ice1.somafm.com/groovesalad-128-mp3',
-        'https://ice1.somafm.com/defcon-128-mp3'
+        'https://ice1.somafm.com/defcon-128-mp3',
+        'https://ice1.somafm.com/space-128-mp3'
     ];
     
     const state = window.musicPlayerState;
@@ -1689,6 +1666,19 @@ function loadFallbackMusic() {
         const randomSource = fallbackSources[Math.floor(Math.random() * fallbackSources.length)];
         state.audio.src = randomSource;
         musicStatus.textContent = 'Trying alternative source...';
+        
+        // Try to play the new source
+        const playPromise = state.audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                state.isPlaying = true;
+                musicStatus.textContent = 'Playing lofi beats...';
+                updateMusicPlayerUI();
+            }).catch(error => {
+                console.log('Fallback source also failed:', error);
+                musicStatus.textContent = 'Click to start music';
+            });
+        }
     }
 }
 
