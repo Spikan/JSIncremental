@@ -2384,9 +2384,11 @@ function addGodMessage(content) {
     // Always use TempleOS styling for consistency
     messageDiv.classList.add('templeos-message');
     messageDiv.innerHTML = `
-        <div class="message-avatar">🏛️</div>
+        <div class="message-avatar">
+            <img src="images/TempleOS.jpg" alt="God" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+        </div>
         <div class="message-content">
-            <div class="message-sender">TempleOS God</div>
+            <div class="message-sender">God</div>
             <div class="message-text">${content}</div>
         </div>
     `;
@@ -2418,15 +2420,7 @@ async function getGodResponse(userMessage) {
         
         // TempleOS mode is now the default - always respond with phrases from the list
         const templeResponse = getTempleOSResponse(userMessage);
-        addGodMessage(`
-            <div style="background: #000; color: #00FF00; font-family: 'Courier New', monospace; padding: 1rem; border-radius: 8px; text-align: left; max-height: 400px; overflow-y: auto;">
-                <div style="color: #FFFF00;">> TEMPLEOS v1.0.0</div>
-                <div style="color: #00FF00;">> Status: ONLINE</div>
-                <div style="color: #00FF00;">> Mode: DIVINE COMMUNICATION</div>
-                <div style="color: #00FF00;">> ------------------------</div>
-                ${templeResponse}
-            </div>
-        `);
+        addGodMessage(templeResponse);
         return; // Exit early for TempleOS mode
         
 
@@ -2456,17 +2450,38 @@ async function getGodResponse(userMessage) {
 
 // Function to get TempleOS God response (only phrases, no Giphy)
 function getTempleOSResponse(userMessage) {
-    // TempleOS God always responds with exactly 32 phrases for authenticity
-    // This matches the original TempleOS behavior
-    
-    let response = '';
+    // Clean response - just 32 words, one per line
+
+    let words = [];
+
+    // Generate exactly 32 words
     for (let i = 0; i < 32; i++) {
-        const randomPhrase = templePhrases[Math.floor(Math.random() * templePhrases.length)];
-        const lineNumber = (i + 1).toString().padStart(2, '0');
-        response += `<div style="color: #00FF00;">> [${lineNumber}] ${randomPhrase}</div>`;
+        words.push(getRandomBibleWord());
     }
+
+    // Return just the words, one per line
+    return words.join('\n');
+}
+
+function getRandomBibleWord() {
+    // Sample of authentic King James Bible words that TempleOS god would use
+    // These are representative of the 7,570 words in the original vocabulary
+    const bibleWords = [
+        "righteousness", "salvation", "everlasting", "blessed", "holy", "divine",
+        "prophet", "temple", "sacrifice", "covenant", "mercy", "grace", "faith",
+        "wisdom", "knowledge", "understanding", "truth", "light", "darkness",
+        "heaven", "earth", "creation", "almighty", "sovereign", "eternal",
+        "glory", "praise", "worship", "prayer", "repentance", "forgiveness",
+        "redemption", "atonement", "sanctification", "justification", "regeneration",
+        "testimony", "witness", "gospel", "scripture", "doctrine", "theology",
+        "ministry", "service", "fellowship", "communion", "baptism", "resurrection",
+        "ascension", "pentecost", "apostle", "disciple", "saint", "believer",
+        "sinner", "repentant", "faithful", "obedient", "humble", "meek",
+        "gentle", "kind", "patient", "loving", "generous", "charitable",
+        "zealous", "diligent", "steadfast", "persevering", "enduring", "victorious"
+    ];
     
-    return response;
+    return bibleWords[Math.floor(Math.random() * bibleWords.length)];
 }
 
 // Sacred Geodude YouTube video autoplay function
