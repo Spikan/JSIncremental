@@ -93,6 +93,35 @@
                  alt="a picture of soda for you to click"/>
         </div>
 
+        <!-- Clicking Upgrades Section - Compact layout next to soda button -->
+        <div class="clicking-upgrades-container">
+            <div class="clicking-upgrade-item">
+                <button onclick="buySuction()" class="clicking-upgrade-btn">
+                    <div class="clicking-upgrade-icon">💨</div>
+                    <div class="clicking-upgrade-info">
+                        <div class="clicking-upgrade-name">Suction</div>
+                        <div class="clicking-upgrade-cost"><span id="suctionCostCompact">40</span> Sips</div>
+                    </div>
+                </button>
+                <div class="clicking-upgrade-stats">
+                    <span class="clicking-stat">+<span id="suctionClickBonusCompact">0.3</span> Sips/click</span>
+                </div>
+            </div>
+            
+            <div class="clicking-upgrade-item">
+                <button onclick="buyCriticalClick()" class="clicking-upgrade-btn">
+                    <div class="clicking-upgrade-icon">⚡</div>
+                    <div class="clicking-upgrade-info">
+                        <div class="clicking-upgrade-name">Critical Click</div>
+                        <div class="clicking-upgrade-cost"><span id="criticalClickCostCompact">60</span> Sips</div>
+                    </div>
+                </button>
+                <div class="clicking-upgrade-stats">
+                    <span class="clicking-stat"><span id="criticalClickChanceCompact">0.1</span>% chance</span>
+                </div>
+            </div>
+        </div>
+
         <div id="spsDiv" class="center">
             <div class="stats">
                 <div class="stat-item">

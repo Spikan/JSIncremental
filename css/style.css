@@ -1017,6 +1017,129 @@ h3 {
     transform: none;
 }
 
+/* Clicking Upgrades Section - Compact layout next to soda button */
+.clicking-upgrades-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    animation: clickingUpgradesFadeIn 0.8s ease-out;
+}
+
+@keyframes clickingUpgradesFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.clicking-upgrade-item {
+    flex: 1;
+    max-width: 200px;
+    background: linear-gradient(135deg, rgba(0, 23, 137, 0.4), rgba(0, 23, 137, 0.2));
+    border: 2px solid #00B36B;
+    border-radius: 12px;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.15);
+    backdrop-filter: blur(8px);
+}
+
+.clicking-upgrade-item:hover {
+    background: linear-gradient(135deg, rgba(0, 23, 137, 0.5), rgba(0, 23, 137, 0.3));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 179, 107, 0.25);
+}
+
+.clicking-upgrade-btn {
+    width: 100%;
+    min-height: 60px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: 2px solid #00B36B;
+    background: linear-gradient(135deg, #001789, #001f5e);
+    color: #00B36B;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.clicking-upgrade-btn:hover {
+    background: linear-gradient(135deg, #00B36B, #00D97F);
+    color: #001789;
+    transform: scale(1.02);
+}
+
+.clicking-upgrade-btn:active {
+    transform: scale(0.98);
+}
+
+.clicking-upgrade-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.clicking-upgrade-info {
+    flex: 1;
+    text-align: left;
+}
+
+.clicking-upgrade-name {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+.clicking-upgrade-cost {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.clicking-upgrade-stats {
+    text-align: center;
+    padding: 0.3rem;
+    background-color: rgba(0, 179, 107, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(0, 179, 107, 0.3);
+}
+
+.clicking-stat {
+    font-size: 0.8rem;
+    color: #FF8E53;
+    font-weight: bold;
+}
+
+/* Responsive design for clicking upgrades */
+@media (max-width: 600px) {
+    .clicking-upgrades-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .clicking-upgrade-item {
+        max-width: 280px;
+        width: 100%;
+    }
+    
+    .clicking-upgrade-btn {
+        min-height: 70px;
+        font-size: 1rem;
+    }
+}
+
 /* Shop & Upgrades Styles */
 .shop-container {
     max-width: 1200px;
@@ -1291,6 +1414,31 @@ h3 {
     color: #FFFFFF !important;
     font-weight: bold;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Compact clicking upgrade affordability styling */
+.clicking-upgrade-btn.affordable {
+    background: linear-gradient(135deg, #00B36B, #00D97F) !important;
+    color: #001789 !important;
+    box-shadow: 0 0 20px rgba(0, 179, 107, 0.6);
+    animation: affordableGlow 2s ease-in-out infinite alternate;
+}
+
+.clicking-upgrade-btn.disabled {
+    background: linear-gradient(135deg, #333, #444) !important;
+    color: #666 !important;
+    border-color: #555 !important;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.clicking-upgrade-btn.affordable .clicking-upgrade-cost {
+    color: #001789 !important;
+    font-weight: bold;
+}
+
+.clicking-upgrade-btn.disabled .clicking-upgrade-cost {
+    color: #666 !important;
 }
 
 /* Affordable Glow Animation */

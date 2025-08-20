@@ -427,6 +427,10 @@ function checkUpgradeAffordability() {
     updateCostDisplay('fasterDrinksUpCost', fasterDrinksUpCost, sips.gte(fasterDrinksUpCost));
     updateCostDisplay('criticalClickUpCost', criticalClickUpCost, sips.gte(criticalClickUpCost));
     updateCostDisplay('levelCost', levelUpCost, sips.gte(levelUpCost));
+    
+    // Update compact clicking upgrade displays
+    updateCostDisplay('suctionCostCompact', suctionCost, sips.gte(suctionCost));
+    updateCostDisplay('criticalClickCostCompact', criticalClickCost, sips.gte(criticalClickCost));
 }
 
 // Update button state based on affordability
@@ -441,6 +445,33 @@ function updateButtonState(buttonId, isAffordable, cost) {
             button.classList.remove('affordable');
             button.classList.add('disabled');
             button.title = `Costs ${prettify(cost)} Sips (You have ${prettify(sips)})`;
+        }
+    }
+    
+    // Also update compact clicking upgrade buttons if they exist
+    if (buttonId === 'buySuction') {
+        const compactButton = document.querySelector('.clicking-upgrade-btn[onclick*="buySuction"]');
+        if (compactButton) {
+            if (isAffordable) {
+                compactButton.classList.remove('disabled');
+                compactButton.classList.add('affordable');
+            } else {
+                compactButton.classList.remove('affordable');
+                compactButton.classList.add('disabled');
+            }
+        }
+    }
+    
+    if (buttonId === 'buyCriticalClick') {
+        const compactButton = document.querySelector('.clicking-upgrade-btn[onclick*="buyCriticalClick"]');
+        if (compactButton) {
+            if (isAffordable) {
+                compactButton.classList.remove('disabled');
+                compactButton.classList.add('affordable');
+            } else {
+                compactButton.classList.remove('affordable');
+                compactButton.classList.add('disabled');
+            }
         }
     }
 }
@@ -1983,11 +2014,12 @@ function prettify(input) {
 
 function reload() {
     try {
-        let strawCost = Math.floor(10 * Math.pow(1.1, straws.toNumber()));
-        let cupCost = Math.floor(20 * Math.pow(1.2, cups.toNumber()));
-        let suctionCost = Math.floor(50 * Math.pow(1.15, suctions.toNumber()));
-        let fasterDrinksCost = Math.floor(100 * Math.pow(1.12, fasterDrinks.toNumber()));
-        let criticalClickCost = Math.floor(75 * Math.pow(1.15, criticalClicks.toNumber()));
+        // IMPROVED BALANCE: Updated cost calculations to match new balance
+        let strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber()));
+        let cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber()));
+        let suctionCost = Math.floor(40 * Math.pow(1.12, suctions.toNumber()));
+        let fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber()));
+        let criticalClickCost = Math.floor(60 * Math.pow(1.12, criticalClicks.toNumber()));
 
         // Safely update DOM elements only if they exist
         const elements = {
@@ -2012,12 +2044,17 @@ function reload() {
             'totalStrawSPS': prettify(strawSPS.times(straws)),
             'totalCupSPS': prettify(cupSPS.times(cups)),
             'totalSuctionBonus': prettify(suctionClickBonus.times(suctions)),
-            'strawUpCost': (200 * strawUpCounter.toNumber()).toString(),
-            'cupUpCost': (500 * cupUpCounter.toNumber()).toString(),
-            'suctionUpCost': (1000 * suctionUpCounter.toNumber()).toString(),
-            'fasterDrinksUpCost': (2000 * fasterDrinksUpCounter.toNumber()).toString(),
-            'criticalClickUpCost': (1500 * criticalClickUpCounter.toNumber()).toString(),
-            'levelNumber': level.toNumber()
+            'strawUpCost': (150 * strawUpCounter.toNumber()).toString(),
+            'cupUpCost': (400 * cupUpCounter.toNumber()).toString(),
+            'suctionUpCost': (800 * suctionUpCounter.toNumber()).toString(),
+            'fasterDrinksUpCost': (1500 * fasterDrinksUpCounter.toNumber()).toString(),
+            'criticalClickUpCost': (1200 * criticalClickUpCounter.toNumber()).toString(),
+            'levelNumber': level.toNumber(),
+            // Compact clicking upgrade displays
+            'suctionCostCompact': suctionCost.toString(),
+            'suctionClickBonusCompact': prettify(suctionClickBonus),
+            'criticalClickCostCompact': criticalClickCost.toString(),
+            'criticalClickChanceCompact': (criticalClickChance.times(100)).toFixed(1)
         };
 
         // Update each element safely
