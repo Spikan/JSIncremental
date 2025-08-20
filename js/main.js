@@ -138,6 +138,7 @@ const DOM_CACHE = {
     prominentClickBonus: null,
     prominentCriticalChance: null,
     levelUpDiv: null,
+    mainSipCounter: null,
     
     // Initialize all cached elements
     init: function() {
@@ -182,6 +183,7 @@ const DOM_CACHE = {
         this.prominentClickBonus = document.getElementById('prominentClickBonus');
         this.prominentCriticalChance = document.getElementById('prominentCriticalChance');
         this.levelUpDiv = document.getElementById('levelUpDiv');
+        this.mainSipCounter = document.getElementById('mainSipCounter');
         
         console.log('DOM cache initialized with', Object.keys(this).filter(key => key !== 'init').length, 'elements');
     },
@@ -1368,6 +1370,7 @@ function updateProminentStats() {
     const prominentSPS = DOM_CACHE.prominentSPS;
     const prominentClickBonus = DOM_CACHE.prominentClickBonus;
     const prominentCriticalChance = DOM_CACHE.prominentCriticalChance;
+    const mainSipCounter = DOM_CACHE.mainSipCounter;
     
     if (prominentSips) {
         prominentSips.textContent = prettify(sips);
@@ -1386,6 +1389,11 @@ function updateProminentStats() {
     if (prominentCriticalChance) {
         // Display critical click chance as percentage
         prominentCriticalChance.textContent = (criticalClickChance.times(100)).toFixed(4) + '%';
+    }
+    
+    // Update main sip counter (prominent display above soda button)
+    if (mainSipCounter) {
+        mainSipCounter.textContent = prettify(sips);
     }
 }
 

@@ -102,40 +102,26 @@
         </div>
     </div>
 
-    <!-- Music Player -->
-    <div class="music-player">
-        <div class="music-player-header">
-            <div class="music-player-icon">🎵</div>
-            <div class="music-player-info">
-                <div class="music-player-title">Lofi Beats</div>
-                <div class="music-player-subtitle">ChilledCow Radio</div>
-            </div>
+    <!-- Drink Progress Bar - Moved to Header -->
+    <div class="drink-progress-container">
+        <div class="drink-info">
+            <span class="drink-label">Next Drink:</span>
+            <span class="drink-countdown" id="drinkCountdown">5.0s</span>
         </div>
-        <div class="music-player-controls">
-            <button class="music-control-btn" id="musicToggleBtn" title="Play/Pause Music">
-                <span class="music-control-icon">▶️</span>
-            </button>
-            <button class="music-control-btn" id="musicMuteBtn" title="Mute/Unmute">
-                <span class="music-control-icon">🔊</span>
-            </button>
+        <div class="drink-progress-bar">
+            <div class="drink-progress-fill" id="drinkProgressFill"></div>
         </div>
-        <div class="music-player-status" id="musicStatus">Ready to play</div>
     </div>
-
-<!-- Drink Progress Bar -->
-<div class="drink-progress-container">
-    <div class="drink-info">
-        <span class="drink-label">Next Drink:</span>
-        <span class="drink-countdown" id="drinkCountdown">5.0s</span>
-    </div>
-    <div class="drink-progress-bar">
-        <div class="drink-progress-fill" id="drinkProgressFill"></div>
-    </div>
-</div>
 
 <!-- Soda Clicking Tab -->
 <div id="sodaTab" class="tab-content active">
     <div id="sodaDiv" class="center">
+        <!-- Prominent Sip Counter -->
+        <div class="prominent-sip-counter">
+            <div class="sip-counter-label">TOTAL SIPS</div>
+            <div class="sip-counter-value" id="mainSipCounter">0</div>
+        </div>
+        
         <div class="soda-container">
             <img src="images/regSoda.png" id="sodaButton" onclick="sodaClick(1)"
                  alt="a picture of soda for you to click"/>
@@ -320,6 +306,44 @@
 <div id="optionsTab" class="tab-content">
     <div class="options-container">
         <div class="options-section">
+            <h3>🎵 Music Player</h3>
+            <div class="music-player">
+                <div class="music-player-header">
+                    <div class="music-player-icon">🎵</div>
+                    <div class="music-player-info">
+                        <div class="music-player-title">Lofi Beats</div>
+                        <div class="music-player-subtitle">ChilledCow Radio</div>
+                    </div>
+                </div>
+                <div class="music-player-controls">
+                    <button class="music-control-btn" id="musicToggleBtn" title="Play/Pause Music">
+                        <span class="music-control-icon">▶️</span>
+                    </button>
+                    <button class="music-control-btn" id="musicMuteBtn" title="Mute/Unmute">
+                        <span class="music-control-icon">🔊</span>
+                    </button>
+                </div>
+                <div class="music-player-status" id="musicStatus">Ready to play</div>
+            </div>
+        </div>
+        
+        <div class="options-section">
+            <h3>🎵 Music Stream Settings</h3>
+            <div class="music-stream-controls">
+                <label for="musicStreamSelect">Select Music Stream:</label>
+                <select id="musicStreamSelect" onchange="changeMusicStream()" class="stream-select">
+                    <option value="groovesalad" selected>Groove Salad - Ambient beats and grooves</option>
+                    <option value="defcon">DEF CON - Dark ambient and industrial</option>
+                    <option value="dronezone">Drone Zone - Atmospheric textures and beats</option>
+                    <option value="illstreet">Ill Street - Lofi hip hop and chill beats</option>
+                </select>
+                <div class="stream-info">
+                    <span id="currentStreamInfo">Current: Groove Salad - Ambient beats and grooves</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="options-section">
             <h3>💾 Save & Load</h3>
             <div class="save-controls">
                 <button onclick="save()" class="save-btn">Save Game</button>
@@ -359,24 +383,6 @@
                     🔊 Click Sounds ON
                 </button>
                 <p class="sound-description">Toggle straw sip sound effects when clicking</p>
-            </div>
-        </div>
-        
-        <div class="options-section">
-            <h3>🎵 Music Stream Settings</h3>
-            <div class="music-stream-controls">
-                <label for="musicStreamSelect">Select Music Stream:</label>
-                <select id="musicStreamSelect" onchange="changeMusicStream()" class="stream-select">
-                    <option value="groovesalad" selected>Groove Salad - Ambient beats and grooves</option>
-                    <option value="defcon">DEF CON - Dark ambient and industrial</option>
-                    <option value="dronezone">Drone Zone - Atmospheric textures and beats</option>
-                    <option value="illstreet">Ill Street - Lofi hip hop and chill beats</option>
-                    
-                    
-                </select>
-                        <div class="stream-info">
-            <span id="currentStreamInfo">Current: Groove Salad - Ambient beats and grooves</span>
-        </div>
             </div>
         </div>
         

@@ -287,7 +287,7 @@ body {
 
     /* Music Player */
     .music-player {
-        max-width: 400px;
+        max-width: 100%;
         margin: 1rem auto;
         padding: 1.5rem;
         background: linear-gradient(135deg, rgba(188, 0, 255, 0.8), rgba(188, 0, 255, 0.6));
@@ -802,9 +802,24 @@ body {
     background: rgba(0, 23, 137, 0.3);
     border: 2px solid #00B36B;
     border-radius: 12px;
-    margin: 1rem 0.5rem;
+    margin: 1rem auto;
     padding: 1rem;
     box-shadow: 0 4px 12px rgba(0, 179, 107, 0.2);
+    max-width: 800px;
+    position: relative;
+    overflow: hidden;
+}
+
+.drink-progress-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00B36B, #00D97F, #FF3D02, #BC00FF, #00B36B);
+    background-size: 200% 100%;
+    animation: gradientFlow 3s linear infinite;
 }
 
 .drink-info {
@@ -1880,6 +1895,62 @@ h3 {
     /* Ensure stable positioning */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+}
+
+/* Prominent Sip Counter */
+.prominent-sip-counter {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(0, 23, 137, 0.8), rgba(0, 23, 137, 0.6));
+    border: 3px solid #FF3D02;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(255, 61, 2, 0.3);
+    backdrop-filter: blur(15px);
+    position: relative;
+    overflow: hidden;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.prominent-sip-counter::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #FF3D02, #FF8E53, #00B36B, #FF3D02);
+    background-size: 200% 100%;
+    animation: gradientFlow 3s linear infinite;
+}
+
+.sip-counter-label {
+    color: #00B36B;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.sip-counter-value {
+    color: #FF3D02;
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    animation: sipCounterGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes sipCounterGlow {
+    from { 
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 10px #FF3D02; 
+    }
+    to { 
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 20px #FF3D02, 0 0 30px #FF3D02; 
+    }
 }
 
 /* Talk to God Tab Styles */
