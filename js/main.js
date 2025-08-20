@@ -93,6 +93,7 @@ const DOM_CACHE = {
     levelNumber: null,
     levelText: null,
     sodaButton: null,
+    topSipValue: null,
     
     // Music player elements
     musicPlayer: null,
@@ -142,6 +143,7 @@ const DOM_CACHE = {
         this.levelNumber = document.getElementById('levelNumber');
         this.levelText = document.getElementById('levelText');
         this.sodaButton = document.getElementById('sodaButton');
+        this.topSipValue = document.getElementById('topSipValue');
         this.musicPlayer = document.querySelector('.music-player');
         this.musicToggleBtn = document.getElementById('musicToggleBtn');
         this.musicMuteBtn = document.getElementById('musicMuteBtn');
@@ -1413,6 +1415,12 @@ function sodaClick(number) {
             sipsElement.innerHTML = prettify(sips);
         }
         
+        // Update top sip counter
+        const topSipElement = DOM_CACHE.topSipValue;
+        if (topSipElement) {
+            topSipElement.innerHTML = prettify(sips);
+        }
+        
         // Update crit chance stat
         updateCritChance();
         
@@ -1494,6 +1502,12 @@ function spsClick(amount) {
     }
     
     DOM_CACHE.sips.innerHTML = prettify(sips);
+    
+    // Update top sip counter
+    const topSipElement = DOM_CACHE.topSipValue;
+    if (topSipElement) {
+        topSipElement.innerHTML = prettify(sips);
+    }
     
     // Update crit chance stat
     updateCritChance();
@@ -1715,7 +1729,12 @@ function levelUp() {
         // Update displays
         DOM_CACHE.sips.innerHTML = prettify(sips);
         DOM_CACHE.levelNumber.innerHTML = level.toNumber();
-        DOM_CACHE.sips.innerHTML = prettify(sips);
+        
+        // Update top sip counter
+        const topSipElement = DOM_CACHE.topSipValue;
+        if (topSipElement) {
+            topSipElement.innerHTML = prettify(sips);
+        }
         
         // Show level up feedback
         showLevelUpFeedback(sipsGained);
@@ -1970,6 +1989,7 @@ function reload() {
             'criticalClickChance': (criticalClickChance.times(100)).toFixed(4) + '%',
             'criticalClickMultiplier': criticalClickMultiplier.toNumber() + 'x',
             'sips': prettify(sips),
+            'topSipValue': prettify(sips),
             'sps': prettify(sps),
             'strawSPS': prettify(strawSPS),
             'cupSPS': prettify(cupSPS),
