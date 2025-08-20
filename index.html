@@ -162,7 +162,7 @@
 <div id="shopTab" class="tab-content">
     <div id="shopDiv" class="center">
         <div class="shop-container">
-            <div class="shop-item">
+                        <div class="shop-item">
                 <div class="shop-header">
                                          <button onclick="buyStraw()" class="shop-btn">
                          <span id="strawCost">5</span> Sips<br/> 
@@ -183,15 +183,32 @@
                         <span id="totalStrawSPS" class="stat-value">0</span> Sips/d
                     </div>
                 </div>
-                <div class="shop-upgrade">
-                    <button onclick="upgradeStraw()" class="upgrade-btn">
-                                                 <span id="strawUpCost">150</span> Sips<br/> 
-                         Upgrade Straws
-                    </button>
-                </div>
             </div>
 
             <div class="shop-item">
+                <div class="shop-header">
+                                         <button onclick="buyWiderStraws()" class="shop-btn">
+                         <span id="widerStrawsCost">150</span> Sips<br/> 
+                         Wider Straws
+                     </button>
+                </div>
+                <div class="shop-stats">
+                    <div class="shop-stat">
+                        <span class="stat-label">Owned:</span>
+                        <span id="widerStraws" class="stat-value">0</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">+ Sips/d:</span>
+                                                 <span id="widerStrawsSPS" class="stat-value">0.6</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">Total:</span>
+                        <span id="totalWiderStrawsSPS" class="stat-value">0</span> Sips/d
+                    </div>
+                </div>
+            </div>
+
+                        <div class="shop-item">
                 <div class="shop-header">
                                          <button onclick="buyCup()" class="shop-btn">
                          <span id="cupCost">15</span> Sips<br/> 
@@ -212,11 +229,28 @@
                         <span id="totalCupSPS" class="stat-value">0</span> Sips/d
                     </div>
                 </div>
-                <div class="shop-upgrade">
-                    <button onclick="upgradeCup()" class="upgrade-btn">
-                                                 <span id="cupUpCost">400</span> Sips<br/> 
-                         Upgrade Cups
-                    </button>
+            </div>
+
+            <div class="shop-item">
+                <div class="shop-header">
+                                         <button onclick="buyBetterCups()" class="shop-btn">
+                         <span id="betterCupsCost">400</span> Sips<br/> 
+                         Better Cups
+                     </button>
+                </div>
+                <div class="shop-stats">
+                    <div class="shop-stat">
+                        <span class="stat-label">Owned:</span>
+                        <span id="betterCups" class="stat-value">0</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">+ Sips/d:</span>
+                                                 <span id="betterCupsSPS" class="stat-value">1.2</span>
+                    </div>
+                    <div class="shop-stat">
+                        <span class="stat-label">Total:</span>
+                                         <span id="totalBetterCupsSPS" class="stat-value">0</span> Sips/d
+                    </div>
                 </div>
             </div>
 
@@ -432,6 +466,20 @@
                     <div class="stat-content">
                         <div class="stat-label">Cups Purchased</div>
                         <div class="stat-value" id="cupsPurchased">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🥤</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Wider Straws</div>
+                        <div class="stat-value" id="widerStrawsPurchased">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">☕</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Better Cups</div>
+                        <div class="stat-value" id="betterCupsPurchased">0</div>
                     </div>
                 </div>
                 <div class="stat-card">
