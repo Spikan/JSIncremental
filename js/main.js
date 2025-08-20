@@ -2476,8 +2476,7 @@ function getStreamDetails(streamUrl) {
         }
     }
     
-    // StarCraft OST streams (using SomaFM streams for now)
-    // These will be handled by the UI display names, not by URL detection
+
     
     // Generic fallback
     return {
@@ -2604,33 +2603,7 @@ const MUSIC_STREAMS = {
         name: 'Ill Street',
         description: 'Lofi hip hop and chill beats'
     },
-    // StarCraft Remastered OST Tracks (KHInsider Direct Streams)
-    // Source: https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered
-    starcraft_main_title: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/01%20-%20Rebel%20Yell%20-%20Main%20Title.mp3',
-        name: 'StarCraft Remastered - Main Title (2017)',
-        description: 'Epic main title theme from StarCraft Remastered'
-    },
-    starcraft_terran: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/02%20-%20Rebel%20Yell%20-%20Terran%20One.mp3',
-        name: 'StarCraft Remastered - Terran One (2017)',
-        description: 'Epic Terran battle music from StarCraft Remastered'
-    },
-    starcraft_zerg: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/07%20-%20Zerg%20Theme.mp3',
-        name: 'StarCraft Remastered - Zerg Theme (2017)',
-        description: 'Dark and menacing Zerg swarm music from StarCraft Remastered'
-    },
-    starcraft_protoss: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/08%20-%20Protoss%20Theme.mp3',
-        name: 'StarCraft Remastered - Protoss Theme (2017)',
-        description: 'Mystical and ancient Protoss music from StarCraft Remastered'
-    },
-    starcraft_broodwar: {
-        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/09%20-%20Brood%20War%20Theme.mp3',
-        name: 'StarCraft Remastered - Brood War Theme (2017)',
-        description: 'Epic Brood War expansion theme from StarCraft Remastered'
-    }
+    
 };
 
 // Function to change music stream
@@ -2700,24 +2673,8 @@ function changeMusicStream() {
     currentStreamInfo.onclick = null;
     currentStreamInfo.classList.remove('clickable');
     
-    // Update music player display with custom stream info for StarCraft themes
-    if (selectedStream.startsWith('starcraft')) {
-        const customStreamInfo = {
-            name: streamData.name,
-            description: streamData.description,
-            genre: 'Game OST',
-            quality: '128k MP3',
-            location: 'Blizzard Entertainment',
-            type: 'StarCraft Soundtrack'
-        };
-        updateMusicPlayerDisplay(customStreamInfo);
-        // Update the music player state with custom info
-        if (state.streamInfo) {
-            state.streamInfo = customStreamInfo;
-        }
-    } else {
-        updateStreamInfo();
-    }
+    // Update music player display with stream info
+    updateStreamInfo();
     
     // If it was playing, try to continue playing
     if (wasPlaying) {
@@ -2790,23 +2747,8 @@ function loadSavedStreamPreference() {
                 state.audio.src = streamData.url;
                 state.currentStream = streamData.url;
                 
-                // Handle custom stream info for StarCraft themes
-                if (savedStream.startsWith('starcraft')) {
-                    const customStreamInfo = {
-                        name: streamData.name,
-                        description: streamData.description,
-                        genre: 'Game OST',
-                        quality: '128k MP3',
-                        location: 'Blizzard Entertainment',
-                        type: 'StarCraft Soundtrack'
-                    };
-                    updateMusicPlayerDisplay(customStreamInfo);
-                    if (state.streamInfo) {
-                        state.streamInfo = customStreamInfo;
-                    }
-                } else {
-                    updateStreamInfo();
-                }
+                // Update music player display with stream info
+                updateStreamInfo();
             }
             
             console.log('Loaded saved stream preference:', savedStream);
@@ -2919,47 +2861,7 @@ window.testMusicStreamChanger = function() {
     console.log('Test complete!');
 };
 
-// Test function for StarCraft OST streams
-window.testStarCraftOST = function() {
-    console.log('=== STARCRAFT OST STREAMS TEST ===');
-    
-    const state = window.musicPlayerState;
-    if (!state || !state.audio) {
-        console.log('Music player not initialized');
-        return;
-    }
-    
-    console.log('Testing StarCraft OST streams...');
-    
-    // Test each StarCraft OST stream
-    const ostStreams = [
-        'starcraft_main_title',
-        'starcraft_terran', 
-        'starcraft_zerg', 
-        'starcraft_protoss',
-        'starcraft_broodwar'
-    ];
-    
-    ostStreams.forEach((streamKey, index) => {
-        setTimeout(() => {
-            console.log(`Testing ${streamKey}...`);
-            const streamData = MUSIC_STREAMS[streamKey];
-            if (streamData) {
-                console.log(`Stream data:`, streamData);
-                // Test if the URL is accessible
-                const testAudio = new Audio();
-                testAudio.src = streamData.url;
-                testAudio.addEventListener('loadstart', () => console.log(`${streamKey}: Load started`));
-                testAudio.addEventListener('canplay', () => console.log(`${streamKey}: Can play`));
-                testAudio.addEventListener('error', (e) => console.log(`${streamKey}: Error -`, e));
-            } else {
-                console.log(`Stream ${streamKey} not found in MUSIC_STREAMS`);
-            }
-        }, index * 1000); // Test each stream 1 second apart
-    });
-    
-    console.log('StarCraft OST test complete! Check console for results.');
-};
+
 
 // Test function for stream switching
 window.testStreamSwitching = function() {
@@ -2974,7 +2876,7 @@ window.testStreamSwitching = function() {
     console.log('Testing stream switching...');
 
     // Test switching to different stream types
-    const testStreams = ['groovesalad', 'starcraft_main_title', 'defcon', 'starcraft_terran', 'starcraft_zerg'];
+    const testStreams = ['groovesalad', 'defcon', 'dronezone', 'illstreet'];
 
     testStreams.forEach((streamKey, index) => {
         setTimeout(() => {
@@ -3139,53 +3041,4 @@ window.showStreamInfo = function() {
     }
 };
 
-// Test function for KHInsider StarCraft OST streams
-window.testKHInsiderStreams = function() {
-    console.log('=== KHINSIDER STARCRAFT STREAMS TEST ===');
-    
-    const streamSelect = document.getElementById('musicStreamSelect');
-    if (!streamSelect) {
-        console.log('Stream select element not found');
-        return;
-    }
-    
-    console.log('Testing KHInsider StarCraft Remastered OST streams...');
-    
-    // Test each StarCraft Remastered stream
-    const starcraftStreams = [
-        'starcraft_main_title',
-        'starcraft_terran', 
-        'starcraft_zerg', 
-        'starcraft_protoss',
-        'starcraft_broodwar'
-    ];
-    
-    starcraftStreams.forEach((streamKey, index) => {
-        setTimeout(() => {
-            console.log(`Testing KHInsider stream: ${streamKey}`);
-            streamSelect.value = streamKey;
-            changeMusicStream();
-            
-            // Check if the stream info is displayed correctly
-            setTimeout(() => {
-                const currentStreamInfo = document.getElementById('currentStreamInfo');
-                if (currentStreamInfo) {
-                    console.log(`Stream info for ${streamKey}:`, {
-                        text: currentStreamInfo.textContent,
-                        cursor: currentStreamInfo.style.cursor,
-                        hasClickableClass: currentStreamInfo.classList.contains('clickable'),
-                        onclick: currentStreamInfo.onclick ? 'Function set' : 'No function'
-                    });
-                }
-                
-                // Check if audio source was set
-                const state = window.musicPlayerState;
-                if (state && state.audio) {
-                    console.log(`Audio source for ${streamKey}:`, state.audio.src);
-                }
-            }, 500);
-        }, index * 3000); // Test each stream 3 seconds apart
-    });
-    
-    console.log('KHInsider StarCraft Remastered streams test complete! Check console for results.');
-};
+
