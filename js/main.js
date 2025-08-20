@@ -2604,30 +2604,61 @@ const MUSIC_STREAMS = {
         name: 'Ill Street',
         description: 'Lofi hip hop and chill beats'
     },
-    // StarCraft OST Tracks (YouTube Alternatives)
+    // StarCraft Remastered OST Tracks (KHInsider Direct Streams)
     starcraft_terran: {
-        url: 'https://www.youtube.com/watch?v=Mhvl7X_as8I',
-        name: 'StarCraft - Terran Theme',
-        description: 'Epic Terran battle music from the original game',
-        type: 'youtube'
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/01%20-%20Rebel%20Yell%20-%20Main%20Title.mp3',
+        name: 'StarCraft Remastered - Main Title (Rebel Yell)',
+        description: 'Epic main title theme from StarCraft Remastered'
     },
     starcraft_zerg: {
-        url: 'https://www.youtube.com/watch?v=ok7fOwdk2gc',
-        name: 'StarCraft - Zerg Theme',
-        description: 'Dark Zerg swarm music from the original game',
-        type: 'youtube'
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/02%20-%20Rebel%20Yell%20-%20Terran%20One.mp3',
+        name: 'StarCraft Remastered - Terran One (Rebel Yell)',
+        description: 'Epic Terran battle music from StarCraft Remastered'
     },
     starcraft_protoss: {
-        url: 'https://www.youtube.com/watch?v=Mhvl7X_as8I',
-        name: 'StarCraft - Protoss Theme',
-        description: 'Mystical Protoss music from the original game',
-        type: 'youtube'
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/03%20-%20Rebel%20Yell%20-%20Terran%20Ready%20Room.mp3',
+        name: 'StarCraft Remastered - Terran Ready Room (Rebel Yell)',
+        description: 'Atmospheric ready room music from StarCraft Remastered'
     },
     starcraft_broodwar: {
-        url: 'https://www.youtube.com/watch?v=ok7fOwdk2gc',
-        name: 'StarCraft - Brood War Theme',
-        description: 'Expansion pack music from Brood War',
-        type: 'youtube'
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/04%20-%20Rebel%20Yell%20-%20Terran%20Two.mp3',
+        name: 'StarCraft Remastered - Terran Two (Rebel Yell)',
+        description: 'Second Terran theme from StarCraft Remastered'
+    },
+    starcraft_terran_defeat: {
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/05%20-%20Rebel%20Yell%20-%20Terran%20Defeat.mp3',
+        name: 'StarCraft Remastered - Terran Defeat (Rebel Yell)',
+        description: 'Dramatic defeat music from StarCraft Remastered'
+    },
+    starcraft_terran_victory: {
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/06%20-%20Rebel%20Yell%20-%20Terran%20Victory.mp3',
+        name: 'StarCraft Remastered - Terran Victory (Rebel Yell)',
+        description: 'Triumphant victory music from StarCraft Remastered'
+    },
+    starcraft_zerg_theme: {
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/07%20-%20Zerg%20Theme.mp3',
+        name: 'StarCraft Remastered - Zerg Theme',
+        description: 'Dark and menacing Zerg swarm music from StarCraft Remastered'
+    },
+    starcraft_protoss_theme: {
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/08%20-%20Protoss%20Theme.mp3',
+        name: 'StarCraft Remastered - Protoss Theme',
+        description: 'Mystical and ancient Protoss music from StarCraft Remastered'
+    },
+    starcraft_broodwar_theme: {
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/09%20-%20Brood%20War%20Theme.mp3',
+        name: 'StarCraft Remastered - Brood War Theme',
+        description: 'Epic Brood War expansion theme from StarCraft Remastered'
+    },
+    starcraft_epilogue: {
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/24%20-%20Epilogue%20-%20The%20Ascension.mp3',
+        name: 'StarCraft Remastered - Epilogue: The Ascension',
+        description: 'Epic epilogue music from StarCraft Remastered'
+    },
+    starcraft_fury: {
+        url: 'https://downloads.khinsider.com/game-soundtracks/album/starcraft-remastered/26%20-%20Epilogue%20-%20Fury%20Of%20The%20Xel%27Naga.mp3',
+        name: 'StarCraft Remastered - Fury Of The Xel\'Naga',
+        description: 'Final epic track from StarCraft Remastered'
     },
     // Legacy StarCraft Options (Using SomaFM as fallback)
     starcraft1: {
@@ -3000,9 +3031,9 @@ window.testStreamSwitching = function() {
     console.log('Stream switching test complete! Check console for results.');
 };
 
-// Test function for YouTube stream functionality
+// Test function for YouTube stream functionality (Legacy - now tests SomaFM alternatives)
 window.testYouTubeStreams = function() {
-    console.log('=== YOUTUBE STREAMS TEST ===');
+    console.log('=== YOUTUBE STREAMS TEST (LEGACY - NOW TESTS SOMA FM ALTERNATIVES) ===');
     
     const streamSelect = document.getElementById('musicStreamSelect');
     if (!streamSelect) {
@@ -3010,18 +3041,18 @@ window.testYouTubeStreams = function() {
         return;
     }
     
-    console.log('Testing YouTube stream functionality...');
+    console.log('Testing SomaFM alternative streams (formerly YouTube)...');
     
-    // Test YouTube streams specifically
-    const youtubeStreams = ['starcraft_terran', 'starcraft_zerg', 'starcraft_protoss', 'starcraft_broodwar'];
+    // Test SomaFM alternative streams
+    const somafmStreams = ['starcraft1', 'starcraft2', 'starcraft3', 'starcraft4'];
     
-    youtubeStreams.forEach((streamKey, index) => {
+    somafmStreams.forEach((streamKey, index) => {
         setTimeout(() => {
-            console.log(`Testing YouTube stream: ${streamKey}`);
+            console.log(`Testing SomaFM alternative stream: ${streamKey}`);
             streamSelect.value = streamKey;
             changeMusicStream();
             
-            // Check if the stream info becomes clickable
+            // Check if the stream info is displayed correctly
             setTimeout(() => {
                 const currentStreamInfo = document.getElementById('currentStreamInfo');
                 if (currentStreamInfo) {
@@ -3036,7 +3067,7 @@ window.testYouTubeStreams = function() {
         }, index * 3000); // Test each stream 3 seconds apart
     });
     
-    console.log('YouTube streams test complete! Check console for results.');
+    console.log('SomaFM alternative streams test complete! Check console for results.');
 };
 
 // Function to test click sounds
@@ -3187,4 +3218,61 @@ window.showStreamInfo = function() {
     if (state.currentStream) {
         console.log('Stream details for current URL:', getStreamDetails(state.currentStream));
     }
+};
+
+// Test function for KHInsider StarCraft OST streams
+window.testKHInsiderStreams = function() {
+    console.log('=== KHINSIDER STARCRAFT STREAMS TEST ===');
+    
+    const streamSelect = document.getElementById('musicStreamSelect');
+    if (!streamSelect) {
+        console.log('Stream select element not found');
+        return;
+    }
+    
+    console.log('Testing KHInsider StarCraft Remastered OST streams...');
+    
+    // Test each StarCraft Remastered stream
+    const starcraftStreams = [
+        'starcraft_terran', 
+        'starcraft_zerg', 
+        'starcraft_protoss', 
+        'starcraft_broodwar',
+        'starcraft_terran_defeat',
+        'starcraft_terran_victory',
+        'starcraft_zerg_theme',
+        'starcraft_protoss_theme',
+        'starcraft_broodwar_theme',
+        'starcraft_epilogue',
+        'starcraft_fury'
+    ];
+    
+    starcraftStreams.forEach((streamKey, index) => {
+        setTimeout(() => {
+            console.log(`Testing KHInsider stream: ${streamKey}`);
+            streamSelect.value = streamKey;
+            changeMusicStream();
+            
+            // Check if the stream info is displayed correctly
+            setTimeout(() => {
+                const currentStreamInfo = document.getElementById('currentStreamInfo');
+                if (currentStreamInfo) {
+                    console.log(`Stream info for ${streamKey}:`, {
+                        text: currentStreamInfo.textContent,
+                        cursor: currentStreamInfo.style.cursor,
+                        hasClickableClass: currentStreamInfo.classList.contains('clickable'),
+                        onclick: currentStreamInfo.onclick ? 'Function set' : 'No function'
+                    });
+                }
+                
+                // Check if audio source was set
+                const state = window.musicPlayerState;
+                if (state && state.audio) {
+                    console.log(`Audio source for ${streamKey}:`, state.audio.src);
+                }
+            }, 500);
+        }, index * 3000); // Test each stream 3 seconds apart
+    });
+    
+    console.log('KHInsider StarCraft Remastered streams test complete! Check console for results.');
 };
