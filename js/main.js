@@ -392,9 +392,9 @@ function checkUpgradeAffordability() {
     // IMPROVED BALANCE: Updated costs to match new progression system
     const strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber()));
     const cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber()));
-    const suctionCost = Math.floor(40 * Math.pow(1.12, suctions.toNumber()));
+    const suctionCost = Math.floor(40 * Math.pow(1.10, suctions.toNumber()));
     const fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber()));
-    const criticalClickCost = Math.floor(60 * Math.pow(1.12, criticalClicks.toNumber()));
+    const criticalClickCost = Math.floor(60 * Math.pow(1.10, criticalClicks.toNumber()));
     const strawUpCost = 150 * strawUpCounter.toNumber();
     const cupUpCost = 400 * cupUpCounter.toNumber();
     const suctionUpCost = 800 * suctionUpCounter.toNumber();
@@ -1633,7 +1633,7 @@ function upgradeCup() {
 
 function buySuction() {
     // IMPROVED BALANCE: Better click bonus progression
-    let suctionCost = Math.floor(40 * Math.pow(1.12, suctions.toNumber())); // Reduced from 50, gentler scaling
+    let suctionCost = Math.floor(40 * Math.pow(1.10, suctions.toNumber())); // Reduced from 50, gentler scaling
     
     if (sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
@@ -1713,7 +1713,7 @@ function upgradeFasterDrinks() {
 
 function buyCriticalClick() {
     // IMPROVED BALANCE: Better critical click progression
-    let criticalClickCost = Math.floor(60 * Math.pow(1.12, criticalClicks.toNumber())); // Reduced from 75, gentler scaling
+    let criticalClickCost = Math.floor(60 * Math.pow(1.10, criticalClicks.toNumber())); // Reduced from 75, gentler scaling
     if (sips.gte(criticalClickCost)) {
         criticalClicks = criticalClicks.plus(1);
         sips = sips.minus(criticalClickCost);
@@ -2017,9 +2017,9 @@ function reload() {
         // IMPROVED BALANCE: Updated cost calculations to match new balance
         let strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber()));
         let cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber()));
-        let suctionCost = Math.floor(40 * Math.pow(1.12, suctions.toNumber()));
+        let suctionCost = Math.floor(40 * Math.pow(1.10, suctions.toNumber()));
         let fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber()));
-        let criticalClickCost = Math.floor(60 * Math.pow(1.12, criticalClicks.toNumber()));
+        let criticalClickCost = Math.floor(60 * Math.pow(1.10, criticalClicks.toNumber()));
 
         // Safely update DOM elements only if they exist
         const elements = {
