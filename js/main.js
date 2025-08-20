@@ -2405,6 +2405,14 @@ function escapeHtml(text) {
 
 async function getGodResponse(userMessage) {
     try {
+        // Check for the sacred "geodude" keyword first
+        if (userMessage.toLowerCase().includes('geodude')) {
+            // Trigger YouTube video autoplay
+            triggerGeodudeVideo();
+            addGodMessage("🎵 The sacred melodies of Geodude echo through the digital realm...");
+            return;
+        }
+        
         // TempleOS mode is now the default - always respond with phrases from the list
         const templeResponse = getTempleOSResponse(userMessage);
         addGodMessage(`
@@ -2458,7 +2466,88 @@ function getTempleOSResponse(userMessage) {
     return response;
 }
 
-
+// Sacred Geodude YouTube video autoplay function
+function triggerGeodudeVideo() {
+            // Two sacred YouTube videos that will autoplay at random
+        const geodudeVideos = [
+            'https://www.youtube.com/embed/Mhvl7X_as8I?autoplay=1&mute=0', // Geodude video 1
+            'https://www.youtube.com/embed/ok7fOwdk2gc?autoplay=1&mute=0'  // Geodude video 2
+        ];
+    
+    // Randomly select one of the two videos
+    const randomVideo = geodudeVideos[Math.floor(Math.random() * geodudeVideos.length)];
+    
+    // Create video modal if it doesn't exist
+    let videoModal = document.getElementById('geodudeVideoModal');
+    if (!videoModal) {
+        videoModal = document.createElement('div');
+        videoModal.id = 'geodudeVideoModal';
+        videoModal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        `;
+        
+        // Create close button
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕ Close Sacred Video';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #00FF00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 10001;
+        `;
+        closeBtn.onclick = () => {
+            videoModal.remove();
+        };
+        
+        // Create iframe for YouTube video
+        const videoFrame = document.createElement('iframe');
+        videoFrame.src = randomVideo;
+        videoFrame.style.cssText = `
+            width: 80%;
+            height: 80%;
+            border: 2px solid #00FF00;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        `;
+        videoFrame.allow = 'autoplay; encrypted-media';
+        
+        videoModal.appendChild(closeBtn);
+        videoModal.appendChild(videoFrame);
+        document.body.appendChild(videoModal);
+        
+        // Auto-close after 30 seconds (or user can close manually)
+        setTimeout(() => {
+            if (videoModal.parentNode) {
+                videoModal.remove();
+            }
+        }, 30000);
+    } else {
+        // If modal already exists, just update the video source
+        const videoFrame = videoModal.querySelector('iframe');
+        if (videoFrame) {
+            videoFrame.src = randomVideo;
+        }
+        videoModal.style.display = 'flex';
+    }
+}
 
 // Event listener optimization - consolidate multiple handlers
 document.addEventListener('DOMContentLoaded', function() {
@@ -2483,6 +2572,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     modal.style.display = 'none';
                 }
             });
+            
+            // Also close the geodude video modal
+            const geodudeModal = document.getElementById('geodudeVideoModal');
+            if (geodudeModal) {
+                geodudeModal.remove();
+            }
         }
         
         // Number keys for quick upgrades (1-5)
@@ -2519,6 +2614,7 @@ window.buyFasterDrinks = buyFasterDrinks;
 window.upgradeFasterDrinks = upgradeFasterDrinks;
 window.buyCriticalClick = buyCriticalClick;
 window.upgradeCriticalClick = upgradeCriticalClick;
+window.triggerGeodudeVideo = triggerGeodudeVideo;
     window.save = save;
     window.delete_save = delete_save;
     window.sendMessage = sendMessage;
