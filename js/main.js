@@ -1900,7 +1900,7 @@ function showClickFeedback(sipsGained, isCritical = false) {
         font-size: ${isCritical ? '1.5em' : '1.2em'};
         color: ${isCritical ? '#ff6b35' : '#4CAF50'};
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        animation: fadeUpAndOut 2s ease-out forwards;
+        animation: clickFeedback 2s ease-out forwards;
     `;
 
     // Add to body for proper positioning
@@ -2637,7 +2637,8 @@ function delete_save() {
 }
 
 
-function prettify(input) {
+// Make prettify available globally for other modules
+window.prettify = function prettify(input) {
     if (input instanceof Decimal) {
         const config = window.GAME_CONFIG?.FORMATTING || {};
         const smallThreshold = config.SMALL_NUMBER_THRESHOLD;

@@ -9,14 +9,14 @@ export function showClickFeedback(sipsGained, isCritical = false) {
     // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
-    feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
+    feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + window.prettify(sipsGained);
     
     // Accessibility improvements
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
     feedback.setAttribute('aria-label', isCritical ? 
-        `Critical hit! Gained ${prettify(sipsGained)} sips` : 
-        `Gained ${prettify(sipsGained)} sips`
+        `Critical hit! Gained ${window.prettify(sipsGained)} sips` : 
+        `Gained ${window.prettify(sipsGained)} sips`
     );
     
     // Use more efficient positioning to avoid layout recalculations
@@ -38,7 +38,7 @@ export function showClickFeedback(sipsGained, isCritical = false) {
         font-size: ${isCritical ? '1.5em' : '1.2em'};
         color: ${isCritical ? '#ff6b35' : '#4CAF50'};
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        animation: fadeUpAndOut 2s ease-out forwards;
+        animation: clickFeedback 2s ease-out forwards;
     `;
     
     // Add to body for proper positioning
@@ -66,13 +66,13 @@ export function showPurchaseFeedback(itemName, cost) {
     feedback.className = 'purchase-feedback';
     feedback.innerHTML = `
         <div class="purchase-item">${itemName}</div>
-        <div class="purchase-cost">-${prettify(cost)} sips</div>
+        <div class="purchase-cost">-${window.prettify(cost)} sips</div>
     `;
     
     // Accessibility
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
-    feedback.setAttribute('aria-label', `Purchased ${itemName} for ${prettify(cost)} sips`);
+    feedback.setAttribute('aria-label', `Purchased ${itemName} for ${window.prettify(cost)} sips`);
     
     // Position relative to shop
     const shopRect = shopDiv.getBoundingClientRect();
@@ -89,7 +89,7 @@ export function showPurchaseFeedback(itemName, cost) {
         border-radius: 8px;
         font-weight: bold;
         text-align: center;
-        animation: fadeUpAndOut 2s ease-out forwards;
+        animation: clickFeedback 2s ease-out forwards;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     `;
     
@@ -114,13 +114,13 @@ export function showLevelUpFeedback(sipsGained) {
     feedback.className = 'levelup-feedback';
     feedback.innerHTML = `
         <div class="levelup-title">🎉 LEVEL UP! 🎉</div>
-        <div class="levelup-bonus">+${prettify(sipsGained)} sips bonus!</div>
+        <div class="levelup-bonus">+${window.prettify(sipsGained)} sips bonus!</div>
     `;
     
     // Accessibility
     feedback.setAttribute('role', 'alert');
     feedback.setAttribute('aria-live', 'assertive');
-    feedback.setAttribute('aria-label', `Level up! Gained ${prettify(sipsGained)} bonus sips`);
+    feedback.setAttribute('aria-label', `Level up! Gained ${window.prettify(sipsGained)} bonus sips`);
     
     // Position relative to level up section
     const levelRect = levelUpDiv.getBoundingClientRect();

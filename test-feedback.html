@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Click Feedback Test</title>
+    <style>
+        body {
+            background: #001789;
+            color: #00B36B;
+            font-family: monospace;
+            text-align: center;
+            padding: 20px;
+        }
+        .test-btn {
+            background: #00B36B;
+            color: #001789;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 10px;
+        }
+        .soda-btn {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        /* Click feedback styles */
+        .click-feedback {
+            position: fixed;
+            color: #4CAF50;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 1000;
+            animation: clickFeedback 2s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        .critical-feedback {
+            color: #ff6b35;
+            font-size: 1.5em;
+        }
+
+        @keyframes clickFeedback {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-20px) scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-40px) scale(1.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Click Feedback Test</h1>
+    <button class="test-btn" onclick="testFeedback(false)">Test Normal Click</button>
+    <button class="test-btn" onclick="testFeedback(true)">Test Critical Click</button>
+
+    <div style="margin: 30px;">
+        <img src="images/regSoda.png" class="soda-btn" onclick="testFeedback(Math.random() < 0.1)">
+        <p>Click the soda to test feedback</p>
+    </div>
+
+    <script>
+        function testFeedback(isCritical = false) {
+            const sipsGained = isCritical ? Math.floor(Math.random() * 1000) + 100 : Math.floor(Math.random() * 100) + 1;
+
+            console.log('Testing feedback:', sipsGained, 'critical:', isCritical);
+
+            // Create feedback element
+            const feedback = document.createElement('div');
+            feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
+            feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + sipsGained;
+
+            // Position in center of viewport
+            feedback.style.left = '50%';
+            feedback.style.top = '50%';
+            feedback.style.transform = 'translate(-50%, -50%)';
+
+            // Add to body
+            document.body.appendChild(feedback);
+
+            // Remove after animation
+            setTimeout(() => {
+                if (feedback.parentNode) {
+                    feedback.parentNode.removeChild(feedback);
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
