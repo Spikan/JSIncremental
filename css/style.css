@@ -2507,3 +2507,380 @@ h3 {
 /* Soda Clicker Pro - Main Stylesheet */
 
 /* Reset and base styles */
+
+/* Unlock Notification System */
+.unlock-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #001789, #0024b3);
+    border: 2px solid #00B36B;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 179, 107, 0.3);
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease-in-out;
+    max-width: 300px;
+    backdrop-filter: blur(10px);
+}
+
+.unlock-notification.show {
+    transform: translateX(0);
+}
+
+.unlock-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.unlock-icon {
+    font-size: 2rem;
+    animation: unlockPulse 1s ease-in-out infinite alternate;
+}
+
+.unlock-text {
+    flex: 1;
+}
+
+.unlock-title {
+    color: #FF3D02;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.unlock-description {
+    color: #00B36B;
+    font-size: 0.9rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes unlockPulse {
+    from {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    to {
+        transform: scale(1.1);
+        filter: brightness(1.2);
+    }
+}
+
+/* Locked tab styling */
+.tab-btn.locked {
+    opacity: 0.3;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.tab-btn.locked::after {
+    content: '🔒';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.8rem;
+    color: #FF3D02;
+}
+
+/* Progressive feature introduction - hide elements initially */
+.clicking-upgrade-item,
+.drink-speed-upgrade-container,
+#levelUpDiv,
+.shop-item {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.clicking-upgrade-item[style*="display: none"],
+.drink-speed-upgrade-container[style*="display: none"],
+#levelUpDiv[style*="display: none"],
+.shop-item[style*="display: none"] {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+/* Unlock hint styling */
+.unlock-hint {
+    background: rgba(0, 23, 137, 0.8);
+    border: 1px solid #00B36B;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    text-align: center;
+    color: #00B36B;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.unlock-hint .hint-icon {
+    color: #FF3D02;
+    margin-right: 0.5rem;
+}
+
+/* Mobile optimizations for unlock notifications */
+@media (max-width: 768px) {
+    .unlock-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        transform: translateY(-100px);
+    }
+    
+    .unlock-notification.show {
+        transform: translateY(0);
+    }
+    
+    .unlock-content {
+        gap: 0.75rem;
+    }
+    
+    .unlock-icon {
+        font-size: 1.5rem;
+    }
+    
+    .unlock-title {
+        font-size: 1rem;
+    }
+    
+    .unlock-description {
+        font-size: 0.8rem;
+    }
+}
+
+/* Unlocks Tab Styling */
+.unlocks-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.unlocks-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.unlocks-header h2 {
+    color: #FF3D02;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.unlocks-subtitle {
+    color: #00B36B;
+    font-size: 1.1rem;
+    margin: 0;
+    font-style: italic;
+}
+
+.unlocks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.unlock-item {
+    background: linear-gradient(135deg, #001789, #0024b3);
+    border: 2px solid #00B36B;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.unlock-item.unlocked {
+    border-color: #FF3D02;
+    background: linear-gradient(135deg, #001789, #003366);
+    box-shadow: 0 0 20px rgba(255, 61, 2, 0.3);
+}
+
+.unlock-item.locked {
+    border-color: #666;
+    background: linear-gradient(135deg, #001789, #001234);
+    opacity: 0.7;
+}
+
+.unlock-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 179, 107, 0.3);
+}
+
+.unlock-item.unlocked:hover {
+    box-shadow: 0 8px 25px rgba(255, 61, 2, 0.4);
+}
+
+.unlock-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.unlock-icon {
+    font-size: 2rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 179, 107, 0.2);
+}
+
+.unlock-item.unlocked .unlock-icon {
+    background: rgba(255, 61, 2, 0.3);
+    animation: unlockPulse 2s ease-in-out infinite alternate;
+}
+
+.unlock-info {
+    flex: 1;
+}
+
+.unlock-name {
+    color: #00B36B;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.unlock-item.unlocked .unlock-name {
+    color: #FF3D02;
+}
+
+.unlock-description {
+    color: #BC00FF;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.unlock-requirements {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border-left: 3px solid #00B36B;
+}
+
+.unlock-item.unlocked .unlock-requirements {
+    border-left-color: #FF3D02;
+}
+
+.requirement {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.requirement:last-child {
+    margin-bottom: 0;
+}
+
+.requirement-label {
+    color: #00B36B;
+}
+
+.requirement-value {
+    color: #BC00FF;
+    font-weight: bold;
+}
+
+.requirement.met .requirement-value {
+    color: #FF3D02;
+}
+
+.unlock-status {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+}
+
+.unlock-item.unlocked .unlock-status {
+    color: #FF3D02;
+    animation: unlockPulse 1s ease-in-out infinite alternate;
+}
+
+.unlock-item.locked .unlock-status {
+    color: #666;
+}
+
+.unlocks-progress {
+    background: rgba(0, 23, 137, 0.8);
+    border: 2px solid #00B36B;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.progress-label {
+    color: #00B36B;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.progress-value {
+    color: #FF3D02;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00B36B, #FF3D02);
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+    width: 0%;
+}
+
+/* Mobile optimizations for unlocks tab */
+@media (max-width: 768px) {
+    .unlocks-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .unlock-item {
+        padding: 1rem;
+    }
+    
+    .unlock-header {
+        gap: 0.75rem;
+    }
+    
+    .unlock-icon {
+        font-size: 1.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .unlock-name {
+        font-size: 1.1rem;
+    }
+    
+    .unlocks-progress {
+        padding: 1rem;
+    }
+}

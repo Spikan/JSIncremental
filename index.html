@@ -75,6 +75,7 @@
 <!-- Tab Navigation -->
 <div class="tab-navigation">
             <button class="tab-btn active" onclick="switchTab('soda', event)">🥤 Soda Clicking</button>
+    <button class="tab-btn" onclick="switchTab('unlocks', event)">🔓 Unlocks</button>
     <button class="tab-btn" onclick="switchTab('shop', event)">🛒 Shop & Upgrades</button>
     <button class="tab-btn" onclick="switchTab('stats', event)">📊 Statistics</button>
             <button class="tab-btn" onclick="switchTab('god', event)">🙏 Talk to God</button>
@@ -159,6 +160,30 @@
             Level Up <br/>
             (+ 150% per drink)
         </button>
+    </div>
+</div>
+
+<!-- Unlocks Tab -->
+<div id="unlocksTab" class="tab-content">
+    <div class="unlocks-container">
+        <div class="unlocks-header">
+            <h2>🔓 Feature Unlocks</h2>
+            <p class="unlocks-subtitle">Discover new features as you progress!</p>
+        </div>
+        
+        <div class="unlocks-grid" id="unlocksGrid">
+            <!-- Unlock items will be populated by JavaScript -->
+        </div>
+        
+        <div class="unlocks-progress">
+            <div class="progress-info">
+                <span class="progress-label">Progress:</span>
+                <span class="progress-value" id="unlocksProgress">0/12</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="unlocksProgressFill"></div>
+            </div>
+        </div>
     </div>
 </div>
 

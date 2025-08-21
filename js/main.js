@@ -86,6 +86,360 @@ const FEATURE_DETECTION = {
     }
 };
 
+// Progressive Feature Unlock System
+const FEATURE_UNLOCKS = {
+    // Track unlocked features
+    unlockedFeatures: new Set(['soda']), // Start with only soda clicking
+    
+    // Define unlock conditions
+    unlockConditions: {
+        'suction': { sips: 50, clicks: 10 },
+        'criticalClick': { sips: 100, clicks: 20 },
+        'fasterDrinks': { sips: 200, clicks: 30 },
+        'straws': { sips: 500, clicks: 50 },
+        'cups': { sips: 1000, clicks: 80 },
+        'widerStraws': { sips: 2000, clicks: 120 },
+        'betterCups': { sips: 5000, clicks: 200 },
+        'levelUp': { sips: 3000, clicks: 150 },
+        'shop': { sips: 500, clicks: 30 },
+        'stats': { sips: 1000, clicks: 60 },
+        'god': { sips: 5000, clicks: 300 },
+        'options': { sips: 2000, clicks: 100 },
+        'unlocks': { sips: 100, clicks: 15 }
+    },
+    
+    // Initialize unlock system
+    init: function() {
+        // Load unlocked features from save
+        const savedUnlocks = localStorage.getItem('unlockedFeatures');
+        if (savedUnlocks) {
+            try {
+                const unlocks = JSON.parse(savedUnlocks);
+                this.unlockedFeatures = new Set(unlocks);
+            } catch (e) {
+                console.error('Error loading unlocked features:', e);
+                this.unlockedFeatures = new Set(['soda']);
+            }
+        }
+        
+        // Apply initial visibility
+        this.updateFeatureVisibility();
+    },
+    
+    // Check if a feature should be unlocked
+    checkUnlock: function(featureName) {
+        if (this.unlockedFeatures.has(featureName)) {
+            return true; // Already unlocked
+        }
+        
+        const condition = this.unlockConditions[featureName];
+        if (!condition) {
+            return false; // No unlock condition defined
+        }
+        
+        // Check if conditions are met
+        const sipsMet = sips.gte(condition.sips);
+        const clicksMet = totalClicks >= condition.clicks;
+        
+        if (sipsMet && clicksMet) {
+            this.unlockFeature(featureName);
+            return true;
+        }
+        
+        return false;
+    },
+    
+    // Unlock a feature
+    unlockFeature: function(featureName) {
+        if (this.unlockedFeatures.has(featureName)) {
+            return; // Already unlocked
+        }
+        
+        this.unlockedFeatures.add(featureName);
+        
+        // Save to localStorage
+        localStorage.setItem('unlockedFeatures', JSON.stringify([...this.unlockedFeatures]));
+        
+        // Show unlock notification
+        this.showUnlockNotification(featureName);
+        
+        // Update UI
+        this.updateFeatureVisibility();
+        
+        console.log(`Feature unlocked: ${featureName}`);
+    },
+    
+    // Show unlock notification
+    showUnlockNotification: function(featureName) {
+        const featureNames = {
+            'suction': 'Suction Upgrade',
+            'criticalClick': 'Critical Click',
+            'fasterDrinks': 'Faster Drinks',
+            'straws': 'Straws',
+            'cups': 'Cups',
+            'widerStraws': 'Wider Straws',
+            'betterCups': 'Better Cups',
+            'levelUp': 'Level Up',
+            'shop': 'Shop & Upgrades Tab',
+            'stats': 'Statistics Tab',
+            'god': 'Talk to God Tab',
+            'options': 'Options Tab',
+            'unlocks': 'Unlocks Tab'
+        };
+        
+        const displayName = featureNames[featureName] || featureName;
+        
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'unlock-notification';
+        notification.innerHTML = `
+            <div class="unlock-content">
+                <div class="unlock-icon">🔓</div>
+                                    <div class="unlock-text">
+                        <div class="unlock-title">New Feature Unlocked!</div>
+                        <div class="unlock-description">${displayName}</div>
+                    </div>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    },
+    
+    // Update visibility of features based on unlock status
+    updateFeatureVisibility: function() {
+        // Update tab buttons
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(btn => {
+            const tabName = btn.getAttribute('onclick').match(/switchTab\('([^']+)'/)?.[1];
+            if (tabName && tabName !== 'soda') {
+                if (this.unlockedFeatures.has(tabName)) {
+                    btn.style.display = 'inline-block';
+                    btn.classList.remove('locked');
+                } else {
+                    btn.style.display = 'none';
+                    btn.classList.add('locked');
+                }
+            }
+        });
+        
+        // Update upgrade buttons and sections
+        this.updateUpgradeVisibility();
+    },
+    
+    // Update visibility of upgrade buttons
+    updateUpgradeVisibility: function() {
+        // Suction upgrade
+        const suctionBtn = document.querySelector('.clicking-upgrade-item:first-child');
+        if (suctionBtn) {
+            suctionBtn.style.display = this.unlockedFeatures.has('suction') ? 'block' : 'none';
+        }
+        
+        // Critical Click upgrade
+        const criticalBtn = document.querySelector('.clicking-upgrade-item:last-child');
+        if (criticalBtn) {
+            criticalBtn.style.display = this.unlockedFeatures.has('criticalClick') ? 'block' : 'none';
+        }
+        
+        // Faster Drinks upgrade
+        const fasterDrinksContainer = document.querySelector('.drink-speed-upgrade-container');
+        if (fasterDrinksContainer) {
+            fasterDrinksContainer.style.display = this.unlockedFeatures.has('fasterDrinks') ? 'block' : 'none';
+        }
+        
+        // Level Up button
+        const levelUpDiv = document.getElementById('levelUpDiv');
+        if (levelUpDiv) {
+            levelUpDiv.style.display = this.unlockedFeatures.has('levelUp') ? 'block' : 'none';
+        }
+        
+        // Shop items
+        const shopItems = document.querySelectorAll('.shop-item');
+        shopItems.forEach((item, index) => {
+            let shouldShow = false;
+            if (index === 0) shouldShow = this.unlockedFeatures.has('straws');
+            else if (index === 1) shouldShow = this.unlockedFeatures.has('widerStraws');
+            else if (index === 2) shouldShow = this.unlockedFeatures.has('cups');
+            else if (index === 3) shouldShow = this.unlockedFeatures.has('betterCups');
+            
+            item.style.display = shouldShow ? 'block' : 'none';
+        });
+    },
+    
+    // Check all unlock conditions (called periodically)
+    checkAllUnlocks: function() {
+        Object.keys(this.unlockConditions).forEach(feature => {
+            this.checkUnlock(feature);
+        });
+        
+        // Update unlocks tab if it's visible
+        this.updateUnlocksTab();
+    },
+    
+    // Update the unlocks tab display
+    updateUnlocksTab: function() {
+        const unlocksGrid = document.getElementById('unlocksGrid');
+        if (!unlocksGrid) return;
+        
+        // Clear existing content
+        unlocksGrid.innerHTML = '';
+        
+        // Define feature information
+        const featureInfo = {
+            'suction': {
+                icon: '💨',
+                name: 'Suction Upgrade',
+                description: 'Increases sips gained per click',
+                category: 'Clicking'
+            },
+            'criticalClick': {
+                icon: '⚡',
+                name: 'Critical Click',
+                description: 'Chance to get bonus sips on clicks',
+                category: 'Clicking'
+            },
+            'fasterDrinks': {
+                icon: '⚡',
+                name: 'Faster Drinks',
+                description: 'Reduces time between automatic drinks',
+                category: 'Drinking'
+            },
+            'straws': {
+                icon: '🥤',
+                name: 'Straws',
+                description: 'Passive sips production per drink',
+                category: 'Production'
+            },
+            'cups': {
+                icon: '☕',
+                name: 'Cups',
+                description: 'More passive sips production per drink',
+                category: 'Production'
+            },
+            'widerStraws': {
+                icon: '🥤',
+                name: 'Wider Straws',
+                description: 'Upgrade to increase straw production',
+                category: 'Production'
+            },
+            'betterCups': {
+                icon: '☕',
+                name: 'Better Cups',
+                description: 'Upgrade to increase cup production',
+                category: 'Production'
+            },
+            'levelUp': {
+                icon: '⭐',
+                name: 'Level Up',
+                description: 'Increase your level for bonus sips',
+                category: 'Progression'
+            },
+            'shop': {
+                icon: '🛒',
+                name: 'Shop & Upgrades',
+                description: 'Access the shop to buy upgrades',
+                category: 'Interface'
+            },
+            'stats': {
+                icon: '📊',
+                name: 'Statistics',
+                description: 'View your game statistics and progress',
+                category: 'Interface'
+            },
+            'god': {
+                icon: '🙏',
+                name: 'Talk to God',
+                description: 'Seek divine wisdom and guidance',
+                category: 'Special'
+            },
+            'options': {
+                icon: '⚙️',
+                name: 'Options',
+                description: 'Configure game settings and save/load',
+                category: 'Interface'
+            },
+            'unlocks': {
+                icon: '🔓',
+                name: 'Unlocks',
+                description: 'Track your feature unlock progress',
+                category: 'Interface'
+            }
+        };
+        
+        // Create unlock items
+        Object.keys(this.unlockConditions).forEach(feature => {
+            const info = featureInfo[feature];
+            const condition = this.unlockConditions[feature];
+            const isUnlocked = this.unlockedFeatures.has(feature);
+            
+            const unlockItem = document.createElement('div');
+            unlockItem.className = `unlock-item ${isUnlocked ? 'unlocked' : 'locked'}`;
+            
+            const sipsMet = sips.gte(condition.sips);
+            const clicksMet = totalClicks >= condition.clicks;
+            
+            unlockItem.innerHTML = `
+                <div class="unlock-status">${isUnlocked ? '🔓' : '🔒'}</div>
+                <div class="unlock-header">
+                    <div class="unlock-icon">${info.icon}</div>
+                    <div class="unlock-info">
+                        <div class="unlock-name">${info.name}</div>
+                        <div class="unlock-description">${info.description}</div>
+                    </div>
+                </div>
+                <div class="unlock-requirements">
+                    <div class="requirement ${sipsMet ? 'met' : ''}">
+                        <span class="requirement-label">Total Sips:</span>
+                        <span class="requirement-value">${prettify(sips)} / ${prettify(condition.sips)}</span>
+                    </div>
+                    <div class="requirement ${clicksMet ? 'met' : ''}">
+                        <span class="requirement-label">Total Clicks:</span>
+                        <span class="requirement-value">${totalClicks} / ${condition.clicks}</span>
+                    </div>
+                </div>
+            `;
+            
+            unlocksGrid.appendChild(unlockItem);
+        });
+        
+        // Update progress
+        this.updateUnlocksProgress();
+    },
+    
+    // Update the unlocks progress display
+    updateUnlocksProgress: function() {
+        const totalFeatures = Object.keys(this.unlockConditions).length;
+        const unlockedCount = this.unlockedFeatures.size - 1; // Subtract 'soda' which starts unlocked
+        const progressPercent = (unlockedCount / totalFeatures) * 100;
+        
+        const progressElement = document.getElementById('unlocksProgress');
+        const progressFillElement = document.getElementById('unlocksProgressFill');
+        
+        if (progressElement) {
+            progressElement.textContent = `${unlockedCount}/${totalFeatures}`;
+        }
+        
+        if (progressFillElement) {
+            progressFillElement.style.width = `${progressPercent}%`;
+        }
+    }
+};
+
 // DOM Element Cache - Imported from dom-cache.js
 // Ensures DOM_CACHE is available before proceeding
 if (typeof DOM_CACHE === 'undefined') {
@@ -297,6 +651,11 @@ function switchTab(tabName, event) {
     if (tabName === 'stats') {
         updateAllStats();
     }
+    
+    // Update unlocks when switching to the unlocks tab
+    if (tabName === 'unlocks') {
+        FEATURE_UNLOCKS.updateUnlocksTab();
+    }
 }
 
 // Make switchTab globally available for HTML onclick attributes
@@ -471,6 +830,9 @@ function initGame() {
         FEATURE_DETECTION.init();
         FEATURE_DETECTION.enableAdvancedFeatures();
         
+        // Initialize progressive feature unlock system
+        FEATURE_UNLOCKS.init();
+        
         // Load saved game data
         let savegame = JSON.parse(localStorage.getItem("save"));
         
@@ -625,6 +987,7 @@ function startGameLoop() {
             updateLastSaveTime();
             updateAllStats();
             checkUpgradeAffordability(); // Check affordability every second
+            FEATURE_UNLOCKS.checkAllUnlocks(); // Check for new feature unlocks
             lastStatsUpdate = currentTime;
         }
         
@@ -670,6 +1033,9 @@ function processDrink() {
         spsClick(sps);
         lastDrinkTime = currentTime;
         drinkProgress = 0;
+        
+        // Check for feature unlocks after processing a drink
+        FEATURE_UNLOCKS.checkAllUnlocks();
         
         // Update auto-save counter based on configurable interval
         if (autosaveEnabled) {
@@ -1573,6 +1939,9 @@ function sodaClick(number) {
     
     // Update upgrade affordability (includes level up button state)
     checkUpgradeAffordability();
+    
+    // Check for feature unlocks after clicking
+    FEATURE_UNLOCKS.checkAllUnlocks();
 }
 
 // Function to show click feedback numbers
