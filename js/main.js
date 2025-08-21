@@ -93,7 +93,7 @@ const FEATURE_UNLOCKS = {
     
     // Define unlock conditions
     unlockConditions: {
-        'suction': { sips: 50, clicks: 10 },
+        'suction': { sips: 25, clicks: 8 },
         'criticalClick': { sips: 100, clicks: 20 },
         'fasterDrinks': { sips: 200, clicks: 30 },
         'straws': { sips: 500, clicks: 50 },
@@ -105,7 +105,7 @@ const FEATURE_UNLOCKS = {
         'stats': { sips: 1000, clicks: 60 },
         'god': { sips: 5000, clicks: 300 },
         'options': { sips: 2000, clicks: 100 },
-        'unlocks': { sips: 100, clicks: 15 }
+        'unlocks': { sips: 25, clicks: 8 }
     },
     
     // Initialize unlock system
@@ -842,7 +842,8 @@ function initGame() {
             cups = new Decimal(savegame.cups || 0);
             suctions = new Decimal(savegame.suctions || 0);
             fasterDrinks = new Decimal(savegame.fasterDrinks || 0);
-            sps = new Decimal(savegame.sps || 0);
+            // Load sps from save, but we'll recalculate it to include base sips per drink
+            const savedSps = new Decimal(savegame.sps || 0);
             widerStraws = new Decimal(savegame.widerStraws || 0);
             betterCups = new Decimal(savegame.betterCups || 0);
             criticalClickChance = new Decimal(savegame.criticalClickChance || 0.001);
@@ -883,10 +884,20 @@ function initGame() {
                 }
 
                 const tempTotalSPD = tempStrawSPD.times(straws).plus(tempCupSPD.times(cups));
+                
+                // Add base sips per drink to offline earnings
+                const baseSipsPerDrink = new Decimal(1);
+                const totalSipsPerDrink = baseSipsPerDrink.plus(tempTotalSPD);
+                
+                // Calculate offline earnings including base sips
+                const drinksPerSecond = 1000 / DEFAULT_DRINK_RATE;
+                const baseSipsPerSecond = baseSipsPerDrink.times(drinksPerSecond);
+                const passiveSipsPerSecond = tempTotalSPD.times(drinksPerSecond);
+                const totalSipsPerSecond = baseSipsPerSecond.plus(passiveSipsPerSecond);
 
                 // Cap offline earnings to prevent abuse (max 1 hour worth)
                 const cappedOfflineSeconds = Math.min(offlineTimeSeconds, 3600);
-                offlineEarnings = tempTotalSPD.times(cappedOfflineSeconds);
+                offlineEarnings = totalSipsPerSecond.times(cappedOfflineSeconds);
 
                 // Show offline progress modal
                 showOfflineProgress(offlineTimeSeconds, offlineEarnings);
@@ -913,8 +924,13 @@ function initGame() {
             cupSPD = cupSPD.times(upgradeMultiplier);
         }
         
-            // Initialize drink rate based on upgrades
-    updateDrinkRate();
+        // Initialize sps with base 1 sip per drink
+        const baseSipsPerDrink = new Decimal(1);
+        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
+
+        // Initialize drink rate based on upgrades
+        updateDrinkRate();
     
     // Update the top sips per drink display
     updateTopSipsPerDrink();
@@ -1031,6 +1047,12 @@ function processDrink() {
     if (currentTime - lastDrinkTime >= drinkRate) {
         // Process the drink
         spsClick(sps);
+        
+        // Add base sips per drink (always 1, regardless of straws/cups)
+        const baseSipsPerDrink = new Decimal(1);
+        sips = sips.plus(baseSipsPerDrink);
+        totalSipsEarned = totalSipsEarned.plus(baseSipsPerDrink);
+        
         lastDrinkTime = currentTime;
         drinkProgress = 0;
         
@@ -1086,21 +1108,26 @@ function getDrinkRateSeconds() {
 function updateTopSipsPerDrink() {
     const topSipsPerDrinkElement = DOM_CACHE.topSipsPerDrink;
     if (topSipsPerDrinkElement) {
-        // Show sips per drink (how many sips you get from automatic drinks)
-        // This is only passive production from straws and cups
-        // Click-based sips are separate and happen when you manually click
+        // Show total sips per drink (base 1 + passive production from straws and cups)
+        // Base sips per drink is always 1, regardless of upgrades
+        const baseSipsPerDrink = new Decimal(1);
         
         // Passive production per drink (from straws and cups)
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         
+        // Total sips per drink = base + passive
+        const totalSipsPerDrink = baseSipsPerDrink.plus(passiveSipsPerDrink);
+        
         console.log('Sips per drink Debug:', {
+            baseSipsPerDrink: baseSipsPerDrink.toString(),
             passiveSipsPerDrink: passiveSipsPerDrink.toString(),
+            totalSipsPerDrink: totalSipsPerDrink.toString(),
             strawSPD: strawSPD.toString(),
             straws: straws.toString(),
             cupSPD: cupSPD.toString(),
             cups: cups.toString()
         });
-        topSipsPerDrinkElement.textContent = prettify(passiveSipsPerDrink);
+        topSipsPerDrinkElement.textContent = prettify(totalSipsPerDrink);
     }
 }
 
@@ -1108,22 +1135,27 @@ function updateTopSipsPerDrink() {
 function updateTopSipsPerSecond() {
     const topSipsPerSecondElement = DOM_CACHE.topSipsPerSecond;
     if (topSipsPerSecondElement) {
-        // Calculate total sips per second from passive production sources only
-        // This shows actual sips generated per second automatically (straws + cups)
-        // Click-based sips are not included since they depend on user clicking speed
-
+        // Calculate total sips per second from all sources
+        // Base sips per drink is always 1, regardless of upgrades
+        const baseSipsPerDrink = new Decimal(1);
+        
         // Passive production per drink (strawSPD and cupSPD are per drink, not per second)
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         
+        // Total sips per drink = base + passive
+        const totalSipsPerDrink = baseSipsPerDrink.plus(passiveSipsPerDrink);
+        
         // Convert to actual sips per second by dividing by drink rate in seconds
         const drinkRateSeconds = drinkRate / 1000;
-        const passiveSipsPerSecond = passiveSipsPerDrink.div(drinkRateSeconds);
+        const totalSipsPerSecond = totalSipsPerDrink.div(drinkRateSeconds);
 
         // Debug logging to check the calculation
         console.log('Total/s Debug:', {
+            baseSipsPerDrink: baseSipsPerDrink.toString(),
             passiveSipsPerDrink: passiveSipsPerDrink.toString(),
+            totalSipsPerDrink: totalSipsPerDrink.toString(),
             drinkRateSeconds: drinkRateSeconds,
-            passiveSipsPerSecond: passiveSipsPerSecond.toString()
+            totalSipsPerSecond: totalSipsPerSecond.toString()
         });
 
         // Also log passive calculation separately
@@ -1137,7 +1169,7 @@ function updateTopSipsPerSecond() {
             drinkRate: drinkRate
         });
 
-        topSipsPerSecondElement.textContent = prettify(passiveSipsPerSecond);
+        topSipsPerSecondElement.textContent = prettify(totalSipsPerSecond);
     }
 }
 
@@ -1313,9 +1345,13 @@ function updateEconomyStats() {
     // Current sips per second
     const currentSipsPerSecondElement = DOM_CACHE.currentSipsPerSecond;
     if (currentSipsPerSecondElement) {
-        const currentSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        // Include base 1 sip per drink in the calculation
+        const baseSipsPerDrink = new Decimal(1);
+        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        const totalSipsPerDrink = baseSipsPerDrink.plus(passiveSipsPerDrink);
+        
         const drinkRateSeconds = drinkRate / 1000;
-        const currentSPS = currentSipsPerDrink.div(drinkRateSeconds);
+        const currentSPS = totalSipsPerDrink.div(drinkRateSeconds);
         currentSipsPerSecondElement.textContent = prettify(currentSPS);
     }
     
@@ -1993,9 +2029,13 @@ function spsClick(amount) {
     totalSipsEarned = totalSipsEarned.plus(amount);
     
     // Update highest SPS if current is higher
-    const currentSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+    // Include base 1 sip per drink in the calculation
+    const baseSipsPerDrink = new Decimal(1);
+    const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+    const totalSipsPerDrink = baseSipsPerDrink.plus(passiveSipsPerDrink);
+    
     const drinkRateSeconds = drinkRate / 1000;
-    const currentSPS = currentSipsPerDrink.div(drinkRateSeconds);
+    const currentSPS = totalSipsPerDrink.div(drinkRateSeconds);
     if (currentSPS.gt(highestSipsPerSecond)) {
         highestSipsPerSecond = currentSPS;
     }
@@ -2022,7 +2062,10 @@ function buyStraw() {
         const upgradeMultiplier = widerStraws.gt(0) ? new Decimal(1 + (widerStraws.toNumber() * 0.5)) : new Decimal(1);
         strawSPD = baseStrawSPD.times(upgradeMultiplier);
 
-        sps = strawSPD.times(straws).plus(cupSPD.times(cups));
+        // Include base 1 sip per drink in total SPS
+        const baseSipsPerDrink = new Decimal(1);
+        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
         // Update the top sips/d indicator
         updateTopSipsPerDrink();
@@ -2055,7 +2098,10 @@ function buyCup() {
         const upgradeMultiplier = betterCups.gt(0) ? new Decimal(1 + (betterCups.toNumber() * 0.4)) : new Decimal(1);
         cupSPD = baseCupSPD.times(upgradeMultiplier);
 
-        sps = strawSPD.times(straws).plus(cupSPD.times(cups));
+        // Include base 1 sip per drink in total SPS
+        const baseSipsPerDrink = new Decimal(1);
+        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
         // Update the top sips/d indicator
         updateTopSipsPerDrink();
@@ -2085,8 +2131,10 @@ function buyWiderStraws() {
         const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5)); // +50% per level
         strawSPD = new Decimal(0.6).times(upgradeMultiplier);
 
-        // Recalculate total SPS
-        sps = strawSPD.times(straws).plus(cupSPD.times(cups));
+        // Recalculate total SPS including base 1 sip per drink
+        const baseSipsPerDrink = new Decimal(1);
+        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
         // Update the top sips/d indicator
         updateTopSipsPerDrink();
@@ -2115,8 +2163,10 @@ function buyBetterCups() {
         const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4)); // +40% per level
         cupSPD = new Decimal(1.2).times(upgradeMultiplier);
 
-        // Recalculate total SPS
-        sps = strawSPD.times(straws).plus(cupSPD.times(cups));
+        // Recalculate total SPS including base 1 sip per drink
+        const baseSipsPerDrink = new Decimal(1);
+        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
         // Update the top sips/d indicator
         updateTopSipsPerDrink();
@@ -2456,9 +2506,10 @@ function delete_save() {
         straws = new Decimal(0);
         cups = new Decimal(0);
         suctions = new Decimal(0);
-        sps = new Decimal(0);
-        strawSPD = new Decimal(0);
-        cupSPD = new Decimal(0);
+        // Set sps to base 1 sip per drink (since no straws/cups yet)
+        sps = new Decimal(1);
+        strawSPD = new Decimal(0.6);
+        cupSPD = new Decimal(1.2);
         suctionClickBonus = new Decimal(0);
         widerStraws = new Decimal(0);
         betterCups = new Decimal(0);
@@ -2507,13 +2558,18 @@ function delete_save() {
         lastClickTime = 0;
         clickTimes = [];
         
-
+        // Reset unlocked features to only soda
+        FEATURE_UNLOCKS.unlockedFeatures = new Set(['soda']);
+        localStorage.removeItem('unlockedFeatures');
         
         // Update the UI to reflect the reset
         reload();
         updateCriticalClickDisplay();
         updateAllStats();
         checkUpgradeAffordability();
+        
+        // Update feature visibility to hide all unlocked features
+        FEATURE_UNLOCKS.updateFeatureVisibility();
         
         // Show success message
         alert("Save deleted successfully! Your game has been reset to the beginning.");
