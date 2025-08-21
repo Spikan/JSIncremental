@@ -6,6 +6,7 @@ import { EVENTS } from './core/constants.js';
 import * as ClickRules from './core/rules/clicks.js';
 import * as PurchaseRules from './core/rules/purchases.js';
 import * as Mutations from './core/state/mutations.js';
+import * as EconomyRules from './core/rules/economy.js';
 
 // Detect module loading
 console.info('[bootstrap] Module index.js loaded');
@@ -30,6 +31,7 @@ window.App = {
     rules: {
         clicks: ClickRules,
         purchases: PurchaseRules,
+        economy: EconomyRules,
     },
     mutations: Mutations,
 };
