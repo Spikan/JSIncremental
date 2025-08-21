@@ -6,6 +6,7 @@ const z = (typeof window !== 'undefined' && window.Zod) || (typeof globalThis !=
         omit: () => chain,
         optional: () => chain,
         min: () => chain,
+        max: () => chain,
     };
     return {
         object: () => chain,

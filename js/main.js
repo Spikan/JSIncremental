@@ -627,19 +627,20 @@ function initGame() {
         const config = window.GAME_CONFIG?.BALANCE || {};
         // Use centralized resources system for production values when available
         if (window.App?.systems?.resources?.recalcProduction) {
+            const up = window.App?.data?.upgrades || {};
             const result = window.App.systems.resources.recalcProduction({
                 straws: straws.toNumber(),
                 cups: cups.toNumber(),
                 widerStraws: widerStraws.toNumber(),
                 betterCups: betterCups.toNumber(),
                 base: {
-                    strawBaseSPD: config.STRAW_BASE_SPD,
-                    cupBaseSPD: config.CUP_BASE_SPD,
+                    strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
+                    cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,
                     baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
                 },
                 multipliers: {
-                    widerStrawsPerLevel: config.WIDER_STRAWS_MULTIPLIER,
-                    betterCupsPerLevel: config.BETTER_CUPS_MULTIPLIER,
+                    widerStrawsPerLevel: up?.widerStraws?.multiplierPerLevel ?? config.WIDER_STRAWS_MULTIPLIER,
+                    betterCupsPerLevel: up?.betterCups?.multiplierPerLevel ?? config.BETTER_CUPS_MULTIPLIER,
                 },
             });
             strawSPD = new Decimal(result.strawSPD);
@@ -1895,19 +1896,20 @@ function buyStraw() {
 
         // Recalculate strawSPD with current upgrade multipliers
         if (window.App?.systems?.resources?.recalcProduction) {
+            const up = window.App?.data?.upgrades || {};
             const result = window.App.systems.resources.recalcProduction({
                 straws: straws.toNumber(),
                 cups: cups.toNumber(),
                 widerStraws: widerStraws.toNumber(),
                 betterCups: betterCups.toNumber(),
                 base: {
-                    strawBaseSPD: config.STRAW_BASE_SPD,
-                    cupBaseSPD: config.CUP_BASE_SPD,
+                    strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
+                    cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,
                     baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
                 },
                 multipliers: {
-                    widerStrawsPerLevel: config.WIDER_STRAWS_MULTIPLIER,
-                    betterCupsPerLevel: config.BETTER_CUPS_MULTIPLIER,
+                    widerStrawsPerLevel: up?.widerStraws?.multiplierPerLevel ?? config.WIDER_STRAWS_MULTIPLIER,
+                    betterCupsPerLevel: up?.betterCups?.multiplierPerLevel ?? config.BETTER_CUPS_MULTIPLIER,
                 },
             });
             strawSPD = new Decimal(result.strawSPD);
@@ -1976,19 +1978,20 @@ function buyCup() {
 
         // Recalculate cupSPD with current upgrade multipliers
         if (window.App?.systems?.resources?.recalcProduction) {
+            const up = window.App?.data?.upgrades || {};
             const result = window.App.systems.resources.recalcProduction({
                 straws: straws.toNumber(),
                 cups: cups.toNumber(),
                 widerStraws: widerStraws.toNumber(),
                 betterCups: betterCups.toNumber(),
                 base: {
-                    strawBaseSPD: config.STRAW_BASE_SPD,
-                    cupBaseSPD: config.CUP_BASE_SPD,
+                    strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
+                    cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,
                     baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
                 },
                 multipliers: {
-                    widerStrawsPerLevel: config.WIDER_STRAWS_MULTIPLIER,
-                    betterCupsPerLevel: config.BETTER_CUPS_MULTIPLIER,
+                    widerStrawsPerLevel: up?.widerStraws?.multiplierPerLevel ?? config.WIDER_STRAWS_MULTIPLIER,
+                    betterCupsPerLevel: up?.betterCups?.multiplierPerLevel ?? config.BETTER_CUPS_MULTIPLIER,
                 },
             });
             cupSPD = new Decimal(result.cupSPD);

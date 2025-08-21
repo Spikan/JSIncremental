@@ -1,31 +1,16 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { validateUnlocks, validateUpgrades, validateGameSave, validateGameOptions } from '../js/core/validation/schemas.js';
+import { z as realZ } from 'zod';
 
-// Mock Zod for tests
-beforeAll(() => {
-    const mockSchema = {
-        parse: (data) => {
-            // Simple mock validation - just return data for valid tests
-            if (data && typeof data === 'object') {
-                return data;
-            }
-            throw new Error('Validation failed');
-        },
-        omit: () => mockSchema,
-        optional: () => mockSchema,
-        min: () => mockSchema
-    };
-    
-    const mockZod = {
-        object: () => mockSchema,
-        number: () => mockSchema,
-        boolean: () => mockSchema,
-        string: () => mockSchema,
-        any: () => mockSchema,
-        record: () => mockSchema
-    };
-    
-    global.window = { Zod: mockZod };
+let validateUnlocks, validateUpgrades, validateGameSave, validateGameOptions;
+
+beforeAll(async () => {
+    // Ensure schemas module picks up real Zod
+    globalThis.Zod = realZ;
+    const mod = await import('../js/core/validation/schemas.js');
+    validateUnlocks = mod.validateUnlocks;
+    validateUpgrades = mod.validateUpgrades;
+    validateGameSave = mod.validateGameSave;
+    validateGameOptions = mod.validateGameOptions;
 });
 
 describe('Validation Schemas', () => {
