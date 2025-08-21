@@ -15,6 +15,7 @@ import * as saveSys from './core/systems/save-system.js';
 import * as loopSys from './core/systems/loop-system.js';
 import * as musicSys from './core/systems/music-system.js';
 import * as optionsSys from './core/systems/options-system.js';
+import { createStateBridge } from './core/state/bridge.js';
 import * as ui from './ui/index.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
 
@@ -87,6 +88,12 @@ async function loadDataFiles() {
 
 // Initialize data files and UI system
 loadDataFiles().then(() => {
+    // Initialize state bridge (mirror selected legacy globals)
+    try {
+        const bridge = createStateBridge(window.App);
+        bridge.init();
+        window.App.stateBridge = bridge;
+    } catch {}
     // Initialize UI system
     if (window.App.ui?.initializeUI) {
         window.App.ui.initializeUI();
