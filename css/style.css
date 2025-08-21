@@ -1089,9 +1089,9 @@ h3 {
 }
 
 .clicking-upgrade-btn {
-    width: 180px;
+    width: 160px;
     height: 70px;
-    padding: 1rem 1.5rem;
+    padding: 1rem 1rem;
     font-size: 1rem;
     font-weight: bold;
     border: 3px solid #00B36B;
@@ -1107,7 +1107,8 @@ h3 {
     overflow: hidden;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: center;
+    gap: 0.5rem;
     margin-bottom: 1rem;
 }
 
@@ -1137,23 +1138,35 @@ h3 {
 }
 
 .clicking-upgrade-icon {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
 }
 
 .clicking-upgrade-info {
     flex: 1;
-    text-align: left;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .clicking-upgrade-name {
     font-weight: bold;
     margin-bottom: 0.2rem;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .clicking-upgrade-cost {
     font-size: 0.8rem;
     opacity: 0.9;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .clicking-upgrade-stats {
@@ -1163,6 +1176,7 @@ h3 {
     border-radius: 8px;
     border: 1px solid rgba(0, 179, 107, 0.3);
     margin-top: auto;
+    width: 100%;
 }
 
 .clicking-stat {
@@ -1185,9 +1199,10 @@ h3 {
     }
     
     .clicking-upgrade-btn {
-        width: 160px;
+        width: 140px;
         height: 70px;
-        font-size: 1rem;
+        font-size: 0.9rem;
+        padding: 0.75rem 0.75rem;
     }
 }
 
