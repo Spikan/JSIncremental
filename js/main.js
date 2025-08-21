@@ -1865,49 +1865,57 @@ function sodaClick(number) {
 
 // Function to show click feedback numbers
 function showClickFeedback(sipsGained, isCritical = false) {
-    const sodaContainer = DOM_CACHE.sodaButton.parentNode;
+    const sodaContainer = DOM_CACHE.sodaButton?.parentNode;
     if (!sodaContainer) return;
-    
+
     // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
     feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
-    
+
     // Accessibility improvements
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
-    feedback.setAttribute('aria-label', isCritical ? 
-        `Critical hit! Gained ${prettify(sipsGained)} sips` : 
+    feedback.setAttribute('aria-label', isCritical ?
+        `Critical hit! Gained ${prettify(sipsGained)} sips` :
         `Gained ${prettify(sipsGained)} sips`
     );
-    
-    // Use more efficient positioning to avoid layout recalculations
+
+    // Use fixed positioning for consistent viewport positioning
     const containerRect = sodaContainer.getBoundingClientRect();
     const config = window.GAME_CONFIG?.LIMITS || {};
-    const rangeX = config.CLICK_FEEDBACK_RANGE_X;
-    const rangeY = config.CLICK_FEEDBACK_RANGE_Y;
+    const rangeX = config.CLICK_FEEDBACK_RANGE_X || 100;
+    const rangeY = config.CLICK_FEEDBACK_RANGE_Y || 80;
     const randomX = (Math.random() - 0.5) * rangeX; // -rangeX/2px to +rangeX/2px
     const randomY = (Math.random() - 0.5) * rangeY;  // -rangeY/2px to +rangeY/2px
-    
-    // Position relative to container center for more stable positioning
-    feedback.style.position = 'absolute';
-    feedback.style.left = '50%';
-    feedback.style.top = '50%';
-    feedback.style.transform = `translate(-50%, -50%) translate(${randomX}px, ${randomY}px)`;
-    
-    // Add to container
-    sodaContainer.appendChild(feedback);
-    
-    // Use requestAnimationFrame for smoother removal
-    requestAnimationFrame(() => {
-        setTimeout(() => {
-            if (feedback.parentNode) {
-                feedback.parentNode.removeChild(feedback);
-            }
-        }, isCritical ? 
-            window.GAME_CONFIG.TIMING.CRITICAL_FEEDBACK_DURATION : 
-            window.GAME_CONFIG.TIMING.CLICK_FEEDBACK_DURATION); // Critical feedback stays longer
-    });
+
+    feedback.style.cssText = `
+        position: fixed;
+        left: ${containerRect.left + containerRect.width/2 + randomX}px;
+        top: ${containerRect.top + containerRect.height/2 + randomY}px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 1000;
+        font-weight: bold;
+        font-size: ${isCritical ? '1.5em' : '1.2em'};
+        color: ${isCritical ? '#ff6b35' : '#4CAF50'};
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        animation: fadeUpAndOut 2s ease-out forwards;
+    `;
+
+    // Add to body for proper positioning
+    document.body.appendChild(feedback);
+
+    // Remove after animation
+    const config2 = window.GAME_CONFIG?.TIMING || {};
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.parentNode.removeChild(feedback);
+        }
+    }, isCritical ?
+        (config2.CRITICAL_FEEDBACK_DURATION || 2500) :
+        (config2.CLICK_FEEDBACK_DURATION || 2000)
+    );
 }
 
 function spsClick(amount) {
