@@ -836,20 +836,42 @@ function setupMobileTouchHandling() {
         console.log('Setting up mobile touch handling for soda button');
         
         // Prevent default touch behaviors that could interfere
+        let touchStartTime = 0;
+        let isTouchClick = false;
+        
         sodaButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
+            touchStartTime = Date.now();
+            isTouchClick = true;
             // Add visual feedback immediately
             sodaButton.classList.add('soda-clicked');
         }, { passive: false });
 
         sodaButton.addEventListener('touchend', function(e) {
             e.preventDefault();
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // Only trigger click if it was a short touch (not a long press)
+            if (touchDuration < 300 && isTouchClick) {
+                // Temporarily disable onclick to prevent duplicate
+                const originalOnclick = sodaButton.onclick;
+                sodaButton.onclick = null;
+                
+                // Trigger the click function
+                sodaClick(1);
+                
+                // Re-enable onclick after a short delay
+                setTimeout(() => {
+                    sodaButton.onclick = originalOnclick;
+                }, 100);
+            }
+            
             // Remove visual feedback after a short delay
             setTimeout(() => {
                 sodaButton.classList.remove('soda-clicked');
             }, 150);
-            // Note: We don't call sodaClick here to avoid duplicate feedback
-            // The onclick handler will still work for touch devices
+            
+            isTouchClick = false;
         }, { passive: false });
 
         // Prevent context menu on long press
