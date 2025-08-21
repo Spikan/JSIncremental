@@ -130,6 +130,9 @@ const DOM_CACHE = {
     }
 };
 
+// Expose DOM cache to window for module access
+window.DOM_CACHE = DOM_CACHE;
+
 // Auto-initialize when DOM is ready if not already initialized
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

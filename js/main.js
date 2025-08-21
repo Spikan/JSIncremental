@@ -124,6 +124,11 @@ window.straws = straws;
 window.cups = cups;
 let suctions = new Decimal(0);
 let sps = new Decimal(0);
+// Expose sps for UI modules
+Object.defineProperty(window, 'sps', {
+	get: function() { return sps; },
+	set: function(v) { sps = new Decimal(v); }
+});
 let strawSPD = new Decimal(0);
 let cupSPD = new Decimal(0);
 let suctionClickBonus = new Decimal(0);
@@ -135,6 +140,11 @@ let level = new Decimal(1);
 // Drink system variables
     const DEFAULT_DRINK_RATE = window.GAME_CONFIG.TIMING.DEFAULT_DRINK_RATE;
 let drinkRate = DEFAULT_DRINK_RATE;
+// Expose drinkRate for UI modules
+Object.defineProperty(window, 'drinkRate', {
+	get: function() { return drinkRate; },
+	set: function(v) { drinkRate = Number(v) || drinkRate; }
+});
 let drinkProgress = 0;
 let lastDrinkTime = Date.now();
 
@@ -1957,11 +1967,12 @@ function sodaClick(number) {
 
         
         // Update top sip counter
-        if (window.App?.ui?.updateTopSipCounter) { try { window.App.ui.updateTopSipCounter(); } catch {}
-        } else {
+        try { window.App?.ui?.updateTopSipCounter?.(); } catch {}
+        {
             const topSipElement = DOM_CACHE.topSipValue;
             if (topSipElement) {
-                topSipElement.innerHTML = prettify(window.sips);
+                const val = (typeof window.prettify === 'function') ? window.prettify(window.sips) : (window.sips?.toString?.() ?? String(window.sips));
+                topSipElement.textContent = val;
             }
         }
         

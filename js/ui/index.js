@@ -57,6 +57,7 @@ export function initializeUI() {
             if (window.sips && typeof window.sips.gte === 'function') {
                 updateTopSipsPerDrink();
                 updateTopSipsPerSecond();
+                updateTopSipCounter();
                 checkUpgradeAffordability();
                 if (data.gained) {
                     showClickFeedback(data.gained, data.critical);
@@ -69,6 +70,7 @@ export function initializeUI() {
             if (window.sips && typeof window.sips.gte === 'function') {
                 updateTopSipsPerDrink();
                 updateTopSipsPerSecond();
+                updateTopSipCounter();
                 checkUpgradeAffordability();
                 updateCriticalClickDisplay();
                 if (data.item && data.cost) {
@@ -95,6 +97,7 @@ export function initializeUI() {
 export function updateAllDisplays() {
     updateTopSipsPerDrink();
     updateTopSipsPerSecond();
+    updateTopSipCounter();
     updateCriticalClickDisplay();
     updateDrinkSpeedDisplay();
     updateAutosaveStatus();
@@ -110,6 +113,7 @@ export function performBatchUIUpdate() {
     requestAnimationFrame(() => {
         updateTopSipsPerDrink();
         updateTopSipsPerSecond();
+        updateTopSipCounter();
         updatePlayTime();
         
         // Only update stats if stats tab is active

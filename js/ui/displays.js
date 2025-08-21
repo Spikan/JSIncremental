@@ -1,134 +1,143 @@
 // UI Display Updates
 // Handles all display updates for game stats, costs, and progress indicators
 
+// Fallback prettify function if not available in global scope
+function safePrettify(value) {
+	if (typeof window?.prettify === 'function') {
+		return window.prettify(value);
+	}
+	return value?.toString?.() ?? String(value);
+}
+
 // Update cost display with affordability indicators
 export function updateCostDisplay(elementId, cost, isAffordable) {
-    if (typeof window === 'undefined') return;
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = prettify(cost);
-        element.classList.toggle('affordable', isAffordable);
-        element.classList.toggle('unaffordable', !isAffordable);
-    }
+	if (typeof window === 'undefined') return;
+	const element = document.getElementById(elementId);
+	if (element) {
+		element.innerHTML = safePrettify(cost);
+		element.classList.toggle('affordable', isAffordable);
+		element.classList.toggle('unaffordable', !isAffordable);
+	}
 }
 
 // Update button state based on affordability
 export function updateButtonState(buttonId, isAffordable, cost) {
-    if (typeof window === 'undefined') return;
-    // Try multiple selectors to find the button
-    const button = document.getElementById(buttonId) || 
-                  document.querySelector(`[data-button-id="${buttonId}"]`) ||
-                  document.querySelector(`button[onclick*="${buttonId}"]`);
-    
-    if (button) {
-        button.disabled = !isAffordable;
-        button.classList.toggle('affordable', isAffordable);
-        button.classList.toggle('unaffordable', !isAffordable);
-        
-        // Update button text with cost if it has a cost span
-        const costSpan = button.querySelector('.cost');
-        if (costSpan && typeof cost !== 'undefined') {
-            costSpan.textContent = prettify(cost);
-        }
-    }
+	if (typeof window === 'undefined') return;
+	// Try multiple selectors to find the button
+	const button = document.getElementById(buttonId) || 
+				  document.querySelector(`[data-button-id="${buttonId}"]`) ||
+				  document.querySelector(`button[onclick*="${buttonId}"]`);
+	
+	if (button) {
+		button.disabled = !isAffordable;
+		button.classList.toggle('affordable', isAffordable);
+		button.classList.toggle('unaffordable', !isAffordable);
+		
+		// Update button text with cost if it has a cost span
+		const costSpan = button.querySelector('.cost');
+		if (costSpan && typeof cost !== 'undefined') {
+			costSpan.textContent = safePrettify(cost);
+		}
+	}
 }
 
 // Update the top sips per drink display
 export function updateTopSipsPerDrink() {
-    if (typeof window === 'undefined') return;
-    const topSipsPerDrinkElement = window.DOM_CACHE?.topSipsPerDrink;
-    if (topSipsPerDrinkElement && window.sps) {
-        topSipsPerDrinkElement.innerHTML = prettify(window.sps);
-    }
+	if (typeof window === 'undefined') return;
+	const topSipsPerDrinkElement = window.DOM_CACHE?.topSipsPerDrink;
+	if (topSipsPerDrinkElement && window.sps) {
+		topSipsPerDrinkElement.innerHTML = safePrettify(window.sps);
+	}
 }
 
 // Update the top total sips per second display (passive production only)
 export function updateTopSipsPerSecond() {
-    if (typeof window === 'undefined') return;
-    const topSipsPerSecondElement = window.DOM_CACHE?.topSipsPerSecond;
-    if (topSipsPerSecondElement && window.sps && window.drinkRate) {
-        const drinkRateSeconds = window.drinkRate / 1000;
-        const sipsPerSecond = window.sps.div(drinkRateSeconds);
-        topSipsPerSecondElement.innerHTML = prettify(sipsPerSecond);
-    }
+	if (typeof window === 'undefined') return;
+	const topSipsPerSecondElement = window.DOM_CACHE?.topSipsPerSecond;
+	if (topSipsPerSecondElement && window.sps && window.drinkRate) {
+		const drinkRateSeconds = window.drinkRate / 1000;
+		const sipsPerSecond = window.sps.div(drinkRateSeconds);
+		topSipsPerSecondElement.innerHTML = safePrettify(sipsPerSecond);
+	}
 }
 
 // Update the critical click chance display
 export function updateCriticalClickDisplay() {
-    if (typeof window === 'undefined') return;
-    const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
-    if (criticalClickChanceCompact && window.criticalClickChance) {
-        const percentage = window.criticalClickChance.times(100).toFixed(1);
-        criticalClickChanceCompact.textContent = `${percentage}%`;
-    }
+	if (typeof window === 'undefined') return;
+	const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
+	if (criticalClickChanceCompact && window.criticalClickChance) {
+		const percentage = window.criticalClickChance.times(100).toFixed(1);
+		criticalClickChanceCompact.textContent = `${percentage}%`;
+	}
 }
 
 // Update drink speed display
 export function updateDrinkSpeedDisplay() {
-    if (typeof window === 'undefined') return;
-    // Update compact drink speed display elements
-    const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
-    if (currentDrinkSpeedCompact && window.drinkRate) {
-        const drinkRateSeconds = window.drinkRate / 1000;
-        currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
-    }
+	if (typeof window === 'undefined') return;
+	// Update compact drink speed display elements
+	const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
+	if (currentDrinkSpeedCompact && window.drinkRate) {
+		const drinkRateSeconds = window.drinkRate / 1000;
+		currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
+	}
 }
 
 // Update autosave status display
 export function updateAutosaveStatus() {
-    if (typeof window === 'undefined') return;
-    const status = document.getElementById('autosaveStatus');
-    if (status && window.autosaveEnabled !== undefined && window.autosaveInterval !== undefined) {
-        if (window.autosaveEnabled) {
-            status.textContent = `Autosave: ON (${window.autosaveInterval}s)`;
-            status.className = 'autosave-on';
-        } else {
-            status.textContent = 'Autosave: OFF';
-            status.className = 'autosave-off';
-        }
-    }
+	if (typeof window === 'undefined') return;
+	const status = document.getElementById('autosaveStatus');
+	if (status && window.autosaveEnabled !== undefined && window.autosaveInterval !== undefined) {
+		if (window.autosaveEnabled) {
+			status.textContent = `Autosave: ON (${window.autosaveInterval}s)`;
+			status.className = 'autosave-on';
+		} else {
+			status.textContent = 'Autosave: OFF';
+			status.className = 'autosave-off';
+		}
+	}
 }
 
 // Update drink progress bar
 export function updateDrinkProgress(progress, drinkRate) {
-    if (typeof window === 'undefined') return;
-    const progressFill = window.DOM_CACHE?.progressFill;
-    const countdown = window.DOM_CACHE?.countdown;
-    
-    if (progressFill && typeof progress === 'number') {
-        progressFill.style.width = `${Math.min(progress, 100)}%`;
-    }
-    
-    if (countdown && drinkRate) {
-        const remainingTime = Math.max(0, drinkRate - (progress / 100 * drinkRate));
-        const remainingSeconds = (remainingTime / 1000).toFixed(1);
-        countdown.textContent = `${remainingSeconds}s`;
-    }
+	if (typeof window === 'undefined') return;
+	const progressFill = window.DOM_CACHE?.progressFill;
+	const countdown = window.DOM_CACHE?.countdown;
+	
+	if (progressFill && typeof progress === 'number') {
+		progressFill.style.width = `${Math.min(progress, 100)}%`;
+	}
+	
+	if (countdown && drinkRate) {
+		const remainingTime = Math.max(0, drinkRate - (progress / 100 * drinkRate));
+		const remainingSeconds = (remainingTime / 1000).toFixed(1);
+		countdown.textContent = `${remainingSeconds}s`;
+	}
 }
 
 // Update the top current sips counter
 export function updateTopSipCounter() {
-    if (typeof window === 'undefined') return;
-    const topSipElement = window.DOM_CACHE?.topSipValue;
-    if (topSipElement && window.sips) {
-        topSipElement.innerHTML = prettify(window.sips);
-    }
+	if (typeof window === 'undefined') return;
+	const topSipElement = window.DOM_CACHE?.topSipValue || document.getElementById('topSipValue');
+	if (topSipElement) {
+		const value = (window.sips != null) ? window.sips : 0;
+		topSipElement.textContent = safePrettify(value);
+	}
 }
 
 // Update the displayed level number
 export function updateLevelNumber() {
-    if (typeof window === 'undefined') return;
-    const levelEl = window.DOM_CACHE?.levelNumber;
-    if (levelEl && window.level != null) {
-        const val = typeof window.level?.toNumber === 'function' ? window.level.toNumber() : window.level;
-        levelEl.innerHTML = String(val);
-    }
+	if (typeof window === 'undefined') return;
+	const levelEl = window.DOM_CACHE?.levelNumber;
+	if (levelEl && window.level != null) {
+		const val = typeof window.level?.toNumber === 'function' ? window.level.toNumber() : window.level;
+		levelEl.innerHTML = String(val);
+	}
 }
 
 // Update the level text banner/label
 export function updateLevelText(text) {
-    const el = window.DOM_CACHE?.levelText || document.getElementById('levelText');
-    if (el && typeof text === 'string') {
-        el.innerHTML = text;
-    }
+	const el = window.DOM_CACHE?.levelText || document.getElementById('levelText');
+	if (el && typeof text === 'string') {
+		el.innerHTML = text;
+	}
 }
