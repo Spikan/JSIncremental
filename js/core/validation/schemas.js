@@ -68,6 +68,10 @@ export const GameSaveSchema = z.object({
   suctions: z.any(), // Decimal.js object
   criticalClicks: z.any(), // Decimal.js object
   fasterDrinks: z.any(), // Decimal.js object
+  totalSipsEarned: z.any().optional(), // Decimal.js object
+  drinkRate: z.number().min(0).optional(),
+  lastDrinkTime: z.number().min(0).optional(),
+  drinkProgress: z.number().min(0).optional(),
   lastSaveTime: z.number().optional(),
   totalClicks: z.number().min(0).optional(),
   totalSips: z.any().optional(), // Decimal.js object

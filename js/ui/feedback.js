@@ -11,8 +11,29 @@ function safePrettify(value) {
 
 // Show click feedback numbers
 export function showClickFeedback(sipsGained, isCritical = false) {
+    // Ensure DOM_CACHE is ready and initialized
+    if (!window.DOM_CACHE || !window.DOM_CACHE.isReady()) {
+        if (window.DOM_CACHE?.init) {
+            window.DOM_CACHE.init();
+        }
+    }
+    
     const sodaContainer = window.DOM_CACHE?.sodaButton?.parentNode;
-    if (!sodaContainer) return;
+    if (!sodaContainer) {
+        // Fallback: try to find soda button directly
+        const sodaButton = document.getElementById('sodaButton');
+        if (sodaButton?.parentNode) {
+            showFeedbackWithContainer(sipsGained, isCritical, sodaButton.parentNode);
+            return;
+        }
+        return;
+    }
+    
+    showFeedbackWithContainer(sipsGained, isCritical, sodaContainer);
+}
+
+// Helper function to show feedback with a given container
+function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
     
     // Create feedback element
     const feedback = document.createElement('div');

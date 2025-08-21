@@ -118,6 +118,10 @@ console.log('window.buySuction available:', typeof window.buySuction);
 window.sips = new Decimal(0);
 let straws = new Decimal(0);
 let cups = new Decimal(0);
+
+// Make these accessible to the save system
+window.straws = straws;
+window.cups = cups;
 let suctions = new Decimal(0);
 let sps = new Decimal(0);
 let strawSPD = new Decimal(0);
@@ -524,8 +528,11 @@ function initGame() {
         
         if (savegame && typeof savegame.sips !== "undefined" && savegame.sips !== null) {
             window.sips = new Decimal(savegame.sips);
-            straws = new Decimal(savegame.straws || 0);
-            cups = new Decimal(savegame.cups || 0);
+            // Handle both string and numeric saved values
+            straws = new Decimal(typeof savegame.straws === 'number' ? savegame.straws : (savegame.straws || 0));
+            cups = new Decimal(typeof savegame.cups === 'number' ? savegame.cups : (savegame.cups || 0));
+            window.straws = straws;
+            window.cups = cups;
             suctions = new Decimal(savegame.suctions || 0);
             fasterDrinks = new Decimal(savegame.fasterDrinks || 0);
             // Load sps from save, but we'll recalculate it to include base sips per drink
@@ -537,8 +544,9 @@ function initGame() {
             criticalClicks = new Decimal(savegame.criticalClicks || 0);
             criticalClickUpCounter = new Decimal(savegame.criticalClickUpCounter || 1);
             suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
-            level = new Decimal(savegame.level || 1);
+            level = new Decimal(typeof savegame.level === 'number' ? savegame.level : (savegame.level || 1));
             totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
+            window.totalClicks = Number(savegame.totalClicks || 0);
             gameStartDate = savegame.gameStartDate || Date.now();
             lastClickTime = savegame.lastClickTime || 0;
             clickTimes = savegame.clickTimes || [];
@@ -614,6 +622,8 @@ function initGame() {
             window.sips = new Decimal(0);
             straws = new Decimal(0);
             cups = new Decimal(0);
+            window.straws = straws;
+            window.cups = cups;
             suctions = new Decimal(0);
             fasterDrinks = new Decimal(0);
             widerStraws = new Decimal(0);
@@ -1808,7 +1818,7 @@ function sodaClick(number) {
         const baseSips = new Decimal(number);
         totalSipsGained = baseSips.plus(suctionClickBonus).times(criticalMultiplier);
     }
-    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.SODA, { gained: totalSipsGained.toString(), critical: isCritical }); } catch {}
+    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.SODA, { gained: totalSipsGained, critical: isCritical }); } catch {}
     
     // Add to total sips earned
     totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
@@ -1865,8 +1875,31 @@ function sodaClick(number) {
 
 // Function to show click feedback numbers
 function showClickFeedback(sipsGained, isCritical = false) {
+    // Ensure DOM_CACHE is ready and initialized
+    if (!DOM_CACHE || !DOM_CACHE.isReady()) {
+        if (DOM_CACHE?.init) {
+            DOM_CACHE.init();
+        }
+    }
+    
     const sodaContainer = DOM_CACHE.sodaButton?.parentNode;
-    if (!sodaContainer) return;
+    if (!sodaContainer) {
+        // Fallback: try to find soda button directly
+        const sodaButton = document.getElementById('sodaButton');
+        if (!sodaButton?.parentNode) {
+            return;
+        }
+        // Use the directly found container
+        const directContainer = sodaButton.parentNode;
+        showLegacyFeedbackWithContainer(sipsGained, isCritical, directContainer);
+        return;
+    }
+    
+    showLegacyFeedbackWithContainer(sipsGained, isCritical, sodaContainer);
+}
+
+// Helper function for legacy feedback
+function showLegacyFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
 
     // Create feedback element
     const feedback = document.createElement('div');
@@ -1958,6 +1991,7 @@ function buyStraw() {
         Math.floor(baseCost * Math.pow(scaling, straws.toNumber()));
             if (window.sips.gte(strawCost)) {
         straws = straws.plus(1);
+        window.straws = straws;
         if (window.App?.mutations?.subtractSips) {
             window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, strawCost));
         } else {
@@ -2046,6 +2080,7 @@ function buyCup() {
         Math.floor(baseCost * Math.pow(scaling, cups.toNumber()));
             if (window.sips.gte(cupCost)) {
         cups = cups.plus(1);
+        window.cups = cups;
         if (window.App?.mutations?.subtractSips) {
             window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, cupCost));
         } else {
@@ -2556,6 +2591,8 @@ function delete_save() {
         window.sips = new Decimal(0);
         straws = new Decimal(0);
         cups = new Decimal(0);
+        window.straws = straws;
+        window.cups = cups;
         suctions = new Decimal(0);
         // Set sps to base configured sips per drink (since no straws/cups yet)
         const config = window.GAME_CONFIG?.BALANCE || {};

@@ -11,10 +11,13 @@ export const storage = {
         try {
             const saved = localStorage.getItem(getKey('save'));
             if (!saved) return null;
-            
+
             const parsed = JSON.parse(saved);
+
+
+
             const validated = validateGameSave(parsed);
-            
+
             if (validated) {
                 return validated;
             } else {
@@ -30,12 +33,14 @@ export const storage = {
     
     saveGame: (data) => {
         try {
+
+
             // Validate before saving
             const validated = validateGameSave(data);
             if (!validated) {
                 console.warn('Attempting to save invalid game data');
             }
-            
+
             localStorage.setItem(getKey('save'), JSON.stringify(data));
             return true;
         } catch (e) {
