@@ -1,0 +1,106 @@
+// UI System Coordinator
+// Main entry point for all UI-related functionality
+
+import * as displays from './displays.js';
+import * as stats from './stats.js';
+import * as feedback from './feedback.js';
+import * as affordability from './affordability.js';
+
+// Export all UI modules
+export { displays, stats, feedback, affordability };
+
+// Convenience functions that delegate to specific modules
+export const updateCostDisplay = displays.updateCostDisplay;
+export const updateButtonState = displays.updateButtonState;
+export const updateTopSipsPerDrink = displays.updateTopSipsPerDrink;
+export const updateTopSipsPerSecond = displays.updateTopSipsPerSecond;
+export const updateCriticalClickDisplay = displays.updateCriticalClickDisplay;
+export const updateDrinkSpeedDisplay = displays.updateDrinkSpeedDisplay;
+export const updateAutosaveStatus = displays.updateAutosaveStatus;
+export const updateDrinkProgress = displays.updateDrinkProgress;
+
+export const updatePlayTime = stats.updatePlayTime;
+export const updateLastSaveTime = stats.updateLastSaveTime;
+export const updateAllStats = stats.updateAllStats;
+export const updateTimeStats = stats.updateTimeStats;
+export const updateClickStats = stats.updateClickStats;
+export const updateEconomyStats = stats.updateEconomyStats;
+export const updateShopStats = stats.updateShopStats;
+export const updateAchievementStats = stats.updateAchievementStats;
+
+export const showClickFeedback = feedback.showClickFeedback;
+export const showPurchaseFeedback = feedback.showPurchaseFeedback;
+export const showLevelUpFeedback = feedback.showLevelUpFeedback;
+export const showOfflineProgress = feedback.showOfflineProgress;
+
+export const checkUpgradeAffordability = affordability.checkUpgradeAffordability;
+
+// Initialize UI event listeners
+export function initializeUI() {
+    console.log('UI system initialized');
+    
+    // Set up event listeners for UI updates
+    if (window.App?.events) {
+        // Listen for game events and update UI accordingly
+        window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA, (data) => {
+            updateTopSipsPerDrink();
+            updateTopSipsPerSecond();
+            checkUpgradeAffordability();
+            if (data.gained) {
+                showClickFeedback(data.gained, data.critical);
+            }
+        });
+        
+        window.App.events.on(window.App.EVENT_NAMES?.ECONOMY?.PURCHASE, (data) => {
+            updateTopSipsPerDrink();
+            updateTopSipsPerSecond();
+            checkUpgradeAffordability();
+            updateCriticalClickDisplay();
+            if (data.item && data.cost) {
+                showPurchaseFeedback(data.item, data.cost);
+            }
+        });
+        
+        window.App.events.on(window.App.EVENT_NAMES?.GAME?.SAVED, () => {
+            updateLastSaveTime();
+        });
+        
+        window.App.events.on(window.App.EVENT_NAMES?.GAME?.LOADED, () => {
+            updateAllDisplays();
+            checkUpgradeAffordability();
+        });
+    }
+}
+
+// Update all UI displays (useful for initialization and major state changes)
+export function updateAllDisplays() {
+    updateTopSipsPerDrink();
+    updateTopSipsPerSecond();
+    updateCriticalClickDisplay();
+    updateDrinkSpeedDisplay();
+    updateAutosaveStatus();
+    updatePlayTime();
+    updateLastSaveTime();
+    updateAllStats();
+    checkUpgradeAffordability();
+}
+
+// Batch UI updates for performance (use in game loop)
+export function performBatchUIUpdate() {
+    // Only update visible elements to improve performance
+    requestAnimationFrame(() => {
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
+        updatePlayTime();
+        
+        // Only update stats if stats tab is active
+        if (window.DOM_CACHE?.statsTab?.classList?.contains('active')) {
+            updateAllStats();
+        }
+        
+        // Update affordability less frequently
+        if (Math.random() < 0.1) { // 10% chance per frame
+            checkUpgradeAffordability();
+        }
+    });
+}

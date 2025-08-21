@@ -1831,7 +1831,11 @@ function sodaClick(number) {
         }
         
         // Show click feedback
-        showClickFeedback(totalSipsGained, isCritical);
+        if (window.App?.ui?.showClickFeedback) {
+            window.App.ui.showClickFeedback(totalSipsGained, isCritical);
+        } else {
+            showClickFeedback(totalSipsGained, isCritical);
+        }
         
         // Visual feedback with smoother image transition
         const sodaButton = DOM_CACHE.sodaButton;
@@ -1849,7 +1853,11 @@ function sodaClick(number) {
     });
     
     // Update upgrade affordability (includes level up button state)
-    checkUpgradeAffordability();
+    if (window.App?.ui?.checkUpgradeAffordability) {
+        window.App.ui.checkUpgradeAffordability();
+    } else {
+        checkUpgradeAffordability();
+    }
     
     // Check for feature unlocks after clicking
     FEATURE_UNLOCKS.checkAllUnlocks();
@@ -2006,7 +2014,11 @@ function buyStraw() {
         }
 
         // Show purchase feedback
-        showPurchaseFeedback('Extra Straw', strawCost);
+        if (window.App?.ui?.showPurchaseFeedback) {
+            window.App.ui.showPurchaseFeedback('Extra Straw', strawCost);
+        } else {
+            showPurchaseFeedback('Extra Straw', strawCost);
+        }
 
         reload();
         checkUpgradeAffordability();

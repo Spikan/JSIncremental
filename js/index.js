@@ -14,6 +14,7 @@ import * as saveSys from './core/systems/save-system.js';
 import * as loopSys from './core/systems/loop-system.js';
 import * as musicSys from './core/systems/music-system.js';
 import * as optionsSys from './core/systems/options-system.js';
+import * as ui from './ui/index.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
 
 // Bootstrap the App global object
@@ -27,7 +28,7 @@ window.App = {
         purchases,
         economy
     },
-                systems: {
+                                systems: {
                 resources,
                 purchases: purchasesSys,
                 clicks: clicksSys,
@@ -36,7 +37,8 @@ window.App = {
                 options: optionsSys,
                 loop: loopSys,
                 music: musicSys
-            },
+             },
+             ui,
     data: {}
 };
 
@@ -82,7 +84,15 @@ async function loadDataFiles() {
     }
 }
 
-// Initialize data files
-loadDataFiles();
+// Initialize data files and UI system
+loadDataFiles().then(() => {
+    // Initialize UI system
+    if (window.App.ui?.initializeUI) {
+        window.App.ui.initializeUI();
+    }
+    console.log('App bootstrapped successfully');
+}).catch(error => {
+    console.error('Failed to bootstrap app:', error);
+});
 
 
