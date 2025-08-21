@@ -1027,6 +1027,7 @@ h3 {
 .clicking-upgrades-container {
     display: flex;
     justify-content: center;
+    align-items: stretch;
     gap: 1.5rem;
     margin: 1rem 0;
     padding: 0 1rem;
@@ -1050,6 +1051,7 @@ h3 {
 .clicking-upgrade-item {
     flex: 1;
     max-width: 200px;
+    min-height: 120px;
     background: linear-gradient(135deg, rgba(0, 23, 137, 0.6), rgba(0, 23, 137, 0.3));
     border: 2px solid #00B36B;
     border-radius: 16px;
@@ -1060,6 +1062,8 @@ h3 {
     position: relative;
     overflow: hidden;
     animation: shopItemFadeIn 0.6s ease-out;
+    display: flex;
+    flex-direction: column;
 }
 
 .clicking-upgrade-item::before {
@@ -1085,8 +1089,8 @@ h3 {
 }
 
 .clicking-upgrade-btn {
-    min-width: 180px;
-    min-height: 70px;
+    width: 180px;
+    height: 70px;
     padding: 1rem 1.5rem;
     font-size: 1rem;
     font-weight: bold;
@@ -1158,6 +1162,7 @@ h3 {
     background: linear-gradient(135deg, rgba(0, 179, 107, 0.15), rgba(0, 179, 107, 0.05));
     border-radius: 8px;
     border: 1px solid rgba(0, 179, 107, 0.3);
+    margin-top: auto;
 }
 
 .clicking-stat {
@@ -1180,7 +1185,8 @@ h3 {
     }
     
     .clicking-upgrade-btn {
-        min-height: 70px;
+        width: 160px;
+        height: 70px;
         font-size: 1rem;
     }
 }
