@@ -776,6 +776,7 @@ function startGameLoop() {
             updateStats: () => { updatePlayTime(); updateLastSaveTime(); updateAllStats(); checkUpgradeAffordability(); FEATURE_UNLOCKS.checkAllUnlocks(); },
             updatePlayTime,
             updateLastSaveTime,
+            performBatchUIUpdate: window.App?.ui?.performBatchUIUpdate,
         });
         return;
     }
@@ -921,6 +922,8 @@ function getDrinkRateSeconds() {
 
 // Function to update the top sips per drink display
 function updateTopSipsPerDrink() {
+    if (window.App?.ui?.updateTopSipsPerDrink) { try { return window.App.ui.updateTopSipsPerDrink(); } catch {}
+    }
     const topSipsPerDrinkElement = DOM_CACHE.topSipsPerDrink;
     if (topSipsPerDrinkElement) {
         // Show total sips per drink (base configured value + passive production from straws and cups)
@@ -949,6 +952,8 @@ function updateTopSipsPerDrink() {
 
 // Function to update the top total sips per second display (passive production only)
 function updateTopSipsPerSecond() {
+    if (window.App?.ui?.updateTopSipsPerSecond) { try { return window.App.ui.updateTopSipsPerSecond(); } catch {}
+    }
     const topSipsPerSecondElement = DOM_CACHE.topSipsPerSecond;
     if (topSipsPerSecondElement) {
         // Calculate total sips per second from all sources
@@ -992,6 +997,8 @@ function updateTopSipsPerSecond() {
 
 // Function to update the critical click chance display
 function updateCriticalClickDisplay() {
+    if (window.App?.ui?.updateCriticalClickDisplay) { try { return window.App.ui.updateCriticalClickDisplay(); } catch {}
+    }
     const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
     if (criticalClickChanceCompact) {
         // Display current critical click chance as percentage
@@ -1019,6 +1026,8 @@ function changeAutosaveInterval() {
 }
 
 function updateAutosaveStatus() {
+    if (window.App?.ui?.updateAutosaveStatus) { try { return window.App.ui.updateAutosaveStatus(); } catch {}
+    }
     const status = document.getElementById('autosaveStatus');
     if (status) {
         if (autosaveEnabled) {
@@ -1750,6 +1759,8 @@ function loadClickSoundsPreference() {
 
 // Function to update drink speed display
 function updateDrinkSpeedDisplay() {
+    if (window.App?.ui?.updateDrinkSpeedDisplay) { try { return window.App.ui.updateDrinkSpeedDisplay(); } catch {}
+    }
     // Update compact drink speed display elements
     const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
     const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
@@ -1875,27 +1886,8 @@ function sodaClick(number) {
 
 // Function to show click feedback numbers
 function showClickFeedback(sipsGained, isCritical = false) {
-    // Ensure DOM_CACHE is ready and initialized
-    if (!DOM_CACHE || !DOM_CACHE.isReady()) {
-        if (DOM_CACHE?.init) {
-            DOM_CACHE.init();
-        }
+    if (window.App?.ui?.showClickFeedback) { try { return window.App.ui.showClickFeedback(sipsGained, isCritical); } catch {}
     }
-    
-    const sodaContainer = DOM_CACHE.sodaButton?.parentNode;
-    if (!sodaContainer) {
-        // Fallback: try to find soda button directly
-        const sodaButton = document.getElementById('sodaButton');
-        if (!sodaButton?.parentNode) {
-            return;
-        }
-        // Use the directly found container
-        const directContainer = sodaButton.parentNode;
-        showLegacyFeedbackWithContainer(sipsGained, isCritical, directContainer);
-        return;
-    }
-    
-    showLegacyFeedbackWithContainer(sipsGained, isCritical, sodaContainer);
 }
 
 // Helper function for legacy feedback
@@ -2418,33 +2410,9 @@ function levelUp() {
 
 // Function to show level up feedback
 function showLevelUpFeedback(sipsGained) {
-    const levelUpDiv = DOM_CACHE.levelUpDiv;
-    if (!levelUpDiv) return;
-    
-    // Create feedback element
-    const feedback = document.createElement('div');
-    feedback.className = 'click-feedback level-up-feedback';
-    feedback.textContent = 'LEVEL UP! +' + prettify(sipsGained) + '/d';
-    
-    // Position above the level up button
-    const buttonRect = levelUpDiv.getBoundingClientRect();
-    feedback.style.position = 'absolute';
-    feedback.style.left = (buttonRect.width / 2) + 'px';
-    feedback.style.top = '-20px';
-    feedback.style.transform = 'translateX(-50%)';
-    
-    // Add to level up div
-    levelUpDiv.style.position = 'relative';
-    levelUpDiv.appendChild(feedback);
-    
-            // Remove after animation completes
-        const config = window.GAME_CONFIG?.TIMING || {};
-        const feedbackDuration = config.LEVEL_UP_FEEDBACK_DURATION;
-        setTimeout(() => {
-            if (feedback.parentNode) {
-                feedback.parentNode.removeChild(feedback);
-            }
-        }, feedbackDuration);
+    if (window.App?.ui?.showLevelUpFeedback) {
+        try { return window.App.ui.showLevelUpFeedback(sipsGained); } catch {}
+    }
 }
 
 // Function to check if level up is possible
@@ -3011,32 +2979,8 @@ window.startGameFromButton = window.startGameWithMusic;
 
 // Function to show purchase feedback
 function showPurchaseFeedback(itemName, cost) {
-    const shopDiv = DOM_CACHE.shopDiv;
-    if (!shopDiv) return;
-    
-    // Create feedback element
-    const feedback = document.createElement('div');
-    feedback.className = 'click-feedback purchase-feedback';
-    feedback.textContent = 'Bought ' + itemName + ' (-' + prettify(cost) + ')';
-    
-    // Position at the top of the shop area
-    feedback.style.position = 'absolute';
-    feedback.style.left = '50%';
-    feedback.style.top = '20px';
-    feedback.style.transform = 'translateX(-50%)';
-    
-    // Add to shop div
-    shopDiv.style.position = 'relative';
-    shopDiv.appendChild(feedback);
-    
-            // Remove after animation completes
-        const config = window.GAME_CONFIG?.TIMING || {};
-        const feedbackDuration = config.PURCHASE_FEEDBACK_DURATION;
-        setTimeout(() => {
-            if (feedback.parentNode) {
-                feedback.parentNode.removeChild(feedback);
-            }
-        }, feedbackDuration);
+    if (window.App?.ui?.showPurchaseFeedback) { try { return window.App.ui.showPurchaseFeedback(itemName, cost); } catch {}
+    }
 }
 
         // Divine oracle functionality
@@ -3159,102 +3103,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to show offline progress modal
 function showOfflineProgress(timeSeconds, earnings) {
-    // Create modal overlay
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        animation: fadeIn 0.3s ease;
-    `;
-
-    // Create modal content
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = `
-        background: linear-gradient(135deg, #001789, #0024b3);
-        border: 3px solid #00B36B;
-        border-radius: 20px;
-        padding: 2rem;
-        max-width: 400px;
-        text-align: center;
-        color: #00B36B;
-        box-shadow: 0 8px 32px rgba(0, 179, 107, 0.3);
-        animation: slideIn 0.4s ease;
-    `;
-
-    // Format time
-    let timeDisplay = '';
-    if (timeSeconds < 60) {
-        timeDisplay = `${timeSeconds} seconds`;
-    } else if (timeSeconds < 3600) {
-        const minutes = Math.floor(timeSeconds / 60);
-        const seconds = timeSeconds % 60;
-        timeDisplay = `${minutes} minute${minutes > 1 ? 's' : ''}${seconds > 0 ? ` ${seconds} second${seconds > 1 ? 's' : ''}` : ''}`;
-    } else {
-        const hours = Math.floor(timeSeconds / 3600);
-        const minutes = Math.floor((timeSeconds % 3600) / 60);
-        timeDisplay = `${hours} hour${hours > 1 ? 's' : ''}${minutes > 0 ? ` ${minutes} minute${minutes > 1 ? 's' : ''}` : ''}`;
+    if (window.App?.ui?.showOfflineProgress) {
+        try { return window.App.ui.showOfflineProgress(timeSeconds, earnings); } catch {}
     }
-
-    // Format earnings
-    const earningsDisplay = prettify(earnings);
-
-    modalContent.innerHTML = `
-        <h2 style="color: #FF3D02; margin-bottom: 1rem;">Welcome Back!</h2>
-        <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
-            You were away for <strong style="color: #FF8E53;">${timeDisplay}</strong>
-        </p>
-        <p style="font-size: 1.2rem; margin-bottom: 2rem;">
-            While you were gone, you earned:
-            <br/>
-            <strong style="color: #00B36B; font-size: 1.5rem;">${earningsDisplay} sips</strong>
-        </p>
-        <button onclick="this.parentElement.parentElement.remove()"
-                style="
-                    background: #00B36B;
-                    border: 2px solid #008F5A;
-                    color: white;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-size: 1rem;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                "
-                onmouseover="this.style.transform='scale(1.05)'"
-                onmouseout="this.style.transform='scale(1)'">
-            Awesome!
-        </button>
-    `;
-
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-
-    // Add CSS animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-    `;
-    document.head.appendChild(style);
 }
 
 // Make all functions globally available for HTML onclick attributes
