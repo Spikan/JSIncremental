@@ -107,8 +107,8 @@ let straws = new Decimal(0);
 let cups = new Decimal(0);
 let suctions = new Decimal(0);
 let sps = new Decimal(0);
-let strawSPS = new Decimal(0);
-let cupSPS = new Decimal(0);
+let strawSPD = new Decimal(0);
+let cupSPD = new Decimal(0);
 let suctionClickBonus = new Decimal(0);
 let widerStraws = new Decimal(0);
 let betterCups = new Decimal(0);
@@ -169,6 +169,9 @@ function initSplashScreen() {
         eruda.get('console').log('initSplashScreen called');
     }
     
+    // Initialize splash screen music
+    initSplashMusic();
+    
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     
@@ -200,6 +203,9 @@ function initSplashScreen() {
             eruda.get('console').log('startGame called');
         }
         
+        // Stop title music when transitioning to game
+        stopTitleMusic();
+        
         // Super simple approach - just hide splash and show game
         const splashScreen = document.getElementById('splashScreen');
         const gameContent = document.getElementById('gameContent');
@@ -229,35 +235,35 @@ function initSplashScreen() {
         }
     }
     
-    // Multiple event listeners for maximum compatibility
+    // Add click-through functionality for splash background
     splashScreen.addEventListener('click', function(e) {
-        console.log('Splash screen clicked!');
-        if (typeof eruda !== 'undefined') {
-            eruda.get('console').log('Splash screen clicked!');
+        // Only start game if clicking on the splash screen background itself
+        // Don't start if clicking on buttons or other elements
+        if (e.target === splashScreen || e.target.classList.contains('splash-content') || 
+            e.target.classList.contains('splash-title') || e.target.classList.contains('splash-subtitle-text') ||
+            e.target.classList.contains('splash-instruction') || e.target.classList.contains('splash-version') ||
+            e.target.tagName === 'H1' || e.target.tagName === 'H2' || e.target.tagName === 'P') {
+            console.log('Splash background clicked, starting game with music...');
+            if (typeof eruda !== 'undefined') {
+                eruda.get('console').log('Splash background clicked, starting game with music...');
+            }
+            // Default to music version when clicking background
+            startGameWithMusic();
         }
-        e.preventDefault();
-        e.stopPropagation();
-        startGame();
     }, true);
     
-    splashScreen.addEventListener('touchstart', function(e) {
-        console.log('Splash screen touched!');
-        if (typeof eruda !== 'undefined') {
-            eruda.get('console').log('Splash screen touched!');
-        }
-        e.preventDefault();
-        e.stopPropagation();
-        startGame();
-    }, true);
-    
-    // Also allow keyboard input to start
+    // Also allow keyboard input to start (space or enter)
     document.addEventListener('keydown', function(event) {
         if (splashScreen.style.display !== 'none') {
-            console.log('Keyboard input detected, starting game...');
-            if (typeof eruda !== 'undefined') {
-                eruda.get('console').log('Keyboard input detected, starting game...');
+            if (event.code === 'Space' || event.code === 'Enter') {
+                console.log('Keyboard input detected, starting game with music...');
+                if (typeof eruda !== 'undefined') {
+                    eruda.get('console').log('Keyboard input detected, starting game with music...');
+                }
+                event.preventDefault();
+                // Default to music version for keyboard shortcuts
+                startGameWithMusic();
             }
-            startGame();
         }
     });
     
@@ -501,24 +507,24 @@ function initGame() {
             // Only calculate offline earnings if at least 30 seconds offline
             if (offlineTimeSeconds >= 30) {
                 // Load temporary SPS values to calculate earnings
-                let tempStrawSPS = new Decimal(0.6);
-                let tempCupSPS = new Decimal(1.2);
+                let tempStrawSPD = new Decimal(0.6);
+                let tempCupSPD = new Decimal(1.2);
 
-                // Apply upgrade multipliers to temporary SPS values
+                // Apply upgrade multipliers to temporary SPD values
                 if (widerStraws.gt(0)) {
                     const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5));
-                    tempStrawSPS = tempStrawSPS.times(upgradeMultiplier);
+                    tempStrawSPD = tempStrawSPD.times(upgradeMultiplier);
                 }
                 if (betterCups.gt(0)) {
                     const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4));
-                    tempCupSPS = tempCupSPS.times(upgradeMultiplier);
+                    tempCupSPD = tempCupSPD.times(upgradeMultiplier);
                 }
 
-                const tempTotalSPS = tempStrawSPS.times(straws).plus(tempCupSPS.times(cups));
+                const tempTotalSPD = tempStrawSPD.times(straws).plus(tempCupSPD.times(cups));
 
                 // Cap offline earnings to prevent abuse (max 1 hour worth)
                 const cappedOfflineSeconds = Math.min(offlineTimeSeconds, 3600);
-                offlineEarnings = tempTotalSPS.times(cappedOfflineSeconds);
+                offlineEarnings = tempTotalSPD.times(cappedOfflineSeconds);
 
                 // Show offline progress modal
                 showOfflineProgress(offlineTimeSeconds, offlineEarnings);
@@ -531,18 +537,18 @@ function initGame() {
 
 
 
-        strawSPS = new Decimal(0.6);
-        cupSPS = new Decimal(1.2);
+        strawSPD = new Decimal(0.6);
+        cupSPD = new Decimal(1.2);
         suctionClickBonus = new Decimal(0.3).times(suctions);
 
-        // Apply upgrade multipliers to base SPS values
+        // Apply upgrade multipliers to base SPD values
         if (widerStraws.gt(0)) {
             const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5));
-            strawSPS = strawSPS.times(upgradeMultiplier);
+            strawSPD = strawSPD.times(upgradeMultiplier);
         }
         if (betterCups.gt(0)) {
             const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4));
-            cupSPS = cupSPS.times(upgradeMultiplier);
+            cupSPD = cupSPD.times(upgradeMultiplier);
         }
         
             // Initialize drink rate based on upgrades
@@ -550,7 +556,8 @@ function initGame() {
     
     // Update the top sips per drink display
     updateTopSipsPerDrink();
-        
+    updateTopSipsPerSecond();
+
         console.log('Game variables initialized, calling reload...');
         
         // Call reload to initialize the game
@@ -701,6 +708,7 @@ function updateDrinkRate() {
     
     // Update the top sips per drink display
     updateTopSipsPerDrink();
+    updateTopSipsPerSecond();
 }
 
 // Function to get current drink rate in seconds
@@ -712,9 +720,58 @@ function getDrinkRateSeconds() {
 function updateTopSipsPerDrink() {
     const topSipsPerDrinkElement = DOM_CACHE.topSipsPerDrink;
     if (topSipsPerDrinkElement) {
-        // Show total sips per second (SPS) from all sources
-        const totalSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
-        topSipsPerDrinkElement.textContent = prettify(totalSPS);
+        // Show sips per drink (how many sips you get from automatic drinks)
+        // This is only passive production from straws and cups
+        // Click-based sips are separate and happen when you manually click
+        
+        // Passive production per drink (from straws and cups)
+        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        
+        console.log('Sips per drink Debug:', {
+            passiveSipsPerDrink: passiveSipsPerDrink.toString(),
+            strawSPD: strawSPD.toString(),
+            straws: straws.toString(),
+            cupSPD: cupSPD.toString(),
+            cups: cups.toString()
+        });
+        topSipsPerDrinkElement.textContent = prettify(passiveSipsPerDrink);
+    }
+}
+
+// Function to update the top total sips per second display (passive production only)
+function updateTopSipsPerSecond() {
+    const topSipsPerSecondElement = DOM_CACHE.topSipsPerSecond;
+    if (topSipsPerSecondElement) {
+        // Calculate total sips per second from passive production sources only
+        // This shows actual sips generated per second automatically (straws + cups)
+        // Click-based sips are not included since they depend on user clicking speed
+
+        // Passive production per drink (strawSPD and cupSPD are per drink, not per second)
+        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        
+        // Convert to actual sips per second by dividing by drink rate in seconds
+        const drinkRateSeconds = drinkRate / 1000;
+        const passiveSipsPerSecond = passiveSipsPerDrink.div(drinkRateSeconds);
+
+        // Debug logging to check the calculation
+        console.log('Total/s Debug:', {
+            passiveSipsPerDrink: passiveSipsPerDrink.toString(),
+            drinkRateSeconds: drinkRateSeconds,
+            passiveSipsPerSecond: passiveSipsPerSecond.toString()
+        });
+
+        // Also log passive calculation separately
+        console.log('Passive Calculation:', {
+            strawSPD: strawSPD.toString(),
+            straws: straws.toString(),
+            strawContribution: strawSPD.times(straws).toString(),
+            cupSPD: cupSPD.toString(),
+            cups: cups.toString(),
+            cupContribution: cupSPD.times(cups).toString(),
+            drinkRate: drinkRate
+        });
+
+        topSipsPerSecondElement.textContent = prettify(passiveSipsPerSecond);
     }
 }
 
@@ -890,7 +947,9 @@ function updateEconomyStats() {
     // Current sips per second
     const currentSipsPerSecondElement = DOM_CACHE.currentSipsPerSecond;
     if (currentSipsPerSecondElement) {
-        const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
+        const currentSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+        const drinkRateSeconds = drinkRate / 1000;
+        const currentSPS = currentSipsPerDrink.div(drinkRateSeconds);
         currentSipsPerSecondElement.textContent = prettify(currentSPS);
     }
     
@@ -1568,7 +1627,9 @@ function spsClick(amount) {
     totalSipsEarned = totalSipsEarned.plus(amount);
     
     // Update highest SPS if current is higher
-    const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
+    const currentSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+    const drinkRateSeconds = drinkRate / 1000;
+    const currentSPS = currentSipsPerDrink.div(drinkRateSeconds);
     if (currentSPS.gt(highestSipsPerSecond)) {
         highestSipsPerSecond = currentSPS;
     }
@@ -1590,21 +1651,25 @@ function buyStraw() {
         straws = straws.plus(1);
         sips = sips.minus(strawCost);
 
-        // Recalculate strawSPS with current upgrade multipliers
-        const baseStrawSPS = new Decimal(0.6);
+        // Recalculate strawSPD with current upgrade multipliers
+        const baseStrawSPD = new Decimal(0.6);
         const upgradeMultiplier = widerStraws.gt(0) ? new Decimal(1 + (widerStraws.toNumber() * 0.5)) : new Decimal(1);
-        strawSPS = baseStrawSPS.times(upgradeMultiplier);
+        strawSPD = baseStrawSPD.times(upgradeMultiplier);
 
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
-        
+        sps = strawSPD.times(straws).plus(cupSPD.times(cups));
+
+        // Update the top sips/d indicator
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
+
         // Play purchase sound
         if (clickSoundsEnabled) {
             playPurchaseSound();
         }
-        
+
         // Show purchase feedback
         showPurchaseFeedback('Extra Straw', strawCost);
-        
+
         reload();
         checkUpgradeAffordability();
     }
@@ -1619,21 +1684,25 @@ function buyCup() {
         cups = cups.plus(1);
         sips = sips.minus(cupCost);
 
-        // Recalculate cupSPS with current upgrade multipliers
-        const baseCupSPS = new Decimal(1.2);
+        // Recalculate cupSPD with current upgrade multipliers
+        const baseCupSPD = new Decimal(1.2);
         const upgradeMultiplier = betterCups.gt(0) ? new Decimal(1 + (betterCups.toNumber() * 0.4)) : new Decimal(1);
-        cupSPS = baseCupSPS.times(upgradeMultiplier);
+        cupSPD = baseCupSPD.times(upgradeMultiplier);
 
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
-        
+        sps = strawSPD.times(straws).plus(cupSPD.times(cups));
+
+        // Update the top sips/d indicator
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
+
         // Play purchase sound
         if (clickSoundsEnabled) {
             playPurchaseSound();
         }
-        
+
         // Show purchase feedback
         showPurchaseFeedback('Bigger Cup', cupCost);
-        
+
         reload();
         checkUpgradeAffordability();
     }
@@ -1646,12 +1715,15 @@ function buyWiderStraws() {
         widerStraws = widerStraws.plus(1);
         sips = sips.minus(widerStrawsCost);
 
-        // Calculate new straw SPS with upgrade multiplier
+        // Calculate new straw SPD with upgrade multiplier
         const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5)); // +50% per level
-        strawSPS = new Decimal(0.6).times(upgradeMultiplier);
+        strawSPD = new Decimal(0.6).times(upgradeMultiplier);
 
         // Recalculate total SPS
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
+        sps = strawSPD.times(straws).plus(cupSPD.times(cups));
+
+        // Update the top sips/d indicator
+        updateTopSipsPerDrink();
 
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1673,12 +1745,15 @@ function buyBetterCups() {
         betterCups = betterCups.plus(1);
         sips = sips.minus(betterCupsCost);
 
-        // Calculate new cup SPS with upgrade multiplier
+        // Calculate new cup SPD with upgrade multiplier
         const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4)); // +40% per level
-        cupSPS = new Decimal(1.2).times(upgradeMultiplier);
+        cupSPD = new Decimal(1.2).times(upgradeMultiplier);
 
         // Recalculate total SPS
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
+        sps = strawSPD.times(straws).plus(cupSPD.times(cups));
+
+        // Update the top sips/d indicator
+        updateTopSipsPerDrink();
 
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1703,7 +1778,10 @@ function buySuction() {
         suctions = suctions.plus(1);
         sips = sips.minus(suctionCost);
         suctionClickBonus = new Decimal(0.3).times(suctions); // Increased from 0.2 for better value
-        
+
+        // Update the sips/s indicator since suction bonus changed
+        updateTopSipsPerSecond();
+
         // Play purchase sound
         if (clickSoundsEnabled) {
             playPurchaseSound();
@@ -1784,9 +1862,12 @@ function buyCriticalClick() {
         
         // Increase critical click chance by 0.01% (0.0001) per purchase - doubled from 0.005%
         criticalClickChance = criticalClickChance.plus(0.0001);
-        
+
         // Update critical click display
         updateCriticalClickDisplay();
+
+        // Update sips/s indicator since critical chance changed
+        updateTopSipsPerSecond();
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1810,7 +1891,10 @@ function upgradeCriticalClick() {
         
         // Increase critical click multiplier by 2x per upgrade
         criticalClickMultiplier = criticalClickMultiplier.plus(2);
-        
+
+        // Update sips/s indicator since critical multiplier changed
+        updateTopSipsPerSecond();
+
         // Play purchase sound
         if (clickSoundsEnabled) {
             playPurchaseSound();
@@ -1939,8 +2023,8 @@ function performSave() {
         suctions: suctions.toString(),
         fasterDrinks: fasterDrinks.toString(),
         sps: sps.toString(),
-        strawSPS: strawSPS.toString(),
-        cupSPS: cupSPS.toString(),
+        strawSPD: strawSPD.toString(),
+        cupSPD: cupSPD.toString(),
         suctionClickBonus: suctionClickBonus.toString(),
         widerStraws: widerStraws.toString(),
         betterCups: betterCups.toString(),
@@ -1990,8 +2074,8 @@ function delete_save() {
         cups = new Decimal(0);
         suctions = new Decimal(0);
         sps = new Decimal(0);
-        strawSPS = new Decimal(0);
-        cupSPS = new Decimal(0);
+        strawSPD = new Decimal(0);
+        cupSPD = new Decimal(0);
         suctionClickBonus = new Decimal(0);
         widerStraws = new Decimal(0);
         betterCups = new Decimal(0);
@@ -2114,20 +2198,20 @@ function reload() {
             'sips': prettify(sips),
             'topSipValue': prettify(sips),
             'sps': prettify(sps),
-            'strawSPS': prettify(strawSPS),
-            'cupSPS': prettify(cupSPS),
+            'strawSPD': prettify(strawSPD),
+            'cupSPD': prettify(cupSPD),
             'suctionClickBonus': prettify(suctionClickBonus),
-            'totalStrawSPS': prettify(strawSPS.times(straws)),
-            'totalCupSPS': prettify(cupSPS.times(cups)),
-            'totalSuctionBonus': prettify(suctionClickBonus.times(suctions)),
+            'totalStrawSPD': prettify(strawSPD.times(straws)),
+            'totalCupSPD': prettify(cupSPD.times(cups)),
+            'totalSuctionBonus': prettify(suctionClickBonus),
             'widerStraws': widerStraws.toNumber(),
             'widerStrawsCost': widerStrawsCost.toString(),
-            'widerStrawsSPS': prettify(strawSPS.div(new Decimal(0.6))) + 'x', // Shows upgrade multiplier
-            'totalWiderStrawsSPS': prettify(strawSPS.times(straws)), // Total straw production
+            'widerStrawsSPD': prettify(strawSPD.div(new Decimal(0.6))) + 'x', // Shows upgrade multiplier
+            'totalWiderStrawsSPD': prettify(strawSPD.times(straws)), // Total straw production
             'betterCups': betterCups.toNumber(),
             'betterCupsCost': betterCupsCost.toString(),
-            'betterCupsSPS': prettify(cupSPS.div(new Decimal(1.2))) + 'x', // Shows upgrade multiplier
-            'totalBetterCupsSPS': prettify(cupSPS.times(cups)), // Total cup production
+            'betterCupsSPD': prettify(cupSPD.div(new Decimal(1.2))) + 'x', // Shows upgrade multiplier
+            'totalBetterCupsSPD': prettify(cupSPD.times(cups)), // Total cup production
             'fasterDrinksUpCost': (1500 * fasterDrinksUpCounter.toNumber()).toString(),
             'levelNumber': level.toNumber(),
             // Compact clicking upgrade displays
@@ -2155,6 +2239,10 @@ function reload() {
         
         // Update critical click display
         updateCriticalClickDisplay();
+        
+        // Update top display indicators
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
         
         // Check affordability after reloading all values
         checkUpgradeAffordability();
@@ -2245,16 +2333,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// Global function for splash screen button (backup method)
-window.startGameFromButton = function() {
-    console.log('startGameFromButton called');
+// Start game with music - plays title music and sets up main game music
+window.startGameWithMusic = function() {
+    console.log('startGameWithMusic called');
+    
+    // Start playing title music immediately
+    if (splashAudio) {
+        console.log('Starting title music for game start...');
+        const playPromise = splashAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('Title music started successfully on game start');
+            }).catch(error => {
+                console.log('Title music failed to start:', error);
+            });
+        }
+    }
+    
+    // Set a flag to indicate music is enabled
+    localStorage.setItem('musicEnabled', 'true');
+    
+    // Start the game after a brief moment to let title music begin
+    setTimeout(() => {
+        startGameCore();
+    }, 500);
+};
+
+// Start game without music - mutes all audio
+window.startGameWithoutMusic = function() {
+    console.log('startGameWithoutMusic called');
+    
+    // Set flag to indicate music is disabled
+    localStorage.setItem('musicEnabled', 'false');
+    
+    // Start the game immediately
+    startGameCore();
+};
+
+// Core game start function used by both music options
+function startGameCore() {
+    console.log('startGameCore called');
     
     // Eruda debugging for mobile
     if (typeof eruda !== 'undefined') {
-        eruda.get('console').log('startGameFromButton called');
+        eruda.get('console').log('startGameCore called');
     }
     
-    // Super simple approach - just hide splash and show game
+    // Hide splash and show game
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     
@@ -2265,6 +2391,44 @@ window.startGameFromButton = function() {
         }
         splashScreen.style.display = 'none';
         gameContent.style.display = 'block';
+        
+        // Show a subtle indicator that title music is playing (only if music is enabled)
+        const musicEnabled = localStorage.getItem('musicEnabled');
+        let musicIndicator = null;
+        
+        if (musicEnabled === 'true') {
+            musicIndicator = document.createElement('div');
+            musicIndicator.id = 'titleMusicIndicator';
+            musicIndicator.innerHTML = '🎵 Playing Title Music...';
+            musicIndicator.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0, 0, 0, 0.7);
+                color: #00B36B;
+                padding: 10px 15px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                font-weight: bold;
+                z-index: 1000;
+                animation: fadeIn 0.5s ease;
+            `;
+            document.body.appendChild(musicIndicator);
+        }
+        
+        // Stop title music after a delay to let it play for a good amount of time
+        setTimeout(() => {
+            stopTitleMusic();
+            // Remove the indicator if it exists
+            if (musicIndicator) {
+                musicIndicator.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => {
+                    if (document.body.contains(musicIndicator)) {
+                        document.body.removeChild(musicIndicator);
+                    }
+                }, 500);
+            }
+        }, 8000); // Let title music play for 8 seconds
         
         // Try to initialize game, but don't let it fail
         try {
@@ -2281,7 +2445,10 @@ window.startGameFromButton = function() {
             eruda.get('console').error('Could not find splash or game elements');
         }
     }
-};
+}
+
+// Keep the old function for compatibility (just redirect to music version)
+window.startGameFromButton = window.startGameWithMusic;
 
 // Function to show purchase feedback
 function showPurchaseFeedback(itemName, cost) {
@@ -2550,6 +2717,158 @@ window.upgradeCriticalClick = upgradeCriticalClick;
     window.delete_save = delete_save;
     window.sendMessage = sendMessage;
 
+// Splash Screen Music Functions
+let splashAudio = null;
+
+function initSplashMusic() {
+    console.log('Initializing splash screen music...');
+    
+    // Create audio element for splash screen title music
+    splashAudio = new Audio();
+    splashAudio.src = 'res/Soda Drinker Title Music.mp3';
+    splashAudio.loop = true;
+    splashAudio.volume = 0.4; // Slightly higher volume for title music
+    
+    console.log('Created splashAudio with src:', splashAudio.src);
+    
+    // Add comprehensive event listeners for debugging
+    splashAudio.addEventListener('loadstart', () => {
+        console.log('Title music: loadstart event');
+    });
+    
+    splashAudio.addEventListener('loadedmetadata', () => {
+        console.log('Title music: loadedmetadata event');
+    });
+    
+    splashAudio.addEventListener('loadeddata', () => {
+        console.log('Title music: loadeddata event');
+    });
+    
+    splashAudio.addEventListener('canplay', () => {
+        console.log('Title music: canplay event - ready to play');
+        // Enable the play music button when audio is ready
+        const playMusicBtn = document.getElementById('playTitleMusicBtn');
+        if (playMusicBtn) {
+            playMusicBtn.disabled = false;
+            playMusicBtn.textContent = '🎵 Play Title Music';
+            console.log('Music button enabled');
+        } else {
+            console.error('Could not find playTitleMusicBtn element');
+        }
+    });
+    
+    splashAudio.addEventListener('canplaythrough', () => {
+        console.log('Title music: canplaythrough event');
+    });
+    
+    // Add error handling
+    splashAudio.addEventListener('error', (e) => {
+        console.error('Splash audio error event:', e);
+        console.error('Error details:', {
+            error: splashAudio.error,
+            src: splashAudio.src,
+            networkState: splashAudio.networkState,
+            readyState: splashAudio.readyState
+        });
+        
+        const playMusicBtn = document.getElementById('playTitleMusicBtn');
+        if (playMusicBtn) {
+            playMusicBtn.textContent = '❌ Load Failed';
+            playMusicBtn.disabled = true;
+        }
+    });
+    
+    // Force load attempt
+    try {
+        splashAudio.load();
+        console.log('Called splashAudio.load()');
+    } catch (error) {
+        console.error('Error calling load():', error);
+    }
+    
+    // Don't auto-play - wait for user interaction
+}
+
+function playTitleMusic() {
+    console.log('playTitleMusic function called');
+    
+    if (!splashAudio) {
+        console.error('splashAudio is null or undefined');
+        const playMusicBtn = document.getElementById('playTitleMusicBtn');
+        if (playMusicBtn) {
+            playMusicBtn.textContent = '❌ Audio Not Loaded';
+        }
+        return;
+    }
+    
+    console.log('splashAudio details:', {
+        src: splashAudio.src,
+        readyState: splashAudio.readyState,
+        networkState: splashAudio.networkState,
+        paused: splashAudio.paused,
+        volume: splashAudio.volume,
+        loop: splashAudio.loop
+    });
+    
+    console.log('Attempting to play title music...');
+    
+    try {
+        const playPromise = splashAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('Title music started playing successfully');
+                // Update button to show stop option
+                const playMusicBtn = document.getElementById('playTitleMusicBtn');
+                if (playMusicBtn) {
+                    playMusicBtn.textContent = '⏸️ Stop Title Music';
+                    playMusicBtn.onclick = stopTitleMusic;
+                }
+            }).catch(error => {
+                console.error('Title music play failed:', error);
+                console.error('Error details:', {
+                    name: error.name,
+                    message: error.message,
+                    code: error.code
+                });
+                const playMusicBtn = document.getElementById('playTitleMusicBtn');
+                if (playMusicBtn) {
+                    playMusicBtn.textContent = '❌ Play Failed';
+                }
+            });
+        } else {
+            console.log('play() returned undefined (older browser)');
+            // For older browsers that don't return a promise
+            const playMusicBtn = document.getElementById('playTitleMusicBtn');
+            if (playMusicBtn) {
+                playMusicBtn.textContent = '⏸️ Stop Title Music';
+                playMusicBtn.onclick = stopTitleMusic;
+            }
+        }
+    } catch (error) {
+        console.error('Exception when calling play():', error);
+        const playMusicBtn = document.getElementById('playTitleMusicBtn');
+        if (playMusicBtn) {
+            playMusicBtn.textContent = '❌ Exception';
+        }
+    }
+}
+
+function stopTitleMusic() {
+    if (splashAudio) {
+        console.log('Stopping title music...');
+        splashAudio.pause();
+        splashAudio.currentTime = 0;
+        
+        // Update button back to play option
+        const playMusicBtn = document.getElementById('playTitleMusicBtn');
+        if (playMusicBtn) {
+            playMusicBtn.textContent = '🎵 Play Title Music';
+            playMusicBtn.onclick = playTitleMusic;
+        }
+    }
+}
+
 // Music Player Functions
 function initMusicPlayer() {
     const musicPlayer = DOM_CACHE.musicPlayer;
@@ -2562,10 +2881,14 @@ function initMusicPlayer() {
         return;
     }
     
+    // Check if user chose to disable music
+    const musicEnabled = localStorage.getItem('musicEnabled');
+    console.log('Music enabled setting:', musicEnabled);
+    
     // Initialize music player state
     window.musicPlayerState = {
         isPlaying: false,
-        isMuted: false,
+        isMuted: musicEnabled === 'false', // Auto-mute if user chose no music
         audio: null,
         currentStream: null,
         streamInfo: {},
@@ -2576,12 +2899,13 @@ function initMusicPlayer() {
         retryDelay: 2000 // 2 second delay between retries
     };
     
-    // Create audio element for lofi stream
+    // Create audio element for music
     const audio = new Audio();
-    // Use a working lofi stream for authentic lofi beats
-    audio.src = 'https://ice1.somafm.com/groovesalad-128-mp3';
+    // Use Between Level Music as default for main game
+    audio.src = 'res/Between Level Music.mp3';
     audio.loop = true;
     audio.volume = 0.3; // Start at 30% volume
+    audio.muted = window.musicPlayerState.isMuted; // Apply mute setting immediately
     
     // Add error handling
     audio.addEventListener('error', (e) => {
@@ -2618,8 +2942,8 @@ function initMusicPlayer() {
                 musicStatus.style.cursor = 'default';
                 musicStatus.onclick = null;
 
-                // Try the default stream again
-                state.audio.src = 'https://ice1.somafm.com/groovesalad-128-mp3';
+                // Try the default music again
+                state.audio.src = 'res/Between Level Music.mp3';
             };
 
             // Stop any further requests by clearing the audio source
@@ -2792,6 +3116,28 @@ function updateStreamInfo() {
 function getStreamDetails(streamUrl) {
     const url = streamUrl.toLowerCase();
     
+    // Local music files
+    if (url.includes('between level music.mp3')) {
+        return {
+            name: 'Between Level Music',
+            description: 'Main game soundtrack',
+            genre: 'Game Music',
+            quality: 'MP3',
+            location: 'Local',
+            type: 'Soundtrack'
+        };
+    }
+    if (url.includes('soda drinker title music.mp3')) {
+        return {
+            name: 'Soda Drinker Title Music',
+            description: 'Original title theme',
+            genre: 'Game Music',
+            quality: 'MP3',
+            location: 'Local',
+            type: 'Title Music'
+        };
+    }
+    
     // SomaFM streams
     if (url.includes('somafm.com')) {
         if (url.includes('groovesalad')) {
@@ -2948,7 +3294,18 @@ function updateMusicPlayerUI() {
 
 // Available music streams
 const MUSIC_STREAMS = {
-    // SomaFM Stations (Default Options)
+    // Local Music (Default)
+    betweenlevel: {
+        url: 'res/Between Level Music.mp3',
+        name: 'Between Level Music',
+        description: 'Main game soundtrack'
+    },
+    sodadrinker: {
+        url: 'res/Soda Drinker Title Music.mp3',
+        name: 'Soda Drinker Title Music',
+        description: 'Original title theme'
+    },
+    // SomaFM Stations
     groovesalad: {
         url: 'https://ice1.somafm.com/groovesalad-128-mp3',
         name: 'Groove Salad',
@@ -3122,24 +3479,25 @@ function loadSavedStreamPreference() {
             
             console.log('Loaded saved stream preference:', savedStream);
         } else {
-            // Set default to groovesalad if no valid preference
-            streamSelect.value = 'groovesalad';
-            const streamData = MUSIC_STREAMS.groovesalad;
+            // Set default to betweenlevel if no valid preference
+            streamSelect.value = 'betweenlevel';
+            const streamData = MUSIC_STREAMS.betweenlevel;
             currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
             console.log('No valid stream preference found, using default');
         }
     } catch (error) {
         console.error('Error loading stream preference:', error);
         // Fallback to default
-        streamSelect.value = 'groovesalad';
-        const streamData = MUSIC_STREAMS.groovesalad;
+        streamSelect.value = 'betweenlevel';
+        const streamData = MUSIC_STREAMS.betweenlevel;
         currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
     }
 }
 
 function loadFallbackMusic() {
-    // Try alternative lofi sources if the main one fails
+    // Try alternative sources if the main one fails
     const fallbackSources = [
+        'res/Between Level Music.mp3', // Main game soundtrack
         'https://ice1.somafm.com/groovesalad-128-mp3', // SomaFM Groove Salad
         'https://ice1.somafm.com/defcon-128-mp3', // SomaFM DEF CON
         'https://ice1.somafm.com/dronezone-128-mp3', // SomaFM Drone Zone
@@ -3229,6 +3587,7 @@ window.addEventListener('beforeunload', () => {
 window.updateAllStats = updateAllStats;
 window.updateDrinkRate = updateDrinkRate;
 window.updateTopSipsPerDrink = updateTopSipsPerDrink;
+window.updateTopSipsPerSecond = updateTopSipsPerSecond;
 window.updateCriticalClickDisplay = updateCriticalClickDisplay;
 window.updateDrinkSpeedDisplay = updateDrinkSpeedDisplay;
 window.loadOptions = loadOptions;
@@ -3245,6 +3604,8 @@ window.toggleMusic = toggleMusic;
 window.toggleMute = toggleMute;
 window.updateStreamInfo = updateStreamInfo;
 window.getStreamDetails = getStreamDetails;
+window.playTitleMusic = playTitleMusic;
+window.stopTitleMusic = stopTitleMusic;
 
 
 window.toggleClickSounds = toggleClickSounds;

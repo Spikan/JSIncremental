@@ -8,6 +8,7 @@ const DOM_CACHE = {
     sodaButton: null,
     topSipValue: null,
     topSipsPerDrink: null,
+    topSipsPerSecond: null,
 
     // Music player elements
     musicPlayer: null,
@@ -21,10 +22,10 @@ const DOM_CACHE = {
     shopDiv: null,
     widerStraws: null,
     betterCups: null,
-    widerStrawsSPS: null,
-    betterCupsSPS: null,
-    totalWiderStrawsSPS: null,
-    totalBetterCupsSPS: null,
+    widerStrawsSPD: null,
+    betterCupsSPD: null,
+    totalWiderStrawsSPD: null,
+    totalBetterCupsSPD: null,
 
     // Stats elements
     statsTab: null,
@@ -66,6 +67,7 @@ const DOM_CACHE = {
         this.sodaButton = document.getElementById('sodaButton');
         this.topSipValue = document.getElementById('topSipValue');
         this.topSipsPerDrink = document.getElementById('topSipsPerDrink');
+        this.topSipsPerSecond = document.getElementById('topSipsPerSecond');
 
         // Music player elements
         this.musicPlayer = document.querySelector('.music-player');
@@ -79,10 +81,10 @@ const DOM_CACHE = {
         this.shopDiv = document.getElementById('shopDiv');
         this.widerStraws = document.getElementById('widerStraws');
         this.betterCups = document.getElementById('betterCups');
-        this.widerStrawsSPS = document.getElementById('widerStrawsSPS');
-        this.betterCupsSPS = document.getElementById('betterCupsSPS');
-        this.totalWiderStrawsSPS = document.getElementById('totalWiderStrawsSPS');
-        this.totalBetterCupsSPS = document.getElementById('totalBetterCupsSPS');
+        this.widerStrawsSPD = document.getElementById('widerStrawsSPD');
+        this.betterCupsSPD = document.getElementById('betterCupsSPD');
+        this.totalWiderStrawsSPD = document.getElementById('totalWiderStrawsSPD');
+        this.totalBetterCupsSPD = document.getElementById('totalBetterCupsSPD');
 
         // Stats elements
         this.statsTab = document.getElementById('statsTab');
