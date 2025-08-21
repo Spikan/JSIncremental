@@ -1729,9 +1729,13 @@ function sodaClick(number) {
     
     // Add to total sips earned
     totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
-    
-    // Update sips
-            window.sips = window.sips.plus(totalSipsGained);
+
+    // Update sips using mutations if available
+    if (window.App?.mutations?.addSips) {
+        window.sips = new Decimal(window.App.mutations.addSips(window.sips, totalSipsGained));
+    } else {
+        window.sips = window.sips.plus(totalSipsGained);
+    }
     
     // Batch DOM updates to reduce layout thrashing
     requestAnimationFrame(() => {
@@ -1852,7 +1856,11 @@ function buyStraw() {
         Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
             if (window.sips.gte(strawCost)) {
         straws = straws.plus(1);
-        window.sips = window.sips.minus(strawCost);
+        if (window.App?.mutations?.subtractSips) {
+            window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, strawCost));
+        } else {
+            window.sips = window.sips.minus(strawCost);
+        }
         try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'straw', cost: strawCost }); } catch {}
 
         // Recalculate strawSPD with current upgrade multipliers
@@ -1892,7 +1900,11 @@ function buyCup() {
         Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
             if (window.sips.gte(cupCost)) {
         cups = cups.plus(1);
-        window.sips = window.sips.minus(cupCost);
+        if (window.App?.mutations?.subtractSips) {
+            window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, cupCost));
+        } else {
+            window.sips = window.sips.minus(cupCost);
+        }
         try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'cup', cost: cupCost }); } catch {}
 
         // Recalculate cupSPD with current upgrade multipliers

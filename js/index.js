@@ -5,6 +5,7 @@ import { bus } from './services/event-bus.js';
 import { EVENTS } from './core/constants.js';
 import * as ClickRules from './core/rules/clicks.js';
 import * as PurchaseRules from './core/rules/purchases.js';
+import * as Mutations from './core/state/mutations.js';
 
 // Detect module loading
 console.info('[bootstrap] Module index.js loaded');
@@ -30,6 +31,7 @@ window.App = {
         clicks: ClickRules,
         purchases: PurchaseRules,
     },
+    mutations: Mutations,
 };
 
 // Optionally, attach a simple dev helper to log state changes
