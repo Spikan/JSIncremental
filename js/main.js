@@ -801,9 +801,9 @@ function getDrinkRateSeconds() {
 function updateTopSipsPerDrink() {
     const topSipsPerDrinkElement = DOM_CACHE.topSipsPerDrink;
     if (topSipsPerDrinkElement) {
-        // Base sips per drink is 1, but this could be modified by future upgrades
-        const baseSipsPerDrink = 1;
-        topSipsPerDrinkElement.textContent = baseSipsPerDrink;
+        // Show total sips per second (SPS) from all sources
+        const totalSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
+        topSipsPerDrinkElement.textContent = prettify(totalSPS);
     }
 }
 
