@@ -1,4 +1,4 @@
-// Phrases from Happy.TXT - exported for TempleOS mode
+// Sacred phrases for divine guidance system
 export const templePhrases = [
     "kay", "African", "Angel", "BBC", "BRB", "Bam", "Boo", "Burp", "CIA", "California",
     "Catastrophic Success", "China", "Church", "Cosmos", "Dad", "Dudly Doright", "FBI", "GarryKasparov", "Ghost", "Give me praise",

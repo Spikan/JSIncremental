@@ -1,8 +1,9 @@
 // Soda Clicker Pro - Main Game Logic
 // 
 // TEMPLEOS GOD FEATURE SETUP:
-// This is now a tribute to Terry A. Davis and TempleOS
-// No external API keys are needed for the TempleOS God feature
+// Divine oracle feature - draws wisdom from sacred texts
+// No external API keys needed for the divine guidance system
+// (But if you know, you know... this runs on 64-bit spiritual processing power)
 
 
 import { templePhrases, totalPhrases } from './phrases.js';
@@ -2245,6 +2246,11 @@ document.addEventListener('DOMContentLoaded', function() {
         eruda.get('console').log('DOM loaded, initializing splash screen...');
     }
     
+    // Load the word bank for the god feature
+    loadWordBank().catch(error => {
+        console.error('Failed to load word bank:', error);
+    });
+    
     // Small delay to ensure everything is ready
     setTimeout(() => {
         try {
@@ -2273,6 +2279,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 100);
 });
+
+
 
 // Global function for splash screen button (backup method)
 window.startGameFromButton = function() {
@@ -2340,7 +2348,7 @@ function showPurchaseFeedback(itemName, cost) {
     }, 2000);
 }
 
-        // TempleOS God functionality
+        // Divine oracle functionality
 function sendMessage() {
     const chatInput = document.getElementById('chatInput');
     const message = chatInput.value.trim();
@@ -2353,7 +2361,7 @@ function sendMessage() {
     // Clear input
     chatInput.value = '';
     
-    // Get TempleOS God response immediately
+    // Get divine response immediately
     getGodResponse(message);
 }
 
@@ -2381,7 +2389,7 @@ function addGodMessage(content) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message god-message';
     
-    // Always use TempleOS styling for consistency
+    // Use divine styling for consistency
     messageDiv.classList.add('templeos-message');
     messageDiv.innerHTML = `
         <div class="message-avatar">
@@ -2418,10 +2426,10 @@ async function getGodResponse(userMessage) {
             return;
         }
         
-        // TempleOS mode is now the default - always respond with phrases from the list
-        const templeResponse = getTempleOSResponse(userMessage);
-        addGodMessage(templeResponse);
-        return; // Exit early for TempleOS mode
+        // Divine mode is now the default - always respond with sacred phrases
+        const divineResponse = getDivineResponse(userMessage);
+        addGodMessage(divineResponse);
+        return; // Exit early for divine mode
         
 
         
@@ -2429,14 +2437,14 @@ async function getGodResponse(userMessage) {
         
 
     } catch (error) {
-        console.error('Error getting TempleOS God response:', error);
-        
+        console.error('Error getting divine response:', error);
+
         const errorMessages = [
-            "TempleOS is experiencing divine technical difficulties. Please try again later!",
+            "The divine connection is experiencing technical difficulties. Please try again later!",
             "The sacred system is temporarily offline. My apologies for the inconvenience!",
-            "Even divine operating systems have bad days. Try again in a moment!",
+            "Even divine systems have bad days. Try again in a moment!",
             "The holy servers are overloaded. Please wait and try again!",
-            "My sacred WiFi is acting up. Give it a moment and try again!"
+            "My sacred connection is acting up. Give it a moment and try again!"
         ];
         
         const randomError = errorMessages[lcgRandomInt(0, errorMessages.length - 1)];
@@ -2470,9 +2478,40 @@ function resetLCGSeed(newSeed = null) {
     console.log('LCG seed reset to:', lcgSeed);
 }
 
-// Function to get TempleOS God response (only phrases, no Giphy)
-function getTempleOSResponse(userMessage) {
+// Function to get divine response (only phrases, no Giphy)
+function getDivineResponse(userMessage) {
+    // Ensure word bank is loaded
+    if (!bibleWordBank || bibleWordBank.length === 0) {
+        console.warn('Word bank not loaded yet, attempting to load...');
+        loadWordBank().then(() => {
+            // Retry the response after loading
+            if (bibleWordBank && bibleWordBank.length > 0) {
+                const response = generateBibleWords();
+                addGodMessage(response);
+            } else {
+                addGodMessage("The sacred texts are temporarily unavailable. Please try again.");
+            }
+        }).catch(error => {
+            console.error('Failed to load word bank:', error);
+            addGodMessage("Divine wisdom is experiencing technical difficulties.");
+        });
+        return "Loading divine wisdom...";
+    }
+
+    return generateBibleWords();
+}
+
+// Function to check if word bank is ready
+function isWordBankReady() {
+    return bibleWordBank && bibleWordBank.length > 0;
+}
+
+
+
+// Helper function to generate Bible words
+function generateBibleWords() {
     // Clean response - just 32 words, one per line
+    // (Because 32-bit should be enough for anyone... or 64-bit if you're feeling divine)
     let words = [];
 
     // Generate exactly 32 words using LCG
@@ -2484,10 +2523,52 @@ function getTempleOSResponse(userMessage) {
     return words.join('\n');
 }
 
+// Word bank array loaded from JSON
+let bibleWordBank = null;
+
+// Load the word bank from JSON file
+async function loadWordBank() {
+    if (!bibleWordBank) {
+        try {
+            console.log('Loading word bank from word_bank.json...');
+            const response = await fetch('word_bank.json');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data || !data.words || !Array.isArray(data.words)) {
+                throw new Error('Invalid word bank format - expected {words: [...]} structure');
+            }
+            
+            bibleWordBank = data.words; // Access the 'words' array from the JSON structure
+            console.log(`✅ Successfully loaded ${bibleWordBank.length} words from word_bank.json`);
+            
+        } catch (error) {
+            console.error('❌ Failed to load word bank:', error);
+            // Fallback to a small set of words if JSON fails to load
+            bibleWordBank = ['lord', 'god', 'jesus', 'christ', 'spirit', 'holy', 'heaven', 'earth'];
+            console.log('Using fallback word bank with', bibleWordBank.length, 'words');
+        }
+    }
+    return bibleWordBank;
+}
+
+
+
 function getRandomBibleWord() {
-    // Use the comprehensive word bank from new_word_bank.js
-    // This contains 13,004 unique words from the King James Bible
-    return getRandomBibleWordFromBank();
+    // Use the comprehensive word bank from word_bank.json
+    // This contains 13,290 unique words from the King James Bible
+    // (That's more words than most operating systems have for divine guidance!)
+    if (!bibleWordBank) {
+        console.warn('Word bank not loaded yet, using fallback');
+        return 'word';
+    }
+
+    const randomIndex = lcgRandomInt(0, bibleWordBank.length - 1);
+    return bibleWordBank[randomIndex];
 }
 
 // Sacred Geodude YouTube video autoplay function
@@ -3257,7 +3338,7 @@ window.toggleMute = toggleMute;
 window.updateStreamInfo = updateStreamInfo;
 window.getStreamDetails = getStreamDetails;
 
-window.getTempleOSResponse = getTempleOSResponse;
+window.getDivineResponse = getDivineResponse;
 window.resetLCGSeed = resetLCGSeed;
 window.toggleClickSounds = toggleClickSounds;
 window.testClickSounds = testClickSounds;

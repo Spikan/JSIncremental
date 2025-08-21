@@ -1,13 +1,13 @@
 // Configuration file for Soda Clicker Pro
 // 
 // TEMPLEOS GOD FEATURE SETUP:
-// This is now a tribute to Terry A. Davis and TempleOS
-// No external API keys are needed for the TempleOS God feature
+// Divine oracle feature - draws wisdom from sacred texts
+// No external API keys needed for the divine guidance system
 
 export const config = {
-    // TempleOS God tribute configuration
-    // This feature honors the memory of Terry A. Davis (1969-2018)
-    // Creator of TempleOS, a 64-bit operating system for God
+    // Divine oracle configuration
+    // This feature provides sacred guidance and inspiration
+    // Drawing wisdom from ancient spiritual texts
     
     // Game configuration
     GAME_VERSION: '1.0.0',

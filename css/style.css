@@ -2166,7 +2166,7 @@ h3 {
 
 
 
-/* TempleOS God Tab Styles - Authentic TempleOS Theme */
+/* Divine Oracle Tab Styles - Sacred Theme */
 .god-container {
     max-width: 800px;
     margin: 0 auto;
@@ -2184,7 +2184,7 @@ h3 {
 }
 
 .god-header h2 {
-    color: #ffff57; /* TempleOS yellow */
+    color: #ffff57; /* Sacred yellow */
     margin: 0 0 0.5rem 0;
     font-size: 2rem;
     font-family: 'Courier New', monospace;
@@ -2192,16 +2192,18 @@ h3 {
 }
 
 .god-subtitle {
-    color: #ffffff; /* TempleOS white */
+    color: #ffffff; /* Sacred white */
     margin: 0;
     font-size: 1.1rem;
     font-style: italic;
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
 }
 
+
+
 .chat-container {
-    background: #101010; /* TempleOS dark background */
-    border: 3px solid #0000a8; /* TempleOS blue */
+    background: #101010; /* Sacred dark background */
+    border: 3px solid #0000a8; /* Sacred blue */
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -2215,7 +2217,7 @@ h3 {
     padding: 1rem;
     background: #000000;
     border-radius: 8px;
-    border: 2px solid #ffff57; /* TempleOS yellow */
+    border: 2px solid #ffff57; /* Sacred yellow */
 }
 
 .message {
@@ -2248,7 +2250,7 @@ h3 {
 }
 
 .message-sender {
-    color: #ffff57; /* TempleOS yellow */
+    color: #ffff57; /* Sacred yellow */
     font-weight: bold;
     font-size: 0.9rem;
     margin-bottom: 0.25rem;
@@ -2257,7 +2259,7 @@ h3 {
 }
 
 .message-text {
-    color: #ffffff; /* TempleOS white */
+    color: #ffffff; /* Sacred white */
     font-size: 1rem;
     line-height: 1.4;
     word-wrap: break-word;
@@ -2298,10 +2300,10 @@ h3 {
 .chat-input {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: 2px solid #0000a8; /* TempleOS blue */
+    border: 2px solid #0000a8; /* Sacred blue */
     border-radius: 8px;
-    background: #101010; /* TempleOS dark background */
-    color: #ffffff; /* TempleOS white */
+    background: #101010; /* Sacred dark background */
+    color: #ffffff; /* Sacred white */
     font-family: 'Courier New', monospace;
     font-size: 1rem;
     outline: none;
@@ -2314,14 +2316,14 @@ h3 {
 }
 
 .chat-input::placeholder {
-    color: #a8a8a8; /* TempleOS muted color */
+    color: #a8a8a8; /* Sacred muted color */
 }
 
 .chat-send-btn {
     padding: 0.75rem 1.5rem;
-    background: #0000a8; /* TempleOS blue */
-    color: #ffffff; /* TempleOS white */
-    border: 2px solid #ffff57; /* TempleOS yellow */
+    background: #0000a8; /* Sacred blue */
+    color: #ffffff; /* Sacred white */
+    border: 2px solid #ffff57; /* Sacred yellow */
     border-radius: 8px;
     font-family: 'Courier New', monospace;
     font-size: 1rem;
@@ -2343,15 +2345,15 @@ h3 {
 }
 
 .god-info {
-    background: #101010; /* TempleOS dark background */
-    border: 2px solid #0000a8; /* TempleOS blue */
+    background: #101010; /* Sacred dark background */
+    border: 2px solid #0000a8; /* Sacred blue */
     border-radius: 8px;
     padding: 1.5rem;
     text-align: center;
 }
 
 .god-info p {
-    color: #ffffff; /* TempleOS white */
+    color: #ffffff; /* Sacred white */
     margin: 0 0 1rem 0;
     line-height: 1.5;
 }
@@ -2414,7 +2416,7 @@ h3 {
     max-width: 100%;
     max-height: 200px;
     border-radius: 8px;
-    border: 2px solid #0000a8; /* TempleOS blue */
+    border: 2px solid #0000a8; /* Sacred blue */
     box-shadow: 0 4px 12px rgba(0, 0, 168, 0.4);
 }
 
