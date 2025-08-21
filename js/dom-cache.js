@@ -131,12 +131,14 @@ const DOM_CACHE = {
 // Auto-initialize when DOM is ready if not already initialized
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOMContentLoaded - initializing DOM_CACHE');
         if (!DOM_CACHE.isReady()) {
             DOM_CACHE.init();
         }
     });
 } else {
     // DOM already loaded
+    console.log('DOM already loaded - initializing DOM_CACHE');
     if (!DOM_CACHE.isReady()) {
         DOM_CACHE.init();
     }

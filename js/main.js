@@ -6,7 +6,7 @@
 // (But if you know, you know... this runs on 64-bit spiritual processing power)
 
 
-import { templePhrases, totalPhrases } from './phrases.js';
+
 
 // Progressive enhancement - detect advanced features
 const FEATURE_DETECTION = {
@@ -90,7 +90,17 @@ const FEATURE_DETECTION = {
 // Ensures DOM_CACHE is available before proceeding
 if (typeof DOM_CACHE === 'undefined') {
     console.error('DOM_CACHE not loaded. Please ensure dom-cache.js is loaded before main.js');
+} else {
+    console.log('DOM_CACHE loaded successfully');
+    if (!DOM_CACHE.isReady()) {
+        console.warn('DOM_CACHE not ready, initializing...');
+        DOM_CACHE.init();
+    }
 }
+
+// Debug: Check if functions are available
+console.log('buySuction function available:', typeof buySuction);
+console.log('window.buySuction available:', typeof window.buySuction);
 
 let sips = new Decimal(0);
 let straws = new Decimal(0);
@@ -520,105 +530,7 @@ function initGame() {
     }
 }
 
-// Function to show offline progress modal
-function showOfflineProgress(timeSeconds, earnings) {
-    // Create modal overlay
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        animation: fadeIn 0.3s ease;
-    `;
 
-    // Create modal content
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = `
-        background: linear-gradient(135deg, #001789, #0024b3);
-        border: 3px solid #00B36B;
-        border-radius: 20px;
-        padding: 2rem;
-        max-width: 400px;
-        text-align: center;
-        color: #00B36B;
-        box-shadow: 0 8px 32px rgba(0, 179, 107, 0.3);
-        animation: slideIn 0.4s ease;
-    `;
-
-    // Format time
-    let timeDisplay = '';
-    if (timeSeconds < 60) {
-        timeDisplay = `${timeSeconds} seconds`;
-    } else if (timeSeconds < 3600) {
-        const minutes = Math.floor(timeSeconds / 60);
-        const seconds = timeSeconds % 60;
-        timeDisplay = `${minutes} minute${minutes > 1 ? 's' : ''}${seconds > 0 ? ` ${seconds} second${seconds > 1 ? 's' : ''}` : ''}`;
-    } else {
-        const hours = Math.floor(timeSeconds / 3600);
-        const minutes = Math.floor((timeSeconds % 3600) / 60);
-        timeDisplay = `${hours} hour${hours > 1 ? 's' : ''}${minutes > 0 ? ` ${minutes} minute${minutes > 1 ? 's' : ''}` : ''}`;
-    }
-
-    // Format earnings
-    const earningsDisplay = prettify(earnings);
-
-    modalContent.innerHTML = `
-        <h2 style="color: #FF3D02; margin-bottom: 1rem;">Welcome Back!</h2>
-        <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
-            You were away for <strong style="color: #FF8E53;">${timeDisplay}</strong>
-        </p>
-        <p style="font-size: 1.2rem; margin-bottom: 2rem;">
-            While you were gone, you earned:
-            <br/>
-            <strong style="color: #00B36B; font-size: 1.5rem;">${earningsDisplay} sips</strong>
-        </p>
-        <button onclick="this.parentElement.parentElement.remove()"
-                style="
-                    background: #00B36B;
-                    border: 2px solid #008F5A;
-                    color: white;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
-                    font-size: 1rem;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                "
-                onmouseover="this.style.transform='scale(1.05)'"
-                onmouseout="this.style.transform='scale(1)'">
-            Awesome!
-        </button>
-    `;
-
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-
-    // Add CSS animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
 
         strawSPS = new Decimal(0.6);
         cupSPS = new Decimal(1.2);
@@ -1678,8 +1590,13 @@ function buyStraw() {
     if (sips.gte(strawCost)) {
         straws = straws.plus(1);
         sips = sips.minus(strawCost);
-        strawSPS = new Decimal(0.6); // Base value, no upgrade multiplier
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups)).plus(widerStrawsSPS.times(widerStraws)).plus(betterCupsSPS.times(betterCups));
+
+        // Recalculate strawSPS with current upgrade multipliers
+        const baseStrawSPS = new Decimal(0.6);
+        const upgradeMultiplier = widerStraws.gt(0) ? new Decimal(1 + (widerStraws.toNumber() * 0.5)) : new Decimal(1);
+        strawSPS = baseStrawSPS.times(upgradeMultiplier);
+
+        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1702,8 +1619,13 @@ function buyCup() {
     if (sips.gte(cupCost)) {
         cups = cups.plus(1);
         sips = sips.minus(cupCost);
-        cupSPS = new Decimal(1.2); // Base value, no upgrade multiplier
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups)).plus(widerStrawsSPS.times(widerStraws)).plus(betterCupsSPS.times(betterCups));
+
+        // Recalculate cupSPS with current upgrade multipliers
+        const baseCupSPS = new Decimal(1.2);
+        const upgradeMultiplier = betterCups.gt(0) ? new Decimal(1 + (betterCups.toNumber() * 0.4)) : new Decimal(1);
+        cupSPS = baseCupSPS.times(upgradeMultiplier);
+
+        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1730,7 +1652,7 @@ function buyWiderStraws() {
         strawSPS = new Decimal(0.6).times(upgradeMultiplier);
 
         // Recalculate total SPS
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups)).plus(betterCupsSPS.times(betterCups));
+        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
 
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -2201,11 +2123,11 @@ function reload() {
             'totalSuctionBonus': prettify(suctionClickBonus.times(suctions)),
             'widerStraws': widerStraws.toNumber(),
             'widerStrawsCost': widerStrawsCost.toString(),
-            'widerStrawsSPS': prettify(strawSPS.div(new Decimal(0.6))), // Shows upgrade multiplier
+            'widerStrawsSPS': prettify(strawSPS.div(new Decimal(0.6))) + 'x', // Shows upgrade multiplier
             'totalWiderStrawsSPS': prettify(strawSPS.times(straws)), // Total straw production
             'betterCups': betterCups.toNumber(),
             'betterCupsCost': betterCupsCost.toString(),
-            'betterCupsSPS': prettify(cupSPS.div(new Decimal(1.2))), // Shows upgrade multiplier
+            'betterCupsSPS': prettify(cupSPS.div(new Decimal(1.2))) + 'x', // Shows upgrade multiplier
             'totalBetterCupsSPS': prettify(cupSPS.times(cups)), // Total cup production
             'fasterDrinksUpCost': (1500 * fasterDrinksUpCounter.toNumber()).toString(),
             'levelNumber': level.toNumber(),
@@ -2763,7 +2685,108 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Make all other functions globally available for HTML onclick attributes
+// Function to show offline progress modal
+function showOfflineProgress(timeSeconds, earnings) {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease;
+    `;
+
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: linear-gradient(135deg, #001789, #0024b3);
+        border: 3px solid #00B36B;
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 400px;
+        text-align: center;
+        color: #00B36B;
+        box-shadow: 0 8px 32px rgba(0, 179, 107, 0.3);
+        animation: slideIn 0.4s ease;
+    `;
+
+    // Format time
+    let timeDisplay = '';
+    if (timeSeconds < 60) {
+        timeDisplay = `${timeSeconds} seconds`;
+    } else if (timeSeconds < 3600) {
+        const minutes = Math.floor(timeSeconds / 60);
+        const seconds = timeSeconds % 60;
+        timeDisplay = `${minutes} minute${minutes > 1 ? 's' : ''}${seconds > 0 ? ` ${seconds} second${seconds > 1 ? 's' : ''}` : ''}`;
+    } else {
+        const hours = Math.floor(timeSeconds / 3600);
+        const minutes = Math.floor((timeSeconds % 3600) / 60);
+        timeDisplay = `${hours} hour${hours > 1 ? 's' : ''}${minutes > 0 ? ` ${minutes} minute${minutes > 1 ? 's' : ''}` : ''}`;
+    }
+
+    // Format earnings
+    const earningsDisplay = prettify(earnings);
+
+    modalContent.innerHTML = `
+        <h2 style="color: #FF3D02; margin-bottom: 1rem;">Welcome Back!</h2>
+        <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+            You were away for <strong style="color: #FF8E53;">${timeDisplay}</strong>
+        </p>
+        <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+            While you were gone, you earned:
+            <br/>
+            <strong style="color: #00B36B; font-size: 1.5rem;">${earningsDisplay} sips</strong>
+        </p>
+        <button onclick="this.parentElement.parentElement.remove()"
+                style="
+                    background: #00B36B;
+                    border: 2px solid #008F5A;
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                "
+                onmouseover="this.style.transform='scale(1.05)'"
+                onmouseout="this.style.transform='scale(1)'">
+            Awesome!
+        </button>
+    `;
+
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Make all functions globally available for HTML onclick attributes
+// This is crucial for module mode to work with HTML onclick handlers
 window.sodaClick = sodaClick;
 window.levelUp = levelUp;
 window.checkLevelUp = checkLevelUp;
