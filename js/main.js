@@ -682,7 +682,6 @@ function initGame() {
         
         // Ensure sps is properly calculated after loading save data
         // This is critical to prevent passive production from being 0 after refresh
-        const config = window.GAME_CONFIG?.BALANCE || {};
         const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
