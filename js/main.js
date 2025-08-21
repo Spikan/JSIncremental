@@ -1571,10 +1571,7 @@ function sodaClick(number) {
         }
     });
     
-    // Check if level up is possible
-    checkLevelUp();
-    
-    // Update upgrade affordability
+    // Update upgrade affordability (includes level up button state)
     checkUpgradeAffordability();
 }
 
@@ -1908,6 +1905,7 @@ function upgradeCriticalClick() {
 function levelUp() {
     // IMPROVED BALANCE: Better level up rewards and scaling
     let levelUpCost = 3000 * Math.pow(1.15, level.toNumber()); // Reduced base cost, better scaling
+    
     if (sips.gte(levelUpCost)) {
         sips = sips.minus(levelUpCost);
         level = level.plus(1);
@@ -1974,15 +1972,31 @@ function checkLevelUp() {
     // This function checks if the player can afford to level up
     // It's called after each click to update the level up button state
     const levelUpCost = 3000 * Math.pow(1.15, level.toNumber()); // Updated to match new balance
+    
     const levelUpButton = document.querySelector('button[onclick*="levelUp"]');
     
     if (levelUpButton) {
         if (sips.gte(levelUpCost)) {
             levelUpButton.classList.remove('disabled');
             levelUpButton.classList.add('affordable');
+            levelUpButton.title = `Click to level up for ${prettify(levelUpCost)} Sips`;
         } else {
             levelUpButton.classList.remove('affordable');
             levelUpButton.classList.add('disabled');
+            levelUpButton.title = `Costs ${prettify(levelUpCost)} Sips (You have ${prettify(sips)})`;
+        }
+        
+        // Update the cost display
+        const levelCostElement = document.getElementById('levelCost');
+        if (levelCostElement) {
+            levelCostElement.innerHTML = prettify(levelUpCost);
+            if (sips.gte(levelUpCost)) {
+                levelCostElement.classList.remove('cost-too-high');
+                levelCostElement.classList.add('cost-affordable');
+            } else {
+                levelCostElement.classList.remove('cost-affordable');
+                levelCostElement.classList.add('cost-too-high');
+            }
         }
     }
 }
@@ -2234,6 +2248,20 @@ function reload() {
             }
         }
         
+        // Update level up cost display
+        const levelUpCost = 3000 * Math.pow(1.15, level.toNumber());
+        const levelCostElement = document.getElementById('levelCost');
+        if (levelCostElement) {
+            levelCostElement.innerHTML = prettify(levelUpCost);
+            if (sips.gte(levelUpCost)) {
+                levelCostElement.classList.remove('cost-too-high');
+                levelCostElement.classList.add('cost-affordable');
+            } else {
+                levelCostElement.classList.remove('cost-affordable');
+                levelCostElement.classList.add('cost-too-high');
+            }
+        }
+        
         // Update drink speed display
         updateDrinkSpeedDisplay();
         
@@ -2246,6 +2274,13 @@ function reload() {
         
         // Check affordability after reloading all values
         checkUpgradeAffordability();
+        
+        // Debug: Check level up button state
+        const levelUpButton = document.querySelector('button[onclick*="levelUp"]');
+        if (levelUpButton) {
+            console.log('Level up button classes after reload:', levelUpButton.className);
+            console.log('Level up button disabled state:', levelUpButton.disabled);
+        }
         
         console.log('Reload completed successfully');
         
