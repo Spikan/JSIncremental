@@ -3344,6 +3344,7 @@ function initMusicPlayer() {
     window.musicPlayerState = {
         isPlaying: false,
         isMuted: musicEnabled === 'false', // Auto-mute if user chose no music
+        userWantsMusic: false, // Track if user explicitly wants music to play
         audio: null,
         currentStream: null,
         streamInfo: {},
@@ -3454,6 +3455,25 @@ function initMusicPlayer() {
         // Don't update stream info on every progress event
     });
     
+    // Prevent auto-resume on mobile by catching play events
+    audio.addEventListener('play', () => {
+        const state = window.musicPlayerState;
+        if (!state) return;
+        
+        // If this is an auto-play event on mobile and user didn't want it
+        if (isMobileDevice() && !state.userWantsMusic && wasPlayingBeforeBlur === false) {
+            console.log('Preventing auto-play on mobile');
+            audio.pause();
+            state.isPlaying = false;
+            updateMusicPlayerUI();
+            return;
+        }
+        
+        // Normal play event - update state
+        state.isPlaying = true;
+        updateMusicPlayerUI();
+    });
+    
     // Store audio reference
     window.musicPlayerState.audio = audio;
     
@@ -3482,6 +3502,7 @@ function initMusicPlayer() {
             if (state.isPlaying) {
                 state.audio.pause();
                 state.isPlaying = false;
+                state.userWantsMusic = false; // Reset user intent when auto-paused
                 updateMusicPlayerUI();
                 console.log('Music paused due to page visibility change on mobile');
             }
@@ -3489,8 +3510,20 @@ function initMusicPlayer() {
             // Page became hidden on desktop - let music continue playing
             console.log('Page became hidden on desktop, music continues playing');
         } else {
-            // Page became visible again - don't auto-resume, let user decide
-            console.log('Page became visible again, music remains paused');
+            // Page became visible again - prevent auto-resume on mobile
+            if (isMobileDevice()) {
+                // On mobile, ensure music stays paused when page becomes visible
+                if (state.audio.played.length > 0 && !state.isPlaying) {
+                    // If audio was previously played and is now paused, keep it paused
+                    state.audio.pause();
+                    state.isPlaying = false;
+                    updateMusicPlayerUI();
+                    console.log('Prevented auto-resume on mobile when page became visible');
+                }
+            } else {
+                // On desktop, let music continue as it was
+                console.log('Page became visible again on desktop, music state unchanged');
+            }
         }
     });
     
@@ -3505,12 +3538,33 @@ function initMusicPlayer() {
             if (state.isPlaying) {
                 state.audio.pause();
                 state.isPlaying = false;
+                state.userWantsMusic = false; // Reset user intent when auto-paused
                 updateMusicPlayerUI();
                 console.log('Music paused due to window blur on mobile');
             }
         } else {
             // Window lost focus on desktop - let music continue playing
             console.log('Window lost focus on desktop, music continues playing');
+        }
+    });
+    
+    // Handle window focus events to prevent auto-resume on mobile
+    window.addEventListener('focus', () => {
+        const state = window.musicPlayerState;
+        if (!state || !state.audio) return;
+        
+        // Only handle on mobile devices
+        if (isMobileDevice()) {
+            // If music was playing before blur, don't auto-resume
+            // Only resume if user explicitly wants it
+            if (wasPlayingBeforeBlur && !state.isPlaying) {
+                // Music was playing before but is now paused - keep it paused
+                state.audio.pause();
+                state.isPlaying = false;
+                state.userWantsMusic = false; // Ensure user intent is reset
+                updateMusicPlayerUI();
+                console.log('Prevented auto-resume on mobile when window regained focus');
+            }
         }
     });
     
@@ -3677,9 +3731,13 @@ function toggleMusic() {
     if (state.isPlaying) {
         state.audio.pause();
         state.isPlaying = false;
+        state.userWantsMusic = false; // User explicitly paused
         musicStatus.textContent = 'Paused';
         updateMusicPlayerUI();
     } else {
+        // User explicitly wants to play music
+        state.userWantsMusic = true;
+        
         // Try to play the audio
         const playPromise = state.audio.play();
         if (playPromise !== undefined) {
