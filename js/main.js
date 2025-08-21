@@ -478,7 +478,148 @@ function initGame() {
             lastClickTime = savegame.lastClickTime || 0;
             clickTimes = savegame.clickTimes || [];
         }
-        
+
+        // Calculate offline progress if we have a save time
+        let offlineEarnings = new Decimal(0);
+        let offlineTimeSeconds = 0;
+
+        if (savegame && savegame.lastSaveTime) {
+            const now = Date.now();
+            const lastSave = parseInt(savegame.lastSaveTime);
+            offlineTimeSeconds = Math.floor((now - lastSave) / 1000);
+
+            // Only calculate offline earnings if at least 30 seconds offline
+            if (offlineTimeSeconds >= 30) {
+                // Load temporary SPS values to calculate earnings
+                let tempStrawSPS = new Decimal(0.6);
+                let tempCupSPS = new Decimal(1.2);
+                const tempSuctionBonus = new Decimal(0.3).times(suctions);
+
+                // Apply upgrade multipliers to temporary SPS values
+                if (widerStraws.gt(0)) {
+                    const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5));
+                    tempStrawSPS = tempStrawSPS.times(upgradeMultiplier);
+                }
+                if (betterCups.gt(0)) {
+                    const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4));
+                    tempCupSPS = tempCupSPS.times(upgradeMultiplier);
+                }
+
+                const tempTotalSPS = tempStrawSPS.times(straws).plus(tempCupSPS.times(cups)).plus(tempSuctionBonus.times(suctions));
+
+                // Cap offline earnings to prevent abuse (max 1 hour worth)
+                const cappedOfflineSeconds = Math.min(offlineTimeSeconds, 3600);
+                offlineEarnings = tempTotalSPS.times(cappedOfflineSeconds);
+
+                // Show offline progress modal
+                showOfflineProgress(offlineTimeSeconds, offlineEarnings);
+
+                        // Add offline earnings to total sips
+        sips = sips.plus(offlineEarnings);
+        totalSipsEarned = totalSipsEarned.plus(offlineEarnings);
+    }
+}
+
+// Function to show offline progress modal
+function showOfflineProgress(timeSeconds, earnings) {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease;
+    `;
+
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: linear-gradient(135deg, #001789, #0024b3);
+        border: 3px solid #00B36B;
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 400px;
+        text-align: center;
+        color: #00B36B;
+        box-shadow: 0 8px 32px rgba(0, 179, 107, 0.3);
+        animation: slideIn 0.4s ease;
+    `;
+
+    // Format time
+    let timeDisplay = '';
+    if (timeSeconds < 60) {
+        timeDisplay = `${timeSeconds} seconds`;
+    } else if (timeSeconds < 3600) {
+        const minutes = Math.floor(timeSeconds / 60);
+        const seconds = timeSeconds % 60;
+        timeDisplay = `${minutes} minute${minutes > 1 ? 's' : ''}${seconds > 0 ? ` ${seconds} second${seconds > 1 ? 's' : ''}` : ''}`;
+    } else {
+        const hours = Math.floor(timeSeconds / 3600);
+        const minutes = Math.floor((timeSeconds % 3600) / 60);
+        timeDisplay = `${hours} hour${hours > 1 ? 's' : ''}${minutes > 0 ? ` ${minutes} minute${minutes > 1 ? 's' : ''}` : ''}`;
+    }
+
+    // Format earnings
+    const earningsDisplay = prettify(earnings);
+
+    modalContent.innerHTML = `
+        <h2 style="color: #FF3D02; margin-bottom: 1rem;">Welcome Back!</h2>
+        <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+            You were away for <strong style="color: #FF8E53;">${timeDisplay}</strong>
+        </p>
+        <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+            While you were gone, you earned:
+            <br/>
+            <strong style="color: #00B36B; font-size: 1.5rem;">${earningsDisplay} sips</strong>
+        </p>
+        <button onclick="this.parentElement.parentElement.remove()"
+                style="
+                    background: #00B36B;
+                    border: 2px solid #008F5A;
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                "
+                onmouseover="this.style.transform='scale(1.05)'"
+                onmouseout="this.style.transform='scale(1)'">
+            Awesome!
+        </button>
+    `;
+
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
         strawSPS = new Decimal(0.6);
         cupSPS = new Decimal(1.2);
         suctionClickBonus = new Decimal(0.3).times(suctions);
@@ -1892,7 +2033,9 @@ function performSave() {
         totalSipsEarned: totalSipsEarned.toString(),
         gameStartDate: gameStartDate,
         lastClickTime: lastClickTime,
-        clickTimes: clickTimes
+        clickTimes: clickTimes,
+        // Offline progress tracking
+        lastSaveTime: Date.now()
     };
 
     try {
@@ -2628,6 +2771,7 @@ window.buyStraw = buyStraw;
 window.buyCup = buyCup;
 window.buyWiderStraws = buyWiderStraws;
 window.buyBetterCups = buyBetterCups;
+window.showOfflineProgress = showOfflineProgress;
 window.buySuction = buySuction;
 window.upgradeSuction = upgradeSuction;
 window.buyFasterDrinks = buyFasterDrinks;
