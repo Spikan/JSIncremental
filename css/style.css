@@ -2236,6 +2236,116 @@ h3 {
     -webkit-transform: translateZ(0);
 }
 
+/* Mobile-specific optimizations for click feedback */
+@media (max-width: 768px) {
+    .click-feedback {
+        /* Ensure feedback is visible on mobile */
+        z-index: 9999 !important;
+        /* Prevent text selection */
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        /* Optimize for mobile rendering */
+        will-change: transform, opacity;
+        /* Ensure proper touch handling */
+        touch-action: none;
+        -webkit-touch-callout: none;
+        /* Mobile-specific positioning adjustments */
+        position: fixed !important;
+        /* Prevent feedback from going off-screen */
+        max-width: 90vw;
+        word-wrap: break-word;
+        text-align: center;
+    }
+    
+    .critical-feedback {
+        /* Ensure critical feedback is always visible */
+        z-index: 10000 !important;
+        /* Larger text for mobile visibility */
+        font-size: 1.3em !important;
+        /* Enhanced shadow for better visibility */
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(255, 107, 53, 0.6) !important;
+    }
+    
+    /* Optimize soda button for mobile */
+    #sodaButton {
+        /* Ensure proper touch handling */
+        touch-action: manipulation;
+        /* Prevent text selection on long press */
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        /* Optimize for mobile performance */
+        will-change: transform, filter;
+        /* Ensure proper z-index on mobile */
+        z-index: 100;
+    }
+    
+    /* Mobile-specific click animation */
+    #sodaButton.soda-clicked {
+        /* Faster animation for mobile */
+        transition: transform 0.08s ease, filter 0.12s ease;
+        /* Ensure feedback is visible above button */
+        z-index: 101;
+    }
+    
+    /* Mobile-optimized feedback animations */
+    @keyframes clickFeedback {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        50% {
+            opacity: 0.9;
+            transform: translateY(-15px) scale(1.05);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-30px) scale(1.1);
+        }
+    }
+    
+    @keyframes criticalFeedback {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        25% {
+            opacity: 1;
+            transform: translateY(-10px) scale(1.2);
+        }
+        50% {
+            opacity: 0.9;
+            transform: translateY(-20px) scale(1.1);
+        }
+        75% {
+            opacity: 0.7;
+            transform: translateY(-30px) scale(1.15);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-40px) scale(1.2);
+        }
+    }
+    
+    /* Prevent feedback from being cut off on mobile */
+    .click-feedback,
+    .critical-feedback {
+        /* Ensure feedback stays within viewport bounds */
+        max-width: calc(100vw - 40px);
+        max-height: calc(100vh - 40px);
+        /* Add padding to prevent edge clipping */
+        padding: 4px 8px;
+        /* Ensure text is readable */
+        line-height: 1.2;
+        /* Optimize for mobile rendering */
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+}
+
 
 
 /* Divine Oracle Tab Styles - Sacred Theme */

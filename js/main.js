@@ -545,6 +545,7 @@ function initGame() {
             criticalClickUpCounter = new Decimal(savegame.criticalClickUpCounter || 1);
             suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
             level = new Decimal(typeof savegame.level === 'number' ? savegame.level : (savegame.level || 1));
+            try { window.App?.stateBridge?.setLevel(level); } catch {}
             totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
             window.totalClicks = Number(savegame.totalClicks || 0);
             gameStartDate = savegame.gameStartDate || Date.now();
@@ -634,6 +635,7 @@ function initGame() {
             criticalClickUpCounter = new Decimal(1);
             suctionClickBonus = new Decimal(0);
             level = new Decimal(1);
+            try { window.App?.stateBridge?.setLevel(level); } catch {}
             totalSipsEarned = new Decimal(0);
             gameStartDate = Date.now();
             lastClickTime = 0;
@@ -722,8 +724,11 @@ function initGame() {
         // Start the game loop
         startGameLoop();
         
+        // Setup mobile touch handling for reliable click feedback
+        setupMobileTouchHandling();
+        
         // Update critical click display with initial value
-        updateCriticalClickDisplay();
+        updateCriticalClickDisplay()
         
         // Initialize music player
         if (window.App?.systems?.music?.initMusicPlayer) {
@@ -812,10 +817,62 @@ function startGameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+// Mobile touch event handling for reliable click feedback
+function setupMobileTouchHandling() {
+    const sodaButton = DOM_CACHE.sodaButton;
+    if (!sodaButton) {
+        console.warn('Soda button not found for mobile touch setup, retrying...');
+        // Retry after a short delay in case DOM cache isn't ready yet
+        setTimeout(setupMobileTouchHandling, 100);
+        return;
+    }
+
+    // Detect mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                    ('ontouchstart' in window) ||
+                    (navigator.maxTouchPoints > 0);
+
+    if (isMobile) {
+        console.log('Setting up mobile touch handling for soda button');
+        
+        // Prevent default touch behaviors that could interfere
+        sodaButton.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            // Add visual feedback immediately
+            sodaButton.classList.add('soda-clicked');
+        }, { passive: false });
+
+        sodaButton.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            // Trigger the click function
+            sodaClick(1);
+            
+            // Remove visual feedback after a short delay
+            setTimeout(() => {
+                sodaButton.classList.remove('soda-clicked');
+            }, 150);
+        }, { passive: false });
+
+        // Prevent context menu on long press
+        sodaButton.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Add touch-action CSS property for better mobile handling
+        sodaButton.style.touchAction = 'manipulation';
+        sodaButton.style.webkitTouchCallout = 'none';
+        sodaButton.style.webkitUserSelect = 'none';
+        sodaButton.style.userSelect = 'none';
+        
+        console.log('Mobile touch handling setup complete');
+    }
+}
+
 function updateDrinkProgress() {
     const currentTime = Date.now();
     const timeSinceLastDrink = currentTime - lastDrinkTime;
     drinkProgress = (timeSinceLastDrink / drinkRate) * 100;
+    try { window.App?.stateBridge?.setDrinkProgress(drinkProgress); } catch {}
     
     // Cache DOM elements to reduce queries
     const progressFill = DOM_CACHE.drinkProgressFill;
@@ -870,6 +927,10 @@ function processDrink() {
         
         lastDrinkTime = currentTime;
         drinkProgress = 0;
+        try {
+            window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
+            window.App?.stateBridge?.setDrinkProgress(drinkProgress);
+        } catch {}
         
         // Check for feature unlocks after processing a drink
         FEATURE_UNLOCKS.checkAllUnlocks();
@@ -902,6 +963,11 @@ function setDrinkRate(newDrinkRate) {
     // Reset progress when changing drink rate
     drinkProgress = 0;
     lastDrinkTime = Date.now();
+    try {
+        window.App?.stateBridge?.setDrinkRate(drinkRate);
+        window.App?.stateBridge?.setDrinkProgress(drinkProgress);
+        window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
+    } catch {}
 }
 
 // Function to calculate and update drink rate based on upgrades
@@ -2414,6 +2480,7 @@ function levelUp() {
     if (window.sips.gte(levelUpCost)) {
         window.sips = window.sips.minus(levelUpCost);
         level = level.plus(1);
+        try { window.App?.stateBridge?.setLevel(level); } catch {}
         
         // Calculate sips gained from level up (configured multiplier)
         const levelUpMultiplier = config.LEVEL_UP_SIPS_MULTIPLIER;
@@ -2623,6 +2690,7 @@ function delete_save() {
         
         // Reset drink system variables
         drinkRate = DEFAULT_DRINK_RATE;
+        try { window.App?.stateBridge?.setDrinkRate(drinkRate); } catch {}
     
         // Update the top sips per drink display
     updateTopSipsPerDrink();
@@ -2632,6 +2700,10 @@ function delete_save() {
     
     drinkProgress = 0;
         lastDrinkTime = Date.now();
+        try {
+            window.App?.stateBridge?.setDrinkProgress(drinkProgress);
+            window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
+        } catch {}
         
         // Reset faster drinks upgrade variables
         fasterDrinks = new Decimal(0);
@@ -2789,7 +2861,7 @@ function reload() {
             'criticalClickChanceCompact': (criticalClickChance.times(100)).toFixed(1),
             // Compact drink speed upgrade displays
             'fasterDrinksCostCompact': fasterDrinksCost.toString(),
-            'currentDrinkSpeedCompact': updateDrinkSpeedDisplay(),
+            'currentDrinkSpeedCompact': (drinkRate / 1000).toFixed(2) + 's',
             'drinkSpeedBonusCompact': (fasterDrinks.toNumber() * 10) + '%',
             'fasterDrinksUpCostCompact': (config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber()).toString()
         };

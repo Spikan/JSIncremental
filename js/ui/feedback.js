@@ -9,6 +9,48 @@ function safePrettify(value) {
     return value?.toString() || '0';
 }
 
+// Detect mobile device
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           ('ontouchstart' in window) ||
+           (navigator.maxTouchPoints > 0);
+}
+
+// Get safe positioning for mobile devices
+function getSafePosition(container, rangeX, rangeY) {
+    if (isMobileDevice()) {
+        // On mobile, use viewport-relative positioning for better reliability
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Center the feedback in the viewport with some randomness
+        const centerX = viewportWidth / 2;
+        const centerY = viewportHeight / 2;
+        
+        // Reduce range on mobile to prevent feedback from going off-screen
+        const mobileRangeX = Math.min(rangeX, 80);
+        const mobileRangeY = Math.min(rangeY, 60);
+        
+        const randomX = (Math.random() - 0.5) * mobileRangeX;
+        const randomY = (Math.random() - 0.5) * mobileRangeY;
+        
+        return {
+            left: centerX + randomX,
+            top: centerY + randomY
+        };
+    } else {
+        // Desktop positioning using container bounds
+        const containerRect = container.getBoundingClientRect();
+        const randomX = (Math.random() - 0.5) * rangeX;
+        const randomY = (Math.random() - 0.5) * rangeY;
+        
+        return {
+            left: containerRect.left + containerRect.width/2 + randomX,
+            top: containerRect.top + containerRect.height/2 + randomY
+        };
+    }
+}
+
 // Show click feedback numbers
 export function showClickFeedback(sipsGained, isCritical = false) {
     const sodaContainer =
@@ -34,26 +76,32 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
         `Gained ${safePrettify(sipsGained)} sips`
     );
     
-    // Use more efficient positioning to avoid layout recalculations
-    const containerRect = sodaContainer.getBoundingClientRect();
+    // Get safe positioning for mobile/desktop
     const config = window.GAME_CONFIG?.LIMITS || {};
     const rangeX = config.CLICK_FEEDBACK_RANGE_X || 100;
     const rangeY = config.CLICK_FEEDBACK_RANGE_Y || 80;
-    const randomX = (Math.random() - 0.5) * rangeX; // -rangeX/2px to +rangeX/2px
-    const randomY = (Math.random() - 0.5) * rangeY;  // -rangeY/2px to +rangeY/2px
+    const position = getSafePosition(sodaContainer, rangeX, rangeY);
+    
+    // Mobile-optimized styling
+    const isMobile = isMobileDevice();
+    const fontSize = isMobile ? 
+        (isCritical ? '1.3em' : '1.1em') : 
+        (isCritical ? '1.5em' : '1.2em');
     
     feedback.style.cssText = `
         position: fixed;
-        left: ${containerRect.left + containerRect.width/2 + randomX}px;
-        top: ${containerRect.top + containerRect.height/2 + randomY}px;
+        left: ${position.left}px;
+        top: ${position.top}px;
         transform: translate(-50%, -50%);
         pointer-events: none;
-        z-index: 1000;
+        z-index: ${isMobile ? '9999' : '1000'};
         font-weight: bold;
-        font-size: ${isCritical ? '1.5em' : '1.2em'};
+        font-size: ${fontSize};
         color: ${isCritical ? '#ff6b35' : '#4CAF50'};
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         animation: clickFeedback 2s ease-out forwards;
+        ${isMobile ? 'touch-action: none; -webkit-touch-callout: none;' : ''}
+        ${isMobile ? 'will-change: transform, opacity;' : ''}
     `;
     
     // Add to body for proper positioning
@@ -61,14 +109,15 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
     
     // Remove after animation
     const config2 = window.GAME_CONFIG?.TIMING || {};
+    const duration = isCritical ? 
+        (config2.CRITICAL_FEEDBACK_DURATION || 2500) : 
+        (config2.CLICK_FEEDBACK_DURATION || 2000);
+    
     setTimeout(() => {
         if (feedback.parentNode) {
             feedback.parentNode.removeChild(feedback);
         }
-    }, isCritical ? 
-        (config2.CRITICAL_FEEDBACK_DURATION || 2500) : 
-        (config2.CLICK_FEEDBACK_DURATION || 2000)
-    );
+    }, duration);
 }
 
 // Show purchase feedback
@@ -183,7 +232,7 @@ export function showOfflineProgress(timeSeconds, earnings) {
                 </div>
                 <div class="offline-earnings">
                     <span class="label">Sips Earned:</span>
-                    <span class="value">+${prettify(earnings)}</span>
+                    <span class="value">+${safePrettify(earnings)}</span>
                 </div>
             </div>
             <button class="offline-continue-btn" onclick="this.closest('.offline-progress-modal').remove()">
@@ -204,6 +253,64 @@ export function showOfflineProgress(timeSeconds, earnings) {
         align-items: center;
         justify-content: center;
     `;
+
+    // Style the background overlay
+    const overlay = modal.querySelector('.modal-overlay');
+    if (overlay) {
+        overlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        `;
+    }
+
+    // Style the content panel
+    const content = modal.querySelector('.modal-content');
+    if (content) {
+        content.style.cssText = `
+            position: relative;
+            background: #111827;
+            color: #E5E7EB;
+            border: 2px solid #374151;
+            border-radius: 12px;
+            padding: 20px 24px;
+            width: min(90%, 420px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 1;
+            text-align: left;
+        `;
+        const h2 = content.querySelector('h2');
+        if (h2) {
+            h2.style.cssText = `
+                margin: 0 0 12px 0;
+                font-size: 20px;
+                color: #60A5FA;
+            `;
+        }
+        const stats = content.querySelector('.offline-stats');
+        if (stats) {
+            stats.style.cssText = `
+                display: grid;
+                gap: 8px;
+            `;
+        }
+        const btn = content.querySelector('.offline-continue-btn');
+        if (btn) {
+            btn.style.cssText = `
+                margin-top: 16px;
+                background: #10B981;
+                color: #06281e;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 12px;
+                font-weight: 600;
+                cursor: pointer;
+            `;
+        }
+    }
     
     // Add to document
     document.body.appendChild(modal);

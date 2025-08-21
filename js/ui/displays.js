@@ -3,6 +3,7 @@
 
 // Update cost display with affordability indicators
 export function updateCostDisplay(elementId, cost, isAffordable) {
+    if (typeof window === 'undefined') return;
     const element = document.getElementById(elementId);
     if (element) {
         element.innerHTML = prettify(cost);
@@ -13,6 +14,7 @@ export function updateCostDisplay(elementId, cost, isAffordable) {
 
 // Update button state based on affordability
 export function updateButtonState(buttonId, isAffordable, cost) {
+    if (typeof window === 'undefined') return;
     // Try multiple selectors to find the button
     const button = document.getElementById(buttonId) || 
                   document.querySelector(`[data-button-id="${buttonId}"]`) ||
@@ -33,6 +35,7 @@ export function updateButtonState(buttonId, isAffordable, cost) {
 
 // Update the top sips per drink display
 export function updateTopSipsPerDrink() {
+    if (typeof window === 'undefined') return;
     const topSipsPerDrinkElement = window.DOM_CACHE?.topSipsPerDrink;
     if (topSipsPerDrinkElement && window.sps) {
         topSipsPerDrinkElement.innerHTML = prettify(window.sps);
@@ -41,6 +44,7 @@ export function updateTopSipsPerDrink() {
 
 // Update the top total sips per second display (passive production only)
 export function updateTopSipsPerSecond() {
+    if (typeof window === 'undefined') return;
     const topSipsPerSecondElement = window.DOM_CACHE?.topSipsPerSecond;
     if (topSipsPerSecondElement && window.sps && window.drinkRate) {
         const drinkRateSeconds = window.drinkRate / 1000;
@@ -51,6 +55,7 @@ export function updateTopSipsPerSecond() {
 
 // Update the critical click chance display
 export function updateCriticalClickDisplay() {
+    if (typeof window === 'undefined') return;
     const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
     if (criticalClickChanceCompact && window.criticalClickChance) {
         const percentage = window.criticalClickChance.times(100).toFixed(1);
@@ -60,6 +65,7 @@ export function updateCriticalClickDisplay() {
 
 // Update drink speed display
 export function updateDrinkSpeedDisplay() {
+    if (typeof window === 'undefined') return;
     // Update compact drink speed display elements
     const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
     if (currentDrinkSpeedCompact && window.drinkRate) {
@@ -70,6 +76,7 @@ export function updateDrinkSpeedDisplay() {
 
 // Update autosave status display
 export function updateAutosaveStatus() {
+    if (typeof window === 'undefined') return;
     const status = document.getElementById('autosaveStatus');
     if (status && window.autosaveEnabled !== undefined && window.autosaveInterval !== undefined) {
         if (window.autosaveEnabled) {
@@ -84,6 +91,7 @@ export function updateAutosaveStatus() {
 
 // Update drink progress bar
 export function updateDrinkProgress(progress, drinkRate) {
+    if (typeof window === 'undefined') return;
     const progressFill = window.DOM_CACHE?.progressFill;
     const countdown = window.DOM_CACHE?.countdown;
     
@@ -100,6 +108,7 @@ export function updateDrinkProgress(progress, drinkRate) {
 
 // Update the top current sips counter
 export function updateTopSipCounter() {
+    if (typeof window === 'undefined') return;
     const topSipElement = window.DOM_CACHE?.topSipValue;
     if (topSipElement && window.sips) {
         topSipElement.innerHTML = prettify(window.sips);
@@ -108,6 +117,7 @@ export function updateTopSipCounter() {
 
 // Update the displayed level number
 export function updateLevelNumber() {
+    if (typeof window === 'undefined') return;
     const levelEl = window.DOM_CACHE?.levelNumber;
     if (levelEl && window.level != null) {
         const val = typeof window.level?.toNumber === 'function' ? window.level.toNumber() : window.level;
