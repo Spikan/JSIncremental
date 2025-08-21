@@ -503,7 +503,6 @@ function initGame() {
                 // Load temporary SPS values to calculate earnings
                 let tempStrawSPS = new Decimal(0.6);
                 let tempCupSPS = new Decimal(1.2);
-                const tempSuctionBonus = new Decimal(0.3).times(suctions);
 
                 // Apply upgrade multipliers to temporary SPS values
                 if (widerStraws.gt(0)) {
@@ -515,7 +514,7 @@ function initGame() {
                     tempCupSPS = tempCupSPS.times(upgradeMultiplier);
                 }
 
-                const tempTotalSPS = tempStrawSPS.times(straws).plus(tempCupSPS.times(cups)).plus(tempSuctionBonus.times(suctions));
+                const tempTotalSPS = tempStrawSPS.times(straws).plus(tempCupSPS.times(cups));
 
                 // Cap offline earnings to prevent abuse (max 1 hour worth)
                 const cappedOfflineSeconds = Math.min(offlineTimeSeconds, 3600);
