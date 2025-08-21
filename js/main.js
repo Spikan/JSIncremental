@@ -812,13 +812,20 @@ function processDrink() {
         // Check for feature unlocks after processing a drink
         FEATURE_UNLOCKS.checkAllUnlocks();
         
-        // Update auto-save counter based on configurable interval
-        if (autosaveEnabled) {
+        // Update auto-save counter based on configurable interval via system helper
+        if (window.App?.systems?.autosave?.computeAutosaveCounter) {
+            const { nextCounter, shouldSave } = window.App.systems.autosave.computeAutosaveCounter({
+                enabled: autosaveEnabled,
+                counter: autosaveCounter,
+                intervalSec: autosaveInterval,
+                drinkRateMs: drinkRate,
+            });
+            autosaveCounter = nextCounter;
+            if (shouldSave) save();
+        } else if (autosaveEnabled) {
             autosaveCounter += 1;
-            // Convert drink rate to seconds and calculate how many drinks equal the auto-save interval
             const drinksPerSecond = 1000 / drinkRate;
             const drinksForAutosave = Math.ceil(autosaveInterval * drinksPerSecond);
-            
             if (autosaveCounter >= drinksForAutosave) {
                 save();
                 autosaveCounter = 1;
