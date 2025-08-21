@@ -21,7 +21,10 @@ export function performSaveSnapshot() {
 			betterCups: String(window.betterCups || 0),
 			suctions: String(window.suctions || 0),
 			criticalClicks: String(window.criticalClicks || 0),
-			fasterDrinks: String(window.fasterDrinks || 0),
+			fasterDrinks: String(window.fasterDrinks || 0),			totalSipsEarned: String(window.totalSipsEarned || 0),
+			drinkRate: Number(window.drinkRate || 0),
+			lastDrinkTime: Number(window.lastDrinkTime || 0),
+			drinkProgress: Number(window.drinkProgress || 0),
 			lastSaveTime: Date.now(),
 		};
 		window.App?.storage?.saveGame?.(payload);
