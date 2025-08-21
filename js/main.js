@@ -837,12 +837,14 @@ function setupMobileTouchHandling() {
         
         // Prevent default touch behaviors that could interfere
         let touchStartTime = 0;
-        let isTouchClick = false;
+        window.isTouchClick = false;
+        window.touchProcessed = false;
         
         sodaButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
             touchStartTime = Date.now();
-            isTouchClick = true;
+            window.isTouchClick = true;
+            window.touchProcessed = false;
             // Add visual feedback immediately
             sodaButton.classList.add('soda-clicked');
         }, { passive: false });
@@ -851,19 +853,11 @@ function setupMobileTouchHandling() {
             e.preventDefault();
             const touchDuration = Date.now() - touchStartTime;
             
-            // Only trigger click if it was a short touch (not a long press)
-            if (touchDuration < 300 && isTouchClick) {
-                // Temporarily disable onclick to prevent duplicate
-                const originalOnclick = sodaButton.onclick;
-                sodaButton.onclick = null;
-                
-                // Trigger the click function
-                sodaClick(1);
-                
-                // Re-enable onclick after a short delay
-                setTimeout(() => {
-                    sodaButton.onclick = originalOnclick;
-                }, 100);
+            // Only process if it was a short touch and hasn't been processed yet
+            if (touchDuration < 300 && window.isTouchClick && !window.touchProcessed) {
+                window.touchProcessed = true;
+                // Let the onclick handler do the work, but mark that we've processed this touch
+                // The onclick will check this flag to avoid duplicate processing
             }
             
             // Remove visual feedback after a short delay
@@ -871,7 +865,7 @@ function setupMobileTouchHandling() {
                 sodaButton.classList.remove('soda-clicked');
             }, 150);
             
-            isTouchClick = false;
+            window.isTouchClick = false;
         }, { passive: false });
 
         // Prevent context menu on long press
@@ -1906,6 +1900,11 @@ clickSoda.src = "images/clickSoda.png";
 
 
 function sodaClick(number) {
+    // Check if this is a touch event that's already been processed
+    if (window.touchProcessed && window.isTouchClick) {
+        return; // Skip processing if this touch was already handled
+    }
+    
     // Track the click
     trackClick();
     
