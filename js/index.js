@@ -3,6 +3,8 @@ import { appStore, createStore } from './core/state/index.js';
 import { loadGame, saveGame, deleteSave, getStorageMeta, setJSON, getJSON, setBoolean, getBoolean, remove } from './services/storage.js';
 import { bus } from './services/event-bus.js';
 import { EVENTS } from './core/constants.js';
+import * as ClickRules from './core/rules/clicks.js';
+import * as PurchaseRules from './core/rules/purchases.js';
 
 // Detect module loading
 console.info('[bootstrap] Module index.js loaded');
@@ -24,6 +26,10 @@ window.App = {
     },
     events: bus,
     EVENT_NAMES: EVENTS,
+    rules: {
+        clicks: ClickRules,
+        purchases: PurchaseRules,
+    },
 };
 
 // Optionally, attach a simple dev helper to log state changes

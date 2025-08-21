@@ -1710,9 +1710,21 @@ function sodaClick(number) {
         console.log('CRITICAL CLICK! Multiplier: ' + criticalMultiplier.toString());
     }
     
-    // Calculate total sips gained from this click
-    const baseSips = new Decimal(number);
-    const totalSipsGained = baseSips.plus(suctionClickBonus).times(criticalMultiplier);
+    // Calculate total sips gained from this click (use rules if available)
+    let totalSipsGained;
+    if (window.App?.rules?.clicks?.computeClick) {
+        const result = window.App.rules.clicks.computeClick({
+            baseClick: number,
+            suctionBonus: suctionClickBonus,
+            criticalChance: criticalClickChance.toNumber(),
+            criticalMultiplier: criticalMultiplier,
+        });
+        totalSipsGained = new Decimal(result.gained);
+        isCritical = result.critical;
+    } else {
+        const baseSips = new Decimal(number);
+        totalSipsGained = baseSips.plus(suctionClickBonus).times(criticalMultiplier);
+    }
     try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.SODA, { gained: totalSipsGained.toString(), critical: isCritical }); } catch {}
     
     // Add to total sips earned
@@ -1835,7 +1847,9 @@ function spsClick(amount) {
 function buyStraw() {
     // IMPROVED BALANCE: Better early game progression
     const config = window.GAME_CONFIG?.BALANCE || {};
-    let strawCost = Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
+    let strawCost = window.App?.rules?.purchases?.nextStrawCost ?
+        window.App.rules.purchases.nextStrawCost(straws.toNumber(), config.STRAW_BASE_COST, config.STRAW_SCALING) :
+        Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
             if (window.sips.gte(strawCost)) {
         straws = straws.plus(1);
         window.sips = window.sips.minus(strawCost);
@@ -1873,7 +1887,9 @@ function buyStraw() {
 function buyCup() {
     // IMPROVED BALANCE: Better mid-game progression
     const config = window.GAME_CONFIG?.BALANCE || {};
-    let cupCost = Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
+    let cupCost = window.App?.rules?.purchases?.nextCupCost ?
+        window.App.rules.purchases.nextCupCost(cups.toNumber(), config.CUP_BASE_COST, config.CUP_SCALING) :
+        Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
             if (window.sips.gte(cupCost)) {
         cups = cups.plus(1);
         window.sips = window.sips.minus(cupCost);
