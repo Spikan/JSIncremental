@@ -666,6 +666,19 @@ function initGame() {
 
         // Initialize drink rate based on upgrades
         updateDrinkRate();
+
+        // Restore in-progress drink timing if present in save
+        try {
+            if (savegame) {
+                if (typeof savegame.lastDrinkTime === 'number' && savegame.lastDrinkTime > 0) {
+                    lastDrinkTime = savegame.lastDrinkTime;
+                } else if (typeof savegame.drinkProgress === 'number' && savegame.drinkProgress >= 0) {
+                    // Approximate lastDrinkTime from saved progress percentage
+                    const progressMs = (savegame.drinkProgress / 100) * drinkRate;
+                    lastDrinkTime = Date.now() - progressMs;
+                }
+            }
+        } catch {}
         
         // Update the top sips per drink display
         updateTopSipsPerDrink();
