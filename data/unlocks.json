@@ -1,0 +1,15 @@
+{
+  "suction": { "sips": 25, "clicks": 8 },
+  "criticalClick": { "sips": 100, "clicks": 20 },
+  "fasterDrinks": { "sips": 200, "clicks": 30 },
+  "straws": { "sips": 500, "clicks": 50 },
+  "cups": { "sips": 1000, "clicks": 80 },
+  "widerStraws": { "sips": 2000, "clicks": 120 },
+  "betterCups": { "sips": 5000, "clicks": 200 },
+  "levelUp": { "sips": 3000, "clicks": 150 },
+  "shop": { "sips": 500, "clicks": 30 },
+  "stats": { "sips": 1000, "clicks": 60 },
+  "god": { "sips": 5000, "clicks": 300 },
+  "unlocks": { "sips": 25, "clicks": 8 }
+}
+

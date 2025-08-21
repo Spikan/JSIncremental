@@ -10,9 +10,12 @@ const FEATURE_UNLOCKS = {
     // Track unlocked features
     unlockedFeatures: new Set(['soda', 'options']), // Start with soda clicking and options always available
     
-    // Define unlock conditions for each feature - now using config constants
+    // Define unlock conditions for each feature - prefer data/unlocks.json via App.data
     get unlockConditions() {
-        // Access config through global variable for compatibility
+        // Prefer loaded JSON data if available
+        const data = window.App?.data?.unlocks;
+        if (data) return data;
+        // Fallback to config
         const config = window.GAME_CONFIG || {};
         return {
             'suction': config.UNLOCKS?.SUCTION || { sips: 25, clicks: 8 },

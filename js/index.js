@@ -38,6 +38,10 @@ window.App = {
     systems: {
         resources: ResourceSystem,
     },
+    data: {
+        unlocks: null,
+        upgrades: null,
+    },
 };
 
 // Optionally, attach a simple dev helper to log state changes
@@ -46,5 +50,17 @@ appStore.subscribe((state) => {
         console.debug('[state]', state);
     }
 });
+
+// Load data files (unlocks) at bootstrap
+try {
+    fetch('./data/unlocks.json')
+        .then((r) => r.ok ? r.json() : null)
+        .then((json) => { if (json) window.App.data.unlocks = json; })
+        .catch(() => {});
+    fetch('./data/upgrades.json')
+        .then((r) => r.ok ? r.json() : null)
+        .then((json) => { if (json) window.App.data.upgrades = json; })
+        .catch(() => {});
+} catch {}
 
 

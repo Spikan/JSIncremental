@@ -1878,9 +1878,12 @@ function spsClick(amount) {
 function buyStraw() {
     // IMPROVED BALANCE: Better early game progression
     const config = window.GAME_CONFIG?.BALANCE || {};
+    const dataUp = window.App?.data?.upgrades;
+    const baseCost = dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST;
+    const scaling = dataUp?.straws?.scaling ?? config.STRAW_SCALING;
     let strawCost = window.App?.rules?.purchases?.nextStrawCost ?
-        window.App.rules.purchases.nextStrawCost(straws.toNumber(), config.STRAW_BASE_COST, config.STRAW_SCALING) :
-        Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
+        window.App.rules.purchases.nextStrawCost(straws.toNumber(), baseCost, scaling) :
+        Math.floor(baseCost * Math.pow(scaling, straws.toNumber()));
             if (window.sips.gte(strawCost)) {
         straws = straws.plus(1);
         if (window.App?.mutations?.subtractSips) {
@@ -1956,9 +1959,12 @@ function buyStraw() {
 function buyCup() {
     // IMPROVED BALANCE: Better mid-game progression
     const config = window.GAME_CONFIG?.BALANCE || {};
+    const dataUp = window.App?.data?.upgrades;
+    const baseCost = dataUp?.cups?.baseCost ?? config.CUP_BASE_COST;
+    const scaling = dataUp?.cups?.scaling ?? config.CUP_SCALING;
     let cupCost = window.App?.rules?.purchases?.nextCupCost ?
-        window.App.rules.purchases.nextCupCost(cups.toNumber(), config.CUP_BASE_COST, config.CUP_SCALING) :
-        Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
+        window.App.rules.purchases.nextCupCost(cups.toNumber(), baseCost, scaling) :
+        Math.floor(baseCost * Math.pow(scaling, cups.toNumber()));
             if (window.sips.gte(cupCost)) {
         cups = cups.plus(1);
         if (window.App?.mutations?.subtractSips) {

@@ -1,3 +1,5 @@
+node_modules/
+dist/
 # Configuration files with API keys
 config.local.js
 .env
