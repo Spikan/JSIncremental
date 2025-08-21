@@ -493,7 +493,26 @@ function initGame() {
         FEATURE_DETECTION.enableAdvancedFeatures();
         
         // Load saved game data
-        let savegame = JSON.parse(localStorage.getItem("save"));
+        let savegame = null;
+        try {
+            if (window.App && window.App.storage && typeof window.App.storage.loadGame === 'function') {
+                // Prefer new storage service
+                const payload = window.App.storage.loadGame();
+                // Maintain compatibility with legacy shape stored under "save"
+                if (payload && payload.sips !== undefined) {
+                    savegame = payload;
+                } else {
+                    // Fallback to legacy key if service returns nothing
+                    savegame = JSON.parse(localStorage.getItem("save"));
+                }
+            } else {
+                // Legacy fallback
+                savegame = JSON.parse(localStorage.getItem("save"));
+            }
+        } catch (e) {
+            console.warn('Failed to load save, starting fresh.', e);
+            savegame = null;
+        }
         
         if (savegame && typeof savegame.sips !== "undefined" && savegame.sips !== null) {
             window.sips = new Decimal(savegame.sips);
@@ -921,13 +940,30 @@ function saveOptions() {
         autosaveEnabled: autosaveEnabled,
         autosaveInterval: autosaveInterval
     };
-    localStorage.setItem('gameOptions', JSON.stringify(options));
+    try {
+        if (window.App?.storage?.setJSON) {
+            window.App.storage.setJSON('gameOptions', options);
+        } else {
+            localStorage.setItem('gameOptions', JSON.stringify(options));
+        }
+    } catch (e) {
+        console.warn('saveOptions failed:', e);
+    }
 }
 
 function loadOptions() {
-    const savedOptions = localStorage.getItem('gameOptions');
-    if (savedOptions) {
-        const options = JSON.parse(savedOptions);
+    let options = null;
+    try {
+        if (window.App?.storage?.getJSON) {
+            options = window.App.storage.getJSON('gameOptions', null);
+        } else {
+            const savedOptions = localStorage.getItem('gameOptions');
+            if (savedOptions) options = JSON.parse(savedOptions);
+        }
+    } catch (e) {
+        console.warn('loadOptions failed:', e);
+    }
+    if (options) {
         autosaveEnabled = options.autosaveEnabled !== undefined ? options.autosaveEnabled : true;
         autosaveInterval = options.autosaveInterval || window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL;
     }
@@ -1583,7 +1619,15 @@ function toggleClickSounds() {
     clickSoundsEnabled = !clickSoundsEnabled;
     
     // Save preference to localStorage
-    localStorage.setItem('clickSoundsEnabled', clickSoundsEnabled.toString());
+    try {
+        if (window.App?.storage?.setBoolean) {
+            window.App.storage.setBoolean('clickSoundsEnabled', clickSoundsEnabled);
+        } else {
+            localStorage.setItem('clickSoundsEnabled', clickSoundsEnabled.toString());
+        }
+    } catch (e) {
+        console.warn('persist clickSoundsEnabled failed:', e);
+    }
     
     // Update UI if there's a toggle button
     const toggleButton = document.getElementById('clickSoundsToggle');
@@ -1595,11 +1639,19 @@ function toggleClickSounds() {
     console.log('Click sounds:', clickSoundsEnabled ? 'enabled' : 'disabled');
 }
 
-// Load click sounds preference from localStorage
+// Load click sounds preference from storage
 function loadClickSoundsPreference() {
-    const saved = localStorage.getItem('clickSoundsEnabled');
-    if (saved !== null) {
-        clickSoundsEnabled = saved === 'true';
+    try {
+        if (window.App?.storage?.getBoolean) {
+            clickSoundsEnabled = window.App.storage.getBoolean('clickSoundsEnabled', true);
+        } else {
+            const saved = localStorage.getItem('clickSoundsEnabled');
+            if (saved !== null) {
+                clickSoundsEnabled = saved === 'true';
+            }
+        }
+    } catch (e) {
+        console.warn('loadClickSoundsPreference failed:', e);
     }
 }
 
@@ -2218,7 +2270,11 @@ function performSave() {
     };
 
     try {
-        localStorage.setItem("save", JSON.stringify(save));
+        if (window.App && window.App.storage && typeof window.App.storage.saveGame === 'function') {
+            window.App.storage.saveGame(save);
+        } else {
+            localStorage.setItem("save", JSON.stringify(save));
+        }
         lastSaveTime = Date.now();
         lastSaveOperation = Date.now();
         updateLastSaveTime();
@@ -2228,7 +2284,11 @@ function performSave() {
         // Fallback: try to save with reduced data
         try {
             const minimalSave = { sips: window.sips.toString(), level: level.toString() };
-            localStorage.setItem("save", JSON.stringify(minimalSave));
+            if (window.App && window.App.storage && typeof window.App.storage.saveGame === 'function') {
+                window.App.storage.saveGame(minimalSave);
+            } else {
+                localStorage.setItem("save", JSON.stringify(minimalSave));
+            }
             console.log('Minimal save completed');
         } catch (fallbackError) {
             console.error('Even minimal save failed:', fallbackError);
@@ -2239,8 +2299,17 @@ function performSave() {
 function delete_save() {
     // Show confirmation dialog
     if (confirm("Are you sure you want to delete your save? This will completely reset your game progress and cannot be undone.")) {
-        // Remove save from localStorage
-        localStorage.removeItem("save");
+        // Remove save using storage service if available, else legacy key
+        try {
+            if (window.App && window.App.storage && typeof window.App.storage.deleteSave === 'function') {
+                window.App.storage.deleteSave();
+            } else {
+                localStorage.removeItem("save");
+            }
+        } catch (e) {
+            console.warn('Delete save failed, attempting legacy removal', e);
+            try { localStorage.removeItem("save"); } catch {}
+        }
         
         // Reset all game variables to their initial values
         window.sips = new Decimal(0);
@@ -2302,7 +2371,13 @@ function delete_save() {
         
         // Reset unlocked features to soda and options (options should always be available)
         FEATURE_UNLOCKS.unlockedFeatures = new Set(['soda', 'options']);
-        localStorage.removeItem('unlockedFeatures');
+        try {
+            if (window.App?.storage?.remove) {
+                window.App.storage.remove('unlockedFeatures');
+            } else {
+                localStorage.removeItem('unlockedFeatures');
+            }
+        } catch {}
         
         // Update the UI to reflect the reset
         reload();
@@ -2573,7 +2648,13 @@ window.startGameWithMusic = function() {
     }
     
     // Set a flag to indicate music is enabled
-    localStorage.setItem('musicEnabled', 'true');
+    try {
+        if (window.App?.storage?.setBoolean) {
+            window.App.storage.setBoolean('musicEnabled', true);
+        } else {
+            localStorage.setItem('musicEnabled', 'true');
+        }
+    } catch {}
     
     // Start the game after a brief moment to let title music begin
     const config = window.GAME_CONFIG?.TIMING || {};
@@ -2588,7 +2669,13 @@ window.startGameWithoutMusic = function() {
     console.log('startGameWithoutMusic called');
     
     // Set flag to indicate music is disabled
-    localStorage.setItem('musicEnabled', 'false');
+    try {
+        if (window.App?.storage?.setBoolean) {
+            window.App.storage.setBoolean('musicEnabled', false);
+        } else {
+            localStorage.setItem('musicEnabled', 'false');
+        }
+    } catch {}
     
     // Start the game immediately
     startGameCore();
@@ -3036,7 +3123,14 @@ function stopTitleMusic() {
 
 function startMainGameMusic() {
     console.log('Starting main game music...');
-    const musicEnabled = localStorage.getItem('musicEnabled');
+    let musicEnabled = 'true';
+    try {
+        if (window.App?.storage?.getBoolean) {
+            musicEnabled = window.App.storage.getBoolean('musicEnabled', true) ? 'true' : 'false';
+        } else {
+            musicEnabled = localStorage.getItem('musicEnabled');
+        }
+    } catch {}
     
     if (musicEnabled === 'true' && window.musicPlayerState && window.musicPlayerState.audio) {
         const mainAudio = window.musicPlayerState.audio;
@@ -3070,7 +3164,14 @@ function initMusicPlayer() {
     }
     
     // Check if user chose to disable music
-    const musicEnabled = localStorage.getItem('musicEnabled');
+    let musicEnabled = 'true';
+    try {
+        if (window.App?.storage?.getBoolean) {
+            musicEnabled = window.App.storage.getBoolean('musicEnabled', true) ? 'true' : 'false';
+        } else {
+            musicEnabled = localStorage.getItem('musicEnabled');
+        }
+    } catch {}
     console.log('Music enabled setting:', musicEnabled);
     
     // Initialize music player state
@@ -3636,9 +3737,22 @@ function changeMusicStream() {
         }
         
         // Save the stream preference
-        const streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
-        streamPreferences.selectedStream = selectedStream;
-        localStorage.setItem('musicStreamPreferences', JSON.stringify(streamPreferences));
+        try {
+            let streamPreferences = {};
+            if (window.App?.storage?.getJSON) {
+                streamPreferences = window.App.storage.getJSON('musicStreamPreferences', {});
+            } else {
+                streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
+            }
+            streamPreferences.selectedStream = selectedStream;
+            if (window.App?.storage?.setJSON) {
+                window.App.storage.setJSON('musicStreamPreferences', streamPreferences);
+            } else {
+                localStorage.setItem('musicStreamPreferences', JSON.stringify(streamPreferences));
+            }
+        } catch (e) {
+            console.warn('Failed to persist stream preference', e);
+        }
         
         console.log('YouTube stream selected:', streamData.name);
         return;
@@ -3676,9 +3790,22 @@ function changeMusicStream() {
     }
     
     // Save the stream preference
-    const streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
-    streamPreferences.selectedStream = selectedStream;
-    localStorage.setItem('musicStreamPreferences', JSON.stringify(streamPreferences));
+    try {
+        let streamPreferences = {};
+        if (window.App?.storage?.getJSON) {
+            streamPreferences = window.App.storage.getJSON('musicStreamPreferences', {});
+        } else {
+            streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
+        }
+        streamPreferences.selectedStream = selectedStream;
+        if (window.App?.storage?.setJSON) {
+            window.App.storage.setJSON('musicStreamPreferences', streamPreferences);
+        } else {
+            localStorage.setItem('musicStreamPreferences', JSON.stringify(streamPreferences));
+        }
+    } catch (e) {
+        console.warn('Failed to persist stream preference', e);
+    }
     
     console.log('Music stream changed to:', streamData.name);
 }
@@ -3694,7 +3821,12 @@ function loadSavedStreamPreference() {
     }
     
     try {
-        const streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
+        let streamPreferences = {};
+        if (window.App?.storage?.getJSON) {
+            streamPreferences = window.App.storage.getJSON('musicStreamPreferences', {});
+        } else {
+            streamPreferences = JSON.parse(localStorage.getItem('musicStreamPreferences') || '{}');
+        }
         const savedStream = streamPreferences.selectedStream;
         
         if (savedStream && MUSIC_STREAMS[savedStream]) {

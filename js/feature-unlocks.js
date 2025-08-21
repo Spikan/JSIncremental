@@ -206,28 +206,48 @@ const FEATURE_UNLOCKS = {
         });
     },
     
-    // Save unlocked features to localStorage
+    // Save unlocked features to storage (namespaced), with legacy fallback
     saveUnlockedFeatures() {
-        localStorage.setItem('unlockedFeatures', JSON.stringify(Array.from(this.unlockedFeatures)));
+        try {
+            if (window.App?.storage?.setJSON) {
+                window.App.storage.setJSON('unlockedFeatures', Array.from(this.unlockedFeatures));
+            } else {
+                localStorage.setItem('unlockedFeatures', JSON.stringify(Array.from(this.unlockedFeatures)));
+            }
+        } catch (e) {
+            console.warn('saveUnlockedFeatures failed', e);
+        }
     },
     
-    // Load unlocked features from localStorage
+    // Load unlocked features from storage
     loadUnlockedFeatures() {
-        const saved = localStorage.getItem('unlockedFeatures');
-        if (saved) {
-            try {
-                this.unlockedFeatures = new Set(JSON.parse(saved));
-            } catch (e) {
-                console.error('Error loading unlocked features:', e);
-                this.unlockedFeatures = new Set(['soda', 'options']);
+        try {
+            let saved = null;
+            if (window.App?.storage?.getJSON) {
+                saved = window.App.storage.getJSON('unlockedFeatures', null);
+            } else {
+                const raw = localStorage.getItem('unlockedFeatures');
+                if (raw) saved = JSON.parse(raw);
             }
+            if (saved) {
+                this.unlockedFeatures = new Set(saved);
+            }
+        } catch (e) {
+            console.error('Error loading unlocked features:', e);
+            this.unlockedFeatures = new Set(['soda', 'options']);
         }
     },
     
     // Reset all unlocked features (for save deletion)
     reset() {
         this.unlockedFeatures = new Set(['soda', 'options']);
-        localStorage.removeItem('unlockedFeatures');
+        try {
+            if (window.App?.storage?.remove) {
+                window.App.storage.remove('unlockedFeatures');
+            } else {
+                localStorage.removeItem('unlockedFeatures');
+            }
+        } catch {}
         this.updateFeatureVisibility();
     },
     
