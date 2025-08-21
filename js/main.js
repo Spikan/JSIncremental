@@ -709,6 +709,13 @@ function updateDrinkProgress() {
                 progressFill.classList.add('nearly-complete');
             }
         });
+    } else {
+        console.log('Drink progress elements not found:', {
+            progressFill: !!progressFill,
+            countdown: !!countdown,
+            drinkProgress: drinkProgress,
+            drinkRate: drinkRate
+        });
     }
 }
 
@@ -2843,15 +2850,8 @@ function initSplashMusic() {
     
     splashAudio.addEventListener('canplay', () => {
         console.log('Title music: canplay event - ready to play');
-        // Enable the play music button when audio is ready
-        const playMusicBtn = document.getElementById('playTitleMusicBtn');
-        if (playMusicBtn) {
-            playMusicBtn.disabled = false;
-            playMusicBtn.textContent = '🎵 Play Title Music';
-            console.log('Music button enabled');
-        } else {
-            console.error('Could not find playTitleMusicBtn element');
-        }
+        // Audio is ready to play
+        console.log('Title music ready to play');
     });
     
     splashAudio.addEventListener('canplaythrough', () => {
@@ -2874,11 +2874,7 @@ function initSplashMusic() {
             readyState: splashAudio.readyState
         });
         
-        const playMusicBtn = document.getElementById('playTitleMusicBtn');
-        if (playMusicBtn) {
-            playMusicBtn.textContent = '❌ Load Failed';
-            playMusicBtn.disabled = true;
-        }
+        console.log('Title music failed to load');
     });
     
     // Force load attempt
@@ -2897,10 +2893,7 @@ function playTitleMusic() {
     
     if (!splashAudio) {
         console.error('splashAudio is null or undefined');
-        const playMusicBtn = document.getElementById('playTitleMusicBtn');
-        if (playMusicBtn) {
-            playMusicBtn.textContent = '❌ Audio Not Loaded';
-        }
+        console.log('Audio not loaded');
         return;
     }
     
@@ -2921,12 +2914,7 @@ function playTitleMusic() {
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 console.log('Title music started playing successfully');
-                // Update button to show stop option
-                const playMusicBtn = document.getElementById('playTitleMusicBtn');
-                if (playMusicBtn) {
-                    playMusicBtn.textContent = '⏸️ Stop Title Music';
-                    playMusicBtn.onclick = stopTitleMusic;
-                }
+                console.log('Title music started playing successfully');
             }).catch(error => {
                 console.error('Title music play failed:', error);
                 console.error('Error details:', {
@@ -2934,26 +2922,16 @@ function playTitleMusic() {
                     message: error.message,
                     code: error.code
                 });
-                const playMusicBtn = document.getElementById('playTitleMusicBtn');
-                if (playMusicBtn) {
-                    playMusicBtn.textContent = '❌ Play Failed';
-                }
+                console.log('Title music play failed');
             });
         } else {
             console.log('play() returned undefined (older browser)');
-            // For older browsers that don't return a promise
-            const playMusicBtn = document.getElementById('playTitleMusicBtn');
-            if (playMusicBtn) {
-                playMusicBtn.textContent = '⏸️ Stop Title Music';
-                playMusicBtn.onclick = stopTitleMusic;
-            }
+                    // For older browsers that don't return a promise
+        console.log('Title music started (older browser)');
         }
     } catch (error) {
         console.error('Exception when calling play():', error);
-        const playMusicBtn = document.getElementById('playTitleMusicBtn');
-        if (playMusicBtn) {
-            playMusicBtn.textContent = '❌ Exception';
-        }
+        console.log('Exception when calling play()');
     }
 }
 
@@ -2963,12 +2941,7 @@ function stopTitleMusic() {
         splashAudio.pause();
         splashAudio.currentTime = 0;
         
-        // Update button back to play option
-        const playMusicBtn = document.getElementById('playTitleMusicBtn');
-        if (playMusicBtn) {
-            playMusicBtn.textContent = '🎵 Play Title Music';
-            playMusicBtn.onclick = playTitleMusic;
-        }
+        console.log('Title music stopped');
     }
 }
 

@@ -24,6 +24,24 @@ const FEATURE_UNLOCKS = {
         'unlocks': { sips: 25, clicks: 8 }
     },
     
+    // Initialize the feature unlock system
+    init() {
+        console.log('Initializing FEATURE_UNLOCKS system...');
+        console.log('Initial unlocked features:', Array.from(this.unlockedFeatures));
+        
+        // Load previously unlocked features from localStorage
+        this.loadUnlockedFeatures();
+        console.log('After loading from localStorage:', Array.from(this.unlockedFeatures));
+        
+        // Set up initial feature visibility
+        this.updateFeatureVisibility();
+        
+        // Update the unlocks tab
+        this.updateUnlocksTab();
+        
+        console.log('FEATURE_UNLOCKS system initialized');
+    },
+    
     // Check if a feature should be unlocked based on current progress
     checkUnlocks(sips, clicks) {
         let newUnlocks = [];
@@ -41,25 +59,36 @@ const FEATURE_UNLOCKS = {
     
     // Check if a specific feature should be unlocked
     checkUnlock(featureName) {
+        console.log(`Checking unlock for feature: ${featureName}`);
+        
         if (this.unlockedFeatures.has(featureName)) {
+            console.log(`Feature ${featureName} already unlocked`);
             return true; // Already unlocked
         }
         
         const condition = this.unlockConditions[featureName];
         if (!condition) {
+            console.log(`No unlock condition defined for ${featureName}`);
             return false; // No unlock condition defined
         }
         
         // Safely check if global variables exist before using them
         if (typeof window.sips === 'undefined' || typeof window.totalClicks === 'undefined') {
+            console.log(`Global variables not ready for ${featureName}`);
             return false; // Global variables not ready yet
         }
+        
+        console.log(`Checking conditions for ${featureName}: sips >= ${condition.sips}, clicks >= ${condition.clicks}`);
+        console.log(`Current sips: ${window.sips}, current clicks: ${window.totalClicks}`);
         
         // Check if conditions are met
         const sipsMet = window.sips && window.sips.gte ? window.sips.gte(condition.sips) : false;
         const clicksMet = window.totalClicks >= condition.clicks;
         
+        console.log(`Conditions met - sips: ${sipsMet}, clicks: ${clicksMet}`);
+        
         if (sipsMet && clicksMet) {
+            console.log(`Unlocking feature: ${featureName}`);
             this.unlockFeature(featureName);
             return true;
         }
@@ -97,17 +126,31 @@ const FEATURE_UNLOCKS = {
     
     // Update UI visibility based on unlocked features
     updateFeatureVisibility() {
+        console.log('Updating feature visibility...');
+        console.log('Unlocked features:', Array.from(this.unlockedFeatures));
+        
         // Update tab buttons
         const tabButtons = document.querySelectorAll('.tab-btn');
         tabButtons.forEach(btn => {
-            const tabName = btn.getAttribute('onclick').match(/switchTab\('([^']+)'/)?.[1];
-            if (tabName && tabName !== 'soda') {
-                if (this.unlockedFeatures.has(tabName)) {
-                    btn.style.display = 'inline-block';
-                    btn.classList.remove('locked');
-                } else {
-                    btn.style.display = 'none';
-                    btn.classList.add('locked');
+            const onclick = btn.getAttribute('onclick');
+            console.log('Button onclick:', onclick);
+            
+            if (onclick) {
+                const match = onclick.match(/switchTab\('([^']+)'/);
+                const tabName = match ? match[1] : null;
+                console.log('Extracted tab name:', tabName);
+                
+                if (tabName && tabName !== 'soda') {
+                    const isUnlocked = this.unlockedFeatures.has(tabName);
+                    console.log(`Tab ${tabName} unlocked:`, isUnlocked);
+                    
+                    if (isUnlocked) {
+                        btn.style.display = 'inline-block';
+                        btn.classList.remove('locked');
+                    } else {
+                        btn.style.display = 'none';
+                        btn.classList.add('locked');
+                    }
                 }
             }
         });
@@ -177,15 +220,6 @@ const FEATURE_UNLOCKS = {
     reset() {
         this.unlockedFeatures = new Set(['soda', 'options']);
         localStorage.removeItem('unlockedFeatures');
-        this.updateFeatureVisibility();
-    },
-    
-    // Initialize unlock system
-    init() {
-        // Load unlocked features from save
-        this.loadUnlockedFeatures();
-        
-        // Apply initial visibility
         this.updateFeatureVisibility();
     },
     
