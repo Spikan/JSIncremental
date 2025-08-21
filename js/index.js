@@ -10,6 +10,7 @@ import * as resources from './core/systems/resources.js';
 import * as purchasesSys from './core/systems/purchases-system.js';
 import * as clicksSys from './core/systems/clicks-system.js';
 import * as autosaveSys from './core/systems/autosave.js';
+import * as saveSys from './core/systems/save-system.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
 
 // Bootstrap the App global object
@@ -27,7 +28,8 @@ window.App = {
         resources,
         purchases: purchasesSys,
         clicks: clicksSys,
-        autosave: autosaveSys
+        autosave: autosaveSys,
+        save: saveSys
     },
     data: {}
 };

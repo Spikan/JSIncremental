@@ -2393,7 +2393,23 @@ function save() {
     const currentTime = Date.now();
     
     // Prevent too frequent saves
-    if (currentTime - lastSaveOperation < MIN_SAVE_INTERVAL) {
+    if (window.App?.systems?.save?.queueSave) {
+        const result = window.App.systems.save.queueSave({
+            now: currentTime,
+            lastOp: lastSaveOperation,
+            minIntervalMs: MIN_SAVE_INTERVAL,
+            schedule: (delay) => {
+                if (!saveTimeout) {
+                    saveTimeout = setTimeout(() => {
+                        performSave();
+                        saveTimeout = null;
+                    }, delay);
+                }
+            },
+            perform: () => performSave(),
+        });
+        if (result.queued) return;
+    } else if (currentTime - lastSaveOperation < MIN_SAVE_INTERVAL) {
         // Queue this save operation
         if (!saveTimeout) {
             saveTimeout = setTimeout(() => {
@@ -2408,6 +2424,16 @@ function save() {
 }
 
 function performSave() {
+    if (window.App?.systems?.save?.performSaveSnapshot) {
+        const payload = window.App.systems.save.performSaveSnapshot();
+        if (payload) {
+            lastSaveTime = payload.lastSaveTime;
+            lastSaveOperation = payload.lastSaveTime;
+            updateLastSaveTime();
+            return;
+        }
+    }
+    // Legacy fallback
     let save = {
         sips: window.sips.toString(),
         straws: straws.toString(),
@@ -2420,7 +2446,6 @@ function performSave() {
         suctionClickBonus: suctionClickBonus.toString(),
         widerStraws: widerStraws.toString(),
         betterCups: betterCups.toString(),
-
         fasterDrinksUpCounter: fasterDrinksUpCounter.toString(),
         criticalClickChance: criticalClickChance.toString(),
         criticalClickMultiplier: criticalClickMultiplier.toString(),
@@ -2431,35 +2456,15 @@ function performSave() {
         gameStartDate: gameStartDate,
         lastClickTime: lastClickTime,
         clickTimes: clickTimes,
-        // Offline progress tracking
         lastSaveTime: Date.now()
     };
-
     try {
-        if (window.App && window.App.storage && typeof window.App.storage.saveGame === 'function') {
-            window.App.storage.saveGame(save);
-        } else {
-            localStorage.setItem("save", JSON.stringify(save));
-        }
-        lastSaveTime = Date.now();
-        lastSaveOperation = Date.now();
+        localStorage.setItem("save", JSON.stringify(save));
+        lastSaveTime = save.lastSaveTime;
+        lastSaveOperation = save.lastSaveTime;
         updateLastSaveTime();
-        console.log('Game saved successfully');
-        try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.GAME?.SAVED, { save }); } catch {}
-    } catch (error) {
-        console.error('Failed to save game:', error);
-        // Fallback: try to save with reduced data
-        try {
-            const minimalSave = { sips: window.sips.toString(), level: level.toString() };
-            if (window.App && window.App.storage && typeof window.App.storage.saveGame === 'function') {
-                window.App.storage.saveGame(minimalSave);
-            } else {
-                localStorage.setItem("save", JSON.stringify(minimalSave));
-            }
-            console.log('Minimal save completed');
-        } catch (fallbackError) {
-            console.error('Even minimal save failed:', fallbackError);
-        }
+    } catch (e) {
+        console.error('Save failed:', e);
     }
 }
 
