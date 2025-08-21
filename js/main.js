@@ -2694,9 +2694,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Spacebar to click the soda button
+        // Spacebar to click the soda button (only when on soda tab)
         if (e.key === ' ' && !e.ctrlKey && !e.altKey) {
+            const sodaTab = document.getElementById('sodaTab');
+            const activeTab = document.querySelector('.tab-content.active');
+
+            // Debug logging
+            console.log('Space pressed - Active tab:', activeTab ? activeTab.id : 'none');
+            console.log('Soda tab active:', sodaTab && sodaTab.classList.contains('active'));
+            console.log('Target element:', e.target.tagName, e.target.id);
+
+            // Only activate space hotkey when on the soda clicking tab
+            if (!sodaTab || !sodaTab.classList.contains('active')) {
+                console.log('Allowing normal space behavior');
+                return; // Allow normal spacebar behavior on other tabs
+            }
+
+            console.log('Triggering soda click');
             e.preventDefault();
+            e.stopPropagation();
             const sodaButton = DOM_CACHE.sodaButton;
             if (sodaButton) {
                 sodaButton.click();
@@ -2742,7 +2758,12 @@ function initMusicPlayer() {
         isMuted: false,
         audio: null,
         currentStream: null,
-        streamInfo: {}
+        streamInfo: {},
+        retryCount: 0,
+        maxRetries: 10,
+        isRetrying: false,
+        lastRetryTime: 0,
+        retryDelay: 2000 // 2 second delay between retries
     };
     
     // Create audio element for lofi stream
@@ -2756,8 +2777,53 @@ function initMusicPlayer() {
     audio.addEventListener('error', (e) => {
         console.log('Audio error:', e);
         console.log('Failed stream URL:', audio.src);
-        musicStatus.textContent = 'Stream unavailable - trying alternative...';
-        loadFallbackMusic();
+
+        const state = window.musicPlayerState;
+        if (!state) return;
+
+        // Prevent rapid retries
+        const now = Date.now();
+        if (state.isRetrying && now - state.lastRetryTime < state.retryDelay) {
+            console.log('Retry too soon, ignoring error');
+            return;
+        }
+
+        state.isRetrying = true;
+        state.lastRetryTime = now;
+
+        state.retryCount++;
+        console.log(`Music retry attempt ${state.retryCount}/${state.maxRetries}`);
+
+        if (state.retryCount >= state.maxRetries) {
+            console.log('Max retries reached, stopping music stream attempts');
+            musicStatus.textContent = 'Music unavailable - click to retry';
+
+            // Add click handler to reset retry count
+            musicStatus.style.cursor = 'pointer';
+            musicStatus.onclick = () => {
+                console.log('User clicked to retry music');
+                state.retryCount = 0;
+                state.isRetrying = false;
+                musicStatus.textContent = 'Retrying...';
+                musicStatus.style.cursor = 'default';
+                musicStatus.onclick = null;
+
+                // Try the default stream again
+                state.audio.src = 'https://ice1.somafm.com/groovesalad-128-mp3';
+            };
+
+            // Stop any further requests by clearing the audio source
+            state.audio.src = '';
+            state.audio.load(); // Cancel any pending requests
+            return;
+        }
+
+        musicStatus.textContent = `Stream unavailable - trying alternative (${state.retryCount}/${state.maxRetries})...`;
+
+        // Delay the fallback attempt to prevent rapid retries
+        setTimeout(() => {
+            loadFallbackMusic();
+        }, 1000); // 1 second delay
     });
     
     audio.addEventListener('loadstart', () => {
@@ -2768,6 +2834,14 @@ function initMusicPlayer() {
         musicStatus.textContent = 'Click to start music';
         // Only update stream info when stream actually changes
         updateStreamInfo();
+
+        // Reset retry count on successful load
+        const state = window.musicPlayerState;
+        if (state && state.retryCount > 0) {
+            console.log('Stream loaded successfully, resetting retry count');
+            state.retryCount = 0;
+            state.isRetrying = false;
+        }
     });
     
     audio.addEventListener('waiting', () => {
@@ -3111,6 +3185,13 @@ function changeMusicStream() {
         console.error('Music player not initialized');
         return;
     }
+
+    // Prevent stream changes if we've hit the retry limit
+    if (state.retryCount >= state.maxRetries) {
+        console.log('Retry limit reached, preventing manual stream change');
+        musicStatus.textContent = 'Music unavailable - too many failures';
+        return;
+    }
     
     // Check if this is a YouTube stream
     if (streamData.type === 'youtube') {
@@ -3148,6 +3229,9 @@ function changeMusicStream() {
     // Change the stream
     state.audio.src = streamData.url;
     state.currentStream = streamData.url;
+
+    // Reset retry count when manually changing streams
+    state.retryCount = 0;
     
     // Update the stream info display
     currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
@@ -3251,18 +3335,38 @@ function loadFallbackMusic() {
         'https://ice1.somafm.com/dronezone-128-mp3', // SomaFM Drone Zone
         'https://ice1.somafm.com/illstreet-128-mp3' // SomaFM Ill Street
     ];
-    
+
     const state = window.musicPlayerState;
-    if (state && state.audio) {
-        const randomSource = fallbackSources[Math.floor(Math.random() * fallbackSources.length)];
-        console.log('Trying fallback source:', randomSource);
-        state.audio.src = randomSource;
-        musicStatus.textContent = 'Trying alternative source...';
-        
-        // Don't autostart - just update the stream info and wait for user interaction
-        updateStreamInfo();
-        musicStatus.textContent = 'Click to start music';
+    if (!state || !state.audio) return;
+
+    // Check if we're already retrying or exceeded max retries
+    if (state.isRetrying && Date.now() - state.lastRetryTime < state.retryDelay) {
+        console.log('Still in retry cooldown, skipping fallback attempt');
+        return;
     }
+
+    if (state.retryCount >= state.maxRetries) {
+        console.log('Max retries reached in loadFallbackMusic, stopping all requests');
+        musicStatus.textContent = 'Music unavailable - too many failures';
+
+        // Ensure no more requests are made
+        state.audio.src = '';
+        state.audio.load();
+        state.isRetrying = false;
+        return;
+    }
+
+    state.isRetrying = true;
+    state.lastRetryTime = Date.now();
+
+    const randomSource = fallbackSources[Math.floor(Math.random() * fallbackSources.length)];
+    console.log(`Trying fallback source (${state.retryCount}/${state.maxRetries}):`, randomSource);
+    state.audio.src = randomSource;
+    musicStatus.textContent = `Trying alternative source (${state.retryCount}/${state.maxRetries})...`;
+
+    // Don't autostart - just update the stream info and wait for user interaction
+    updateStreamInfo();
+    musicStatus.textContent = 'Click to start music';
 }
 
 // Memory management and cleanup functions
