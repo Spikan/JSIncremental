@@ -31,7 +31,14 @@ js/
 │   │   ├── purchases.js     # Purchase cost calculations
 │   │   └── economy.js       # Economy calculations (SPD, SPS)
 │   ├── systems/             # Game systems
-│   │   └── resources.js     # Resource production calculations
+│   │   ├── resources.js     # Resource production calculations
+│   │   ├── purchases-system.js # Purchase logic for all upgrades
+│   │   ├── clicks-system.js # Click handling and feedback
+│   │   ├── autosave.js      # Autosave counter and timing logic
+│   │   ├── save-system.js   # Save/load operations with validation
+│   │   ├── options-system.js # Game options and preferences management
+│   │   ├── loop-system.js   # Game loop and timing management
+│   │   └── music-system.js  # Music playback, sound effects, and audio context management
 │   ├── constants.js         # Event names and constants
 │   └── validation/          # Zod validation schemas
 │       └── schemas.js       # Data validation schemas
@@ -59,7 +66,14 @@ window.App = {
         clicks, purchases, economy
     },
     systems: {                     // Game systems
-        resources
+        resources,                  # Resource production calculations
+        purchases,                  # Purchase logic for all upgrades
+        clicks,                     # Click handling and feedback
+        autosave,                   # Autosave counter and timing logic
+        save,                       # Save/load operations with validation
+        options,                    # Game options and preferences management
+        loop,                       # Game loop and timing management
+        music                       # Music playback, sound effects, and audio context management
     },
     data: {                        // Game data
         unlocks, upgrades
@@ -178,12 +192,13 @@ npm run dev           # Vite dev server
    - Basic rules and systems
    - Data file loading
 
-2. **Phase 2**: Game logic extraction (🔄 In Progress)
+2. **Phase 2**: Game logic extraction (✅ Complete)
    - Move calculations to pure functions
    - Extract upgrade logic
    - Centralize resource management
+   - Extract all major game systems (purchases, clicks, autosave, save, options, loop, music)
 
-3. **Phase 3**: UI decoupling
+3. **Phase 3**: UI decoupling (🔄 Next)
    - Separate UI logic from game logic
    - Event-driven UI updates
    - Component-based structure

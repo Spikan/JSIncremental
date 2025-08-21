@@ -183,7 +183,11 @@ function initSplashScreen() {
     }
     
     // Initialize splash screen music
-    initSplashMusic();
+    if (window.App?.systems?.music?.initSplashMusic) {
+        window.App.systems.music.initSplashMusic();
+    } else {
+        initSplashMusic();
+    }
     
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
@@ -217,7 +221,11 @@ function initSplashScreen() {
         }
         
         // Stop title music when transitioning to game
-        stopTitleMusic();
+        if (window.App?.systems?.music?.stopTitleMusic) {
+            window.App.systems.music.stopTitleMusic();
+        } else {
+            stopTitleMusic();
+        }
         
         // Super simple approach - just hide splash and show game
         const splashScreen = document.getElementById('splashScreen');
@@ -708,19 +716,32 @@ function initGame() {
         updateCriticalClickDisplay();
         
         // Initialize music player
-        initMusicPlayer();
+        if (window.App?.systems?.music?.initMusicPlayer) {
+            window.App.systems.music.initMusicPlayer();
+        } else {
+            initMusicPlayer();
+        }
         
         // Initialize audio context for click sounds
-        initAudioContext();
+        if (window.App?.systems?.music?.initAudioContext) {
+            window.App.systems.music.initAudioContext();
+        } else {
+            initAudioContext();
+        }
         
         // Load click sounds preference
-        loadClickSoundsPreference();
+        if (window.App?.systems?.music?.loadClickSoundsPreference) {
+            window.App.systems.music.loadClickSoundsPreference();
+        } else {
+            loadClickSoundsPreference();
+        }
         
         // Update click sounds button text to match current state
         const clickSoundsToggle = document.getElementById('clickSoundsToggle');
         if (clickSoundsToggle) {
-            clickSoundsToggle.textContent = clickSoundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
-            clickSoundsToggle.classList.toggle('sounds-off', !clickSoundsEnabled);
+            const soundsEnabled = window.App?.systems?.music?.getClickSoundsEnabled?.() ?? clickSoundsEnabled;
+            clickSoundsToggle.textContent = soundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
+            clickSoundsToggle.classList.toggle('sounds-off', !soundsEnabled);
         }
         
         console.log('Game initialization complete!');
@@ -1249,7 +1270,11 @@ function trackClick() {
     }
     
     // Play straw sip sound effect
-    playStrawSipSound();
+    if (window.App?.systems?.music?.playStrawSipSound) {
+        window.App.systems.music.playStrawSipSound();
+    } else {
+        playStrawSipSound();
+    }
     
     // Update stats display if stats tab is active
     if (DOM_CACHE.statsTab && DOM_CACHE.statsTab.classList.contains('active')) {
@@ -1758,7 +1783,11 @@ function sodaClick(number) {
         
         // Play critical click sound
         if (clickSoundsEnabled) {
-            playCriticalClickSound();
+            if (window.App?.systems?.music?.playCriticalClickSound) {
+                window.App.systems.music.playCriticalClickSound();
+            } else {
+                playCriticalClickSound();
+            }
         }
         
         console.log('CRITICAL CLICK! Multiplier: ' + criticalMultiplier.toString());
@@ -2826,7 +2855,10 @@ window.startGameWithMusic = function() {
     console.log('startGameWithMusic called');
     
     // Start playing title music immediately
-    if (splashAudio) {
+    if (window.App?.systems?.music?.playTitleMusic) {
+        console.log('Starting title music for game start...');
+        window.App.systems.music.playTitleMusic();
+    } else if (splashAudio) {
         console.log('Starting title music for game start...');
         const playPromise = splashAudio.play();
         
@@ -3229,7 +3261,11 @@ function initSplashMusic() {
     splashAudio.addEventListener('ended', () => {
         console.log('Title music ended, switching to Between Level Music...');
         // Start the main game music
-        startMainGameMusic();
+        if (window.App?.systems?.music?.startMainGameMusic) {
+            window.App.systems.music.startMainGameMusic();
+        } else {
+            startMainGameMusic();
+        }
     });
     
     // Add error handling
@@ -4178,7 +4214,13 @@ window.addUserMessage = addUserMessage;
 window.toggleAutosave = toggleAutosave;
 window.changeAutosaveInterval = changeAutosaveInterval;
 window.initMusicPlayer = initMusicPlayer;
-window.toggleMusic = toggleMusic;
+window.toggleMusic = function() {
+    if (window.App?.systems?.music?.toggleMusic) {
+        window.App.systems.music.toggleMusic();
+    } else {
+        toggleMusic();
+    }
+};
 window.toggleMute = toggleMute;
 window.updateStreamInfo = updateStreamInfo;
 window.getStreamDetails = getStreamDetails;
@@ -4186,13 +4228,55 @@ window.playTitleMusic = playTitleMusic;
 window.stopTitleMusic = stopTitleMusic;
 
 
-window.toggleClickSounds = toggleClickSounds;
-window.testClickSounds = testClickSounds;
-window.playCriticalClickSound = playCriticalClickSound;
-window.playPurchaseSound = playPurchaseSound;
-window.testPurchaseSound = testPurchaseSound;
-window.testCriticalClickSound = testCriticalClickSound;
-window.changeMusicStream = changeMusicStream;
+window.toggleClickSounds = function() {
+    if (window.App?.systems?.music?.toggleClickSounds) {
+        window.App.systems.music.toggleClickSounds();
+    } else {
+        toggleClickSounds();
+    }
+};
+window.testClickSounds = function() {
+    if (window.App?.systems?.music?.testClickSounds) {
+        window.App.systems.music.testClickSounds();
+    } else {
+        testClickSounds();
+    }
+};
+window.playCriticalClickSound = function() {
+    if (window.App?.systems?.music?.playCriticalClickSound) {
+        window.App.systems.music.playCriticalClickSound();
+    } else {
+        playCriticalClickSound();
+    }
+};
+window.playPurchaseSound = function() {
+    if (window.App?.systems?.music?.playPurchaseSound) {
+        window.App.systems.music.playPurchaseSound();
+    } else {
+        playPurchaseSound();
+    }
+};
+window.testPurchaseSound = function() {
+    if (window.App?.systems?.music?.testPurchaseSound) {
+        window.App.systems.music.testPurchaseSound();
+    } else {
+        testPurchaseSound();
+    }
+};
+window.testCriticalClickSound = function() {
+    if (window.App?.systems?.music?.testCriticalClickSound) {
+        window.App.systems.music.testCriticalClickSound();
+    } else {
+        testCriticalClickSound();
+    }
+};
+window.changeMusicStream = function() {
+    if (window.App?.systems?.music?.changeMusicStream) {
+        window.App.systems.music.changeMusicStream();
+    } else {
+        changeMusicStream();
+    }
+};
 window.loadSavedStreamPreference = loadSavedStreamPreference;
 
 // Test function for music stream changer
