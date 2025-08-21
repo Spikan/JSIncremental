@@ -96,6 +96,7 @@ const FEATURE_UNLOCKS = {
         if (sipsMet && clicksMet) {
             console.log(`Unlocking feature: ${featureName}`);
             this.unlockFeature(featureName);
+            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.FEATURE?.UNLOCKED, { feature: featureName }); } catch {}
             return true;
         }
         
@@ -109,6 +110,7 @@ const FEATURE_UNLOCKS = {
             this.showUnlockNotification(feature);
             this.updateFeatureVisibility();
             this.saveUnlockedFeatures();
+            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.FEATURE?.UNLOCKED, { feature }); } catch {}
             return true;
         }
         return false;

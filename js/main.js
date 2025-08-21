@@ -536,6 +536,10 @@ function initGame() {
             clickTimes = savegame.clickTimes || [];
         }
 
+        try {
+            window.App?.events?.emit?.(window.App?.EVENT_NAMES?.GAME?.LOADED, { save: !!savegame });
+        } catch {}
+
         // Calculate offline progress if we have a save time
         let offlineEarnings = new Decimal(0);
         let offlineTimeSeconds = 0;
@@ -1696,6 +1700,7 @@ function sodaClick(number) {
         isCritical = true;
         criticalMultiplier = criticalClickMultiplier;
         criticalClicks = criticalClicks.plus(1);
+        try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.CRITICAL, { multiplier: criticalMultiplier.toString() }); } catch {}
         
         // Play critical click sound
         if (clickSoundsEnabled) {
@@ -1708,6 +1713,7 @@ function sodaClick(number) {
     // Calculate total sips gained from this click
     const baseSips = new Decimal(number);
     const totalSipsGained = baseSips.plus(suctionClickBonus).times(criticalMultiplier);
+    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.SODA, { gained: totalSipsGained.toString(), critical: isCritical }); } catch {}
     
     // Add to total sips earned
     totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
@@ -1833,6 +1839,7 @@ function buyStraw() {
             if (window.sips.gte(strawCost)) {
         straws = straws.plus(1);
         window.sips = window.sips.minus(strawCost);
+        try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'straw', cost: strawCost }); } catch {}
 
         // Recalculate strawSPD with current upgrade multipliers
         const baseStrawSPD = new Decimal(config.STRAW_BASE_SPD);
@@ -1870,6 +1877,7 @@ function buyCup() {
             if (window.sips.gte(cupCost)) {
         cups = cups.plus(1);
         window.sips = window.sips.minus(cupCost);
+        try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'cup', cost: cupCost }); } catch {}
 
         // Recalculate cupSPD with current upgrade multipliers
         const baseCupSPD = new Decimal(config.CUP_BASE_SPD);
@@ -2279,6 +2287,7 @@ function performSave() {
         lastSaveOperation = Date.now();
         updateLastSaveTime();
         console.log('Game saved successfully');
+        try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.GAME?.SAVED, { save }); } catch {}
     } catch (error) {
         console.error('Failed to save game:', error);
         // Fallback: try to save with reduced data
@@ -2310,6 +2319,7 @@ function delete_save() {
             console.warn('Delete save failed, attempting legacy removal', e);
             try { localStorage.removeItem("save"); } catch {}
         }
+        try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.GAME?.DELETED, {}); } catch {}
         
         // Reset all game variables to their initial values
         window.sips = new Decimal(0);
