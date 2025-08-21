@@ -89,7 +89,7 @@ const FEATURE_DETECTION = {
 // Progressive Feature Unlock System
 const FEATURE_UNLOCKS = {
     // Track unlocked features
-    unlockedFeatures: new Set(['soda']), // Start with only soda clicking
+    unlockedFeatures: new Set(['soda', 'options']), // Start with soda clicking and options always available
     
     // Define unlock conditions
     unlockConditions: {
@@ -104,7 +104,6 @@ const FEATURE_UNLOCKS = {
         'shop': { sips: 500, clicks: 30 },
         'stats': { sips: 1000, clicks: 60 },
         'god': { sips: 5000, clicks: 300 },
-        'options': { sips: 2000, clicks: 100 },
         'unlocks': { sips: 25, clicks: 8 }
     },
     
@@ -2558,8 +2557,8 @@ function delete_save() {
         lastClickTime = 0;
         clickTimes = [];
         
-        // Reset unlocked features to only soda
-        FEATURE_UNLOCKS.unlockedFeatures = new Set(['soda']);
+        // Reset unlocked features to soda and options (options should always be available)
+        FEATURE_UNLOCKS.unlockedFeatures = new Set(['soda', 'options']);
         localStorage.removeItem('unlockedFeatures');
         
         // Update the UI to reflect the reset
