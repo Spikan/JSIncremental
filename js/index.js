@@ -11,6 +11,7 @@ import * as purchasesSys from './core/systems/purchases-system.js';
 import * as clicksSys from './core/systems/clicks-system.js';
 import * as autosaveSys from './core/systems/autosave.js';
 import * as saveSys from './core/systems/save-system.js';
+import * as optionsSys from './core/systems/options-system.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
 
 // Bootstrap the App global object
@@ -29,7 +30,8 @@ window.App = {
         purchases: purchasesSys,
         clicks: clicksSys,
         autosave: autosaveSys,
-        save: saveSys
+        save: saveSys,
+        options: optionsSys
     },
     data: {}
 };

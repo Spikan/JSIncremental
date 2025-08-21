@@ -952,6 +952,7 @@ function toggleAutosave() {
     const checkbox = document.getElementById('autosaveToggle');
     autosaveEnabled = checkbox.checked;
     updateAutosaveStatus();
+    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_TOGGLED, { enabled: autosaveEnabled }); } catch {}
     saveOptions();
 }
 
@@ -960,6 +961,7 @@ function changeAutosaveInterval() {
     autosaveInterval = parseInt(select.value);
     autosaveCounter = 0; // Reset counter when changing interval
     updateAutosaveStatus();
+    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_INTERVAL_CHANGED, { seconds: autosaveInterval }); } catch {}
     saveOptions();
 }
 
@@ -975,37 +977,32 @@ function updateAutosaveStatus() {
 }
 
 function saveOptions() {
-    const options = {
-        autosaveEnabled: autosaveEnabled,
-        autosaveInterval: autosaveInterval
-    };
+    const options = { autosaveEnabled, autosaveInterval };
     try {
-        if (window.App?.storage?.setJSON) {
-            window.App.storage.setJSON('gameOptions', options);
-        } else {
-            localStorage.setItem('gameOptions', JSON.stringify(options));
+        if (window.App?.systems?.options?.saveOptions) {
+            window.App.systems.options.saveOptions(options);
+            return;
         }
-    } catch (e) {
-        console.warn('saveOptions failed:', e);
-    }
+    } catch {}
+    try { localStorage.setItem('gameOptions', JSON.stringify(options)); } catch (e) { console.warn('saveOptions failed:', e); }
 }
 
 function loadOptions() {
+    const defaults = { autosaveEnabled: true, autosaveInterval: window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL };
     let options = null;
     try {
-        if (window.App?.storage?.getJSON) {
-            options = window.App.storage.getJSON('gameOptions', null);
-        } else {
-            const savedOptions = localStorage.getItem('gameOptions');
-            if (savedOptions) options = JSON.parse(savedOptions);
+        if (window.App?.systems?.options?.loadOptions) {
+            options = window.App.systems.options.loadOptions(defaults);
         }
-    } catch (e) {
-        console.warn('loadOptions failed:', e);
+    } catch {}
+    if (!options) {
+        try {
+            const saved = localStorage.getItem('gameOptions');
+            options = saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
+        } catch { options = defaults; }
     }
-    if (options) {
-        autosaveEnabled = options.autosaveEnabled !== undefined ? options.autosaveEnabled : true;
-        autosaveInterval = options.autosaveInterval || window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL;
-    }
+    autosaveEnabled = options.autosaveEnabled !== undefined ? options.autosaveEnabled : true;
+    autosaveInterval = options.autosaveInterval || window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL;
     
     // Update UI to match loaded options
     const checkbox = document.getElementById('autosaveToggle');
