@@ -7,6 +7,7 @@ import * as ClickRules from './core/rules/clicks.js';
 import * as PurchaseRules from './core/rules/purchases.js';
 import * as Mutations from './core/state/mutations.js';
 import * as EconomyRules from './core/rules/economy.js';
+import * as ResourceSystem from './core/systems/resources.js';
 
 // Detect module loading
 console.info('[bootstrap] Module index.js loaded');
@@ -34,6 +35,9 @@ window.App = {
         economy: EconomyRules,
     },
     mutations: Mutations,
+    systems: {
+        resources: ResourceSystem,
+    },
 };
 
 // Optionally, attach a simple dev helper to log state changes

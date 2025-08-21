@@ -625,24 +625,43 @@ function initGame() {
 
 
         const config = window.GAME_CONFIG?.BALANCE || {};
-                        strawSPD = new Decimal(config.STRAW_BASE_SPD);
-                cupSPD = new Decimal(config.CUP_BASE_SPD);
-                suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
-
-        // Apply upgrade multipliers to base SPD values
-        if (widerStraws.gt(0)) {
-            const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER));
-            strawSPD = strawSPD.times(upgradeMultiplier);
+        // Use centralized resources system for production values when available
+        if (window.App?.systems?.resources?.recalcProduction) {
+            const result = window.App.systems.resources.recalcProduction({
+                straws: straws.toNumber(),
+                cups: cups.toNumber(),
+                widerStraws: widerStraws.toNumber(),
+                betterCups: betterCups.toNumber(),
+                base: {
+                    strawBaseSPD: config.STRAW_BASE_SPD,
+                    cupBaseSPD: config.CUP_BASE_SPD,
+                    baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
+                },
+                multipliers: {
+                    widerStrawsPerLevel: config.WIDER_STRAWS_MULTIPLIER,
+                    betterCupsPerLevel: config.BETTER_CUPS_MULTIPLIER,
+                },
+            });
+            strawSPD = new Decimal(result.strawSPD);
+            cupSPD = new Decimal(result.cupSPD);
+            sps = new Decimal(result.sipsPerDrink);
+        } else {
+            strawSPD = new Decimal(config.STRAW_BASE_SPD);
+            cupSPD = new Decimal(config.CUP_BASE_SPD);
+            if (widerStraws.gt(0)) {
+                const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER));
+                strawSPD = strawSPD.times(upgradeMultiplier);
+            }
+            if (betterCups.gt(0)) {
+                const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER));
+                cupSPD = cupSPD.times(upgradeMultiplier);
+            }
+            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
+            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
         }
-        if (betterCups.gt(0)) {
-            const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER));
-            cupSPD = cupSPD.times(upgradeMultiplier);
-        }
-        
-        // Initialize sps with base configured sips per drink
-        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
+        // Suction click bonus stays multiplicative on suctions
+        suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
 
         // Initialize drink rate based on upgrades
         updateDrinkRate();
@@ -1872,7 +1891,25 @@ function buyStraw() {
         try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'straw', cost: strawCost }); } catch {}
 
         // Recalculate strawSPD with current upgrade multipliers
-        if (window.App?.rules?.economy?.computeStrawSPD) {
+        if (window.App?.systems?.resources?.recalcProduction) {
+            const result = window.App.systems.resources.recalcProduction({
+                straws: straws.toNumber(),
+                cups: cups.toNumber(),
+                widerStraws: widerStraws.toNumber(),
+                betterCups: betterCups.toNumber(),
+                base: {
+                    strawBaseSPD: config.STRAW_BASE_SPD,
+                    cupBaseSPD: config.CUP_BASE_SPD,
+                    baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
+                },
+                multipliers: {
+                    widerStrawsPerLevel: config.WIDER_STRAWS_MULTIPLIER,
+                    betterCupsPerLevel: config.BETTER_CUPS_MULTIPLIER,
+                },
+            });
+            strawSPD = new Decimal(result.strawSPD);
+            sps = new Decimal(result.sipsPerDrink);
+        } else if (window.App?.rules?.economy?.computeStrawSPD) {
             const val = window.App.rules.economy.computeStrawSPD(
                 straws.toNumber(),
                 config.STRAW_BASE_SPD,
@@ -1880,10 +1917,16 @@ function buyStraw() {
                 config.WIDER_STRAWS_MULTIPLIER
             );
             strawSPD = new Decimal(val);
+            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
+            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
         } else {
             const baseStrawSPD = new Decimal(config.STRAW_BASE_SPD);
             const upgradeMultiplier = widerStraws.gt(0) ? new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER)) : new Decimal(1);
             strawSPD = baseStrawSPD.times(upgradeMultiplier);
+            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
+            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
         }
 
         // Include base configured sips per drink in total SPS
@@ -1926,7 +1969,25 @@ function buyCup() {
         try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'cup', cost: cupCost }); } catch {}
 
         // Recalculate cupSPD with current upgrade multipliers
-        if (window.App?.rules?.economy?.computeCupSPD) {
+        if (window.App?.systems?.resources?.recalcProduction) {
+            const result = window.App.systems.resources.recalcProduction({
+                straws: straws.toNumber(),
+                cups: cups.toNumber(),
+                widerStraws: widerStraws.toNumber(),
+                betterCups: betterCups.toNumber(),
+                base: {
+                    strawBaseSPD: config.STRAW_BASE_SPD,
+                    cupBaseSPD: config.CUP_BASE_SPD,
+                    baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
+                },
+                multipliers: {
+                    widerStrawsPerLevel: config.WIDER_STRAWS_MULTIPLIER,
+                    betterCupsPerLevel: config.BETTER_CUPS_MULTIPLIER,
+                },
+            });
+            cupSPD = new Decimal(result.cupSPD);
+            sps = new Decimal(result.sipsPerDrink);
+        } else if (window.App?.rules?.economy?.computeCupSPD) {
             const val = window.App.rules.economy.computeCupSPD(
                 cups.toNumber(),
                 config.CUP_BASE_SPD,
@@ -1934,10 +1995,16 @@ function buyCup() {
                 config.BETTER_CUPS_MULTIPLIER
             );
             cupSPD = new Decimal(val);
+            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
+            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
         } else {
             const baseCupSPD = new Decimal(config.CUP_BASE_SPD);
             const upgradeMultiplier = betterCups.gt(0) ? new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER)) : new Decimal(1);
             cupSPD = baseCupSPD.times(upgradeMultiplier);
+            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
+            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
         }
 
         // Include base configured sips per drink in total SPS
