@@ -10,20 +10,24 @@ const FEATURE_UNLOCKS = {
     // Track unlocked features
     unlockedFeatures: new Set(['soda', 'options']), // Start with soda clicking and options always available
     
-    // Define unlock conditions for each feature
-    unlockConditions: {
-        'suction': { sips: 25, clicks: 8 },
-        'criticalClick': { sips: 100, clicks: 20 },
-        'fasterDrinks': { sips: 200, clicks: 30 },
-        'straws': { sips: 500, clicks: 50 },
-        'cups': { sips: 1000, clicks: 80 },
-        'widerStraws': { sips: 2000, clicks: 120 },
-        'betterCups': { sips: 5000, clicks: 200 },
-        'levelUp': { sips: 3000, clicks: 150 },
-        'shop': { sips: 500, clicks: 30 },
-        'stats': { sips: 1000, clicks: 60 },
-        'god': { sips: 5000, clicks: 300 },
-        'unlocks': { sips: 25, clicks: 8 }
+    // Define unlock conditions for each feature - now using config constants
+    get unlockConditions() {
+        // Access config through global variable for compatibility
+        const config = window.GAME_CONFIG || {};
+        return {
+            'suction': config.UNLOCKS?.SUCTION || { sips: 25, clicks: 8 },
+            'criticalClick': config.UNLOCKS?.CRITICAL_CLICK || { sips: 100, clicks: 20 },
+            'fasterDrinks': config.UNLOCKS?.FASTER_DRINKS || { sips: 200, clicks: 30 },
+            'straws': config.UNLOCKS?.STRAWS || { sips: 500, clicks: 50 },
+            'cups': config.UNLOCKS?.CUPS || { sips: 1000, clicks: 80 },
+            'widerStraws': config.UNLOCKS?.WIDER_STRAWS || { sips: 2000, clicks: 120 },
+            'betterCups': config.UNLOCKS?.BETTER_CUPS || { sips: 5000, clicks: 200 },
+            'levelUp': config.UNLOCKS?.LEVEL_UP || { sips: 3000, clicks: 150 },
+            'shop': config.UNLOCKS?.SHOP || { sips: 500, clicks: 30 },
+            'stats': config.UNLOCKS?.STATS || { sips: 1000, clicks: 60 },
+            'god': config.UNLOCKS?.GOD || { sips: 5000, clicks: 300 },
+            'unlocks': config.UNLOCKS?.UNLOCKS_TAB || { sips: 25, clicks: 8 }
+        };
     },
     
     // Initialize the feature unlock system
@@ -118,12 +122,14 @@ const FEATURE_UNLOCKS = {
         
         document.body.appendChild(notification);
         
-        // Remove notification after 3 seconds
+        // Remove notification after configured duration
+        const config = window.GAME_CONFIG || {};
+        const duration = config.TIMING?.UNLOCK_NOTIFICATION_DURATION;
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);
             }
-        }, 3000);
+        }, duration);
     },
     
     // Update UI visibility based on unlocked features

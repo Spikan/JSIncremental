@@ -65,9 +65,13 @@ const FEATURE_DETECTION = {
             frameCount++;
             const currentTime = performance.now();
             
-            if (currentTime - lastTime >= 1000) {
+            const config = window.GAME_CONFIG?.PERFORMANCE || {};
+                    const frameCountInterval = config.FRAME_COUNT_INTERVAL;
+        const lowFpsThreshold = config.LOW_FPS_WARNING_THRESHOLD;
+            
+            if (currentTime - lastTime >= frameCountInterval) {
                 const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
-                if (fps < 30) {
+                if (fps < lowFpsThreshold) {
                     console.warn('Low FPS detected:', fps);
                 }
                 frameCount = 0;
@@ -125,7 +129,7 @@ let betterCups = new Decimal(0);
 let level = new Decimal(1);
 
 // Drink system variables
-const DEFAULT_DRINK_RATE = 5000; // 5 seconds in milliseconds
+    const DEFAULT_DRINK_RATE = window.GAME_CONFIG.TIMING.DEFAULT_DRINK_RATE;
 let drinkRate = DEFAULT_DRINK_RATE;
 let drinkProgress = 0;
 let lastDrinkTime = Date.now();
@@ -135,8 +139,8 @@ let fasterDrinks = new Decimal(0);
 let fasterDrinksUpCounter = new Decimal(1);
 
 // Critical Click system variables - IMPROVED BALANCE
-let criticalClickChance = new Decimal(0.001); // 0.1% base chance (10x higher)
-let criticalClickMultiplier = new Decimal(5); // 5x multiplier (more balanced)
+    let criticalClickChance = new Decimal(window.GAME_CONFIG.BALANCE.CRITICAL_CLICK_BASE_CHANCE); // 0.1% base chance (10x higher)
+    let criticalClickMultiplier = new Decimal(window.GAME_CONFIG.BALANCE.CRITICAL_CLICK_BASE_MULTIPLIER); // 5x multiplier (more balanced)
 let criticalClicks = new Decimal(0); // Total critical clicks achieved
 let criticalClickUpCounter = new Decimal(1); // Upgrade counter for critical chance
 
@@ -148,7 +152,7 @@ let clickSoundsEnabled = true;
 
 // Auto-save and options variables
 let autosaveEnabled = true;
-let autosaveInterval = 10; // seconds
+    let autosaveInterval = window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL; // seconds
 let autosaveCounter = 0;
 let gameStartTime = Date.now();
 let lastSaveTime = null;
@@ -157,7 +161,7 @@ let lastSaveTime = null;
 let saveQueue = [];
 let saveTimeout = null;
 let lastSaveOperation = 0;
-const MIN_SAVE_INTERVAL = 1000; // Minimum 1 second between saves
+    const MIN_SAVE_INTERVAL = window.GAME_CONFIG.TIMING.MIN_SAVE_INTERVAL; // Minimum 1 second between saves
 
 // Statistics tracking variables
 window.totalClicks = 0;
@@ -319,16 +323,17 @@ window.switchTab = switchTab;
 // Check if upgrades are affordable and update UI accordingly
 function checkUpgradeAffordability() {
     // IMPROVED BALANCE: Updated costs to match new progression system
-    const strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber()));
-    const cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber()));
-    const suctionCost = Math.floor(40 * Math.pow(1.10, suctions.toNumber()));
-    const fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber()));
-    const criticalClickCost = Math.floor(60 * Math.pow(1.10, criticalClicks.toNumber()));
-    const widerStrawsCost = Math.floor(150 * Math.pow(1.12, widerStraws.toNumber()));
-    const betterCupsCost = Math.floor(400 * Math.pow(1.12, betterCups.toNumber()));
-    const fasterDrinksUpCost = 1500 * fasterDrinksUpCounter.toNumber();
-    const criticalClickUpCost = 1200 * criticalClickUpCounter.toNumber();
-    const levelUpCost = 3000 * Math.pow(1.15, level.toNumber());
+    const config = window.GAME_CONFIG?.BALANCE || {};
+            const strawCost = Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
+        const cupCost = Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
+        const suctionCost = Math.floor(config.SUCTION_BASE_COST * Math.pow(config.SUCTION_SCALING, suctions.toNumber()));
+        const fasterDrinksCost = Math.floor(config.FASTER_DRINKS_BASE_COST * Math.pow(config.FASTER_DRINKS_SCALING, fasterDrinks.toNumber()));
+        const criticalClickCost = Math.floor(config.CRITICAL_CLICK_BASE_COST * Math.pow(config.CRITICAL_CLICK_SCALING, criticalClicks.toNumber()));
+        const widerStrawsCost = Math.floor(config.WIDER_STRAWS_BASE_COST * Math.pow(config.WIDER_STRAWS_SCALING, widerStraws.toNumber()));
+        const betterCupsCost = Math.floor(config.BETTER_CUPS_BASE_COST * Math.pow(config.BETTER_CUPS_SCALING, betterCups.toNumber()));
+        const fasterDrinksUpCost = config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber();
+        const criticalClickUpCost = config.CRITICAL_CLICK_UPGRADE_BASE_COST * criticalClickUpCounter.toNumber();
+        const levelUpCost = config.LEVEL_UP_BASE_COST * Math.pow(config.LEVEL_UP_SCALING, level.toNumber());
     
 
     
@@ -521,26 +526,27 @@ function initGame() {
             const lastSave = parseInt(savegame.lastSaveTime);
             offlineTimeSeconds = Math.floor((now - lastSave) / 1000);
 
-            // Only calculate offline earnings if at least 30 seconds offline
-            if (offlineTimeSeconds >= 30) {
+            // Only calculate offline earnings if at least configured minimum time offline
+            const minOfflineTime = window.GAME_CONFIG.TIMING.OFFLINE_MIN_TIME;
+            if (offlineTimeSeconds >= minOfflineTime) {
                 // Load temporary SPS values to calculate earnings
-                let tempStrawSPD = new Decimal(0.6);
-                let tempCupSPD = new Decimal(1.2);
+                let tempStrawSPD = new Decimal(window.GAME_CONFIG.BALANCE.STRAW_BASE_SPD);
+                let tempCupSPD = new Decimal(window.GAME_CONFIG.BALANCE.CUP_BASE_SPD);
 
                 // Apply upgrade multipliers to temporary SPD values
                 if (widerStraws.gt(0)) {
-                    const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5));
+                    const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * window.GAME_CONFIG.BALANCE.WIDER_STRAWS_MULTIPLIER));
                     tempStrawSPD = tempStrawSPD.times(upgradeMultiplier);
                 }
                 if (betterCups.gt(0)) {
-                    const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4));
+                    const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * window.GAME_CONFIG.BALANCE.BETTER_CUPS_MULTIPLIER));
                     tempCupSPD = tempCupSPD.times(upgradeMultiplier);
                 }
 
                 const tempTotalSPD = tempStrawSPD.times(straws).plus(tempCupSPD.times(cups));
                 
                 // Add base sips per drink to offline earnings
-                const baseSipsPerDrink = new Decimal(1);
+                const baseSipsPerDrink = new Decimal(window.GAME_CONFIG.BALANCE.BASE_SIPS_PER_DRINK);
                 const totalSipsPerDrink = baseSipsPerDrink.plus(tempTotalSPD);
                 
                 // Calculate offline earnings including base sips
@@ -549,8 +555,9 @@ function initGame() {
                 const passiveSipsPerSecond = tempTotalSPD.times(drinksPerSecond);
                 const totalSipsPerSecond = baseSipsPerSecond.plus(passiveSipsPerSecond);
 
-                // Cap offline earnings to prevent abuse (max 1 hour worth)
-                const cappedOfflineSeconds = Math.min(offlineTimeSeconds, 3600);
+                // Cap offline earnings to prevent abuse (max configured time worth)
+                const maxOfflineTime = window.GAME_CONFIG.TIMING.OFFLINE_MAX_TIME;
+                const cappedOfflineSeconds = Math.min(offlineTimeSeconds, maxOfflineTime);
                 offlineEarnings = totalSipsPerSecond.times(cappedOfflineSeconds);
 
                 // Show offline progress modal
@@ -564,6 +571,7 @@ function initGame() {
 
         // Initialize base values for new games
         if (!savegame) {
+            const config = window.GAME_CONFIG?.BALANCE || {};
             window.sips = new Decimal(0);
             straws = new Decimal(0);
             cups = new Decimal(0);
@@ -571,8 +579,8 @@ function initGame() {
             fasterDrinks = new Decimal(0);
             widerStraws = new Decimal(0);
             betterCups = new Decimal(0);
-            criticalClickChance = new Decimal(0.001);
-            criticalClickMultiplier = new Decimal(5);
+            criticalClickChance = new Decimal(config.CRITICAL_CLICK_BASE_CHANCE);
+            criticalClickMultiplier = new Decimal(config.CRITICAL_CLICK_BASE_MULTIPLIER);
             criticalClicks = new Decimal(0);
             criticalClickUpCounter = new Decimal(1);
             suctionClickBonus = new Decimal(0);
@@ -585,22 +593,23 @@ function initGame() {
 
 
 
-        strawSPD = new Decimal(0.6);
-        cupSPD = new Decimal(1.2);
-        suctionClickBonus = new Decimal(0.3).times(suctions);
+        const config = window.GAME_CONFIG?.BALANCE || {};
+                        strawSPD = new Decimal(config.STRAW_BASE_SPD);
+                cupSPD = new Decimal(config.CUP_BASE_SPD);
+                suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
 
         // Apply upgrade multipliers to base SPD values
         if (widerStraws.gt(0)) {
-            const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5));
+            const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER));
             strawSPD = strawSPD.times(upgradeMultiplier);
         }
         if (betterCups.gt(0)) {
-            const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4));
+            const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER));
             cupSPD = cupSPD.times(upgradeMultiplier);
         }
         
-        // Initialize sps with base 1 sip per drink
-        const baseSipsPerDrink = new Decimal(1);
+        // Initialize sps with base configured sips per drink
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
@@ -661,17 +670,18 @@ function initGame() {
 function startGameLoop() {
     let lastUpdate = 0;
     let lastStatsUpdate = 0;
-    const targetFPS = 60;
+    const targetFPS = window.GAME_CONFIG.LIMITS.TARGET_FPS;
     const frameInterval = 1000 / targetFPS;
-    const statsInterval = 1000; // Update stats every second
+    const statsInterval = window.GAME_CONFIG.LIMITS.STATS_UPDATE_INTERVAL; // Update stats every second
     
     function gameLoop(currentTime) {
-        // Update drink progress and game logic at 60 FPS
+        // Update drink progress and game logic at target FPS
         if (currentTime - lastUpdate >= frameInterval) {
             updateDrinkProgress();
             processDrink();
             // Check affordability more frequently for better responsiveness
-            if (currentTime - lastUpdate >= 200) { // Check every 200ms
+            const affordabilityInterval = window.GAME_CONFIG.LIMITS.AFFORDABILITY_CHECK_INTERVAL;
+            if (currentTime - lastUpdate >= affordabilityInterval) { // Check every configured interval
                 checkUpgradeAffordability();
             }
             lastUpdate = currentTime;
@@ -712,10 +722,14 @@ function updateDrinkProgress() {
             countdown.textContent = remainingTime.toFixed(1) + 's';
             
             // Update progress bar colors based on completion
+            const config = window.GAME_CONFIG?.LIMITS || {};
+                    const nearlyCompleteThreshold = config.PROGRESS_BAR_NEARLY_COMPLETE;
+        const completeThreshold = config.PROGRESS_BAR_COMPLETE;
+            
             progressFill.classList.remove('nearly-complete', 'complete');
-            if (drinkProgress >= 100) {
+            if (drinkProgress >= completeThreshold) {
                 progressFill.classList.add('complete');
-            } else if (drinkProgress >= 75) {
+            } else if (drinkProgress >= nearlyCompleteThreshold) {
                 progressFill.classList.add('nearly-complete');
             }
         });
@@ -735,8 +749,9 @@ function processDrink() {
         // Process the drink
         spsClick(sps);
         
-        // Add base sips per drink (always 1, regardless of straws/cups)
-        const baseSipsPerDrink = new Decimal(1);
+        // Add base sips per drink (configured value, regardless of straws/cups)
+        const config = window.GAME_CONFIG?.BALANCE || {};
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         window.sips = window.sips.plus(baseSipsPerDrink);
         totalSipsEarned = totalSipsEarned.plus(baseSipsPerDrink);
         
@@ -771,13 +786,15 @@ function setDrinkRate(newDrinkRate) {
 
 // Function to calculate and update drink rate based on upgrades
 function updateDrinkRate() {
-    // Each faster drink reduces time by 1%
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    // Each faster drink reduces time by configured percentage
     // Each upgrade increases the effectiveness
-    let totalReduction = fasterDrinks.times(fasterDrinksUpCounter).times(0.01);
-    let newDrinkRate = DEFAULT_DRINK_RATE * (1 - totalReduction.toNumber());
-    
-    // Ensure drink rate doesn't go below 0.5 seconds
-    newDrinkRate = Math.max(500, newDrinkRate);
+            let totalReduction = fasterDrinks.times(fasterDrinksUpCounter).times(config.FASTER_DRINKS_REDUCTION_PER_LEVEL);
+        let newDrinkRate = DEFAULT_DRINK_RATE * (1 - totalReduction.toNumber());
+        
+        // Ensure drink rate doesn't go below configured minimum
+        const minDrinkRate = config.MIN_DRINK_RATE;
+    newDrinkRate = Math.max(minDrinkRate, newDrinkRate);
     
     setDrinkRate(newDrinkRate);
     
@@ -795,9 +812,10 @@ function getDrinkRateSeconds() {
 function updateTopSipsPerDrink() {
     const topSipsPerDrinkElement = DOM_CACHE.topSipsPerDrink;
     if (topSipsPerDrinkElement) {
-        // Show total sips per drink (base 1 + passive production from straws and cups)
-        // Base sips per drink is always 1, regardless of upgrades
-        const baseSipsPerDrink = new Decimal(1);
+        // Show total sips per drink (base configured value + passive production from straws and cups)
+        // Base sips per drink is configured value, regardless of upgrades
+        const config = window.GAME_CONFIG?.BALANCE || {};
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         
         // Passive production per drink (from straws and cups)
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
@@ -823,8 +841,9 @@ function updateTopSipsPerSecond() {
     const topSipsPerSecondElement = DOM_CACHE.topSipsPerSecond;
     if (topSipsPerSecondElement) {
         // Calculate total sips per second from all sources
-        // Base sips per drink is always 1, regardless of upgrades
-        const baseSipsPerDrink = new Decimal(1);
+        // Base sips per drink is configured value, regardless of upgrades
+        const config = window.GAME_CONFIG?.BALANCE || {};
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         
         // Passive production per drink (strawSPD and cupSPD are per drink, not per second)
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
@@ -910,7 +929,7 @@ function loadOptions() {
     if (savedOptions) {
         const options = JSON.parse(savedOptions);
         autosaveEnabled = options.autosaveEnabled !== undefined ? options.autosaveEnabled : true;
-        autosaveInterval = options.autosaveInterval || 10;
+        autosaveInterval = options.autosaveInterval || window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL;
     }
     
     // Update UI to match loaded options
@@ -1032,8 +1051,9 @@ function updateEconomyStats() {
     // Current sips per second
     const currentSipsPerSecondElement = DOM_CACHE.currentSipsPerSecond;
     if (currentSipsPerSecondElement) {
-        // Include base 1 sip per drink in the calculation
-        const baseSipsPerDrink = new Decimal(1);
+        // Include base configured sips per drink in the calculation
+        const config = window.GAME_CONFIG?.BALANCE || {};
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         const totalSipsPerDrink = baseSipsPerDrink.plus(passiveSipsPerDrink);
         
@@ -1114,7 +1134,9 @@ function trackClick() {
     const now = Date.now();
     
     // Track click streak
-    if (now - lastClickTime < 1000) { // Within 1 second
+    const config = window.GAME_CONFIG?.TIMING || {};
+    const clickStreakWindow = config.CLICK_STREAK_WINDOW;
+    if (now - lastClickTime < clickStreakWindow) { // Within configured time window
         currentClickStreak++;
         if (currentClickStreak > bestClickStreak) {
             bestClickStreak = currentClickStreak;
@@ -1126,8 +1148,9 @@ function trackClick() {
     lastClickTime = now;
     clickTimes.push(now);
     
-    // Keep only last 100 clicks for performance
-    if (clickTimes.length > 100) {
+    // Keep only last configured number of clicks for performance
+            const maxClickTimes = window.GAME_CONFIG.LIMITS.MAX_CLICK_TIMES;
+    if (clickTimes.length > maxClickTimes) {
         clickTimes.shift();
     }
     
@@ -1181,9 +1204,10 @@ function playBasicStrawSipSound() {
         const gainNode = audioContext.createGain();
         
         // Random modulation parameters for variety
-        const baseFreq = 200 + Math.random() * 100; // 200-300 Hz base frequency
-        const duration = 0.1 + Math.random() * 0.1; // 0.1-0.2 seconds
-        const volume = 0.3 + Math.random() * 0.2; // 0.3-0.5 volume
+            const config = window.GAME_CONFIG.AUDIO;
+    const baseFreq = config.CLICK_SOUND_BASE_FREQ_MIN + Math.random() * (config.CLICK_SOUND_BASE_FREQ_MAX - config.CLICK_SOUND_BASE_FREQ_MIN);
+    const duration = config.CLICK_SOUND_DURATION_MIN + Math.random() * (config.CLICK_SOUND_DURATION_MAX - config.CLICK_SOUND_DURATION_MIN);
+    const volume = config.CLICK_SOUND_VOLUME_MIN + Math.random() * (config.CLICK_SOUND_VOLUME_MAX - config.CLICK_SOUND_VOLUME_MIN);
         
         // Set up oscillator
         oscillator.type = 'sine';
@@ -1233,10 +1257,11 @@ function playAlternativeStrawSipSound() {
         const filterNode = audioContext.createBiquadFilter();
         
         // Random parameters
-        const baseFreq1 = 150 + Math.random() * 80; // 150-230 Hz
-        const baseFreq2 = 300 + Math.random() * 120; // 300-420 Hz
-        const duration = 0.08 + Math.random() * 0.12; // 0.08-0.2 seconds
-        const volume = 0.25 + Math.random() * 0.15; // 0.25-0.4 volume
+            const config = window.GAME_CONFIG.AUDIO;
+    const baseFreq1 = config.CRITICAL_CLICK_FREQ1_MIN + Math.random() * (config.CRITICAL_CLICK_FREQ1_MAX - config.CRITICAL_CLICK_FREQ1_MIN);
+    const baseFreq2 = config.CRITICAL_CLICK_FREQ2_MIN + Math.random() * (config.CRITICAL_CLICK_FREQ2_MAX - config.CRITICAL_CLICK_FREQ2_MIN);
+    const duration = config.CRITICAL_CLICK_DURATION_MIN + Math.random() * (config.CRITICAL_CLICK_DURATION_MAX - config.CRITICAL_CLICK_DURATION_MIN);
+    const volume = config.CRITICAL_CLICK_VOLUME_MIN + Math.random() * (config.CRITICAL_CLICK_VOLUME_MAX - config.CRITICAL_CLICK_VOLUME_MIN);
         
         // Set up oscillators
         oscillator1.type = 'triangle';
@@ -1306,11 +1331,12 @@ function playBubbleStrawSipSound() {
         const delayNode = audioContext.createDelay();
         
         // Random parameters for variety
-        const baseFreq1 = 180 + Math.random() * 60; // 180-240 Hz
-        const baseFreq2 = 350 + Math.random() * 100; // 350-450 Hz
-        const baseFreq3 = 500 + Math.random() * 150; // 500-650 Hz
-        const duration = 0.12 + Math.random() * 0.08; // 0.12-0.2 seconds
-        const volume = 0.2 + Math.random() * 0.15; // 0.2-0.35 volume
+            const config = window.GAME_CONFIG.AUDIO;
+    const baseFreq1 = config.LEVEL_UP_FREQ1_MIN + Math.random() * (config.LEVEL_UP_FREQ1_MAX - config.LEVEL_UP_FREQ1_MIN);
+    const baseFreq2 = config.LEVEL_UP_FREQ2_MIN + Math.random() * (config.LEVEL_UP_FREQ2_MAX - config.LEVEL_UP_FREQ2_MIN);
+    const baseFreq3 = config.LEVEL_UP_FREQ3_MIN + Math.random() * (config.LEVEL_UP_FREQ3_MAX - config.LEVEL_UP_FREQ3_MIN);
+    const duration = config.LEVEL_UP_DURATION_MIN + Math.random() * (config.LEVEL_UP_DURATION_MAX - config.LEVEL_UP_DURATION_MIN);
+    const volume = config.LEVEL_UP_VOLUME_MIN + Math.random() * (config.LEVEL_UP_VOLUME_MAX - config.LEVEL_UP_VOLUME_MIN);
         
         // Set up oscillators with different waveforms
         oscillator1.type = 'sawtooth';
@@ -1396,11 +1422,12 @@ function playCriticalClickSound() {
         const delayNode = audioContext.createDelay();
         
         // Critical sound parameters - more dramatic than regular sounds
-        const baseFreq1 = 400 + Math.random() * 200; // 400-600 Hz - higher pitch
-        const baseFreq2 = 800 + Math.random() * 300; // 800-1100 Hz - even higher
-        const baseFreq3 = 1200 + Math.random() * 400; // 1200-1600 Hz - highest
-        const duration = 0.3 + Math.random() * 0.2; // 0.3-0.5 seconds - longer
-        const volume = 0.4 + Math.random() * 0.2; // 0.4-0.6 volume - louder
+            const config = window.GAME_CONFIG.AUDIO;
+    const baseFreq1 = config.PURCHASE_FREQ1_MIN + Math.random() * (config.PURCHASE_FREQ1_MAX - config.PURCHASE_FREQ1_MIN);
+    const baseFreq2 = config.PURCHASE_FREQ2_MIN + Math.random() * (config.PURCHASE_FREQ2_MAX - config.PURCHASE_FREQ2_MIN);
+    const baseFreq3 = config.PURCHASE_FREQ3_MIN + Math.random() * (config.PURCHASE_FREQ3_MAX - config.PURCHASE_FREQ3_MIN);
+    const duration = config.PURCHASE_DURATION_MIN + Math.random() * (config.PURCHASE_DURATION_MAX - config.PURCHASE_DURATION_MIN);
+    const volume = config.PURCHASE_VOLUME_MIN + Math.random() * (config.PURCHASE_VOLUME_MAX - config.PURCHASE_VOLUME_MIN);
         
         // Set up oscillators with different waveforms for dramatic effect
         oscillator1.type = 'sawtooth'; // Rich harmonics
@@ -1486,10 +1513,11 @@ function playPurchaseSound() {
         const delayNode = audioContext.createDelay();
         
         // Deep purchase sound parameters
-        const baseFreq1 = 80 + Math.random() * 40; // 80-120 Hz - very low, deep
-        const baseFreq2 = 160 + Math.random() * 60; // 160-220 Hz - low
-        const duration = 0.4 + Math.random() * 0.2; // 0.4-0.6 seconds - longer for satisfaction
-        const volume = 0.35 + Math.random() * 0.15; // 0.35-0.5 volume
+            const config = window.GAME_CONFIG.AUDIO;
+    const baseFreq1 = config.SODA_CLICK_FREQ1_MIN + Math.random() * (config.SODA_CLICK_FREQ1_MAX - config.SODA_CLICK_FREQ1_MIN);
+    const baseFreq2 = config.SODA_CLICK_FREQ2_MIN + Math.random() * (config.SODA_CLICK_FREQ2_MAX - config.SODA_CLICK_FREQ2_MIN);
+    const duration = config.SODA_CLICK_DURATION_MIN + Math.random() * (config.SODA_CLICK_DURATION_MAX - config.SODA_CLICK_DURATION_MIN);
+    const volume = config.SODA_CLICK_VOLUME_MIN + Math.random() * (config.SODA_CLICK_VOLUME_MAX - config.SODA_CLICK_VOLUME_MIN);
         
         // Set up oscillators with deep waveforms
         oscillator1.type = 'sine'; // Pure, deep tone
@@ -1586,7 +1614,8 @@ function updateDrinkSpeedDisplay() {
     }
     
     if (drinkSpeedBonusCompact) {
-        let totalReduction = fasterDrinks.times(fasterDrinksUpCounter).times(0.01);
+        const config = window.GAME_CONFIG?.BALANCE || {};
+        let totalReduction = fasterDrinks.times(fasterDrinksUpCounter).times(config.FASTER_DRINKS_REDUCTION_PER_LEVEL);
         let speedBonusPercent = totalReduction.times(100);
         drinkSpeedBonusCompact.textContent = speedBonusPercent.toFixed(1) + '%';
     }
@@ -1653,10 +1682,12 @@ function sodaClick(number) {
             // Add a CSS class for the click effect instead of changing src
             sodaButton.classList.add('soda-clicked');
             
-            // Remove the class after animation completes
-            setTimeout(() => {
-                sodaButton.classList.remove('soda-clicked');
-            }, 150);
+                    // Remove the class after animation completes
+        const config = window.GAME_CONFIG?.TIMING || {};
+        const animationDuration = config.SODA_CLICK_ANIMATION_DURATION;
+        setTimeout(() => {
+            sodaButton.classList.remove('soda-clicked');
+        }, animationDuration);
         }
     });
     
@@ -1687,8 +1718,11 @@ function showClickFeedback(sipsGained, isCritical = false) {
     
     // Use more efficient positioning to avoid layout recalculations
     const containerRect = sodaContainer.getBoundingClientRect();
-    const randomX = (Math.random() - 0.5) * 80; // -40px to +40px (reduced range)
-    const randomY = (Math.random() - 0.5) * 40;  // -20px to +20px (reduced range)
+    const config = window.GAME_CONFIG?.LIMITS || {};
+    const rangeX = config.CLICK_FEEDBACK_RANGE_X;
+    const rangeY = config.CLICK_FEEDBACK_RANGE_Y;
+    const randomX = (Math.random() - 0.5) * rangeX; // -rangeX/2px to +rangeX/2px
+    const randomY = (Math.random() - 0.5) * rangeY;  // -rangeY/2px to +rangeY/2px
     
     // Position relative to container center for more stable positioning
     feedback.style.position = 'absolute';
@@ -1705,7 +1739,9 @@ function showClickFeedback(sipsGained, isCritical = false) {
             if (feedback.parentNode) {
                 feedback.parentNode.removeChild(feedback);
             }
-        }, isCritical ? 2000 : 1000); // Critical feedback stays longer
+        }, isCritical ? 
+            window.GAME_CONFIG.TIMING.CRITICAL_FEEDBACK_DURATION : 
+            window.GAME_CONFIG.TIMING.CLICK_FEEDBACK_DURATION); // Critical feedback stays longer
     });
 }
 
@@ -1716,8 +1752,9 @@ function spsClick(amount) {
     totalSipsEarned = totalSipsEarned.plus(amount);
     
     // Update highest SPS if current is higher
-    // Include base 1 sip per drink in the calculation
-    const baseSipsPerDrink = new Decimal(1);
+    // Include base configured sips per drink in the calculation
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
     const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
     const totalSipsPerDrink = baseSipsPerDrink.plus(passiveSipsPerDrink);
     
@@ -1739,18 +1776,19 @@ function spsClick(amount) {
 
 function buyStraw() {
     // IMPROVED BALANCE: Better early game progression
-    let strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber())); // Reduced from 10, gentler scaling
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let strawCost = Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
             if (window.sips.gte(strawCost)) {
         straws = straws.plus(1);
         window.sips = window.sips.minus(strawCost);
 
         // Recalculate strawSPD with current upgrade multipliers
-        const baseStrawSPD = new Decimal(0.6);
-        const upgradeMultiplier = widerStraws.gt(0) ? new Decimal(1 + (widerStraws.toNumber() * 0.5)) : new Decimal(1);
+        const baseStrawSPD = new Decimal(config.STRAW_BASE_SPD);
+        const upgradeMultiplier = widerStraws.gt(0) ? new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER)) : new Decimal(1);
         strawSPD = baseStrawSPD.times(upgradeMultiplier);
 
-        // Include base 1 sip per drink in total SPS
-        const baseSipsPerDrink = new Decimal(1);
+        // Include base configured sips per drink in total SPS
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
@@ -1775,18 +1813,19 @@ function buyStraw() {
 
 function buyCup() {
     // IMPROVED BALANCE: Better mid-game progression
-    let cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber())); // Reduced from 20, gentler scaling
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let cupCost = Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
             if (window.sips.gte(cupCost)) {
         cups = cups.plus(1);
         window.sips = window.sips.minus(cupCost);
 
         // Recalculate cupSPD with current upgrade multipliers
-        const baseCupSPD = new Decimal(1.2);
-        const upgradeMultiplier = betterCups.gt(0) ? new Decimal(1 + (betterCups.toNumber() * 0.4)) : new Decimal(1);
+        const baseCupSPD = new Decimal(config.CUP_BASE_SPD);
+        const upgradeMultiplier = betterCups.gt(0) ? new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER)) : new Decimal(1);
         cupSPD = baseCupSPD.times(upgradeMultiplier);
 
-        // Include base 1 sip per drink in total SPS
-        const baseSipsPerDrink = new Decimal(1);
+        // Include base configured sips per drink in total SPS
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
@@ -1809,17 +1848,18 @@ function buyCup() {
 
 function buyWiderStraws() {
     // Now an upgrade that improves base straw production
-    let widerStrawsCost = Math.floor(150 * Math.pow(1.15, widerStraws.toNumber())); // Upgrade scaling
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let widerStrawsCost = Math.floor(config.WIDER_STRAWS_BASE_COST * Math.pow(config.WIDER_STRAWS_SCALING, widerStraws.toNumber()));
             if (window.sips.gte(widerStrawsCost)) {
         widerStraws = widerStraws.plus(1);
         window.sips = window.sips.minus(widerStrawsCost);
 
         // Calculate new straw SPD with upgrade multiplier
-        const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5)); // +50% per level
-        strawSPD = new Decimal(0.6).times(upgradeMultiplier);
+        const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER)); // +50% per level
+        strawSPD = new Decimal(config.STRAW_BASE_SPD).times(upgradeMultiplier);
 
-        // Recalculate total SPS including base 1 sip per drink
-        const baseSipsPerDrink = new Decimal(1);
+        // Recalculate total SPS including base configured sips per drink
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
@@ -1841,17 +1881,18 @@ function buyWiderStraws() {
 
 function buyBetterCups() {
     // Now an upgrade that improves base cup production
-    let betterCupsCost = Math.floor(400 * Math.pow(1.15, betterCups.toNumber())); // Upgrade scaling
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let betterCupsCost = Math.floor(config.BETTER_CUPS_BASE_COST * Math.pow(config.BETTER_CUPS_SCALING, betterCups.toNumber()));
             if (window.sips.gte(betterCupsCost)) {
         betterCups = betterCups.plus(1);
         window.sips = window.sips.minus(betterCupsCost);
 
         // Calculate new cup SPD with upgrade multiplier
-        const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4)); // +40% per level
-        cupSPD = new Decimal(1.2).times(upgradeMultiplier);
+        const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER)); // +40% per level
+        cupSPD = new Decimal(config.CUP_BASE_SPD).times(upgradeMultiplier);
 
-        // Recalculate total SPS including base 1 sip per drink
-        const baseSipsPerDrink = new Decimal(1);
+        // Recalculate total SPS including base configured sips per drink
+        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
 
@@ -1875,12 +1916,13 @@ function buyBetterCups() {
 
 function buySuction() {
     // IMPROVED BALANCE: Better click bonus progression
-    let suctionCost = Math.floor(40 * Math.pow(1.10, suctions.toNumber())); // Reduced from 50, gentler scaling
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let suctionCost = Math.floor(config.SUCTION_BASE_COST * Math.pow(config.SUCTION_SCALING, suctions.toNumber()));
     
             if (window.sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
         window.sips = window.sips.minus(suctionCost);
-        suctionClickBonus = new Decimal(0.3).times(suctions); // Increased from 0.2 for better value
+        suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
 
         // Update the sips/s indicator since suction bonus changed
         updateTopSipsPerSecond();
@@ -1900,12 +1942,13 @@ function buySuction() {
 
 function upgradeSuction() {
     // IMPROVED BALANCE: More affordable upgrades
-    let suctionUpCost = 800 * suctionUpCounter.toNumber(); // Reduced from 1000
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let suctionUpCost = config.SUCTION_UPGRADE_BASE_COST * suctionUpCounter.toNumber();
     
             if (window.sips.gte(suctionUpCost)) {
         window.sips = window.sips.minus(suctionUpCost);
         suctionUpCounter = suctionUpCounter.plus(1);
-        suctionClickBonus = new Decimal(0.3).times(suctionUpCounter); // Increased base value
+        suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctionUpCounter);
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -1919,7 +1962,8 @@ function upgradeSuction() {
 
 function buyFasterDrinks() {
     // IMPROVED BALANCE: Better drink speed progression
-    let fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber())); // Reduced from 100, gentler scaling
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let fasterDrinksCost = Math.floor(config.FASTER_DRINKS_BASE_COST * Math.pow(config.FASTER_DRINKS_SCALING, fasterDrinks.toNumber()));
             if (window.sips.gte(fasterDrinksCost)) {
         fasterDrinks = fasterDrinks.plus(1);
         window.sips = window.sips.minus(fasterDrinksCost);
@@ -1940,7 +1984,8 @@ function buyFasterDrinks() {
 
 function upgradeFasterDrinks() {
     // IMPROVED BALANCE: More affordable upgrades
-    let fasterDrinksUpCost = 1500 * fasterDrinksUpCounter.toNumber(); // Reduced from 2000
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let fasterDrinksUpCost = config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber();
             if (window.sips.gte(fasterDrinksUpCost)) {
         window.sips = window.sips.minus(fasterDrinksUpCost);
         fasterDrinksUpCounter = fasterDrinksUpCounter.plus(1);
@@ -1958,13 +2003,15 @@ function upgradeFasterDrinks() {
 
 function buyCriticalClick() {
     // IMPROVED BALANCE: Better critical click progression
-    let criticalClickCost = Math.floor(60 * Math.pow(1.10, criticalClicks.toNumber())); // Reduced from 75, gentler scaling
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let criticalClickCost = Math.floor(config.CRITICAL_CLICK_BASE_COST * Math.pow(config.CRITICAL_CLICK_SCALING, criticalClicks.toNumber()));
             if (window.sips.gte(criticalClickCost)) {
         criticalClicks = criticalClicks.plus(1);
         window.sips = window.sips.minus(criticalClickCost);
         
-        // Increase critical click chance by 0.01% (0.0001) per purchase - doubled from 0.005%
-        criticalClickChance = criticalClickChance.plus(0.0001);
+        // Increase critical click chance by configured increment per purchase
+        const chanceIncrement = config.CRITICAL_CLICK_CHANCE_INCREMENT;
+        criticalClickChance = criticalClickChance.plus(chanceIncrement);
 
         // Update critical click display
         updateCriticalClickDisplay();
@@ -1987,13 +2034,15 @@ function buyCriticalClick() {
 
 function upgradeCriticalClick() {
     // IMPROVED BALANCE: More affordable upgrades
-    let criticalClickUpCost = 1200 * criticalClickUpCounter.toNumber(); // Reduced from 1500
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let criticalClickUpCost = config.CRITICAL_CLICK_UPGRADE_BASE_COST * criticalClickUpCounter.toNumber();
             if (window.sips.gte(criticalClickUpCost)) {
         window.sips = window.sips.minus(criticalClickUpCost);
         criticalClickUpCounter = criticalClickUpCounter.plus(1);
         
-        // Increase critical click multiplier by 2x per upgrade
-        criticalClickMultiplier = criticalClickMultiplier.plus(2);
+        // Increase critical click multiplier by configured increment per upgrade
+        const multiplierIncrement = config.CRITICAL_CLICK_MULTIPLIER_INCREMENT;
+        criticalClickMultiplier = criticalClickMultiplier.plus(multiplierIncrement);
 
         // Update sips/s indicator since critical multiplier changed
         updateTopSipsPerSecond();
@@ -2010,14 +2059,16 @@ function upgradeCriticalClick() {
 
 function levelUp() {
     // IMPROVED BALANCE: Better level up rewards and scaling
-    let levelUpCost = 3000 * Math.pow(1.15, level.toNumber()); // Reduced base cost, better scaling
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    let levelUpCost = config.LEVEL_UP_BASE_COST * Math.pow(config.LEVEL_UP_SCALING, level.toNumber());
     
     if (window.sips.gte(levelUpCost)) {
         window.sips = window.sips.minus(levelUpCost);
         level = level.plus(1);
         
-        // Calculate sips gained from level up (150% increase instead of 100%)
-        const sipsGained = sps.times(1.5);
+        // Calculate sips gained from level up (configured multiplier)
+        const levelUpMultiplier = config.LEVEL_UP_SIPS_MULTIPLIER;
+        const sipsGained = sps.times(levelUpMultiplier);
         
         // Add bonus sips for leveling up
         window.sips = window.sips.plus(sipsGained);
@@ -2065,19 +2116,22 @@ function showLevelUpFeedback(sipsGained) {
     levelUpDiv.style.position = 'relative';
     levelUpDiv.appendChild(feedback);
     
-    // Remove after animation completes
-    setTimeout(() => {
-        if (feedback.parentNode) {
-            feedback.parentNode.removeChild(feedback);
-        }
-    }, 800);
+            // Remove after animation completes
+        const config = window.GAME_CONFIG?.TIMING || {};
+        const feedbackDuration = config.LEVEL_UP_FEEDBACK_DURATION;
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.parentNode.removeChild(feedback);
+            }
+        }, feedbackDuration);
 }
 
 // Function to check if level up is possible
 function checkLevelUp() {
     // This function checks if the player can afford to level up
     // It's called after each click to update the level up button state
-    const levelUpCost = 3000 * Math.pow(1.15, level.toNumber()); // Updated to match new balance
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    const levelUpCost = config.LEVEL_UP_BASE_COST * Math.pow(config.LEVEL_UP_SCALING, level.toNumber());
     
     const levelUpButton = document.querySelector('button[onclick*="levelUp"]');
     
@@ -2193,10 +2247,11 @@ function delete_save() {
         straws = new Decimal(0);
         cups = new Decimal(0);
         suctions = new Decimal(0);
-        // Set sps to base 1 sip per drink (since no straws/cups yet)
-        sps = new Decimal(1);
-        strawSPD = new Decimal(0.6);
-        cupSPD = new Decimal(1.2);
+        // Set sps to base configured sips per drink (since no straws/cups yet)
+        const config = window.GAME_CONFIG?.BALANCE || {};
+        sps = new Decimal(config.BASE_SIPS_PER_DRINK);
+        strawSPD = new Decimal(config.STRAW_BASE_SPD);
+        cupSPD = new Decimal(config.CUP_BASE_SPD);
         suctionClickBonus = new Decimal(0);
         widerStraws = new Decimal(0);
         betterCups = new Decimal(0);
@@ -2220,8 +2275,8 @@ function delete_save() {
         fasterDrinksUpCounter = new Decimal(1);
         
         // Reset critical click system variables
-        criticalClickChance = new Decimal(0.001);
-        criticalClickMultiplier = new Decimal(5);
+        criticalClickChance = new Decimal(config.CRITICAL_CLICK_BASE_CHANCE);
+        criticalClickMultiplier = new Decimal(config.CRITICAL_CLICK_BASE_MULTIPLIER);
         criticalClicks = new Decimal(0);
         criticalClickUpCounter = new Decimal(1);
         
@@ -2268,28 +2323,44 @@ function delete_save() {
 
 function prettify(input) {
     if (input instanceof Decimal) {
-        if (input.lt(1000)) {
-            return input.toFixed(2);
-        } else if (input.lt(1e6)) {
-            return input.toFixed(1);
-        } else if (input.lt(1e9)) {
-            return (input.toNumber() / 1e6).toFixed(2) + "M";
-        } else if (input.lt(1e12)) {
-            return (input.toNumber() / 1e9).toFixed(2) + "B";
-        } else if (input.lt(1e15)) {
-            return (input.toNumber() / 1e12).toFixed(2) + "T";
-        } else if (input.lt(1e18)) {
-            return (input.toNumber() / 1e15).toFixed(2) + "Qa";
-        } else if (input.lt(1e21)) {
-            return (input.toNumber() / 1e18).toFixed(2) + "Qi";
-        } else if (input.lt(1e24)) {
-            return (input.toNumber() / 1e21).toFixed(2) + "Sx";
-        } else if (input.lt(1e27)) {
-            return (input.toNumber() / 1e24).toFixed(2) + "Sp";
-        } else if (input.lt(1e30)) {
-            return (input.toNumber() / 1e27).toFixed(2) + "Oc";
+        const config = window.GAME_CONFIG?.FORMATTING || {};
+        const smallThreshold = config.SMALL_NUMBER_THRESHOLD;
+        const mediumThreshold = config.MEDIUM_NUMBER_THRESHOLD;
+        const largeThreshold = config.LARGE_NUMBER_THRESHOLD;
+        const hugeThreshold = config.HUGE_NUMBER_THRESHOLD;
+        const massiveThreshold = config.MASSIVE_NUMBER_THRESHOLD;
+        const enormousThreshold = config.ENORMOUS_NUMBER_THRESHOLD;
+        const giganticThreshold = config.GIGANTIC_NUMBER_THRESHOLD;
+        const titanicThreshold = config.TITANIC_NUMBER_THRESHOLD;
+        const cosmicThreshold = config.COSMIC_NUMBER_THRESHOLD;
+        const infiniteThreshold = config.INFINITE_NUMBER_THRESHOLD;
+        
+        const smallDecimalPlaces = config.DECIMAL_PLACES_SMALL;
+        const mediumDecimalPlaces = config.DECIMAL_PLACES_MEDIUM;
+        const largeDecimalPlaces = config.DECIMAL_PLACES_LARGE;
+        
+        if (input.lt(smallThreshold)) {
+            return input.toFixed(smallDecimalPlaces);
+        } else if (input.lt(mediumThreshold)) {
+            return input.toFixed(mediumDecimalPlaces);
+        } else if (input.lt(largeThreshold)) {
+            return (input.toNumber() / 1e6).toFixed(largeDecimalPlaces) + "M";
+        } else if (input.lt(hugeThreshold)) {
+            return (input.toNumber() / 1e9).toFixed(largeDecimalPlaces) + "B";
+        } else if (input.lt(massiveThreshold)) {
+            return (input.toNumber() / 1e12).toFixed(largeDecimalPlaces) + "T";
+        } else if (input.lt(enormousThreshold)) {
+            return (input.toNumber() / 1e15).toFixed(largeDecimalPlaces) + "Qa";
+        } else if (input.lt(giganticThreshold)) {
+            return (input.toNumber() / 1e18).toFixed(largeDecimalPlaces) + "Qi";
+        } else if (input.lt(titanicThreshold)) {
+            return (input.toNumber() / 1e21).toFixed(largeDecimalPlaces) + "Sx";
+        } else if (input.lt(cosmicThreshold)) {
+            return (input.toNumber() / 1e24).toFixed(largeDecimalPlaces) + "Sp";
+        } else if (input.lt(infiniteThreshold)) {
+            return (input.toNumber() / 1e27).toFixed(largeDecimalPlaces) + "Oc";
         } else {
-            return input.toExponential(2);
+            return input.toExponential(largeDecimalPlaces);
         }
     }
     return input.toFixed(2);
@@ -2299,13 +2370,14 @@ function prettify(input) {
 function reload() {
     try {
         // IMPROVED BALANCE: Updated cost calculations to match new balance
-        let strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber()));
-        let cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber()));
-        let suctionCost = Math.floor(40 * Math.pow(1.10, suctions.toNumber()));
-        let fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber()));
-        let criticalClickCost = Math.floor(60 * Math.pow(1.10, criticalClicks.toNumber()));
-        let widerStrawsCost = Math.floor(150 * Math.pow(1.12, widerStraws.toNumber()));
-        let betterCupsCost = Math.floor(400 * Math.pow(1.12, betterCups.toNumber()));
+        const config = window.GAME_CONFIG?.BALANCE || {};
+        let strawCost = Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
+        let cupCost = Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
+        let suctionCost = Math.floor(config.SUCTION_BASE_COST * Math.pow(config.SUCTION_SCALING, suctions.toNumber()));
+        let fasterDrinksCost = Math.floor(config.FASTER_DRINKS_BASE_COST * Math.pow(config.FASTER_DRINKS_SCALING, fasterDrinks.toNumber()));
+        let criticalClickCost = Math.floor(config.CRITICAL_CLICK_BASE_COST * Math.pow(config.CRITICAL_CLICK_SCALING, criticalClicks.toNumber()));
+        let widerStrawsCost = Math.floor(config.WIDER_STRAWS_BASE_COST * Math.pow(config.WIDER_STRAWS_SCALING, widerStraws.toNumber()));
+        let betterCupsCost = Math.floor(config.BETTER_CUPS_BASE_COST * Math.pow(config.BETTER_CUPS_SCALING, betterCups.toNumber()));
 
         // Safely update DOM elements only if they exist
         const elements = {
@@ -2338,7 +2410,7 @@ function reload() {
             'betterCupsCost': betterCupsCost.toString(),
             'betterCupsSPD': prettify(cupSPD.div(new Decimal(1.2))) + 'x', // Shows upgrade multiplier
             'totalBetterCupsSPD': prettify(cupSPD.times(cups)), // Total cup production
-            'fasterDrinksUpCost': (1500 * fasterDrinksUpCounter.toNumber()).toString(),
+            'fasterDrinksUpCost': (config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber()).toString(),
             'levelNumber': level.toNumber(),
             // Compact clicking upgrade displays
             'suctionCostCompact': suctionCost.toString(),
@@ -2349,7 +2421,7 @@ function reload() {
             'fasterDrinksCostCompact': fasterDrinksCost.toString(),
             'currentDrinkSpeedCompact': updateDrinkSpeedDisplay(),
             'drinkSpeedBonusCompact': (fasterDrinks.toNumber() * 10) + '%',
-            'fasterDrinksUpCostCompact': (1500 * fasterDrinksUpCounter.toNumber()).toString()
+            'fasterDrinksUpCostCompact': (config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber()).toString()
         };
 
         // Update each element safely
@@ -2361,7 +2433,7 @@ function reload() {
         }
         
         // Update level up cost display
-        const levelUpCost = 3000 * Math.pow(1.15, level.toNumber());
+        const levelUpCost = config.LEVEL_UP_BASE_COST * Math.pow(config.LEVEL_UP_SCALING, level.toNumber());
         const levelCostElement = document.getElementById('levelCost');
         if (levelCostElement) {
             levelCostElement.innerHTML = prettify(levelUpCost);
@@ -2449,33 +2521,35 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Failed to load word bank:', error);
     });
     
-    // Small delay to ensure everything is ready
-    setTimeout(() => {
-        try {
-            initSplashScreen();
-            loadOptions(); // Load options on page load
-            updatePlayTime(); // Start play time tracking
-            console.log('Splash screen initialization complete');
-            
-            if (typeof eruda !== 'undefined') {
-                eruda.get('console').log('Splash screen initialization complete');
-            }
-        } catch (error) {
-            console.error('Error during splash screen initialization:', error);
-            // Fallback: try to show game content directly
-            const splashScreen = document.getElementById('splashScreen');
-            const gameContent = document.getElementById('gameContent');
-            if (splashScreen && gameContent) {
-                splashScreen.style.display = 'none';
-                gameContent.style.display = 'block';
-                try {
-                    initGame();
-                } catch (gameError) {
-                    console.error('Game initialization also failed:', gameError);
+            // Small delay to ensure everything is ready
+        const config = window.GAME_CONFIG?.TIMING || {};
+        const domReadyDelay = config.DOM_READY_DELAY;
+        setTimeout(() => {
+            try {
+                initSplashScreen();
+                loadOptions(); // Load options on page load
+                updatePlayTime(); // Start play time tracking
+                console.log('Splash screen initialization complete');
+                
+                if (typeof eruda !== 'undefined') {
+                    eruda.get('console').log('Splash screen initialization complete');
+                }
+            } catch (error) {
+                console.error('Error during splash screen initialization:', error);
+                // Fallback: try to show game content directly
+                const splashScreen = document.getElementById('splashScreen');
+                const gameContent = document.getElementById('gameContent');
+                if (splashScreen && gameContent) {
+                    splashScreen.style.display = 'none';
+                    gameContent.style.display = 'block';
+                    try {
+                        initGame();
+                    } catch (gameError) {
+                        console.error('Game initialization also failed:', gameError);
+                    }
                 }
             }
-        }
-    }, 100);
+        }, domReadyDelay);
 });
 
 
@@ -2502,9 +2576,11 @@ window.startGameWithMusic = function() {
     localStorage.setItem('musicEnabled', 'true');
     
     // Start the game after a brief moment to let title music begin
+    const config = window.GAME_CONFIG?.TIMING || {};
+    const splashTransitionDelay = config.SPLASH_TRANSITION_DELAY;
     setTimeout(() => {
         startGameCore();
-    }, 500);
+    }, splashTransitionDelay);
 };
 
 // Start game without music - mutes all audio
@@ -2584,12 +2660,14 @@ function showPurchaseFeedback(itemName, cost) {
     shopDiv.style.position = 'relative';
     shopDiv.appendChild(feedback);
     
-    // Remove after animation completes
-    setTimeout(() => {
-        if (feedback.parentNode) {
-            feedback.parentNode.removeChild(feedback);
-        }
-    }, 2000);
+            // Remove after animation completes
+        const config = window.GAME_CONFIG?.TIMING || {};
+        const feedbackDuration = config.PURCHASE_FEEDBACK_DURATION;
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.parentNode.removeChild(feedback);
+            }
+        }, feedbackDuration);
 }
 
         // Divine oracle functionality
@@ -2841,7 +2919,8 @@ function initSplashMusic() {
     splashAudio = new Audio();
     splashAudio.src = 'res/Soda Drinker Title Music.mp3';
     splashAudio.loop = false; // Don't loop - we want it to play once fully
-    splashAudio.volume = 0.15; // Further reduced volume
+    const config = window.GAME_CONFIG?.AUDIO || {};
+    splashAudio.volume = config.SPLASH_MUSIC_VOLUME;
     
     console.log('Created splashAudio with src:', splashAudio.src);
     
@@ -3003,10 +3082,10 @@ function initMusicPlayer() {
         currentStream: null,
         streamInfo: {},
         retryCount: 0,
-        maxRetries: 10,
+        maxRetries: window.GAME_CONFIG.LIMITS.MAX_MUSIC_RETRIES,
         isRetrying: false,
         lastRetryTime: 0,
-        retryDelay: 2000 // 2 second delay between retries
+        retryDelay: window.GAME_CONFIG.TIMING.MUSIC_RETRY_DELAY // 2 second delay between retries
     };
     
     // Create audio element for music
@@ -3014,7 +3093,8 @@ function initMusicPlayer() {
     // Use Between Level Music as default for main game
     audio.src = 'res/Between Level Music.mp3';
     audio.loop = true;
-    audio.volume = 0.1; // Further reduced volume
+    const config = window.GAME_CONFIG?.AUDIO || {};
+    audio.volume = config.MAIN_MUSIC_VOLUME;
     audio.muted = window.musicPlayerState.isMuted; // Apply mute setting immediately
     
     // Add error handling
@@ -3140,8 +3220,13 @@ function initMusicPlayer() {
     
     // Function to detect if user is on a mobile device
     function isMobileDevice() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-               (window.innerWidth <= 768 && window.innerHeight <= 1024);
+        const config = window.GAME_CONFIG?.MOBILE || {};
+        const maxWidth = config.MAX_WIDTH;
+        const maxHeight = config.MAX_HEIGHT;
+        const userAgentPatterns = config.USER_AGENT_PATTERNS;
+        
+        return userAgentPatterns.some(pattern => new RegExp(pattern, 'i').test(navigator.userAgent)) ||
+               (window.innerWidth <= maxWidth && window.innerHeight <= maxHeight);
     }
     
     // Handle page visibility change (when user switches tabs or apps)
@@ -3226,6 +3311,8 @@ function initMusicPlayer() {
     updateMusicPlayerUI();
     
     // Try to auto-play (may be blocked by browser)
+    const musicConfig = window.GAME_CONFIG?.TIMING || {};
+    const musicInitDelay = musicConfig.MUSIC_INIT_DELAY;
     setTimeout(() => {
         if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
             // Don't auto-play, just show ready state
@@ -3233,7 +3320,7 @@ function initMusicPlayer() {
             // Only update stream info once on initialization
             updateStreamInfo();
         }
-    }, 1000);
+    }, musicInitDelay);
     
     // Set initial stream info immediately for better UX
     updateStreamInfo();
