@@ -856,8 +856,8 @@ function setupMobileTouchHandling() {
             // Only process if it was a short touch and hasn't been processed yet
             if (touchDuration < 300 && window.isTouchClick && !window.touchProcessed) {
                 window.touchProcessed = true;
-                // Let the onclick handler do the work, but mark that we've processed this touch
-                // The onclick will check this flag to avoid duplicate processing
+                // Directly trigger click logic for mobile since default click is prevented
+                try { sodaClick(1); } catch {}
             }
             
             // Remove visual feedback after a short delay
@@ -1900,11 +1900,6 @@ clickSoda.src = "images/clickSoda.png";
 
 
 function sodaClick(number) {
-    // Check if this is a touch event that's already been processed
-    if (window.touchProcessed && window.isTouchClick) {
-        return; // Skip processing if this touch was already handled
-    }
-    
     // Track the click
     trackClick();
     
@@ -1970,12 +1965,7 @@ function sodaClick(number) {
             }
         }
         
-        // Show click feedback
-        if (window.App?.ui?.showClickFeedback) {
-            window.App.ui.showClickFeedback(totalSipsGained, isCritical);
-        } else {
-            showClickFeedback(totalSipsGained, isCritical);
-        }
+        // Click feedback is emitted via CLICK.SODA event and handled by UI
         
         // Visual feedback with smoother image transition
         const sodaButton = DOM_CACHE.sodaButton;
