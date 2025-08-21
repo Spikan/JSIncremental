@@ -1,4 +1,15 @@
-import { z } from 'zod';
+// Import Zod from CDN or global (UMD exposes as window.Zod)
+const z = window.Zod || (() => {
+    console.warn('Zod not available, validation disabled');
+    return {
+        object: () => ({ parse: (data) => data }),
+        number: () => ({ min: () => ({ optional: () => ({}) }) }),
+        boolean: () => ({}),
+        string: () => ({}),
+        any: () => ({}),
+        record: () => ({ optional: () => ({}) })
+    };
+})();
 
 // Schema for unlock conditions
 export const UnlockSchema = z.object({
