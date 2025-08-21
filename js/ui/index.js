@@ -20,6 +20,7 @@ export const updateAutosaveStatus = displays.updateAutosaveStatus;
 export const updateDrinkProgress = displays.updateDrinkProgress;
 export const updateTopSipCounter = displays.updateTopSipCounter;
 export const updateLevelNumber = displays.updateLevelNumber;
+export const updateLevelText = displays.updateLevelText;
 
 export const updatePlayTime = stats.updatePlayTime;
 export const updateLastSaveTime = stats.updateLastSaveTime;

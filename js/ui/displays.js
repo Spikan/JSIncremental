@@ -114,3 +114,11 @@ export function updateLevelNumber() {
         levelEl.innerHTML = String(val);
     }
 }
+
+// Update the level text banner/label
+export function updateLevelText(text) {
+    const el = window.DOM_CACHE?.levelText || document.getElementById('levelText');
+    if (el && typeof text === 'string') {
+        el.innerHTML = text;
+    }
+}

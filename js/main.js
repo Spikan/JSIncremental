@@ -1110,6 +1110,9 @@ function updateLastSaveTime() {
 
 // Statistics update functions
 function updateAllStats() {
+    if (window.App?.ui?.updateAllStats) {
+        try { return window.App.ui.updateAllStats(); } catch {}
+    }
     // Only update stats if the stats tab is active and elements exist
     const statsTab = DOM_CACHE.statsTab;
     if (statsTab && statsTab.classList.contains('active')) {
@@ -1122,6 +1125,9 @@ function updateAllStats() {
 }
 
 function updateTimeStats() {
+    if (window.App?.ui?.updateTimeStats) {
+        try { return window.App.ui.updateTimeStats(); } catch {}
+    }
     // Total play time (including previous sessions)
     const totalPlayTimeElement = DOM_CACHE.totalPlayTime;
     if (totalPlayTimeElement) {
@@ -1153,6 +1159,9 @@ function updateTimeStats() {
 }
 
 function updateClickStats() {
+    if (window.App?.ui?.updateClickStats) {
+        try { return window.App.ui.updateClickStats(); } catch {}
+    }
     // Total clicks
             const totalClicksElement = DOM_CACHE.totalClicks;
         if (totalClicksElement) {
@@ -1176,6 +1185,9 @@ function updateClickStats() {
 }
 
 function updateEconomyStats() {
+    if (window.App?.ui?.updateEconomyStats) {
+        try { return window.App.ui.updateEconomyStats(); } catch {}
+    }
     // Total sips earned
     const totalSipsEarnedElement = DOM_CACHE.totalSipsEarned;
     if (totalSipsEarnedElement) {
@@ -1204,6 +1216,9 @@ function updateEconomyStats() {
 }
 
 function updateShopStats() {
+    if (window.App?.ui?.updateShopStats) {
+        try { return window.App.ui.updateShopStats(); } catch {}
+    }
     // Straws purchased
     const strawsPurchasedElement = DOM_CACHE.strawsPurchased;
     if (strawsPurchasedElement) {
@@ -1242,6 +1257,9 @@ function updateShopStats() {
 }
 
 function updateAchievementStats() {
+    if (window.App?.ui?.updateAchievementStats) {
+        try { return window.App.ui.updateAchievementStats(); } catch {}
+    }
     // Current level
     const currentLevelElement = DOM_CACHE.currentLevel;
     if (currentLevelElement) {
@@ -2400,7 +2418,10 @@ function levelUp() {
         // Update displays
         if (window.App?.ui?.updateLevelNumber) { try { window.App.ui.updateLevelNumber(); } catch {}
         } else {
-            DOM_CACHE.levelNumber.innerHTML = level.toNumber();
+            if (window.App?.ui?.updateLevelNumber) { try { window.App.ui.updateLevelNumber(); } catch {}
+            } else {
+                DOM_CACHE.levelNumber.innerHTML = level.toNumber();
+            }
         }
         
         // Update top sip counter
@@ -2467,7 +2488,10 @@ function changeLevel(i) {
     let body = document.querySelector("body");
 
     if (i === 2) {
-        DOM_CACHE.levelText.innerHTML = "On a Red Background";
+        if (window.App?.ui?.updateLevelText) { try { window.App.ui.updateLevelText("On a Red Background"); } catch {}
+        } else {
+            DOM_CACHE.levelText.innerHTML = "On a Red Background";
+        }
         body.style.backgroundColor = "#AE323B";
     }
 }
