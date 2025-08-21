@@ -3,6 +3,8 @@
 // ============================================================================
 // Manages progressive feature unlocking based on player progress
 
+console.log('=== FEATURE-UNLOCKS.JS LOADING ===');
+
 // Feature unlock conditions and configuration
 const FEATURE_UNLOCKS = {
     // Track unlocked features
@@ -403,4 +405,6 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
     // Browser environment - make it globally available
     window.FEATURE_UNLOCKS = FEATURE_UNLOCKS;
+    console.log('=== FEATURE-UNLOCKS.JS FULLY LOADED ===');
+    console.log('FEATURE_UNLOCKS object available at:', window.FEATURE_UNLOCKS);
 }

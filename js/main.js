@@ -89,6 +89,12 @@ const FEATURE_DETECTION = {
 // Feature Unlock System - Now imported from js/feature-unlocks.js
 // The FEATURE_UNLOCKS object is defined in the separate module file
 
+console.log('=== MAIN.JS LOADING ===');
+console.log('FEATURE_UNLOCKS available:', typeof window.FEATURE_UNLOCKS !== 'undefined' ? 'YES' : 'NO');
+if (typeof window.FEATURE_UNLOCKS !== 'undefined') {
+    console.log('FEATURE_UNLOCKS object:', window.FEATURE_UNLOCKS);
+}
+
 // DOM Element Cache - Imported from dom-cache.js
 // Ensures DOM_CACHE is available before proceeding
 if (typeof DOM_CACHE === 'undefined') {
@@ -105,7 +111,7 @@ if (typeof DOM_CACHE === 'undefined') {
 console.log('buySuction function available:', typeof buySuction);
 console.log('window.buySuction available:', typeof window.buySuction);
 
-let sips = new Decimal(0);
+window.sips = new Decimal(0);
 let straws = new Decimal(0);
 let cups = new Decimal(0);
 let suctions = new Decimal(0);
@@ -154,7 +160,7 @@ let lastSaveOperation = 0;
 const MIN_SAVE_INTERVAL = 1000; // Minimum 1 second between saves
 
 // Statistics tracking variables
-let totalClicks = 0;
+window.totalClicks = 0;
 let currentClickStreak = 0;
 let bestClickStreak = 0;
 let totalSipsEarned = new Decimal(0);
@@ -329,35 +335,35 @@ function checkUpgradeAffordability() {
 
     
     // Update button states based on affordability
-    updateButtonState('buyStraw', sips.gte(strawCost), strawCost);
-    updateButtonState('buyCup', sips.gte(cupCost), cupCost);
-    updateButtonState('buySuction', sips.gte(suctionCost), suctionCost);
-    updateButtonState('buyFasterDrinks', sips.gte(fasterDrinksCost), fasterDrinksCost);
-    updateButtonState('buyCriticalClick', sips.gte(criticalClickCost), criticalClickCost);
-    updateButtonState('buyWiderStraws', sips.gte(widerStrawsCost), widerStrawsCost);
-    updateButtonState('buyBetterCups', sips.gte(betterCupsCost), betterCupsCost);
-    updateButtonState('upgradeFasterDrinks', sips.gte(fasterDrinksUpCost), fasterDrinksUpCost);
-    updateButtonState('upgradeCriticalClick', sips.gte(criticalClickUpCost), criticalClickUpCost);
-    updateButtonState('levelUp', sips.gte(levelUpCost), levelUpCost);
+            updateButtonState('buyStraw', window.sips.gte(strawCost), strawCost);
+        updateButtonState('buyCup', window.sips.gte(cupCost), cupCost);
+        updateButtonState('buySuction', window.sips.gte(suctionCost), suctionCost);
+        updateButtonState('buyFasterDrinks', window.sips.gte(fasterDrinksCost), fasterDrinksCost);
+        updateButtonState('buyCriticalClick', window.sips.gte(criticalClickCost), criticalClickCost);
+        updateButtonState('buyWiderStraws', window.sips.gte(widerStrawsCost), widerStrawsCost);
+        updateButtonState('buyBetterCups', window.sips.gte(betterCupsCost), betterCupsCost);
+        updateButtonState('upgradeFasterDrinks', window.sips.gte(fasterDrinksUpCost), fasterDrinksUpCost);
+        updateButtonState('upgradeCriticalClick', window.sips.gte(criticalClickUpCost), criticalClickUpCost);
+        updateButtonState('levelUp', window.sips.gte(levelUpCost), levelUpCost);
     
     // Update cost displays with affordability indicators
-    updateCostDisplay('strawCost', strawCost, sips.gte(strawCost));
-    updateCostDisplay('cupCost', cupCost, sips.gte(cupCost));
-    updateCostDisplay('suctionCost', suctionCost, sips.gte(suctionCost));
-    updateCostDisplay('fasterDrinksCost', fasterDrinksCost, sips.gte(fasterDrinksCost));
-    updateCostDisplay('criticalClickCost', criticalClickCost, sips.gte(criticalClickCost));
-    updateCostDisplay('widerStrawsCost', widerStrawsCost, sips.gte(widerStrawsCost));
-    updateCostDisplay('betterCupsCost', betterCupsCost, sips.gte(betterCupsCost));
-    updateCostDisplay('fasterDrinksUpCost', fasterDrinksUpCost, sips.gte(fasterDrinksUpCost));
-    updateCostDisplay('criticalClickUpCost', criticalClickUpCost, sips.gte(criticalClickUpCost));
-    updateCostDisplay('levelCost', levelUpCost, sips.gte(levelUpCost));
+            updateCostDisplay('strawCost', strawCost, window.sips.gte(strawCost));
+        updateCostDisplay('cupCost', cupCost, window.sips.gte(cupCost));
+        updateCostDisplay('suctionCost', suctionCost, window.sips.gte(suctionCost));
+        updateCostDisplay('fasterDrinksCost', fasterDrinksCost, window.sips.gte(fasterDrinksCost));
+        updateCostDisplay('criticalClickCost', criticalClickCost, window.sips.gte(criticalClickCost));
+        updateCostDisplay('widerStrawsCost', widerStrawsCost, window.sips.gte(widerStrawsCost));
+        updateCostDisplay('betterCupsCost', betterCupsCost, window.sips.gte(betterCupsCost));
+        updateCostDisplay('fasterDrinksUpCost', fasterDrinksUpCost, window.sips.gte(fasterDrinksUpCost));
+        updateCostDisplay('criticalClickUpCost', criticalClickUpCost, window.sips.gte(criticalClickUpCost));
+        updateCostDisplay('levelCost', levelUpCost, window.sips.gte(levelUpCost));
     
     // Update compact clicking upgrade displays
-    updateCostDisplay('suctionCostCompact', suctionCost, sips.gte(suctionCost));
-    updateCostDisplay('criticalClickCostCompact', criticalClickCost, sips.gte(criticalClickCost));
+    updateCostDisplay('suctionCostCompact', suctionCost, window.sips.gte(suctionCost));
+    updateCostDisplay('criticalClickCostCompact', criticalClickCost, window.sips.gte(criticalClickCost));
     // Update compact drink speed upgrade displays
-    updateCostDisplay('fasterDrinksCostCompact', fasterDrinksCost, sips.gte(fasterDrinksCost));
-    updateCostDisplay('fasterDrinksUpCostCompact', fasterDrinksUpCost, sips.gte(fasterDrinksUpCost));
+    updateCostDisplay('fasterDrinksCostCompact', fasterDrinksCost, window.sips.gte(fasterDrinksCost));
+    updateCostDisplay('fasterDrinksUpCostCompact', fasterDrinksUpCost, window.sips.gte(fasterDrinksUpCost));
 }
 
 // Update button state based on affordability
@@ -394,7 +400,7 @@ function updateButtonState(buttonId, isAffordable, cost) {
         } else {
             button.classList.remove('affordable');
             button.classList.add('disabled');
-            button.title = `Costs ${prettify(cost)} Sips (You have ${prettify(sips)})`;
+            button.title = `Costs ${prettify(cost)} Sips (You have ${prettify(window.sips)})`;
         }
     }
     
@@ -469,6 +475,8 @@ function updateCostDisplay(elementId, cost, isAffordable) {
 }
 
 function initGame() {
+    console.log('=== INITGAME CALLED ===');
+    console.log('FEATURE_UNLOCKS available in initGame:', typeof window.FEATURE_UNLOCKS !== 'undefined' ? 'YES' : 'NO');
     console.log('initGame called');
     
     try {
@@ -483,7 +491,7 @@ function initGame() {
         let savegame = JSON.parse(localStorage.getItem("save"));
         
         if (savegame && typeof savegame.sips !== "undefined" && savegame.sips !== null) {
-            sips = new Decimal(savegame.sips);
+            window.sips = new Decimal(savegame.sips);
             straws = new Decimal(savegame.straws || 0);
             cups = new Decimal(savegame.cups || 0);
             suctions = new Decimal(savegame.suctions || 0);
@@ -549,14 +557,14 @@ function initGame() {
                 showOfflineProgress(offlineTimeSeconds, offlineEarnings);
 
                 // Add offline earnings to total sips
-                sips = sips.plus(offlineEarnings);
+                window.sips = window.sips.plus(offlineEarnings);
                 totalSipsEarned = totalSipsEarned.plus(offlineEarnings);
             }
         }
 
         // Initialize base values for new games
         if (!savegame) {
-            sips = new Decimal(0);
+            window.sips = new Decimal(0);
             straws = new Decimal(0);
             cups = new Decimal(0);
             suctions = new Decimal(0);
@@ -604,6 +612,8 @@ function initGame() {
         updateTopSipsPerSecond();
 
         // Initialize progressive feature unlock system after game variables are set up
+        console.log('About to call FEATURE_UNLOCKS.init()...');
+        console.log('FEATURE_UNLOCKS object:', window.FEATURE_UNLOCKS);
         FEATURE_UNLOCKS.init();
 
         console.log('Game variables initialized, calling reload...');
@@ -727,7 +737,7 @@ function processDrink() {
         
         // Add base sips per drink (always 1, regardless of straws/cups)
         const baseSipsPerDrink = new Decimal(1);
-        sips = sips.plus(baseSipsPerDrink);
+        window.sips = window.sips.plus(baseSipsPerDrink);
         totalSipsEarned = totalSipsEarned.plus(baseSipsPerDrink);
         
         lastDrinkTime = currentTime;
@@ -991,9 +1001,9 @@ function updateTimeStats() {
 
 function updateClickStats() {
     // Total clicks
-    const totalClicksElement = DOM_CACHE.totalClicks;
-    if (totalClicksElement) {
-        totalClicksElement.textContent = prettify(totalClicks);
+            const totalClicksElement = DOM_CACHE.totalClicks;
+        if (totalClicksElement) {
+            totalClicksElement.textContent = prettify(window.totalClicks);
     }
     
     // Clicks per second (last 10 seconds)
@@ -1100,7 +1110,7 @@ function updateAchievementStats() {
 
 // Click tracking function
 function trackClick() {
-    totalClicks++;
+            window.totalClicks++;
     const now = Date.now();
     
     // Track click streak
@@ -1622,7 +1632,7 @@ function sodaClick(number) {
     totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
     
     // Update sips
-    sips = sips.plus(totalSipsGained);
+            window.sips = window.sips.plus(totalSipsGained);
     
     // Batch DOM updates to reduce layout thrashing
     requestAnimationFrame(() => {
@@ -1631,7 +1641,7 @@ function sodaClick(number) {
         // Update top sip counter
         const topSipElement = DOM_CACHE.topSipValue;
         if (topSipElement) {
-            topSipElement.innerHTML = prettify(sips);
+            topSipElement.innerHTML = prettify(window.sips);
         }
         
         // Show click feedback
@@ -1700,7 +1710,7 @@ function showClickFeedback(sipsGained, isCritical = false) {
 }
 
 function spsClick(amount) {
-    sips = sips.plus(amount);
+            window.sips = window.sips.plus(amount);
     
     // Track passive income in total sips earned
     totalSipsEarned = totalSipsEarned.plus(amount);
@@ -1720,7 +1730,7 @@ function spsClick(amount) {
     // Update top sip counter
     const topSipElement = DOM_CACHE.topSipValue;
     if (topSipElement) {
-        topSipElement.innerHTML = prettify(sips);
+        topSipElement.innerHTML = prettify(window.sips);
     }
     
     // Update critical click display
@@ -1730,9 +1740,9 @@ function spsClick(amount) {
 function buyStraw() {
     // IMPROVED BALANCE: Better early game progression
     let strawCost = Math.floor(5 * Math.pow(1.08, straws.toNumber())); // Reduced from 10, gentler scaling
-    if (sips.gte(strawCost)) {
+            if (window.sips.gte(strawCost)) {
         straws = straws.plus(1);
-        sips = sips.minus(strawCost);
+        window.sips = window.sips.minus(strawCost);
 
         // Recalculate strawSPD with current upgrade multipliers
         const baseStrawSPD = new Decimal(0.6);
@@ -1766,9 +1776,9 @@ function buyStraw() {
 function buyCup() {
     // IMPROVED BALANCE: Better mid-game progression
     let cupCost = Math.floor(15 * Math.pow(1.15, cups.toNumber())); // Reduced from 20, gentler scaling
-    if (sips.gte(cupCost)) {
+            if (window.sips.gte(cupCost)) {
         cups = cups.plus(1);
-        sips = sips.minus(cupCost);
+        window.sips = window.sips.minus(cupCost);
 
         // Recalculate cupSPD with current upgrade multipliers
         const baseCupSPD = new Decimal(1.2);
@@ -1800,9 +1810,9 @@ function buyCup() {
 function buyWiderStraws() {
     // Now an upgrade that improves base straw production
     let widerStrawsCost = Math.floor(150 * Math.pow(1.15, widerStraws.toNumber())); // Upgrade scaling
-    if (sips.gte(widerStrawsCost)) {
+            if (window.sips.gte(widerStrawsCost)) {
         widerStraws = widerStraws.plus(1);
-        sips = sips.minus(widerStrawsCost);
+        window.sips = window.sips.minus(widerStrawsCost);
 
         // Calculate new straw SPD with upgrade multiplier
         const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5)); // +50% per level
@@ -1832,9 +1842,9 @@ function buyWiderStraws() {
 function buyBetterCups() {
     // Now an upgrade that improves base cup production
     let betterCupsCost = Math.floor(400 * Math.pow(1.15, betterCups.toNumber())); // Upgrade scaling
-    if (sips.gte(betterCupsCost)) {
+            if (window.sips.gte(betterCupsCost)) {
         betterCups = betterCups.plus(1);
-        sips = sips.minus(betterCupsCost);
+        window.sips = window.sips.minus(betterCupsCost);
 
         // Calculate new cup SPD with upgrade multiplier
         const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4)); // +40% per level
@@ -1867,9 +1877,9 @@ function buySuction() {
     // IMPROVED BALANCE: Better click bonus progression
     let suctionCost = Math.floor(40 * Math.pow(1.10, suctions.toNumber())); // Reduced from 50, gentler scaling
     
-    if (sips.gte(suctionCost)) {
+            if (window.sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
-        sips = sips.minus(suctionCost);
+        window.sips = window.sips.minus(suctionCost);
         suctionClickBonus = new Decimal(0.3).times(suctions); // Increased from 0.2 for better value
 
         // Update the sips/s indicator since suction bonus changed
@@ -1892,8 +1902,8 @@ function upgradeSuction() {
     // IMPROVED BALANCE: More affordable upgrades
     let suctionUpCost = 800 * suctionUpCounter.toNumber(); // Reduced from 1000
     
-    if (sips.gte(suctionUpCost)) {
-        sips = sips.minus(suctionUpCost);
+            if (window.sips.gte(suctionUpCost)) {
+        window.sips = window.sips.minus(suctionUpCost);
         suctionUpCounter = suctionUpCounter.plus(1);
         suctionClickBonus = new Decimal(0.3).times(suctionUpCounter); // Increased base value
         
@@ -1910,9 +1920,9 @@ function upgradeSuction() {
 function buyFasterDrinks() {
     // IMPROVED BALANCE: Better drink speed progression
     let fasterDrinksCost = Math.floor(80 * Math.pow(1.10, fasterDrinks.toNumber())); // Reduced from 100, gentler scaling
-    if (sips.gte(fasterDrinksCost)) {
+            if (window.sips.gte(fasterDrinksCost)) {
         fasterDrinks = fasterDrinks.plus(1);
-        sips = sips.minus(fasterDrinksCost);
+        window.sips = window.sips.minus(fasterDrinksCost);
         updateDrinkRate();
         
         // Play purchase sound
@@ -1931,8 +1941,8 @@ function buyFasterDrinks() {
 function upgradeFasterDrinks() {
     // IMPROVED BALANCE: More affordable upgrades
     let fasterDrinksUpCost = 1500 * fasterDrinksUpCounter.toNumber(); // Reduced from 2000
-    if (sips.gte(fasterDrinksUpCost)) {
-        sips = sips.minus(fasterDrinksUpCost);
+            if (window.sips.gte(fasterDrinksUpCost)) {
+        window.sips = window.sips.minus(fasterDrinksUpCost);
         fasterDrinksUpCounter = fasterDrinksUpCounter.plus(1);
         updateDrinkRate();
         
@@ -1949,9 +1959,9 @@ function upgradeFasterDrinks() {
 function buyCriticalClick() {
     // IMPROVED BALANCE: Better critical click progression
     let criticalClickCost = Math.floor(60 * Math.pow(1.10, criticalClicks.toNumber())); // Reduced from 75, gentler scaling
-    if (sips.gte(criticalClickCost)) {
+            if (window.sips.gte(criticalClickCost)) {
         criticalClicks = criticalClicks.plus(1);
-        sips = sips.minus(criticalClickCost);
+        window.sips = window.sips.minus(criticalClickCost);
         
         // Increase critical click chance by 0.01% (0.0001) per purchase - doubled from 0.005%
         criticalClickChance = criticalClickChance.plus(0.0001);
@@ -1978,8 +1988,8 @@ function buyCriticalClick() {
 function upgradeCriticalClick() {
     // IMPROVED BALANCE: More affordable upgrades
     let criticalClickUpCost = 1200 * criticalClickUpCounter.toNumber(); // Reduced from 1500
-    if (sips.gte(criticalClickUpCost)) {
-        sips = sips.minus(criticalClickUpCost);
+            if (window.sips.gte(criticalClickUpCost)) {
+        window.sips = window.sips.minus(criticalClickUpCost);
         criticalClickUpCounter = criticalClickUpCounter.plus(1);
         
         // Increase critical click multiplier by 2x per upgrade
@@ -2002,15 +2012,15 @@ function levelUp() {
     // IMPROVED BALANCE: Better level up rewards and scaling
     let levelUpCost = 3000 * Math.pow(1.15, level.toNumber()); // Reduced base cost, better scaling
     
-    if (sips.gte(levelUpCost)) {
-        sips = sips.minus(levelUpCost);
+    if (window.sips.gte(levelUpCost)) {
+        window.sips = window.sips.minus(levelUpCost);
         level = level.plus(1);
         
         // Calculate sips gained from level up (150% increase instead of 100%)
         const sipsGained = sps.times(1.5);
         
         // Add bonus sips for leveling up
-        sips = sips.plus(sipsGained);
+        window.sips = window.sips.plus(sipsGained);
         
         // Play purchase sound
         if (clickSoundsEnabled) {
@@ -2023,7 +2033,7 @@ function levelUp() {
         // Update top sip counter
         const topSipElement = DOM_CACHE.topSipValue;
         if (topSipElement) {
-            topSipElement.innerHTML = prettify(sips);
+            topSipElement.innerHTML = prettify(window.sips);
         }
         
         // Show level up feedback
@@ -2072,21 +2082,21 @@ function checkLevelUp() {
     const levelUpButton = document.querySelector('button[onclick*="levelUp"]');
     
     if (levelUpButton) {
-        if (sips.gte(levelUpCost)) {
+        if (window.sips.gte(levelUpCost)) {
             levelUpButton.classList.remove('disabled');
             levelUpButton.classList.add('affordable');
             levelUpButton.title = `Click to level up for ${prettify(levelUpCost)} Sips`;
         } else {
             levelUpButton.classList.remove('affordable');
             levelUpButton.classList.add('disabled');
-            levelUpButton.title = `Costs ${prettify(levelUpCost)} Sips (You have ${prettify(sips)})`;
+            levelUpButton.title = `Costs ${prettify(levelUpCost)} Sips (You have ${prettify(window.sips)})`;
         }
         
         // Update the cost display
         const levelCostElement = document.getElementById('levelCost');
         if (levelCostElement) {
             levelCostElement.innerHTML = prettify(levelUpCost);
-            if (sips.gte(levelUpCost)) {
+            if (window.sips.gte(levelUpCost)) {
                 levelCostElement.classList.remove('cost-too-high');
                 levelCostElement.classList.add('cost-affordable');
             } else {
@@ -2127,7 +2137,7 @@ function save() {
 
 function performSave() {
     let save = {
-        sips: sips.toString(),
+        sips: window.sips.toString(),
         straws: straws.toString(),
         cups: cups.toString(),
         suctions: suctions.toString(),
@@ -2163,7 +2173,7 @@ function performSave() {
         console.error('Failed to save game:', error);
         // Fallback: try to save with reduced data
         try {
-            const minimalSave = { sips: sips.toString(), level: level.toString() };
+            const minimalSave = { sips: window.sips.toString(), level: level.toString() };
             localStorage.setItem("save", JSON.stringify(minimalSave));
             console.log('Minimal save completed');
         } catch (fallbackError) {
@@ -2179,7 +2189,7 @@ function delete_save() {
         localStorage.removeItem("save");
         
         // Reset all game variables to their initial values
-        sips = new Decimal(0);
+        window.sips = new Decimal(0);
         straws = new Decimal(0);
         cups = new Decimal(0);
         suctions = new Decimal(0);
@@ -2226,7 +2236,7 @@ function delete_save() {
         lastSaveTime = null;
         
         // Reset statistics tracking variables
-        totalClicks = 0;
+        window.totalClicks = 0;
         currentClickStreak = 0;
         bestClickStreak = 0;
         totalSipsEarned = new Decimal(0);
@@ -2311,8 +2321,8 @@ function reload() {
             'criticalClickCost': criticalClickCost.toString(),
             'criticalClickChance': (criticalClickChance.times(100)).toFixed(4) + '%',
             'criticalClickMultiplier': criticalClickMultiplier.toNumber() + 'x',
-            'sips': prettify(sips),
-            'topSipValue': prettify(sips),
+            'sips': prettify(window.sips),
+            'topSipValue': prettify(window.sips),
             'sps': prettify(sps),
             'strawSPD': prettify(strawSPD),
             'cupSPD': prettify(cupSPD),
@@ -2355,7 +2365,7 @@ function reload() {
         const levelCostElement = document.getElementById('levelCost');
         if (levelCostElement) {
             levelCostElement.innerHTML = prettify(levelUpCost);
-            if (sips.gte(levelUpCost)) {
+            if (window.sips.gte(levelUpCost)) {
                 levelCostElement.classList.remove('cost-too-high');
                 levelCostElement.classList.add('cost-affordable');
             } else {
