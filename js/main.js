@@ -102,8 +102,7 @@ let cupSPS = new Decimal(0);
 let suctionClickBonus = new Decimal(0);
 let widerStraws = new Decimal(0);
 let betterCups = new Decimal(0);
-let widerStrawsSPS = new Decimal(0);
-let betterCupsSPS = new Decimal(0);
+
 let level = new Decimal(1);
 
 // Drink system variables
@@ -482,9 +481,17 @@ function initGame() {
         
         strawSPS = new Decimal(0.6);
         cupSPS = new Decimal(1.2);
-        widerStrawsSPS = new Decimal(0.6);
-        betterCupsSPS = new Decimal(1.2);
         suctionClickBonus = new Decimal(0.3).times(suctions);
+
+        // Apply upgrade multipliers to base SPS values
+        if (widerStraws.gt(0)) {
+            const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5));
+            strawSPS = strawSPS.times(upgradeMultiplier);
+        }
+        if (betterCups.gt(0)) {
+            const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4));
+            cupSPS = cupSPS.times(upgradeMultiplier);
+        }
         
             // Initialize drink rate based on upgrades
     updateDrinkRate();
@@ -831,7 +838,7 @@ function updateEconomyStats() {
     // Current sips per second
     const currentSipsPerSecondElement = DOM_CACHE.currentSipsPerSecond;
     if (currentSipsPerSecondElement) {
-        const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups)).plus(widerStrawsSPS.times(widerStraws)).plus(betterCupsSPS.times(betterCups));
+        const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
         currentSipsPerSecondElement.textContent = prettify(currentSPS);
     }
     
@@ -1509,7 +1516,7 @@ function spsClick(amount) {
     totalSipsEarned = totalSipsEarned.plus(amount);
     
     // Update highest SPS if current is higher
-    const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups)).plus(widerStrawsSPS.times(widerStraws)).plus(betterCupsSPS.times(betterCups));
+    const currentSPS = strawSPS.times(straws).plus(cupSPS.times(cups));
     if (currentSPS.gt(highestSipsPerSecond)) {
         highestSipsPerSecond = currentSPS;
     }
@@ -1571,44 +1578,54 @@ function buyCup() {
 }
 
 function buyWiderStraws() {
-    // IMPROVED BALANCE: Separate upgrade item
-    let widerStrawsCost = Math.floor(150 * Math.pow(1.12, widerStraws.toNumber())); // Balanced scaling
+    // Now an upgrade that improves base straw production
+    let widerStrawsCost = Math.floor(150 * Math.pow(1.15, widerStraws.toNumber())); // Upgrade scaling
     if (sips.gte(widerStrawsCost)) {
         widerStraws = widerStraws.plus(1);
         sips = sips.minus(widerStrawsCost);
-        widerStrawsSPS = new Decimal(0.6); // Base value per wider straw
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups)).plus(widerStrawsSPS.times(widerStraws)).plus(betterCupsSPS.times(betterCups));
-        
+
+        // Calculate new straw SPS with upgrade multiplier
+        const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * 0.5)); // +50% per level
+        strawSPS = new Decimal(0.6).times(upgradeMultiplier);
+
+        // Recalculate total SPS
+        sps = strawSPS.times(straws).plus(cupSPS.times(cups)).plus(betterCupsSPS.times(betterCups));
+
         // Play purchase sound
         if (clickSoundsEnabled) {
             playPurchaseSound();
         }
-        
+
         // Show purchase feedback
-        showPurchaseFeedback('Wider Straws', widerStrawsCost);
-        
+        showPurchaseFeedback('Wider Straws Upgrade', widerStrawsCost);
+
         reload();
         checkUpgradeAffordability();
     }
 }
 
 function buyBetterCups() {
-    // IMPROVED BALANCE: Separate upgrade item
-    let betterCupsCost = Math.floor(400 * Math.pow(1.12, betterCups.toNumber())); // Balanced scaling
+    // Now an upgrade that improves base cup production
+    let betterCupsCost = Math.floor(400 * Math.pow(1.15, betterCups.toNumber())); // Upgrade scaling
     if (sips.gte(betterCupsCost)) {
         betterCups = betterCups.plus(1);
         sips = sips.minus(betterCupsCost);
-        betterCupsSPS = new Decimal(1.2); // Base value per better cup
-        sps = strawSPS.times(straws).plus(cupSPS.times(cups)).plus(widerStrawsSPS.times(widerStraws)).plus(betterCupsSPS.times(betterCups));
-        
+
+        // Calculate new cup SPS with upgrade multiplier
+        const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * 0.4)); // +40% per level
+        cupSPS = new Decimal(1.2).times(upgradeMultiplier);
+
+        // Recalculate total SPS
+        sps = strawSPS.times(straws).plus(cupSPS.times(cups));
+
         // Play purchase sound
         if (clickSoundsEnabled) {
             playPurchaseSound();
         }
-        
+
         // Show purchase feedback
-        showPurchaseFeedback('Better Cups', betterCupsCost);
-        
+        showPurchaseFeedback('Better Cups Upgrade', betterCupsCost);
+
         reload();
         checkUpgradeAffordability();
     }
@@ -1865,8 +1882,7 @@ function performSave() {
         suctionClickBonus: suctionClickBonus.toString(),
         widerStraws: widerStraws.toString(),
         betterCups: betterCups.toString(),
-        widerStrawsSPS: widerStrawsSPS.toString(),
-        betterCupsSPS: betterCupsSPS.toString(),
+
         fasterDrinksUpCounter: fasterDrinksUpCounter.toString(),
         criticalClickChance: criticalClickChance.toString(),
         criticalClickMultiplier: criticalClickMultiplier.toString(),
@@ -1915,8 +1931,7 @@ function delete_save() {
         suctionClickBonus = new Decimal(0);
         widerStraws = new Decimal(0);
         betterCups = new Decimal(0);
-        widerStrawsSPS = new Decimal(0);
-        betterCupsSPS = new Decimal(0);
+
         level = new Decimal(1);
         
         // Reset drink system variables
@@ -2043,12 +2058,12 @@ function reload() {
             'totalSuctionBonus': prettify(suctionClickBonus.times(suctions)),
             'widerStraws': widerStraws.toNumber(),
             'widerStrawsCost': widerStrawsCost.toString(),
-            'widerStrawsSPS': prettify(widerStrawsSPS),
-            'totalWiderStrawsSPS': prettify(widerStrawsSPS.times(widerStraws)),
+            'widerStrawsSPS': prettify(strawSPS.div(new Decimal(0.6))), // Shows upgrade multiplier
+            'totalWiderStrawsSPS': prettify(strawSPS.times(straws)), // Total straw production
             'betterCups': betterCups.toNumber(),
             'betterCupsCost': betterCupsCost.toString(),
-            'betterCupsSPS': prettify(betterCupsSPS),
-            'totalBetterCupsSPS': prettify(betterCupsSPS.times(betterCups)),
+            'betterCupsSPS': prettify(cupSPS.div(new Decimal(1.2))), // Shows upgrade multiplier
+            'totalBetterCupsSPS': prettify(cupSPS.times(cups)), // Total cup production
             'fasterDrinksUpCost': (1500 * fasterDrinksUpCounter.toNumber()).toString(),
             'levelNumber': level.toNumber(),
             // Compact clicking upgrade displays
