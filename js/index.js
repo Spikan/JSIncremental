@@ -7,6 +7,8 @@ import * as clicks from './core/rules/clicks.js';
 import * as purchases from './core/rules/purchases.js';
 import * as economy from './core/rules/economy.js';
 import * as resources from './core/systems/resources.js';
+import * as purchasesSys from './core/systems/purchases-system.js';
+import * as clicksSys from './core/systems/clicks-system.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
 
 // Bootstrap the App global object
@@ -21,7 +23,9 @@ window.App = {
         economy
     },
     systems: {
-        resources
+        resources,
+        purchases: purchasesSys,
+        clicks: clicksSys
     },
     data: {}
 };
