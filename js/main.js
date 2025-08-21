@@ -2392,43 +2392,10 @@ function startGameCore() {
         splashScreen.style.display = 'none';
         gameContent.style.display = 'block';
         
-        // Show a subtle indicator that title music is playing (only if music is enabled)
-        const musicEnabled = localStorage.getItem('musicEnabled');
-        let musicIndicator = null;
+            // Music will handle its own transition when title music ends
         
-        if (musicEnabled === 'true') {
-            musicIndicator = document.createElement('div');
-            musicIndicator.id = 'titleMusicIndicator';
-            musicIndicator.innerHTML = '🎵 Playing Title Music...';
-            musicIndicator.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: rgba(0, 0, 0, 0.7);
-                color: #00B36B;
-                padding: 10px 15px;
-                border-radius: 20px;
-                font-size: 0.9rem;
-                font-weight: bold;
-                z-index: 1000;
-                animation: fadeIn 0.5s ease;
-            `;
-            document.body.appendChild(musicIndicator);
-        }
-        
-        // Stop title music after a delay to let it play for a good amount of time
-        setTimeout(() => {
-            stopTitleMusic();
-            // Remove the indicator if it exists
-            if (musicIndicator) {
-                musicIndicator.style.animation = 'fadeOut 0.5s ease';
-                setTimeout(() => {
-                    if (document.body.contains(musicIndicator)) {
-                        document.body.removeChild(musicIndicator);
-                    }
-                }, 500);
-            }
-        }, 8000); // Let title music play for 8 seconds
+        // Title music will handle its own transition when it ends
+        // No need for a fixed timer - the 'ended' event will trigger the switch
         
         // Try to initialize game, but don't let it fail
         try {
@@ -2726,8 +2693,8 @@ function initSplashMusic() {
     // Create audio element for splash screen title music
     splashAudio = new Audio();
     splashAudio.src = 'res/Soda Drinker Title Music.mp3';
-    splashAudio.loop = true;
-    splashAudio.volume = 0.4; // Slightly higher volume for title music
+    splashAudio.loop = false; // Don't loop - we want it to play once fully
+    splashAudio.volume = 0.15; // Further reduced volume
     
     console.log('Created splashAudio with src:', splashAudio.src);
     
@@ -2759,6 +2726,12 @@ function initSplashMusic() {
     
     splashAudio.addEventListener('canplaythrough', () => {
         console.log('Title music: canplaythrough event');
+    });
+    
+    splashAudio.addEventListener('ended', () => {
+        console.log('Title music ended, switching to Between Level Music...');
+        // Start the main game music
+        startMainGameMusic();
     });
     
     // Add error handling
@@ -2869,6 +2842,29 @@ function stopTitleMusic() {
     }
 }
 
+function startMainGameMusic() {
+    console.log('Starting main game music...');
+    const musicEnabled = localStorage.getItem('musicEnabled');
+    
+    if (musicEnabled === 'true' && window.musicPlayerState && window.musicPlayerState.audio) {
+        const mainAudio = window.musicPlayerState.audio;
+        
+        // Start playing the Between Level Music
+        const playPromise = mainAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('Between Level Music started successfully');
+                window.musicPlayerState.isPlaying = true;
+                updateMusicPlayerUI();
+                updateStreamInfo(); // Ensure stream data displays correctly
+            }).catch(error => {
+                console.log('Between Level Music failed to start:', error);
+            });
+        }
+    }
+}
+
 // Music Player Functions
 function initMusicPlayer() {
     const musicPlayer = DOM_CACHE.musicPlayer;
@@ -2904,7 +2900,7 @@ function initMusicPlayer() {
     // Use Between Level Music as default for main game
     audio.src = 'res/Between Level Music.mp3';
     audio.loop = true;
-    audio.volume = 0.3; // Start at 30% volume
+    audio.volume = 0.1; // Further reduced volume
     audio.muted = window.musicPlayerState.isMuted; // Apply mute setting immediately
     
     // Add error handling
