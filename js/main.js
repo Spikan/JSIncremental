@@ -2038,7 +2038,10 @@ function buyCup() {
 function buyWiderStraws() {
     // Now an upgrade that improves base straw production
     const config = window.GAME_CONFIG?.BALANCE || {};
-    let widerStrawsCost = Math.floor(config.WIDER_STRAWS_BASE_COST * Math.pow(config.WIDER_STRAWS_SCALING, widerStraws.toNumber()));
+    const dataUp = window.App?.data?.upgrades;
+    const baseCost = dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST;
+    const scaling = dataUp?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING;
+    let widerStrawsCost = Math.floor(baseCost * Math.pow(scaling, widerStraws.toNumber()));
             if (window.sips.gte(widerStrawsCost)) {
         widerStraws = widerStraws.plus(1);
         window.sips = window.sips.minus(widerStrawsCost);
@@ -2071,7 +2074,10 @@ function buyWiderStraws() {
 function buyBetterCups() {
     // Now an upgrade that improves base cup production
     const config = window.GAME_CONFIG?.BALANCE || {};
-    let betterCupsCost = Math.floor(config.BETTER_CUPS_BASE_COST * Math.pow(config.BETTER_CUPS_SCALING, betterCups.toNumber()));
+    const dataUp = window.App?.data?.upgrades;
+    const baseCost = dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST;
+    const scaling = dataUp?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING;
+    let betterCupsCost = Math.floor(baseCost * Math.pow(scaling, betterCups.toNumber()));
             if (window.sips.gte(betterCupsCost)) {
         betterCups = betterCups.plus(1);
         window.sips = window.sips.minus(betterCupsCost);
@@ -2106,7 +2112,10 @@ function buyBetterCups() {
 function buySuction() {
     // IMPROVED BALANCE: Better click bonus progression
     const config = window.GAME_CONFIG?.BALANCE || {};
-    let suctionCost = Math.floor(config.SUCTION_BASE_COST * Math.pow(config.SUCTION_SCALING, suctions.toNumber()));
+    const dataUp = window.App?.data?.upgrades;
+    const baseCost = dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST;
+    const scaling = dataUp?.suction?.scaling ?? config.SUCTION_SCALING;
+    let suctionCost = Math.floor(baseCost * Math.pow(scaling, suctions.toNumber()));
     
             if (window.sips.gte(suctionCost)) {
         suctions = suctions.plus(1);
@@ -2152,7 +2161,10 @@ function upgradeSuction() {
 function buyFasterDrinks() {
     // IMPROVED BALANCE: Better drink speed progression
     const config = window.GAME_CONFIG?.BALANCE || {};
-    let fasterDrinksCost = Math.floor(config.FASTER_DRINKS_BASE_COST * Math.pow(config.FASTER_DRINKS_SCALING, fasterDrinks.toNumber()));
+    const dataUp = window.App?.data?.upgrades;
+    const baseCost = dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST;
+    const scaling = dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING;
+    let fasterDrinksCost = Math.floor(baseCost * Math.pow(scaling, fasterDrinks.toNumber()));
             if (window.sips.gte(fasterDrinksCost)) {
         fasterDrinks = fasterDrinks.plus(1);
         window.sips = window.sips.minus(fasterDrinksCost);
@@ -2174,7 +2186,8 @@ function buyFasterDrinks() {
 function upgradeFasterDrinks() {
     // IMPROVED BALANCE: More affordable upgrades
     const config = window.GAME_CONFIG?.BALANCE || {};
-    let fasterDrinksUpCost = config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber();
+    const dataUp = window.App?.data?.upgrades;
+    let fasterDrinksUpCost = (dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST) * fasterDrinksUpCounter.toNumber();
             if (window.sips.gte(fasterDrinksUpCost)) {
         window.sips = window.sips.minus(fasterDrinksUpCost);
         fasterDrinksUpCounter = fasterDrinksUpCounter.plus(1);
@@ -2193,7 +2206,10 @@ function upgradeFasterDrinks() {
 function buyCriticalClick() {
     // IMPROVED BALANCE: Better critical click progression
     const config = window.GAME_CONFIG?.BALANCE || {};
-    let criticalClickCost = Math.floor(config.CRITICAL_CLICK_BASE_COST * Math.pow(config.CRITICAL_CLICK_SCALING, criticalClicks.toNumber()));
+    const dataUp = window.App?.data?.upgrades;
+    const baseCost = dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST;
+    const scaling = dataUp?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING;
+    let criticalClickCost = Math.floor(baseCost * Math.pow(scaling, criticalClicks.toNumber()));
             if (window.sips.gte(criticalClickCost)) {
         criticalClicks = criticalClicks.plus(1);
         window.sips = window.sips.minus(criticalClickCost);

@@ -1,20 +1,57 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { computeClick } from '../js/core/rules/clicks.js';
 
-describe('computeClick', () => {
-  it('adds suction bonus to base', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(1); // no critical
-    const res = computeClick({ baseClick: 1, suctionBonus: 0.3, criticalChance: 0, criticalMultiplier: 5 });
-    expect(Number(res.gained)).toBeCloseTo(1.3, 6);
-    expect(res.critical).toBe(false);
-  });
+// Mock Decimal for tests
+beforeEach(() => {
+    window.Decimal = class MockDecimal {
+        constructor(value) {
+            this.value = value;
+        }
+        
+        plus(other) {
+            const otherValue = other instanceof MockDecimal ? other.value : other;
+            return new MockDecimal(this.value + otherValue);
+        }
+        
+        times(other) {
+            const otherValue = other instanceof MockDecimal ? other.value : other;
+            return new MockDecimal(this.value * otherValue);
+        }
+        
+        toString() {
+            return String(this.value);
+        }
+        
+        toNumber() {
+            return this.value;
+        }
+    };
+});
 
-  it('applies critical multiplier when rng < chance', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0); // force critical
-    const res = computeClick({ baseClick: 1, suctionBonus: 0, criticalChance: 0.5, criticalMultiplier: 5 });
-    expect(Number(res.gained)).toBeCloseTo(5, 6);
-    expect(res.critical).toBe(true);
-  });
+describe('computeClick', () => {
+    it('adds suction bonus to base', () => {
+        const result = computeClick({
+            baseClick: 10,
+            suctionBonus: 5,
+            criticalChance: 0,
+            criticalMultiplier: 1
+        });
+        
+        expect(result.gained).toBe('15');
+        expect(result.critical).toBe(false);
+    });
+    
+    it('applies critical multiplier when rng < chance', () => {
+        const result = computeClick({
+            baseClick: 10,
+            suctionBonus: 5,
+            criticalChance: 1, // 100% chance
+            criticalMultiplier: 2
+        });
+        
+        expect(result.gained).toBe('30'); // (10 + 5) * 2
+        expect(result.critical).toBe(true);
+    });
 });
 
 

@@ -6,6 +6,8 @@
     "multiplierPerLevel": 0.2
   },
   "widerStraws": {
+    "baseCost": 150,
+    "scaling": 1.18,
     "multiplierPerLevel": 0.2
   },
   "cups": {
@@ -15,7 +17,22 @@
     "multiplierPerLevel": 0.3
   },
   "betterCups": {
+    "baseCost": 400,
+    "scaling": 1.22,
     "multiplierPerLevel": 0.3
+  },
+  "suction": {
+    "baseCost": 40,
+    "scaling": 1.16
+  },
+  "fasterDrinks": {
+    "baseCost": 80,
+    "scaling": 1.2,
+    "upgradeBaseCost": 1500
+  },
+  "criticalClick": {
+    "baseCost": 60,
+    "scaling": 1.22
   }
 }
 

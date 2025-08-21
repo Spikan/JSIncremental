@@ -1,96 +1,119 @@
-// Basic localStorage-backed persistence with versioning hook
+import { validateGameSave, validateGameOptions } from '../core/validation/schemas.js';
 
-const STORAGE_KEY = 'soda-clicker-pro.save';
-const STORAGE_VERSION = 1;
+const STORAGE_PREFIX = 'game_';
 
-export function loadGame() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed !== 'object') return null;
-        // Future: apply migrations based on parsed.__v
-        return parsed;
-    } catch (err) {
-        console.warn('loadGame failed:', err);
-        return null;
-    }
+function getKey(key) {
+    return STORAGE_PREFIX + key;
 }
 
-export function saveGame(data) {
-    try {
-        if (data == null) return;
-        const payload = { ...data, __v: STORAGE_VERSION, __ts: Date.now() };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch (err) {
-        console.warn('saveGame failed:', err);
+export const storage = {
+    loadGame: () => {
+        try {
+            const saved = localStorage.getItem(getKey('save'));
+            if (!saved) return null;
+            
+            const parsed = JSON.parse(saved);
+            const validated = validateGameSave(parsed);
+            
+            if (validated) {
+                return validated;
+            } else {
+                console.warn('Invalid save data detected, attempting recovery...');
+                // Return parsed data anyway for backward compatibility
+                return parsed;
+            }
+        } catch (e) {
+            console.error('Error loading game:', e);
+            return null;
+        }
+    },
+    
+    saveGame: (data) => {
+        try {
+            // Validate before saving
+            const validated = validateGameSave(data);
+            if (!validated) {
+                console.warn('Attempting to save invalid game data');
+            }
+            
+            localStorage.setItem(getKey('save'), JSON.stringify(data));
+            return true;
+        } catch (e) {
+            console.error('Error saving game:', e);
+            return false;
+        }
+    },
+    
+    deleteSave: () => {
+        try {
+            localStorage.removeItem(getKey('save'));
+            return true;
+        } catch (e) {
+            console.error('Error deleting save:', e);
+            return false;
+        }
+    },
+    
+    setJSON: (key, value) => {
+        try {
+            localStorage.setItem(getKey(key), JSON.stringify(value));
+            return true;
+        } catch (e) {
+            console.error(`Error setting JSON for ${key}:`, e);
+            return false;
+        }
+    },
+    
+    getJSON: (key, defaultValue = null) => {
+        try {
+            const saved = localStorage.getItem(getKey(key));
+            if (!saved) return defaultValue;
+            
+            const parsed = JSON.parse(saved);
+            
+            // Validate specific keys
+            if (key === 'options') {
+                const validated = validateGameOptions(parsed);
+                return validated || parsed; // Return parsed for backward compatibility
+            }
+            
+            return parsed;
+        } catch (e) {
+            console.error(`Error getting JSON for ${key}:`, e);
+            return defaultValue;
+        }
+    },
+    
+    setBoolean: (key, value) => {
+        try {
+            localStorage.setItem(getKey(key), value ? 'true' : 'false');
+            return true;
+        } catch (e) {
+            console.error(`Error setting boolean for ${key}:`, e);
+            return false;
+        }
+    },
+    
+    getBoolean: (key, defaultValue = false) => {
+        try {
+            const saved = localStorage.getItem(getKey(key));
+            if (saved === null) return defaultValue;
+            return saved === 'true';
+        } catch (e) {
+            console.error(`Error getting boolean for ${key}:`, e);
+            return defaultValue;
+        }
+    },
+    
+    remove: (key) => {
+        try {
+            localStorage.removeItem(getKey(key));
+            return true;
+        } catch (e) {
+            console.error(`Error removing item for ${key}:`, e);
+            return false;
+        }
     }
-}
-
-export function deleteSave() {
-    try {
-        localStorage.removeItem(STORAGE_KEY);
-    } catch (err) {
-        console.warn('deleteSave failed:', err);
-    }
-}
-
-export function getStorageMeta() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    try {
-        const parsed = JSON.parse(raw);
-        return { version: parsed.__v, timestamp: parsed.__ts };
-    } catch {
-        return null;
-    }
-}
-
-// Generic helpers for namespaced settings/preferences
-export function setJSON(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (err) {
-        console.warn('setJSON failed:', key, err);
-    }
-}
-
-export function getJSON(key, defaultValue = null) {
-    try {
-        const raw = localStorage.getItem(key);
-        if (raw == null) return defaultValue;
-        return JSON.parse(raw);
-    } catch (err) {
-        console.warn('getJSON failed:', key, err);
-        return defaultValue;
-    }
-}
-
-export function setBoolean(key, value) {
-    try {
-        localStorage.setItem(key, value ? 'true' : 'false');
-    } catch (err) {
-        console.warn('setBoolean failed:', key, err);
-    }
-}
-
-export function getBoolean(key, defaultValue = false) {
-    try {
-        const raw = localStorage.getItem(key);
-        if (raw == null) return defaultValue;
-        return raw === 'true';
-    } catch (err) {
-        console.warn('getBoolean failed:', key, err);
-        return defaultValue;
-    }
-}
-
-export function remove(key) {
-    try {
-        localStorage.removeItem(key);
-    } catch (err) {
-        console.warn('remove failed:', key, err);
-    }
-}
+};
 
 
