@@ -5,9 +5,11 @@ import * as displays from './displays.js';
 import * as stats from './stats.js';
 import * as feedback from './feedback.js';
 import * as affordability from './affordability.js';
+import * as labels from './labels.js';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability };
+export { labels };
 
 // Convenience functions that delegate to specific modules
 export const updateCostDisplay = displays.updateCostDisplay;
@@ -37,6 +39,11 @@ export const showLevelUpFeedback = feedback.showLevelUpFeedback;
 export const showOfflineProgress = feedback.showOfflineProgress;
 
 export const checkUpgradeAffordability = affordability.checkUpgradeAffordability;
+
+// Labels
+export const updateClickSoundsToggleText = labels.updateClickSoundsToggleText;
+export const updateCountdownText = labels.updateCountdownText;
+export const setMusicStatusText = labels.setMusicStatusText;
 
 // Initialize UI event listeners
 export function initializeUI() {

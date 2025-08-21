@@ -747,11 +747,15 @@ function initGame() {
         }
         
         // Update click sounds button text to match current state
-        const clickSoundsToggle = document.getElementById('clickSoundsToggle');
-        if (clickSoundsToggle) {
-            const soundsEnabled = window.App?.systems?.music?.getClickSoundsEnabled?.() ?? clickSoundsEnabled;
-            clickSoundsToggle.textContent = soundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
-            clickSoundsToggle.classList.toggle('sounds-off', !soundsEnabled);
+        const soundsEnabled = window.App?.systems?.music?.getClickSoundsEnabled?.() ?? clickSoundsEnabled;
+        if (window.App?.ui?.updateClickSoundsToggleText) {
+            try { window.App.ui.updateClickSoundsToggleText(!!soundsEnabled); } catch {}
+        } else {
+            const clickSoundsToggle = document.getElementById('clickSoundsToggle');
+            if (clickSoundsToggle) {
+                clickSoundsToggle.textContent = soundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
+                clickSoundsToggle.classList.toggle('sounds-off', !soundsEnabled);
+            }
         }
         
         console.log('Game initialization complete!');
@@ -824,7 +828,11 @@ function updateDrinkProgress() {
             
             // Update countdown text
             const remainingTime = Math.max(0, (drinkRate - timeSinceLastDrink) / 1000);
-            countdown.textContent = remainingTime.toFixed(1) + 's';
+            if (window.App?.ui?.updateCountdownText) {
+                try { window.App.ui.updateCountdownText(remainingTime); } catch {}
+            } else {
+                countdown.textContent = remainingTime.toFixed(1) + 's';
+            }
             
             // Update progress bar colors based on completion
             const config = window.GAME_CONFIG?.LIMITS || {};
@@ -1750,10 +1758,14 @@ function toggleClickSounds() {
     }
     
     // Update UI if there's a toggle button
-    const toggleButton = document.getElementById('clickSoundsToggle');
-    if (toggleButton) {
-        toggleButton.textContent = clickSoundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
-        toggleButton.classList.toggle('sounds-off', !clickSoundsEnabled);
+    if (window.App?.ui?.updateClickSoundsToggleText) {
+        try { window.App.ui.updateClickSoundsToggleText(!!clickSoundsEnabled); } catch {}
+    } else {
+        const toggleButton = document.getElementById('clickSoundsToggle');
+        if (toggleButton) {
+            toggleButton.textContent = clickSoundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
+            toggleButton.classList.toggle('sounds-off', !clickSoundsEnabled);
+        }
     }
     
     console.log('Click sounds:', clickSoundsEnabled ? 'enabled' : 'disabled');
@@ -3394,7 +3406,7 @@ function initMusicPlayer() {
 
         if (state.retryCount >= state.maxRetries) {
             console.log('Max retries reached, stopping music stream attempts');
-            musicStatus.textContent = 'Music unavailable - click to retry';
+            if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Music unavailable - click to retry'); } catch {} } else { musicStatus.textContent = 'Music unavailable - click to retry'; }
 
             // Add click handler to reset retry count
             musicStatus.style.cursor = 'pointer';
@@ -3402,7 +3414,7 @@ function initMusicPlayer() {
                 console.log('User clicked to retry music');
                 state.retryCount = 0;
                 state.isRetrying = false;
-                musicStatus.textContent = 'Retrying...';
+                if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Retrying...'); } catch {} } else { musicStatus.textContent = 'Retrying...'; }
                 musicStatus.style.cursor = 'default';
                 musicStatus.onclick = null;
 
@@ -3416,7 +3428,7 @@ function initMusicPlayer() {
             return;
         }
 
-        musicStatus.textContent = `Stream unavailable - trying alternative (${state.retryCount}/${state.maxRetries})...`;
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText(`Stream unavailable - trying alternative (${state.retryCount}/${state.maxRetries})...`); } catch {} } else { musicStatus.textContent = `Stream unavailable - trying alternative (${state.retryCount}/${state.maxRetries})...`; }
 
         // Delay the fallback attempt to prevent rapid retries
         setTimeout(() => {
@@ -3425,11 +3437,11 @@ function initMusicPlayer() {
     });
     
     audio.addEventListener('loadstart', () => {
-        musicStatus.textContent = 'Loading stream...';
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Loading stream...'); } catch {} } else { musicStatus.textContent = 'Loading stream...'; }
     });
     
     audio.addEventListener('canplay', () => {
-        musicStatus.textContent = 'Click to start music';
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Click to start music'); } catch {} } else { musicStatus.textContent = 'Click to start music'; }
         // Only update stream info when stream actually changes
         updateStreamInfo();
 
@@ -3443,7 +3455,7 @@ function initMusicPlayer() {
     });
     
     audio.addEventListener('waiting', () => {
-        musicStatus.textContent = 'Buffering...';
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Buffering...'); } catch {} } else { musicStatus.textContent = 'Buffering...'; }
     });
     
     audio.addEventListener('load', () => {
@@ -3590,7 +3602,7 @@ function initMusicPlayer() {
     setTimeout(() => {
         if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
             // Don't auto-play, just show ready state
-            musicStatus.textContent = 'Click to start music';
+            if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Click to start music'); } catch {} } else { musicStatus.textContent = 'Click to start music'; }
             // Only update stream info once on initialization
             updateStreamInfo();
         }
@@ -3626,10 +3638,10 @@ function updateStreamInfo() {
     // Update status with more detailed information
     if (state.isPlaying) {
         const statusText = `${streamDetails.name} - ${streamDetails.description}`;
-        musicStatus.textContent = statusText;
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText(statusText); } catch {} } else { musicStatus.textContent = statusText; }
     } else {
         // Show stream info even when paused
-        musicStatus.textContent = 'Click to start music';
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Click to start music'); } catch {} } else { musicStatus.textContent = 'Click to start music'; }
     }
     
     // Only log stream info updates when debugging is needed
@@ -3747,7 +3759,7 @@ function toggleMusic() {
         state.audio.pause();
         state.isPlaying = false;
         state.userWantsMusic = false; // User explicitly paused
-        musicStatus.textContent = 'Paused';
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Paused'); } catch {} } else { musicStatus.textContent = 'Paused'; }
         updateMusicPlayerUI();
     } else {
         // User explicitly wants to play music
@@ -3762,7 +3774,7 @@ function toggleMusic() {
                 updateMusicPlayerUI();
             }).catch(error => {
                 console.log('Auto-play prevented:', error);
-                musicStatus.textContent = 'Click to start music';
+                if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Click to start music'); } catch {} } else { musicStatus.textContent = 'Click to start music'; }
                 // Fallback: try to load from a different source
                 loadFallbackMusic();
             });
@@ -3778,12 +3790,12 @@ function toggleMute() {
     state.audio.muted = state.isMuted;
     
     if (state.isMuted) {
-        musicStatus.textContent = 'Muted';
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Muted'); } catch {} } else { musicStatus.textContent = 'Muted'; }
     } else {
         if (state.isPlaying && state.streamInfo) {
-            musicStatus.textContent = `${state.streamInfo.name} - ${state.streamInfo.description}`;
+            if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText(`${state.streamInfo.name} - ${state.streamInfo.description}`); } catch {} } else { musicStatus.textContent = `${state.streamInfo.name} - ${state.streamInfo.description}`; }
         } else {
-            musicStatus.textContent = 'Paused';
+            if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Paused'); } catch {} } else { musicStatus.textContent = 'Paused'; }
         }
     }
     
@@ -3884,7 +3896,7 @@ function changeMusicStream() {
     // Prevent stream changes if we've hit the retry limit
     if (state.retryCount >= state.maxRetries) {
         console.log('Retry limit reached, preventing manual stream change');
-        musicStatus.textContent = 'Music unavailable - too many failures';
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Music unavailable - too many failures'); } catch {} } else { musicStatus.textContent = 'Music unavailable - too many failures'; }
         return;
     }
     
@@ -3906,7 +3918,7 @@ function changeMusicStream() {
         // Show a notification about YouTube streams
         const musicStatus = DOM_CACHE.musicStatus;
         if (musicStatus) {
-            musicStatus.textContent = 'YouTube stream selected - Click stream info to open';
+            if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('YouTube stream selected - Click stream info to open'); } catch {} } else { musicStatus.textContent = 'YouTube stream selected - Click stream info to open'; }
         }
         
         // Save the stream preference
@@ -3957,7 +3969,7 @@ function changeMusicStream() {
         state.isPlaying = false;
         const musicStatus = DOM_CACHE.musicStatus;
         if (musicStatus) {
-            musicStatus.textContent = 'Click to start music';
+            if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Click to start music'); } catch {} } else { musicStatus.textContent = 'Click to start music'; }
         }
         updateMusicPlayerUI();
     }
@@ -4074,7 +4086,7 @@ function loadFallbackMusic() {
 
     if (state.retryCount >= state.maxRetries) {
         console.log('Max retries reached in loadFallbackMusic, stopping all requests');
-        musicStatus.textContent = 'Music unavailable - too many failures';
+        if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Music unavailable - too many failures'); } catch {} } else { musicStatus.textContent = 'Music unavailable - too many failures'; }
 
         // Ensure no more requests are made
         state.audio.src = '';
@@ -4089,11 +4101,11 @@ function loadFallbackMusic() {
     const randomSource = fallbackSources[Math.floor(Math.random() * fallbackSources.length)];
     console.log(`Trying fallback source (${state.retryCount}/${state.maxRetries}):`, randomSource);
     state.audio.src = randomSource;
-    musicStatus.textContent = `Trying alternative source (${state.retryCount}/${state.maxRetries})...`;
+    if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText(`Trying alternative source (${state.retryCount}/${state.maxRetries})...`); } catch {} } else { musicStatus.textContent = `Trying alternative source (${state.retryCount}/${state.maxRetries})...`; }
 
     // Don't autostart - just update the stream info and wait for user interaction
     updateStreamInfo();
-    musicStatus.textContent = 'Click to start music';
+    if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Click to start music'); } catch {} } else { musicStatus.textContent = 'Click to start music'; }
 }
 
 // Memory management and cleanup functions
