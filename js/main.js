@@ -844,13 +844,12 @@ function setupMobileTouchHandling() {
 
         sodaButton.addEventListener('touchend', function(e) {
             e.preventDefault();
-            // Trigger the click function
-            sodaClick(1);
-            
             // Remove visual feedback after a short delay
             setTimeout(() => {
                 sodaButton.classList.remove('soda-clicked');
             }, 150);
+            // Note: We don't call sodaClick here to avoid duplicate feedback
+            // The onclick handler will still work for touch devices
         }, { passive: false });
 
         // Prevent context menu on long press
