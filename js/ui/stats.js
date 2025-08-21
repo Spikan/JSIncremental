@@ -161,19 +161,30 @@ export function updateShopStats() {
 
 // Update achievement-related statistics
 export function updateAchievementStats() {
+    // Helper function to safely get number value
+    const safeToNumber = (value) => {
+        if (!value) return 0;
+        if (typeof value.toNumber === 'function') return value.toNumber();
+        if (typeof value === 'number') return value;
+        return Number(value) || 0;
+    };
+    
     // Current level
     const currentLevelElement = window.DOM_CACHE?.currentLevel;
     if (currentLevelElement && window.level) {
-        currentLevelElement.textContent = window.level.toString();
+        currentLevelElement.textContent = safeToNumber(window.level).toString();
     }
     
     // Total upgrades (sum of all upgrade counters)
     const totalUpgradesElement = window.DOM_CACHE?.totalUpgrades;
-    if (totalUpgradesElement && window.widerStraws && window.betterCups && 
-        window.suctionUpCounter && window.fasterDrinksUpCounter && window.criticalClickUpCounter) {
-        const totalUpgrades = window.widerStraws.plus(window.betterCups)
-            .plus(window.suctionUpCounter).plus(window.fasterDrinksUpCounter)
-            .plus(window.criticalClickUpCounter);
+    if (totalUpgradesElement) {
+        const widerStraws = safeToNumber(window.widerStraws);
+        const betterCups = safeToNumber(window.betterCups);
+        const suctionUpCounter = safeToNumber(window.suctionUpCounter);
+        const fasterDrinksUpCounter = safeToNumber(window.fasterDrinksUpCounter);
+        const criticalClickUpCounter = safeToNumber(window.criticalClickUpCounter);
+        
+        const totalUpgrades = widerStraws + betterCups + suctionUpCounter + fasterDrinksUpCounter + criticalClickUpCounter;
         totalUpgradesElement.textContent = prettify(totalUpgrades);
     }
     

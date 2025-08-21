@@ -43,21 +43,27 @@ export function initializeUI() {
     if (window.App?.events) {
         // Listen for game events and update UI accordingly
         window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA, (data) => {
-            updateTopSipsPerDrink();
-            updateTopSipsPerSecond();
-            checkUpgradeAffordability();
-            if (data.gained) {
-                showClickFeedback(data.gained, data.critical);
+            // Only update UI if game is ready
+            if (window.sips && typeof window.sips.gte === 'function') {
+                updateTopSipsPerDrink();
+                updateTopSipsPerSecond();
+                checkUpgradeAffordability();
+                if (data.gained) {
+                    showClickFeedback(data.gained, data.critical);
+                }
             }
         });
         
         window.App.events.on(window.App.EVENT_NAMES?.ECONOMY?.PURCHASE, (data) => {
-            updateTopSipsPerDrink();
-            updateTopSipsPerSecond();
-            checkUpgradeAffordability();
-            updateCriticalClickDisplay();
-            if (data.item && data.cost) {
-                showPurchaseFeedback(data.item, data.cost);
+            // Only update UI if game is ready
+            if (window.sips && typeof window.sips.gte === 'function') {
+                updateTopSipsPerDrink();
+                updateTopSipsPerSecond();
+                checkUpgradeAffordability();
+                updateCriticalClickDisplay();
+                if (data.item && data.cost) {
+                    showPurchaseFeedback(data.item, data.cost);
+                }
             }
         });
         
@@ -66,8 +72,11 @@ export function initializeUI() {
         });
         
         window.App.events.on(window.App.EVENT_NAMES?.GAME?.LOADED, () => {
-            updateAllDisplays();
-            checkUpgradeAffordability();
+            // Wait a bit for game state to be fully initialized
+            setTimeout(() => {
+                updateAllDisplays();
+                checkUpgradeAffordability();
+            }, 100);
         });
     }
 }
