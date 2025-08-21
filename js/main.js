@@ -1846,9 +1846,12 @@ function sodaClick(number) {
 
         
         // Update top sip counter
-        const topSipElement = DOM_CACHE.topSipValue;
-        if (topSipElement) {
-            topSipElement.innerHTML = prettify(window.sips);
+        if (window.App?.ui?.updateTopSipCounter) { try { window.App.ui.updateTopSipCounter(); } catch {}
+        } else {
+            const topSipElement = DOM_CACHE.topSipValue;
+            if (topSipElement) {
+                topSipElement.innerHTML = prettify(window.sips);
+            }
         }
         
         // Show click feedback
@@ -1963,9 +1966,12 @@ function spsClick(amount) {
     }
     
     // Update top sip counter
-    const topSipElement = DOM_CACHE.topSipValue;
-    if (topSipElement) {
-        topSipElement.innerHTML = prettify(window.sips);
+    if (window.App?.ui?.updateTopSipCounter) { try { window.App.ui.updateTopSipCounter(); } catch {}
+    } else {
+        const topSipElement = DOM_CACHE.topSipValue;
+        if (topSipElement) {
+            topSipElement.innerHTML = prettify(window.sips);
+        }
     }
     
     // Update critical click display
@@ -2392,12 +2398,18 @@ function levelUp() {
         }
         
         // Update displays
-        DOM_CACHE.levelNumber.innerHTML = level.toNumber();
+        if (window.App?.ui?.updateLevelNumber) { try { window.App.ui.updateLevelNumber(); } catch {}
+        } else {
+            DOM_CACHE.levelNumber.innerHTML = level.toNumber();
+        }
         
         // Update top sip counter
-        const topSipElement = DOM_CACHE.topSipValue;
-        if (topSipElement) {
-            topSipElement.innerHTML = prettify(window.sips);
+        if (window.App?.ui?.updateTopSipCounter) { try { window.App.ui.updateTopSipCounter(); } catch {}
+        } else {
+            const topSipElement = DOM_CACHE.topSipValue;
+            if (topSipElement) {
+                topSipElement.innerHTML = prettify(window.sips);
+            }
         }
         
         // Show level up feedback

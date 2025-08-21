@@ -97,3 +97,20 @@ export function updateDrinkProgress(progress, drinkRate) {
         countdown.textContent = `${remainingSeconds}s`;
     }
 }
+
+// Update the top current sips counter
+export function updateTopSipCounter() {
+    const topSipElement = window.DOM_CACHE?.topSipValue;
+    if (topSipElement && window.sips) {
+        topSipElement.innerHTML = prettify(window.sips);
+    }
+}
+
+// Update the displayed level number
+export function updateLevelNumber() {
+    const levelEl = window.DOM_CACHE?.levelNumber;
+    if (levelEl && window.level != null) {
+        const val = typeof window.level?.toNumber === 'function' ? window.level.toNumber() : window.level;
+        levelEl.innerHTML = String(val);
+    }
+}

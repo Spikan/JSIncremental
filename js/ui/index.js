@@ -18,6 +18,8 @@ export const updateCriticalClickDisplay = displays.updateCriticalClickDisplay;
 export const updateDrinkSpeedDisplay = displays.updateDrinkSpeedDisplay;
 export const updateAutosaveStatus = displays.updateAutosaveStatus;
 export const updateDrinkProgress = displays.updateDrinkProgress;
+export const updateTopSipCounter = displays.updateTopSipCounter;
+export const updateLevelNumber = displays.updateLevelNumber;
 
 export const updatePlayTime = stats.updatePlayTime;
 export const updateLastSaveTime = stats.updateLastSaveTime;
