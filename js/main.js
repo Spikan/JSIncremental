@@ -719,38 +719,41 @@ function initGame() {
 }
 
 function startGameLoop() {
+    if (window.App?.systems?.loop?.start) {
+        window.App.systems.loop.start({
+            updateDrinkProgress,
+            processDrink,
+            updateStats: () => { updatePlayTime(); updateLastSaveTime(); updateAllStats(); checkUpgradeAffordability(); FEATURE_UNLOCKS.checkAllUnlocks(); },
+            updatePlayTime,
+            updateLastSaveTime,
+        });
+        return;
+    }
     let lastUpdate = 0;
     let lastStatsUpdate = 0;
     const targetFPS = window.GAME_CONFIG.LIMITS.TARGET_FPS;
     const frameInterval = 1000 / targetFPS;
-    const statsInterval = window.GAME_CONFIG.LIMITS.STATS_UPDATE_INTERVAL; // Update stats every second
-    
+    const statsInterval = window.GAME_CONFIG.LIMITS.STATS_UPDATE_INTERVAL;
     function gameLoop(currentTime) {
-        // Update drink progress and game logic at target FPS
         if (currentTime - lastUpdate >= frameInterval) {
             updateDrinkProgress();
             processDrink();
-            // Check affordability more frequently for better responsiveness
             const affordabilityInterval = window.GAME_CONFIG.LIMITS.AFFORDABILITY_CHECK_INTERVAL;
-            if (currentTime - lastUpdate >= affordabilityInterval) { // Check every configured interval
+            if (currentTime - lastUpdate >= affordabilityInterval) {
                 checkUpgradeAffordability();
             }
             lastUpdate = currentTime;
         }
-        
-        // Update stats and time tracking every second
         if (currentTime - lastStatsUpdate >= statsInterval) {
             updatePlayTime();
             updateLastSaveTime();
             updateAllStats();
-            checkUpgradeAffordability(); // Check affordability every second
-            FEATURE_UNLOCKS.checkAllUnlocks(); // Check for new feature unlocks
+            checkUpgradeAffordability();
+            FEATURE_UNLOCKS.checkAllUnlocks();
             lastStatsUpdate = currentTime;
         }
-        
         requestAnimationFrame(gameLoop);
     }
-    
     requestAnimationFrame(gameLoop);
 }
 

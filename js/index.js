@@ -11,6 +11,7 @@ import * as purchasesSys from './core/systems/purchases-system.js';
 import * as clicksSys from './core/systems/clicks-system.js';
 import * as autosaveSys from './core/systems/autosave.js';
 import * as saveSys from './core/systems/save-system.js';
+import * as loopSys from './core/systems/loop-system.js';
 import * as optionsSys from './core/systems/options-system.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
 
@@ -31,7 +32,8 @@ window.App = {
         clicks: clicksSys,
         autosave: autosaveSys,
         save: saveSys,
-        options: optionsSys
+        options: optionsSys,
+        loop: loopSys
     },
     data: {}
 };
