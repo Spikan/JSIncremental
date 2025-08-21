@@ -31,8 +31,17 @@ export function createStore(initialState = {}) {
 // Default app store instance; can be used by legacy code gradually
 export const appStore = createStore({
     version: 1,
-    // Place top-level state you want to expose/observe incrementally
-    // We avoid moving existing globals yet to prevent behavior changes.
+    // Composed during bootstrap from default shape (see shape.js)
 });
+
+// Selectors (lightweight helpers we can expand as we migrate state)
+export const selectors = {
+    sips: (s) => s.sips,
+    level: (s) => s.level,
+    drinkProgress: (s) => s.drinkProgress,
+    drinkRate: (s) => s.drinkRate,
+    options: (s) => s.options || {},
+};
+
 
 

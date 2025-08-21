@@ -1,5 +1,6 @@
 // Entry module providing a small public API surface and environment checks
 import { createStore } from './core/state/index.js';
+import { defaultState } from './core/state/shape.js';
 import { storage } from './services/storage.js';
 import { bus as eventBus } from './services/event-bus.js';
 import { EVENT_NAMES } from './core/constants.js';
@@ -19,7 +20,7 @@ import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js'
 
 // Bootstrap the App global object
 window.App = {
-    state: createStore(),
+    state: createStore(defaultState),
     storage,
     events: eventBus,
     EVENT_NAMES,
