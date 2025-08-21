@@ -479,9 +479,6 @@ function initGame() {
         FEATURE_DETECTION.init();
         FEATURE_DETECTION.enableAdvancedFeatures();
         
-        // Initialize progressive feature unlock system
-        FEATURE_UNLOCKS.init();
-        
         // Load saved game data
         let savegame = JSON.parse(localStorage.getItem("save"));
         
@@ -551,11 +548,32 @@ function initGame() {
                 // Show offline progress modal
                 showOfflineProgress(offlineTimeSeconds, offlineEarnings);
 
-                        // Add offline earnings to total sips
-        sips = sips.plus(offlineEarnings);
-        totalSipsEarned = totalSipsEarned.plus(offlineEarnings);
-    }
-}
+                // Add offline earnings to total sips
+                sips = sips.plus(offlineEarnings);
+                totalSipsEarned = totalSipsEarned.plus(offlineEarnings);
+            }
+        }
+
+        // Initialize base values for new games
+        if (!savegame) {
+            sips = new Decimal(0);
+            straws = new Decimal(0);
+            cups = new Decimal(0);
+            suctions = new Decimal(0);
+            fasterDrinks = new Decimal(0);
+            widerStraws = new Decimal(0);
+            betterCups = new Decimal(0);
+            criticalClickChance = new Decimal(0.001);
+            criticalClickMultiplier = new Decimal(5);
+            criticalClicks = new Decimal(0);
+            criticalClickUpCounter = new Decimal(1);
+            suctionClickBonus = new Decimal(0);
+            level = new Decimal(1);
+            totalSipsEarned = new Decimal(0);
+            gameStartDate = Date.now();
+            lastClickTime = 0;
+            clickTimes = [];
+        }
 
 
 
@@ -580,10 +598,13 @@ function initGame() {
 
         // Initialize drink rate based on upgrades
         updateDrinkRate();
-    
-    // Update the top sips per drink display
-    updateTopSipsPerDrink();
-    updateTopSipsPerSecond();
+        
+        // Update the top sips per drink display
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
+
+        // Initialize progressive feature unlock system after game variables are set up
+        FEATURE_UNLOCKS.init();
 
         console.log('Game variables initialized, calling reload...');
         

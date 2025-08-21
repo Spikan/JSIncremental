@@ -50,6 +50,11 @@ const FEATURE_UNLOCKS = {
             return false; // No unlock condition defined
         }
         
+        // Safely check if global variables exist before using them
+        if (typeof window.sips === 'undefined' || typeof window.totalClicks === 'undefined') {
+            return false; // Global variables not ready yet
+        }
+        
         // Check if conditions are met
         const sipsMet = window.sips && window.sips.gte ? window.sips.gte(condition.sips) : false;
         const clicksMet = window.totalClicks >= condition.clicks;
@@ -186,6 +191,11 @@ const FEATURE_UNLOCKS = {
     
     // Check all unlock conditions (called periodically)
     checkAllUnlocks() {
+        // Safely check if global variables exist before proceeding
+        if (typeof window.sips === 'undefined' || typeof window.totalClicks === 'undefined') {
+            return; // Global variables not ready yet
+        }
+        
         Object.keys(this.unlockConditions).forEach(feature => {
             this.checkUnlock(feature);
         });
@@ -198,6 +208,11 @@ const FEATURE_UNLOCKS = {
     updateUnlocksTab() {
         const unlocksGrid = document.getElementById('unlocksGrid');
         if (!unlocksGrid) return;
+        
+        // Safely check if global variables exist before proceeding
+        if (typeof window.sips === 'undefined' || typeof window.totalClicks === 'undefined') {
+            return; // Global variables not ready yet
+        }
         
         // Clear existing content
         unlocksGrid.innerHTML = '';
@@ -293,8 +308,8 @@ const FEATURE_UNLOCKS = {
             const unlockItem = document.createElement('div');
             unlockItem.className = `unlock-item ${isUnlocked ? 'unlocked' : 'locked'}`;
             
-            const sipsMet = window.sips && window.sips.gte ? window.sips.gte(condition.sips) : false;
-            const clicksMet = window.totalClicks >= condition.clicks;
+            const sipsMet = typeof window.sips !== 'undefined' && window.sips.gte ? window.sips.gte(condition.sips) : false;
+            const clicksMet = typeof window.totalClicks !== 'undefined' && window.totalClicks >= condition.clicks;
             
             unlockItem.innerHTML = `
                 <div class="unlock-status">${isUnlocked ? '🔓' : '🔒'}</div>
@@ -308,11 +323,11 @@ const FEATURE_UNLOCKS = {
                 <div class="unlock-requirements">
                     <div class="requirement ${sipsMet ? 'met' : ''}">
                         <span class="requirement-label">Total Sips:</span>
-                        <span class="requirement-value">${window.prettify ? window.prettify(window.sips) : '0'} / ${window.prettify ? window.prettify(condition.sips) : '0'}</span>
+                        <span class="requirement-value">${typeof window.prettify !== 'undefined' ? window.prettify(window.sips) : '0'} / ${typeof window.prettify !== 'undefined' ? window.prettify(condition.sips) : '0'}</span>
                     </div>
                     <div class="requirement ${clicksMet ? 'met' : ''}">
                         <span class="requirement-label">Total Clicks:</span>
-                        <span class="requirement-value">${window.totalClicks || 0} / ${condition.clicks}</span>
+                        <span class="requirement-value">${typeof window.totalClicks !== 'undefined' ? window.totalClicks : 0} / ${condition.clicks}</span>
                     </div>
                 </div>
             `;
@@ -326,6 +341,11 @@ const FEATURE_UNLOCKS = {
     
     // Update the unlocks progress display
     updateUnlocksProgress() {
+        // Safely check if global variables exist before proceeding
+        if (typeof window.sips === 'undefined' || typeof window.totalClicks === 'undefined') {
+            return; // Global variables not ready yet
+        }
+        
         const totalFeatures = Object.keys(this.unlockConditions).length;
         const unlockedCount = this.unlockedFeatures.size - 1; // Subtract 'soda' which starts unlocked
         const progressPercent = (unlockedCount / totalFeatures) * 100;
