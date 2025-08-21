@@ -1,12 +1,12 @@
 // Entry module providing a small public API surface and environment checks
 import { createStore } from './core/state/index.js';
 import { storage } from './services/storage.js';
-import { eventBus } from './services/event-bus.js';
+import { bus as eventBus } from './services/event-bus.js';
 import { EVENT_NAMES } from './core/constants.js';
-import { clicks } from './core/rules/clicks.js';
-import { purchases } from './core/rules/purchases.js';
-import { economy } from './core/rules/economy.js';
-import { resources } from './core/systems/resources.js';
+import * as clicks from './core/rules/clicks.js';
+import * as purchases from './core/rules/purchases.js';
+import * as economy from './core/rules/economy.js';
+import * as resources from './core/systems/resources.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
 
 // Bootstrap the App global object

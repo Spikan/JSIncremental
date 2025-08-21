@@ -1,13 +1,19 @@
-// Import Zod from CDN or global (UMD exposes as window.Zod)
-const z = window.Zod || (() => {
-    console.warn('Zod not available, validation disabled');
+// Import Zod from CDN or global (UMD exposes as window.Zod). Provide a safe fallback for non-browser/tests.
+const z = (typeof window !== 'undefined' && window.Zod) || (typeof globalThis !== 'undefined' && globalThis.Zod) || (() => {
+    // Minimal chainable stub so consumers don't crash when Zod isn't present (tests can mock window.Zod)
+    const chain = {
+        parse: (data) => data,
+        omit: () => chain,
+        optional: () => chain,
+        min: () => chain,
+    };
     return {
-        object: () => ({ parse: (data) => data }),
-        number: () => ({ min: () => ({ optional: () => ({}) }) }),
-        boolean: () => ({}),
-        string: () => ({}),
-        any: () => ({}),
-        record: () => ({ optional: () => ({}) })
+        object: () => chain,
+        number: () => chain,
+        boolean: () => chain,
+        string: () => chain,
+        any: () => chain,
+        record: () => chain,
     };
 })();
 

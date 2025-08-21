@@ -2,11 +2,17 @@
   "env": { "browser": true, "es2022": true },
   "extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
   "plugins": ["import"],
+  "settings": {
+    "import/resolver": {
+      "node": { "extensions": [".js"] }
+    }
+  },
   "parserOptions": { "sourceType": "module" },
   "rules": {
     "no-implicit-globals": "error",
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "error",
+    "import/named": "error"
   }
 }
 
