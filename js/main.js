@@ -1459,8 +1459,14 @@ function buyFasterDrinks() {
             fasterDrinks = new Decimal(res.fasterDrinks);
         updateDrinkRate();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            showPurchaseFeedback('Faster Drinks', res.spent);
-        reload();
+        
+        // Get click coordinates from the event if available
+        const clickEvent = window.lastClickEvent;
+        const clickX = clickEvent?.clientX || null;
+        const clickY = clickEvent?.clientY || null;
+        
+        showPurchaseFeedback('Faster Drinks', res.spent, clickX, clickY);
+        // reload(); // Removed - causing issues
         checkUpgradeAffordability();
             return;
     }
@@ -1484,7 +1490,7 @@ function upgradeFasterDrinks() {
             fasterDrinksUpCounter = new Decimal(res.fasterDrinksUpCounter);
         updateDrinkRate();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        reload();
+        // reload(); // Removed - causing issues
         checkUpgradeAffordability();
             return;
         }
@@ -1511,11 +1517,17 @@ function buyCriticalClick() {
         updateCriticalClickDisplay();
         updateTopSipsPerSecond();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            showPurchaseFeedback('Critical Click', res.spent);
-        reload();
+        
+        // Get click coordinates from the event if available
+        const clickEvent = window.lastClickEvent;
+        const clickX = clickEvent?.clientX || null;
+        const clickY = clickEvent?.clientY || null;
+        
+        showPurchaseFeedback('Critical Click', res.spent, clickX, clickY);
+        // reload(); // Removed - causing issues
         checkUpgradeAffordability();
             return;
-        }
+    }
     }
     
 }
@@ -1538,7 +1550,7 @@ function upgradeCriticalClick() {
             criticalClickMultiplier = new Decimal(res.criticalClickMultiplier);
         updateTopSipsPerSecond();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        reload();
+        // reload(); // Removed - causing issues
         checkUpgradeAffordability();
             return;
         }
