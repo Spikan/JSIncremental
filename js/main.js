@@ -1,10 +1,10 @@
 // Soda Clicker Pro - Main Game Logic
-//
+// 
 // TEMPLEOS GOD FEATURE SETUP:
 // Divine oracle feature - draws wisdom from sacred texts
 // No external API keys needed for the divine guidance system
 // (But if you know, you know... this runs on 64-bit spiritual processing power)
- 
+
 // Progressive enhancement - detect advanced features
 const FEATURE_DETECTION = {
     webGL: !!window.WebGLRenderingContext,
@@ -22,14 +22,7 @@ const FEATURE_DETECTION = {
         webPTest.onerror = () => { this.webP = false; };
         webPTest.src = 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAADsAD+JaQAA3AAAAAA';
         
-        console.log('Feature detection results:', {
-            webGL: this.webGL,
-            webAudio: this.webAudio,
-            serviceWorker: this.serviceWorker,
-            localStorage: this.localStorage,
-            requestAnimationFrame: this.requestAnimationFrame,
-            performance: this.performance
-        });
+        
     },
     
     // Enable features based on capability
@@ -48,12 +41,12 @@ const FEATURE_DETECTION = {
     },
     
     enableWebGLEffects: function() {
-        console.log('WebGL effects enabled');
+        
         // Future: Add WebGL particle effects for clicks
     },
     
     enablePerformanceMonitoring: function() {
-        console.log('Performance monitoring enabled');
+        
         // Monitor frame rates and performance
         let frameCount = 0;
         let lastTime = performance.now();
@@ -82,7 +75,7 @@ const FEATURE_DETECTION = {
     },
     
     enableServiceWorker: function() {
-        console.log('Service worker support detected');
+        
         // Future: Enable offline functionality
     }
 };
@@ -93,7 +86,7 @@ const FEATURE_DETECTION = {
 console.log('=== MAIN.JS LOADING ===');
 console.log('FEATURE_UNLOCKS available:', typeof window.FEATURE_UNLOCKS !== 'undefined' ? 'YES' : 'NO');
 if (typeof window.FEATURE_UNLOCKS !== 'undefined') {
-    console.log('FEATURE_UNLOCKS object:', window.FEATURE_UNLOCKS);
+    
 }
 
 // DOM Element Cache - Imported from dom-cache.js
@@ -101,7 +94,7 @@ if (typeof window.FEATURE_UNLOCKS !== 'undefined') {
 if (typeof DOM_CACHE === 'undefined') {
     console.error('DOM_CACHE not loaded. Please ensure dom-cache.js is loaded before main.js');
 } else {
-    console.log('DOM_CACHE loaded successfully');
+    
     if (!DOM_CACHE.isReady()) {
         console.warn('DOM_CACHE not ready, initializing...');
         DOM_CACHE.init();
@@ -196,8 +189,7 @@ function initSplashScreen() {
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     
-    console.log('Splash screen element:', splashScreen);
-    console.log('Game content element:', gameContent);
+    
     
     if (typeof eruda !== 'undefined') {
         eruda.get('console').log('Splash screen element:', splashScreen);
@@ -265,7 +257,7 @@ function initSplashScreen() {
             e.target.classList.contains('splash-title') || e.target.classList.contains('splash-subtitle-text') ||
             e.target.classList.contains('splash-instruction') || e.target.classList.contains('splash-version') ||
             e.target.tagName === 'H1' || e.target.tagName === 'H2' || e.target.tagName === 'P') {
-            console.log('Splash background clicked, starting game...');
+            
             if (typeof eruda !== 'undefined') {
                 eruda.get('console').log('Splash background clicked, starting game...');
             }
@@ -278,7 +270,7 @@ function initSplashScreen() {
     document.addEventListener('keydown', function(event) {
         if (splashScreen.style.display !== 'none') {
             if (event.code === 'Space' || event.code === 'Enter') {
-                console.log('Keyboard input detected, starting game...');
+                
                 if (typeof eruda !== 'undefined') {
                     eruda.get('console').log('Keyboard input detected, starting game...');
                 }
@@ -488,8 +480,7 @@ function updateCostDisplay(elementId, cost, isAffordable) {
 }
 
 function initGame() {
-    console.log('FEATURE_UNLOCKS available in initGame:', typeof window.FEATURE_UNLOCKS !== 'undefined' ? 'YES' : 'NO');
-    console.log('initGame called');
+    
     
     try {
         // Initialize DOM cache first
@@ -706,7 +697,7 @@ function initGame() {
         updateTopSipsPerSecond();
 
         // Initialize progressive feature unlock system after game variables are set up
-        console.log('FEATURE_UNLOCKS object:', window.FEATURE_UNLOCKS);
+        
         FEATURE_UNLOCKS.init();
 
         
@@ -797,7 +788,7 @@ function setupMobileTouchHandling() {
                     (navigator.maxTouchPoints > 0);
 
     if (isMobile) {
-        console.log('Setting up mobile touch handling for soda button');
+        
         
         // Prevent default touch behaviors that could interfere
         let touchStartTime = 0;
@@ -843,7 +834,7 @@ function setupMobileTouchHandling() {
         sodaButton.style.webkitUserSelect = 'none';
         sodaButton.style.userSelect = 'none';
         
-        console.log('Mobile touch handling setup complete');
+        
     }
 }
 
@@ -1613,25 +1604,25 @@ function buyStraw() {
     const sys = window.App?.systems?.purchases;
     if (!sys?.purchaseStraw) return;
     const res = sys.purchaseStraw({
-        sips: window.sips.toNumber(),
-        straws: straws.toNumber(),
-        cups: cups.toNumber(),
-        widerStraws: widerStraws.toNumber(),
-        betterCups: betterCups.toNumber(),
-    });
+                sips: window.sips.toNumber(),
+                straws: straws.toNumber(),
+                cups: cups.toNumber(),
+                widerStraws: widerStraws.toNumber(),
+                betterCups: betterCups.toNumber(),
+            });
     if (!res) return;
     window.sips = window.sips.minus(res.spent);
     straws = new Decimal(res.straws);
     window.straws = straws;
-    strawSPD = new Decimal(res.strawSPD);
+                strawSPD = new Decimal(res.strawSPD);
     cupSPD = new Decimal(res.cupSPD);
-    sps = new Decimal(res.sipsPerDrink);
-    updateTopSipsPerDrink();
-    updateTopSipsPerSecond();
-    try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+                sps = new Decimal(res.sipsPerDrink);
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
     showPurchaseFeedback('Extra Straw', res.spent);
-    reload();
-    checkUpgradeAffordability();
+        reload();
+        checkUpgradeAffordability();
 }
 
 
@@ -1640,19 +1631,19 @@ function buyCup() {
     const sys = window.App?.systems?.purchases;
     if (!sys?.purchaseCup) return;
     const res = sys.purchaseCup({
-        sips: window.sips.toNumber(),
-        straws: straws.toNumber(),
-        cups: cups.toNumber(),
-        widerStraws: widerStraws.toNumber(),
-        betterCups: betterCups.toNumber(),
-    });
+                sips: window.sips.toNumber(),
+                straws: straws.toNumber(),
+                cups: cups.toNumber(),
+                widerStraws: widerStraws.toNumber(),
+                betterCups: betterCups.toNumber(),
+            });
     if (!res) return;
     window.sips = window.sips.minus(res.spent);
     cups = new Decimal(res.cups);
     window.cups = cups;
     strawSPD = new Decimal(res.strawSPD);
-    cupSPD = new Decimal(res.cupSPD);
-    sps = new Decimal(res.sipsPerDrink);
+                cupSPD = new Decimal(res.cupSPD);
+                sps = new Decimal(res.sipsPerDrink);
     updateTopSipsPerDrink();
     updateTopSipsPerSecond();
     try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
@@ -1666,26 +1657,26 @@ function buyWiderStraws() {
     if (window.App?.systems?.purchases?.purchaseWiderStraws) {
         const res = window.App.systems.purchases.purchaseWiderStraws({
             sips: window.sips.toNumber(),
-            straws: straws.toNumber(),
-            cups: cups.toNumber(),
-            widerStraws: widerStraws.toNumber(),
-            betterCups: betterCups.toNumber(),
-        });
+                straws: straws.toNumber(),
+                cups: cups.toNumber(),
+                widerStraws: widerStraws.toNumber(),
+                betterCups: betterCups.toNumber(),
+            });
         if (res) {
             if (window.App?.mutations?.subtractSips) {
                 window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
-            } else {
+        } else {
                 window.sips = window.sips.minus(res.spent);
             }
             widerStraws = new Decimal(res.widerStraws);
             strawSPD = new Decimal(res.strawSPD);
             cupSPD = new Decimal(res.cupSPD);
             sps = new Decimal(res.sipsPerDrink);
-            updateTopSipsPerDrink();
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        updateTopSipsPerDrink();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
             showPurchaseFeedback('Wider Straws Upgrade', res.spent);
-            reload();
-            checkUpgradeAffordability();
+        reload();
+        checkUpgradeAffordability();
             return;
         }
     }
@@ -1711,11 +1702,11 @@ function buyBetterCups() {
             strawSPD = new Decimal(res.strawSPD);
             cupSPD = new Decimal(res.cupSPD);
             sps = new Decimal(res.sipsPerDrink);
-            updateTopSipsPerDrink();
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        updateTopSipsPerDrink();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
             showPurchaseFeedback('Better Cups Upgrade', res.spent);
-            reload();
-            checkUpgradeAffordability();
+        reload();
+        checkUpgradeAffordability();
             return;
         }
     }
@@ -1739,11 +1730,11 @@ function buySuction() {
             }
             suctions = new Decimal(res.suctions);
             suctionClickBonus = new Decimal(res.suctionClickBonus);
-            updateTopSipsPerSecond();
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        updateTopSipsPerSecond();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
             showPurchaseFeedback('Improved Suction', res.spent);
-            reload();
-            checkUpgradeAffordability();
+        reload();
+        checkUpgradeAffordability();
             return;
         }
     }
@@ -1765,11 +1756,11 @@ function upgradeSuction() {
             }
             suctionUpCounter = new Decimal(res.suctionUpCounter);
             suctionClickBonus = new Decimal(res.suctionClickBonus);
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            reload();
-            checkUpgradeAffordability();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        reload();
+        checkUpgradeAffordability();
             return;
-        }
+    }
     }
     
 }
@@ -1788,13 +1779,13 @@ function buyFasterDrinks() {
                 window.sips = window.sips.minus(res.spent);
             }
             fasterDrinks = new Decimal(res.fasterDrinks);
-            updateDrinkRate();
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        updateDrinkRate();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
             showPurchaseFeedback('Faster Drinks', res.spent);
-            reload();
-            checkUpgradeAffordability();
+        reload();
+        checkUpgradeAffordability();
             return;
-        }
+    }
     }
     
 }
@@ -1813,10 +1804,10 @@ function upgradeFasterDrinks() {
                 window.sips = window.sips.minus(res.spent);
             }
             fasterDrinksUpCounter = new Decimal(res.fasterDrinksUpCounter);
-            updateDrinkRate();
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            reload();
-            checkUpgradeAffordability();
+        updateDrinkRate();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        reload();
+        checkUpgradeAffordability();
             return;
         }
     }
@@ -1839,12 +1830,12 @@ function buyCriticalClick() {
             }
             criticalClicks = new Decimal(res.criticalClicks);
             criticalClickChance = new Decimal(res.criticalClickChance);
-            updateCriticalClickDisplay();
-            updateTopSipsPerSecond();
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        updateCriticalClickDisplay();
+        updateTopSipsPerSecond();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
             showPurchaseFeedback('Critical Click', res.spent);
-            reload();
-            checkUpgradeAffordability();
+        reload();
+        checkUpgradeAffordability();
             return;
         }
     }
@@ -1867,10 +1858,10 @@ function upgradeCriticalClick() {
             }
             criticalClickUpCounter = new Decimal(res.criticalClickUpCounter);
             criticalClickMultiplier = new Decimal(res.criticalClickMultiplier);
-            updateTopSipsPerSecond();
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            reload();
-            checkUpgradeAffordability();
+        updateTopSipsPerSecond();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        reload();
+        checkUpgradeAffordability();
             return;
         }
     }
@@ -1897,9 +1888,9 @@ function levelUp() {
             if (window.App?.ui?.updateTopSipCounter) { try { window.App.ui.updateTopSipCounter(); } catch {} }
             else { const topSipElement = DOM_CACHE.topSipValue; if (topSipElement) { topSipElement.innerHTML = prettify(window.sips); } }
             showLevelUpFeedback(new Decimal(res.sipsGained || 0));
-            checkUpgradeAffordability();
+        checkUpgradeAffordability();
             return;
-        }
+    }
     }
     
 }
@@ -2584,7 +2575,7 @@ let audioContext = null;
 let buttonSoundsEnabled = true;
 
 function initSplashMusic() {
-    console.log('Initializing splash screen music...');
+    
 
     // Check user's music preference during initialization
     let musicEnabled = true;
@@ -2610,12 +2601,12 @@ function initSplashMusic() {
     // Apply music preference during initialization
     if (!musicEnabled) {
         splashAudio.muted = true;
-        console.log('Music preference: disabled - audio muted during initialization');
+        
     } else {
-        console.log('Music preference: enabled - audio ready to play');
+        
     }
     
-    console.log('Created splashAudio with src:', splashAudio.src);
+    
     
     // Add comprehensive event listeners for debugging
     splashAudio.addEventListener('loadstart', () => {
@@ -2629,14 +2620,14 @@ function initSplashMusic() {
     
     splashAudio.addEventListener('canplay', () => {
         // Audio is ready to play
-        console.log('Title music ready to play');
+        
     });
     
     splashAudio.addEventListener('canplaythrough', () => {
     });
     
     splashAudio.addEventListener('ended', () => {
-        console.log('Title music ended, switching to Between Level Music...');
+        
         // Start the main game music (legacy no-op)
         try { window.App?.systems?.audio?.music?.startMainGameMusic?.(); } catch {}
     });
@@ -2651,13 +2642,13 @@ function initSplashMusic() {
             readyState: splashAudio.readyState
         });
         
-        console.log('Title music failed to load');
+        
     });
     
     // Force load attempt
     try {
         splashAudio.load();
-        console.log('Called splashAudio.load()');
+        
     } catch (error) {
         console.error('Error calling load():', error);
     }
@@ -2683,7 +2674,7 @@ function updateSplashAudioMuteState() {
     }
 
     splashAudio.muted = !musicEnabled;
-    console.log('Updated splash audio mute state:', splashAudio.muted ? 'muted' : 'unmuted');
+    
 }
 
 // ===== BUTTON AUDIO SYSTEM (moved to App.systems.audio.button) =====
@@ -2704,27 +2695,26 @@ function playTitleMusic() {
     }
 
     if (!musicEnabled) {
-        console.log('Music disabled by user preference, skipping title music playback');
+        
         return;
     }
 
     if (!splashAudio) {
         console.error('splashAudio is null or undefined');
-        console.log('Audio not loaded');
+        
         return;
     }
     
     
     
-    console.log('Attempting to play title music...');
+    
     
     try {
         const playPromise = splashAudio.play();
         
         if (playPromise !== undefined) {
             playPromise.then(() => {
-                console.log('Title music started playing successfully');
-                console.log('Title music started playing successfully');
+                
             }).catch(error => {
                 console.error('Title music play failed:', error);
                 console.error('Error details:', {
@@ -2732,26 +2722,26 @@ function playTitleMusic() {
                     message: error.message,
                     code: error.code
                 });
-                console.log('Title music play failed');
+                
             });
         } else {
-            console.log('play() returned undefined (older browser)');
+            
                     // For older browsers that don't return a promise
-        console.log('Title music started (older browser)');
+        
         }
     } catch (error) {
         console.error('Exception when calling play():', error);
-        console.log('Exception when calling play()');
+        
     }
 }
 
 function stopTitleMusic() {
     if (splashAudio) {
-        console.log('Stopping title music...');
+        
         splashAudio.pause();
         splashAudio.currentTime = 0;
         
-        console.log('Title music stopped');
+        
     }
 }
 
@@ -2773,7 +2763,7 @@ function startMainGameMusic() {
     }
 
     if (!musicEnabled) {
-        console.log('Music disabled by user preference, skipping main game music playback');
+        
         return;
     }
 
@@ -2785,12 +2775,12 @@ function startMainGameMusic() {
         
         if (playPromise !== undefined) {
             playPromise.then(() => {
-                console.log('Between Level Music started successfully');
+                
                 window.musicPlayerState.isPlaying = true;
                 updateMusicPlayerUI();
                 updateStreamInfo(); // Ensure stream data displays correctly
             }).catch(error => {
-                console.log('Between Level Music failed to start:', error);
+                
             });
         }
     }
@@ -2817,7 +2807,7 @@ function initMusicPlayer() {
             musicEnabled = localStorage.getItem('musicEnabled');
         }
     } catch {}
-    console.log('Music enabled setting:', musicEnabled);
+    
     
     // Initialize music player state
     window.musicPlayerState = {
@@ -2845,8 +2835,7 @@ function initMusicPlayer() {
     
     // Add error handling
     audio.addEventListener('error', (e) => {
-        console.log('Audio error:', e);
-        console.log('Failed stream URL:', audio.src);
+        
 
         const state = window.musicPlayerState;
         if (!state) return;
@@ -2854,7 +2843,7 @@ function initMusicPlayer() {
         // Prevent rapid retries
         const now = Date.now();
         if (state.isRetrying && now - state.lastRetryTime < state.retryDelay) {
-            console.log('Retry too soon, ignoring error');
+            
             return;
         }
 
@@ -2862,16 +2851,16 @@ function initMusicPlayer() {
         state.lastRetryTime = now;
 
         state.retryCount++;
-        console.log(`Music retry attempt ${state.retryCount}/${state.maxRetries}`);
+        
 
         if (state.retryCount >= state.maxRetries) {
-            console.log('Max retries reached, stopping music stream attempts');
+            
             if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Music unavailable - click to retry'); } catch {} } else { musicStatus.textContent = 'Music unavailable - click to retry'; }
 
             // Add click handler to reset retry count
             musicStatus.style.cursor = 'pointer';
             musicStatus.onclick = () => {
-                console.log('User clicked to retry music');
+                
                 state.retryCount = 0;
                 state.isRetrying = false;
                 if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Retrying...'); } catch {} } else { musicStatus.textContent = 'Retrying...'; }
@@ -2908,7 +2897,7 @@ function initMusicPlayer() {
         // Reset retry count on successful load
         const state = window.musicPlayerState;
         if (state && state.retryCount > 0) {
-            console.log('Stream loaded successfully, resetting retry count');
+            
             state.retryCount = 0;
             state.isRetrying = false;
         }
@@ -2942,7 +2931,7 @@ function initMusicPlayer() {
         
         // If this is an auto-play event on mobile and user didn't want it
         if (isMobileDevice() && !state.userWantsMusic && wasPlayingBeforeBlur === false) {
-            console.log('Preventing auto-play on mobile');
+            
             audio.pause();
             state.isPlaying = false;
             updateMusicPlayerUI();
@@ -2989,11 +2978,11 @@ function initMusicPlayer() {
                 state.isPlaying = false;
                 state.userWantsMusic = false; // Reset user intent when auto-paused
                 updateMusicPlayerUI();
-                console.log('Music paused due to page visibility change on mobile');
+                
             }
         } else if (document.hidden) {
             // Page became hidden on desktop - let music continue playing
-            console.log('Page became hidden on desktop, music continues playing');
+            
         } else {
             // Page became visible again - prevent auto-resume on mobile
             if (isMobileDevice()) {
@@ -3003,11 +2992,11 @@ function initMusicPlayer() {
                     state.audio.pause();
                     state.isPlaying = false;
                     updateMusicPlayerUI();
-                    console.log('Prevented auto-resume on mobile when page became visible');
+                    
                 }
             } else {
                 // On desktop, let music continue as it was
-                console.log('Page became visible again on desktop, music state unchanged');
+                
             }
         }
     });
@@ -3025,11 +3014,11 @@ function initMusicPlayer() {
                 state.isPlaying = false;
                 state.userWantsMusic = false; // Reset user intent when auto-paused
                 updateMusicPlayerUI();
-                console.log('Music paused due to window blur on mobile');
+                
             }
         } else {
             // Window lost focus on desktop - let music continue playing
-            console.log('Window lost focus on desktop, music continues playing');
+            
         }
     });
     
@@ -3048,7 +3037,7 @@ function initMusicPlayer() {
                 state.isPlaying = false;
                 state.userWantsMusic = false; // Ensure user intent is reset
                 updateMusicPlayerUI();
-                console.log('Prevented auto-resume on mobile when window regained focus');
+                
             }
         }
     });
@@ -3254,7 +3243,7 @@ function toggleMusic() {
                 // Don't update stream info on every play - only when stream changes
                 updateMusicPlayerUI();
             }).catch(error => {
-                console.log('Auto-play prevented:', error);
+                
                 if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Click to start music'); } catch {} } else { musicStatus.textContent = 'Click to start music'; }
                 // Fallback: try to load from a different source
                 loadFallbackMusic();
@@ -3376,7 +3365,7 @@ function changeMusicStream() {
 
     // Prevent stream changes if we've hit the retry limit
     if (state.retryCount >= state.maxRetries) {
-        console.log('Retry limit reached, preventing manual stream change');
+        
         if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Music unavailable - too many failures'); } catch {} } else { musicStatus.textContent = 'Music unavailable - too many failures'; }
         return;
     }
@@ -3420,7 +3409,7 @@ function changeMusicStream() {
             console.warn('Failed to persist stream preference', e);
         }
         
-        console.log('YouTube stream selected:', streamData.name);
+        
         return;
     }
     
@@ -3473,7 +3462,7 @@ function changeMusicStream() {
         console.warn('Failed to persist stream preference', e);
     }
     
-    console.log('Music stream changed to:', streamData.name);
+    
 }
 
 // Function to load saved stream preference
@@ -3482,7 +3471,7 @@ function loadSavedStreamPreference() {
     const currentStreamInfo = DOM_CACHE.currentStreamInfo;
     
     if (!streamSelect || !currentStreamInfo) {
-        console.log('Music stream elements not found, skipping preference load');
+        
         return;
     }
     
@@ -3510,7 +3499,7 @@ function loadSavedStreamPreference() {
                 currentStreamInfo.classList.add('clickable');
                 
                 // Don't try to set audio source for YouTube streams
-                console.log('Loaded saved YouTube stream preference:', savedStream);
+                
                 return;
             }
             
@@ -3529,13 +3518,13 @@ function loadSavedStreamPreference() {
                 updateStreamInfo();
             }
             
-            console.log('Loaded saved stream preference:', savedStream);
+            
         } else {
             // Set default to betweenlevel if no valid preference
             streamSelect.value = 'betweenlevel';
             const streamData = MUSIC_STREAMS.betweenlevel;
             currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
-            console.log('No valid stream preference found, using default');
+            
         }
     } catch (error) {
         console.error('Error loading stream preference:', error);
@@ -3561,12 +3550,12 @@ function loadFallbackMusic() {
 
     // Check if we're already retrying or exceeded max retries
     if (state.isRetrying && Date.now() - state.lastRetryTime < state.retryDelay) {
-        console.log('Still in retry cooldown, skipping fallback attempt');
+        
         return;
     }
 
     if (state.retryCount >= state.maxRetries) {
-        console.log('Max retries reached in loadFallbackMusic, stopping all requests');
+        
         if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Music unavailable - too many failures'); } catch {} } else { musicStatus.textContent = 'Music unavailable - too many failures'; }
 
         // Ensure no more requests are made
@@ -3580,7 +3569,7 @@ function loadFallbackMusic() {
     state.lastRetryTime = Date.now();
 
     const randomSource = fallbackSources[Math.floor(Math.random() * fallbackSources.length)];
-    console.log(`Trying fallback source (${state.retryCount}/${state.maxRetries}):`, randomSource);
+    
     state.audio.src = randomSource;
     if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText(`Trying alternative source (${state.retryCount}/${state.maxRetries})...`); } catch {} } else { musicStatus.textContent = `Trying alternative source (${state.retryCount}/${state.maxRetries})...`; }
 
@@ -3595,7 +3584,7 @@ function cleanupAudioResources() {
         try {
             audioContext.close();
             audioContext = null;
-            console.log('Audio context cleaned up');
+            
         } catch (error) {
             console.error('Error closing audio context:', error);
         }
@@ -3607,7 +3596,7 @@ function cleanupAudioResources() {
             window.musicPlayerState.audio.pause();
             window.musicPlayerState.audio.src = '';
             window.musicPlayerState.audio = null;
-            console.log('Music player audio cleaned up');
+            
         } catch (error) {
             console.error('Error cleaning up music player:', error);
         }
@@ -3625,14 +3614,14 @@ function cleanupGameResources() {
     // Clear any pending autosave counters
     autosaveCounter = 0;
     
-    console.log('Game resources cleaned up');
+    
 }
 
 // Call cleanup when page unloads
 window.addEventListener('beforeunload', () => {
     cleanupAudioResources();
     cleanupGameResources();
-    console.log('Cleanup completed before page unload');
+    
 });
 
 // Make all other functions globally available to prevent undefined errors
@@ -3682,14 +3671,14 @@ window.testButtonAudio = function() {
         }
     } catch {}
 
-    console.log('Testing all button sound types...');
+    
 
     // Test each sound type
     try { window.App?.systems?.audio?.button?.playButtonClickSound?.(); } catch {}
     setTimeout(() => { try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {} }, 300);
     setTimeout(() => { try { window.App?.systems?.audio?.button?.playButtonCriticalClickSound?.(); } catch {} }, 600);
 
-    console.log('Button audio test complete! Check console for any errors.');
+    
 };
 
 
