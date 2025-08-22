@@ -1,12 +1,21 @@
 import { nextStrawCost, nextCupCost } from '../rules/purchases.js';
 import { recalcProduction } from './resources.js';
 
-export function purchaseStraw({ sips, straws, cups, widerStraws, betterCups }) {
+// Helper function to get configuration with proper fallbacks
+function getConfig() {
+    // Try to get from App.data.upgrades first (from upgrades.json)
+    const upgrades = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    // Fallback to GAME_CONFIG (from config.js)
     const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
-    const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    
+    return { upgrades, config };
+}
 
-    const baseCost = up?.straws?.baseCost ?? config.STRAW_BASE_COST;
-    const scaling = up?.straws?.scaling ?? config.STRAW_SCALING;
+export function purchaseStraw({ sips, straws, cups, widerStraws, betterCups }) {
+    const { upgrades, config } = getConfig();
+
+    const baseCost = upgrades?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5;
+    const scaling = upgrades?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08;
     const cost = nextStrawCost(straws, baseCost, scaling);
     if (sips < cost) return null;
 
@@ -22,11 +31,10 @@ export function purchaseStraw({ sips, straws, cups, widerStraws, betterCups }) {
 }
 
 export function purchaseCup({ sips, straws, cups, widerStraws, betterCups }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
-    const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    const { upgrades, config } = getConfig();
 
-    const baseCost = up?.cups?.baseCost ?? config.CUP_BASE_COST;
-    const scaling = up?.cups?.scaling ?? config.CUP_SCALING;
+    const baseCost = upgrades?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15;
+    const scaling = upgrades?.cups?.scaling ?? config.CUP_SCALING ?? 1.15;
     const cost = nextCupCost(cups, baseCost, scaling);
     if (sips < cost) return null;
 
@@ -42,11 +50,10 @@ export function purchaseCup({ sips, straws, cups, widerStraws, betterCups }) {
 }
 
 export function purchaseWiderStraws({ sips, straws, cups, widerStraws, betterCups }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
-    const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    const { upgrades, config } = getConfig();
 
-    const baseCost = up?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST;
-    const scaling = up?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING;
+    const baseCost = upgrades?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150;
+    const scaling = upgrades?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING ?? 1.12;
     const cost = Math.floor(baseCost * Math.pow(scaling, Number(widerStraws)));
     if (sips < cost) return null;
 
@@ -62,11 +69,10 @@ export function purchaseWiderStraws({ sips, straws, cups, widerStraws, betterCup
 }
 
 export function purchaseBetterCups({ sips, straws, cups, widerStraws, betterCups }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
-    const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    const { upgrades, config } = getConfig();
 
-    const baseCost = up?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST;
-    const scaling = up?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING;
+    const baseCost = upgrades?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400;
+    const scaling = upgrades?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.12;
     const cost = Math.floor(baseCost * Math.pow(scaling, Number(betterCups)));
     if (sips < cost) return null;
 
