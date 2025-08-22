@@ -272,6 +272,30 @@ window.triggerGeodudeVideo = triggerGeodudeVideo;
 window.loadWordBank = loadWordBank;
 window.isWordBankReady = isWordBankReady;
 window.resetLCGSeed = resetLCGSeed;
+// Chat helpers (moved from main.js)
+window.sendMessage = function sendMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const message = (chatInput?.value || '').trim();
+    if (!message) return;
+    window.addUserMessage?.(message);
+    if (chatInput) chatInput.value = '';
+    try { window.getGodResponse?.(message); } catch {}
+};
+window.addUserMessage = function addUserMessage(message) {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message user-message';
+    messageDiv.innerHTML = `
+        <div class="message-avatar">👤</div>
+        <div class="message-content">
+            <div class="message-sender">You</div>
+            <div class="message-text">${(function escapeHtml(text){ const div=document.createElement('div'); div.textContent=text; return div.innerHTML; })(message)}</div>
+        </div>
+    `;
+    chatMessages.appendChild(messageDiv);
+    try { window.scrollToBottom?.(); } catch {}
+};
 
 // Initialize word bank on module load
 loadWordBank();

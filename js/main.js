@@ -1,9 +1,5 @@
 // Soda Clicker Pro - Main Game Logic
 // 
-// TEMPLEOS GOD FEATURE SETUP:
-// Divine oracle feature - draws wisdom from sacred texts
-// No external API keys needed for the divine guidance system
-// (But if you know, you know... this runs on 64-bit spiritual processing power)
 
 // Progressive enhancement - detect advanced features
 const FEATURE_DETECTION = {
@@ -1058,22 +1054,7 @@ function loadClickSoundsPreference() {
 
 // Function to update drink speed display
 function updateDrinkSpeedDisplay() {
-    if (window.App?.ui?.updateDrinkSpeedDisplay) { try { return window.App.ui.updateDrinkSpeedDisplay(); } catch {}
-    }
-    // Update compact drink speed display elements
-    const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
-    const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
-    
-    if (currentDrinkSpeedCompact) {
-        currentDrinkSpeedCompact.textContent = getDrinkRateSeconds().toFixed(2) + 's';
-    }
-    
-    if (drinkSpeedBonusCompact) {
-        const config = window.GAME_CONFIG?.BALANCE || {};
-        let totalReduction = fasterDrinks.times(fasterDrinksUpCounter).times(config.FASTER_DRINKS_REDUCTION_PER_LEVEL);
-        let speedBonusPercent = totalReduction.times(100);
-        drinkSpeedBonusCompact.textContent = speedBonusPercent.toFixed(1) + '%';
-    }
+    if (window.App?.ui?.updateDrinkSpeedDisplay) { try { return window.App.ui.updateDrinkSpeedDisplay(); } catch {} }
 }
 
 // Function to update crit chance stat
@@ -2016,40 +1997,11 @@ function showPurchaseFeedback(itemName, cost) {
 }
 
         // Divine oracle functionality
-function sendMessage() {
-    const chatInput = document.getElementById('chatInput');
-    const message = chatInput.value.trim();
-    
-    if (!message) return;
-    
-    // Add user message to chat
-    addUserMessage(message);
-    
-    // Clear input
-    chatInput.value = '';
-    
-    // Get divine response immediately
-    getGodResponse(message);
-}
+function sendMessage() { try { return window.sendMessage?.(); } catch {} }
 
 
 
-function addUserMessage(message) {
-    const chatMessages = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'message user-message';
-    
-    messageDiv.innerHTML = `
-        <div class="message-avatar">👤</div>
-        <div class="message-content">
-            <div class="message-sender">You</div>
-            <div class="message-text">${escapeHtml(message)}</div>
-        </div>
-    `;
-    
-    chatMessages.appendChild(messageDiv);
-    scrollToBottom();
-}
+function addUserMessage(message) { try { return window.addUserMessage?.(message); } catch {} }
 
 
 
@@ -2155,7 +2107,7 @@ window.upgradeCriticalClick = upgradeCriticalClick;
 
     window.save = save;
     window.delete_save = delete_save;
-    window.sendMessage = sendMessage;
+    window.sendMessage = function(msg) { try { return window.sendMessage?.(msg); } catch {} };
 
 // Button Audio System - Only handles button click sounds
 let audioContext = null;
@@ -3224,7 +3176,7 @@ window.updateLastSaveTime = updateLastSaveTime;
 window.trackClick = trackClick;
 window.showClickFeedback = showClickFeedback;
 window.showPurchaseFeedback = showPurchaseFeedback;
-window.addUserMessage = addUserMessage;
+window.addUserMessage = function(msg) { try { return window.addUserMessage?.(msg); } catch {} };
 window.toggleAutosave = toggleAutosave;
 window.changeAutosaveInterval = changeAutosaveInterval;
 window.initMusicPlayer = initMusicPlayer;
