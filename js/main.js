@@ -203,6 +203,50 @@ function switchTab(tabName, event) {
 // Make switchTab globally available for HTML onclick attributes
 window.switchTab = switchTab;
 
+// Add event listeners to shop buttons to ensure they work immediately
+function setupShopButtonEventListeners() {
+    console.log('🔧 Setting up shop button event listeners...');
+    
+    // Find all shop buttons
+    const shopButtons = document.querySelectorAll('.shop-btn');
+    shopButtons.forEach(button => {
+        // Remove existing onclick attributes to prevent conflicts
+        button.removeAttribute('onclick');
+        
+        // Add click event listeners based on button content
+        button.addEventListener('click', function(e) {
+            const buttonText = button.textContent || '';
+            console.log('🔧 Shop button clicked:', buttonText);
+            
+            if (buttonText.includes('Extra Straw')) {
+                console.log('🔧 Calling buyStraw via event listener');
+                buyStraw();
+            } else if (buttonText.includes('Bigger Cup')) {
+                console.log('🔧 Calling buyCup via event listener');
+                buyCup();
+            } else if (buttonText.includes('Wider Straws')) {
+                console.log('🔧 Calling buyWiderStraws via event listener');
+                buyWiderStraws();
+            } else if (buttonText.includes('Better Cups')) {
+                console.log('🔧 Calling buyBetterCups via event listener');
+                buyBetterCups();
+            }
+        });
+        
+        console.log('🔧 Added event listener to button:', button.textContent);
+    });
+    
+    console.log('🔧 Shop button event listeners setup complete');
+}
+
+// Set up event listeners when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupShopButtonEventListeners);
+} else {
+    // DOM already loaded
+    setupShopButtonEventListeners();
+}
+
 // Check if upgrades are affordable and update UI accordingly
 function checkUpgradeAffordability() {
     // IMPROVED BALANCE: Updated costs to match new progression system
@@ -1527,6 +1571,11 @@ function updateShopButtonStates() {
 // Simplified purchase functions that poll for App to be ready
 function buyStraw() {
     console.log('🔧 buyStraw called - checking App availability...');
+    console.log('🔧 Debug: window.App exists?', !!window.App);
+    console.log('🔧 Debug: window.App.systems exists?', !!window.App?.systems);
+    console.log('🔧 Debug: window.App.systems.purchases exists?', !!window.App?.systems?.purchases);
+    console.log('🔧 Debug: isGameReady() result:', isGameReady());
+    console.log('🔧 Debug: This function is working!');
     
     // Try the new App system first
     if (window.App?.systems?.purchases && isGameReady()) {
@@ -1597,6 +1646,10 @@ function buyStraw() {
 
 function buyCup() {
     console.log('🔧 buyCup called - checking App availability...');
+    console.log('🔧 Debug: window.App exists?', !!window.App);
+    console.log('🔧 Debug: window.App.systems exists?', !!window.App?.systems);
+    console.log('🔧 Debug: window.App.systems.purchases exists?', !!window.App?.systems?.purchases);
+    console.log('🔧 Debug: isGameReady() result:', isGameReady());
     
     // Try the new App system first
     if (window.App?.systems?.purchases && isGameReady()) {
