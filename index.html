@@ -82,6 +82,7 @@
     <button class="tab-btn" onclick="switchTab('stats', event)">📊 Statistics</button>
             <button class="tab-btn" onclick="switchTab('god', event)">🙏 Talk to God</button>
     <button class="tab-btn" onclick="switchTab('options', event)">⚙️ Options</button>
+    <button class="tab-btn" onclick="switchTab('dev', event)">🔧 Dev Tools</button>
 </div>
 
     <!-- Drink Progress Bar - Moved to Header -->
@@ -561,6 +562,127 @@
             <p style="margin-top: 0.5rem; font-size: 0.8em; color: #888; font-style: italic;">
                 <em>⚡ If you know, you know... this oracle runs on 64-bit divine wisdom ✨</em>
             </p>
+        </div>
+    </div>
+</div>
+
+<!-- Dev Tools Tab -->
+<div id="devTab" class="tab-content">
+    <div class="dev-container">
+        <div class="dev-header">
+            <h2>🔧 Development Tools</h2>
+            <p class="dev-subtitle">Testing and development utilities</p>
+            <div class="dev-status" id="devStatus">
+                <span class="dev-status-label">Dev Mode:</span>
+                <span class="dev-status-value" id="devModeStatus">Disabled</span>
+            </div>
+        </div>
+        
+        <div class="dev-section">
+            <h3>🚀 Feature Unlocks</h3>
+            <div class="dev-grid">
+                <button onclick="devUnlockAll()" class="dev-btn unlock-all">
+                    <div class="dev-btn-icon">🔓</div>
+                    <div class="dev-btn-text">Unlock All Features</div>
+                </button>
+                <button onclick="devUnlockShop()" class="dev-btn unlock-shop">
+                    <div class="dev-btn-icon">🛒</div>
+                    <div class="dev-btn-text">Unlock Shop</div>
+                </button>
+                <button onclick="devUnlockUpgrades()" class="dev-btn unlock-upgrades">
+                    <div class="dev-btn-icon">⚡</div>
+                    <div class="dev-btn-text">Unlock All Upgrades</div>
+                </button>
+                <button onclick="devResetUnlocks()" class="dev-btn reset">
+                    <div class="dev-btn-icon">🔄</div>
+                    <div class="dev-btn-text">Reset Unlocks</div>
+                </button>
+            </div>
+        </div>
+        
+        <div class="dev-section">
+            <h3>⏰ Time Travel</h3>
+            <div class="dev-grid">
+                <button onclick="devAddTime(3600000)" class="dev-btn time-travel">
+                    <div class="dev-btn-icon">⏰</div>
+                    <div class="dev-btn-text">+1 Hour</div>
+                </button>
+                <button onclick="devAddTime(86400000)" class="dev-btn time-travel">
+                    <div class="dev-btn-icon">📅</div>
+                    <div class="dev-btn-text">+1 Day</div>
+                </button>
+                <button onclick="devAddTime(604800000)" class="dev-btn time-travel">
+                    <div class="dev-btn-icon">📆</div>
+                    <div class="dev-btn-text">+1 Week</div>
+                </button>
+                <button onclick="devAddTime(2592000000)" class="dev-btn time-travel">
+                    <div class="dev-btn-icon">🗓️</div>
+                    <div class="dev-btn-text">+1 Month</div>
+                </button>
+            </div>
+        </div>
+        
+        <div class="dev-section">
+            <h3>💰 Resource Management</h3>
+            <div class="dev-grid">
+                <button onclick="devAddSips(1000)" class="dev-btn resources">
+                    <div class="dev-btn-icon">🥤</div>
+                    <div class="dev-btn-text">+1000 Sips</div>
+                </button>
+                <button onclick="devAddSips(10000)" class="dev-btn resources">
+                    <div class="dev-btn-icon">🥤</div>
+                    <div class="dev-btn-text">+10K Sips</div>
+                </button>
+                <button onclick="devAddSips(100000)" class="dev-btn resources">
+                    <div class="dev-btn-icon">🥤</div>
+                    <div class="dev-btn-text">+100K Sips</div>
+                </button>
+                <button onclick="devAddSips(1000000)" class="dev-btn resources">
+                    <div class="dev-btn-icon">🥤</div>
+                    <div class="dev-btn-text">+1M Sips</div>
+                </button>
+            </div>
+        </div>
+        
+        <div class="dev-section">
+            <h3>🎯 Testing Tools</h3>
+            <div class="dev-grid">
+                <button onclick="devToggleDevMode()" class="dev-btn testing">
+                    <div class="dev-btn-icon">🔧</div>
+                    <div class="dev-btn-text">Toggle Dev Mode</div>
+                </button>
+                <button onclick="devToggleGodMode()" class="dev-btn testing">
+                    <div class="dev-btn-icon">👑</div>
+                    <div class="dev-btn-text">Toggle God Mode</div>
+                </button>
+                <button onclick="devShowDebugInfo()" class="dev-btn testing">
+                    <div class="dev-btn-icon">🐛</div>
+                    <div class="dev-btn-text">Show Debug Info</div>
+                </button>
+                <button onclick="devExportSave()" class="dev-btn testing">
+                    <div class="dev-btn-icon">💾</div>
+                    <div class="dev-btn-text">Export Save</div>
+                </button>
+            </div>
+        </div>
+        
+        <div class="dev-section">
+            <h3>📁 Save Management</h3>
+            <div class="dev-grid">
+                <button onclick="devImportSave()" class="dev-btn testing">
+                    <div class="dev-btn-icon">📥</div>
+                    <div class="dev-btn-text">Import Save</div>
+                </button>
+                <button onclick="quickUnlock()" class="dev-btn unlock-all">
+                    <div class="dev-btn-icon">⚡</div>
+                    <div class="dev-btn-text">Quick Unlock</div>
+                </button>
+            </div>
+        </div>
+        
+        <div class="dev-info">
+            <p>⚠️ <strong>Warning:</strong> These tools are for development and testing purposes only!</p>
+            <p>💡 <strong>Tip:</strong> Use these tools to test game balance, debug issues, or experiment with different game states.</p>
         </div>
     </div>
 </div>

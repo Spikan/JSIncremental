@@ -398,6 +398,212 @@ body {
     display: block;
 }
 
+/* Dev Tools Tab Styles */
+.dev-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.dev-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.dev-header h2 {
+    color: #FF3D02;
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+}
+
+.dev-subtitle {
+    color: #00B36B;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.dev-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 62, 2, 0.1);
+    border: 1px solid #FF3D02;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.dev-status-label {
+    color: #FF8E53;
+    font-weight: bold;
+}
+
+.dev-status-value {
+    color: #FF3D02;
+    font-weight: bold;
+    padding: 0.2rem 0.5rem;
+    background: rgba(255, 62, 2, 0.2);
+    border-radius: 4px;
+}
+
+.dev-status-value.enabled {
+    color: #00B36B;
+    background: rgba(0, 179, 107, 0.2);
+}
+
+.dev-section {
+    background: rgba(0, 23, 137, 0.3);
+    border: 2px solid #00B36B;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.dev-section h3 {
+    color: #FF8E53;
+    margin: 0 0 1rem 0;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+.dev-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.dev-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 2px solid #00B36B;
+    background-color: #001789;
+    color: #00B36B;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 80px;
+    justify-content: center;
+}
+
+.dev-btn:hover {
+    background-color: #00B36B;
+    color: #001789;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 179, 107, 0.3);
+}
+
+.dev-btn:active {
+    transform: scale(0.95);
+}
+
+.dev-btn-icon {
+    font-size: 1.5rem;
+}
+
+.dev-btn-text {
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Dev button variants */
+.dev-btn.unlock-all {
+    border-color: #FF3D02;
+    color: #FF3D02;
+}
+
+.dev-btn.unlock-all:hover {
+    background-color: #FF3D02;
+    color: #001789;
+}
+
+.dev-btn.unlock-shop {
+    border-color: #FF8E53;
+    color: #FF8E53;
+}
+
+.dev-btn.unlock-shop:hover {
+    background-color: #FF8E53;
+    color: #001789;
+}
+
+.dev-btn.unlock-upgrades {
+    border-color: #BC00FF;
+    color: #BC00FF;
+}
+
+.dev-btn.unlock-upgrades:hover {
+    background-color: #BC00FF;
+    color: #001789;
+}
+
+.dev-btn.reset {
+    border-color: #FF6B6B;
+    color: #FF6B6B;
+}
+
+.dev-btn.reset:hover {
+    background-color: #FF6B6B;
+    color: #001789;
+}
+
+.dev-btn.time-travel {
+    border-color: #4ECDC4;
+    color: #4ECDC4;
+}
+
+.dev-btn.time-travel:hover {
+    background-color: #4ECDC4;
+    color: #001789;
+}
+
+.dev-btn.resources {
+    border-color: #45B7D1;
+    color: #45B7D1;
+}
+
+.dev-btn.resources:hover {
+    background-color: #45B7D1;
+    color: #001789;
+}
+
+.dev-btn.testing {
+    border-color: #96CEB4;
+    color: #96CEB4;
+}
+
+.dev-btn.testing:hover {
+    background-color: #96CEB4;
+    color: #001789;
+}
+
+.dev-info {
+    background: rgba(255, 62, 2, 0.1);
+    border: 2px solid #FF3D02;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.dev-info p {
+    margin: 0.5rem 0;
+    color: #FF8E53;
+}
+
+.dev-info p:first-child {
+    margin-top: 0;
+}
+
+.dev-info p:last-child {
+    margin-bottom: 0;
+}
+
 /* Options Tab Styles */
 .options-container {
     max-width: 600px;

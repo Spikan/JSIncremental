@@ -2198,4 +2198,432 @@ window.testButtonAudio = function() {
     
 };
 
+// ============================================================================
+// DEV TOOLS FUNCTIONS
+// ============================================================================
+// Development and testing utilities for debugging and game balance testing
 
+// Feature unlock functions
+function devUnlockAll() {
+    if (!confirm('🔓 Unlock ALL features? This will make everything available immediately.')) return;
+    
+    const allFeatures = [
+        'suction', 'criticalClick', 'fasterDrinks', 'straws', 'cups', 
+        'widerStraws', 'betterCups', 'levelUp', 'shop', 'stats', 'god', 'unlocks'
+    ];
+    
+    allFeatures.forEach(feature => {
+        if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.unlockFeature) {
+            window.FEATURE_UNLOCKS.unlockFeature(feature);
+        }
+    });
+    
+    // Force refresh UI
+    if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.updateFeatureVisibility) {
+        window.FEATURE_UNLOCKS.updateFeatureVisibility();
+    }
+    
+    showPurchaseFeedback('🔓 All Features Unlocked!', 0);
+    console.log('🔧 Dev: All features unlocked');
+}
+
+function devUnlockShop() {
+    if (!confirm('🛒 Unlock shop and all shop items?')) return;
+    
+    const shopFeatures = ['shop', 'straws', 'cups', 'widerStraws', 'betterCups'];
+    
+    shopFeatures.forEach(feature => {
+        if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.unlockFeature) {
+            window.FEATURE_UNLOCKS.unlockFeature(feature);
+        }
+    });
+    
+    if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.updateFeatureVisibility) {
+        window.FEATURE_UNLOCKS.updateFeatureVisibility();
+    }
+    
+    showPurchaseFeedback('🛒 Shop Unlocked!', 0);
+    console.log('🔧 Dev: Shop unlocked');
+}
+
+function devUnlockUpgrades() {
+    if (!confirm('⚡ Unlock all upgrade systems?')) return;
+    
+    const upgradeFeatures = ['suction', 'criticalClick', 'fasterDrinks', 'levelUp'];
+    
+    upgradeFeatures.forEach(feature => {
+        if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.unlockFeature) {
+            window.FEATURE_UNLOCKS.unlockFeature(feature);
+        }
+    });
+    
+    if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.updateFeatureVisibility) {
+        window.FEATURE_UNLOCKS.updateFeatureVisibility();
+    }
+    
+    showPurchaseFeedback('⚡ Upgrades Unlocked!', 0);
+    console.log('🔧 Dev: Upgrades unlocked');
+}
+
+function devResetUnlocks() {
+    if (!confirm('🔄 Reset all feature unlocks? This will lock everything except basic soda clicking.')) return;
+    
+    if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.reset) {
+        window.FEATURE_UNLOCKS.reset();
+    }
+    
+    if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.updateFeatureVisibility) {
+        window.FEATURE_UNLOCKS.updateFeatureVisibility();
+    }
+    
+    showPurchaseFeedback('🔄 Unlocks Reset!', 0);
+    console.log('🔧 Dev: Unlocks reset');
+}
+
+// Time travel functions
+function devAddTime(milliseconds) {
+    const hours = Math.floor(milliseconds / 3600000);
+    const days = Math.floor(milliseconds / 86400000);
+    const weeks = Math.floor(milliseconds / 604800000);
+    const months = Math.floor(milliseconds / 2592000000);
+    
+    let timeLabel = '';
+    if (months > 0) timeLabel = `${months} month${months > 1 ? 's' : ''}`;
+    else if (weeks > 0) timeLabel = `${weeks} week${weeks > 1 ? 's' : ''}`;
+    else if (days > 0) timeLabel = `${days} day${days > 1 ? 's' : ''}`;
+    else if (hours > 0) timeLabel = `${hours} hour${hours > 1 ? 's' : ''}`;
+    
+    if (!confirm(`⏰ Add ${timeLabel} of offline time? This will simulate being away from the game.`)) return;
+    
+    // Simulate offline progress
+    const offlineTime = milliseconds / 1000; // Convert to seconds
+    const offlineSips = calculateOfflineProgress(offlineTime);
+    
+    window.sips = window.sips.plus(offlineSips);
+    
+    // Update last save time to reflect the time travel
+    if (window.lastSaveTime) {
+        window.lastSaveTime = Date.now() - milliseconds;
+    }
+    
+    showPurchaseFeedback(`⏰ +${timeLabel} Time Travel!`, 0);
+    console.log(`🔧 Dev: Added ${timeLabel} of offline time, gained ${offlineSips} sips`);
+    
+    // Refresh UI
+    updateAllStats();
+}
+
+// Helper function to calculate offline progress
+function calculateOfflineProgress(seconds) {
+    if (!window.sps || window.sps.isZero()) return 0;
+    
+    // Calculate sips per second and multiply by offline time
+    const sipsPerSecond = window.sps.toNumber();
+    return Math.floor(sipsPerSecond * seconds);
+}
+
+// Resource management functions
+function devAddSips(amount) {
+    if (!confirm(`🥤 Add ${amount.toLocaleString()} sips to your balance?`)) return;
+    
+    window.sips = window.sips.plus(amount);
+    
+    showPurchaseFeedback(`🥤 +${amount.toLocaleString()} Sips!`, 0);
+    console.log(`🔧 Dev: Added ${amount} sips`);
+    
+    // Refresh UI
+    updateAllStats();
+    checkUpgradeAffordability();
+}
+
+// Testing tools
+let godMode = false;
+
+function devToggleGodMode() {
+    godMode = !godMode;
+    
+    if (godMode) {
+        // Enable god mode - make everything free
+        window.originalCosts = {
+            straw: strawCost,
+            cup: cupCost,
+            widerStraws: widerStrawsCost,
+            betterCups: betterCupsCost,
+            suction: suctionCost,
+            fasterDrinks: fasterDrinksCost,
+            criticalClick: criticalClickCost,
+            levelUp: levelUpCost
+        };
+        
+        // Set all costs to 0
+        strawCost = 0;
+        cupCost = 0;
+        widerStrawsCost = 0;
+        betterCupsCost = 0;
+        suctionCost = 0;
+        fasterDrinksCost = 0;
+        criticalClickCost = 0;
+        levelUpCost = 0;
+        
+        showPurchaseFeedback('👑 God Mode Enabled!', 0);
+        console.log('🔧 Dev: God mode enabled - all purchases are free');
+    } else {
+        // Disable god mode - restore original costs
+        if (window.originalCosts) {
+            strawCost = window.originalCosts.straw;
+            cupCost = window.originalCosts.cup;
+            widerStrawsCost = window.originalCosts.widerStraws;
+            betterCupsCost = window.originalCosts.betterCups;
+            suctionCost = window.originalCosts.suction;
+            fasterDrinksCost = window.originalCosts.fasterDrinks;
+            criticalClickCost = window.originalCosts.criticalClick;
+            levelUpCost = window.originalCosts.levelUp;
+        }
+        
+        showPurchaseFeedback('👑 God Mode Disabled!', 0);
+        console.log('🔧 Dev: God mode disabled - normal costs restored');
+    }
+    
+    // Refresh UI
+    checkUpgradeAffordability();
+}
+
+function devShowDebugInfo() {
+    const debugInfo = {
+        'Game Version': 'Soda Clicker Pro',
+        'Current Sips': window.sips ? window.sips.toString() : 'undefined',
+        'Total Clicks': window.totalClicks || 0,
+        'Sips Per Second': window.sps ? window.sps.toString() : 'undefined',
+        'Unlocked Features': window.FEATURE_UNLOCKS ? Array.from(window.FEATURE_UNLOCKS.unlockedFeatures) : 'undefined',
+        'God Mode': godMode ? 'Enabled' : 'Disabled',
+        'Last Save': window.lastSaveTime ? new Date(window.lastSaveTime).toLocaleString() : 'Never',
+        'Play Time': window.playTime || 0,
+        'Memory Usage': performance.memory ? `${Math.round(performance.memory.usedJSHeapSize / 1024 / 1024)}MB` : 'N/A'
+    };
+    
+    console.group('🔧 Debug Information');
+    Object.entries(debugInfo).forEach(([key, value]) => {
+        console.log(`${key}:`, value);
+    });
+    console.groupEnd();
+    
+    // Also show in a simple alert for quick reference
+    const debugText = Object.entries(debugInfo)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join('\n');
+    
+    alert('🔧 Debug Information:\n\n' + debugText);
+}
+
+function devExportSave() {
+    try {
+        const saveData = {
+            sips: window.sips ? window.sips.toString() : '0',
+            straws: window.straws ? window.straws.toString() : '0',
+            cups: window.cups ? window.cups.toString() : '0',
+            widerStraws: window.widerStraws ? window.widerStraws.toString() : '0',
+            betterCups: window.betterCups ? window.betterCups.toString() : '0',
+            suctions: window.suctions ? window.suctions.toString() : '0',
+            fasterDrinks: window.fasterDrinks ? window.fasterDrinks.toString() : '0',
+            criticalClicks: window.criticalClicks ? window.criticalClicks.toString() : '0',
+            totalClicks: window.totalClicks || 0,
+            playTime: window.playTime || 0,
+            lastSaveTime: window.lastSaveTime || Date.now(),
+            unlockedFeatures: window.FEATURE_UNLOCKS ? Array.from(window.FEATURE_UNLOCKS.unlockedFeatures) : [],
+            timestamp: Date.now()
+        };
+        
+        const saveString = JSON.stringify(saveData, null, 2);
+        const blob = new Blob([saveString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `soda-clicker-save-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showPurchaseFeedback('💾 Save Exported!', 0);
+        console.log('🔧 Dev: Save exported');
+    } catch (error) {
+        console.error('🔧 Dev: Error exporting save:', error);
+        alert('Error exporting save: ' + error.message);
+    }
+}
+
+function devImportSave() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const saveData = JSON.parse(e.target.result);
+                
+                if (!confirm('📥 Import this save data? This will overwrite your current progress!')) return;
+                
+                // Import the save data
+                if (saveData.sips) window.sips = new Decimal(saveData.sips);
+                if (saveData.straws) window.straws = new Decimal(saveData.straws);
+                if (saveData.cups) window.cups = new Decimal(saveData.cups);
+                if (saveData.widerStraws) window.widerStraws = new Decimal(saveData.widerStraws);
+                if (saveData.betterCups) window.betterCups = new Decimal(saveData.betterCups);
+                if (saveData.suctions) window.suctions = new Decimal(saveData.suctions);
+                if (saveData.fasterDrinks) window.fasterDrinks = new Decimal(saveData.fasterDrinks);
+                if (saveData.criticalClicks) window.criticalClicks = new Decimal(saveData.criticalClicks);
+                if (saveData.totalClicks) window.totalClicks = saveData.totalClicks;
+                if (saveData.playTime) window.playTime = saveData.playTime;
+                if (saveData.lastSaveTime) window.lastSaveTime = saveData.lastSaveTime;
+                
+                // Import unlocked features
+                if (saveData.unlockedFeatures && window.FEATURE_UNLOCKS) {
+                    window.FEATURE_UNLOCKS.unlockedFeatures = new Set(saveData.unlockedFeatures);
+                    window.FEATURE_UNLOCKS.saveUnlockedFeatures();
+                    window.FEATURE_UNLOCKS.updateFeatureVisibility();
+                }
+                
+                showPurchaseFeedback('📥 Save Imported!', 0);
+                console.log('🔧 Dev: Save imported');
+                
+                // Refresh UI
+                updateAllStats();
+                checkUpgradeAffordability();
+                
+            } catch (error) {
+                console.error('🔧 Dev: Error importing save:', error);
+                alert('Error importing save: ' + error.message);
+            }
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
+
+// ============================================================================
+// END DEV TOOLS FUNCTIONS
+// ============================================================================
+
+    window.save = save;
+
+// Dev tools functions
+window.devUnlockAll = devUnlockAll;
+window.devUnlockShop = devUnlockShop;
+window.devUnlockUpgrades = devUnlockUpgrades;
+window.devResetUnlocks = devResetUnlocks;
+window.devAddTime = devAddTime;
+window.devAddSips = devAddSips;
+window.devToggleDevMode = devToggleDevMode;
+window.devToggleGodMode = devToggleGodMode;
+window.devShowDebugInfo = devShowDebugInfo;
+window.devExportSave = devExportSave;
+window.devImportSave = devImportSave;
+window.updateDevModeStatus = updateDevModeStatus;
+
+// Quick unlock function for console access
+function quickUnlock() {
+    console.log('🔧 Quick unlock activated - unlocking all features...');
+    devUnlockAll();
+}
+
+// Make quick unlock available globally for console access
+window.quickUnlock = quickUnlock;
+window.q = quickUnlock; // Short alias
+
+// Testing tools
+let godMode = false;
+
+function devToggleDevMode() {
+    if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.toggleDevMode) {
+        const isEnabled = window.FEATURE_UNLOCKS.toggleDevMode();
+        
+        if (isEnabled) {
+            showPurchaseFeedback('🔧 Dev Mode Enabled!', 0);
+            console.log('🔧 Dev: Dev mode enabled - all features unlocked');
+        } else {
+            showPurchaseFeedback('🔧 Dev Mode Disabled!', 0);
+            console.log('🔧 Dev: Dev mode disabled - normal unlock conditions restored');
+        }
+        
+        // Update status display
+        updateDevModeStatus();
+        
+        // Refresh UI
+        if (window.FEATURE_UNLOCKS.updateFeatureVisibility) {
+            window.FEATURE_UNLOCKS.updateFeatureVisibility();
+        }
+    } else {
+        console.error('🔧 Dev: FEATURE_UNLOCKS system not available');
+        alert('Feature unlock system not available');
+    }
+}
+
+// Update dev mode status display
+function updateDevModeStatus() {
+    const statusElement = document.getElementById('devModeStatus');
+    if (statusElement) {
+        const isDevMode = window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.isDevMode ? 
+            window.FEATURE_UNLOCKS.isDevMode() : false;
+        
+        statusElement.textContent = isDevMode ? 'Enabled' : 'Disabled';
+        statusElement.className = `dev-status-value ${isDevMode ? 'enabled' : ''}`;
+    }
+}
+
+// Initialize dev mode status display
+setTimeout(() => {
+    if (window.updateDevModeStatus) {
+        window.updateDevModeStatus();
+    }
+    
+    // Show available dev commands in console
+    console.log('🔧 Dev Tools Available:');
+    console.log('  - quickUnlock() or q() - Unlock all features');
+    console.log('  - devToggleDevMode() - Toggle dev mode (always unlocked)');
+    console.log('  - devToggleGodMode() - Toggle god mode (free purchases)');
+    console.log('  - devAddSips(amount) - Add sips');
+    console.log('  - devAddTime(ms) - Add offline time');
+    console.log('  - devShowDebugInfo() - Show debug information');
+    console.log('  - testDevTools() - Test dev tools functionality');
+}, 1000); // Small delay to ensure FEATURE_UNLOCKS is loaded
+
+// Test function for dev tools
+window.testDevTools = function() {
+    console.log('🔧 Testing Dev Tools...');
+    
+    // Test if dev tab exists
+    const devTab = document.getElementById('devTab');
+    if (devTab) {
+        console.log('✅ Dev tab found');
+    } else {
+        console.error('❌ Dev tab not found');
+    }
+    
+    // Test if dev functions are available
+    const functions = ['devUnlockAll', 'devToggleDevMode', 'devToggleGodMode', 'quickUnlock'];
+    functions.forEach(func => {
+        if (window[func]) {
+            console.log(`✅ ${func} function available`);
+        } else {
+            console.error(`❌ ${func} function not available`);
+        }
+    });
+    
+    // Test tab switching
+    try {
+        switchTab('dev', new Event('click'));
+        console.log('✅ Dev tab switching works');
+    } catch (error) {
+        console.error('❌ Dev tab switching failed:', error);
+    }
+    
+    console.log('🔧 Dev tools test complete');
+};

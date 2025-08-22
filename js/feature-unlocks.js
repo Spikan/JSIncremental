@@ -10,6 +10,9 @@ const FEATURE_UNLOCKS = {
     // Track unlocked features
     unlockedFeatures: new Set(['soda', 'options']), // Start with soda clicking and options always available
     
+    // Dev mode - when enabled, all features are unlocked
+    devMode: false,
+    
     // Define unlock conditions for each feature - prefer data/unlocks.json via App.data
     get unlockConditions() {
         // Prefer loaded JSON data if available
@@ -70,6 +73,12 @@ const FEATURE_UNLOCKS = {
     checkUnlock(featureName) {
         console.log(`Checking unlock for feature: ${featureName}`);
         
+        // If dev mode is enabled, all features are unlocked
+        if (this.devMode) {
+            console.log(`Feature ${featureName} unlocked via dev mode`);
+            return true;
+        }
+        
         if (this.unlockedFeatures.has(featureName)) {
             console.log(`Feature ${featureName} already unlocked`);
             return true; // Already unlocked
@@ -99,11 +108,36 @@ const FEATURE_UNLOCKS = {
         if (sipsMet && clicksMet) {
             console.log(`Unlocking feature: ${featureName}`);
             this.unlockFeature(featureName);
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.FEATURE?.UNLOCKED, { feature: featureName }); } catch {}
             return true;
         }
         
         return false;
+    },
+    
+    // Toggle dev mode
+    toggleDevMode() {
+        this.devMode = !this.devMode;
+        console.log(`🔧 Dev mode ${this.devMode ? 'enabled' : 'disabled'}`);
+        
+        if (this.devMode) {
+            // When enabling dev mode, unlock all features
+            const allFeatures = Object.keys(this.unlockConditions);
+            allFeatures.forEach(feature => {
+                this.unlockedFeatures.add(feature);
+            });
+            this.saveUnlockedFeatures();
+        }
+        
+        // Update UI
+        this.updateFeatureVisibility();
+        this.updateUnlocksTab();
+        
+        return this.devMode;
+    },
+    
+    // Check if dev mode is enabled
+    isDevMode() {
+        return this.devMode;
     },
     
     // Unlock a specific feature
