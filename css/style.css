@@ -2857,6 +2857,15 @@ button {
   line-height: 1.2;
 }
 
+/* Ensure specific button classes override base styles */
+.shop-btn,
+.clicking-upgrade-btn,
+.drink-speed-upgrade-btn {
+  background-color: var(--primary-green) !important;
+  color: var(--primary-blue) !important;
+  border-color: var(--primary-blue) !important;
+}
+
 /* ========================================
    BUTTON SIZE VARIANTS
    ======================================== */
