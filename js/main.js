@@ -1454,7 +1454,19 @@ function updateUpgradeMultiplier(elementId, newSPD, baseSPD) {
 
 // Check if the game is ready for purchases
 function isGameReady() {
-    return !!(window.App?.systems?.purchases && window.App.data?.upgrades);
+    // Check if App and purchase system exist
+    if (!window.App?.systems?.purchases) {
+        return false;
+    }
+    
+    // Check if upgrades data is loaded and has actual content
+    const dataUp = window.App?.data?.upgrades;
+    if (!dataUp || Object.keys(dataUp).length === 0) {
+        return false;
+    }
+    
+    // Check if at least one upgrade type has data (indicating JSON was loaded)
+    return !!(dataUp.straws || dataUp.cups || dataUp.widerStraws || dataUp.betterCups);
 }
 
 // Wait for App to be available with a timeout
@@ -1528,6 +1540,12 @@ function buyStraw() {
     
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
+        // Try to trigger the same initialization that sodaClick does
+        try {
+            checkUpgradeAffordability();
+        } catch (e) {
+            console.log('🔧 checkUpgradeAffordability failed:', e);
+        }
         return false;
     }
     
@@ -1555,6 +1573,12 @@ function buyCup() {
     
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
+        // Try to trigger the same initialization that sodaClick does
+        try {
+            checkUpgradeAffordability();
+        } catch (e) {
+            console.log('🔧 checkUpgradeAffordability failed:', e);
+        }
         return false;
     }
     
@@ -1582,6 +1606,12 @@ function buyWiderStraws() {
     
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
+        // Try to trigger the same initialization that sodaClick does
+        try {
+            checkUpgradeAffordability();
+        } catch (e) {
+            console.log('🔧 checkUpgradeAffordability failed:', e);
+        }
         return false;
     }
     
@@ -1609,6 +1639,12 @@ function buyBetterCups() {
     
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
+        // Try to trigger the same initialization that sodaClick does
+        try {
+            checkUpgradeAffordability();
+        } catch (e) {
+            console.log('🔧 checkUpgradeAffordability failed:', e);
+        }
         return false;
     }
     
