@@ -53,8 +53,7 @@ export function purchaseWiderStraws({ sips, straws, cups, widerStraws, betterCup
     const { upgrades, config } = getConfig();
 
     const baseCost = upgrades?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150;
-    const scaling = upgrades?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING ?? 1.12;
-    const cost = Math.floor(baseCost * Math.pow(scaling, Number(widerStraws)));
+    const cost = Math.floor(baseCost * (Number(widerStraws) + 1));
     if (sips < cost) return null;
 
     const newWiderStraws = Number(widerStraws) + 1;
@@ -72,8 +71,7 @@ export function purchaseBetterCups({ sips, straws, cups, widerStraws, betterCups
     const { upgrades, config } = getConfig();
 
     const baseCost = upgrades?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400;
-    const scaling = upgrades?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.12;
-    const cost = Math.floor(baseCost * Math.pow(scaling, Number(betterCups)));
+    const cost = Math.floor(baseCost * (Number(betterCups) + 1));
     if (sips < cost) return null;
 
     const newBetterCups = Number(betterCups) + 1;

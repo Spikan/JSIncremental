@@ -90,10 +90,10 @@ function calculateAllCosts(config, dataUp) {
     costs.criticalClick = Math.floor(criticalClickBaseCost * Math.pow(criticalClickScaling, safeToNumber(window.criticalClicks)));
     
     // Wider straws cost
-    costs.widerStraws = (dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST) * safeToNumber(window.widerStraws);
+    costs.widerStraws = (dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST) * (safeToNumber(window.widerStraws) + 1);
     
     // Better cups cost
-    costs.betterCups = (dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST) * safeToNumber(window.betterCups);
+    costs.betterCups = (dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST) * (safeToNumber(window.betterCups) + 1);
     
     // Faster drinks upgrade cost
     costs.fasterDrinksUp = (dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST) * safeToNumber(window.fasterDrinksUpCounter);
