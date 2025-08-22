@@ -1307,17 +1307,27 @@ function buyStraw() {
     // Update UI directly
     const strawsElement = document.getElementById('straws');
     if (strawsElement) {
+        console.log('🔧 Debug: Setting straws to:', res.straws);
         strawsElement.textContent = res.straws.toString();
     }
     
     const strawSPDElement = document.getElementById('strawSPD');
     if (strawSPDElement) {
+        console.log('🔧 Debug: Setting strawSPD to:', res.strawSPD);
         strawSPDElement.textContent = res.strawSPD.toString();
     }
     
     const totalStrawSPDElement = document.getElementById('totalStrawSPD');
     if (totalStrawSPDElement) {
-        totalStrawSPDElement.textContent = (res.strawSPD * res.straws).toString() + ' per drink';
+        const totalProduction = res.strawSPD * res.straws;
+        console.log('🔧 Debug: Calculating total production:', res.strawSPD, '*', res.straws, '=', totalProduction);
+        
+        if (isNaN(totalProduction)) {
+            console.error('🔧 Debug: Total production is NaN! res.strawSPD:', res.strawSPD, 'res.straws:', res.straws);
+            totalStrawSPDElement.textContent = '0 per drink';
+        } else {
+            totalStrawSPDElement.textContent = totalProduction.toString() + ' per drink';
+        }
     }
     
     checkUpgradeAffordability();
@@ -1378,17 +1388,27 @@ function buyCup() {
     // Update UI directly
     const cupsElement = document.getElementById('cups');
     if (cupsElement) {
+        console.log('🔧 Debug: Setting cups to:', res.cups);
         cupsElement.textContent = res.cups.toString();
     }
     
     const cupSPDElement = document.getElementById('cupSPD');
     if (cupSPDElement) {
+        console.log('🔧 Debug: Setting cupSPD to:', res.cupSPD);
         cupSPDElement.textContent = res.cupSPD.toString();
     }
     
     const totalCupSPDElement = document.getElementById('totalCupSPD');
     if (totalCupSPDElement) {
-        totalCupSPDElement.textContent = (res.cupSPD * res.cups).toString() + ' per drink';
+        const totalProduction = res.cupSPD * res.cups;
+        console.log('🔧 Debug: Calculating total cup production:', res.cupSPD, '*', res.cups, '=', totalProduction);
+        
+        if (isNaN(totalProduction)) {
+            console.error('🔧 Debug: Total cup production is NaN! res.cupSPD:', res.cupSPD, 'res.cups:', res.cups);
+            totalCupSPDElement.textContent = '0 per drink';
+        } else {
+            totalCupSPDElement.textContent = totalProduction.toString() + ' per drink';
+        }
     }
     
     checkUpgradeAffordability();
@@ -1429,17 +1449,34 @@ function buyWiderStraws() {
         // Update UI directly
         const widerStrawsElement = document.getElementById('widerStraws');
         if (widerStrawsElement) {
+            console.log('🔧 Debug: Setting widerStraws to:', res.widerStraws);
             widerStrawsElement.textContent = res.widerStraws.toString();
         }
         
         const widerStrawsSPDElement = document.getElementById('widerStrawsSPD');
         if (widerStrawsSPDElement) {
-            widerStrawsSPDElement.textContent = (res.strawSPD / 0.6).toFixed(2) + 'x';
+            const upgradeMultiplier = res.strawSPD / 0.6;
+            console.log('🔧 Debug: Calculating wider straws multiplier:', res.strawSPD, '/ 0.6 =', upgradeMultiplier);
+            
+            if (isNaN(upgradeMultiplier)) {
+                console.error('🔧 Debug: Upgrade multiplier is NaN! res.strawSPD:', res.strawSPD);
+                widerStrawsSPDElement.textContent = '0x';
+            } else {
+                widerStrawsSPDElement.textContent = upgradeMultiplier.toFixed(2) + 'x';
+            }
         }
         
         const totalWiderStrawsSPDElement = document.getElementById('totalWiderStrawsSPD');
         if (totalWiderStrawsSPDElement) {
-            totalWiderStrawsSPDElement.textContent = (res.strawSPD * window.straws.toNumber()).toString() + ' per drink';
+            const totalProduction = res.strawSPD * window.straws.toNumber();
+            console.log('🔧 Debug: Calculating total wider straws production:', res.strawSPD, '*', window.straws.toNumber(), '=', totalProduction);
+            
+            if (isNaN(totalProduction)) {
+                console.error('🔧 Debug: Total wider straws production is NaN!');
+                totalWiderStrawsSPDElement.textContent = '0 per drink';
+            } else {
+                totalWiderStrawsSPDElement.textContent = totalProduction.toString() + ' per drink';
+            }
         }
         
         checkUpgradeAffordability();
@@ -1482,17 +1519,34 @@ function buyBetterCups() {
             // Update UI directly
             const betterCupsElement = document.getElementById('betterCups');
             if (betterCupsElement) {
+                console.log('🔧 Debug: Setting betterCups to:', res.betterCups);
                 betterCupsElement.textContent = res.betterCups.toString();
             }
             
             const betterCupsSPDElement = document.getElementById('betterCupsSPD');
             if (betterCupsSPDElement) {
-                betterCupsSPDElement.textContent = (res.cupSPD / 1.2).toFixed(2) + 'x';
+                const upgradeMultiplier = res.cupSPD / 1.2;
+                console.log('🔧 Debug: Calculating better cups multiplier:', res.cupSPD, '/ 1.2 =', upgradeMultiplier);
+                
+                if (isNaN(upgradeMultiplier)) {
+                    console.error('🔧 Debug: Better cups multiplier is NaN! res.cupSPD:', res.cupSPD);
+                    betterCupsSPDElement.textContent = '0x';
+                } else {
+                    betterCupsSPDElement.textContent = upgradeMultiplier.toFixed(2) + 'x';
+                }
             }
             
             const totalBetterCupsSPDElement = document.getElementById('totalBetterCupsSPD');
             if (totalBetterCupsSPDElement) {
-                totalBetterCupsSPDElement.textContent = (res.cupSPD * window.cups.toNumber()).toString() + ' per drink';
+                const totalProduction = res.cupSPD * window.cups.toNumber();
+                console.log('🔧 Debug: Calculating total better cups production:', res.cupSPD, '*', window.cups.toNumber(), '=', totalProduction);
+                
+                if (isNaN(totalProduction)) {
+                    console.error('🔧 Debug: Total better cups production is NaN!');
+                    totalBetterCupsSPDElement.textContent = '0 per drink';
+                } else {
+                    totalBetterCupsSPDElement.textContent = totalProduction.toString() + ' per drink';
+                }
             }
             
             checkUpgradeAffordability();
