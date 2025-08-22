@@ -1621,427 +1621,298 @@ function spsClick(amount) {
 }
 
 function buyStraw() {
-    // IMPROVED BALANCE: Better early game progression
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades;
-    const baseCost = dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST;
-    const scaling = dataUp?.straws?.scaling ?? config.STRAW_SCALING;
-    let strawCost = window.App?.rules?.purchases?.nextStrawCost ?
-        window.App.rules.purchases.nextStrawCost(straws.toNumber(), baseCost, scaling) :
-        Math.floor(baseCost * Math.pow(scaling, straws.toNumber()));
-            if (window.sips.gte(strawCost)) {
-        straws = straws.plus(1);
-        window.straws = straws;
-        if (window.App?.mutations?.subtractSips) {
-            window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, strawCost));
-        } else {
-            window.sips = window.sips.minus(strawCost);
-        }
-        try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'straw', cost: strawCost }); } catch {}
-
-        // Use purchases system to apply change and recalc
-        if (window.App?.systems?.purchases?.purchaseStraw) {
-            const res = window.App.systems.purchases.purchaseStraw({
-                sips: window.sips.toNumber(),
-                straws: straws.toNumber(),
-                cups: cups.toNumber(),
-                widerStraws: widerStraws.toNumber(),
-                betterCups: betterCups.toNumber(),
-            });
-            if (res) {
-                strawSPD = new Decimal(res.strawSPD);
-                sps = new Decimal(res.sipsPerDrink);
-            }
-        } else if (window.App?.systems?.resources?.recalcProduction) {
-            const result = window.App.systems.resources.recalcProduction({
-                straws: straws.toNumber(),
-                cups: cups.toNumber(),
-                widerStraws: widerStraws.toNumber(),
-                betterCups: betterCups.toNumber(),
-            });
-            strawSPD = new Decimal(result.strawSPD);
-            sps = new Decimal(result.sipsPerDrink);
-        } else if (window.App?.rules?.economy?.computeStrawSPD) {
-            const val = window.App.rules.economy.computeStrawSPD(
-                straws.toNumber(),
-                config.STRAW_BASE_SPD,
-                widerStraws.toNumber(),
-                config.WIDER_STRAWS_MULTIPLIER
-            );
-            strawSPD = new Decimal(val);
-            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-        } else {
-            const baseStrawSPD = new Decimal(config.STRAW_BASE_SPD);
-            const upgradeMultiplier = widerStraws.gt(0) ? new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER)) : new Decimal(1);
-            strawSPD = baseStrawSPD.times(upgradeMultiplier);
-            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-        }
-
-        // Include base configured sips per drink in total SPS
-        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-
-        // Update the top sips/d indicator
-        updateTopSipsPerDrink();
-        updateTopSipsPerSecond();
-
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-
-        // Show purchase feedback
-        if (window.App?.ui?.showPurchaseFeedback) {
-            window.App.ui.showPurchaseFeedback('Extra Straw', strawCost);
-        } else {
-            showPurchaseFeedback('Extra Straw', strawCost);
-        }
-
-        reload();
-        checkUpgradeAffordability();
-    }
+    const sys = window.App?.systems?.purchases;
+    if (!sys?.purchaseStraw) return;
+    const res = sys.purchaseStraw({
+        sips: window.sips.toNumber(),
+        straws: straws.toNumber(),
+        cups: cups.toNumber(),
+        widerStraws: widerStraws.toNumber(),
+        betterCups: betterCups.toNumber(),
+    });
+    if (!res) return;
+    window.sips = window.sips.minus(res.spent);
+    straws = new Decimal(res.straws);
+    window.straws = straws;
+    strawSPD = new Decimal(res.strawSPD);
+    cupSPD = new Decimal(res.cupSPD);
+    sps = new Decimal(res.sipsPerDrink);
+    updateTopSipsPerDrink();
+    updateTopSipsPerSecond();
+    try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+    showPurchaseFeedback('Extra Straw', res.spent);
+    reload();
+    checkUpgradeAffordability();
 }
 
 
 
 function buyCup() {
-    // IMPROVED BALANCE: Better mid-game progression
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades;
-    const baseCost = dataUp?.cups?.baseCost ?? config.CUP_BASE_COST;
-    const scaling = dataUp?.cups?.scaling ?? config.CUP_SCALING;
-    let cupCost = window.App?.rules?.purchases?.nextCupCost ?
-        window.App.rules.purchases.nextCupCost(cups.toNumber(), baseCost, scaling) :
-        Math.floor(baseCost * Math.pow(scaling, cups.toNumber()));
-            if (window.sips.gte(cupCost)) {
-        cups = cups.plus(1);
-        window.cups = cups;
-        if (window.App?.mutations?.subtractSips) {
-            window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, cupCost));
-        } else {
-            window.sips = window.sips.minus(cupCost);
-        }
-        try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'cup', cost: cupCost }); } catch {}
-
-        if (window.App?.systems?.purchases?.purchaseCup) {
-            const res = window.App.systems.purchases.purchaseCup({
-                sips: window.sips.toNumber(),
-                straws: straws.toNumber(),
-                cups: cups.toNumber(),
-                widerStraws: widerStraws.toNumber(),
-                betterCups: betterCups.toNumber(),
-            });
-            if (res) {
-                cupSPD = new Decimal(res.cupSPD);
-                sps = new Decimal(res.sipsPerDrink);
-            }
-        } else if (window.App?.systems?.resources?.recalcProduction) {
-            const result = window.App.systems.resources.recalcProduction({
-                straws: straws.toNumber(),
-                cups: cups.toNumber(),
-                widerStraws: widerStraws.toNumber(),
-                betterCups: betterCups.toNumber(),
-            });
-            cupSPD = new Decimal(result.cupSPD);
-            sps = new Decimal(result.sipsPerDrink);
-        } else if (window.App?.rules?.economy?.computeCupSPD) {
-            const val = window.App.rules.economy.computeCupSPD(
-                cups.toNumber(),
-                config.CUP_BASE_SPD,
-                betterCups.toNumber(),
-                config.BETTER_CUPS_MULTIPLIER
-            );
-            cupSPD = new Decimal(val);
-            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-        } else {
-            const baseCupSPD = new Decimal(config.CUP_BASE_SPD);
-            const upgradeMultiplier = betterCups.gt(0) ? new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER)) : new Decimal(1);
-            cupSPD = baseCupSPD.times(upgradeMultiplier);
-            const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-            const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-            sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-        }
-
-        // Include base configured sips per drink in total SPS
-        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-
-        // Update the top sips/d indicator
-        updateTopSipsPerDrink();
-        updateTopSipsPerSecond();
-
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-
-        // Show purchase feedback
-        showPurchaseFeedback('Bigger Cup', cupCost);
-
-        reload();
-        checkUpgradeAffordability();
-    }
+    const sys = window.App?.systems?.purchases;
+    if (!sys?.purchaseCup) return;
+    const res = sys.purchaseCup({
+        sips: window.sips.toNumber(),
+        straws: straws.toNumber(),
+        cups: cups.toNumber(),
+        widerStraws: widerStraws.toNumber(),
+        betterCups: betterCups.toNumber(),
+    });
+    if (!res) return;
+    window.sips = window.sips.minus(res.spent);
+    cups = new Decimal(res.cups);
+    window.cups = cups;
+    strawSPD = new Decimal(res.strawSPD);
+    cupSPD = new Decimal(res.cupSPD);
+    sps = new Decimal(res.sipsPerDrink);
+    updateTopSipsPerDrink();
+    updateTopSipsPerSecond();
+    try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+    showPurchaseFeedback('Bigger Cup', res.spent);
+    reload();
+    checkUpgradeAffordability();
 }
 
 function buyWiderStraws() {
-    // Now an upgrade that improves base straw production
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades;
-    const baseCost = dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST;
-    const scaling = dataUp?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING;
-    let widerStrawsCost = Math.floor(baseCost * Math.pow(scaling, widerStraws.toNumber()));
-            if (window.sips.gte(widerStrawsCost)) {
-        widerStraws = widerStraws.plus(1);
-        window.sips = window.sips.minus(widerStrawsCost);
-
-        // Calculate new straw SPD with upgrade multiplier
-        const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER)); // +50% per level
-        strawSPD = new Decimal(config.STRAW_BASE_SPD).times(upgradeMultiplier);
-
-        // Recalculate total SPS including base configured sips per drink
-        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-
-        // Update the top sips/d indicator
-        updateTopSipsPerDrink();
-
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-
-        // Show purchase feedback
-        showPurchaseFeedback('Wider Straws Upgrade', widerStrawsCost);
-
-        reload();
-        checkUpgradeAffordability();
+    // Prefer centralized purchases system when available
+    if (window.App?.systems?.purchases?.purchaseWiderStraws) {
+        const res = window.App.systems.purchases.purchaseWiderStraws({
+            sips: window.sips.toNumber(),
+            straws: straws.toNumber(),
+            cups: cups.toNumber(),
+            widerStraws: widerStraws.toNumber(),
+            betterCups: betterCups.toNumber(),
+        });
+        if (res) {
+            if (window.App?.mutations?.subtractSips) {
+                window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
+            } else {
+                window.sips = window.sips.minus(res.spent);
+            }
+            widerStraws = new Decimal(res.widerStraws);
+            strawSPD = new Decimal(res.strawSPD);
+            cupSPD = new Decimal(res.cupSPD);
+            sps = new Decimal(res.sipsPerDrink);
+            updateTopSipsPerDrink();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            showPurchaseFeedback('Wider Straws Upgrade', res.spent);
+            reload();
+            checkUpgradeAffordability();
+            return;
+        }
     }
+    
 }
 
 function buyBetterCups() {
-    // Now an upgrade that improves base cup production
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades;
-    const baseCost = dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST;
-    const scaling = dataUp?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING;
-    let betterCupsCost = Math.floor(baseCost * Math.pow(scaling, betterCups.toNumber()));
-            if (window.sips.gte(betterCupsCost)) {
-        betterCups = betterCups.plus(1);
-        window.sips = window.sips.minus(betterCupsCost);
-
-        // Calculate new cup SPD with upgrade multiplier
-        const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER)); // +40% per level
-        cupSPD = new Decimal(config.CUP_BASE_SPD).times(upgradeMultiplier);
-
-        // Recalculate total SPS including base configured sips per drink
-        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-
-        // Update the top sips/d indicator
-        updateTopSipsPerDrink();
-
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-
-        // Show purchase feedback
-        showPurchaseFeedback('Better Cups Upgrade', betterCupsCost);
-
-        reload();
-        checkUpgradeAffordability();
+    if (window.App?.systems?.purchases?.purchaseBetterCups) {
+        const res = window.App.systems.purchases.purchaseBetterCups({
+            sips: window.sips.toNumber(),
+            straws: straws.toNumber(),
+            cups: cups.toNumber(),
+            widerStraws: widerStraws.toNumber(),
+            betterCups: betterCups.toNumber(),
+        });
+        if (res) {
+            if (window.App?.mutations?.subtractSips) {
+                window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
+            } else {
+                window.sips = window.sips.minus(res.spent);
+            }
+            betterCups = new Decimal(res.betterCups);
+            strawSPD = new Decimal(res.strawSPD);
+            cupSPD = new Decimal(res.cupSPD);
+            sps = new Decimal(res.sipsPerDrink);
+            updateTopSipsPerDrink();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            showPurchaseFeedback('Better Cups Upgrade', res.spent);
+            reload();
+            checkUpgradeAffordability();
+            return;
+        }
     }
+    
 }
 
 
 
 function buySuction() {
-    // IMPROVED BALANCE: Better click bonus progression
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades;
-    const baseCost = dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST;
-    const scaling = dataUp?.suction?.scaling ?? config.SUCTION_SCALING;
-    let suctionCost = Math.floor(baseCost * Math.pow(scaling, suctions.toNumber()));
-    
-            if (window.sips.gte(suctionCost)) {
-        suctions = suctions.plus(1);
-        window.sips = window.sips.minus(suctionCost);
-        suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
-
-        // Update the sips/s indicator since suction bonus changed
-        updateTopSipsPerSecond();
-
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        
-        // Show purchase feedback
-        showPurchaseFeedback('Improved Suction', suctionCost);
-        
-        reload();
-        checkUpgradeAffordability();
+    // Prefer centralized purchases system when available
+    if (window.App?.systems?.purchases?.purchaseSuction) {
+        const res = window.App.systems.purchases.purchaseSuction({
+            sips: window.sips.toNumber(),
+            suctions: suctions.toNumber(),
+        });
+        if (res) {
+            if (window.App?.mutations?.subtractSips) {
+                window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
+            } else {
+                window.sips = window.sips.minus(res.spent);
+            }
+            suctions = new Decimal(res.suctions);
+            suctionClickBonus = new Decimal(res.suctionClickBonus);
+            updateTopSipsPerSecond();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            showPurchaseFeedback('Improved Suction', res.spent);
+            reload();
+            checkUpgradeAffordability();
+            return;
+        }
     }
+    
 }
 
 function upgradeSuction() {
-    // IMPROVED BALANCE: More affordable upgrades
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    let suctionUpCost = config.SUCTION_UPGRADE_BASE_COST * suctionUpCounter.toNumber();
-    
-            if (window.sips.gte(suctionUpCost)) {
-        window.sips = window.sips.minus(suctionUpCost);
-        suctionUpCounter = suctionUpCounter.plus(1);
-        suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctionUpCounter);
-        
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        
-        reload();
-        checkUpgradeAffordability();
+    // Prefer centralized purchases system when available
+    if (window.App?.systems?.purchases?.upgradeSuction) {
+        const res = window.App.systems.purchases.upgradeSuction({
+            sips: window.sips.toNumber(),
+            suctionUpCounter: suctionUpCounter.toNumber(),
+        });
+        if (res) {
+            if (window.App?.mutations?.subtractSips) {
+                window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
+            } else {
+                window.sips = window.sips.minus(res.spent);
+            }
+            suctionUpCounter = new Decimal(res.suctionUpCounter);
+            suctionClickBonus = new Decimal(res.suctionClickBonus);
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            reload();
+            checkUpgradeAffordability();
+            return;
+        }
     }
+    
 }
 
 function buyFasterDrinks() {
-    // IMPROVED BALANCE: Better drink speed progression
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades;
-    const baseCost = dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST;
-    const scaling = dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING;
-    let fasterDrinksCost = Math.floor(baseCost * Math.pow(scaling, fasterDrinks.toNumber()));
-            if (window.sips.gte(fasterDrinksCost)) {
-        fasterDrinks = fasterDrinks.plus(1);
-        window.sips = window.sips.minus(fasterDrinksCost);
-        updateDrinkRate();
-        
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        
-        // Show purchase feedback
-        showPurchaseFeedback('Faster Drinks', fasterDrinksCost);
-        
-        reload();
-        checkUpgradeAffordability();
+    // Prefer centralized purchases system when available
+    if (window.App?.systems?.purchases?.purchaseFasterDrinks) {
+        const res = window.App.systems.purchases.purchaseFasterDrinks({
+            sips: window.sips.toNumber(),
+            fasterDrinks: fasterDrinks.toNumber(),
+        });
+        if (res) {
+            if (window.App?.mutations?.subtractSips) {
+                window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
+            } else {
+                window.sips = window.sips.minus(res.spent);
+            }
+            fasterDrinks = new Decimal(res.fasterDrinks);
+            updateDrinkRate();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            showPurchaseFeedback('Faster Drinks', res.spent);
+            reload();
+            checkUpgradeAffordability();
+            return;
+        }
     }
+    
 }
 
 function upgradeFasterDrinks() {
-    // IMPROVED BALANCE: More affordable upgrades
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades;
-    let fasterDrinksUpCost = (dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST) * fasterDrinksUpCounter.toNumber();
-            if (window.sips.gte(fasterDrinksUpCost)) {
-        window.sips = window.sips.minus(fasterDrinksUpCost);
-        fasterDrinksUpCounter = fasterDrinksUpCounter.plus(1);
-        updateDrinkRate();
-        
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        
-        reload();
-        checkUpgradeAffordability();
+    // Prefer centralized purchases system when available
+    if (window.App?.systems?.purchases?.upgradeFasterDrinks) {
+        const res = window.App.systems.purchases.upgradeFasterDrinks({
+            sips: window.sips.toNumber(),
+            fasterDrinksUpCounter: fasterDrinksUpCounter.toNumber(),
+        });
+        if (res) {
+            if (window.App?.mutations?.subtractSips) {
+                window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
+            } else {
+                window.sips = window.sips.minus(res.spent);
+            }
+            fasterDrinksUpCounter = new Decimal(res.fasterDrinksUpCounter);
+            updateDrinkRate();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            reload();
+            checkUpgradeAffordability();
+            return;
+        }
     }
+    
 }
 
 function buyCriticalClick() {
-    // IMPROVED BALANCE: Better critical click progression
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades;
-    const baseCost = dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST;
-    const scaling = dataUp?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING;
-    let criticalClickCost = Math.floor(baseCost * Math.pow(scaling, criticalClicks.toNumber()));
-            if (window.sips.gte(criticalClickCost)) {
-        criticalClicks = criticalClicks.plus(1);
-        window.sips = window.sips.minus(criticalClickCost);
-        
-        // Increase critical click chance by configured increment per purchase
-        const chanceIncrement = config.CRITICAL_CLICK_CHANCE_INCREMENT;
-        criticalClickChance = criticalClickChance.plus(chanceIncrement);
-
-        // Update critical click display
-        updateCriticalClickDisplay();
-
-        // Update sips/s indicator since critical chance changed
-        updateTopSipsPerSecond();
-        
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        
-        // Show purchase feedback
-        showPurchaseFeedback('Critical Click', criticalClickCost);
-        
-        reload();
-        checkUpgradeAffordability();
+    // Prefer centralized purchases system when available
+    if (window.App?.systems?.purchases?.purchaseCriticalClick) {
+        const res = window.App.systems.purchases.purchaseCriticalClick({
+            sips: window.sips.toNumber(),
+            criticalClicks: criticalClicks.toNumber(),
+            criticalClickChance: criticalClickChance.toNumber(),
+        });
+        if (res) {
+            if (window.App?.mutations?.subtractSips) {
+                window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
+            } else {
+                window.sips = window.sips.minus(res.spent);
+            }
+            criticalClicks = new Decimal(res.criticalClicks);
+            criticalClickChance = new Decimal(res.criticalClickChance);
+            updateCriticalClickDisplay();
+            updateTopSipsPerSecond();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            showPurchaseFeedback('Critical Click', res.spent);
+            reload();
+            checkUpgradeAffordability();
+            return;
+        }
     }
+    
 }
 
 function upgradeCriticalClick() {
-    // IMPROVED BALANCE: More affordable upgrades
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    let criticalClickUpCost = config.CRITICAL_CLICK_UPGRADE_BASE_COST * criticalClickUpCounter.toNumber();
-            if (window.sips.gte(criticalClickUpCost)) {
-        window.sips = window.sips.minus(criticalClickUpCost);
-        criticalClickUpCounter = criticalClickUpCounter.plus(1);
-        
-        // Increase critical click multiplier by configured increment per upgrade
-        const multiplierIncrement = config.CRITICAL_CLICK_MULTIPLIER_INCREMENT;
-        criticalClickMultiplier = criticalClickMultiplier.plus(multiplierIncrement);
-
-        // Update sips/s indicator since critical multiplier changed
-        updateTopSipsPerSecond();
-
-        // Play purchase sound
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        
-        reload();
-        checkUpgradeAffordability();
+    // Prefer centralized purchases system when available
+    if (window.App?.systems?.purchases?.upgradeCriticalClick) {
+        const res = window.App.systems.purchases.upgradeCriticalClick({
+            sips: window.sips.toNumber(),
+            criticalClickUpCounter: criticalClickUpCounter.toNumber(),
+            criticalClickMultiplier: criticalClickMultiplier.toNumber(),
+        });
+        if (res) {
+            if (window.App?.mutations?.subtractSips) {
+                window.sips = new Decimal(window.App.mutations.subtractSips(window.sips, res.spent));
+            } else {
+                window.sips = window.sips.minus(res.spent);
+            }
+            criticalClickUpCounter = new Decimal(res.criticalClickUpCounter);
+            criticalClickMultiplier = new Decimal(res.criticalClickMultiplier);
+            updateTopSipsPerSecond();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            reload();
+            checkUpgradeAffordability();
+            return;
+        }
     }
+    
 }
 
 function levelUp() {
-    // IMPROVED BALANCE: Better level up rewards and scaling
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    let levelUpCost = config.LEVEL_UP_BASE_COST * Math.pow(config.LEVEL_UP_SCALING, level.toNumber());
-    
-    if (window.sips.gte(levelUpCost)) {
-        window.sips = window.sips.minus(levelUpCost);
-        level = level.plus(1);
-        try { window.App?.stateBridge?.setLevel(level); } catch {}
-        
-        // Calculate sips gained from level up (configured multiplier)
-        const levelUpMultiplier = config.LEVEL_UP_SIPS_MULTIPLIER;
-        const sipsGained = sps.times(levelUpMultiplier);
-        
-        // Add bonus sips for leveling up
-        window.sips = window.sips.plus(sipsGained);
-        
-        // Play purchase sound
-        playButtonPurchaseSound();
-        
-        // Update displays
-        if (window.App?.ui?.updateLevelNumber) { try { window.App.ui.updateLevelNumber(); } catch {}
-        } else {
-            if (window.App?.ui?.updateLevelNumber) { try { window.App.ui.updateLevelNumber(); } catch {}
-            } else {
-                DOM_CACHE.levelNumber.innerHTML = level.toNumber();
+    // Prefer centralized purchases system when available
+    if (window.App?.systems?.purchases?.levelUp) {
+        const res = window.App.systems.purchases.levelUp({
+            sips: window.sips.toNumber(),
+            level: level.toNumber(),
+            sipsPerDrink: sps.toNumber?.() ?? Number(sps),
+        });
+        if (res) {
+            if (res.sipsDelta) {
+                window.sips = window.sips.plus(res.sipsDelta);
             }
+            level = new Decimal(res.level);
+            try { window.App?.stateBridge?.setLevel(level); } catch {}
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            if (window.App?.ui?.updateLevelNumber) { try { window.App.ui.updateLevelNumber(); } catch {} }
+            else { DOM_CACHE.levelNumber.innerHTML = level.toNumber(); }
+            if (window.App?.ui?.updateTopSipCounter) { try { window.App.ui.updateTopSipCounter(); } catch {} }
+            else { const topSipElement = DOM_CACHE.topSipValue; if (topSipElement) { topSipElement.innerHTML = prettify(window.sips); } }
+            showLevelUpFeedback(new Decimal(res.sipsGained || 0));
+            checkUpgradeAffordability();
+            return;
         }
-        
-        // Update top sip counter
-        if (window.App?.ui?.updateTopSipCounter) { try { window.App.ui.updateTopSipCounter(); } catch {}
-        } else {
-            const topSipElement = DOM_CACHE.topSipValue;
-            if (topSipElement) {
-                topSipElement.innerHTML = prettify(window.sips);
-            }
-        }
-        
-        // Show level up feedback
-        showLevelUpFeedback(sipsGained);
-        
-        // Check affordability after level up
-        checkUpgradeAffordability();
     }
+    
 }
 
 // Function to show level up feedback
