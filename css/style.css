@@ -128,8 +128,8 @@ body {
 .splash-music-start {
     background: linear-gradient(135deg, #00B36B, #008F5A);
     border-color: #008F5A;
-    color: #001789;
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+    color: #FFFFFF;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     box-shadow: 0 4px 15px rgba(0, 179, 107, 0.4);
 }
 
@@ -1100,18 +1100,48 @@ h3 {
 }
 
 /* Level Up Button */
+.level-up-btn {
+  min-width: 200px;
+  min-height: var(--btn-xl);
+  padding: var(--btn-padding-md);
+  font-size: 1.1rem;
+  background-color: var(--primary-blue);
+  color: var(--neutral-white);
+  border-color: var(--primary-purple);
+  margin: 1rem auto;
+  display: block;
+  text-align: center;
+}
 
+/* Level up button content styling */
+.level-up-btn .cost-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.level-up-btn .cost-number {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.level-up-btn .cost-text {
+  font-size: 1rem;
+  opacity: 0.9;
+}
 
 .level-up-btn:hover {
-    background-color: var(--primary-purple);
-    color: var(--primary-blue);
-    transform: scale(1.02);
+  background-color: var(--primary-purple);
+  color: var(--neutral-white);
+  transform: scale(1.02);
 }
 
 .level-up-btn:active {
-    transform: scale(0.98);
-    background: var(--primary-purple);
-    color: var(--primary-blue);
+  transform: scale(0.98);
+  background-color: var(--primary-purple);
+  color: var(--neutral-white);
 }
 
 .level-up-btn.affordable {
@@ -2851,7 +2881,7 @@ button {
 /* Base button defaults - will be overridden by specific button types */
 button {
   background-color: var(--primary-blue);
-  color: var(--primary-green);
+  color: var(--neutral-white);
   border-color: var(--primary-green);
   font-size: 1rem;
   line-height: 1.2;
@@ -2921,14 +2951,14 @@ button {
 /* Secondary Button - Blue theme */
 .btn-secondary {
   background-color: var(--primary-blue);
-  color: var(--primary-green);
+  color: var(--neutral-white);
   border-color: var(--primary-green);
   box-shadow: var(--btn-shadow-sm);
 }
 
 .btn-secondary:hover {
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
@@ -2936,20 +2966,21 @@ button {
 .btn-secondary:active {
   transform: scale(0.98);
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
 }
 
 /* Purple Button - Special theme */
 .btn-purple {
   background-color: var(--primary-blue);
-  color: var(--primary-purple);
+  color: var(--neutral-white);
   border-color: var(--primary-purple);
   box-shadow: var(--btn-shadow-sm);
 }
 
 .btn-purple:hover {
   background-color: var(--primary-purple);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
@@ -2957,7 +2988,7 @@ button {
 .btn-purple:active {
   transform: scale(0.98);
   background-color: var(--primary-purple);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 /* ========================================
@@ -3003,7 +3034,7 @@ button.affordable:hover {
 .clicking-upgrade-btn.affordable,
 .drink-speed-upgrade-btn.affordable {
   background-color: var(--primary-blue) !important;
-  color: var(--primary-green) !important;
+  color: var(--neutral-white) !important;
   border-color: var(--primary-green) !important;
 }
 
@@ -3011,7 +3042,7 @@ button.affordable:hover {
 .clicking-upgrade-btn.affordable:hover,
 .drink-speed-upgrade-btn.affordable:hover {
   background-color: var(--primary-green) !important;
-  color: var(--primary-blue) !important;
+  color: var(--neutral-white) !important;
   border-color: var(--primary-green) !important;
 }
 
@@ -3033,19 +3064,19 @@ button:focus {
   padding: var(--btn-padding-sm);
   font-size: 1rem;
   background-color: var(--primary-blue);
-  color: var(--primary-green);
+  color: var(--neutral-white);
   border-color: var(--primary-green);
 }
 
 .tab-btn:hover {
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: translateY(-2px);
 }
 
 .tab-btn.active {
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   border-color: var(--primary-orange);
   box-shadow: var(--btn-shadow-md);
 }
@@ -3053,25 +3084,25 @@ button:focus {
 .tab-btn:active {
   transform: scale(0.95);
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 /* God Tab - Special styling but consistent behavior */
 .tab-btn[onclick*="god"] {
   background-color: var(--primary-blue);
-  color: var(--primary-purple);
+  color: var(--neutral-white);
   border-color: var(--primary-purple);
 }
 
 .tab-btn[onclick*="god"]:hover {
   background-color: var(--primary-purple);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: translateY(-2px);
 }
 
 .tab-btn[onclick*="god"].active {
   background-color: var(--primary-purple);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   border-color: var(--primary-orange);
   box-shadow: var(--btn-shadow-md);
 }
@@ -3079,7 +3110,7 @@ button:focus {
 .tab-btn[onclick*="god"]:active {
   transform: scale(0.95);
   background-color: var(--primary-purple);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 /* Shop Buttons */
@@ -3089,7 +3120,7 @@ button:focus {
   padding: var(--btn-padding-md);
   font-size: 1rem;
   background-color: var(--primary-blue);
-  color: var(--primary-green);
+  color: var(--neutral-white);
   border-color: var(--primary-green);
   text-align: center;
   line-height: 1.3;
@@ -3136,7 +3167,7 @@ button:focus {
 
 .shop-btn:hover:not(.affordable):not(.disabled) {
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
@@ -3155,7 +3186,7 @@ button:focus {
   padding: var(--btn-padding-md);
   font-size: 1rem;
   background-color: var(--primary-blue);
-  color: var(--primary-green);
+  color: var(--neutral-white);
   border-color: var(--primary-green);
   margin-bottom: 1rem;
   text-align: center;
@@ -3164,7 +3195,7 @@ button:focus {
 
 .clicking-upgrade-btn:hover {
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
@@ -3184,13 +3215,13 @@ button:focus {
   padding: var(--btn-padding-md);
   font-size: 1rem;
   background-color: var(--primary-blue);
-  color: var(--primary-green);
+  color: var(--neutral-white);
   border-color: var(--primary-green);
 }
 
 .drink-speed-upgrade-btn:hover {
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
@@ -3209,7 +3240,7 @@ button:focus {
   padding: var(--btn-padding-md);
   font-size: 1.1rem;
   background-color: var(--primary-blue);
-  color: var(--primary-purple);
+  color: var(--neutral-white);
   border-color: var(--primary-purple);
   margin: 1rem auto;
   display: block;
@@ -3237,14 +3268,14 @@ button:focus {
 
 .level-up-btn:hover {
   background-color: var(--primary-purple);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: scale(1.02);
 }
 
 .level-up-btn:active {
   transform: scale(0.98);
   background-color: var(--primary-purple);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 /* Save Buttons */
@@ -3254,19 +3285,19 @@ button:focus {
   padding: var(--btn-padding-sm);
   font-size: 1rem;
   background-color: var(--primary-blue);
-  color: var(--primary-green);
+  color: var(--neutral-white);
   border-color: var(--primary-green);
 }
 
 .save-btn:hover {
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 .save-btn:active {
   transform: scale(0.95);
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 /* Sound Toggle Button */
@@ -3299,7 +3330,7 @@ button:focus {
   gap: 0.5rem;
   padding: var(--btn-padding-md);
   background-color: var(--primary-blue);
-  color: var(--primary-green);
+  color: var(--neutral-white);
   border-color: var(--primary-green);
   min-height: var(--btn-xl);
   justify-content: center;
@@ -3307,7 +3338,7 @@ button:focus {
 
 .dev-btn:hover {
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
@@ -3315,78 +3346,78 @@ button:focus {
 .dev-btn:active {
   transform: scale(0.95);
   background-color: var(--primary-green);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 /* Dev Button Variants */
 .dev-btn.unlock-all {
   border-color: var(--primary-orange);
-  color: var(--primary-orange);
+  color: var(--neutral-white);
 }
 
 .dev-btn.unlock-all:hover {
   background-color: var(--primary-orange);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 .dev-btn.unlock-shop {
   border-color: var(--secondary-orange);
-  color: var(--secondary-orange);
+  color: var(--neutral-white);
 }
 
 .dev-btn.unlock-shop:hover {
   background-color: var(--secondary-orange);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 .dev-btn.unlock-upgrades {
   border-color: var(--primary-purple);
-  color: var(--primary-purple);
+  color: var(--neutral-white);
 }
 
 .dev-btn.unlock-upgrades:hover {
   background-color: var(--primary-purple);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 .dev-btn.reset {
   border-color: var(--secondary-red);
-  color: var(--secondary-red);
+  color: var(--neutral-white);
 }
 
 .dev-btn.reset:hover {
   background-color: var(--secondary-red);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 .dev-btn.time-travel {
   border-color: var(--secondary-cyan);
-  color: var(--secondary-cyan);
+  color: var(--neutral-white);
 }
 
 .dev-btn.time-travel:hover {
   background-color: var(--secondary-cyan);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 .dev-btn.resources {
   border-color: var(--secondary-blue);
-  color: var(--secondary-blue);
+  color: var(--neutral-white);
 }
 
 .dev-btn.resources:hover {
   background-color: var(--secondary-blue);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 .dev-btn.testing {
   border-color: var(--neutral-light);
-  color: var(--neutral-light);
+  color: var(--neutral-white);
 }
 
 .dev-btn.testing:hover {
   background-color: var(--neutral-light);
-  color: var(--primary-blue);
+  color: var(--neutral-white);
 }
 
 /* Chat Send Button */
