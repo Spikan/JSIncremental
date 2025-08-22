@@ -1,13 +1,10 @@
 // Soda Clicker Pro - Main Game Logic
-// 
+//
 // TEMPLEOS GOD FEATURE SETUP:
 // Divine oracle feature - draws wisdom from sacred texts
 // No external API keys needed for the divine guidance system
 // (But if you know, you know... this runs on 64-bit spiritual processing power)
-
-
-
-
+ 
 // Progressive enhancement - detect advanced features
 const FEATURE_DETECTION = {
     webGL: !!window.WebGLRenderingContext,
@@ -195,8 +192,7 @@ function initSplashScreen() {
         eruda.get('console').log('initSplashScreen called');
     }
     
-    // Initialize splash screen music (simple system)
-    initSplashMusic();
+    // No music: removed splash screen music initialization
     
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
@@ -261,35 +257,10 @@ function initSplashScreen() {
         }
     }
     
-    // Start game honoring previously saved music preference
-    function startGameRespectingPreference() {
-        let musicEnabledPref = true;
-        try {
-            if (window.App?.storage?.getBoolean) {
-                musicEnabledPref = window.App.storage.getBoolean('musicEnabled', true);
-            } else {
-                const stored = localStorage.getItem('musicEnabled');
-                musicEnabledPref = stored === null ? true : stored === 'true';
-            }
-        } catch {}
-        if (musicEnabledPref) {
-            startGameWithMusic();
-        } else {
-            startGameWithoutMusic();
-        }
-    }
+    // Expose global start for splash button
+    window.startGame = startGame;
     
-    // Ensure splash buttons don't bubble to background handler
-    try {
-        const withMusicBtn = document.querySelector('.splash-music-start');
-        const noMusicBtn = document.querySelector('.splash-no-music-start');
-        if (withMusicBtn) {
-            withMusicBtn.addEventListener('click', (e) => { e.stopPropagation(); });
-        }
-        if (noMusicBtn) {
-            noMusicBtn.addEventListener('click', (e) => { e.stopPropagation(); });
-        }
-    } catch {}
+    // No special splash buttons to handle
 
     // Add click-through functionality for splash background
     splashScreen.addEventListener('click', function(e) {
@@ -303,8 +274,8 @@ function initSplashScreen() {
             if (typeof eruda !== 'undefined') {
                 eruda.get('console').log('Splash background clicked, starting game...');
             }
-            // Honor saved preference when clicking background
-            startGameRespectingPreference();
+            // Start game directly
+            startGame();
         }
     });
     
@@ -317,8 +288,8 @@ function initSplashScreen() {
                     eruda.get('console').log('Keyboard input detected, starting game...');
                 }
                 event.preventDefault();
-                // Honor saved preference for keyboard shortcuts
-                startGameRespectingPreference();
+                // Start game directly
+                startGame();
             }
         }
     });
@@ -1030,15 +1001,7 @@ function updateTopSipsPerDrink() {
         // Total sips per drink = base + passive
         const totalSipsPerDrink = baseSipsPerDrink.plus(passiveSipsPerDrink);
         
-        console.log('Sips per drink Debug:', {
-            baseSipsPerDrink: baseSipsPerDrink.toString(),
-            passiveSipsPerDrink: passiveSipsPerDrink.toString(),
-            totalSipsPerDrink: totalSipsPerDrink.toString(),
-            strawSPD: strawSPD.toString(),
-            straws: straws.toString(),
-            cupSPD: cupSPD.toString(),
-            cups: cups.toString()
-        });
+        
         topSipsPerDrinkElement.textContent = prettify(totalSipsPerDrink);
     }
 }
@@ -1071,17 +1034,6 @@ function updateTopSipsPerSecond() {
             totalSipsPerDrink: totalSipsPerDrink.toString(),
             drinkRateSeconds: drinkRateSeconds,
             totalSipsPerSecond: totalSipsPerSecond.toString()
-        });
-
-        // Also log passive calculation separately
-        console.log('Passive Calculation:', {
-            strawSPD: strawSPD.toString(),
-            straws: straws.toString(),
-            strawContribution: strawSPD.times(straws).toString(),
-            cupSPD: cupSPD.toString(),
-            cups: cups.toString(),
-            cupContribution: cupSPD.times(cups).toString(),
-            drinkRate: drinkRate
         });
 
         topSipsPerSecondElement.textContent = prettify(totalSipsPerSecond);
@@ -1408,406 +1360,9 @@ function trackClick() {
     }
 }
 
-// Straw sip sound effect system (now handled by simple audio system below)
 
-// Generate a straw sip sound with random modulation
-function playStrawSipSound() {
-    if (!clickSoundsEnabled || !audioContext) {
-        return;
-    }
-    
-    // Randomly choose between the three sound types for variety
-    const soundChoice = Math.random();
-    if (soundChoice < 0.5) {
-        playBasicStrawSipSound();
-    } else if (soundChoice < 0.8) {
-        playAlternativeStrawSipSound();
-    } else {
-        playBubbleStrawSipSound();
-    }
-}
-
-// Basic straw sip sound
-function playBasicStrawSipSound() {
-    try {
-        // Create oscillator for the main sip sound
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        // Random modulation parameters for variety
-            const config = window.GAME_CONFIG.AUDIO;
-    const baseFreq = config.CLICK_SOUND_BASE_FREQ_MIN + Math.random() * (config.CLICK_SOUND_BASE_FREQ_MAX - config.CLICK_SOUND_BASE_FREQ_MIN);
-    const duration = config.CLICK_SOUND_DURATION_MIN + Math.random() * (config.CLICK_SOUND_DURATION_MAX - config.CLICK_SOUND_DURATION_MIN);
-    const volume = config.CLICK_SOUND_VOLUME_MIN + Math.random() * (config.CLICK_SOUND_VOLUME_MAX - config.CLICK_SOUND_VOLUME_MIN);
-        
-        // Set up oscillator
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
-        
-        // Add frequency modulation for realistic straw sound
-        oscillator.frequency.exponentialRampToValueAtTime(
-            baseFreq * (0.8 + Math.random() * 0.4), 
-            audioContext.currentTime + duration
-        );
-        
-        // Set up gain envelope for natural sound
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        // Connect nodes
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Start and stop the sound
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + duration);
-        
-        // Clean up
-        setTimeout(() => {
-            oscillator.disconnect();
-            gainNode.disconnect();
-        }, duration * 1000 + 100);
-        
-    } catch (error) {
-        console.error('Error playing basic straw sip sound:', error);
-    }
-}
-
-// Alternative straw sip sound with different characteristics
-function playAlternativeStrawSipSound() {
-    if (!clickSoundsEnabled || !audioContext) {
-        return;
-    }
-    
-    try {
-        // Create multiple oscillators for a richer sound
-        const oscillator1 = audioContext.createOscillator();
-        const oscillator2 = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        const filterNode = audioContext.createBiquadFilter();
-        
-        // Random parameters
-            const config = window.GAME_CONFIG.AUDIO;
-    const baseFreq1 = config.CRITICAL_CLICK_FREQ1_MIN + Math.random() * (config.CRITICAL_CLICK_FREQ1_MAX - config.CRITICAL_CLICK_FREQ1_MIN);
-    const baseFreq2 = config.CRITICAL_CLICK_FREQ2_MIN + Math.random() * (config.CRITICAL_CLICK_FREQ2_MAX - config.CRITICAL_CLICK_FREQ2_MIN);
-    const duration = config.CRITICAL_CLICK_DURATION_MIN + Math.random() * (config.CRITICAL_CLICK_DURATION_MAX - config.CRITICAL_CLICK_DURATION_MIN);
-    const volume = config.CRITICAL_CLICK_VOLUME_MIN + Math.random() * (config.CRITICAL_CLICK_VOLUME_MAX - config.CRITICAL_CLICK_VOLUME_MIN);
-        
-        // Set up oscillators
-        oscillator1.type = 'triangle';
-        oscillator2.type = 'sine';
-        
-        oscillator1.frequency.setValueAtTime(baseFreq1, audioContext.currentTime);
-        oscillator2.frequency.setValueAtTime(baseFreq2, audioContext.currentTime);
-        
-        // Add subtle frequency changes
-        oscillator1.frequency.exponentialRampToValueAtTime(
-            baseFreq1 * (0.9 + Math.random() * 0.2), 
-            audioContext.currentTime + duration
-        );
-        oscillator2.frequency.exponentialRampToValueAtTime(
-            baseFreq2 * (0.85 + Math.random() * 0.3), 
-            audioContext.currentTime + duration
-        );
-        
-        // Set up filter for more realistic straw sound
-        filterNode.type = 'lowpass';
-        filterNode.frequency.setValueAtTime(800 + Math.random() * 400, audioContext.currentTime);
-        filterNode.Q.setValueAtTime(2 + Math.random() * 3, audioContext.currentTime);
-        
-        // Set up gain envelope
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.005);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        // Connect nodes
-        oscillator1.connect(filterNode);
-        oscillator2.connect(filterNode);
-        filterNode.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Start and stop sounds
-        oscillator1.start(audioContext.currentTime);
-        oscillator2.start(audioContext.currentTime);
-        oscillator1.stop(audioContext.currentTime + duration);
-        oscillator2.stop(audioContext.currentTime + duration);
-        
-        // Clean up
-        setTimeout(() => {
-            oscillator1.disconnect();
-            oscillator2.disconnect();
-            filterNode.disconnect();
-            gainNode.disconnect();
-        }, duration * 1000 + 100);
-        
-    } catch (error) {
-        console.error('Error playing alternative straw sip sound:', error);
-    }
-}
-
-// Bubble straw sip sound with more complex modulation
-function playBubbleStrawSipSound() {
-    if (!clickSoundsEnabled || !audioContext) {
-        return;
-    }
-    
-    try {
-        // Create multiple oscillators for a bubbly effect
-        const oscillator1 = audioContext.createOscillator();
-        const oscillator2 = audioContext.createOscillator();
-        const oscillator3 = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        const filterNode = audioContext.createBiquadFilter();
-        const delayNode = audioContext.createDelay();
-        
-        // Random parameters for variety
-            const config = window.GAME_CONFIG.AUDIO;
-    const baseFreq1 = config.LEVEL_UP_FREQ1_MIN + Math.random() * (config.LEVEL_UP_FREQ1_MAX - config.LEVEL_UP_FREQ1_MIN);
-    const baseFreq2 = config.LEVEL_UP_FREQ2_MIN + Math.random() * (config.LEVEL_UP_FREQ2_MAX - config.LEVEL_UP_FREQ2_MIN);
-    const baseFreq3 = config.LEVEL_UP_FREQ3_MIN + Math.random() * (config.LEVEL_UP_FREQ3_MAX - config.LEVEL_UP_FREQ3_MIN);
-    const duration = config.LEVEL_UP_DURATION_MIN + Math.random() * (config.LEVEL_UP_DURATION_MAX - config.LEVEL_UP_DURATION_MIN);
-    const volume = config.LEVEL_UP_VOLUME_MIN + Math.random() * (config.LEVEL_UP_VOLUME_MAX - config.LEVEL_UP_VOLUME_MIN);
-        
-        // Set up oscillators with different waveforms
-        oscillator1.type = 'sawtooth';
-        oscillator2.type = 'square';
-        oscillator3.type = 'sine';
-        
-        oscillator1.frequency.setValueAtTime(baseFreq1, audioContext.currentTime);
-        oscillator2.frequency.setValueAtTime(baseFreq2, audioContext.currentTime);
-        oscillator3.frequency.setValueAtTime(baseFreq3, audioContext.currentTime);
-        
-        // Add complex frequency modulation for bubbly effect
-        oscillator1.frequency.exponentialRampToValueAtTime(
-            baseFreq1 * (0.7 + Math.random() * 0.6), 
-            audioContext.currentTime + duration
-        );
-        oscillator2.frequency.exponentialRampToValueAtTime(
-            baseFreq2 * (0.6 + Math.random() * 0.8), 
-            audioContext.currentTime + duration
-        );
-        oscillator3.frequency.exponentialRampToValueAtTime(
-            baseFreq3 * (0.5 + Math.random() * 1.0), 
-            audioContext.currentTime + duration
-        );
-        
-        // Set up filter for bubbly character
-        filterNode.type = 'bandpass';
-        filterNode.frequency.setValueAtTime(600 + Math.random() * 300, audioContext.currentTime);
-        filterNode.Q.setValueAtTime(4 + Math.random() * 4, audioContext.currentTime);
-        
-        // Add subtle delay for depth
-        delayNode.delayTime.setValueAtTime(0.01 + Math.random() * 0.02, audioContext.currentTime);
-        
-        // Set up gain envelope with multiple stages
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.003);
-        gainNode.gain.setValueAtTime(volume * 0.8, audioContext.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        // Connect nodes with delay for depth
-        oscillator1.connect(filterNode);
-        oscillator2.connect(filterNode);
-        oscillator3.connect(filterNode);
-        filterNode.connect(gainNode);
-        gainNode.connect(delayNode);
-        delayNode.connect(audioContext.destination);
-        
-        // Start and stop sounds
-        oscillator1.start(audioContext.currentTime);
-        oscillator2.start(audioContext.currentTime);
-        oscillator3.start(audioContext.currentTime);
-        oscillator1.stop(audioContext.currentTime + duration);
-        oscillator2.stop(audioContext.currentTime + duration);
-        oscillator3.stop(audioContext.currentTime + duration);
-        
-        // Clean up
-        setTimeout(() => {
-            oscillator1.disconnect();
-            oscillator2.disconnect();
-            oscillator3.disconnect();
-            filterNode.disconnect();
-            gainNode.disconnect();
-            delayNode.disconnect();
-        }, duration * 1000 + 100);
-        
-    } catch (error) {
-        console.error('Error playing bubble straw sip sound:', error);
-    }
-}
-
-// Generate a critical click sound with dramatic effect
-function playCriticalClickSound() {
-    if (!clickSoundsEnabled || !audioContext) {
-        return;
-    }
-    
-    try {
-        // Create multiple oscillators for a dramatic critical sound
-        const oscillator1 = audioContext.createOscillator();
-        const oscillator2 = audioContext.createOscillator();
-        const oscillator3 = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        const filterNode = audioContext.createBiquadFilter();
-        const delayNode = audioContext.createDelay();
-        
-        // Critical sound parameters - more dramatic than regular sounds
-            const config = window.GAME_CONFIG.AUDIO;
-    const baseFreq1 = config.PURCHASE_FREQ1_MIN + Math.random() * (config.PURCHASE_FREQ1_MAX - config.PURCHASE_FREQ1_MIN);
-    const baseFreq2 = config.PURCHASE_FREQ2_MIN + Math.random() * (config.PURCHASE_FREQ2_MAX - config.PURCHASE_FREQ2_MIN);
-    const baseFreq3 = config.PURCHASE_FREQ3_MIN + Math.random() * (config.PURCHASE_FREQ3_MAX - config.PURCHASE_FREQ3_MIN);
-    const duration = config.PURCHASE_DURATION_MIN + Math.random() * (config.PURCHASE_DURATION_MAX - config.PURCHASE_DURATION_MIN);
-    const volume = config.PURCHASE_VOLUME_MIN + Math.random() * (config.PURCHASE_VOLUME_MAX - config.PURCHASE_VOLUME_MIN);
-        
-        // Set up oscillators with different waveforms for dramatic effect
-        oscillator1.type = 'sawtooth'; // Rich harmonics
-        oscillator2.type = 'square'; // Strong presence
-        oscillator3.type = 'triangle'; // Smooth high end
-        
-        oscillator1.frequency.setValueAtTime(baseFreq1, audioContext.currentTime);
-        oscillator2.frequency.setValueAtTime(baseFreq2, audioContext.currentTime);
-        oscillator3.frequency.setValueAtTime(baseFreq3, audioContext.currentTime);
-        
-        // Add dramatic frequency sweeps for critical effect
-        oscillator1.frequency.exponentialRampToValueAtTime(
-            baseFreq1 * (0.5 + Math.random() * 1.0), 
-            audioContext.currentTime + duration
-        );
-        oscillator2.frequency.exponentialRampToValueAtTime(
-            baseFreq2 * (0.3 + Math.random() * 1.4), 
-            audioContext.currentTime + duration
-        );
-        oscillator3.frequency.exponentialRampToValueAtTime(
-            baseFreq3 * (0.2 + Math.random() * 1.8), 
-            audioContext.currentTime + duration
-        );
-        
-        // Set up filter for dramatic character
-        filterNode.type = 'highpass'; // Emphasize high frequencies
-        filterNode.frequency.setValueAtTime(300 + Math.random() * 200, audioContext.currentTime);
-        filterNode.Q.setValueAtTime(6 + Math.random() * 4, audioContext.currentTime);
-        
-        // Add delay for dramatic depth
-        delayNode.delayTime.setValueAtTime(0.02 + Math.random() * 0.03, audioContext.currentTime);
-        
-        // Set up gain envelope with dramatic attack and release
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.001); // Fast attack
-        gainNode.gain.setValueAtTime(volume, audioContext.currentTime + 0.05);
-        gainNode.gain.setValueAtTime(volume * 0.9, audioContext.currentTime + 0.1);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        // Connect nodes with delay for dramatic depth
-        oscillator1.connect(filterNode);
-        oscillator2.connect(filterNode);
-        oscillator3.connect(filterNode);
-        filterNode.connect(gainNode);
-        gainNode.connect(delayNode);
-        delayNode.connect(audioContext.destination);
-        
-        // Start and stop sounds
-        oscillator1.start(audioContext.currentTime);
-        oscillator2.start(audioContext.currentTime);
-        oscillator3.start(audioContext.currentTime);
-        oscillator1.stop(audioContext.currentTime + duration);
-        oscillator2.stop(audioContext.currentTime + duration);
-        oscillator3.stop(audioContext.currentTime + duration);
-        
-        // Clean up
-        setTimeout(() => {
-            oscillator1.disconnect();
-            oscillator2.disconnect();
-            oscillator3.disconnect();
-            filterNode.disconnect();
-            gainNode.disconnect();
-            delayNode.disconnect();
-        }, duration * 1000 + 100);
-        
-    } catch (error) {
-        console.error('Error playing critical click sound:', error);
-    }
-}
 
 // Generate a deep purchase sound for shop upgrades (OLD COMPLEX VERSION - DISABLED)
-function playPurchaseSoundOld() {
-    if (!clickSoundsEnabled || !audioContext) {
-        return;
-    }
-    
-    try {
-        // Create oscillators for a deep, satisfying purchase sound
-        const oscillator1 = audioContext.createOscillator();
-        const oscillator2 = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        const filterNode = audioContext.createBiquadFilter();
-        const delayNode = audioContext.createDelay();
-        
-        // Deep purchase sound parameters
-            const config = window.GAME_CONFIG.AUDIO;
-    const baseFreq1 = config.SODA_CLICK_FREQ1_MIN + Math.random() * (config.SODA_CLICK_FREQ1_MAX - config.SODA_CLICK_FREQ1_MIN);
-    const baseFreq2 = config.SODA_CLICK_FREQ2_MIN + Math.random() * (config.SODA_CLICK_FREQ2_MAX - config.SODA_CLICK_FREQ2_MIN);
-    const duration = config.SODA_CLICK_DURATION_MIN + Math.random() * (config.SODA_CLICK_DURATION_MAX - config.SODA_CLICK_DURATION_MIN);
-    const volume = config.SODA_CLICK_VOLUME_MIN + Math.random() * (config.SODA_CLICK_VOLUME_MAX - config.SODA_CLICK_VOLUME_MIN);
-        
-        // Set up oscillators with deep waveforms
-        oscillator1.type = 'sine'; // Pure, deep tone
-        oscillator2.type = 'triangle'; // Rich harmonics
-        
-        oscillator1.frequency.setValueAtTime(baseFreq1, audioContext.currentTime);
-        oscillator2.frequency.setValueAtTime(baseFreq2, audioContext.currentTime);
-        
-        // Add subtle frequency modulation for depth
-        oscillator1.frequency.exponentialRampToValueAtTime(
-            baseFreq1 * (0.9 + Math.random() * 0.2), 
-            audioContext.currentTime + duration
-        );
-        oscillator2.frequency.exponentialRampToValueAtTime(
-            baseFreq2 * (0.85 + Math.random() * 0.3), 
-            audioContext.currentTime + duration
-        );
-        
-        // Set up low-pass filter for deep, warm character
-        filterNode.type = 'lowpass';
-        filterNode.frequency.setValueAtTime(300 + Math.random() * 200, audioContext.currentTime);
-        filterNode.Q.setValueAtTime(3 + Math.random() * 2, audioContext.currentTime);
-        
-        // Add subtle delay for depth
-        delayNode.delayTime.setValueAtTime(0.03 + Math.random() * 0.02, audioContext.currentTime);
-        
-        // Set up gain envelope with smooth attack and release
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.05); // Smooth attack
-        gainNode.gain.setValueAtTime(volume, audioContext.currentTime + 0.1);
-        gainNode.gain.setValueAtTime(volume * 0.8, audioContext.currentTime + 0.2);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        // Connect nodes for deep sound
-        oscillator1.connect(filterNode);
-        oscillator2.connect(filterNode);
-        filterNode.connect(gainNode);
-        gainNode.connect(delayNode);
-        delayNode.connect(audioContext.destination);
-        
-        // Start and stop sounds
-        oscillator1.start(audioContext.currentTime);
-        oscillator2.start(audioContext.currentTime);
-        oscillator1.stop(audioContext.currentTime + duration);
-        oscillator2.stop(audioContext.currentTime + duration);
-        
-        // Clean up
-        setTimeout(() => {
-            oscillator1.disconnect();
-            oscillator2.disconnect();
-            filterNode.disconnect();
-            gainNode.disconnect();
-            delayNode.disconnect();
-        }, duration * 1000 + 100);
-        
-    } catch (error) {
-        console.error('Error playing purchase sound:', error);
-    }
-}
 
 // Function to toggle click sounds on/off
 function toggleClickSounds() {
@@ -1900,7 +1455,7 @@ function sodaClick(number) {
         try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.CRITICAL, { multiplier: criticalMultiplier.toString() }); } catch {}
         
         // Play critical button click sound
-        playButtonCriticalClickSound();
+        try { window.App?.systems?.audio?.button?.playButtonCriticalClickSound?.(); } catch {}
         
         console.log('CRITICAL CLICK! Multiplier: ' + criticalMultiplier.toString());
     }
@@ -2340,7 +1895,7 @@ function upgradeSuction() {
         suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctionUpCounter);
         
         // Play purchase sound
-        playButtonPurchaseSound();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
         
         reload();
         checkUpgradeAffordability();
@@ -2360,7 +1915,7 @@ function buyFasterDrinks() {
         updateDrinkRate();
         
         // Play purchase sound
-        playButtonPurchaseSound();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
         
         // Show purchase feedback
         showPurchaseFeedback('Faster Drinks', fasterDrinksCost);
@@ -2381,7 +1936,7 @@ function upgradeFasterDrinks() {
         updateDrinkRate();
         
         // Play purchase sound
-        playButtonPurchaseSound();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
         
         reload();
         checkUpgradeAffordability();
@@ -2410,7 +1965,7 @@ function buyCriticalClick() {
         updateTopSipsPerSecond();
         
         // Play purchase sound
-        playButtonPurchaseSound();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
         
         // Show purchase feedback
         showPurchaseFeedback('Critical Click', criticalClickCost);
@@ -2436,7 +1991,7 @@ function upgradeCriticalClick() {
         updateTopSipsPerSecond();
 
         // Play purchase sound
-        playButtonPurchaseSound();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
         
         reload();
         checkUpgradeAffordability();
@@ -2965,92 +2520,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// Start game with music - plays title music and sets up main game music
-window.startGameWithMusic = function() {
-    console.log('startGameWithMusic called');
-    
-    // Check user's music preference first
-    let musicEnabled = true;
-    try {
-        if (window.App?.storage?.getBoolean) {
-            musicEnabled = window.App.storage.getBoolean('musicEnabled', true);
-        } else {
-            const stored = localStorage.getItem('musicEnabled');
-            musicEnabled = stored !== null ? stored === 'true' : true;
-        }
-    } catch (error) {
-        console.error('Error checking music preference:', error);
-        musicEnabled = true; // Default to enabled
-    }
-
-    if (!musicEnabled) {
-        console.log('Music disabled by user preference, skipping title music playback');
-        return;
-    }
-
-    // Start playing title music immediately
-    if (splashAudio) {
-        console.log('Starting title music for game start...');
-        const playPromise = splashAudio.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                console.log('Title music started successfully on game start');
-            }).catch(error => {
-                console.log('Title music failed to start:', error);
-            });
-        }
-    }
-    
-    // Set a flag to indicate music is enabled
-    try {
-        if (window.App?.storage?.setBoolean) {
-            window.App.storage.setBoolean('musicEnabled', true);
-        } else {
-            localStorage.setItem('musicEnabled', 'true');
-        }
-    } catch {}
-    
-    // Start the game after a brief moment to let title music begin
-    const config = window.GAME_CONFIG?.TIMING || {};
-    const splashTransitionDelay = config.SPLASH_TRANSITION_DELAY;
-    setTimeout(() => {
-        startGameCore();
-    }, splashTransitionDelay);
-};
-
-// Start game without music - mutes all audio
-window.startGameWithoutMusic = function() {
-    console.log('startGameWithoutMusic called');
-    
-    // Set flag to indicate music is disabled
-    try {
-        if (window.App?.storage?.setBoolean) {
-            window.App.storage.setBoolean('musicEnabled', false);
-        } else {
-            localStorage.setItem('musicEnabled', 'false');
-        }
-    } catch {}
-
-    // Update splash audio mute state to reflect new preference
-    updateSplashAudioMuteState();
-
-    // Ensure any title music is stopped immediately
-    try { if (splashAudio) { splashAudio.pause(); splashAudio.currentTime = 0; } } catch {}
-    if (typeof splashAudio !== 'undefined' && splashAudio) {
-        try { splashAudio.pause(); splashAudio.currentTime = 0; } catch {}
-    }
-    
-    // Pre-configure main music player state to be muted
-    window.musicPlayerState = window.musicPlayerState || {};
-    window.musicPlayerState.isMuted = true;
-    if (window.musicPlayerState.audio) {
-        try { window.musicPlayerState.audio.muted = true; } catch {}
-    }
-    
-    // Start the game immediately
-    startGameCore();
-};
+ 
 
 // Core game start function used by both music options
 function startGameCore() {
@@ -3095,8 +2565,14 @@ function startGameCore() {
     }
 }
 
-// Keep the old function for compatibility (just redirect to music version)
-window.startGameFromButton = window.startGameWithMusic;
+// Keep the old function for compatibility (call global start if available)
+window.startGameFromButton = function() {
+    try {
+        if (typeof window.startGame === 'function') {
+            window.startGame();
+        }
+    } catch {}
+};
 
 // Function to show purchase feedback
 function showPurchaseFeedback(itemName, cost) {
