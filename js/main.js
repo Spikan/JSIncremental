@@ -600,6 +600,33 @@ function initGame() {
         const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
         sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
         
+        // Seed App.state with authoritative numeric snapshot
+        try {
+            const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+            window.App?.state?.setState?.({
+                sips: toNum(window.sips),
+                straws: toNum(straws),
+                cups: toNum(cups),
+                suctions: toNum(window.suctions),
+                widerStraws: toNum(widerStraws),
+                betterCups: toNum(betterCups),
+                fasterDrinks: toNum(window.fasterDrinks),
+                criticalClicks: toNum(criticalClicks),
+                level: toNum(level),
+                sps: toNum(sps),
+                strawSPD: toNum(strawSPD),
+                cupSPD: toNum(cupSPD),
+                drinkRate: Number(drinkRate || 0),
+                drinkProgress: Number(drinkProgress || 0),
+                lastDrinkTime: Number(lastDrinkTime || 0),
+                criticalClickChance: toNum(criticalClickChance),
+                criticalClickMultiplier: toNum(criticalClickMultiplier),
+                suctionClickBonus: toNum(suctionClickBonus),
+                fasterDrinksUpCounter: toNum(fasterDrinksUpCounter),
+                criticalClickUpCounter: toNum(criticalClickUpCounter)
+            });
+        } catch {}
+
         // Update the top sips per drink display
         window.App?.ui?.updateTopSipsPerDrink?.();
         window.App?.ui?.updateTopSipsPerSecond?.();
@@ -802,7 +829,9 @@ function processDrink() {
         try {
             window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
             window.App?.stateBridge?.setDrinkProgress(drinkProgress);
-            window.App?.stateBridge?.autoSync?.();
+            // Also write sips to state directly
+            const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+            window.App?.state?.setState?.({ sips: toNum(window.sips) });
         } catch {}
         
         // Check for feature unlocks after processing a drink
@@ -1127,6 +1156,16 @@ function buyStraw() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.straws = new Decimal(result.straws);
+            // Update App.state snapshot
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    straws: Number(result.straws),
+                    strawSPD: Number(result.strawSPD ?? 0),
+                    cupSPD: Number(result.cupSPD ?? 0),
+                    sps: Number(result.sipsPerDrink ?? 0)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1156,6 +1195,15 @@ function buyCup() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.cups = new Decimal(result.cups);
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    cups: Number(result.cups),
+                    strawSPD: Number(result.strawSPD ?? 0),
+                    cupSPD: Number(result.cupSPD ?? 0),
+                    sps: Number(result.sipsPerDrink ?? 0)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1186,6 +1234,13 @@ function buySuction() {
             window.sips = window.sips.minus(result.spent);
             // Ensure suctions is a Decimal object
             window.suctions = new Decimal(result.suctions);
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    suctions: Number(result.suctions),
+                    suctionClickBonus: Number(result.suctionClickBonus ?? 0)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1217,6 +1272,13 @@ function buyCriticalClick() {
             window.sips = window.sips.minus(result.spent);
             window.criticalClicks = new Decimal(result.criticalClicks);
             window.criticalClickChance = new Decimal(result.criticalClickChance);
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    criticalClicks: Number(result.criticalClicks),
+                    criticalClickChance: Number(result.criticalClickChance)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1246,6 +1308,12 @@ function buyFasterDrinks() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.fasterDrinks = new Decimal(result.fasterDrinks);
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    fasterDrinks: Number(result.fasterDrinks)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1275,6 +1343,15 @@ function buyWiderStraws() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.widerStraws = new Decimal(result.widerStraws);
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    widerStraws: Number(result.widerStraws),
+                    strawSPD: Number(result.strawSPD ?? 0),
+                    cupSPD: Number(result.cupSPD ?? 0),
+                    sps: Number(result.sipsPerDrink ?? 0)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1304,6 +1381,15 @@ function buyBetterCups() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.betterCups = new Decimal(result.betterCups);
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    betterCups: Number(result.betterCups),
+                    strawSPD: Number(result.strawSPD ?? 0),
+                    cupSPD: Number(result.cupSPD ?? 0),
+                    sps: Number(result.sipsPerDrink ?? 0)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1334,6 +1420,12 @@ function upgradeFasterDrinks() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.fasterDrinksUpCounter = result.fasterDrinksUpCounter;
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    fasterDrinksUpCounter: Number(result.fasterDrinksUpCounter)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1434,6 +1526,12 @@ function levelUp() {
             // Update global state
             window.sips = window.sips.minus(result.spent).plus(result.sipsGained);
             window.level = result.level;
+            try {
+                window.App?.state?.setState?.({
+                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
+                    level: Number(result.level)
+                });
+            } catch {}
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1547,8 +1645,13 @@ function loadClickSoundsPreference() {
 function toggleAutosave() {
     const checkbox = document.getElementById('autosaveToggle');
     autosaveEnabled = !!(checkbox && checkbox.checked);
-    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_TOGGLED, { enabled: autosaveEnabled }); } catch {}
-    try { window.App?.systems?.options?.saveOptions?.({ autosaveEnabled, autosaveInterval }); } catch {}
+    try {
+        window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_TOGGLED, { enabled: autosaveEnabled });
+        // Update state options
+        const prev = window.App?.state?.getState?.()?.options || {};
+        window.App?.state?.setState?.({ options: { ...prev, autosaveEnabled } });
+        window.App?.systems?.options?.saveOptions?.({ autosaveEnabled, autosaveInterval });
+    } catch {}
     try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
 }
 
@@ -1556,8 +1659,12 @@ function changeAutosaveInterval() {
     const select = document.getElementById('autosaveInterval');
     autosaveInterval = parseInt(select?.value || autosaveInterval, 10);
     autosaveCounter = 0; // Reset counter when changing interval
-    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_INTERVAL_CHANGED, { seconds: autosaveInterval }); } catch {}
-    try { window.App?.systems?.options?.saveOptions?.({ autosaveEnabled, autosaveInterval }); } catch {}
+    try {
+        window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_INTERVAL_CHANGED, { seconds: autosaveInterval });
+        const prev = window.App?.state?.getState?.()?.options || {};
+        window.App?.state?.setState?.({ options: { ...prev, autosaveInterval } });
+        window.App?.systems?.options?.saveOptions?.({ autosaveEnabled, autosaveInterval });
+    } catch {}
     try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
 }
 
