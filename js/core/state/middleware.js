@@ -195,4 +195,23 @@ export function createHistoryMiddleware(maxHistory = 50) {
     };
 }
 
+// Convenience function to create a store with common middleware
+export function createEnhancedStore(initialState = {}) {
+    const store = createStore(initialState);
 
+    // Add essential middleware
+    store.use(createValidationMiddleware());
+
+    // Add development middleware in development
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        store.use(createDebugMiddleware(true));
+        store.use(createPerformanceMiddleware());
+    }
+
+    // Add persistence if storage is available
+    if (typeof localStorage !== 'undefined') {
+        store.use(createPersistenceMiddleware());
+    }
+
+    return store;
+}
