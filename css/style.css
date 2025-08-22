@@ -95,6 +95,14 @@ body {
     animation: blink 2s infinite;
 }
 
+.splash-warning {
+    margin-top: 12px;
+    color: #FF8E53;
+    font-weight: 600;
+    font-size: clamp(0.9rem, 3vw, 1rem);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 .splash-buttons {
     text-align: center;
     margin: 20px 0;
