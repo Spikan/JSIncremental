@@ -298,42 +298,12 @@
 <div id="optionsTab" class="tab-content">
     <div class="options-container">
         <div class="options-section">
-            <h3>🎵 Music Player</h3>
-            <div class="music-player">
-                <div class="music-player-header">
-                    <div class="music-player-icon">🎵</div>
-                    <div class="music-player-info">
-                        <div class="music-player-title">Lofi Beats</div>
-                        <div class="music-player-subtitle">ChilledCow Radio</div>
-                    </div>
-                </div>
-                <div class="music-player-controls">
-                    <button class="music-control-btn" id="musicToggleBtn" title="Play/Pause Music">
-                        <span class="music-control-icon">▶️</span>
-                    </button>
-                    <button class="music-control-btn" id="musicMuteBtn" title="Mute/Unmute">
-                        <span class="music-control-icon">🔊</span>
-                    </button>
-                </div>
-                <div class="music-player-status" id="musicStatus">Ready to play</div>
-            </div>
-        </div>
-        
-        <div class="options-section">
-            <h3>🎵 Music Stream Settings</h3>
-            <div class="music-stream-controls">
-                <label for="musicStreamSelect">Select Music Stream:</label>
-                <select id="musicStreamSelect" onchange="changeMusicStream()" class="stream-select">
-                    <option value="betweenlevel" selected>Between Level Music - Main game soundtrack</option>
-                    <option value="sodadrinker">Soda Drinker Title Music - Original title theme</option>
-                    <option value="groovesalad">Groove Salad - Ambient beats and grooves</option>
-                    <option value="defcon">DEF CON - Dark ambient and industrial</option>
-                    <option value="dronezone">Drone Zone - Atmospheric textures and beats</option>
-                    <option value="illstreet">Ill Street - Lofi hip hop and chill beats</option>
-                </select>
-                <div class="stream-info">
-                    <span id="currentStreamInfo">Current: Between Level Music - Main game soundtrack</span>
-                </div>
+            <h3>🔊 Button Audio</h3>
+            <div class="sound-controls">
+                <button id="buttonSoundsToggle" onclick="toggleButtonSounds()" class="sound-toggle-btn">
+                    🔊 Button Sounds ON
+                </button>
+                <p class="sound-description">Enable or disable button click sound effects</p>
             </div>
         </div>
         

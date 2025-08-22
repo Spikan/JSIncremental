@@ -13,7 +13,7 @@ import * as clicksSys from './core/systems/clicks-system.js';
 import * as autosaveSys from './core/systems/autosave.js';
 import * as saveSys from './core/systems/save-system.js';
 import * as loopSys from './core/systems/loop-system.js';
-import * as musicSys from './core/systems/music-system.js';
+import * as buttonAudio from './core/systems/button-audio.js';
 import * as optionsSys from './core/systems/options-system.js';
 import { createStateBridge } from './core/state/bridge.js';
 import * as ui from './ui/index.js';
@@ -38,7 +38,7 @@ window.App = {
                 save: saveSys,
                 options: optionsSys,
                 loop: loopSys,
-                music: musicSys
+                audio: { button: buttonAudio }
              },
              ui,
     data: {}

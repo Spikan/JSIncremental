@@ -38,7 +38,7 @@ js/
 │   │   ├── save-system.js   # Save/load operations with validation
 │   │   ├── options-system.js # Game options and preferences management
 │   │   ├── loop-system.js   # Game loop and timing management
-│   │   └── music-system.js  # Music playback, sound effects, and audio context management
+│   │   └── button-audio.js  # Button click/purchase/critical sound effects and preferences
 │   ├── constants.js         # Event names and constants
 │   └── validation/          # Zod validation schemas
 │       └── schemas.js       # Data validation schemas
