@@ -2203,6 +2203,15 @@ window.testButtonAudio = function() {
 // ============================================================================
 // Development and testing utilities for debugging and game balance testing
 
+// Helper function to safely get Decimal values
+function safeDecimal(value, defaultValue = 0) {
+    if (!value) return new Decimal(defaultValue);
+    if (typeof value.toNumber === 'function') return value;
+    if (typeof value === 'number') return new Decimal(value);
+    if (typeof value === 'string') return new Decimal(value);
+    return new Decimal(defaultValue);
+}
+
 // Feature unlock functions
 function devUnlockAll() {
     if (!window.FEATURE_UNLOCKS) {
@@ -2349,10 +2358,14 @@ function devAddTime(milliseconds) {
 
 // Helper function to calculate offline progress
 function calculateOfflineProgress(seconds) {
-    if (!window.sps || window.sps.isZero()) return 0;
+    // Safely get sps value
+    const sps = safeDecimal(window.sps, 0);
+    
+    // Check if sps is zero
+    if (sps.isZero()) return 0;
     
     // Calculate sips per second and multiply by offline time
-    const sipsPerSecond = window.sps.toNumber();
+    const sipsPerSecond = sps.toNumber();
     return Math.floor(sipsPerSecond * seconds);
 }
 
@@ -2360,7 +2373,9 @@ function calculateOfflineProgress(seconds) {
 function devAddSips(amount) {
     if (!confirm(`🥤 Add ${amount.toLocaleString()} sips to your balance?`)) return;
     
-    window.sips = window.sips.plus(amount);
+    // Safely get current sips and add the amount
+    const currentSips = safeDecimal(window.sips, 0);
+    window.sips = currentSips.plus(amount);
     
     if (typeof showPurchaseFeedback === 'function') {
         showPurchaseFeedback(`🥤 +${amount.toLocaleString()} Sips!`, 0);
@@ -2435,9 +2450,9 @@ function devToggleGodMode() {
 function devShowDebugInfo() {
     const debugInfo = {
         'Game Version': 'Soda Clicker Pro',
-        'Current Sips': window.sips ? window.sips.toString() : 'undefined',
+        'Current Sips': window.sips ? safeDecimal(window.sips, 0).toString() : 'undefined',
         'Total Clicks': window.totalClicks || 0,
-        'Sips Per Second': window.sps ? window.sps.toString() : 'undefined',
+        'Sips Per Second': window.sps ? safeDecimal(window.sps, 0).toString() : 'undefined',
         'Unlocked Features': window.FEATURE_UNLOCKS ? Array.from(window.FEATURE_UNLOCKS.unlockedFeatures) : 'undefined',
         'God Mode': godMode ? 'Enabled' : 'Disabled',
         'Last Save': window.lastSaveTime ? new Date(window.lastSaveTime).toLocaleString() : 'Never',
@@ -2462,14 +2477,14 @@ function devShowDebugInfo() {
 function devExportSave() {
     try {
         const saveData = {
-            sips: window.sips ? window.sips.toString() : '0',
-            straws: window.straws ? window.straws.toString() : '0',
-            cups: window.cups ? window.cups.toString() : '0',
-            widerStraws: window.widerStraws ? window.widerStraws.toString() : '0',
-            betterCups: window.betterCups ? window.betterCups.toString() : '0',
-            suctions: window.suctions ? window.suctions.toString() : '0',
-            fasterDrinks: window.fasterDrinks ? window.fasterDrinks.toString() : '0',
-            criticalClicks: window.criticalClicks ? window.criticalClicks.toString() : '0',
+            sips: window.sips ? safeDecimal(window.sips, 0).toString() : '0',
+            straws: window.straws ? safeDecimal(window.straws, 0).toString() : '0',
+            cups: window.cups ? safeDecimal(window.cups, 0).toString() : '0',
+            widerStraws: window.widerStraws ? safeDecimal(window.widerStraws, 0).toString() : '0',
+            betterCups: window.betterCups ? safeDecimal(window.betterCups, 0).toString() : '0',
+            suctions: window.suctions ? safeDecimal(window.suctions, 0).toString() : '0',
+            fasterDrinks: window.fasterDrinks ? safeDecimal(window.fasterDrinks, 0).toString() : '0',
+            criticalClicks: window.criticalClicks ? safeDecimal(window.criticalClicks, 0).toString() : '0',
             totalClicks: window.totalClicks || 0,
             playTime: window.playTime || 0,
             lastSaveTime: window.lastSaveTime || Date.now(),
@@ -2514,14 +2529,14 @@ function devImportSave() {
                 if (!confirm('📥 Import this save data? This will overwrite your current progress!')) return;
                 
                 // Import the save data
-                if (saveData.sips) window.sips = new Decimal(saveData.sips);
-                if (saveData.straws) window.straws = new Decimal(saveData.straws);
-                if (saveData.cups) window.cups = new Decimal(saveData.cups);
-                if (saveData.widerStraws) window.widerStraws = new Decimal(saveData.widerStraws);
-                if (saveData.betterCups) window.betterCups = new Decimal(saveData.betterCups);
-                if (saveData.suctions) window.suctions = new Decimal(saveData.suctions);
-                if (saveData.fasterDrinks) window.fasterDrinks = new Decimal(saveData.fasterDrinks);
-                if (saveData.criticalClicks) window.criticalClicks = new Decimal(saveData.criticalClicks);
+                if (saveData.sips) window.sips = safeDecimal(saveData.sips, 0);
+                if (saveData.straws) window.straws = safeDecimal(saveData.straws, 0);
+                if (saveData.cups) window.cups = safeDecimal(saveData.cups, 0);
+                if (saveData.widerStraws) window.widerStraws = safeDecimal(saveData.widerStraws, 0);
+                if (saveData.betterCups) window.betterCups = safeDecimal(saveData.betterCups, 0);
+                if (saveData.suctions) window.suctions = safeDecimal(saveData.suctions, 0);
+                if (saveData.fasterDrinks) window.fasterDrinks = safeDecimal(saveData.fasterDrinks, 0);
+                if (saveData.criticalClicks) window.criticalClicks = safeDecimal(saveData.criticalClicks, 0);
                 if (saveData.totalClicks) window.totalClicks = saveData.totalClicks;
                 if (saveData.playTime) window.playTime = saveData.playTime;
                 if (saveData.lastSaveTime) window.lastSaveTime = saveData.lastSaveTime;

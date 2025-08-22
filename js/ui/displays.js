@@ -17,7 +17,7 @@ export function updateTopSipsPerDrink() {
 export function updateTopSipsPerSecond() {
 	if (typeof window === 'undefined') return;
 	const topSipsPerSecondElement = window.DOM_CACHE?.topSipsPerSecond;
-	if (topSipsPerSecondElement && window.sps && window.drinkRate) {
+	if (topSipsPerSecondElement && window.sps && window.drinkRate && typeof window.sps.div === 'function') {
 		const drinkRateSeconds = window.drinkRate / 1000;
 		const sipsPerSecond = window.sps.div(drinkRateSeconds);
 		topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
