@@ -1,5 +1,7 @@
 // Enhanced Observable State Store with Middleware Support
 
+import { createEnhancedStore as _createEnhancedStore } from './middleware.js';
+
 /**
  * Creates an enhanced observable store with middleware support.
  * - getState(): returns current state object
@@ -95,6 +97,9 @@ export const selectors = {
     drinkRate: (s) => s.drinkRate,
     options: (s) => s.options || {},
 };
+
+// Re-export enhanced store creator
+export const createEnhancedStore = _createEnhancedStore;
 
 
 
