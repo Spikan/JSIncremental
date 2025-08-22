@@ -191,7 +191,7 @@ function switchTab(tabName, event) {
 
     // Refresh stats when switching to the stats tab
     if (tabName === 'stats') {
-        updateAllStats();
+        window.App?.ui?.updateAllStats?.();
     }
     
     // Update unlocks when switching to the unlocks tab
@@ -428,19 +428,13 @@ function initGame() {
         sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
         
         // Update the top sips per drink display
-        updateTopSipsPerDrink();
-        updateTopSipsPerSecond();
+        window.App?.ui?.updateTopSipsPerDrink?.();
+        window.App?.ui?.updateTopSipsPerSecond?.();
 
         // Initialize progressive feature unlock system after game variables are set up
         
         FEATURE_UNLOCKS.init();
 
-        
-        // Call reload to initialize the game
-        reload();
-        
-        // Update shop button states now that everything is initialized
-        updateShopButtonStates();
         
         // Start the game loop
         startGameLoop();
@@ -473,11 +467,11 @@ function initGame() {
 function startGameLoop() {
     if (window.App?.systems?.loop?.start) {
         window.App.systems.loop.start({
-            updateDrinkProgress,
+            updateDrinkProgress: () => window.App?.ui?.updateDrinkProgress?.(),
             processDrink,
-            updateStats: () => { updatePlayTime(); updateLastSaveTime(); updateAllStats(); checkUpgradeAffordability(); FEATURE_UNLOCKS.checkAllUnlocks(); },
-            updatePlayTime,
-            updateLastSaveTime,
+            updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); FEATURE_UNLOCKS.checkAllUnlocks(); },
+            updatePlayTime: () => window.App?.ui?.updatePlayTime?.(),
+            updateLastSaveTime: () => window.App?.ui?.updateLastSaveTime?.(),
             performBatchUIUpdate: window.App?.ui?.performBatchUIUpdate,
         });
         return;
@@ -489,19 +483,19 @@ function startGameLoop() {
     const statsInterval = window.GAME_CONFIG.LIMITS.STATS_UPDATE_INTERVAL;
     function gameLoop(currentTime) {
         if (currentTime - lastUpdate >= frameInterval) {
-            updateDrinkProgress();
+            try { window.App?.ui?.updateDrinkProgress?.(); } catch {}
             processDrink();
             const affordabilityInterval = window.GAME_CONFIG.LIMITS.AFFORDABILITY_CHECK_INTERVAL;
             if (currentTime - lastUpdate >= affordabilityInterval) {
-                checkUpgradeAffordability();
+                window.App?.ui?.checkUpgradeAffordability?.();
             }
             lastUpdate = currentTime;
         }
         if (currentTime - lastStatsUpdate >= statsInterval) {
-            updatePlayTime();
-            updateLastSaveTime();
-            updateAllStats();
-            checkUpgradeAffordability();
+            window.App?.ui?.updatePlayTime?.();
+            window.App?.ui?.updateLastSaveTime?.();
+            window.App?.ui?.updateAllStats?.();
+            window.App?.ui?.checkUpgradeAffordability?.();
             FEATURE_UNLOCKS.checkAllUnlocks();
             lastStatsUpdate = currentTime;
         }
@@ -554,7 +548,7 @@ function setupMobileTouchHandling() {
                 const clickX = touch.clientX;
                 const clickY = touch.clientY;
                 // Directly trigger click logic for mobile since default click is prevented
-                try { sodaClick(1, clickX, clickY); } catch {}
+                // Note: sodaClick function has been moved to UI system
             }
             
             // Remove visual feedback after a short delay
@@ -585,9 +579,6 @@ function setupMobileTouchHandling() {
 function processDrink() {
     const currentTime = Date.now();
     if (currentTime - lastDrinkTime >= drinkRate) {
-        // Process the drink
-        spsClick(sps);
-        
         // Add base sips per drink (configured value, regardless of straws/cups)
         const config = window.GAME_CONFIG?.BALANCE || {};
         const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
@@ -613,13 +604,13 @@ function processDrink() {
                 drinkRateMs: drinkRate,
             });
             autosaveCounter = nextCounter;
-            if (shouldSave) save();
+            if (shouldSave) try { window.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
         } else if (autosaveEnabled) {
             autosaveCounter += 1;
             const drinksPerSecond = 1000 / drinkRate;
             const drinksForAutosave = Math.ceil(autosaveInterval * drinksPerSecond);
             if (autosaveCounter >= drinksForAutosave) {
-                save();
+                try { window.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
                 autosaveCounter = 1;
             }
         }

@@ -101,11 +101,6 @@ loadDataFiles().then(() => {
         window.App.ui.initializeUI();
     }
     
-    // Update shop button states now that data is loaded
-    if (typeof window.updateShopButtonStates === 'function') {
-        window.updateShopButtonStates();
-    }
-    
     console.log('App bootstrapped successfully');
 }).catch(error => {
     console.error('Failed to bootstrap app:', error);

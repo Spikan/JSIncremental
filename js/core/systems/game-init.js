@@ -68,8 +68,8 @@ export function initOnDomReady() {
         setTimeout(() => {
             try {
                 initSplashScreen();
-                try { window.loadOptions?.(); } catch {}
-                try { window.updatePlayTime?.(); } catch {}
+                try { window.App?.systems?.options?.loadOptions?.({ autosaveEnabled: true, autosaveInterval: 30 }); } catch {}
+                try { window.App?.ui?.updatePlayTime?.(); } catch {}
             } catch (error) {
                 console.error('Error during splash screen initialization:', error);
                 const splashScreen = document.getElementById('splashScreen');
