@@ -271,9 +271,9 @@ const BUTTON_CONFIG = {
         'levelUp': { func: levelUp, type: 'level-up-btn' },
         'save': { func: save, type: 'save-btn' },
         'delete_save': { func: delete_save, type: 'save-btn' },
-        'toggleButtonSounds': { func: toggleButtonSounds, type: 'sound-toggle-btn' },
-        'sendMessage': { func: sendMessage, type: 'chat-send-btn' },
-        'startGame': { func: startGame, type: 'splash-start-btn' }
+        'toggleButtonSounds': { func: window.App?.systems?.audio?.button?.toggleButtonSounds, type: 'sound-toggle-btn' },
+        'sendMessage': { func: window.sendMessage, type: 'chat-send-btn' },
+        'startGame': { func: window.App?.systems?.gameInit?.startGame, type: 'splash-start-btn' }
     }
 };
 
@@ -2675,62 +2675,11 @@ function showPurchaseFeedback(itemName, cost, clickX = null, clickY = null) {
 }
 
         // Divine oracle functionality
-function sendMessage() { 
-    try { 
-        if (window.sendMessage) {
-            return window.sendMessage();
-        } else {
-            // Fallback implementation
-            const chatInput = document.getElementById('chatInput');
-            if (chatInput && chatInput.value.trim()) {
-                const message = chatInput.value.trim();
-                chatInput.value = '';
-                
-                // Add user message to chat
-                if (window.addUserMessage) {
-                    window.addUserMessage(message);
-                }
-                
-                // Trigger God's response
-                if (window.App?.systems?.god?.processMessage) {
-                    window.App.systems.god.processMessage(message);
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error sending message:', error);
-    }
-}
+function sendMessage() { try { return window.sendMessage?.(); } catch {} }
 
 
 
-function addUserMessage(message) { 
-    try { 
-        if (window.addUserMessage) {
-            return window.addUserMessage(message);
-        } else {
-            // Fallback implementation
-            const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages && message) {
-                const userMessageDiv = document.createElement('div');
-                userMessageDiv.className = 'message user-message';
-                userMessageDiv.innerHTML = `
-                    <div class="message-avatar">
-                        <div class="user-avatar">👤</div>
-                    </div>
-                    <div class="message-content">
-                        <div class="message-sender">You</div>
-                        <div class="message-text">${message}</div>
-                    </div>
-                `;
-                chatMessages.appendChild(userMessageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-    } catch (error) {
-        console.error('Error adding user message:', error);
-    }
-}
+function addUserMessage(message) { try { return window.addUserMessage?.(message); } catch {} }
 
 
 
@@ -2882,30 +2831,7 @@ window.upgradeCriticalClick = upgradeCriticalClick;
 let audioContext = null;
 let buttonSoundsEnabled = true;
 
-// Toggle button sounds function
-function toggleButtonSounds() {
-    try {
-        if (window.App?.systems?.audio?.button) {
-            window.App.systems.audio.button.toggleButtonSounds();
-        } else {
-            // Fallback if audio system not available
-            buttonSoundsEnabled = !buttonSoundsEnabled;
-            try { 
-                localStorage.setItem('buttonSoundsEnabled', buttonSoundsEnabled.toString()); 
-            } catch {}
-            
-            // Update toggle button text
-            const buttonSoundsToggle = document.getElementById('buttonSoundsToggle');
-            if (buttonSoundsToggle) {
-                buttonSoundsToggle.textContent = buttonSoundsEnabled ? '🔊 Button Sounds ON' : '🔇 Button Sounds OFF';
-            }
-            
-            console.log('Button sounds:', buttonSoundsEnabled ? 'ON' : 'OFF');
-        }
-    } catch (error) {
-        console.error('Error toggling button sounds:', error);
-    }
-}
+// Note: toggleButtonSounds is already defined in js/core/systems/button-audio.js
 
 // Memory management and cleanup functions
 function cleanupAudioResources() {
