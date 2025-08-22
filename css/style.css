@@ -1258,12 +1258,7 @@ h3 {
         width: 100%;
     }
     
-    .clicking-upgrade-btn {
-        width: 140px;
-        height: 70px;
-        font-size: 0.9rem;
-        padding: 0.75rem 0.75rem;
-    }
+
 }
 
 /* Responsive design for drink speed upgrades */
@@ -1492,36 +1487,36 @@ h3 {
 .shop-btn.affordable span,
 .upgrade-btn.affordable span,
 .level-up-btn.affordable span {
-    color: #FFFFFF !important;
+    color: var(--neutral-white) !important;
     font-weight: bold;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Compact clicking upgrade affordability styling */
 .clicking-upgrade-btn.affordable {
-    background: linear-gradient(135deg, #00B36B, #00D4FF) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3) !important;
+    background-color: var(--primary-green) !important;
+    color: var(--neutral-white) !important;
+    box-shadow: var(--btn-shadow-md) !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-    border-color: #00D4FF !important;
+    border-color: var(--primary-green-light) !important;
 }
 
 .clicking-upgrade-btn.disabled {
-    background-color: #333 !important;
-    color: #666 !important;
-    border-color: #555 !important;
+    background-color: var(--neutral-dark) !important;
+    color: var(--neutral-medium) !important;
+    border-color: var(--neutral-medium) !important;
     cursor: not-allowed;
     transform: none;
 }
 
 .clicking-upgrade-btn.affordable .clicking-upgrade-cost {
-    color: #FFFFFF !important;
+    color: var(--neutral-white) !important;
     font-weight: bold;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .clicking-upgrade-btn.disabled .clicking-upgrade-cost {
-    color: #666 !important;
+    color: var(--neutral-medium) !important;
 }
 
 /* Drink Speed Upgrade Button Styling */
@@ -1770,12 +1765,7 @@ h3 {
         margin: 0;
     }
     
-    .shop-btn {
-        min-width: 100%;
-        min-height: 70px;
-        padding: 0.875rem 1rem;
-        font-size: 1rem;
-    }
+
     
     .upgrade-btn {
         min-width: 100%;
@@ -3512,6 +3502,20 @@ button:focus {
   background-color: var(--primary-blue);
   color: var(--primary-green);
   border-color: var(--primary-green);
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Shop button content styling */
+.shop-btn span {
+  color: inherit;
+  font-weight: bold;
+}
+
+.shop-btn small {
+  color: var(--secondary-orange);
+  font-size: 0.7rem;
+  font-weight: normal;
 }
 
 .shop-btn:hover:not(.affordable):not(.disabled) {
@@ -3537,6 +3541,8 @@ button:focus {
   color: var(--primary-green);
   border-color: var(--primary-green);
   margin-bottom: 1rem;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .clicking-upgrade-btn:hover {
