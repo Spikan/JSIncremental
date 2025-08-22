@@ -207,16 +207,19 @@ window.switchTab = switchTab;
 function checkUpgradeAffordability() {
     // IMPROVED BALANCE: Updated costs to match new progression system
     const config = window.GAME_CONFIG?.BALANCE || {};
-            const strawCost = Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
-        const cupCost = Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
-        const suctionCost = Math.floor(config.SUCTION_BASE_COST * Math.pow(config.SUCTION_SCALING, suctions.toNumber()));
-        const fasterDrinksCost = Math.floor(config.FASTER_DRINKS_BASE_COST * Math.pow(config.FASTER_DRINKS_SCALING, fasterDrinks.toNumber()));
-        const criticalClickCost = Math.floor(config.CRITICAL_CLICK_BASE_COST * Math.pow(config.CRITICAL_CLICK_SCALING, criticalClicks.toNumber()));
-        const widerStrawsCost = Math.floor(config.WIDER_STRAWS_BASE_COST * Math.pow(config.WIDER_STRAWS_SCALING, widerStraws.toNumber()));
-        const betterCupsCost = Math.floor(config.BETTER_CUPS_BASE_COST * Math.pow(config.BETTER_CUPS_SCALING, betterCups.toNumber()));
-        const fasterDrinksUpCost = config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber();
-        const criticalClickUpCost = config.CRITICAL_CLICK_UPGRADE_BASE_COST * criticalClickUpCounter.toNumber();
-        const levelUpCost = config.LEVEL_UP_BASE_COST * Math.pow(config.LEVEL_UP_SCALING, level.toNumber());
+    const dataUp = window.App?.data?.upgrades || {};
+    
+    // Use the same data source as the purchase system for consistency
+    const strawCost = Math.floor((dataUp.straws?.baseCost ?? config.STRAW_BASE_COST) * Math.pow(dataUp.straws?.scaling ?? config.STRAW_SCALING, straws.toNumber()));
+    const cupCost = Math.floor((dataUp.cups?.baseCost ?? config.CUP_BASE_COST) * Math.pow(dataUp.cups?.scaling ?? config.CUP_SCALING, cups.toNumber()));
+    const suctionCost = Math.floor(config.SUCTION_BASE_COST * Math.pow(config.SUCTION_SCALING, suctions.toNumber()));
+    const fasterDrinksCost = Math.floor(config.FASTER_DRINKS_BASE_COST * Math.pow(config.FASTER_DRINKS_SCALING, fasterDrinks.toNumber()));
+    const criticalClickCost = Math.floor(config.CRITICAL_CLICK_BASE_COST * Math.pow(config.CRITICAL_CLICK_SCALING, criticalClicks.toNumber()));
+    const widerStrawsCost = Math.floor((dataUp.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST) * Math.pow(dataUp.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING, widerStraws.toNumber()));
+    const betterCupsCost = Math.floor((dataUp.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST) * Math.pow(dataUp.betterCups?.scaling ?? config.BETTER_CUPS_SCALING, betterCups.toNumber()));
+    const fasterDrinksUpCost = config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber();
+    const criticalClickUpCost = config.CRITICAL_CLICK_UPGRADE_BASE_COST * criticalClickUpCounter.toNumber();
+    const levelUpCost = config.LEVEL_UP_BASE_COST * Math.pow(config.LEVEL_UP_SCALING, level.toNumber());
     
 
     
