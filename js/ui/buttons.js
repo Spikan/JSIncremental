@@ -127,7 +127,7 @@ function handleButtonClick(event, button, actionName) {
 
 // Setup unified button event listeners
 function setupUnifiedButtonSystem() {
-    console.log('🔧 Setting up unified button event handler system...');
+    // console.log('🔧 Setting up unified button event handler system...');
     
     // Remove all onclick attributes and replace with event listeners
     const allButtons = document.querySelectorAll('button');
@@ -152,9 +152,10 @@ function setupUnifiedButtonSystem() {
                         button.classList.add(action.type);
                     }
                     
-                    console.log(`🔧 Added unified listener for ${actionName} button`);
+                    // console.log(`🔧 Added unified listener for ${actionName} button`);
                 } else {
-                    console.warn(`Unknown action: ${actionName}`);
+                    // Don't warn about unknown actions - they might be added later
+                    console.log(`Button action ${actionName} not yet configured, skipping`);
                 }
             }
         }
@@ -163,7 +164,7 @@ function setupUnifiedButtonSystem() {
     // Special handling for buttons without onclick attributes
     setupSpecialButtonHandlers();
     
-    console.log('🔧 Unified button event handler system setup complete');
+    // console.log('🔧 Unified button event handler system setup complete');
 }
 
 // Setup special button handlers that don't use onclick
@@ -219,13 +220,27 @@ function setupSpecialButtonHandlers() {
     }
 }
 
-// Initialize button system when DOM is ready
+// Initialize button system when DOM is ready and game functions are available
 function initButtonSystem() {
+    // Wait for both DOM and game functions to be ready
+    function tryInitialize() {
+        // Check if essential game functions are available
+        const essentialFunctions = ['buyStraw', 'buyCup', 'sodaClick', 'switchTab'];
+        const functionsAvailable = essentialFunctions.every(func => typeof window[func] === 'function');
+        
+        if (functionsAvailable) {
+            setupUnifiedButtonSystem();
+        } else {
+            // Try again in a bit
+            setTimeout(tryInitialize, 100);
+        }
+    }
+    
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupUnifiedButtonSystem);
+        document.addEventListener('DOMContentLoaded', tryInitialize);
     } else {
-        // DOM already loaded
-        setupUnifiedButtonSystem();
+        // DOM already loaded, try to initialize
+        tryInitialize();
     }
 }
 
