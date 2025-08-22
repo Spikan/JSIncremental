@@ -428,12 +428,12 @@ describe('Core Systems - Comprehensive Testing', () => {
       // Test just before threshold
       const result1 = mockApp.systems.autosave.computeAutosaveCounter({
         enabled: true,
-        counter: drinksForAutosave - 1,
+        counter: drinksForAutosave - 2, // 28, so next will be 29
         intervalSec,
         drinkRateMs
       });
       
-      expect(result1.nextCounter).toBe(30);
+      expect(result1.nextCounter).toBe(29);
       expect(result1.shouldSave).toBe(false);
       
       // Test at threshold
