@@ -1256,25 +1256,45 @@ function spsClick(amount) {
 }
 
 function buyStraw() {
+    console.log('🔧 Debug: buyStraw called');
+    
     const sys = window.App?.systems?.purchases;
-    if (!sys?.purchaseStraw) return;
-    const res = sys.purchaseStraw({
-                sips: window.sips.toNumber(),
-                straws: straws.toNumber(),
-                cups: cups.toNumber(),
-                widerStraws: widerStraws.toNumber(),
-                betterCups: betterCups.toNumber(),
-            });
-    if (!res) return;
+    console.log('🔧 Debug: Purchase system:', sys);
+    
+    if (!sys?.purchaseStraw) {
+        console.error('🔧 Debug: purchaseStraw function not available');
+        return;
+    }
+    
+    const purchaseData = {
+        sips: window.sips.toNumber(),
+        straws: straws.toNumber(),
+        cups: cups.toNumber(),
+        widerStraws: widerStraws.toNumber(),
+        betterCups: betterCups.toNumber(),
+    };
+    console.log('🔧 Debug: Purchase data:', purchaseData);
+    
+    const res = sys.purchaseStraw(purchaseData);
+    console.log('🔧 Debug: Purchase result:', res);
+    
+    if (!res) {
+        console.error('🔧 Debug: Purchase failed - no result returned');
+        return;
+    }
+    
+    console.log('🔧 Debug: Purchase successful, updating game state...');
+    
     window.sips = window.sips.minus(res.spent);
     straws = new Decimal(res.straws);
     window.straws = straws;
-                strawSPD = new Decimal(res.strawSPD);
+    strawSPD = new Decimal(res.strawSPD);
     cupSPD = new Decimal(res.cupSPD);
-                sps = new Decimal(res.sipsPerDrink);
-        updateTopSipsPerDrink();
-        updateTopSipsPerSecond();
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+    sps = new Decimal(res.sipsPerDrink);
+    
+    updateTopSipsPerDrink();
+    updateTopSipsPerSecond();
+    try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
     
     // Get click coordinates from the event if available
     const clickEvent = window.lastClickEvent;
@@ -1282,49 +1302,69 @@ function buyStraw() {
     const clickY = clickEvent?.clientY || null;
     
     showPurchaseFeedback('Extra Straw', res.spent, clickX, clickY);
-        // reload(); // Removed - causing issues
-        
-        // Update UI directly
-        const strawsElement = document.getElementById('straws');
-        if (strawsElement) {
-            strawsElement.textContent = res.straws.toString();
-        }
-        
-        const strawSPDElement = document.getElementById('strawSPD');
-        if (strawSPDElement) {
-            strawSPDElement.textContent = res.strawSPD.toString();
-        }
-        
-        const totalStrawSPDElement = document.getElementById('totalStrawSPD');
-        if (totalStrawSPDElement) {
-            totalStrawSPDElement.textContent = (res.strawSPD * res.straws).toString() + ' per drink';
-        }
-        
-        checkUpgradeAffordability();
+    
+    // Update UI directly
+    const strawsElement = document.getElementById('straws');
+    if (strawsElement) {
+        strawsElement.textContent = res.straws.toString();
+    }
+    
+    const strawSPDElement = document.getElementById('strawSPD');
+    if (strawSPDElement) {
+        strawSPDElement.textContent = res.strawSPD.toString();
+    }
+    
+    const totalStrawSPDElement = document.getElementById('totalStrawSPD');
+    if (totalStrawSPDElement) {
+        totalStrawSPDElement.textContent = (res.strawSPD * res.straws).toString() + ' per drink';
+    }
+    
+    checkUpgradeAffordability();
+    console.log('🔧 Debug: buyStraw completed successfully');
 }
 
 
 
 function buyCup() {
+    console.log('🔧 Debug: buyCup called');
+    
     const sys = window.App?.systems?.purchases;
-    if (!sys?.purchaseCup) return;
-    const res = sys.purchaseCup({
-                sips: window.sips.toNumber(),
-                straws: straws.toNumber(),
-                cups: cups.toNumber(),
-                widerStraws: widerStraws.toNumber(),
-                betterCups: betterCups.toNumber(),
-            });
-    if (!res) return;
+    console.log('🔧 Debug: Purchase system:', sys);
+    
+    if (!sys?.purchaseCup) {
+        console.error('🔧 Debug: purchaseCup function not available');
+        return;
+    }
+    
+    const purchaseData = {
+        sips: window.sips.toNumber(),
+        straws: straws.toNumber(),
+        cups: cups.toNumber(),
+        widerStraws: widerStraws.toNumber(),
+        betterCups: betterCups.toNumber(),
+    };
+    console.log('🔧 Debug: Purchase data:', purchaseData);
+    
+    const res = sys.purchaseCup(purchaseData);
+    console.log('🔧 Debug: Purchase result:', res);
+    
+    if (!res) {
+        console.error('🔧 Debug: Purchase failed - no result returned');
+        return;
+    }
+    
+    console.log('🔧 Debug: Purchase successful, updating game state...');
+    
     window.sips = window.sips.minus(res.spent);
     cups = new Decimal(res.cups);
     window.cups = cups;
     strawSPD = new Decimal(res.strawSPD);
-                cupSPD = new Decimal(res.cupSPD);
-                sps = new Decimal(res.sipsPerDrink);
-        updateTopSipsPerDrink();
-        updateTopSipsPerSecond();
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+    cupSPD = new Decimal(res.cupSPD);
+    sps = new Decimal(res.sipsPerDrink);
+    
+    updateTopSipsPerDrink();
+    updateTopSipsPerSecond();
+    try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
     
     // Get click coordinates from the event if available
     const clickEvent = window.lastClickEvent;
@@ -1332,25 +1372,25 @@ function buyCup() {
     const clickY = clickEvent?.clientY || null;
     
     showPurchaseFeedback('Bigger Cup', res.spent, clickX, clickY);
-        // reload(); // Removed - causing issues
-        
-        // Update UI directly
-        const cupsElement = document.getElementById('cups');
-        if (cupsElement) {
-            cupsElement.textContent = res.cups.toString();
-        }
-        
-        const cupSPDElement = document.getElementById('cupSPD');
-        if (cupSPDElement) {
-            cupSPDElement.textContent = res.cupSPD.toString();
-        }
-        
-        const totalCupSPDElement = document.getElementById('totalCupSPD');
-        if (totalCupSPDElement) {
-            totalCupSPDElement.textContent = (res.cupSPD * res.cups).toString() + ' per drink';
-        }
-        
-        checkUpgradeAffordability();
+    
+    // Update UI directly
+    const cupsElement = document.getElementById('cups');
+    if (cupsElement) {
+        cupsElement.textContent = res.cups.toString();
+    }
+    
+    const cupSPDElement = document.getElementById('cupSPD');
+    if (cupSPDElement) {
+        cupSPDElement.textContent = res.cupSPD.toString();
+    }
+    
+    const totalCupSPDElement = document.getElementById('totalCupSPD');
+    if (totalCupSPDElement) {
+        totalCupSPDElement.textContent = (res.cupSPD * res.cups).toString() + ' per drink';
+    }
+    
+    checkUpgradeAffordability();
+    console.log('🔧 Debug: buyCup completed successfully');
 }
 
 function buyWiderStraws() {
