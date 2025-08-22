@@ -1,6 +1,6 @@
 // Enhanced Observable State Store with Middleware Support
 
-import { createEnhancedStore as _createEnhancedStore } from './middleware.js';
+import { createValidationMiddleware, createDebugMiddleware, createPerformanceMiddleware, createPersistenceMiddleware } from './middleware.js';
 
 /**
  * Creates an enhanced observable store with middleware support.
@@ -83,6 +83,27 @@ export function createStore(initialState = {}) {
     };
 }
 
+// Convenience function to create a store with common middleware
+export function createEnhancedStore(initialState = {}) {
+    const store = createStore(initialState);
+
+    // Add essential middleware
+    store.use(createValidationMiddleware());
+
+    // Add development middleware in development
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        store.use(createDebugMiddleware(true));
+        store.use(createPerformanceMiddleware());
+    }
+
+    // Add persistence if storage is available
+    if (typeof localStorage !== 'undefined') {
+        store.use(createPersistenceMiddleware());
+    }
+
+    return store;
+}
+
 // Default app store instance; can be used by legacy code gradually
 export const appStore = createStore({
     version: 1,
@@ -98,8 +119,7 @@ export const selectors = {
     options: (s) => s.options || {},
 };
 
-// Re-export enhanced store creator
-export const createEnhancedStore = _createEnhancedStore;
+
 
 
 
