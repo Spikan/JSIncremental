@@ -1277,27 +1277,49 @@ function buyStraw() {
 
 function buyCup() {
     const sys = window.App?.systems?.purchases;
-    if (!sys?.purchaseCup) return;
-    const res = sys.purchaseCup({
-                sips: window.sips.toNumber(),
-                straws: straws.toNumber(),
-                cups: cups.toNumber(),
-                widerStraws: widerStraws.toNumber(),
-                betterCups: betterCups.toNumber(),
-            });
-    if (!res) return;
-    window.sips = window.sips.minus(res.spent);
-    cups = new Decimal(res.cups);
-    window.cups = cups;
-    strawSPD = new Decimal(res.strawSPD);
-                cupSPD = new Decimal(res.cupSPD);
-                sps = new Decimal(res.sipsPerDrink);
-    updateTopSipsPerDrink();
-    updateTopSipsPerSecond();
-    try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-    showPurchaseFeedback('Bigger Cup', res.spent);
-    reload();
-    checkUpgradeAffordability();
+    if (sys?.purchaseCup) {
+        // Use centralized purchase system if available
+        const res = sys.purchaseCup({
+            sips: window.sips.toNumber(),
+            straws: straws.toNumber(),
+            cups: cups.toNumber(),
+            widerStraws: widerStraws.toNumber(),
+            betterCups: betterCups.toNumber(),
+        });
+        if (!res) return;
+        window.sips = window.sips.minus(res.spent);
+        cups = new Decimal(res.cups);
+        window.cups = cups;
+        strawSPD = new Decimal(res.strawSPD);
+        cupSPD = new Decimal(res.cupSPD);
+        sps = new Decimal(res.sipsPerDrink);
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
+        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+        showPurchaseFeedback('Bigger Cup', res.spent);
+        reload();
+        checkUpgradeAffordability();
+    } else {
+        // Fallback purchase logic when external system is not available
+        const cupCost = Math.floor(window.GAME_CONFIG?.BALANCE?.CUP_BASE_COST * Math.pow(window.GAME_CONFIG?.BALANCE?.CUP_SCALING, cups.toNumber()));
+        
+        if (window.sips.gte(cupCost)) {
+            window.sips = window.sips.minus(cupCost);
+            cups = cups.plus(1);
+            window.cups = cups;
+            
+            // Recalculate stats
+            updateDrinkRate();
+            updateAllStats();
+            checkUpgradeAffordability();
+            
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            showPurchaseFeedback('Bigger Cup', cupCost);
+            console.log('🔧 Dev: Cup purchased using fallback logic');
+        } else {
+            console.warn('🔧 Dev: Not enough sips to buy cup');
+        }
+    }
 }
 
 function buyWiderStraws() {
@@ -1350,15 +1372,34 @@ function buyBetterCups() {
             strawSPD = new Decimal(res.strawSPD);
             cupSPD = new Decimal(res.cupSPD);
             sps = new Decimal(res.sipsPerDrink);
-        updateTopSipsPerDrink();
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            updateTopSipsPerDrink();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
             showPurchaseFeedback('Better Cups Upgrade', res.spent);
-        reload();
-        checkUpgradeAffordability();
+            reload();
+            checkUpgradeAffordability();
             return;
         }
+    } else {
+        // Fallback purchase logic when external system is not available
+        const betterCupsCost = Math.floor(window.GAME_CONFIG?.BALANCE?.BETTER_CUPS_BASE_COST * Math.pow(window.GAME_CONFIG?.BALANCE?.BETTER_CUPS_SCALING, betterCups.toNumber()));
+        
+        if (window.sips.gte(betterCupsCost)) {
+            window.sips = window.sips.minus(betterCupsCost);
+            betterCups = betterCups.plus(1);
+            window.betterCups = betterCups;
+            
+            // Recalculate stats
+            updateDrinkRate();
+            updateAllStats();
+            checkUpgradeAffordability();
+            
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            showPurchaseFeedback('Better Cups Upgrade', betterCupsCost);
+            console.log('🔧 Dev: Better Cups purchased using fallback logic');
+        } else {
+            console.warn('🔧 Dev: Not enough sips to buy better cups');
+        }
     }
-    
 }
 
 
@@ -2342,6 +2383,8 @@ function devAddTime(milliseconds) {
     const offlineTime = milliseconds / 1000; // Convert to seconds
     const offlineSips = calculateOfflineProgress(offlineTime);
     
+    console.log(`🔧 Dev: Time travel debug - Time: ${offlineTime}s, SPS: ${window.sps?.toString() || 'undefined'}, Drink Rate: ${window.drinkRate || 'undefined'}, Offline Sips: ${offlineSips}`);
+    
     window.sips = window.sips.plus(offlineSips);
     
     // Update last save time to reflect the time travel
@@ -2363,15 +2406,26 @@ function calculateOfflineProgress(seconds) {
     // Safely get sps value
     const sps = safeDecimal(window.sps, 0);
     
-    // If sps is not available or invalid, return 0
-    if (!sps) return 0;
+    // If sps is available and valid, use it
+    if (sps && !sps.isZero()) {
+        const sipsPerSecond = sps.toNumber();
+        return Math.floor(sipsPerSecond * seconds);
+    }
     
-    // Check if sps is zero
-    if (sps.isZero()) return 0;
+    // Fallback calculation using base sips per drink and drink rate
+    if (window.drinkRate && window.drinkRate > 0) {
+        const baseSipsPerDrink = window.GAME_CONFIG?.BALANCE?.BASE_SIPS_PER_DRINK || 1;
+        const drinksPerSecond = 1000 / window.drinkRate; // Convert ms to seconds
+        const fallbackSipsPerSecond = baseSipsPerDrink * drinksPerSecond;
+        
+        console.log(`🔧 Dev: Using fallback calculation: ${fallbackSipsPerSecond} sips/second`);
+        return Math.floor(fallbackSipsPerSecond * seconds);
+    }
     
-    // Calculate sips per second and multiply by offline time
-    const sipsPerSecond = sps.toNumber();
-    return Math.floor(sipsPerSecond * seconds);
+    // Last resort: give some minimal progress
+    const minimalSipsPerSecond = 0.1; // 0.1 sips per second as fallback
+    console.log(`🔧 Dev: Using minimal fallback: ${minimalSipsPerSecond} sips/second`);
+    return Math.floor(minimalSipsPerSecond * seconds);
 }
 
 // Resource management functions
