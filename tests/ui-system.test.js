@@ -29,7 +29,8 @@ global.document = {
     body: {
         appendChild: vi.fn()
     },
-    querySelector: vi.fn()
+    querySelector: vi.fn(),
+    querySelectorAll: vi.fn(() => [])
 };
 
 global.window = {
