@@ -23,6 +23,15 @@ const defaultState = {
 	drinkProgress: 0,
 	lastDrinkTime: 0,
 
+	// Click/crit systems (migrate from globals)
+	criticalClickChance: 0,
+	criticalClickMultiplier: 0,
+	suctionClickBonus: 0,
+
+	// Upgrade counters
+	fasterDrinksUpCounter: 0,
+	criticalClickUpCounter: 0,
+
 	// Options
 	options: {
 		autosaveEnabled: true,

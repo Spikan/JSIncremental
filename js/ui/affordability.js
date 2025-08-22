@@ -4,31 +4,14 @@
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability() {
     // Safety checks - ensure game is fully initialized
-    if (!window.GAME_CONFIG) {
-        console.log('UI: Game config not available yet, skipping affordability check');
-        return;
-    }
-
     const config = window.GAME_CONFIG?.BALANCE || {};
     const dataUp = window.App?.data?.upgrades || {};
 
-    // Get current sips from multiple sources with fallbacks
-    let currentSips = 0;
-    if (window.sips) {
-        if (typeof window.sips.toNumber === 'function') {
-            currentSips = window.sips.toNumber();
-        } else if (typeof window.sips === 'number') {
-            currentSips = window.sips;
-        }
-    } else if (window.App?.state) {
-        try {
-            const state = window.App.state.getState();
-            currentSips = state.sips || 0;
-        } catch {}
-    }
+    // Get current sips from App.state (preferred)
+    const currentSips = Number(window.App?.state?.getState?.()?.sips || 0);
 
     // If we still don't have sips, skip the affordability check
-    if (currentSips === 0 && !window.sips) {
+    if (currentSips === 0) {
         console.log('UI: No sips available yet, skipping affordability check');
         return;
     }
@@ -108,7 +91,7 @@ function calculateAllCosts(config, dataUp) {
     // Straw cost
     const strawBaseCost = dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5;
     const strawScaling = dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08;
-    const strawCount = safeToNumber(window.straws, 'straws');
+    const strawCount = Number(window.App?.state?.getState?.()?.straws || 0);
     costs.straw = window.App?.rules?.purchases?.nextStrawCost ?
         window.App.rules.purchases.nextStrawCost(strawCount, strawBaseCost, strawScaling) :
         Math.floor(strawBaseCost * Math.pow(strawScaling, strawCount));
@@ -116,7 +99,7 @@ function calculateAllCosts(config, dataUp) {
     // Cup cost
     const cupBaseCost = dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15;
     const cupScaling = dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15;
-    const cupCount = safeToNumber(window.cups, 'cups');
+    const cupCount = Number(window.App?.state?.getState?.()?.cups || 0);
     costs.cup = window.App?.rules?.purchases?.nextCupCost ?
         window.App.rules.purchases.nextCupCost(cupCount, cupBaseCost, cupScaling) :
         Math.floor(cupBaseCost * Math.pow(cupScaling, cupCount));
@@ -124,37 +107,37 @@ function calculateAllCosts(config, dataUp) {
     // Suction cost
     const suctionBaseCost = dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40;
     const suctionScaling = dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12;
-    costs.suction = Math.floor(suctionBaseCost * Math.pow(suctionScaling, safeToNumber(window.suctions, 'suctions')));
+    costs.suction = Math.floor(suctionBaseCost * Math.pow(suctionScaling, Number(window.App?.state?.getState?.()?.suctions || 0)));
 
     // Faster drinks cost
     const fasterDrinksBaseCost = dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST ?? 80;
     const fasterDrinksScaling = dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.10;
-    const fasterDrinksCount = safeToNumber(window.fasterDrinks, 'fasterDrinks');
+    const fasterDrinksCount = Number(window.App?.state?.getState?.()?.fasterDrinks || 0);
     costs.fasterDrinks = Math.floor(fasterDrinksBaseCost * Math.pow(fasterDrinksScaling, fasterDrinksCount));
 
     // Critical click cost
     const criticalClickBaseCost = dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST ?? 60;
     const criticalClickScaling = dataUp?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING ?? 1.12;
-    costs.criticalClick = Math.floor(criticalClickBaseCost * Math.pow(criticalClickScaling, safeToNumber(window.criticalClicks, 'criticalClicks')));
+    costs.criticalClick = Math.floor(criticalClickBaseCost * Math.pow(criticalClickScaling, Number(window.App?.state?.getState?.()?.criticalClicks || 0)));
 
     // Wider straws cost
     const widerStrawsBaseCost = dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150;
-    costs.widerStraws = widerStrawsBaseCost * (safeToNumber(window.widerStraws, 'widerStraws') + 1);
+    costs.widerStraws = widerStrawsBaseCost * (Number(window.App?.state?.getState?.()?.widerStraws || 0) + 1);
 
     // Better cups cost
     const betterCupsBaseCost = dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400;
-    costs.betterCups = betterCupsBaseCost * (safeToNumber(window.betterCups, 'betterCups') + 1);
+    costs.betterCups = betterCupsBaseCost * (Number(window.App?.state?.getState?.()?.betterCups || 0) + 1);
 
     // Faster drinks upgrade cost
     const fasterDrinksUpBaseCost = dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 1500;
-    costs.fasterDrinksUp = fasterDrinksUpBaseCost * safeToNumber(window.fasterDrinksUpCounter, 'fasterDrinks');
+    costs.fasterDrinksUp = fasterDrinksUpBaseCost * Number(window.App?.state?.getState?.()?.fasterDrinksUpCounter || 0);
 
     // Critical click upgrade cost - button doesn't exist, so don't calculate
     // costs.criticalClickUp = config.CRITICAL_CLICK_UPGRADE_BASE_COST * safeToNumber(window.criticalClickUpCounter);
 
     // Level up cost
     const levelUpBaseCost = config.LEVEL_UP_BASE_COST ?? 3000;
-    costs.levelUp = levelUpBaseCost * safeToNumber(window.level, 'level');
+    costs.levelUp = levelUpBaseCost * Number(window.App?.state?.getState?.()?.level || 0);
 
     return costs;
 }

@@ -76,6 +76,27 @@ function createStateBridge(app) {
 		} catch {}
 	}
 
+	function syncCriticalClickChance(value) {
+		try {
+			const numericValue = (value && typeof value.toNumber === 'function') ? value.toNumber() : Number(value) || 0;
+			app.state.setState({ criticalClickChance: numericValue });
+		} catch {}
+	}
+
+	function syncCriticalClickMultiplier(value) {
+		try {
+			const numericValue = (value && typeof value.toNumber === 'function') ? value.toNumber() : Number(value) || 0;
+			app.state.setState({ criticalClickMultiplier: numericValue });
+		} catch {}
+	}
+
+	function syncSuctionClickBonus(value) {
+		try {
+			const numericValue = (value && typeof value.toNumber === 'function') ? value.toNumber() : Number(value) || 0;
+			app.state.setState({ suctionClickBonus: numericValue });
+		} catch {}
+	}
+
 	function syncSps(value) {
 		try {
 			const numericValue = (value && typeof value.toNumber === 'function') ? value.toNumber() : Number(value) || 0;
@@ -114,6 +135,11 @@ function createStateBridge(app) {
 				if (typeof window.betterCups !== 'undefined') seed.betterCups = (typeof window.betterCups?.toNumber === 'function') ? window.betterCups.toNumber() : Number(window.betterCups) || 0;
 				if (typeof window.fasterDrinks !== 'undefined') seed.fasterDrinks = (typeof window.fasterDrinks?.toNumber === 'function') ? window.fasterDrinks.toNumber() : Number(window.fasterDrinks) || 0;
 				if (typeof window.criticalClicks !== 'undefined') seed.criticalClicks = (typeof window.criticalClicks?.toNumber === 'function') ? window.criticalClicks.toNumber() : Number(window.criticalClicks) || 0;
+				if (typeof window.criticalClickChance !== 'undefined') seed.criticalClickChance = (typeof window.criticalClickChance?.toNumber === 'function') ? window.criticalClickChance.toNumber() : Number(window.criticalClickChance) || 0;
+				if (typeof window.criticalClickMultiplier !== 'undefined') seed.criticalClickMultiplier = (typeof window.criticalClickMultiplier?.toNumber === 'function') ? window.criticalClickMultiplier.toNumber() : Number(window.criticalClickMultiplier) || 0;
+				if (typeof window.suctionClickBonus !== 'undefined') seed.suctionClickBonus = (typeof window.suctionClickBonus?.toNumber === 'function') ? window.suctionClickBonus.toNumber() : Number(window.suctionClickBonus) || 0;
+				if (typeof window.fasterDrinksUpCounter !== 'undefined') seed.fasterDrinksUpCounter = (typeof window.fasterDrinksUpCounter?.toNumber === 'function') ? window.fasterDrinksUpCounter.toNumber() : Number(window.fasterDrinksUpCounter) || 0;
+				if (typeof window.criticalClickUpCounter !== 'undefined') seed.criticalClickUpCounter = (typeof window.criticalClickUpCounter?.toNumber === 'function') ? window.criticalClickUpCounter.toNumber() : Number(window.criticalClickUpCounter) || 0;
 				if (typeof window.sps !== 'undefined') seed.sps = (typeof window.sps?.toNumber === 'function') ? window.sps.toNumber() : Number(window.sps) || 0;
 			}
 			if (Object.keys(seed).length) app.state.setState(seed);
@@ -134,6 +160,9 @@ function createStateBridge(app) {
 			if (typeof window.betterCups !== 'undefined') syncBetterCups(window.betterCups);
 			if (typeof window.fasterDrinks !== 'undefined') syncFasterDrinks(window.fasterDrinks);
 			if (typeof window.criticalClicks !== 'undefined') syncCriticalClicks(window.criticalClicks);
+			if (typeof window.criticalClickChance !== 'undefined') syncCriticalClickChance(window.criticalClickChance);
+			if (typeof window.criticalClickMultiplier !== 'undefined') syncCriticalClickMultiplier(window.criticalClickMultiplier);
+			if (typeof window.suctionClickBonus !== 'undefined') syncSuctionClickBonus(window.suctionClickBonus);
 			if (typeof window.sps !== 'undefined') syncSps(window.sps);
 			if (typeof window.drinkRate !== 'undefined') setDrinkRate(window.drinkRate);
 			if (typeof window.drinkProgress !== 'undefined') setDrinkProgress(window.drinkProgress);
