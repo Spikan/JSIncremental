@@ -218,18 +218,23 @@ function setupShopButtonEventListeners() {
             const buttonText = button.textContent || '';
             console.log('🔧 Shop button clicked:', buttonText);
             
+            // Capture click coordinates for better feedback positioning
+            const clickX = e.clientX;
+            const clickY = e.clientY;
+            console.log('🔧 Click coordinates:', { x: clickX, y: clickY });
+            
             if (buttonText.includes('Extra Straw')) {
                 console.log('🔧 Calling buyStraw via event listener');
-                buyStraw();
+                buyStraw(clickX, clickY);
             } else if (buttonText.includes('Bigger Cup')) {
                 console.log('🔧 Calling buyCup via event listener');
-                buyCup();
+                buyCup(clickX, clickY);
             } else if (buttonText.includes('Wider Straws')) {
                 console.log('🔧 Calling buyWiderStraws via event listener');
-                buyWiderStraws();
+                buyWiderStraws(clickX, clickY);
             } else if (buttonText.includes('Better Cups')) {
                 console.log('🔧 Calling buyBetterCups via event listener');
-                buyBetterCups();
+                buyBetterCups(clickX, clickY);
             }
         });
         
@@ -1323,7 +1328,7 @@ function spsClick(amount) {
 }
 
 // Unified purchase handler to fix all shop issues
-function handlePurchase(purchaseType, purchaseData) {
+function handlePurchase(purchaseType, purchaseData, clickX = null, clickY = null) {
     try {
         console.log(`🔧 DEBUG: handlePurchase called for ${purchaseType}`);
         
@@ -1410,10 +1415,7 @@ function handlePurchase(purchaseType, purchaseData) {
         // Play sound
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
         
-        // Show feedback
-        const clickEvent = window.lastClickEvent;
-        const clickX = clickEvent?.clientX || null;
-        const clickY = clickEvent?.clientY || null;
+        // Show feedback using passed coordinates
         
         const itemNames = {
             'Straw': 'Extra Straw',
@@ -1589,7 +1591,7 @@ function updateShopButtonStates() {
 }
 
 // Simplified purchase functions that poll for App to be ready
-function buyStraw() {
+function buyStraw(clickX = null, clickY = null) {
     console.log('🔧 buyStraw called - checking App availability...');
     console.log('🔧 Debug: window.App exists?', !!window.App);
     console.log('🔧 Debug: window.App.systems exists?', !!window.App?.systems);
@@ -1652,9 +1654,9 @@ function buyStraw() {
     try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
     try {
         if (window.App?.ui?.showPurchaseFeedback) {
-            window.App.ui.showPurchaseFeedback('Extra Straw', strawCost);
+            window.App.ui.showPurchaseFeedback('Extra Straw', strawCost, clickX, clickY);
         } else if (typeof showPurchaseFeedback === 'function') {
-            showPurchaseFeedback('Extra Straw', strawCost);
+            showPurchaseFeedback('Extra Straw', strawCost, clickX, clickY);
         }
     } catch (e) {
         console.log('🔧 showPurchaseFeedback failed:', e);
@@ -1664,7 +1666,7 @@ function buyStraw() {
     return true;
 }
 
-function buyCup() {
+function buyCup(clickX = null, clickY = null) {
     console.log('🔧 buyCup called - checking App availability...');
     console.log('🔧 Debug: window.App exists?', !!window.App);
     console.log('🔧 Debug: window.App.systems exists?', !!window.App?.systems);
@@ -1726,9 +1728,9 @@ function buyCup() {
     try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
     try {
         if (window.App?.ui?.showPurchaseFeedback) {
-            window.App.ui.showPurchaseFeedback('Bigger Cup', cupCost);
+            window.App.ui.showPurchaseFeedback('Bigger Cup', cupCost, clickX, clickY);
         } else if (typeof showPurchaseFeedback === 'function') {
-            showPurchaseFeedback('Bigger Cup', cupCost);
+            showPurchaseFeedback('Bigger Cup', cupCost, clickX, clickY);
         }
     } catch (e) {
         console.log('🔧 showPurchaseFeedback failed:', e);
@@ -1738,7 +1740,7 @@ function buyCup() {
     return true;
 }
 
-function buyWiderStraws() {
+function buyWiderStraws(clickX = null, clickY = null) {
     console.log('🔧 buyWiderStraws called - checking App availability...');
     
     if (!window.App?.systems?.purchases) {
@@ -1769,12 +1771,12 @@ function buyWiderStraws() {
         cups: cups,
         widerStraws: widerStraws,
         betterCups: betterCups,
-    });
+    }, clickX, clickY);
     console.log('🔧 handlePurchase result:', result);
     return result;
 }
 
-function buyBetterCups() {
+function buyBetterCups(clickX = null, clickY = null) {
     console.log('🔧 buyBetterCups called - checking App availability...');
     
     if (!window.App?.systems?.purchases) {
@@ -1805,12 +1807,12 @@ function buyBetterCups() {
         cups: cups,
         widerStraws: widerStraws,
         betterCups: betterCups,
-    });
+    }, clickX, clickY);
     console.log('🔧 handlePurchase result:', result);
     return result;
 }
 
-function buySuction() {
+function buySuction(clickX = null, clickY = null) {
     // Prefer centralized purchases system when available
     if (window.App?.systems?.purchases?.purchaseSuction) {
         const res = window.App.systems.purchases.purchaseSuction({
@@ -1827,7 +1829,7 @@ function buySuction() {
             suctionClickBonus = new Decimal(res.suctionClickBonus);
         updateTopSipsPerSecond();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            showPurchaseFeedback('Improved Suction', res.spent);
+            showPurchaseFeedback('Improved Suction', res.spent, clickX, clickY);
         reload();
         checkUpgradeAffordability();
             return;

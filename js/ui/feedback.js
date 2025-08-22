@@ -136,9 +136,9 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
     // Position feedback - prefer click coordinates if available, otherwise center on shop
     let left, top;
     if (clickX !== null && clickY !== null) {
-        // Position near click location with slight offset
-        left = clickX + (Math.random() * 40 - 20); // Random offset ±20px
-        top = clickY - 60; // Above click location
+        // Position near click location with slight offset for visual appeal
+        left = clickX + (Math.random() * 30 - 15); // Random offset ±15px for natural feel
+        top = clickY - 50; // Above click location, closer for better visibility
     } else {
         // Fallback to shop center positioning
         const shopRect = shopDiv.getBoundingClientRect();
