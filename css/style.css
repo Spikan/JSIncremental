@@ -261,6 +261,8 @@ body {
 
 .tab-btn:active {
     transform: scale(0.95);
+    background: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 
@@ -499,6 +501,8 @@ body {
 
 .dev-btn:active {
     transform: scale(0.95);
+    background: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 .dev-btn-icon {
@@ -653,6 +657,8 @@ body {
 
 .save-btn:active {
     transform: scale(0.95);
+    background: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 /* Auto-save Controls */
@@ -1270,6 +1276,8 @@ h3 {
 
 .level-up-btn:active {
     transform: scale(0.98);
+    background: var(--primary-purple);
+    color: var(--primary-blue);
 }
 
 .level-up-btn.affordable {
@@ -1399,6 +1407,8 @@ h3 {
 
 .clicking-upgrade-btn:active {
     transform: scale(0.98);
+    background: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 .clicking-upgrade-icon {
@@ -1612,8 +1622,8 @@ h3 {
 
 .shop-btn:active {
     transform: scale(0.98);
-    background: linear-gradient(135deg, var(--primary-blue-dark), #003366);
-    color: var(--primary-green-light);
+    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+    color: var(--primary-blue);
     box-shadow: var(--btn-shadow-sm);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
@@ -1870,6 +1880,8 @@ h3 {
 
 .drink-speed-upgrade-btn:active {
     transform: scale(0.98);
+    background: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 .drink-speed-upgrade-icon {
@@ -3353,8 +3365,10 @@ h3 {
 }
 
 .btn-primary:active {
-  transform: scale(0.98);
-  box-shadow: var(--btn-shadow-sm);
+    transform: scale(0.98);
+    box-shadow: var(--btn-shadow-sm);
+    background: linear-gradient(135deg, var(--primary-green-light), var(--primary-green));
+    color: var(--neutral-white);
 }
 
 .btn-secondary {
@@ -3372,8 +3386,10 @@ h3 {
 }
 
 .btn-secondary:active {
-  transform: scale(0.98);
-  box-shadow: var(--btn-shadow-sm);
+    transform: scale(0.98);
+    box-shadow: var(--btn-shadow-sm);
+    background: linear-gradient(135deg, var(--primary-green-light), var(--primary-green));
+    color: var(--primary-blue);
 }
 
 .btn-outline {
@@ -3389,7 +3405,9 @@ h3 {
 }
 
 .btn-outline:active {
-  transform: scale(0.98);
+    transform: scale(0.98);
+    background: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 /* Special Button Variants */
@@ -3400,9 +3418,15 @@ h3 {
 }
 
 .btn-purple:hover {
-  background: var(--primary-purple);
-  color: var(--primary-blue);
-  transform: translateY(-2px);
+    background: var(--primary-purple);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+}
+
+.btn-purple:active {
+    transform: scale(0.98);
+    background: var(--primary-purple);
+    color: var(--primary-blue);
 }
 
 .btn-orange {
@@ -3412,9 +3436,15 @@ h3 {
 }
 
 .btn-orange:hover {
-  background: var(--primary-orange);
-  color: var(--primary-blue);
-  transform: translateY(-2px);
+    background: var(--primary-orange);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+}
+
+.btn-orange:active {
+    transform: scale(0.98);
+    background: var(--primary-orange);
+    color: var(--primary-blue);
 }
 
 /* Button States */
@@ -3522,24 +3552,28 @@ h3 {
 
 /* God Tab Special Styling (Preserved) */
 .tab-btn[onclick*="god"] {
-  background: linear-gradient(135deg, var(--primary-purple), #D633FF);
-  color: var(--neutral-white);
-  border-color: var(--primary-purple);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    background: var(--primary-blue);
+    color: var(--primary-purple);
+    border-color: var(--primary-purple);
 }
 
 .tab-btn[onclick*="god"]:hover {
-  background: linear-gradient(135deg, #D633FF, var(--primary-purple));
-  color: var(--neutral-white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(188, 0, 255, 0.4);
+    background: var(--primary-purple);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
 }
 
 .tab-btn[onclick*="god"].active {
-  background: linear-gradient(135deg, var(--primary-purple), #D633FF);
-  color: var(--neutral-white);
-  border-color: var(--primary-orange);
-  box-shadow: 0 4px 12px rgba(188, 0, 255, 0.4);
+    background: var(--primary-purple);
+    color: var(--primary-blue);
+    border-color: var(--primary-orange);
+    box-shadow: var(--btn-shadow-md);
+}
+
+.tab-btn[onclick*="god"]:active {
+    transform: scale(0.95);
+    background: var(--primary-purple);
+    color: var(--primary-blue);
 }
 
 /* ========================================
