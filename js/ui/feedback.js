@@ -135,15 +135,19 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
     
     // Position feedback - prefer click coordinates if available, otherwise center on shop
     let left, top;
+    console.log('🔧 Feedback positioning - clickX:', clickX, 'clickY:', clickY);
+    
     if (clickX !== null && clickY !== null) {
         // Position near click location with slight offset for visual appeal
         left = clickX + (Math.random() * 30 - 15); // Random offset ±15px for natural feel
         top = clickY - 50; // Above click location, closer for better visibility
+        console.log('🔧 Using click coordinates - left:', left, 'top:', top);
     } else {
         // Fallback to shop center positioning
         const shopRect = shopDiv.getBoundingClientRect();
         left = shopRect.left + shopRect.width/2;
         top = shopRect.top;
+        console.log('🔧 Using fallback positioning - left:', left, 'top:', top);
     }
     
     feedback.style.cssText = `
@@ -159,9 +163,38 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
         border-radius: 8px;
         font-weight: bold;
         text-align: center;
-        animation: clickFeedback 2s ease-out forwards;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        /* Ensure positioning is not overridden */
+        transform-origin: center bottom;
     `;
+    
+    // Add custom animation using JavaScript for better control
+    let startTime = Date.now();
+    const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const duration = 2000; // 2 seconds
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        
+        // Calculate new position (move up and fade out)
+        const moveUp = 40 * easeOut;
+        const opacity = 1 - easeOut;
+        const scale = 1 + (0.2 * easeOut);
+        
+        feedback.style.transform = `translate(-50%, calc(-100% - ${moveUp}px)) scale(${scale})`;
+        feedback.style.opacity = opacity;
+        
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        }
+    };
+    
+    requestAnimationFrame(animate);
+    
+    console.log('🔧 Final feedback positioning - left:', left, 'top:', top);
+    console.log('🔧 Feedback element style:', feedback.style.cssText);
     
     document.body.appendChild(feedback);
     
