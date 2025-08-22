@@ -1528,75 +1528,141 @@ function updateShopButtonStates() {
 function buyStraw() {
     console.log('🔧 buyStraw called - checking App availability...');
     
-    if (!window.App?.systems?.purchases) {
-        console.warn('🔧 App not available yet - purchase will be queued');
-        // Queue the purchase to retry after a short delay
-        setTimeout(() => {
-            console.log('🔧 Retrying buyStraw...');
-            buyStraw();
-        }, 100);
+    // Try the new App system first
+    if (window.App?.systems?.purchases && isGameReady()) {
+        console.log('🔧 Using App system for Straw purchase');
+        const result = handlePurchase('Straw', {
+            sips: window.sips,
+            straws: straws,
+            cups: cups,
+            widerStraws: widerStraws,
+            betterCups: betterCups,
+        });
+        console.log('🔧 handlePurchase result:', result);
+        return result;
+    }
+    
+    // Fallback to legacy system if App is not ready
+    console.log('🔧 App not ready, using legacy system for Straw purchase');
+    
+    // Check if we have enough sips
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    const strawCost = Math.floor(config.STRAW_BASE_COST * Math.pow(config.STRAW_SCALING, straws.toNumber()));
+    
+    if (window.sips.lt(strawCost)) {
+        console.log('🔧 Not enough sips for straw purchase');
         return false;
     }
     
-
+    // Perform the purchase using legacy logic
+    window.sips = window.sips.minus(strawCost);
+    straws = straws.plus(1);
+    window.straws = straws;
     
-    if (!isGameReady()) {
-        console.warn('🔧 Game not ready yet - please wait for initialization');
-        // Try to trigger the same initialization that sodaClick does
-        try {
+    // Update production
+    const strawSPD = new Decimal(config.STRAW_BASE_SPD || 0.6);
+    const totalStrawSPD = strawSPD.times(straws);
+    
+    // Update UI
+    updateElement('straws', straws);
+    updateElement('strawSPD', strawSPD);
+    updateTotalProduction('totalStrawSPD', strawSPD, straws);
+    
+    // Update affordability directly
+    try {
+        if (window.App?.ui?.checkUpgradeAffordability) {
+            window.App.ui.checkUpgradeAffordability();
+        } else if (typeof checkUpgradeAffordability === 'function') {
             checkUpgradeAffordability();
-        } catch (e) {
-            console.log('🔧 checkUpgradeAffordability failed:', e);
         }
-        return false;
+    } catch (e) {
+        console.log('🔧 checkUpgradeAffordability failed:', e);
     }
     
-    console.log('🔧 About to call handlePurchase for Straw');
-    const result = handlePurchase('Straw', {
-        sips: window.sips,
-        straws: straws,
-        cups: cups,
-        widerStraws: widerStraws,
-        betterCups: betterCups,
-    });
-    console.log('🔧 handlePurchase result:', result);
-    return result;
+    // Play sound and show feedback
+    try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+    try {
+        if (window.App?.ui?.showPurchaseFeedback) {
+            window.App.ui.showPurchaseFeedback('Extra Straw', strawCost);
+        } else if (typeof showPurchaseFeedback === 'function') {
+            showPurchaseFeedback('Extra Straw', strawCost);
+        }
+    } catch (e) {
+        console.log('🔧 showPurchaseFeedback failed:', e);
+    }
+    
+    console.log('🔧 Legacy straw purchase completed successfully');
+    return true;
 }
 
 function buyCup() {
     console.log('🔧 buyCup called - checking App availability...');
     
-    if (!window.App?.systems?.purchases) {
-        console.warn('🔧 App not available yet - purchase will be queued');
-        // Queue the purchase to retry after a short delay
-        setTimeout(() => {
-            console.log('🔧 Retrying buyCup...');
-            buyCup();
-        }, 100);
+    // Try the new App system first
+    if (window.App?.systems?.purchases && isGameReady()) {
+        console.log('🔧 Using App system for Cup purchase');
+        const result = handlePurchase('Cup', {
+            sips: window.sips,
+            straws: straws,
+            cups: cups,
+            widerStraws: widerStraws,
+            betterCups: betterCups,
+        });
+        console.log('🔧 handlePurchase result:', result);
+        return result;
+    }
+    
+    // Fallback to legacy system if App is not ready
+    console.log('🔧 App not ready, using legacy system for Cup purchase');
+    
+    // Check if we have enough sips
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    const cupCost = Math.floor(config.CUP_BASE_COST * Math.pow(config.CUP_SCALING, cups.toNumber()));
+    
+    if (window.sips.lt(cupCost)) {
+        console.log('🔧 Not enough sips for cup purchase');
         return false;
     }
     
-    if (!isGameReady()) {
-        console.warn('🔧 Game not ready yet - please wait for initialization');
-        // Try to trigger the same initialization that sodaClick does
-        try {
+    // Perform the purchase using legacy logic
+    window.sips = window.sips.minus(cupCost);
+    cups = cups.plus(1);
+    window.cups = cups;
+    
+    // Update production
+    const cupSPD = new Decimal(config.CUP_BASE_SPD || 1.2);
+    const totalCupSPD = cupSPD.times(cups);
+    
+    // Update UI
+    updateElement('cups', cups);
+    updateElement('cupSPD', cupSPD);
+    updateTotalProduction('totalCupSPD', cupSPD, cups);
+    
+    // Update affordability directly
+    try {
+        if (window.App?.ui?.checkUpgradeAffordability) {
+            window.App.ui.checkUpgradeAffordability();
+        } else if (typeof checkUpgradeAffordability === 'function') {
             checkUpgradeAffordability();
-        } catch (e) {
-            console.log('🔧 checkUpgradeAffordability failed:', e);
         }
-        return false;
+    } catch (e) {
+        console.log('🔧 checkUpgradeAffordability failed:', e);
     }
     
-    console.log('🔧 About to call handlePurchase for Cup');
-    const result = handlePurchase('Cup', {
-        sips: window.sips,
-        straws: straws,
-        cups: cups,
-        widerStraws: widerStraws,
-        betterCups: betterCups,
-    });
-    console.log('🔧 handlePurchase result:', result);
-    return result;
+    // Play sound and show feedback
+    try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+    try {
+        if (window.App?.ui?.showPurchaseFeedback) {
+            window.App.ui.showPurchaseFeedback('Bigger Cup', cupCost);
+        } else if (typeof showPurchaseFeedback === 'function') {
+            showPurchaseFeedback('Bigger Cup', cupCost);
+        }
+    } catch (e) {
+        console.log('🔧 showPurchaseFeedback failed:', e);
+    }
+    
+    console.log('🔧 Legacy cup purchase completed successfully');
+    return true;
 }
 
 function buyWiderStraws() {
