@@ -2770,4 +2770,19 @@ window.testDevTools = function() {
     const functions = ['devUnlockAll', 'devToggleDevMode', 'devToggleGodMode', 'quickUnlock'];
     functions.forEach(func => {
         if (window[func]) {
-            console.log(`
+            console.log(`✅ ${func} function available`);
+        } else {
+            console.error(`❌ ${func} function not available`);
+        }
+    });
+    
+    // Test tab switching
+    try {
+        switchTab('dev', new Event('click'));
+        console.log('✅ Dev tab switching works');
+    } catch (error) {
+        console.error('❌ Dev tab switching failed:', error);
+    }
+    
+    console.log('🔧 Dev tools test complete');
+};
