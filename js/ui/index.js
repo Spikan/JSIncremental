@@ -7,9 +7,10 @@ import * as feedback from './feedback.js';
 import * as affordability from './affordability.js';
 import * as labels from './labels.js';
 import * as utils from './utils.js';
+import * as buttons from './buttons.js';
 
 // Export all UI modules
-export { displays, stats, feedback, affordability };
+export { displays, stats, feedback, affordability, buttons };
 export { labels };
 
 // Convenience functions using consolidated utilities
@@ -49,6 +50,9 @@ export const setMusicStatusText = labels.setMusicStatusText;
 // Initialize UI event listeners
 export function initializeUI() {
     console.log('UI system initialized');
+    
+    // Initialize button system
+    buttons.initButtonSystem();
     
     // Set up event listeners for UI updates
     if (window.App?.events) {
