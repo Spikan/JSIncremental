@@ -594,6 +594,9 @@ function initGame() {
         // Call reload to initialize the game
         reload();
         
+        // Update shop button states now that everything is initialized
+        updateShopButtonStates();
+        
         // Start the game loop
         startGameLoop();
         
@@ -1449,8 +1452,51 @@ function updateUpgradeMultiplier(elementId, newSPD, baseSPD) {
     }
 }
 
-// Simplified purchase functions that use the unified handler
+// Check if the game is ready for purchases
+function isGameReady() {
+    return !!(window.App?.systems?.purchases && window.App.data?.upgrades);
+}
+
+// Update shop button states based on game readiness
+function updateShopButtonStates() {
+    const isReady = isGameReady();
+    const shopButtons = document.querySelectorAll('.shop-btn');
+    
+    shopButtons.forEach(button => {
+        if (isReady) {
+            button.disabled = false;
+            button.style.opacity = '1';
+            button.style.cursor = 'pointer';
+            // Remove loading text if it exists
+            const loadingText = button.querySelector('.loading-text');
+            if (loadingText) {
+                loadingText.remove();
+            }
+        } else {
+            button.disabled = true;
+            button.style.opacity = '0.6';
+            button.style.cursor = 'not-allowed';
+            // Add loading text if it doesn't exist
+            if (!button.querySelector('.loading-text')) {
+                const loadingText = document.createElement('div');
+                loadingText.className = 'loading-text';
+                loadingText.textContent = 'Loading...';
+                loadingText.style.fontSize = '0.8rem';
+                loadingText.style.color = '#888';
+                button.appendChild(loadingText);
+            }
+        }
+    });
+    
+    console.log(`🔧 Shop buttons ${isReady ? 'enabled' : 'disabled'} - Game ready: ${isReady}`);
+}
+
+// Simplified purchase functions that check if game is ready
 function buyStraw() {
+    if (!isGameReady()) {
+        console.warn('🔧 Game not ready yet - please wait for initialization');
+        return false;
+    }
     return handlePurchase('Straw', {
         sips: window.sips,
         straws: straws,
@@ -1461,6 +1507,10 @@ function buyStraw() {
 }
 
 function buyCup() {
+    if (!isGameReady()) {
+        console.warn('🔧 Game not ready yet - please wait for initialization');
+        return false;
+    }
     return handlePurchase('Cup', {
         sips: window.sips,
         straws: straws,
@@ -1471,6 +1521,10 @@ function buyCup() {
 }
 
 function buyWiderStraws() {
+    if (!isGameReady()) {
+        console.warn('🔧 Game not ready yet - please wait for initialization');
+        return false;
+    }
     return handlePurchase('WiderStraws', {
         sips: window.sips,
         straws: straws,
@@ -1481,6 +1535,10 @@ function buyWiderStraws() {
 }
 
 function buyBetterCups() {
+    if (!isGameReady()) {
+        console.warn('🔧 Game not ready yet - please wait for initialization');
+        return false;
+    }
     return handlePurchase('BetterCups', {
         sips: window.sips,
         straws: straws,
@@ -2159,6 +2217,9 @@ function addUserMessage(message) { try { return window.addUserMessage?.(message)
 
 // Event listener optimization - consolidate multiple handlers
 document.addEventListener('DOMContentLoaded', function() {
+    // Initially disable shop buttons until game is ready
+    updateShopButtonStates();
+    
     // Global click event listener to capture coordinates for purchase feedback
     document.addEventListener('click', function(e) {
         window.lastClickEvent = e;
