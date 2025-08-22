@@ -925,6 +925,9 @@ function updateDrinkRate() {
     // Update the top sips per drink display
     updateTopSipsPerDrink();
     updateTopSipsPerSecond();
+    
+    // Update the compact drink speed displays
+    updateCompactDrinkSpeedDisplays();
 }
 
 // Function to get current drink rate in seconds
@@ -978,6 +981,26 @@ function updateTopSipsPerSecond() {
         
 
         topSipsPerSecondElement.textContent = prettify(totalSipsPerSecond);
+    }
+}
+
+// Function to update the compact drink speed displays
+function updateCompactDrinkSpeedDisplays() {
+    // Update current drink speed display
+    const currentDrinkSpeedElement = document.getElementById('currentDrinkSpeedCompact');
+    if (currentDrinkSpeedElement) {
+        const drinkRateSeconds = getDrinkRateSeconds();
+        currentDrinkSpeedElement.textContent = drinkRateSeconds.toFixed(2) + 's';
+    }
+    
+    // Update drink speed bonus display
+    const drinkSpeedBonusElement = document.getElementById('drinkSpeedBonusCompact');
+    if (drinkSpeedBonusElement) {
+        const config = window.GAME_CONFIG?.BALANCE || {};
+        const baseDrinkRate = config.DEFAULT_DRINK_RATE || 5000;
+        const currentDrinkRate = drinkRate;
+        const reduction = ((baseDrinkRate - currentDrinkRate) / baseDrinkRate) * 100;
+        drinkSpeedBonusElement.textContent = reduction.toFixed(1) + '%';
     }
 }
 
@@ -1868,7 +1891,7 @@ function upgradeSuction() {
     
 }
 
-function buyFasterDrinks() {
+function buyFasterDrinks(clickX = null, clickY = null) {
     // Prefer centralized purchases system when available
     if (window.App?.systems?.purchases?.purchaseFasterDrinks) {
         const res = window.App.systems.purchases.purchaseFasterDrinks({
@@ -1898,7 +1921,7 @@ function buyFasterDrinks() {
     
 }
 
-function upgradeFasterDrinks() {
+function upgradeFasterDrinks(clickX = null, clickY = null) {
     // Prefer centralized purchases system when available
     if (window.App?.systems?.purchases?.upgradeFasterDrinks) {
         const res = window.App.systems.purchases.upgradeFasterDrinks({
@@ -2512,6 +2535,26 @@ document.addEventListener('DOMContentLoaded', function() {
             sodaClick(1, clickX, clickY);
         });
     }
+    
+    // Add event listeners to faster drinks buttons for coordinate capture
+    const fasterDrinksButtons = document.querySelectorAll('.drink-speed-upgrade-btn');
+    fasterDrinksButtons.forEach(button => {
+        button.removeAttribute('onclick'); // Remove onclick to prevent conflicts
+        
+        button.addEventListener('click', function(e) {
+            const clickX = e.clientX;
+            const clickY = e.clientY;
+            console.log('🔧 Faster drinks button clicked at:', { clickX, clickY });
+            
+            // Determine which button was clicked and call appropriate function
+            const buttonText = button.textContent || '';
+            if (buttonText.includes('Upgrade Faster Drinks')) {
+                upgradeFasterDrinks(clickX, clickY);
+            } else {
+                buyFasterDrinks(clickX, clickY);
+            }
+        });
+    });
     
     // Chat input keyboard support
     const chatInput = document.getElementById('chatInput');
