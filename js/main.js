@@ -1275,7 +1275,13 @@ function buyStraw() {
         updateTopSipsPerDrink();
         updateTopSipsPerSecond();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-    showPurchaseFeedback('Extra Straw', res.spent);
+    
+    // Get click coordinates from the event if available
+    const clickEvent = window.lastClickEvent;
+    const clickX = clickEvent?.clientX || null;
+    const clickY = clickEvent?.clientY || null;
+    
+    showPurchaseFeedback('Extra Straw', res.spent, clickX, clickY);
         // reload(); // Removed - causing issues
         checkUpgradeAffordability();
 }
@@ -1302,7 +1308,13 @@ function buyCup() {
         updateTopSipsPerDrink();
         updateTopSipsPerSecond();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-    showPurchaseFeedback('Bigger Cup', res.spent);
+    
+    // Get click coordinates from the event if available
+    const clickEvent = window.lastClickEvent;
+    const clickX = clickEvent?.clientX || null;
+    const clickY = clickEvent?.clientY || null;
+    
+    showPurchaseFeedback('Bigger Cup', res.spent, clickX, clickY);
         // reload(); // Removed - causing issues
         checkUpgradeAffordability();
 }
@@ -1329,8 +1341,14 @@ function buyWiderStraws() {
             sps = new Decimal(res.sipsPerDrink);
         updateTopSipsPerDrink();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            showPurchaseFeedback('Wider Straws Upgrade', res.spent);
-        reload();
+        
+        // Get click coordinates from the event if available
+        const clickEvent = window.lastClickEvent;
+        const clickX = clickEvent?.clientX || null;
+        const clickY = clickEvent?.clientY || null;
+        
+        showPurchaseFeedback('Wider Straws Upgrade', res.spent, clickX, clickY);
+        // reload(); // Removed - causing issues
         checkUpgradeAffordability();
             return;
         }
@@ -1359,8 +1377,14 @@ function buyBetterCups() {
             sps = new Decimal(res.sipsPerDrink);
             updateTopSipsPerDrink();
             try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            showPurchaseFeedback('Better Cups Upgrade', res.spent);
-            reload();
+            
+            // Get click coordinates from the event if available
+            const clickEvent = window.lastClickEvent;
+            const clickX = clickEvent?.clientX || null;
+            const clickY = clickEvent?.clientY || null;
+            
+            showPurchaseFeedback('Better Cups Upgrade', res.spent, clickX, clickY);
+            // reload(); // Removed - causing issues
             checkUpgradeAffordability();
             return;
         }
@@ -2026,6 +2050,11 @@ function addUserMessage(message) { try { return window.addUserMessage?.(message)
 
 // Event listener optimization - consolidate multiple handlers
 document.addEventListener('DOMContentLoaded', function() {
+    // Global click event listener to capture coordinates for purchase feedback
+    document.addEventListener('click', function(e) {
+        window.lastClickEvent = e;
+    });
+    
     // Chat input keyboard support
     const chatInput = document.getElementById('chatInput');
     if (chatInput) {
@@ -2729,19 +2758,4 @@ window.testDevTools = function() {
     const functions = ['devUnlockAll', 'devToggleDevMode', 'devToggleGodMode', 'quickUnlock'];
     functions.forEach(func => {
         if (window[func]) {
-            console.log(`✅ ${func} function available`);
-        } else {
-            console.error(`❌ ${func} function not available`);
-        }
-    });
-    
-    // Test tab switching
-    try {
-        switchTab('dev', new Event('click'));
-        console.log('✅ Dev tab switching works');
-    } catch (error) {
-        console.error('❌ Dev tab switching failed:', error);
-    }
-    
-    console.log('🔧 Dev tools test complete');
-};
+            console.log(`

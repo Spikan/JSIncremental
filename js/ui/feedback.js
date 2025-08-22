@@ -116,7 +116,7 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
 }
 
 // Show purchase feedback
-export function showPurchaseFeedback(itemName, cost) {
+export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = null) {
     const shopDiv = window.DOM_CACHE?.shopDiv;
     if (!shopDiv) return;
     
@@ -133,12 +133,23 @@ export function showPurchaseFeedback(itemName, cost) {
     feedback.setAttribute('aria-live', 'polite');
     feedback.setAttribute('aria-label', `Purchased ${itemName} for ${formatNumber(cost)} sips`);
     
-    // Position relative to shop
-    const shopRect = shopDiv.getBoundingClientRect();
+    // Position feedback - prefer click coordinates if available, otherwise center on shop
+    let left, top;
+    if (clickX !== null && clickY !== null) {
+        // Position near click location with slight offset
+        left = clickX + (Math.random() * 40 - 20); // Random offset ±20px
+        top = clickY - 60; // Above click location
+    } else {
+        // Fallback to shop center positioning
+        const shopRect = shopDiv.getBoundingClientRect();
+        left = shopRect.left + shopRect.width/2;
+        top = shopRect.top;
+    }
+    
     feedback.style.cssText = `
         position: fixed;
-        left: ${shopRect.left + shopRect.width/2}px;
-        top: ${shopRect.top}px;
+        left: ${left}px;
+        top: ${top}px;
         transform: translate(-50%, -100%);
         pointer-events: none;
         z-index: 1000;
