@@ -61,7 +61,7 @@ export function initializeUI() {
                 updateTopSipCounter();
                 checkUpgradeAffordability();
                 if (data.gained) {
-                    showClickFeedback(data.gained, data.critical);
+                    showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
                 }
             }
         });

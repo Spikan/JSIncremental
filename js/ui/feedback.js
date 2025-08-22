@@ -46,8 +46,91 @@ function getSafePosition(container, rangeX, rangeY) {
     }
 }
 
+// Show feedback at specific click coordinates
+function showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY) {
+    console.log('🔧 showFeedbackAtCoordinates called with:', { sipsGained, isCritical, clickX, clickY });
+    
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
+    feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
+    
+    // Accessibility improvements
+    feedback.setAttribute('role', 'status');
+    feedback.setAttribute('aria-live', 'polite');
+    feedback.setAttribute('aria-label', isCritical ? 
+        `Critical hit! Gained ${formatNumber(sipsGained)} sips` :
+        `Gained ${formatNumber(sipsGained)} sips`
+    );
+    
+    // Mobile-optimized styling
+    const isMobile = isMobileDevice();
+    const fontSize = isMobile ? 
+        (isCritical ? '1.3em' : '1.1em') : 
+        (isCritical ? '1.5em' : '1.2em');
+    
+    // Position feedback directly at click coordinates with slight offset
+    const offsetX = (Math.random() - 0.5) * 20; // ±10px horizontal offset
+    const offsetY = (Math.random() - 0.5) * 20; // ±10px vertical offset
+    
+    feedback.style.cssText = `
+        position: fixed;
+        left: ${clickX + offsetX}px;
+        top: ${clickY + offsetY}px;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: ${isMobile ? '9999' : '1000'};
+        font-weight: bold;
+        font-size: ${fontSize};
+        color: ${isCritical ? '#ff6b35' : '#4CAF50'};
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        ${isMobile ? 'touch-action: none; -webkit-touch-callout: none;' : ''}
+        ${isMobile ? 'will-change: transform, opacity;' : ''}
+    `;
+    
+    // Add to body for proper positioning
+    document.body.appendChild(feedback);
+    
+    // Simple fade out and slight upward animation
+    let startTime = Date.now();
+    const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const duration = isCritical ? 2500 : 2000; // Longer for critical hits
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Simple fade out and slight upward movement
+        const opacity = 1 - progress;
+        const moveUp = 15 * progress; // Only move up 15px total
+        
+        feedback.style.opacity = opacity;
+        feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
+        
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        }
+    };
+    
+    requestAnimationFrame(animate);
+    
+    // Remove after animation
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.parentNode.removeChild(feedback);
+        }
+    }, isCritical ? 2500 : 2000);
+}
+
 // Show click feedback numbers
-export function showClickFeedback(sipsGained, isCritical = false) {
+export function showClickFeedback(sipsGained, isCritical = false, clickX = null, clickY = null) {
+    console.log('🔧 showClickFeedback called with:', { sipsGained, isCritical, clickX, clickY });
+    
+    // If we have click coordinates, use them directly
+    if (clickX !== null && clickY !== null) {
+        showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY);
+        return;
+    }
+    
+    // Fallback to container-based positioning
     const sodaContainer =
         window.DOM_CACHE?.sodaButton?.parentNode ||
         document.getElementById('sodaButton')?.parentNode;
@@ -94,7 +177,6 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
         font-size: ${fontSize};
         color: ${isCritical ? '#ff6b35' : '#4CAF50'};
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        animation: clickFeedback 2s ease-out forwards;
         ${isMobile ? 'touch-action: none; -webkit-touch-callout: none;' : ''}
         ${isMobile ? 'will-change: transform, opacity;' : ''}
     `;
@@ -102,17 +184,33 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
     // Add to body for proper positioning
     document.body.appendChild(feedback);
     
-    // Remove after animation
-    const config2 = window.GAME_CONFIG?.TIMING || {};
-    const duration = isCritical ? 
-        (config2.CRITICAL_FEEDBACK_DURATION || 2500) : 
-        (config2.CLICK_FEEDBACK_DURATION || 2000);
+    // Simple fade out and slight upward animation (replacing CSS animation)
+    let startTime = Date.now();
+    const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const duration = isCritical ? 2500 : 2000;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Simple fade out and slight upward movement
+        const opacity = 1 - progress;
+        const moveUp = 15 * progress; // Only move up 15px total
+        
+        feedback.style.opacity = opacity;
+        feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
+        
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        }
+    };
     
+    requestAnimationFrame(animate);
+    
+    // Remove after animation
     setTimeout(() => {
         if (feedback.parentNode) {
             feedback.parentNode.removeChild(feedback);
         }
-    }, duration);
+    }, isCritical ? 2500 : 2000);
 }
 
 // Show purchase feedback

@@ -773,8 +773,12 @@ function setupMobileTouchHandling() {
             // Only process if it was a short touch and hasn't been processed yet
             if (touchDuration < 300 && window.isTouchClick && !window.touchProcessed) {
                 window.touchProcessed = true;
+                // Get touch coordinates for feedback positioning
+                const touch = e.changedTouches[0];
+                const clickX = touch.clientX;
+                const clickY = touch.clientY;
                 // Directly trigger click logic for mobile since default click is prevented
-                try { sodaClick(1); } catch {}
+                try { sodaClick(1, clickX, clickY); } catch {}
             }
             
             // Remove visual feedback after a short delay
@@ -1147,7 +1151,7 @@ let clickSoda = new Image();
 clickSoda.src = "images/clickSoda.png";
 
 
-function sodaClick(number) {
+function sodaClick(number, clickX = null, clickY = null) {
     // Track the click
     trackClick();
     
@@ -1182,7 +1186,7 @@ function sodaClick(number) {
         const baseSips = new Decimal(number);
         totalSipsGained = baseSips.plus(suctionClickBonus).times(criticalMultiplier);
     }
-    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.SODA, { gained: totalSipsGained, critical: isCritical }); } catch {}
+    try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.SODA, { gained: totalSipsGained, critical: isCritical, clickX, clickY }); } catch {}
     
     // Add to total sips earned
     totalSipsEarned = totalSipsEarned.plus(totalSipsGained);
@@ -2496,6 +2500,18 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
         window.lastClickEvent = e;
     });
+    
+    // Add click event listener to soda button for coordinate capture
+    const sodaButton = DOM_CACHE.sodaButton;
+    if (sodaButton) {
+        sodaButton.addEventListener('click', function(e) {
+            const clickX = e.clientX;
+            const clickY = e.clientY;
+            console.log('🔧 Soda button clicked at:', { clickX, clickY });
+            // Call sodaClick with coordinates
+            sodaClick(1, clickX, clickY);
+        });
+    }
     
     // Chat input keyboard support
     const chatInput = document.getElementById('chatInput');
