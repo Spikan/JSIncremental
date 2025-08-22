@@ -352,6 +352,10 @@ function updateButtonState(buttonId, isAffordable, cost) {
 function updateCostDisplay(elementId, cost, isAffordable) {
     const element = document.getElementById(elementId);
     if (element) {
+        // Update the cost text
+        element.textContent = cost.toLocaleString();
+        
+        // Update CSS classes for affordability
         if (isAffordable) {
             element.classList.remove('cost-too-high');
             element.classList.add('cost-affordable');
