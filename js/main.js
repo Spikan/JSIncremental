@@ -1538,6 +1538,8 @@ function buyStraw() {
         return false;
     }
     
+
+    
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
         // Try to trigger the same initialization that sodaClick does
@@ -1549,13 +1551,16 @@ function buyStraw() {
         return false;
     }
     
-    return handlePurchase('Straw', {
+    console.log('🔧 About to call handlePurchase for Straw');
+    const result = handlePurchase('Straw', {
         sips: window.sips,
         straws: straws,
         cups: cups,
         widerStraws: widerStraws,
         betterCups: betterCups,
     });
+    console.log('🔧 handlePurchase result:', result);
+    return result;
 }
 
 function buyCup() {
@@ -1582,13 +1587,16 @@ function buyCup() {
         return false;
     }
     
-    return handlePurchase('Cup', {
+    console.log('🔧 About to call handlePurchase for Cup');
+    const result = handlePurchase('Cup', {
         sips: window.sips,
         straws: straws,
         cups: cups,
         widerStraws: widerStraws,
         betterCups: betterCups,
     });
+    console.log('🔧 handlePurchase result:', result);
+    return result;
 }
 
 function buyWiderStraws() {
@@ -1615,13 +1623,16 @@ function buyWiderStraws() {
         return false;
     }
     
-    return handlePurchase('WiderStraws', {
+    console.log('🔧 About to call handlePurchase for WiderStraws');
+    const result = handlePurchase('WiderStraws', {
         sips: window.sips,
         straws: straws,
         cups: cups,
         widerStraws: widerStraws,
         betterCups: betterCups,
     });
+    console.log('🔧 handlePurchase result:', result);
+    return result;
 }
 
 function buyBetterCups() {
@@ -1648,13 +1659,16 @@ function buyBetterCups() {
         return false;
     }
     
-    return handlePurchase('BetterCups', {
+    console.log('🔧 About to call handlePurchase for BetterCups');
+    const result = handlePurchase('BetterCups', {
         sips: window.sips,
         straws: straws,
         cups: cups,
         widerStraws: widerStraws,
         betterCups: betterCups,
     });
+    console.log('🔧 handlePurchase result:', result);
+    return result;
 }
 
 function buySuction() {
