@@ -1,11 +1,17 @@
-// Storage service - validation functions will be available globally
+// @ts-check
+// Storage service with explicit schema imports
+import { validateGameSave, validateGameOptions } from '../core/validation/schemas.js';
 const STORAGE_PREFIX = 'game_';
 
+/**
+ * @param {string} key
+ */
 function getKey(key) {
     return STORAGE_PREFIX + key;
 }
 
-const storage = {
+const AppStorage = {
+    /** @returns {any} */
     loadGame: () => {
         try {
             const saved = localStorage.getItem(getKey('save'));
@@ -15,7 +21,7 @@ const storage = {
 
 
 
-            const validated = (window.validateGameSave ? window.validateGameSave(parsed) : parsed);
+            const validated = validateGameSave(parsed);
 
             if (validated) {
                 return validated;
@@ -30,6 +36,7 @@ const storage = {
         }
     },
     
+    /** @param {any} data */
     saveGame: (data) => {
         try {
 
@@ -48,6 +55,7 @@ const storage = {
         }
     },
     
+    /** @returns {boolean} */
     deleteSave: () => {
         try {
             localStorage.removeItem(getKey('save'));
@@ -58,6 +66,7 @@ const storage = {
         }
     },
     
+    /** @param {string} key @param {any} value */
     setJSON: (key, value) => {
         try {
             localStorage.setItem(getKey(key), JSON.stringify(value));
@@ -68,6 +77,7 @@ const storage = {
         }
     },
     
+    /** @param {string} key @param {any} [defaultValue=null] */
     getJSON: (key, defaultValue = null) => {
         try {
             const saved = localStorage.getItem(getKey(key));
@@ -77,7 +87,7 @@ const storage = {
             
             // Validate specific keys
             if (key === 'options') {
-                const validated = (window.validateGameOptions ? window.validateGameOptions(parsed) : parsed);
+                const validated = validateGameOptions(parsed);
                 return validated || parsed; // Return parsed for backward compatibility
             }
             
@@ -88,6 +98,7 @@ const storage = {
         }
     },
     
+    /** @param {string} key @param {boolean} value */
     setBoolean: (key, value) => {
         try {
             localStorage.setItem(getKey(key), value ? 'true' : 'false');
@@ -98,6 +109,7 @@ const storage = {
         }
     },
     
+    /** @param {string} key @param {boolean} [defaultValue=false] */
     getBoolean: (key, defaultValue = false) => {
         try {
             const saved = localStorage.getItem(getKey(key));
@@ -109,6 +121,7 @@ const storage = {
         }
     },
     
+    /** @param {string} key */
     remove: (key) => {
         try {
             localStorage.removeItem(getKey(key));
@@ -120,7 +133,7 @@ const storage = {
     }
 };
 
-// Make available globally
-window.storage = storage;
+// Make available globally after module body executes
+(/** @type {any} */(window)).storage = AppStorage;
 
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Game Init System: splash and start logic
 
 export function initSplashScreen() {

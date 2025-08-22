@@ -35,7 +35,7 @@ const EVENT_NAMES = {
     },
 };
 
-// Make available globally
+// Make available globally (runtime uses non-module script loading)
 window.EVENT_NAMES = EVENT_NAMES;
 
 

@@ -20,22 +20,23 @@ export function queueSave({ now, lastOp, minIntervalMs, schedule, perform }) {
  */
 export function performSaveSnapshot() {
 	try {
+		const w = /** @type {any} */(window);
 		const payload = {
-			sips: String(window.sips || 0),
-			straws: (window.straws && typeof window.straws.toNumber === 'function') ? window.straws.toNumber() : Number(window.straws || 0),
-			cups: (window.cups && typeof window.cups.toNumber === 'function') ? window.cups.toNumber() : Number(window.cups || 0),
-			widerStraws: String(window.widerStraws || 0),
-			betterCups: String(window.betterCups || 0),
-			suctions: String(window.suctions || 0),
-			criticalClicks: String(window.criticalClicks || 0),
-			fasterDrinks: String(window.fasterDrinks || 0),
-			totalSipsEarned: String(window.totalSipsEarned || 0),
-			drinkRate: Number(window.drinkRate || 0),
-			lastDrinkTime: Number(window.lastDrinkTime || 0),
-			drinkProgress: Number(window.drinkProgress || 0),
+			sips: String(w.sips || 0),
+			straws: (w.straws && typeof w.straws.toNumber === 'function') ? w.straws.toNumber() : Number(w.straws || 0),
+			cups: (w.cups && typeof w.cups.toNumber === 'function') ? w.cups.toNumber() : Number(w.cups || 0),
+			widerStraws: String(w.widerStraws || 0),
+			betterCups: String(w.betterCups || 0),
+			suctions: String(w.suctions || 0),
+			criticalClicks: String(w.criticalClicks || 0),
+			fasterDrinks: String(w.fasterDrinks || 0),
+			totalSipsEarned: String(w.totalSipsEarned || 0),
+			drinkRate: Number(w.drinkRate || 0),
+			lastDrinkTime: Number(w.lastDrinkTime || 0),
+			drinkProgress: Number(w.drinkProgress || 0),
 			lastSaveTime: Date.now(),
-			totalClicks: Number(window.totalClicks || 0),
-			level: (window.level && typeof window.level.toNumber === 'function') ? window.level.toNumber() : Number(window.level || 1)
+			totalClicks: Number(w.totalClicks || 0),
+			level: (w.level && typeof w.level.toNumber === 'function') ? w.level.toNumber() : Number(w.level || 1)
 		};
 
 

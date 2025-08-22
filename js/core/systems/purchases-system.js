@@ -6,20 +6,32 @@ import { recalcProduction } from './resources.js';
 /**
  * @returns {{ upgrades: any; config: any }}
  */
+/**
+ * @returns {{ upgrades: any; config: any }}
+ */
 function getConfig() {
     // Try to get from App.data.upgrades first (from upgrades.json)
     const upgrades = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
     // Fallback to GAME_CONFIG (from config.js)
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
+    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
     
     return { upgrades, config };
+}
+
+/**
+ * Ensures returned config is typed as any to satisfy property access in JS.
+ * @returns {{ upgrades: any; config: any }}
+ */
+function getTypedConfig() {
+    const { upgrades, config } = getConfig();
+    return { upgrades, config: /** @type {any} */(config) };
 }
 
 /**
  * @param {{ sips: number; straws: number; cups: number; widerStraws: number; betterCups: number }} args
  */
 export function purchaseStraw({ sips, straws, cups, widerStraws, betterCups }) {
-    const { upgrades, config } = getConfig();
+    const { upgrades, config } = getTypedConfig();
 
     const baseCost = upgrades?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5;
     const scaling = upgrades?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08;
@@ -41,7 +53,7 @@ export function purchaseStraw({ sips, straws, cups, widerStraws, betterCups }) {
  * @param {{ sips: number; straws: number; cups: number; widerStraws: number; betterCups: number }} args
  */
 export function purchaseCup({ sips, straws, cups, widerStraws, betterCups }) {
-    const { upgrades, config } = getConfig();
+    const { upgrades, config } = getTypedConfig();
 
     const baseCost = upgrades?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15;
     const scaling = upgrades?.cups?.scaling ?? config.CUP_SCALING ?? 1.15;
@@ -63,7 +75,7 @@ export function purchaseCup({ sips, straws, cups, widerStraws, betterCups }) {
  * @param {{ sips: number; straws: number; cups: number; widerStraws: number; betterCups: number }} args
  */
 export function purchaseWiderStraws({ sips, straws, cups, widerStraws, betterCups }) {
-    const { upgrades, config } = getConfig();
+    const { upgrades, config } = getTypedConfig();
 
     const baseCost = upgrades?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150;
     const cost = Math.floor(baseCost * (Number(widerStraws) + 1));
@@ -84,7 +96,7 @@ export function purchaseWiderStraws({ sips, straws, cups, widerStraws, betterCup
  * @param {{ sips: number; straws: number; cups: number; widerStraws: number; betterCups: number }} args
  */
 export function purchaseBetterCups({ sips, straws, cups, widerStraws, betterCups }) {
-    const { upgrades, config } = getConfig();
+    const { upgrades, config } = getTypedConfig();
 
     const baseCost = upgrades?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400;
     const cost = Math.floor(baseCost * (Number(betterCups) + 1));
@@ -105,7 +117,7 @@ export function purchaseBetterCups({ sips, straws, cups, widerStraws, betterCups
  * @param {{ sips: number; suctions: number }} args
  */
 export function purchaseSuction({ sips, suctions }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
+    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
     const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
 
     const baseCost = up?.suction?.baseCost ?? config.SUCTION_BASE_COST;
@@ -122,7 +134,7 @@ export function purchaseSuction({ sips, suctions }) {
  * @param {{ sips: number; suctionUpCounter: number }} args
  */
 export function upgradeSuction({ sips, suctionUpCounter }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
+    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
     const cost = (config.SUCTION_UPGRADE_BASE_COST ?? 0) * Number(suctionUpCounter);
     if (sips < cost) return null;
     const newCounter = Number(suctionUpCounter) + 1;
@@ -134,8 +146,8 @@ export function upgradeSuction({ sips, suctionUpCounter }) {
  * @param {{ sips: number; fasterDrinks: number }} args
  */
 export function purchaseFasterDrinks({ sips, fasterDrinks }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
-    const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
+    const up = (typeof window !== 'undefined' && (/** @type {any} */(window)).App?.data?.upgrades) || {};
     const baseCost = up?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST;
     const scaling = up?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING;
     const cost = Math.floor(baseCost * Math.pow(scaling, Number(fasterDrinks)));
@@ -158,8 +170,8 @@ export function purchaseFasterDrinks({ sips, fasterDrinks }) {
  * @param {{ sips: number; fasterDrinksUpCounter: number }} args
  */
 export function upgradeFasterDrinks({ sips, fasterDrinksUpCounter }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
-    const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
+    const up = (typeof window !== 'undefined' && (/** @type {any} */(window)).App?.data?.upgrades) || {};
     const base = up?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 0;
     const cost = base * Number(fasterDrinksUpCounter);
     if (sips < cost) return null;
@@ -171,8 +183,8 @@ export function upgradeFasterDrinks({ sips, fasterDrinksUpCounter }) {
  * @param {{ sips: number; criticalClicks: number; criticalClickChance: number }} args
  */
 export function purchaseCriticalClick({ sips, criticalClicks, criticalClickChance }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
-    const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
+    const up = (typeof window !== 'undefined' && (/** @type {any} */(window)).App?.data?.upgrades) || {};
     const baseCost = up?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST;
     const scaling = up?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING;
     const cost = Math.floor(baseCost * Math.pow(scaling, Number(criticalClicks)));
@@ -186,7 +198,7 @@ export function purchaseCriticalClick({ sips, criticalClicks, criticalClickChanc
  * @param {{ sips: number; criticalClickUpCounter: number; criticalClickMultiplier: number }} args
  */
 export function upgradeCriticalClick({ sips, criticalClickUpCounter, criticalClickMultiplier }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
+    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
     const cost = (config.CRITICAL_CLICK_UPGRADE_BASE_COST ?? 0) * Number(criticalClickUpCounter);
     if (sips < cost) return null;
     const newCounter = Number(criticalClickUpCounter) + 1;
@@ -198,7 +210,7 @@ export function upgradeCriticalClick({ sips, criticalClickUpCounter, criticalCli
  * @param {{ sips: number; level: number; sipsPerDrink: number }} args
  */
 export function levelUp({ sips, level, sipsPerDrink }) {
-    const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
+    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
     const base = config.LEVEL_UP_BASE_COST ?? 0;
     const scaling = config.LEVEL_UP_SCALING ?? 1;
     const cost = base * Math.pow(scaling, Number(level));

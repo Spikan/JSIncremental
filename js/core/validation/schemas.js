@@ -1,7 +1,10 @@
+// @ts-check
 // Import Zod from CDN or global (UMD exposes as window.Zod). Provide a safe fallback for non-browser/tests.
-const z = (typeof window !== 'undefined' && window.Zod) || (typeof globalThis !== 'undefined' && globalThis.Zod) || (() => {
+const z = (typeof window !== 'undefined' && /** @type any */(window).Zod) || (typeof globalThis !== 'undefined' && /** @type any */(globalThis).Zod) || (() => {
     // Minimal chainable stub so consumers don't crash when Zod isn't present (tests can mock window.Zod)
+    /** @type {any} */
     const chain = {
+        /** @param {any} data */
         parse: (data) => data,
         omit: () => chain,
         optional: () => chain,
@@ -19,11 +22,13 @@ const z = (typeof window !== 'undefined' && window.Zod) || (typeof globalThis !=
 })();
 
 // Schema for unlock conditions
+/** @typedef {{ sips: number; clicks: number }} Unlock */
 export const UnlockSchema = z.object({
   sips: z.number().min(0),
   clicks: z.number().min(0)
 });
 
+/** @typedef {{ [k in 'suction'|'criticalClick'|'fasterDrinks'|'straws'|'cups'|'widerStraws'|'betterCups'|'levelUp'|'shop'|'stats'|'god'|'unlocks']: Unlock }} Unlocks */
 export const UnlocksSchema = z.object({
   suction: UnlockSchema,
   criticalClick: UnlockSchema,
@@ -40,6 +45,7 @@ export const UnlocksSchema = z.object({
 });
 
 // Schema for upgrade definitions
+/** @typedef {{ baseCost: number; scaling: number; baseSPD?: number; multiplierPerLevel?: number; upgradeBaseCost?: number }} Upgrade */
 export const UpgradeSchema = z.object({
   baseCost: z.number().min(0),
   scaling: z.number().min(1),
@@ -48,6 +54,7 @@ export const UpgradeSchema = z.object({
   upgradeBaseCost: z.number().min(0).optional()
 });
 
+/** @typedef {{ straws: Upgrade; widerStraws: Upgrade; cups: Upgrade; betterCups: Upgrade; suction: Omit<Upgrade, 'baseSPD'|'multiplierPerLevel'>; fasterDrinks: Omit<Upgrade, 'baseSPD'|'multiplierPerLevel'>; criticalClick: Omit<Upgrade, 'baseSPD'|'multiplierPerLevel'> }} Upgrades */
 export const UpgradesSchema = z.object({
   straws: UpgradeSchema,
   widerStraws: UpgradeSchema,
@@ -59,6 +66,7 @@ export const UpgradesSchema = z.object({
 });
 
 // Schema for game save data (partial - we'll expand this)
+/** @typedef {{ sips: any; straws: number; cups: number; widerStraws: any; betterCups: any; suctions: any; criticalClicks: any; fasterDrinks: any; totalSipsEarned?: any; drinkRate?: number; lastDrinkTime?: number; drinkProgress?: number; lastSaveTime?: number; totalClicks?: number; totalSips?: any; level?: number }} GameSave */
 export const GameSaveSchema = z.object({
   sips: z.any(), // Decimal.js object
   straws: z.number().min(0),
@@ -79,6 +87,7 @@ export const GameSaveSchema = z.object({
 });
 
 // Schema for game options
+/** @typedef {{ autosaveEnabled: boolean; autosaveInterval: number; clickSoundsEnabled: boolean; musicEnabled: boolean; musicStreamPreferences?: Record<string, boolean> }} GameOptions */
 export const GameOptionsSchema = z.object({
   autosaveEnabled: z.boolean(),
   autosaveInterval: z.number().min(1000).max(60000),
@@ -88,6 +97,7 @@ export const GameOptionsSchema = z.object({
 });
 
 // Validation helper functions
+/** @param {any} data */
 export function validateUnlocks(data) {
   try {
     return UnlocksSchema.parse(data);
@@ -97,6 +107,7 @@ export function validateUnlocks(data) {
   }
 }
 
+/** @param {any} data */
 export function validateUpgrades(data) {
   try {
     return UpgradesSchema.parse(data);
@@ -106,6 +117,7 @@ export function validateUpgrades(data) {
   }
 }
 
+/** @param {any} data */
 export function validateGameSave(data) {
   try {
     return GameSaveSchema.parse(data);
@@ -115,6 +127,7 @@ export function validateGameSave(data) {
   }
 }
 
+/** @param {any} data */
 export function validateGameOptions(data) {
   try {
     return GameOptionsSchema.parse(data);

@@ -1,5 +1,9 @@
+// @ts-check
 // Autosave counter progression helper
 // Inputs are primitives; returns next counter and whether to perform a save
+/**
+ * @param {{ enabled: boolean; counter: number; intervalSec: number; drinkRateMs: number }} args
+ */
 export function computeAutosaveCounter({ enabled, counter, intervalSec, drinkRateMs }) {
 	if (!enabled) return { nextCounter: 0, shouldSave: false };
 	const drinksPerSecond = 1000 / Number(drinkRateMs || 1000);

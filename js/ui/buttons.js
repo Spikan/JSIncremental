@@ -193,8 +193,8 @@ function setupUnifiedButtonSystem() {
     console.log('🔧 Setting up modern button event handler system...');
     
     // Find all buttons with onclick attributes
-    const allButtons = document.querySelectorAll('button');
-    console.log(`🔧 Found ${allButtons.length} buttons to process`);
+    const allButtons = document.querySelectorAll('button[onclick]');
+    console.log(`🔧 Found ${allButtons.length} buttons with inline onclick to process`);
     
     allButtons.forEach(button => {
         // Check if button has onclick attribute
@@ -221,10 +221,7 @@ function setupUnifiedButtonSystem() {
                         button.classList.add(action.type);
                     }
                     
-                    // Update button text if label is available
-                    if (action.label) {
-                        button.textContent = action.label;
-                    }
+                    // Leave original button text intact to preserve UI copy
                     
                     console.log(`🔧 Successfully configured button: ${actionName} (${action.type})`);
                 } else {

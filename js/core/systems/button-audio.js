@@ -1,13 +1,16 @@
+// @ts-check
 // Button Audio System
 // Handles button click/purchase/critical sound effects and preference state
 
+/** @type {AudioContext | null} */
 let audioContext = null;
 let buttonSoundsEnabled = true;
 
 function initButtonAudioContext() {
     try {
         if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const Ctx = window.AudioContext || (/** @type any */(window)).webkitAudioContext;
+            audioContext = new Ctx();
         }
         console.log('Button audio context initialized');
     } catch (error) {

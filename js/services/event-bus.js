@@ -1,19 +1,29 @@
+// @ts-check
 // Simple pub/sub event bus
 
+/**
+ * @template {Record<string, any>} [E=Record<string, any>]
+ * @returns {{ on: (event: keyof E & string, handler: (payload: E[keyof E]) => void) => () => void; off: (event: keyof E & string, handler: (payload: E[keyof E]) => void) => void; emit: (event: keyof E & string, payload?: E[keyof E]) => void }}
+ */
 function createEventBus() {
+    /** @type {Map<string, Set<Function>>} */
     const listeners = new Map(); // event -> Set<fn>
 
+    /** @param {string} event @param {(payload:any)=>void} handler */
     function on(event, handler) {
         if (!listeners.has(event)) listeners.set(event, new Set());
-        listeners.get(event).add(handler);
+        const set = listeners.get(event);
+        if (set) set.add(handler);
         return () => off(event, handler);
     }
 
+    /** @param {string} event @param {(payload:any)=>void} handler */
     function off(event, handler) {
         const set = listeners.get(event);
         if (set) set.delete(handler);
     }
 
+    /** @param {string} event @param {any} [payload] */
     function emit(event, payload) {
         const set = listeners.get(event);
         if (!set) return;
@@ -28,8 +38,8 @@ function createEventBus() {
 const bus = createEventBus();
 
 // Make available globally
-window.createEventBus = createEventBus;
-window.eventBus = bus;
-window.bus = bus;
+(/** @type {any} */(window)).createEventBus = createEventBus;
+(/** @type {any} */(window)).eventBus = bus;
+(/** @type {any} */(window)).bus = bus;
 
 

@@ -6,7 +6,14 @@ const createStore = window.createStore || ((state) => ({ getState: () => state, 
 const defaultState = window.defaultState || {};
 const storage = window.storage || { loadGame: () => null, saveGame: () => {} };
 const eventBus = window.eventBus || { emit: () => {}, on: () => {} };
-const EVENT_NAMES = window.EVENT_NAMES || {};
+// Pull event names from module export if available; fallback to global
+let EVENT_NAMES = window.EVENT_NAMES || {};
+try {
+    // If constants module defined a global export, prefer it
+    if (window && window.EVENT_NAMES) {
+        EVENT_NAMES = window.EVENT_NAMES;
+    }
+} catch {}
 
 // Bootstrap the App global object
 console.log('🔧 index.js starting App initialization...');
@@ -34,6 +41,9 @@ window.App = {
     ui: {},
     data: {}
 };
+
+// Mirror EVENT_NAMES onto window from App (single write location)
+try { window.EVENT_NAMES = window.App.EVENT_NAMES; } catch {}
 
 // Initialize state bridge (mirror selected legacy globals)
 try {

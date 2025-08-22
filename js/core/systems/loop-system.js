@@ -1,6 +1,7 @@
 // @ts-check
 // Loop system: centralizes requestAnimationFrame game loop
 
+/** @type {number | null} */
 let rafId = null;
 
 /**
@@ -53,6 +54,7 @@ export function stop() {
 	}
 }
 
+/** @param {(() => void) | undefined} fn */
 function runOnceSafely(fn) {
 	try { fn && fn(); } catch {}
 }
