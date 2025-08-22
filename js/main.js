@@ -306,12 +306,29 @@ function updateButtonState(buttonId, isAffordable, cost) {
     // Try multiple selectors to find the button
     let button = null;
     
-    // First try to find by onclick attribute
+    // First try to find by onclick attribute (for backward compatibility)
     button = document.querySelector(`button[onclick*="${buttonId}"]`);
     
-    // If not found, try to find by button text content or other attributes
+    // If not found, try to find by button text content (for our new event listener setup)
     if (!button) {
-        // For shop buttons, try to find by the cost span ID pattern
+        const shopButtons = document.querySelectorAll('.shop-btn');
+        shopButtons.forEach(shopButton => {
+            const buttonText = shopButton.textContent || '';
+            
+            if (buttonId === 'buyStraw' && buttonText.includes('Extra Straw')) {
+                button = shopButton;
+            } else if (buttonId === 'buyCup' && buttonText.includes('Bigger Cup')) {
+                button = shopButton;
+            } else if (buttonId === 'buyWiderStraws' && buttonText.includes('Wider Straws')) {
+                button = shopButton;
+            } else if (buttonId === 'buyBetterCups' && buttonText.includes('Better Cups')) {
+                button = shopButton;
+            }
+        });
+    }
+    
+    // If still not found, try to find by the cost span ID pattern
+    if (!button) {
         if (buttonId.startsWith('buy')) {
             const costElementId = buttonId.replace('buy', '') + 'Cost';
             const costElement = document.getElementById(costElementId);
@@ -328,6 +345,7 @@ function updateButtonState(buttonId, isAffordable, cost) {
     }
     
     if (button) {
+        console.log(`🔧 Found button for ${buttonId}, updating state. Affordable: ${isAffordable}`);
         if (isAffordable) {
             button.classList.remove('disabled');
             button.classList.add('affordable');
@@ -337,6 +355,8 @@ function updateButtonState(buttonId, isAffordable, cost) {
             button.classList.add('disabled');
             button.title = `Costs ${prettify(cost)} Sips (You have ${prettify(window.sips)})`;
         }
+    } else {
+        console.warn(`🔧 Could not find button for ${buttonId}`);
     }
     
     // Also update compact clicking upgrade buttons if they exist

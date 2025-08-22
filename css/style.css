@@ -1275,8 +1275,7 @@ h3 {
 .level-up-btn.affordable {
     background-color: #BC00FF;
     color: #FFFFFF;
-    box-shadow: 0 0 20px rgba(188, 0, 255, 0.6);
-    animation: affordableGlow 2s ease-in-out infinite alternate;
+    box-shadow: 0 4px 12px rgba(188, 0, 255, 0.3);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
@@ -1622,8 +1621,7 @@ h3 {
 .shop-btn.affordable {
     background: linear-gradient(135deg, #00B36B, #00D4FF) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 0 20px rgba(0, 179, 107, 0.6) !important;
-    animation: affordableGlow 2s ease-in-out infinite alternate;
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3) !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     border-color: #00D4FF !important;
 }
@@ -1786,8 +1784,7 @@ h3 {
 .clicking-upgrade-btn.affordable {
     background-color: #00B36B !important;
     color: #FFFFFF !important;
-    box-shadow: 0 0 20px rgba(0, 179, 107, 0.6);
-    animation: affordableGlow 2s ease-in-out infinite alternate;
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
@@ -1964,15 +1961,7 @@ h3 {
     color: #666 !important;
 }
 
-/* Affordable Glow Animation */
-@keyframes affordableGlow {
-    from {
-        box-shadow: 0 0 20px rgba(0, 179, 107, 0.6);
-    }
-    to {
-        box-shadow: 0 0 30px rgba(0, 179, 107, 0.8), 0 0 40px rgba(0, 179, 107, 0.4);
-    }
-}
+/* Affordable Glow Animation - Removed for cleaner look */
 
 /* Mobile-specific optimizations */
 @media (max-width: 768px) {
