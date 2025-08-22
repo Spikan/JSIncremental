@@ -14,7 +14,7 @@ html {
 
 body {
     background-color: #001789;
-    color: #00B36B;
+    color: #FFFFFF;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -620,7 +620,7 @@ body {
     font-weight: bold;
     border: 2px solid #00B36B;
     background-color: #001789;
-    color: #00B36B;
+    color: #FFFFFF;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -641,7 +641,7 @@ body {
 
 .stream-select option {
     background: #001789;
-    color: #00B36B;
+    color: #FFFFFF;
     padding: 0.5rem;
 }
 
@@ -706,7 +706,7 @@ body {
     padding: 0.5rem;
     border: 2px solid #00B36B;
     background-color: #001789;
-    color: #00B36B;
+    color: #FFFFFF;
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
@@ -821,7 +821,8 @@ body {
 }
 
 .stat-label {
-    color: #00B36B;
+    font-weight: bold;
+    color: #FFFFFF;
     font-size: 0.9rem;
     font-weight: bold;
     margin-bottom: 0.25rem;
@@ -1086,7 +1087,7 @@ h3 {
 
 .stat-label {
     font-weight: bold;
-    color: #00B36B;
+    color: #FFFFFF;
 }
 
 .stat-value {
@@ -1504,7 +1505,7 @@ h3 {
 
 /* Cost display styling */
 .cost-affordable {
-    color: #00B36B !important;
+    color: #FFFFFF !important;
     font-weight: bold;
 }
 
