@@ -479,14 +479,14 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    padding: 1rem;
-    border: 2px solid #00B36B;
-    background-color: #001789;
-    color: #00B36B;
-    border-radius: 8px;
+    padding: var(--btn-padding-md);
+    border: 2px solid var(--primary-green);
+    background-color: var(--primary-blue);
+    color: var(--primary-green);
+    border-radius: var(--btn-radius-md);
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-height: 80px;
+    transition: var(--btn-transition);
+    min-height: var(--btn-xl);
     justify-content: center;
 }
 
@@ -635,20 +635,20 @@ body {
 
 .save-btn {
     min-width: 120px;
-    min-height: 44px;
-    padding: 0.75rem 1rem;
+    min-height: var(--btn-sm);
+    padding: var(--btn-padding-sm);
     font-size: 1rem;
-    border: 2px solid #00B36B;
-    background-color: #001789;
-    color: #00B36B;
-    border-radius: 8px;
+    border: 2px solid var(--primary-green);
+    background-color: var(--primary-blue);
+    color: var(--primary-green);
+    border-radius: var(--btn-radius-md);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--btn-transition);
 }
 
 .save-btn:hover {
-    background-color: #00B36B;
-    color: #001789;
+    background-color: var(--primary-green);
+    color: var(--primary-blue);
 }
 
 .save-btn:active {
@@ -714,15 +714,15 @@ body {
 }
 
 .sound-toggle-btn {
-    padding: 0.75rem 1.5rem;
+    padding: var(--btn-padding-md);
     font-size: 1rem;
     font-weight: bold;
-    border: 2px solid #00B36B;
-    background-color: #00B36B;
-    color: white;
-    border-radius: 8px;
+    border: 2px solid var(--primary-green);
+    background-color: var(--primary-green);
+    color: var(--neutral-white);
+    border-radius: var(--btn-radius-md);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--btn-transition);
     min-width: 200px;
 }
 
@@ -1246,16 +1246,16 @@ h3 {
 /* Level Up Button */
 .level-up-btn {
     min-width: 200px;
-    min-height: 80px;
-    padding: 1rem 1.5rem;
+    min-height: var(--btn-xl);
+    padding: var(--btn-padding-md);
     font-size: 1.1rem;
     font-weight: bold;
-    border: 3px solid #BC00FF;
-    background-color: #001789;
-    color: #BC00FF;
-    border-radius: 12px;
+    border: 2px solid var(--primary-purple);
+    background-color: var(--primary-blue);
+    color: var(--primary-purple);
+    border-radius: var(--btn-radius-lg);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--btn-transition);
     line-height: 1.3;
     white-space: nowrap;
     margin: 1rem auto;
@@ -1263,8 +1263,8 @@ h3 {
 }
 
 .level-up-btn:hover {
-    background-color: #BC00FF;
-    color: #001789;
+    background-color: var(--primary-purple);
+    color: var(--primary-blue);
     transform: scale(1.02);
 }
 
@@ -1273,16 +1273,16 @@ h3 {
 }
 
 .level-up-btn.affordable {
-    background-color: #BC00FF;
-    color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(188, 0, 255, 0.3);
+    background-color: var(--primary-purple);
+    color: var(--neutral-white);
+    box-shadow: var(--btn-shadow-md);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 .level-up-btn.disabled {
-    background-color: #333;
-    color: #666;
-    border-color: #555;
+    background-color: var(--neutral-dark);
+    color: var(--neutral-medium);
+    border-color: var(--neutral-medium);
     cursor: not-allowed;
     transform: none;
 }
@@ -1354,19 +1354,19 @@ h3 {
 
 .clicking-upgrade-btn {
     width: 160px;
-    height: 70px;
-    padding: 1rem 1rem;
+    height: var(--btn-lg);
+    padding: var(--btn-padding-md);
     font-size: 1rem;
     font-weight: bold;
-    border: 3px solid #00B36B;
-    background: linear-gradient(135deg, #001789, #001f5e);
-    color: #00B36B;
-    border-radius: 12px;
+    border: 2px solid var(--primary-green);
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+    color: var(--primary-green);
+    border-radius: var(--btn-radius-lg);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--btn-transition-slow);
     line-height: 1.2;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.2);
+    box-shadow: var(--btn-shadow-sm);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -1392,8 +1392,8 @@ h3 {
 }
 
 .clicking-upgrade-btn:hover {
-    background-color: #00B36B;
-    color: #001789;
+    background-color: var(--primary-green);
+    color: var(--primary-blue);
     transform: scale(1.02);
 }
 
@@ -1568,19 +1568,19 @@ h3 {
 
 .shop-btn {
     min-width: 180px;
-    min-height: 70px;
-    padding: 1rem 1.5rem;
+    min-height: var(--btn-lg);
+    padding: var(--btn-padding-md);
     font-size: 1rem;
     font-weight: bold;
-    border: 3px solid #00B36B;
-    background: linear-gradient(135deg, #001789, #001f5e);
-    color: #00B36B;
-    border-radius: 12px;
+    border: 2px solid var(--primary-green);
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+    color: var(--primary-green);
+    border-radius: var(--btn-radius-lg);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--btn-transition-slow);
     line-height: 1.2;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.2);
+    box-shadow: var(--btn-shadow-sm);
     position: relative;
     overflow: hidden;
     /* Ensure text is always readable */
@@ -1603,27 +1603,27 @@ h3 {
 }
 
 .shop-btn:hover:not(.affordable):not(.disabled) {
-    background: linear-gradient(135deg, #00B36B, #00D4FF);
-    color: #001789;
+    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+    color: var(--primary-blue);
     transform: scale(1.02);
-    box-shadow: 0 6px 16px rgba(0, 179, 107, 0.3);
+    box-shadow: var(--btn-shadow-lg);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .shop-btn:active {
     transform: scale(0.98);
-    background: linear-gradient(135deg, #002299, #003366);
-    color: #00D4FF;
-    box-shadow: 0 2px 8px rgba(0, 179, 107, 0.4);
+    background: linear-gradient(135deg, var(--primary-blue-dark), #003366);
+    color: var(--primary-green-light);
+    box-shadow: var(--btn-shadow-sm);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 .shop-btn.affordable {
-    background: linear-gradient(135deg, #00B36B, #00D4FF) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3) !important;
+    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light)) !important;
+    color: var(--neutral-white) !important;
+    box-shadow: var(--btn-shadow-md) !important;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
-    border-color: #00D4FF !important;
+    border-color: var(--primary-green-light) !important;
 }
 
 .shop-btn.affordable * {
@@ -1632,16 +1632,16 @@ h3 {
 }
 
 .shop-btn.disabled {
-    background-color: #333;
-    color: #666;
-    border-color: #555;
+    background-color: var(--neutral-dark);
+    color: var(--neutral-medium);
+    border-color: var(--neutral-medium);
     cursor: not-allowed;
     transform: none;
 }
 
 /* Focus state for accessibility */
 .shop-btn:focus {
-    outline: 2px solid #00D4FF;
+    outline: 2px solid var(--primary-green-light);
     outline-offset: 2px;
     box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
 }
@@ -1827,22 +1827,22 @@ h3 {
 .drink-speed-upgrade-btn {
     width: 100%;
     min-width: 200px;
-    min-height: 70px;
-    padding: 1rem 1.5rem;
+    min-height: var(--btn-lg);
+    padding: var(--btn-padding-md);
     font-size: 1rem;
     font-weight: bold;
-    border: 3px solid #00B36B;
-    background: linear-gradient(135deg, #001789, #001f5e);
-    color: #00B36B;
-    border-radius: 12px;
+    border: 2px solid var(--primary-green);
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+    color: var(--primary-green);
+    border-radius: var(--btn-radius-lg);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--btn-transition-slow);
     display: flex;
     align-items: center;
     gap: 0.75rem;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.2);
+    box-shadow: var(--btn-shadow-sm);
     line-height: 1.2;
     white-space: nowrap;
 }
@@ -1863,8 +1863,8 @@ h3 {
 }
 
 .drink-speed-upgrade-btn:hover {
-    background-color: #00B36B;
-    color: #001789;
+    background-color: var(--primary-green);
+    color: var(--primary-blue);
     transform: scale(1.02);
 }
 
@@ -1907,17 +1907,17 @@ h3 {
 }
 
 .drink-speed-upgrade-btn.affordable {
-    background: linear-gradient(135deg, #00B36B, #00D4FF) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3) !important;
+    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light)) !important;
+    color: var(--neutral-white) !important;
+    box-shadow: var(--btn-shadow-md) !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-    border-color: #00D4FF !important;
+    border-color: var(--primary-green-light) !important;
 }
 
 .drink-speed-upgrade-btn.disabled {
-    background-color: #333 !important;
-    color: #666 !important;
-    border-color: #555 !important;
+    background-color: var(--neutral-dark) !important;
+    color: var(--neutral-medium) !important;
+    border-color: var(--neutral-medium) !important;
     cursor: not-allowed;
     transform: none;
 }
@@ -3228,3 +3228,320 @@ h3 {
         padding: 1rem;
     }
 }
+
+/* ========================================
+   BUTTON DESIGN SYSTEM
+   ======================================== */
+
+/* CSS Custom Properties for consistent theming */
+:root {
+  /* Primary Colors */
+  --primary-blue: #001789;
+  --primary-blue-dark: #001f5e;
+  --primary-green: #00B36B;
+  --primary-green-light: #00D4FF;
+  --primary-orange: #FF3D02;
+  --primary-purple: #BC00FF;
+  
+  /* Secondary Colors */
+  --secondary-orange: #FF8E53;
+  --secondary-red: #FF6B6B;
+  --secondary-cyan: #4ECDC4;
+  --secondary-blue: #45B7D1;
+  
+  /* Neutral Colors */
+  --neutral-dark: #333;
+  --neutral-medium: #666;
+  --neutral-light: #999;
+  --neutral-white: #FFFFFF;
+  
+  /* Button Sizes */
+  --btn-xs: 32px;
+  --btn-sm: 44px;
+  --btn-md: 50px;
+  --btn-lg: 70px;
+  --btn-xl: 80px;
+  
+  /* Button Padding */
+  --btn-padding-xs: 0.5rem 0.75rem;
+  --btn-padding-sm: 0.75rem 1rem;
+  --btn-padding-md: 1rem 1.5rem;
+  --btn-padding-lg: 1.25rem 2rem;
+  
+  /* Border Radius */
+  --btn-radius-sm: 6px;
+  --btn-radius-md: 8px;
+  --btn-radius-lg: 12px;
+  --btn-radius-xl: 16px;
+  
+  /* Transitions */
+  --btn-transition: all 0.2s ease;
+  --btn-transition-slow: all 0.3s ease;
+  
+  /* Shadows */
+  --btn-shadow-sm: 0 2px 4px rgba(0, 179, 107, 0.2);
+  --btn-shadow-md: 0 4px 8px rgba(0, 179, 107, 0.3);
+  --btn-shadow-lg: 0 6px 16px rgba(0, 179, 107, 0.4);
+  --btn-shadow-xl: 0 8px 25px rgba(0, 179, 107, 0.5);
+}
+
+/* Base Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-weight: bold;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--btn-radius-md);
+  cursor: pointer;
+  transition: var(--btn-transition);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Button Size Variants */
+.btn-xs {
+  min-height: var(--btn-xs);
+  padding: var(--btn-padding-xs);
+  font-size: 0.875rem;
+}
+
+.btn-sm {
+  min-height: var(--btn-sm);
+  padding: var(--btn-padding-sm);
+  font-size: 0.875rem;
+}
+
+.btn-md {
+  min-height: var(--btn-md);
+  padding: var(--btn-padding-sm);
+  font-size: 1rem;
+}
+
+.btn-lg {
+  min-height: var(--btn-lg);
+  padding: var(--btn-padding-md);
+  font-size: 1rem;
+}
+
+.btn-xl {
+  min-height: var(--btn-xl);
+  padding: var(--btn-padding-md);
+  font-size: 1.1rem;
+}
+
+/* Button Style Variants */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+  color: var(--neutral-white);
+  border: 2px solid var(--primary-green);
+  box-shadow: var(--btn-shadow-sm);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-green-light), var(--primary-green));
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: var(--btn-shadow-sm);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+  color: var(--primary-green);
+  border: 2px solid var(--primary-green);
+  box-shadow: var(--btn-shadow-sm);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+  box-shadow: var(--btn-shadow-sm);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary-green);
+  border: 2px solid var(--primary-green);
+}
+
+.btn-outline:hover {
+  background: var(--primary-green);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.btn-outline:active {
+  transform: scale(0.98);
+}
+
+/* Special Button Variants */
+.btn-purple {
+  background: var(--primary-blue);
+  color: var(--primary-purple);
+  border: 2px solid var(--primary-purple);
+}
+
+.btn-purple:hover {
+  background: var(--primary-purple);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.btn-orange {
+  background: var(--primary-blue);
+  color: var(--primary-orange);
+  border: 2px solid var(--primary-orange);
+}
+
+.btn-orange:hover {
+  background: var(--primary-orange);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+/* Button States */
+.btn:disabled,
+.btn.disabled {
+  background: var(--neutral-dark);
+  color: var(--neutral-medium);
+  border-color: var(--neutral-medium);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled:hover,
+.btn.disabled:hover {
+  background: var(--neutral-dark);
+  color: var(--neutral-medium);
+  transform: none;
+  box-shadow: none;
+}
+
+.btn.affordable {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+  color: var(--neutral-white);
+  border-color: var(--primary-green-light);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.btn.affordable:hover {
+  background: linear-gradient(135deg, var(--primary-green-light), var(--primary-green));
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-lg);
+}
+
+/* Focus States for Accessibility */
+.btn:focus {
+  outline: 2px solid var(--primary-green-light);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+}
+
+/* Button with Icon */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2em;
+  height: 1.2em;
+  flex-shrink: 0;
+}
+
+/* Button with Text */
+.btn-text {
+  flex: 1;
+  text-align: center;
+}
+
+/* Special Effects */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 179, 107, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+/* Tab Button Specific Styles */
+.tab-btn {
+  min-width: 150px;
+  min-height: var(--btn-md);
+  padding: var(--btn-padding-sm);
+  font-size: 1rem;
+  border: 2px solid var(--primary-green);
+  background: var(--primary-blue);
+  color: var(--primary-green);
+  border-radius: var(--btn-radius-md);
+  cursor: pointer;
+  transition: var(--btn-transition);
+  font-weight: bold;
+}
+
+.tab-btn:hover {
+  background: var(--primary-green);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.tab-btn.active {
+  background: var(--primary-green);
+  color: var(--primary-blue);
+  border-color: var(--primary-orange);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.tab-btn:active {
+  transform: scale(0.95);
+}
+
+/* God Tab Special Styling (Preserved) */
+.tab-btn[onclick*="god"] {
+  background: linear-gradient(135deg, var(--primary-purple), #D633FF);
+  color: var(--neutral-white);
+  border-color: var(--primary-purple);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.tab-btn[onclick*="god"]:hover {
+  background: linear-gradient(135deg, #D633FF, var(--primary-purple));
+  color: var(--neutral-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(188, 0, 255, 0.4);
+}
+
+.tab-btn[onclick*="god"].active {
+  background: linear-gradient(135deg, var(--primary-purple), #D633FF);
+  color: var(--neutral-white);
+  border-color: var(--primary-orange);
+  box-shadow: 0 4px 12px rgba(188, 0, 255, 0.4);
+}
+
+/* ========================================
+   END BUTTON DESIGN SYSTEM
+   ======================================== */
