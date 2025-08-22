@@ -1,4 +1,4 @@
-// Button System - Unified button event handling and management
+// Modern Button System - Unified button event handling and management
 // Part of the UI system for coordinated user interaction
 
 // Button configuration for consistent behavior
@@ -52,30 +52,86 @@ const BUTTON_CONFIG = {
         }
     },
     
-    // Function mappings for button actions
+    // Function mappings for button actions - using proper function references
     actions: {
-        'buyStraw': { func: 'buyStraw', type: 'shop-btn' },
-        'buyCup': { func: 'buyCup', type: 'shop-btn' },
-        'buyWiderStraws': { func: 'buyWiderStraws', type: 'shop-btn' },
-        'buyBetterCups': { func: 'buyBetterCups', type: 'shop-btn' },
-        'buySuction': { func: 'buySuction', type: 'clicking-upgrade-btn' },
-        'buyCriticalClick': { func: 'buyCriticalClick', type: 'clicking-upgrade-btn' },
-        'buyFasterDrinks': { func: 'buyFasterDrinks', type: 'drink-speed-upgrade-btn' },
-        'upgradeFasterDrinks': { func: 'upgradeFasterDrinks', type: 'drink-speed-upgrade-btn' },
-        'levelUp': { func: 'levelUp', type: 'level-up-btn' },
-        'save': { func: 'save', type: 'save-btn' },
-        'delete_save': { func: 'delete_save', type: 'save-btn' },
-        'toggleButtonSounds': { func: 'toggleButtonSounds', type: 'sound-toggle-btn' },
-        'sendMessage': { func: 'sendMessage', type: 'chat-send-btn' },
-        'startGame': { func: 'startGame', type: 'splash-start-btn' }
+        'buyStraw': { 
+            func: () => window.App?.systems?.purchases?.buyStraw?.(), 
+            type: 'shop-btn',
+            label: 'Buy Straw'
+        },
+        'buyCup': { 
+            func: () => window.App?.systems?.purchases?.buyCup?.(), 
+            type: 'shop-btn',
+            label: 'Buy Cup'
+        },
+        'buyWiderStraws': { 
+            func: () => window.App?.systems?.purchases?.buyWiderStraws?.(), 
+            type: 'shop-btn',
+            label: 'Buy Wider Straws'
+        },
+        'buyBetterCups': { 
+            func: () => window.App?.systems?.purchases?.buyBetterCups?.(), 
+            type: 'shop-btn',
+            label: 'Buy Better Cups'
+        },
+        'buySuction': { 
+            func: () => window.App?.systems?.purchases?.buySuction?.(), 
+            type: 'clicking-upgrade-btn',
+            label: 'Buy Suction'
+        },
+        'buyCriticalClick': { 
+            func: () => window.App?.systems?.purchases?.buyCriticalClick?.(), 
+            type: 'clicking-upgrade-btn',
+            label: 'Buy Critical Click'
+        },
+        'buyFasterDrinks': { 
+            func: () => window.App?.systems?.purchases?.buyFasterDrinks?.(), 
+            type: 'drink-speed-upgrade-btn',
+            label: 'Buy Faster Drinks'
+        },
+        'upgradeFasterDrinks': { 
+            func: () => window.App?.systems?.purchases?.upgradeFasterDrinks?.(), 
+            type: 'drink-speed-upgrade-btn',
+            label: 'Upgrade Faster Drinks'
+        },
+        'levelUp': { 
+            func: () => window.App?.systems?.gameInit?.levelUp?.(), 
+            type: 'level-up-btn',
+            label: 'Level Up'
+        },
+        'save': { 
+            func: () => window.App?.systems?.save?.queueSave?.(), 
+            type: 'save-btn',
+            label: 'Save Game'
+        },
+        'delete_save': { 
+            func: () => window.App?.storage?.deleteSave?.(), 
+            type: 'save-btn',
+            label: 'Delete Save'
+        },
+        'toggleButtonSounds': { 
+            func: () => window.App?.systems?.audio?.button?.toggleButtonSounds?.(), 
+            type: 'sound-toggle-btn',
+            label: 'Toggle Button Sounds'
+        },
+        'sendMessage': { 
+            func: () => window.App?.systems?.god?.sendMessage?.(), 
+            type: 'chat-send-btn',
+            label: 'Send Message'
+        },
+        'startGame': { 
+            func: () => window.App?.systems?.gameInit?.startGame?.(), 
+            type: 'splash-start-btn',
+            label: 'Start Game'
+        }
     }
 };
 
-// Unified button click handler
+// Modern button click handler
 function handleButtonClick(event, button, actionName) {
-    // Don't prevent default - let the original onclick work
-    // event.preventDefault();
-    // event.stopPropagation();
+    // Prevent default to ensure our system handles everything
+    event.preventDefault();
+    event.stopPropagation();
     
     // Get button configuration
     const action = BUTTON_CONFIG.actions[actionName];
@@ -113,13 +169,21 @@ function handleButtonClick(event, button, actionName) {
         button.classList.remove('button-clicked');
     }, 150);
     
-    // Note: We don't execute the action here since the original onclick will handle it
-    // This prevents double-execution of button actions
+    // Execute the modern function reference
+    try {
+        if (action.func && typeof action.func === 'function') {
+            action.func();
+        } else {
+            console.warn(`Action function for ${actionName} is not available`);
+        }
+    } catch (error) {
+        console.error(`Button action ${actionName} failed:`, error);
+    }
 }
 
-// Setup unified button event listeners
+// Setup modern button event listeners
 function setupUnifiedButtonSystem() {
-    console.log('🔧 Setting up unified button event handler system...');
+    console.log('🔧 Setting up modern button event handler system...');
     
     // Find all buttons with onclick attributes
     const allButtons = document.querySelectorAll('button');
@@ -139,8 +203,10 @@ function setupUnifiedButtonSystem() {
                 const action = BUTTON_CONFIG.actions[actionName];
                 
                 if (action) {
-                    // Add unified event listener WITHOUT removing onclick
-                    // This ensures the original functionality still works
+                    // Remove the old onclick attribute
+                    button.removeAttribute('onclick');
+                    
+                    // Add modern event listener
                     button.addEventListener('click', (e) => handleButtonClick(e, button, actionName));
                     
                     // Add appropriate CSS classes for styling
@@ -148,9 +214,13 @@ function setupUnifiedButtonSystem() {
                         button.classList.add(action.type);
                     }
                     
+                    // Update button text if label is available
+                    if (action.label) {
+                        button.textContent = action.label;
+                    }
+                    
                     console.log(`🔧 Successfully configured button: ${actionName} (${action.type})`);
                 } else {
-                    // Don't warn about unknown actions - they might be added later
                     console.log(`Button action ${actionName} not yet configured, skipping`);
                 }
             }
@@ -160,7 +230,7 @@ function setupUnifiedButtonSystem() {
     // Special handling for buttons without onclick attributes
     setupSpecialButtonHandlers();
     
-    console.log('🔧 Unified button event handler system setup complete');
+    console.log('🔧 Modern button event handler system setup complete');
 }
 
 // Setup special button handlers that don't use onclick
@@ -216,34 +286,63 @@ function setupSpecialButtonHandlers() {
     }
 }
 
-// Initialize button system when DOM is ready and game functions are available
+// Initialize button system when App systems are ready
 function initButtonSystem() {
-    // Wait for both DOM and game functions to be ready
+    // Wait for App systems to be available
     function tryInitialize() {
-        // Check if essential game functions are available
-        const essentialFunctions = ['buyStraw', 'buyCup', 'buySuction', 'buyCriticalClick', 'buyFasterDrinks', 'buyWiderStraws', 'buyBetterCups', 'sodaClick', 'switchTab'];
-        const functionsAvailable = essentialFunctions.every(func => typeof window[func] === 'function');
+        // Check if essential App systems are available
+        const essentialSystems = [
+            'App.systems.purchases',
+            'App.systems.gameInit', 
+            'App.systems.save',
+            'App.systems.audio.button',
+            'App.storage'
+        ];
         
-        if (functionsAvailable) {
-            console.log('🔧 All game functions available, setting up button system');
+        const systemsAvailable = essentialSystems.every(path => {
+            const parts = path.split('.');
+            let current = window;
+            for (const part of parts) {
+                if (current && current[part]) {
+                    current = current[part];
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        });
+        
+        if (systemsAvailable) {
+            console.log('🔧 All App systems available, setting up modern button system');
             setupUnifiedButtonSystem();
         } else {
-            // Log which functions are missing for debugging
-            const missingFunctions = essentialFunctions.filter(func => typeof window[func] !== 'function');
-            console.log('🔧 Waiting for game functions:', missingFunctions.join(', '));
+            // Log which systems are missing for debugging
+            const missingSystems = essentialSystems.filter(path => {
+                const parts = path.split('.');
+                let current = window;
+                for (const part of parts) {
+                    if (current && current[part]) {
+                        current = current[part];
+                    } else {
+                        return false;
+                    }
+                }
+                return false;
+            });
+            console.log('🔧 Waiting for App systems:', missingSystems.join(', '));
             // Try again in a bit
             setTimeout(tryInitialize, 200);
         }
     }
     
-    // Wait for both DOM and main.js to be fully loaded
+    // Wait for both DOM and App to be ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            // Wait a bit more for main.js to finish loading
+            // Wait for App to be fully initialized
             setTimeout(tryInitialize, 100);
         });
     } else {
-        // DOM already loaded, wait for main.js
+        // DOM already loaded, wait for App
         setTimeout(tryInitialize, 100);
     }
 }
