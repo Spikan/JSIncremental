@@ -9,7 +9,6 @@ export function initSplashScreen() {
     }
 
     function startGame() {
-        try { window.App?.systems?.audio?.music?.stopTitleMusic?.(); } catch {}
         const splash = document.getElementById('splashScreen');
         const game = document.getElementById('gameContent');
         if (splash && game) {

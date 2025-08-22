@@ -1978,7 +1978,7 @@ window.addEventListener('unhandledrejection', (e) => {
 
  
 
-// Core game start function used by both music options
+// Core game start function
 function startGameCore() { try { window.App?.systems?.gameInit?.startGameCore?.(); } catch {} }
 
 // Keep the old function for compatibility (call global start if available)
@@ -2113,219 +2113,18 @@ window.upgradeCriticalClick = upgradeCriticalClick;
 let audioContext = null;
 let buttonSoundsEnabled = true;
 
-function initSplashMusic() {
-    
+// music: initSplashMusic removed
 
-    // Check user's music preference during initialization
-    let musicEnabled = true;
-    try {
-        if (window.App?.storage?.getBoolean) {
-            musicEnabled = window.App.storage.getBoolean('musicEnabled', true);
-        } else {
-            const stored = localStorage.getItem('musicEnabled');
-            musicEnabled = stored !== null ? stored === 'true' : true;
-        }
-    } catch (error) {
-        console.error('Error checking music preference during init:', error);
-        musicEnabled = true; // Default to enabled
-    }
-
-    // Create audio element for splash screen title music
-    splashAudio = new Audio();
-    splashAudio.src = 'res/Soda Drinker Title Music.mp3';
-    splashAudio.loop = false; // Don't loop - we want it to play once fully
-    const config = window.GAME_CONFIG?.AUDIO || {};
-    splashAudio.volume = config.SPLASH_MUSIC_VOLUME;
-
-    // Apply music preference during initialization
-    if (!musicEnabled) {
-        splashAudio.muted = true;
-        
-    } else {
-        
-    }
-    
-    
-    
-    // Add comprehensive event listeners for debugging
-    splashAudio.addEventListener('loadstart', () => {
-    });
-    
-    splashAudio.addEventListener('loadedmetadata', () => {
-    });
-    
-    splashAudio.addEventListener('loadeddata', () => {
-    });
-    
-    splashAudio.addEventListener('canplay', () => {
-        // Audio is ready to play
-        
-    });
-    
-    splashAudio.addEventListener('canplaythrough', () => {
-    });
-    
-    splashAudio.addEventListener('ended', () => {
-        
-        // Start the main game music (legacy no-op)
-        try { window.App?.systems?.audio?.music?.startMainGameMusic?.(); } catch {}
-    });
-    
-    // Add error handling
-    splashAudio.addEventListener('error', (e) => {
-        console.error('Splash audio error event:', e);
-        console.error('Error details:', {
-            error: splashAudio.error,
-            src: splashAudio.src,
-            networkState: splashAudio.networkState,
-            readyState: splashAudio.readyState
-        });
-        
-        
-    });
-    
-    // Force load attempt
-    try {
-        splashAudio.load();
-        
-    } catch (error) {
-        console.error('Error calling load():', error);
-    }
-    
-    // Don't auto-play - wait for user interaction
-}
-
-// Function to update splash audio mute state when preference changes
-function updateSplashAudioMuteState() {
-    if (!splashAudio) return;
-
-    let musicEnabled = true;
-    try {
-        if (window.App?.storage?.getBoolean) {
-            musicEnabled = window.App.storage.getBoolean('musicEnabled', true);
-        } else {
-            const stored = localStorage.getItem('musicEnabled');
-            musicEnabled = stored !== null ? stored === 'true' : true;
-        }
-    } catch (error) {
-        console.error('Error checking music preference for mute update:', error);
-        musicEnabled = true;
-    }
-
-    splashAudio.muted = !musicEnabled;
-    
-}
+// music: updateSplashAudioMuteState removed
 
 // ===== BUTTON AUDIO SYSTEM (moved to App.systems.audio.button) =====
-function playTitleMusic() {
 
-    // Check user's music preference first
-    let musicEnabled = true;
-    try {
-        if (window.App?.storage?.getBoolean) {
-            musicEnabled = window.App.storage.getBoolean('musicEnabled', true);
-        } else {
-            const stored = localStorage.getItem('musicEnabled');
-            musicEnabled = stored !== null ? stored === 'true' : true;
-        }
-    } catch (error) {
-        console.error('Error checking music preference:', error);
-        musicEnabled = true; // Default to enabled
-    }
+// music: stopTitleMusic removed
 
-    if (!musicEnabled) {
-        
-        return;
-    }
+// music: startMainGameMusic removed
 
-    if (!splashAudio) {
-        console.error('splashAudio is null or undefined');
-        
-        return;
-    }
-    
-    
-    
-    
-    
-    try {
-        const playPromise = splashAudio.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                
-            }).catch(error => {
-                console.error('Title music play failed:', error);
-                console.error('Error details:', {
-                    name: error.name,
-                    message: error.message,
-                    code: error.code
-                });
-                
-            });
-        } else {
-            
-                    // For older browsers that don't return a promise
-        
-        }
-    } catch (error) {
-        console.error('Exception when calling play():', error);
-        
-    }
-}
-
-function stopTitleMusic() {
-    if (splashAudio) {
-        
-        splashAudio.pause();
-        splashAudio.currentTime = 0;
-        
-        
-    }
-}
-
-function startMainGameMusic() {
-    
-
-    // Check user's music preference first
-    let musicEnabled = true;
-    try {
-        if (window.App?.storage?.getBoolean) {
-            musicEnabled = window.App.storage.getBoolean('musicEnabled', true);
-        } else {
-            const stored = localStorage.getItem('musicEnabled');
-            musicEnabled = stored !== null ? stored === 'true' : true;
-        }
-    } catch (error) {
-        console.error('Error checking music preference:', error);
-        musicEnabled = true; // Default to enabled
-    }
-
-    if (!musicEnabled) {
-        
-        return;
-    }
-
-    if (window.musicPlayerState && window.musicPlayerState.audio) {
-        const mainAudio = window.musicPlayerState.audio;
-        
-        // Start playing the Between Level Music
-        const playPromise = mainAudio.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                
-                window.musicPlayerState.isPlaying = true;
-                updateMusicPlayerUI();
-                updateStreamInfo(); // Ensure stream data displays correctly
-            }).catch(error => {
-                
-            });
-        }
-    }
-}
-
-// Music Player Functions
+// Music player (removed)
+/*
 function initMusicPlayer() {
     const musicPlayer = DOM_CACHE.musicPlayer;
     const musicToggleBtn = DOM_CACHE.musicToggleBtn;
@@ -2604,8 +2403,10 @@ function initMusicPlayer() {
     
     
 }
+*/
 
-// Function to update stream information and display
+// Stream info (removed)
+/*
 function updateStreamInfo() {
     const state = window.musicPlayerState;
     if (!state || !state.audio) return;
@@ -2635,8 +2436,10 @@ function updateStreamInfo() {
     // Only log stream info updates when debugging is needed
     // console.log('Stream info updated:', streamDetails);
 }
+*/
 
-// Function to get detailed information about streams
+// Stream details (removed)
+/*
 function getStreamDetails(streamUrl) {
     const url = streamUrl.toLowerCase();
     
@@ -2724,8 +2527,10 @@ function getStreamDetails(streamUrl) {
         type: 'Stream'
     };
 }
+*/
 
-// Function to update music player display with stream info
+// Music player display (removed)
+/*
 function updateMusicPlayerDisplay(streamInfo) {
     const musicPlayerTitle = DOM_CACHE.musicPlayer.querySelector('.music-player-title');
     const musicPlayerSubtitle = DOM_CACHE.musicPlayer.querySelector('.music-player-subtitle');
@@ -2738,7 +2543,10 @@ function updateMusicPlayerDisplay(streamInfo) {
         musicPlayerSubtitle.textContent = streamInfo.description;
     }
 }
+*/
 
+// Toggle music (removed)
+/*
 function toggleMusic() {
     const state = window.musicPlayerState;
     if (!state || !state.audio) return;
@@ -2790,7 +2598,10 @@ function toggleMusic() {
         }
     }
 }
+*/
 
+// Toggle mute (removed)
+/*
 function toggleMute() {
     const state = window.musicPlayerState;
     if (!state || !state.audio) return;
@@ -2810,7 +2621,10 @@ function toggleMute() {
     
     updateMusicPlayerUI();
 }
+*/
 
+// Update music UI (removed)
+/*
 function updateMusicPlayerUI() {
     const state = window.musicPlayerState;
     const musicPlayer = DOM_CACHE.musicPlayer;
@@ -2840,8 +2654,9 @@ function updateMusicPlayerUI() {
         musicPlayer.classList.remove('muted');
     }
 }
+*/
 
-// Available music streams
+// MUSIC_STREAMS (removed)
 const MUSIC_STREAMS = {
     // Local Music (Default)
     betweenlevel: {
@@ -2878,7 +2693,8 @@ const MUSIC_STREAMS = {
     
 };
 
-// Function to change music stream
+// Change music stream (removed)
+/*
 function changeMusicStream() {
     const streamSelect = DOM_CACHE.musicStreamSelect;
     const currentStreamInfo = DOM_CACHE.currentStreamInfo;
@@ -3003,8 +2819,10 @@ function changeMusicStream() {
     
     
 }
+*/
 
-// Function to load saved stream preference
+// Load saved stream preference (removed)
+/*
 function loadSavedStreamPreference() {
     const streamSelect = DOM_CACHE.musicStreamSelect;
     const currentStreamInfo = DOM_CACHE.currentStreamInfo;
@@ -3073,7 +2891,10 @@ function loadSavedStreamPreference() {
         currentStreamInfo.textContent = `Current: ${streamData.name} - ${streamData.description}`;
     }
 }
+*/
 
+// Fallback music (removed)
+/*
 function loadFallbackMusic() {
     // Try alternative sources if the main one fails
     const fallbackSources = [
@@ -3116,6 +2937,7 @@ function loadFallbackMusic() {
     updateStreamInfo();
     if (window.App?.ui?.setMusicStatusText) { try { window.App.ui.setMusicStatusText('Click to start music'); } catch {} } else { musicStatus.textContent = 'Click to start music'; }
 }
+*/
 
 // Memory management and cleanup functions
 function cleanupAudioResources() {
@@ -3179,13 +3001,7 @@ window.showPurchaseFeedback = showPurchaseFeedback;
 window.addUserMessage = function(msg) { try { return window.addUserMessage?.(msg); } catch {} };
 window.toggleAutosave = toggleAutosave;
 window.changeAutosaveInterval = changeAutosaveInterval;
-window.initMusicPlayer = initMusicPlayer;
-window.toggleMusic = function() { try { window.App?.systems?.audio?.music?.toggleMusic?.(); } catch {} try { toggleMusic(); } catch {} };
-window.toggleMute = toggleMute;
-window.updateStreamInfo = updateStreamInfo;
-window.getStreamDetails = getStreamDetails;
-window.playTitleMusic = playTitleMusic;
-window.stopTitleMusic = stopTitleMusic;
+// music globals removed
 
 // Expose button audio toggle for HTML handler
 window.toggleButtonSounds = function() { try { window.App?.systems?.audio?.button?.toggleButtonSounds?.(); } catch {} };
