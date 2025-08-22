@@ -1,219 +1,456 @@
-# Soda Clicker Pro - Architecture
+# Soda Clicker Pro - Complete Codebase Architecture
 
-## Overview
+## 🎯 Project Overview
 
-This document outlines the modular architecture for Soda Clicker Pro, designed to improve code readability, maintainability, and AI agent traversability.
+**Soda Clicker Pro** is an incremental/idle game built with vanilla JavaScript, featuring a modular architecture designed for maintainability and AI agent traversability. The game simulates a soda business where players click to earn "sips" and purchase upgrades to automate production.
 
-## Core Principles
+## 🏗️ Architecture Principles
 
-1. **Single State Container**: Plain object store with pure mutations and derived selectors
-2. **Event Bus (Pub/Sub)**: Decoupled systems and UI via event-driven architecture  
-3. **Declarative Gameplay**: Game definitions in JSON data files
-4. **Pure Functions**: Business logic extracted into pure, testable functions
+1. **Single State Container**: Centralized state management with pure mutations
+2. **Event-Driven Architecture**: Decoupled systems via pub/sub event bus
+3. **Data-Driven Design**: Game mechanics defined in JSON configuration files
+4. **Pure Functions**: Business logic extracted into testable, pure functions
 5. **Runtime Validation**: Zod schemas ensure data integrity
+6. **Progressive Enhancement**: Graceful degradation for different browser capabilities
 
-## Module Structure
+## 📁 Complete File Structure
 
 ```
-js/
-├── index.js                 # Main entry point, bootstraps App global
-├── main.js                  # Legacy game logic (being refactored)
-├── config.js                # Game configuration
-├── feature-unlocks.js       # Feature unlock management
-├── god.js                   # God mode functionality
-├── dom-cache.js             # DOM element caching
-├── core/
-│   ├── state/
-│   │   ├── index.js         # State store implementation
-│   │   └── mutations.js     # Pure state mutation helpers
-│   ├── rules/               # Pure business logic
-│   │   ├── clicks.js        # Click calculations
-│   │   ├── purchases.js     # Purchase cost calculations
-│   │   └── economy.js       # Economy calculations (SPD, SPS)
-│   ├── systems/             # Game systems
-│   │   ├── resources.js     # Resource production calculations
-│   │   ├── purchases-system.js # Purchase logic for all upgrades
-│   │   ├── clicks-system.js # Click handling and feedback
-│   │   ├── autosave.js      # Autosave counter and timing logic
-│   │   ├── save-system.js   # Save/load operations with validation
-│   │   ├── options-system.js # Game options and preferences management
-│   │   ├── loop-system.js   # Game loop and timing management
-│   │   └── button-audio.js  # Button click/purchase/critical sound effects and preferences
-│   ├── constants.js         # Event names and constants
-│   └── validation/          # Zod validation schemas
-│       └── schemas.js       # Data validation schemas
-├── services/
-│   ├── storage.js           # Abstracted localStorage operations
-│   └── event-bus.js         # Event bus implementation
-└── data/                    # JSON data files
-    ├── unlocks.json         # Feature unlock conditions
-    └── upgrades.json        # Upgrade definitions and costs
+soda-clicker-pro/
+├── 📄 index.html                 # Main HTML entry point (31KB, 713 lines)
+├── 📄 package.json               # Node.js dependencies and scripts
+├── 📄 vite.config.js             # Vite build configuration
+├── 📄 vitest.config.ts           # Vitest testing configuration
+├── 📄 .eslintrc.json             # ESLint configuration
+├── 📄 .prettierrc                # Prettier formatting rules
+├── 📄 ARCHITECTURE.md            # This comprehensive architecture guide
+├── 📄 BALANCE_CHANGES.md         # Game balance documentation
+├── 📄 README.md                  # Project overview
+├── 📄 RULES.md                   # Development rules and guidelines
+│
+├── 📁 js/                        # JavaScript source code
+│   ├── 📄 index.js               # Main entry point, bootstraps App global
+│   ├── 📄 main.js                # Legacy game logic (121KB, 3092 lines) - BEING REFACTORED
+│   ├── 📄 config.js              # Game configuration and constants
+│   ├── 📄 feature-unlocks.js     # Feature unlock management system
+│   ├── 📄 god.js                 # God mode functionality
+│   ├── 📄 dom-cache.js           # DOM element caching system
+│   │
+│   ├── 📁 core/                  # Core game systems
+│   │   ├── 📄 constants.js       # Event names and game constants
+│   │   │
+│   │   ├── 📁 state/             # State management
+│   │   │   ├── 📄 index.js       # State store implementation
+│   │   │   ├── 📄 shape.js       # Default state structure
+│   │   │   └── 📄 bridge.js      # Legacy state bridge
+│   │   │
+│   │   ├── 📁 rules/             # Pure business logic
+│   │   │   ├── 📄 clicks.js      # Click calculations and mechanics
+│   │   │   ├── 📄 purchases.js   # Purchase cost calculations
+│   │   │   └── 📄 economy.js     # Economy calculations (SPD, SPS)
+│   │   │
+│   │   ├── 📁 systems/           # Game systems
+│   │   │   ├── 📄 resources.js   # Resource production calculations
+│   │   │   ├── 📄 purchases-system.js # Purchase logic for all upgrades
+│   │   │   ├── 📄 clicks-system.js # Click handling and feedback
+│   │   │   ├── 📄 autosave.js    # Autosave counter and timing logic
+│   │   │   ├── 📄 save-system.js # Save/load operations with validation
+│   │   │   ├── 📄 options-system.js # Game options and preferences
+│   │   │   ├── 📄 loop-system.js # Game loop and timing management
+│   │   │   ├── 📄 button-audio.js # Sound effects and audio preferences
+│   │   │   └── 📄 game-init.js   # Game initialization system
+│   │   │
+│   │   └── 📁 validation/        # Data validation schemas
+│   │       └── 📄 schemas.js     # Zod validation schemas
+│   │
+│   ├── 📁 services/              # Service layer
+│   │   ├── 📄 storage.js         # Abstracted localStorage operations
+│   │   ├── 📄 event-bus.js       # Event bus implementation
+│   │   └── 📄 error-overlay.js   # Error handling and display
+│   │
+│   └── 📁 ui/                    # User interface system
+│       ├── 📄 index.js           # UI system coordinator
+│       ├── 📄 displays.js        # Display update functions
+│       ├── 📄 stats.js           # Statistics display management
+│       ├── 📄 feedback.js        # Visual feedback system
+│       ├── 📄 affordability.js   # Upgrade affordability checking
+│       ├── 📄 labels.js          # Text label management
+│       └── 📄 utils.js           # UI utility functions
+│
+├── 📁 data/                      # Game data files
+│   ├── 📄 unlocks.json           # Feature unlock conditions
+│   └── 📄 upgrades.json          # Upgrade definitions and costs
+│
+├── 📁 css/                       # Stylesheets
+├── 📁 images/                    # Game assets
+├── 📁 fonts/                     # Typography
+├── 📁 res/                       # Additional resources
+├── 📁 tests/                     # Test files
+└── 📁 .github/                   # GitHub workflows and templates
 ```
 
-## Key Components
+## 🔧 Core Systems Deep Dive
 
-### App Global Object
+### 1. **State Management System** (`js/core/state/`)
 
-The `window.App` object provides a centralized API for all modularized functionality:
+**Purpose**: Centralized state container with subscription support
 
+**Key Components**:
+- `createStore()`: Factory function for creating observable stores
+- `defaultState`: Centralized state shape definition
+- `selectors`: Lightweight helper functions for state access
+
+**State Structure**:
 ```javascript
-window.App = {
-    state: createStore(),           // State management
-    storage,                        // Storage abstraction
-    events: eventBus,              // Event system
-    EVENT_NAMES,                   // Event constants
-    rules: {                       // Business logic
-        clicks, purchases, economy
-    },
-    systems: {                     // Game systems
-        resources,                  # Resource production calculations
-        purchases,                  # Purchase logic for all upgrades
-        clicks,                     # Click handling and feedback
-        autosave,                   # Autosave counter and timing logic
-        save,                       # Save/load operations with validation
-        options,                    # Game options and preferences management
-        loop,                       # Game loop and timing management
-        music                       # Music playback, sound effects, and audio context management
-    },
-    data: {                        // Game data
-        unlocks, upgrades
-    }
-};
-```
-
-### State Management
-
-Simple state store with subscription support:
-
-```javascript
-const store = createStore(initialState);
-store.subscribe((newState, oldState) => {
-    // React to state changes
-});
-store.set({ sips: newValue });
-const currentState = store.get();
-```
-
-### Event System
-
-Pub/sub event bus for loose coupling:
-
-```javascript
-App.events.on(App.EVENT_NAMES.CLICK.SODA, (data) => {
-    // Handle soda click
-});
-
-App.events.emit(App.EVENT_NAMES.ECONOMY.PURCHASE, {
-    item: 'straw',
-    cost: 5
-});
-```
-
-### Data Validation
-
-Zod schemas ensure data integrity at runtime:
-
-```javascript
-// Validate unlocks data
-const validatedUnlocks = validateUnlocks(unlocksData);
-if (validatedUnlocks) {
-    App.data.unlocks = validatedUnlocks;
-} else {
-    console.warn('Invalid unlocks data, using fallback');
-}
-
-// Validate game saves
-const validatedSave = validateGameSave(saveData);
-if (validatedSave) {
-    // Load validated save
-} else {
-    // Handle invalid save gracefully
-}
-```
-
-### Storage Abstraction
-
-Namespaced localStorage with validation:
-
-```javascript
-// All keys prefixed with 'game_'
-App.storage.setJSON('options', gameOptions);
-App.storage.getBoolean('clickSoundsEnabled', true);
-App.storage.saveGame(gameState);
-```
-
-## Data Files
-
-### unlocks.json
-Defines thresholds for feature unlocks:
-```json
 {
-  "suction": { "sips": 25, "clicks": 8 },
-  "straws": { "sips": 500, "clicks": 50 }
-}
-```
-
-### upgrades.json  
-Defines upgrade costs and effects:
-```json
-{
-  "straws": {
-    "baseCost": 5,
-    "scaling": 1.15,
-    "baseSPD": 0.6,
-    "multiplierPerLevel": 0.2
+  // Core resources
+  sips: 0,                    // Primary currency
+  straws: 0,                  // Basic production unit
+  cups: 0,                    // Advanced production unit
+  suctions: 0,                // Click multiplier
+  widerStraws: 0,             // Straw efficiency upgrade
+  betterCups: 0,              // Cup efficiency upgrade
+  fasterDrinks: 0,            // Speed upgrade
+  criticalClicks: 0,          // Critical hit system
+  level: 1,                   // Player level
+  
+  // Production stats
+  sps: 0,                     // Sips per second
+  strawSPD: 0,                // Straws per drink
+  cupSPD: 0,                  // Cups per drink
+  
+  // Drink system
+  drinkRate: 0,                // Time between drinks
+  drinkProgress: 0,            // Current drink progress
+  lastDrinkTime: 0,           // Timestamp of last drink
+  
+  // Options
+  options: {
+    autosaveEnabled: true,
+    autosaveInterval: 30,
+    clickSoundsEnabled: true,
+    musicEnabled: true,
+    musicStreamPreferences: { preferred: 'local' }
   }
 }
 ```
 
-## Development Workflow
-
-### Testing
-```bash
-npm test              # Run all tests
-npm run test:watch    # Watch mode for development
+**Usage**:
+```javascript
+const store = App.state;
+store.subscribe((newState, oldState) => {
+  // React to state changes
+});
+store.setState({ sips: newValue });
+const currentState = store.getState();
 ```
 
-### Code Quality
-```bash
-npm run lint          # ESLint
-npm run format        # Prettier
+### 2. **Event System** (`js/services/event-bus.js`)
+
+**Purpose**: Decoupled communication between systems via pub/sub pattern
+
+**Event Categories**:
+```javascript
+EVENT_NAMES = {
+  GAME: ['LOADED', 'SAVED', 'DELETED', 'TICK'],
+  CLICK: ['SODA', 'CRITICAL'],
+  ECONOMY: ['SIPS_GAINED', 'PURCHASE', 'UPGRADE_PURCHASED'],
+  FEATURE: ['UNLOCKED'],
+  UI: ['TAB_SWITCHED', 'UPDATE_DISPLAY'],
+  MUSIC: ['PLAY', 'PAUSE', 'MUTE', 'UNMUTE', 'STREAM_CHANGED'],
+  OPTIONS: ['AUTOSAVE_TOGGLED', 'AUTOSAVE_INTERVAL_CHANGED', 'CLICK_SOUNDS_TOGGLED']
+}
 ```
 
-### Development Server
-```bash
-npm run dev           # Vite dev server
+**Usage**:
+```javascript
+// Subscribe to events
+App.events.on(App.EVENT_NAMES.CLICK.SODA, (data) => {
+  // Handle soda click
+});
+
+// Emit events
+App.events.emit(App.EVENT_NAMES.ECONOMY.PURCHASE, {
+  item: 'straw',
+  cost: 5
+});
 ```
 
-## Migration Strategy
+### 3. **Storage System** (`js/services/storage.js`)
 
-1. **Phase 1**: Core infrastructure (✅ Complete)
-   - State store, event bus, storage abstraction
-   - Basic rules and systems
-   - Data file loading
+**Purpose**: Abstracted localStorage with validation and namespacing
 
-2. **Phase 2**: Game logic extraction (✅ Complete)
-   - Move calculations to pure functions
-   - Extract upgrade logic
-   - Centralize resource management
-   - Extract all major game systems (purchases, clicks, autosave, save, options, loop, music)
+**Features**:
+- Namespaced keys (all prefixed with 'game_')
+- JSON serialization/deserialization
+- Boolean storage helpers
+- Save game validation
+- Error handling and fallbacks
 
-3. **Phase 3**: UI decoupling (🔄 Next)
-   - Separate UI logic from game logic
-   - Event-driven UI updates
-   - Component-based structure
+**Key Methods**:
+```javascript
+App.storage.saveGame(gameState);           // Save with validation
+App.storage.loadGame();                    // Load with validation
+App.storage.setJSON('options', options);   // Store JSON data
+App.storage.getBoolean('clickSounds', true); // Get boolean with default
+```
 
-4. **Phase 4**: Advanced features
-   - Save file versioning
-   - Plugin system
-   - Performance optimizations
+### 4. **Validation System** (`js/core/validation/schemas.js`)
 
-## Benefits
+**Purpose**: Runtime data validation using Zod schemas
 
-- **AI Agent Friendly**: Clear module boundaries and data flow
-- **Maintainable**: Small, focused modules with single responsibilities
-- **Testable**: Pure functions and isolated components
-- **Debuggable**: Event tracing and validation errors
-- **Extensible**: Easy to add new features and systems
+**Schemas**:
+- `UnlocksSchema`: Feature unlock conditions
+- `UpgradesSchema`: Upgrade definitions and costs
+- `GameSaveSchema`: Save file validation
+- `GameOptionsSchema`: Options validation
+
+**Usage**:
+```javascript
+const validatedUnlocks = validateUnlocks(unlocksData);
+if (validatedUnlocks) {
+  App.data.unlocks = validatedUnlocks;
+} else {
+  console.warn('Invalid unlocks data, using fallback');
+}
+```
+
+### 5. **Business Logic Rules** (`js/core/rules/`)
+
+**Purpose**: Pure functions for game calculations
+
+**Economy Rules** (`economy.js`):
+```javascript
+computeStrawSPD(straws, baseSPD, widerStrawsCount, multiplier)
+computeCupSPD(cups, baseSPD, betterCupsCount, multiplier)
+computeTotalSPD(straws, strawSPD, cups, cupSPD)
+computeTotalSipsPerDrink(baseSips, totalSPD)
+```
+
+**Click Rules** (`clicks.js`):
+- Click value calculations
+- Critical hit mechanics
+- Click streak tracking
+
+**Purchase Rules** (`purchases.js`):
+- Cost scaling formulas
+- Affordability checking
+- Purchase validation
+
+### 6. **Game Systems** (`js/core/systems/`)
+
+**Resources System** (`resources.js`):
+- Centralized production recalculation
+- Configuration fallbacks (JSON → config.js → defaults)
+- Pure calculation functions
+
+**Purchases System** (`purchases-system.js`):
+- Upgrade purchase logic
+- Cost calculations
+- Purchase validation
+
+**Clicks System** (`clicks-system.js`):
+- Click handling and feedback
+- Critical hit system
+- Click statistics
+
+**Save System** (`save-system.js`):
+- Game state persistence
+- Save validation
+- Auto-save functionality
+
+**Options System** (`options-system.js`):
+- Game preferences management
+- Option persistence
+- Default value handling
+
+**Loop System** (`loop-system.js`):
+- Game loop management
+- Performance optimization
+- Frame rate control
+
+**Audio System** (`button-audio.js`):
+- Sound effect management
+- Audio preferences
+- Volume control
+
+### 7. **UI System** (`js/ui/`)
+
+**Purpose**: Coordinated UI updates and user interaction
+
+**Components**:
+- **Displays** (`displays.js`): Update game statistics and counters
+- **Stats** (`stats.js`): Statistics panel management
+- **Feedback** (`feedback.js`): Visual feedback for actions
+- **Affordability** (`affordability.js`): Upgrade button states
+- **Labels** (`labels.js`): Text label management
+- **Utils** (`utils.js`): Common UI operations
+
+**Event-Driven Updates**:
+```javascript
+// UI automatically updates based on game events
+App.events.on(App.EVENT_NAMES.CLICK.SODA, () => {
+  updateTopSipsPerDrink();
+  updateTopSipsPerSecond();
+  updateTopSipCounter();
+  checkUpgradeAffordability();
+});
+```
+
+## 📊 Data Flow Architecture
+
+### 1. **Game Initialization Flow**
+```
+index.html → index.js → loadDataFiles() → validateData() → initializeUI() → gameInit.initOnDomReady()
+```
+
+### 2. **Click Processing Flow**
+```
+User Click → main.js → App.events.emit(CLICK.SODA) → UI System → Update Displays
+                ↓
+            State Update → App.state.setState() → Subscribers Notified
+```
+
+### 3. **Purchase Flow**
+```
+User Purchase → main.js → App.events.emit(ECONOMY.PURCHASE) → UI System → Update Affordability
+                   ↓
+               State Update → Save Game → Update Displays
+```
+
+### 4. **Save/Load Flow**
+```
+Auto-save Timer → save-system.js → validateGameSave() → storage.saveGame() → App.events.emit(GAME.SAVED)
+Load Game → storage.loadGame() → validateGameSave() → App.state.setState() → App.events.emit(GAME.LOADED)
+```
+
+## 🎮 Game Mechanics
+
+### **Core Resources**
+- **Sips**: Primary currency earned by clicking
+- **Straws**: Basic production unit (0.6 sips per drink)
+- **Cups**: Advanced production unit (1.2 sips per drink)
+- **Suctions**: Click multiplier (+0.3 sips per click)
+- **Critical Clicks**: Random bonus clicks (5x multiplier)
+
+### **Upgrade System**
+- **Wider Straws**: Increase straw efficiency (+50% per level)
+- **Better Cups**: Increase cup efficiency (+40% per level)
+- **Faster Drinks**: Reduce time between drinks (-1% per level)
+- **Critical Click Upgrades**: Increase chance and multiplier
+
+### **Progression System**
+- **Levels**: Unlock new features and increase earnings
+- **Feature Unlocks**: Progressive feature availability
+- **Offline Progress**: Calculate earnings while away
+
+## 🔄 Migration Status
+
+### **✅ Phase 1: Core Infrastructure (Complete)**
+- State store implementation
+- Event bus system
+- Storage abstraction
+- Basic rules and systems
+- Data file loading
+
+### **✅ Phase 2: Game Logic Extraction (Complete)**
+- Business logic moved to pure functions
+- Upgrade logic centralized
+- Resource management extracted
+- All major game systems modularized
+
+### **🔄 Phase 3: UI Decoupling (In Progress)**
+- UI system partially separated
+- Event-driven updates implemented
+- Component-based structure emerging
+
+### **⏳ Phase 4: Advanced Features (Planned)**
+- Save file versioning
+- Plugin system
+- Performance optimizations
+- Advanced UI components
+
+## 🧪 Testing & Development
+
+### **Testing Framework**
+- **Vitest**: Unit and integration testing
+- **Test Files**: Located in `tests/` directory
+- **Test Commands**:
+  ```bash
+  npm test              # Run all tests
+  npm run test:watch    # Watch mode for development
+  ```
+
+### **Code Quality**
+- **ESLint**: Code linting and style enforcement
+- **Prettier**: Code formatting
+- **Commands**:
+  ```bash
+  npm run lint          # ESLint
+  npm run format        # Prettier
+  ```
+
+### **Development Server**
+- **Vite**: Fast development server with HMR
+- **Command**: `npm run dev`
+
+## 🚀 Agent Navigation Guide
+
+### **For Understanding Game Logic**
+1. Start with `js/core/rules/` - Pure business logic
+2. Examine `js/core/systems/` - Game system implementations
+3. Check `js/config.js` - Game balance and constants
+
+### **For Understanding State Management**
+1. Review `js/core/state/shape.js` - State structure
+2. Examine `js/core/state/index.js` - Store implementation
+3. Check `js/index.js` - App bootstrap and state initialization
+
+### **For Understanding UI Updates**
+1. Start with `js/ui/index.js` - UI system coordinator
+2. Examine individual UI modules in `js/ui/`
+3. Check event listeners and update functions
+
+### **For Understanding Data Flow**
+1. Review `js/core/constants.js` - Event definitions
+2. Examine `js/services/event-bus.js` - Event system
+3. Check how systems emit and listen to events
+
+### **For Understanding Game Configuration**
+1. Check `data/upgrades.json` - Upgrade definitions
+2. Check `data/unlocks.json` - Feature unlock conditions
+3. Review `js/config.js` - Game constants and balance
+
+### **For Understanding Legacy Code**
+1. Examine `js/main.js` - Legacy game logic (being refactored)
+2. Check `js/feature-unlocks.js` - Feature unlock system
+3. Review `js/dom-cache.js` - DOM element management
+
+## 🔍 Key Design Patterns
+
+1. **Observer Pattern**: State store subscriptions
+2. **Pub/Sub Pattern**: Event-driven communication
+3. **Factory Pattern**: Store and event bus creation
+4. **Strategy Pattern**: Different calculation methods
+5. **Bridge Pattern**: Legacy code integration
+6. **Module Pattern**: ES6 modules for organization
+
+## 📈 Performance Considerations
+
+- **RequestAnimationFrame**: Used for game loop and UI updates
+- **Batch Updates**: UI updates batched for performance
+- **Lazy Loading**: Only update visible elements
+- **Event Debouncing**: Reduce update frequency for expensive operations
+- **Memory Management**: Limited click history and cleanup
+
+## 🛡️ Error Handling
+
+- **Graceful Degradation**: Fallbacks for missing features
+- **Validation Errors**: Data validation with fallbacks
+- **Storage Errors**: LocalStorage error handling
+- **Feature Detection**: Progressive enhancement
+- **Console Logging**: Comprehensive error logging
+
+This architecture provides a solid foundation for incremental game development while maintaining code clarity and AI agent traversability. The modular design allows for easy feature additions and modifications while preserving the existing game mechanics.
 
 
