@@ -185,7 +185,6 @@ let clickTimes = []; // For calculating clicks per second
 
 // Splash screen functionality
 function initSplashScreen() {
-    console.log('initSplashScreen called');
     
     // Eruda debugging for mobile
     if (typeof eruda !== 'undefined') {
@@ -213,16 +212,13 @@ function initSplashScreen() {
         return;
     }
     
-    console.log('Setting up splash screen event listeners...');
     if (typeof eruda !== 'undefined') {
         eruda.get('console').log('Setting up splash screen event listeners...');
     }
     
     // Function to start the game
     function startGame() {
-        console.log('startGame called');
         if (typeof eruda !== 'undefined') {
-            eruda.get('console').log('startGame called');
         }
         
         // Stop title music when transitioning to game (legacy no-op)
@@ -233,7 +229,6 @@ function initSplashScreen() {
         const gameContent = document.getElementById('gameContent');
         
         if (splashScreen && gameContent) {
-            console.log('Hiding splash, showing game...');
             if (typeof eruda !== 'undefined') {
                 eruda.get('console').log('Hiding splash, showing game...');
             }
@@ -294,7 +289,6 @@ function initSplashScreen() {
         }
     });
     
-    console.log('Splash screen event listeners set up successfully');
     if (typeof eruda !== 'undefined') {
         eruda.get('console').log('Splash screen event listeners set up successfully');
     }
@@ -494,7 +488,6 @@ function updateCostDisplay(elementId, cost, isAffordable) {
 }
 
 function initGame() {
-    console.log('=== INITGAME CALLED ===');
     console.log('FEATURE_UNLOCKS available in initGame:', typeof window.FEATURE_UNLOCKS !== 'undefined' ? 'YES' : 'NO');
     console.log('initGame called');
     
@@ -713,16 +706,13 @@ function initGame() {
         updateTopSipsPerSecond();
 
         // Initialize progressive feature unlock system after game variables are set up
-        console.log('About to call FEATURE_UNLOCKS.init()...');
         console.log('FEATURE_UNLOCKS object:', window.FEATURE_UNLOCKS);
         FEATURE_UNLOCKS.init();
 
-        console.log('Game variables initialized, calling reload...');
         
         // Call reload to initialize the game
         reload();
         
-        console.log('Starting game loop...');
         // Start the game loop
         startGameLoop();
         
@@ -738,7 +728,6 @@ function initGame() {
         // Update button sounds toggle button (delegated to module)
         try { window.App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } catch {}
         
-        console.log('Game initialization complete!');
         
     } catch (error) {
         console.error('Error in initGame:', error);
@@ -2346,7 +2335,6 @@ window.addEventListener('unhandledrejection', (e) => {
 
 // Initialize splash screen when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing splash screen...');
     
     // Eruda debugging for mobile
     if (typeof eruda !== 'undefined') {
@@ -2395,11 +2383,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Core game start function used by both music options
 function startGameCore() {
-    console.log('startGameCore called');
     
     // Eruda debugging for mobile
     if (typeof eruda !== 'undefined') {
-        eruda.get('console').log('startGameCore called');
     }
     
     // Hide splash and show game
@@ -2407,7 +2393,7 @@ function startGameCore() {
     const gameContent = document.getElementById('gameContent');
     
     if (splashScreen && gameContent) {
-        console.log('Hiding splash, showing game...');
+        
         if (typeof eruda !== 'undefined') {
             eruda.get('console').log('Hiding splash, showing game...');
         }
