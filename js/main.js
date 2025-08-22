@@ -2343,7 +2343,14 @@ function devAddTime(milliseconds) {
     
     console.log(`🔧 Dev: Time travel debug - Time: ${offlineTime}s, SPS: ${window.sps?.toString() || 'undefined'}, Drink Rate: ${window.drinkRate || 'undefined'}, Offline Sips: ${offlineSips}`);
     
-    window.sips = window.sips.plus(offlineSips);
+    // Safely add sips
+    if (window.sips && typeof window.sips.plus === 'function') {
+        window.sips = window.sips.plus(offlineSips);
+    } else {
+        // Fallback if sips is not a valid Decimal object
+        console.warn('🔧 Dev: window.sips is not a valid Decimal, creating new one');
+        window.sips = new (window.Decimal || Decimal)(offlineSips);
+    }
     
     // Update last save time to reflect the time travel
     if (window.lastSaveTime) {
@@ -2351,12 +2358,28 @@ function devAddTime(milliseconds) {
     }
     
     if (typeof showPurchaseFeedback === 'function') {
-        showPurchaseFeedback(`⏰ +${timeLabel} Time Travel!`, 0);
+        showPurchaseFeedback(`⏰ +${offlineSips.toLocaleString()} Sips from ${timeLabel} Time Travel!`, 0);
     }
-    console.log(`🔧 Dev: Added ${timeLabel} of offline time, gained ${offlineSips} sips`);
+    console.log(`🔧 Dev: Added ${offlineSips.toLocaleString()} sips from ${timeLabel} time travel`);
     
     // Refresh UI
     updateAllStats();
+    
+    // Additional UI updates to ensure everything is refreshed
+    if (window.App?.ui?.updateTopSipCounter) {
+        try { window.App.ui.updateTopSipCounter(); } catch {}
+    }
+    if (window.App?.ui?.updateTopSipsPerDrink) {
+        try { window.App.ui.updateTopSipsPerDrink(); } catch {}
+    }
+    if (window.App?.ui?.updateTopSipsPerSecond) {
+        try { window.App.ui.updateTopSipsPerSecond(); } catch {}
+    }
+    if (typeof checkUpgradeAffordability === 'function') {
+        checkUpgradeAffordability();
+    }
+    
+    console.log(`🔧 Dev: UI refreshed after time travel. New sips total: ${window.sips?.toString() || 'undefined'}`);
 }
 
 // Helper function to calculate offline progress
