@@ -68,7 +68,7 @@ body {
 }
 
 .splash-subtitle {
-    color: #00B36B;
+    color: #FFFFFF;
     font-size: clamp(2rem, 10vw, 48px);
     margin: 10px 0 0 0;
     text-shadow: 2px 2px 0px #000;
@@ -90,7 +90,7 @@ body {
     text-align: center;
     margin: 20px 0;
     font-size: 1.2rem;
-    color: #00B36B;
+    color: #FFFFFF;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     animation: blink 2s infinite;
 }
@@ -388,7 +388,7 @@ body {
 }
 
 .dev-subtitle {
-    color: #00B36B;
+    color: #FFFFFF;
     margin: 0;
     font-size: 1.1rem;
 }
@@ -420,7 +420,7 @@ body {
 }
 
 .dev-status-value.enabled {
-    color: #00B36B;
+    color: #FFFFFF;
     background: rgba(0, 179, 107, 0.2);
 }
 
@@ -534,7 +534,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
-    color: #00B36B;
+    color: #FFFFFF;
     font-weight: bold;
 }
 
@@ -667,7 +667,7 @@ body {
 }
 
 .stream-info span {
-    color: #00B36B;
+    color: #FFFFFF;
     font-weight: bold;
     font-size: 0.9rem;
 }
@@ -698,7 +698,7 @@ body {
 }
 
 .autosave-interval label {
-    color: #00B36B;
+    color: #FFFFFF;
     font-weight: bold;
 }
 
@@ -727,7 +727,7 @@ body {
 }
 
 .autosave-status span {
-    color: #00B36B;
+    color: #FFFFFF;
     font-weight: bold;
 }
 
@@ -749,7 +749,7 @@ body {
 }
 
 .info-label {
-    color: #00B36B;
+    color: #FFFFFF;
     font-weight: bold;
 }
 
@@ -821,14 +821,13 @@ body {
 }
 
 .stat-label {
-    font-weight: bold;
+    display: block;
     color: #FFFFFF;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: bold;
     margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
 .stat-value {
@@ -870,12 +869,14 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.75rem;
-    color: #00B36B;
+    color: #FFFFFF;
     font-weight: bold;
 }
 
 .drink-label {
     font-size: 1.1rem;
+    color: #FFFFFF;
+    font-weight: bold;
 }
 
 .drink-countdown {
@@ -983,7 +984,7 @@ h3 {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    color: #00B36B;
+    color: #FFFFFF;
     z-index: 10;
     text-align: right;
     background-color: rgba(0, 179, 107, 0.1);
@@ -1005,7 +1006,7 @@ h3 {
 
 .top-sip-separator {
     margin: 0 0.5rem;
-    color: #00B36B;
+    color: #FFFFFF;
     font-weight: bold;
 }
 
@@ -1375,7 +1376,7 @@ h3 {
 }
 
 .shop-header h3 {
-    color: #00B36B;
+    color: #FFFFFF;
     margin: 0 0 0.5rem 0;
     font-size: 1.4rem;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -1419,7 +1420,7 @@ h3 {
 
 .stat-label {
     display: block;
-    color: #00B36B;
+    color: #FFFFFF;
     font-size: 0.8rem;
     font-weight: bold;
     margin-bottom: 0.25rem;
@@ -1930,7 +1931,7 @@ h3 {
 /* Click Feedback Animation */
 .click-feedback {
     position: absolute;
-    color: #00B36B;
+    color: #FFFFFF;
     font-size: 1.2rem;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
@@ -2468,7 +2469,7 @@ h3 {
 }
 
 .unlock-description {
-    color: #00B36B;
+    color: #FFFFFF;
     font-size: 0.9rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
@@ -2524,7 +2525,7 @@ h3 {
     padding: 0.75rem;
     margin: 0.5rem 0;
     text-align: center;
-    color: #00B36B;
+    color: #FFFFFF;
     font-size: 0.9rem;
     font-style: italic;
 }
@@ -2585,7 +2586,7 @@ h3 {
 }
 
 .unlocks-subtitle {
-    color: #00B36B;
+    color: #FFFFFF;
     font-size: 1.1rem;
     margin: 0;
     font-style: italic;
@@ -2657,7 +2658,7 @@ h3 {
 }
 
 .unlock-name {
-    color: #00B36B;
+    color: #FFFFFF;
     font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 0.25rem;
@@ -2668,9 +2669,9 @@ h3 {
 }
 
 .unlock-description {
-    color: #BC00FF;
+    color: #FFFFFF;
     font-size: 0.9rem;
-    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .unlock-requirements {
@@ -2698,7 +2699,7 @@ h3 {
 }
 
 .requirement-label {
-    color: #00B36B;
+    color: #FFFFFF;
 }
 
 .requirement-value {
@@ -2742,7 +2743,7 @@ h3 {
 }
 
 .progress-label {
-    color: #00B36B;
+    color: #FFFFFF;
     font-size: 1.1rem;
     font-weight: bold;
 }
