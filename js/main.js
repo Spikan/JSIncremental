@@ -1277,49 +1277,27 @@ function buyStraw() {
 
 function buyCup() {
     const sys = window.App?.systems?.purchases;
-    if (sys?.purchaseCup) {
-        // Use centralized purchase system if available
-        const res = sys.purchaseCup({
-            sips: window.sips.toNumber(),
-            straws: straws.toNumber(),
-            cups: cups.toNumber(),
-            widerStraws: widerStraws.toNumber(),
-            betterCups: betterCups.toNumber(),
-        });
-        if (!res) return;
-        window.sips = window.sips.minus(res.spent);
-        cups = new Decimal(res.cups);
-        window.cups = cups;
-        strawSPD = new Decimal(res.strawSPD);
-        cupSPD = new Decimal(res.cupSPD);
-        sps = new Decimal(res.sipsPerDrink);
+    if (!sys?.purchaseCup) return;
+    const res = sys.purchaseCup({
+                sips: window.sips.toNumber(),
+                straws: straws.toNumber(),
+                cups: cups.toNumber(),
+                widerStraws: widerStraws.toNumber(),
+                betterCups: betterCups.toNumber(),
+            });
+    if (!res) return;
+    window.sips = window.sips.minus(res.spent);
+    cups = new Decimal(res.cups);
+    window.cups = cups;
+    strawSPD = new Decimal(res.strawSPD);
+                cupSPD = new Decimal(res.cupSPD);
+                sps = new Decimal(res.sipsPerDrink);
         updateTopSipsPerDrink();
         updateTopSipsPerSecond();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        showPurchaseFeedback('Bigger Cup', res.spent);
+    showPurchaseFeedback('Bigger Cup', res.spent);
         reload();
         checkUpgradeAffordability();
-    } else {
-        // Fallback purchase logic when external system is not available
-        const cupCost = Math.floor(window.GAME_CONFIG?.BALANCE?.CUP_BASE_COST * Math.pow(window.GAME_CONFIG?.BALANCE?.CUP_SCALING, cups.toNumber()));
-        
-        if (window.sips.gte(cupCost)) {
-            window.sips = window.sips.minus(cupCost);
-            cups = cups.plus(1);
-            window.cups = cups;
-            
-            // Recalculate stats
-            updateDrinkRate();
-            updateAllStats();
-            checkUpgradeAffordability();
-            
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            showPurchaseFeedback('Bigger Cup', cupCost);
-            console.log('🔧 Dev: Cup purchased using fallback logic');
-        } else {
-            console.warn('🔧 Dev: Not enough sips to buy cup');
-        }
-    }
 }
 
 function buyWiderStraws() {
@@ -1378,26 +1356,6 @@ function buyBetterCups() {
             reload();
             checkUpgradeAffordability();
             return;
-        }
-    } else {
-        // Fallback purchase logic when external system is not available
-        const betterCupsCost = Math.floor(window.GAME_CONFIG?.BALANCE?.BETTER_CUPS_BASE_COST * Math.pow(window.GAME_CONFIG?.BALANCE?.BETTER_CUPS_SCALING, betterCups.toNumber()));
-        
-        if (window.sips.gte(betterCupsCost)) {
-            window.sips = window.sips.minus(betterCupsCost);
-            betterCups = betterCups.plus(1);
-            window.betterCups = betterCups;
-            
-            // Recalculate stats
-            updateDrinkRate();
-            updateAllStats();
-            checkUpgradeAffordability();
-            
-            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-            showPurchaseFeedback('Better Cups Upgrade', betterCupsCost);
-            console.log('🔧 Dev: Better Cups purchased using fallback logic');
-        } else {
-            console.warn('🔧 Dev: Not enough sips to buy better cups');
         }
     }
 }
@@ -2403,29 +2361,35 @@ function devAddTime(milliseconds) {
 
 // Helper function to calculate offline progress
 function calculateOfflineProgress(seconds) {
-    // Safely get sps value
+    // Try to get sps value first
     const sps = safeDecimal(window.sps, 0);
-    
-    // If sps is available and valid, use it
     if (sps && !sps.isZero()) {
         const sipsPerSecond = sps.toNumber();
         return Math.floor(sipsPerSecond * seconds);
     }
     
-    // Fallback calculation using base sips per drink and drink rate
-    if (window.drinkRate && window.drinkRate > 0) {
-        const baseSipsPerDrink = window.GAME_CONFIG?.BALANCE?.BASE_SIPS_PER_DRINK || 1;
-        const drinksPerSecond = 1000 / window.drinkRate; // Convert ms to seconds
-        const fallbackSipsPerSecond = baseSipsPerDrink * drinksPerSecond;
-        
-        console.log(`🔧 Dev: Using fallback calculation: ${fallbackSipsPerSecond} sips/second`);
-        return Math.floor(fallbackSipsPerSecond * seconds);
+    // Calculate from base game state if sps is not available
+    const baseSipsPerDrink = window.GAME_CONFIG?.BALANCE?.BASE_SIPS_PER_DRINK || 1;
+    const drinkRate = window.drinkRate || 5000; // Default 5 seconds
+    const drinksPerSecond = 1000 / drinkRate;
+    
+    // Calculate passive production from straws and cups
+    let passiveSipsPerDrink = 0;
+    if (window.straws && window.straws.gte && window.straws.gte(1)) {
+        const strawSPD = window.GAME_CONFIG?.BALANCE?.STRAW_BASE_SPD || 0.1;
+        passiveSipsPerDrink += strawSPD * window.straws.toNumber();
+    }
+    if (window.cups && window.cups.gte && window.cups.gte(1)) {
+        const cupSPD = window.GAME_CONFIG?.BALANCE?.CUP_BASE_SPD || 0.2;
+        passiveSipsPerDrink += cupSPD * window.cups.toNumber();
     }
     
-    // Last resort: give some minimal progress
-    const minimalSipsPerSecond = 0.1; // 0.1 sips per second as fallback
-    console.log(`🔧 Dev: Using minimal fallback: ${minimalSipsPerSecond} sips/second`);
-    return Math.floor(minimalSipsPerSecond * seconds);
+    const totalSipsPerDrink = baseSipsPerDrink + passiveSipsPerDrink;
+    const totalSipsPerSecond = totalSipsPerDrink * drinksPerSecond;
+    
+    console.log(`🔧 Dev: Calculated offline progress - Base: ${baseSipsPerDrink}, Passive: ${passiveSipsPerDrink}, Total/Drink: ${totalSipsPerDrink}, Total/Second: ${totalSipsPerSecond}`);
+    
+    return Math.floor(totalSipsPerSecond * seconds);
 }
 
 // Resource management functions
