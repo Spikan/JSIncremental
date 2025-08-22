@@ -1256,6 +1256,7 @@ function spsClick(amount) {
 }
 
 function buyStraw() {
+    console.log('🔧 DEBUG: buyStraw FUNCTION CALLED - TESTING');
     console.log('🔧 Debug: buyStraw called');
     
     const sys = window.App?.systems?.purchases;
@@ -1326,6 +1327,7 @@ function buyStraw() {
 
 
 function buyCup() {
+    console.log('🔧 DEBUG: buyCup FUNCTION CALLED - TESTING');
     console.log('🔧 Debug: buyCup called');
     
     const sys = window.App?.systems?.purchases;
@@ -2884,6 +2886,20 @@ window.testDevTools = function() {
             console.error(`❌ ${func} function not available`);
         }
     });
+    
+    // Test if purchase functions are available
+    console.log('🔧 Testing purchase functions...');
+    if (typeof window.buyStraw === 'function') {
+        console.log('✅ buyStraw function available');
+    } else {
+        console.error('❌ buyStraw function not available');
+    }
+    
+    if (typeof window.buyCup === 'function') {
+        console.log('✅ buyCup function available');
+    } else {
+        console.error('❌ buyCup function not available');
+    }
     
     // Test tab switching
     try {

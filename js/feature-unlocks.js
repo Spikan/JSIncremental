@@ -72,43 +72,45 @@ const FEATURE_UNLOCKS = {
     
     // Check if a specific feature should be unlocked
     checkUnlock(featureName) {
-        console.log(`Checking unlock for feature: ${featureName}`);
+        // Temporarily reduce logging for debugging
+        // console.log(`Checking unlock for feature: ${featureName}`);
         
-        // If dev mode is enabled, all features are unlocked
+        // Dev mode bypass
         if (this.devMode) {
-            console.log(`Feature ${featureName} unlocked via dev mode`);
+            // console.log(`Feature ${featureName} unlocked via dev mode`);
             return true;
         }
         
+        // Check if already unlocked
         if (this.unlockedFeatures.has(featureName)) {
-            console.log(`Feature ${featureName} already unlocked`);
-            return true; // Already unlocked
+            // console.log(`Feature ${featureName} already unlocked`);
+            return true;
         }
         
+        // Get unlock conditions
         const condition = this.unlockConditions[featureName];
         if (!condition) {
-            console.log(`No unlock condition defined for ${featureName}`);
-            return false; // No unlock condition defined
+            // console.log(`No unlock condition defined for ${featureName}`);
+            return false;
         }
         
-        // Safely check if global variables exist before using them
+        // Check if global variables are ready
         if (typeof window.sips === 'undefined' || typeof window.totalClicks === 'undefined') {
-            console.log(`Global variables not ready for ${featureName}`);
-            return false; // Global variables not ready yet
+            // console.log(`Global variables not ready for ${featureName}`);
+            return false;
         }
         
-        console.log(`Checking conditions for ${featureName}: sips >= ${condition.sips}, clicks >= ${condition.clicks}`);
-        console.log(`Current sips: ${window.sips}, current clicks: ${window.totalClicks}`);
-        
-        // Check if conditions are met
-        const sipsMet = window.sips && window.sips.gte ? window.sips.gte(condition.sips) : false;
+        // Check conditions
+        const sipsMet = window.sips.gte(condition.sips);
         const clicksMet = window.totalClicks >= condition.clicks;
         
-        console.log(`Conditions met - sips: ${sipsMet}, clicks: ${clicksMet}`);
+        // console.log(`Checking conditions for ${featureName}: sips >= ${condition.sips}, clicks >= ${condition.clicks}`);
+        // console.log(`Current sips: ${window.sips}, current clicks: ${window.totalClicks}`);
         
         if (sipsMet && clicksMet) {
-            console.log(`Unlocking feature: ${featureName}`);
+            // console.log(`Conditions met - sips: ${sipsMet}, clicks: ${clicksMet}`);
             this.unlockFeature(featureName);
+            // console.log(`Unlocking feature: ${featureName}`);
             return true;
         }
         
