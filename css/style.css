@@ -3169,7 +3169,7 @@ button:focus {
 
 .shop-btn:hover:not(.affordable):not(.disabled) {
   background-color: var(--primary-green);
-  color: var(--neutral-white);
+  color: var(--neutral-white) !important;
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
@@ -3197,7 +3197,7 @@ button:focus {
 
 .clicking-upgrade-btn:hover {
   background-color: var(--primary-green);
-  color: var(--neutral-white);
+  color: var(--neutral-white) !important;
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
