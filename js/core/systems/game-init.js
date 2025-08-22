@@ -59,3 +59,29 @@ export function startGameCore() {
 }
 
 
+// Initialize splash and basic options when DOM is ready
+export function initOnDomReady() {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load the word bank for the god feature (kept here to centralize init)
+        try { window.loadWordBank?.(); } catch {}
+        const config = window.GAME_CONFIG?.TIMING || {};
+        const domReadyDelay = config.DOM_READY_DELAY;
+        setTimeout(() => {
+            try {
+                initSplashScreen();
+                try { window.loadOptions?.(); } catch {}
+                try { window.updatePlayTime?.(); } catch {}
+            } catch (error) {
+                console.error('Error during splash screen initialization:', error);
+                const splashScreen = document.getElementById('splashScreen');
+                const gameContent = document.getElementById('gameContent');
+                if (splashScreen && gameContent) {
+                    splashScreen.style.display = 'none';
+                    gameContent.style.display = 'block';
+                    try { window.initGame?.(); } catch {}
+                }
+            }
+        }, domReadyDelay);
+    });
+}
+

@@ -105,4 +105,7 @@ loadDataFiles().then(() => {
     console.error('Failed to bootstrap app:', error);
 });
 
+// Set up DOM-ready splash/init
+try { gameInit.initOnDomReady?.(); } catch {}
+
 

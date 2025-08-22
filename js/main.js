@@ -83,11 +83,7 @@ const FEATURE_DETECTION = {
 // Feature Unlock System - Now imported from js/feature-unlocks.js
 // The FEATURE_UNLOCKS object is defined in the separate module file
 
-console.log('=== MAIN.JS LOADING ===');
-console.log('FEATURE_UNLOCKS available:', typeof window.FEATURE_UNLOCKS !== 'undefined' ? 'YES' : 'NO');
-if (typeof window.FEATURE_UNLOCKS !== 'undefined') {
-    
-}
+// Main module loaded
 
 // DOM Element Cache - Imported from dom-cache.js
 // Ensures DOM_CACHE is available before proceeding
@@ -101,9 +97,7 @@ if (typeof DOM_CACHE === 'undefined') {
     }
 }
 
-// Debug: Check if functions are available
-console.log('buySuction function available:', typeof buySuction);
-console.log('window.buySuction available:', typeof window.buySuction);
+// Debug checks removed for production
 
 window.sips = new Decimal(0);
 let straws = new Decimal(0);
@@ -2210,30 +2204,7 @@ window.addEventListener('unhandledrejection', (e) => {
 });
 
 // Initialize splash screen when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Load the word bank for the god feature
-    loadWordBank().catch(error => {
-        console.error('Failed to load word bank:', error);
-    });
-    const config = window.GAME_CONFIG?.TIMING || {};
-    const domReadyDelay = config.DOM_READY_DELAY;
-    setTimeout(() => {
-        try {
-            window.App?.systems?.gameInit?.initSplashScreen?.();
-            loadOptions();
-            updatePlayTime();
-        } catch (error) {
-            console.error('Error during splash screen initialization:', error);
-            const splashScreen = document.getElementById('splashScreen');
-            const gameContent = document.getElementById('gameContent');
-            if (splashScreen && gameContent) {
-                splashScreen.style.display = 'none';
-                gameContent.style.display = 'block';
-                try { initGame(); } catch {}
-            }
-        }
-    }, domReadyDelay);
-});
+// DOM ready init moved to App.systems.gameInit.initOnDomReady()
 
 
 
