@@ -1273,7 +1273,7 @@ function buyStraw() {
         updateTopSipsPerSecond();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
     showPurchaseFeedback('Extra Straw', res.spent);
-        reload();
+        // reload(); // Removed - causing issues
         checkUpgradeAffordability();
 }
 
@@ -1300,7 +1300,7 @@ function buyCup() {
         updateTopSipsPerSecond();
         try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
     showPurchaseFeedback('Bigger Cup', res.spent);
-        reload();
+        // reload(); // Removed - causing issues
         checkUpgradeAffordability();
 }
 
