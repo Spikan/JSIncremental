@@ -1283,7 +1283,23 @@ function buyStraw() {
     
     showPurchaseFeedback('Extra Straw', res.spent, clickX, clickY);
         // reload(); // Removed - causing issues
-        updateShopDisplays();
+        
+        // Update UI directly
+        const strawsElement = document.getElementById('straws');
+        if (strawsElement) {
+            strawsElement.textContent = res.straws.toString();
+        }
+        
+        const strawSPDElement = document.getElementById('strawSPD');
+        if (strawSPDElement) {
+            strawSPDElement.textContent = res.strawSPD.toString();
+        }
+        
+        const totalStrawSPDElement = document.getElementById('totalStrawSPD');
+        if (totalStrawSPDElement) {
+            totalStrawSPDElement.textContent = (res.strawSPD * res.straws).toString() + ' per drink';
+        }
+        
         checkUpgradeAffordability();
 }
 
@@ -1317,7 +1333,23 @@ function buyCup() {
     
     showPurchaseFeedback('Bigger Cup', res.spent, clickX, clickY);
         // reload(); // Removed - causing issues
-        updateShopDisplays();
+        
+        // Update UI directly
+        const cupsElement = document.getElementById('cups');
+        if (cupsElement) {
+            cupsElement.textContent = res.cups.toString();
+        }
+        
+        const cupSPDElement = document.getElementById('cupSPD');
+        if (cupSPDElement) {
+            cupSPDElement.textContent = res.cupSPD.toString();
+        }
+        
+        const totalCupSPDElement = document.getElementById('totalCupSPD');
+        if (totalCupSPDElement) {
+            totalCupSPDElement.textContent = (res.cupSPD * res.cups).toString() + ' per drink';
+        }
+        
         checkUpgradeAffordability();
 }
 
@@ -1351,7 +1383,23 @@ function buyWiderStraws() {
         
         showPurchaseFeedback('Wider Straws Upgrade', res.spent, clickX, clickY);
         // reload(); // Removed - causing issues
-        updateShopDisplays();
+        
+        // Update UI directly
+        const widerStrawsElement = document.getElementById('widerStraws');
+        if (widerStrawsElement) {
+            widerStrawsElement.textContent = res.widerStraws.toString();
+        }
+        
+        const widerStrawsSPDElement = document.getElementById('widerStrawsSPD');
+        if (widerStrawsSPDElement) {
+            widerStrawsSPDElement.textContent = (res.strawSPD / 0.6).toFixed(2) + 'x';
+        }
+        
+        const totalWiderStrawsSPDElement = document.getElementById('totalWiderStrawsSPD');
+        if (totalWiderStrawsSPDElement) {
+            totalWiderStrawsSPDElement.textContent = (res.strawSPD * window.straws.toNumber()).toString() + ' per drink';
+        }
+        
         checkUpgradeAffordability();
             return;
         }
@@ -1388,7 +1436,23 @@ function buyBetterCups() {
             
             showPurchaseFeedback('Better Cups Upgrade', res.spent, clickX, clickY);
             // reload(); // Removed - causing issues
-            updateShopDisplays();
+            
+            // Update UI directly
+            const betterCupsElement = document.getElementById('betterCups');
+            if (betterCupsElement) {
+                betterCupsElement.textContent = res.betterCups.toString();
+            }
+            
+            const betterCupsSPDElement = document.getElementById('betterCupsSPD');
+            if (betterCupsSPDElement) {
+                betterCupsSPDElement.textContent = (res.cupSPD / 1.2).toFixed(2) + 'x';
+            }
+            
+            const totalBetterCupsSPDElement = document.getElementById('totalBetterCupsSPD');
+            if (totalBetterCupsSPDElement) {
+                totalBetterCupsSPDElement.textContent = (res.cupSPD * window.cups.toNumber()).toString() + ' per drink';
+            }
+            
             checkUpgradeAffordability();
             return;
         }
@@ -1471,7 +1535,6 @@ function buyFasterDrinks() {
         
         showPurchaseFeedback('Faster Drinks', res.spent, clickX, clickY);
         // reload(); // Removed - causing issues
-        updateShopDisplays();
         checkUpgradeAffordability();
             return;
     }
@@ -1530,7 +1593,6 @@ function buyCriticalClick() {
         
         showPurchaseFeedback('Critical Click', res.spent, clickX, clickY);
         // reload(); // Removed - causing issues
-        updateShopDisplays();
         checkUpgradeAffordability();
             return;
     }
@@ -2207,7 +2269,7 @@ window.updateTopSipsPerDrink = updateTopSipsPerDrink;
 window.updateTopSipsPerSecond = updateTopSipsPerSecond;
 window.updateCriticalClickDisplay = updateCriticalClickDisplay;
 window.updateDrinkSpeedDisplay = updateDrinkSpeedDisplay;
-window.updateShopDisplays = updateShopDisplays;
+
 window.loadOptions = loadOptions;
 window.updatePlayTime = updatePlayTime;
 window.updateLastSaveTime = updateLastSaveTime;
@@ -2796,68 +2858,8 @@ window.testDevTools = function() {
 
 // Update shop displays after purchases
 function updateShopDisplays() {
-    // Update owned counts
-    const strawsElement = document.getElementById('straws');
-    if (strawsElement && window.straws) {
-        strawsElement.textContent = window.straws.toString();
-    }
-    
-    const cupsElement = document.getElementById('cups');
-    if (cupsElement && window.cups) {
-        cupsElement.textContent = window.cups.toString();
-    }
-    
-    const widerStrawsElement = document.getElementById('widerStraws');
-    if (widerStrawsElement && window.widerStraws) {
-        widerStrawsElement.textContent = window.widerStraws.toString();
-    }
-    
-    const betterCupsElement = document.getElementById('betterCups');
-    if (betterCupsElement && window.betterCups) {
-        betterCupsElement.textContent = window.betterCups.toString();
-    }
-    
-    // Update production values
-    const strawSPDElement = document.getElementById('strawSPD');
-    if (strawSPDElement && strawSPD) {
-        strawSPDElement.textContent = strawSPD.toString();
-    }
-    
-    const cupSPDElement = document.getElementById('cupSPD');
-    if (cupSPDElement && cupSPD) {
-        cupSPDElement.textContent = cupSPD.toString();
-    }
-    
-    const widerStrawsSPDElement = document.getElementById('widerStrawsSPD');
-    if (widerStrawsSPDElement && strawSPD) {
-        widerStrawsSPDElement.textContent = (strawSPD.div(new Decimal(0.6))).toString() + 'x';
-    }
-    
-    const betterCupsSPDElement = document.getElementById('betterCupsSPD');
-    if (betterCupsSPDElement && cupSPD) {
-        betterCupsSPDElement.textContent = (cupSPD.div(new Decimal(1.2))).toString() + 'x';
-    }
-    
-    // Update total production
-    const totalStrawSPDElement = document.getElementById('totalStrawSPD');
-    if (totalStrawSPDElement && strawSPD && window.straws) {
-        totalStrawSPDElement.textContent = (strawSPD.times(window.straws)).toString() + ' per drink';
-    }
-    
-    const totalCupSPDElement = document.getElementById('totalCupSPD');
-    if (totalCupSPDElement && cupSPD && window.cups) {
-        totalCupSPDElement.textContent = (cupSPD.times(window.cups)).toString() + ' per drink';
-    }
-    
-    const totalWiderStrawsSPDElement = document.getElementById('totalWiderStrawsSPD');
-    if (totalWiderStrawsSPDElement && strawSPD && window.straws) {
-        totalWiderStrawsSPDElement.textContent = (strawSPD.times(window.straws)).toString() + ' per drink';
-    }
-    
-    const totalBetterCupsSPDElement = document.getElementById('totalBetterCupsSPD');
-    if (totalBetterCupsSPDElement && cupSPD && window.cups) {
-        totalBetterCupsSPDElement.textContent = (cupSPD.times(window.cups)).toString() + ' per drink';
-    }
+    // This function was causing issues - removed
+    // Will add proper UI updates to each purchase function instead
 }
 
 // Make switchTab globally available for HTML onclick attributes
