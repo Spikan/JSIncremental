@@ -52,75 +52,75 @@ const BUTTON_CONFIG = {
         }
     },
     
-    // Function mappings for button actions - using proper function references
+    // Function mappings for button actions - using the actual working global functions
     actions: {
         'buyStraw': { 
-            func: () => window.App?.systems?.purchases?.buyStraw?.(), 
+            func: () => window.buyStraw?.(),
             type: 'shop-btn',
             label: 'Buy Straw'
         },
         'buyCup': { 
-            func: () => window.App?.systems?.purchases?.buyCup?.(), 
+            func: () => window.buyCup?.(),
             type: 'shop-btn',
             label: 'Buy Cup'
         },
         'buyWiderStraws': { 
-            func: () => window.App?.systems?.purchases?.buyWiderStraws?.(), 
+            func: () => window.buyWiderStraws?.(),
             type: 'shop-btn',
             label: 'Buy Wider Straws'
         },
         'buyBetterCups': { 
-            func: () => window.App?.systems?.purchases?.buyBetterCups?.(), 
+            func: () => window.buyBetterCups?.(),
             type: 'shop-btn',
             label: 'Buy Better Cups'
         },
         'buySuction': { 
-            func: () => window.App?.systems?.purchases?.buySuction?.(), 
+            func: () => window.buySuction?.(),
             type: 'clicking-upgrade-btn',
             label: 'Buy Suction'
         },
         'buyCriticalClick': { 
-            func: () => window.App?.systems?.purchases?.buyCriticalClick?.(), 
+            func: () => window.buyCriticalClick?.(),
             type: 'clicking-upgrade-btn',
             label: 'Buy Critical Click'
         },
         'buyFasterDrinks': { 
-            func: () => window.App?.systems?.purchases?.buyFasterDrinks?.(), 
+            func: () => window.buyFasterDrinks?.(),
             type: 'drink-speed-upgrade-btn',
             label: 'Buy Faster Drinks'
         },
         'upgradeFasterDrinks': { 
-            func: () => window.App?.systems?.purchases?.upgradeFasterDrinks?.(), 
+            func: () => window.upgradeFasterDrinks?.(),
             type: 'drink-speed-upgrade-btn',
             label: 'Upgrade Faster Drinks'
         },
         'levelUp': { 
-            func: () => window.App?.systems?.gameInit?.levelUp?.(), 
+            func: () => window.levelUp?.(),
             type: 'level-up-btn',
             label: 'Level Up'
         },
         'save': { 
-            func: () => window.App?.systems?.save?.queueSave?.(), 
+            func: () => window.save?.(),
             type: 'save-btn',
             label: 'Save Game'
         },
         'delete_save': { 
-            func: () => window.App?.storage?.deleteSave?.(), 
+            func: () => window.delete_save?.(),
             type: 'save-btn',
             label: 'Delete Save'
         },
         'toggleButtonSounds': { 
-            func: () => window.App?.systems?.audio?.button?.toggleButtonSounds?.(), 
+            func: () => window.toggleButtonSounds?.(),
             type: 'sound-toggle-btn',
             label: 'Toggle Button Sounds'
         },
         'sendMessage': { 
-            func: () => window.App?.systems?.god?.sendMessage?.(), 
+            func: () => window.sendMessage?.(),
             type: 'chat-send-btn',
             label: 'Send Message'
         },
         'startGame': { 
-            func: () => window.App?.systems?.gameInit?.startGame?.(), 
+            func: () => window.startGame?.(),
             type: 'splash-start-btn',
             label: 'Start Game'
         }
@@ -157,6 +157,13 @@ function handleButtonClick(event, button, actionName) {
                 window.App.systems.audio.button.playButtonPurchaseSound();
             } else {
                 window.App.systems.audio.button.playButtonClickSound();
+            }
+        } else if (window.playButtonPurchaseSound && window.playButtonClickSound) {
+            // Fallback to global audio functions
+            if (buttonType.audio === 'purchase') {
+                window.playButtonPurchaseSound();
+            } else {
+                window.playButtonClickSound();
             }
         }
     } catch (error) {
@@ -257,6 +264,9 @@ function setupSpecialButtonHandlers() {
             try {
                 if (window.App?.systems?.audio?.button) {
                     window.App.systems.audio.button.playButtonClickSound();
+                } else if (window.playButtonClickSound) {
+                    // Fallback to global audio function
+                    window.playButtonClickSound();
                 }
             } catch (error) {
                 console.warn('Audio playback failed:', error);
@@ -286,63 +296,53 @@ function setupSpecialButtonHandlers() {
     }
 }
 
-// Initialize button system when App systems are ready
+// Initialize button system when global functions are ready
 function initButtonSystem() {
-    // Wait for App systems to be available
+    // Wait for global functions to be available
     function tryInitialize() {
-        // Check if essential App systems are available
-        const essentialSystems = [
-            'App.systems.purchases',
-            'App.systems.gameInit', 
-            'App.systems.save',
-            'App.systems.audio.button',
-            'App.storage'
+        // Check if essential global functions are available
+        const essentialFunctions = [
+            'buyStraw',
+            'buyCup', 
+            'buySuction',
+            'buyCriticalClick',
+            'buyFasterDrinks',
+            'buyWiderStraws',
+            'buyBetterCups',
+            'levelUp',
+            'save',
+            'delete_save',
+            'toggleButtonSounds',
+            'sendMessage',
+            'startGame'
         ];
         
-        const systemsAvailable = essentialSystems.every(path => {
-            const parts = path.split('.');
-            let current = window;
-            for (const part of parts) {
-                if (current && current[part]) {
-                    current = current[part];
-                } else {
-                    return false;
-                }
-            }
-            return true;
-        });
+        const functionsAvailable = essentialFunctions.every(func => 
+            typeof window[func] === 'function'
+        );
         
-        if (systemsAvailable) {
-            console.log('🔧 All App systems available, setting up modern button system');
+        if (functionsAvailable) {
+            console.log('🔧 All global functions available, setting up modern button system');
             setupUnifiedButtonSystem();
         } else {
-            // Log which systems are missing for debugging
-            const missingSystems = essentialSystems.filter(path => {
-                const parts = path.split('.');
-                let current = window;
-                for (const part of parts) {
-                    if (current && current[part]) {
-                        current = current[part];
-                    } else {
-                        return false;
-                    }
-                }
-                return false;
-            });
-            console.log('🔧 Waiting for App systems:', missingSystems.join(', '));
+            // Log which functions are missing for debugging
+            const missingFunctions = essentialFunctions.filter(func => 
+                typeof window[func] !== 'function'
+            );
+            console.log('🔧 Waiting for global functions:', missingFunctions.join(', '));
             // Try again in a bit
             setTimeout(tryInitialize, 200);
         }
     }
     
-    // Wait for both DOM and App to be ready
+    // Wait for both DOM and main.js to be ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            // Wait for App to be fully initialized
+            // Wait for main.js to be fully loaded
             setTimeout(tryInitialize, 100);
         });
     } else {
-        // DOM already loaded, wait for App
+        // DOM already loaded, wait for main.js
         setTimeout(tryInitialize, 100);
     }
 }
