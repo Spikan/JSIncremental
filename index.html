@@ -716,13 +716,51 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2.0.0/dist/break_infinity.min.js"></script>
-    <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/dom-cache.js"></script>
-    <script type="module" src="js/index.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/god.js"></script>
-    <script src="js/feature-unlocks.js"></script>
-    <script src="js/services/error-overlay.js"></script>
+<script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
+<script src="js/config.js"></script>
+<script src="js/dom-cache.js"></script>
+<script type="module" src="js/index.js"></script>
+<script>
+// Ensure Decimal is available globally before loading main.js
+if (typeof Decimal === 'undefined') {
+    console.error('❌ Decimal library not loaded! Game will not work properly.');
+} else {
+    console.log('✅ Decimal library loaded successfully');
+}
+
+// Ensure App object is available before loading main.js
+function waitForApp() {
+    if (window.App && window.App.ui) {
+        console.log('✅ App object ready, loading main.js');
+        // Load main.js only after App is ready
+        const script = document.createElement('script');
+        script.src = 'js/main.js';
+        script.onload = () => console.log('✅ main.js loaded successfully');
+        script.onerror = (e) => console.error('❌ Failed to load main.js:', e);
+        document.body.appendChild(script);
+        
+        // Load other scripts after main.js
+        setTimeout(() => {
+            const godScript = document.createElement('script');
+            godScript.src = 'js/god.js';
+            document.body.appendChild(godScript);
+            
+            const featureScript = document.createElement('script');
+            featureScript.src = 'js/feature-unlocks.js';
+            document.body.appendChild(featureScript);
+            
+            const errorScript = document.createElement('script');
+            errorScript.src = 'js/services/error-overlay.js';
+            document.body.appendChild(errorScript);
+        }, 100);
+    } else {
+        console.log('⏳ Waiting for App object...');
+        setTimeout(waitForApp, 50);
+    }
+}
+
+// Start waiting for App object
+waitForApp();
+</script>
 </body>
 </html>

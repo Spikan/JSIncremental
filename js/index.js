@@ -96,14 +96,28 @@ loadDataFiles().then(() => {
         bridge.init();
         window.App.stateBridge = bridge;
     } catch {}
+    
     // Initialize UI system
     if (window.App.ui?.initializeUI) {
-        window.App.ui.initializeUI();
+        try {
+            window.App.ui.initializeUI();
+            console.log('✅ UI system initialized successfully');
+        } catch (error) {
+            console.error('❌ Failed to initialize UI system:', error);
+        }
     }
     
-    console.log('App bootstrapped successfully');
+    // Signal that App is fully ready
+    console.log('✅ App object fully initialized and ready');
+    
+    // Dispatch a custom event to signal readiness
+    try {
+        window.dispatchEvent(new CustomEvent('appReady', { detail: { App: window.App } }));
+    } catch (error) {
+        console.warn('Could not dispatch appReady event:', error);
+    }
 }).catch(error => {
-    console.error('Failed to bootstrap app:', error);
+    console.error('❌ Failed to initialize App:', error);
 });
 
 // Set up DOM-ready splash/init
