@@ -2,6 +2,86 @@
 
 import { vi, beforeEach, afterEach } from 'vitest';
 
+// Mock Decimal library (break_infinity.js)
+global.Decimal = class Decimal {
+  constructor(value) {
+    this._value = Number(value) || 0;
+  }
+  
+  // Basic arithmetic methods
+  plus(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return new Decimal(this._value + otherValue);
+  }
+  
+  minus(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return new Decimal(this._value - otherValue);
+  }
+  
+  times(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return new Decimal(this._value * otherValue);
+  }
+  
+  div(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return new Decimal(this._value / otherValue);
+  }
+  
+  // Comparison methods
+  gte(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return this._value >= otherValue;
+  }
+  
+  lte(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return this._value <= otherValue;
+  }
+  
+  gt(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return this._value > otherValue;
+  }
+  
+  lt(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return this._value < otherValue;
+  }
+  
+  eq(other) {
+    const otherValue = other instanceof Decimal ? other._value : Number(other);
+    return this._value === otherValue;
+  }
+  
+  // Utility methods
+  toNumber() {
+    return this._value;
+  }
+  
+  toString() {
+    return String(this._value);
+  }
+  
+  toFixed(decimals = 0) {
+    return this._value.toFixed(decimals);
+  }
+  
+  // Static methods
+  static fromString(str) {
+    return new Decimal(Number(str));
+  }
+  
+  static fromNumber(num) {
+    return new Decimal(num);
+  }
+};
+
+// Make Decimal available on window for tests
+global.window = global.window || {};
+global.window.Decimal = global.Decimal;
+
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),
@@ -342,6 +422,195 @@ Object.defineProperty(global, 'indexedDB', {
   value: indexedDBMock,
   writable: true
 });
+
+// Enhanced DOM element mock with all necessary methods
+function createMockElement(tagName = 'div') {
+  const element = {
+    tagName: tagName.toUpperCase(),
+    id: '',
+    className: '',
+    textContent: '',
+    innerHTML: '',
+    style: {
+      cssText: '',
+      position: '',
+      top: '',
+      left: '',
+      width: '',
+      height: '',
+      background: '',
+      color: '',
+      fontSize: '',
+      fontWeight: '',
+      animation: '',
+      setProperty: vi.fn(),
+      getPropertyValue: vi.fn(() => ''),
+      cssText: ''
+    },
+    classList: {
+      add: vi.fn(),
+      remove: vi.fn(),
+      toggle: vi.fn(),
+      contains: vi.fn(() => false),
+      replace: vi.fn()
+    },
+    dataset: {},
+    attributes: {},
+    children: [],
+    parentNode: null,
+    appendChild: vi.fn(),
+    removeChild: vi.fn(),
+    insertBefore: vi.fn(),
+    querySelector: vi.fn(() => null),
+    querySelectorAll: vi.fn(() => []),
+    getAttribute: vi.fn(() => null),
+    setAttribute: vi.fn(),
+    removeAttribute: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    focus: vi.fn(),
+    blur: vi.fn(),
+    click: vi.fn(),
+    scrollIntoView: vi.fn(),
+    getBoundingClientRect: vi.fn(() => ({
+      top: 0,
+      left: 0,
+      width: 100,
+      height: 100,
+      right: 100,
+      bottom: 100
+    })),
+    offsetWidth: 100,
+    offsetHeight: 100,
+    clientWidth: 100,
+    clientHeight: 100,
+    scrollTop: 0,
+    scrollLeft: 0,
+    scrollWidth: 100,
+    scrollHeight: 100
+  };
+  
+  // Add getter/setter for style properties
+  Object.defineProperty(element.style, 'position', {
+    get: () => element.style._position || '',
+    set: (value) => { element.style._position = value; }
+  });
+  
+  Object.defineProperty(element.style, 'top', {
+    get: () => element.style._top || '',
+    set: (value) => { element.style._top = value; }
+  });
+  
+  Object.defineProperty(element.style, 'left', {
+    get: () => element.style._left || '',
+    set: (value) => { element.style._left = value; }
+  });
+  
+  Object.defineProperty(element.style, 'width', {
+    get: () => element.style._width || '',
+    set: (value) => { element.style._width = value; }
+  });
+  
+  Object.defineProperty(element.style, 'height', {
+    get: () => element.style._height || '',
+    set: (value) => { element.style._height = value; }
+  });
+  
+  Object.defineProperty(element.style, 'background', {
+    get: () => element.style._background || '',
+    set: (value) => { element.style._background = value; }
+  });
+  
+  Object.defineProperty(element.style, 'color', {
+    get: () => element.style._color || '',
+    set: (value) => { element.style._color = value; }
+  });
+  
+  Object.defineProperty(element.style, 'fontSize', {
+    get: () => element.style._fontSize || '',
+    set: (value) => { element.style._fontSize = value; }
+  });
+  
+  Object.defineProperty(element.style, 'fontWeight', {
+    get: () => element.style._fontWeight || '',
+    set: (value) => { element.style._fontWeight = value; }
+  });
+  
+  Object.defineProperty(element.style, 'animation', {
+    get: () => element.style._animation || '',
+    set: (value) => { element.style._animation = value; }
+  });
+  
+  return element;
+}
+
+// Mock document
+global.document = {
+  createElement: vi.fn((tagName) => createMockElement(tagName)),
+  createTextNode: vi.fn((text) => ({ textContent: text, nodeType: 3 })),
+  getElementById: vi.fn((id) => {
+    // Return null for missing elements to test graceful degradation
+    if (id === 'nonexistent' || id === 'missing') {
+      return null;
+    }
+    const element = createMockElement();
+    element.id = id;
+    return element;
+  }),
+  querySelector: vi.fn((selector) => {
+    // Return null for missing elements to test graceful degradation
+    if (selector === '#nonexistent' || selector === '.missing') {
+      return null;
+    }
+    const element = createMockElement();
+    element.id = selector.replace(/[.#]/, '');
+    return element;
+  }),
+  querySelectorAll: vi.fn((selector) => []),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
+  body: {
+    appendChild: vi.fn(),
+    removeChild: vi.fn(),
+    insertBefore: vi.fn(),
+    children: [],
+    querySelector: vi.fn(() => null),
+    querySelectorAll: vi.fn(() => []),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    style: {},
+    className: '',
+    id: 'body'
+  },
+  head: {
+    appendChild: vi.fn(),
+    removeChild: vi.fn(),
+    insertBefore: vi.fn(),
+    children: [],
+    querySelector: vi.fn(() => null),
+    querySelectorAll: vi.fn(() => []),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    style: {},
+    className: '',
+    id: 'head'
+  },
+  documentElement: {
+    style: {},
+    className: '',
+    id: 'html'
+  },
+  readyState: 'complete',
+  hidden: false,
+  visibilityState: 'visible',
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn()
+};
 
 // Setup test utilities
 global.testUtils = {

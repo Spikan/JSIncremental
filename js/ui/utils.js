@@ -91,20 +91,24 @@ export function updateButtonState(buttonId, isAffordable, cost) {
     if (typeof window === 'undefined') return;
 
     const button = findButton(buttonId);
-    if (!button) return;
+    if (!button || !button.classList) return;
 
     // Update main button state
     button.disabled = !isAffordable;
 
-    // Use CSS classes for state (more semantic)
-    button.classList.toggle('affordable', isAffordable);
-    button.classList.toggle('unaffordable', !isAffordable);
-    button.classList.toggle('disabled', !isAffordable);
+    // Use CSS classes for state (more semantic) - with safety checks
+    if (typeof button.classList.toggle === 'function') {
+        button.classList.toggle('affordable', isAffordable);
+        button.classList.toggle('unaffordable', !isAffordable);
+        button.classList.toggle('disabled', !isAffordable);
+    }
 
-    // Update cost span if present
-    const costSpan = button.querySelector('.cost');
-    if (costSpan && typeof cost !== 'undefined') {
-        costSpan.textContent = formatNumber(cost);
+    // Update cost span if present - with safety checks
+    if (typeof button.querySelector === 'function') {
+        const costSpan = button.querySelector('.cost');
+        if (costSpan && typeof cost !== 'undefined') {
+            costSpan.textContent = formatNumber(cost);
+        }
     }
 
     // Update button title for accessibility
@@ -139,7 +143,7 @@ function updateCompactButtonVariants(buttonId, isAffordable) {
     if (compactSelector) {
         const compactButtons = document.querySelectorAll(compactSelector);
         compactButtons.forEach(button => {
-            if (button) {
+            if (button && button.classList && typeof button.classList.toggle === 'function') {
                 button.classList.toggle('affordable', isAffordable);
                 button.classList.toggle('unaffordable', !isAffordable);
                 button.classList.toggle('disabled', !isAffordable);
@@ -156,14 +160,16 @@ export function updateCostDisplay(elementId, cost, isAffordable) {
     if (typeof window === 'undefined') return;
 
     const element = findElement(elementId);
-    if (!element) return;
+    if (!element || !element.classList) return;
 
     // Update the cost display
     element.innerHTML = formatNumber(cost);
 
-    // Apply affordability classes
-    element.classList.toggle('affordable', isAffordable);
-    element.classList.toggle('unaffordable', !isAffordable);
+    // Apply affordability classes - with safety checks
+    if (typeof element.classList.toggle === 'function') {
+        element.classList.toggle('affordable', isAffordable);
+        element.classList.toggle('unaffordable', !isAffordable);
+    }
 }
 
 /**

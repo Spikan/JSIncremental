@@ -98,9 +98,62 @@ export function updateLevelNumber() {
 }
 
 // Update the level text banner/label
-export function updateLevelText(text) {
-	const el = window.DOM_CACHE?.levelText || document.getElementById('levelText');
-	if (el && typeof text === 'string') {
-		el.innerHTML = text;
+export function updateLevelText() {
+	if (typeof window === 'undefined') return;
+	const levelTextEl = window.DOM_CACHE?.levelText;
+	if (levelTextEl && window.level != null) {
+		const level = typeof window.level?.toNumber === 'function' ? window.level.toNumber() : window.level;
+		const levelText = getLevelText(level);
+		levelTextEl.innerHTML = levelText;
 	}
+}
+
+// Update drink rate display
+export function updateDrinkRate() {
+	if (typeof window === 'undefined') return;
+	const drinkRateElement = document.getElementById('drinkRate');
+	if (drinkRateElement && window.drinkRate) {
+		const drinkRateSeconds = window.drinkRate / 1000;
+		drinkRateElement.textContent = drinkRateSeconds.toFixed(2) + 's';
+	}
+}
+
+// Update compact drink speed displays
+export function updateCompactDrinkSpeedDisplays() {
+	if (typeof window === 'undefined') return;
+	
+	// Update compact drink speed display elements
+	const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
+	if (currentDrinkSpeedCompact && window.drinkRate) {
+		const drinkRateSeconds = window.drinkRate / 1000;
+		currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
+	}
+	
+	// Update other compact displays if they exist
+	const compactDisplays = document.querySelectorAll('[id*="Compact"]');
+	compactDisplays.forEach(display => {
+		if (display.id.includes('DrinkSpeed') && window.drinkRate) {
+			const drinkRateSeconds = window.drinkRate / 1000;
+			display.textContent = drinkRateSeconds.toFixed(2) + 's';
+		}
+	});
+}
+
+// Helper function to get level text based on level number
+function getLevelText(level) {
+	const levelTexts = [
+		'On a Blue Background',
+		'With a Straw',
+		'In a Cup',
+		'With Suction',
+		'Faster Drinking',
+		'Critical Hits',
+		'Advanced Upgrades',
+		'Master Soda Drinker',
+		'Soda Legend',
+		'Ultimate Soda Master'
+	];
+	
+	const index = Math.min(Math.floor(level - 1), levelTexts.length - 1);
+	return levelTexts[index] || levelTexts[levelTexts.length - 1];
 }

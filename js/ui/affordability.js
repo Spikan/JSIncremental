@@ -48,6 +48,13 @@ export function checkUpgradeAffordability() {
     updateCostDisplay('levelUpCost', costs.levelUp, window.sips.gte(costs.levelUp));
 }
 
+// Update shop button states based on current affordability
+export function updateShopButtonStates() {
+    // This function is a convenience wrapper around checkUpgradeAffordability
+    // It ensures all shop buttons are updated with current affordability status
+    checkUpgradeAffordability();
+}
+
 // Calculate all upgrade costs
 function calculateAllCosts(config, dataUp) {
     const costs = {};

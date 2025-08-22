@@ -25,6 +25,8 @@ export const updateDrinkProgress = displays.updateDrinkProgress;
 export const updateTopSipCounter = displays.updateTopSipCounter;
 export const updateLevelNumber = displays.updateLevelNumber;
 export const updateLevelText = displays.updateLevelText;
+export const updateDrinkRate = displays.updateDrinkRate;
+export const updateCompactDrinkSpeedDisplays = displays.updateCompactDrinkSpeedDisplays;
 
 export const updatePlayTime = stats.updatePlayTime;
 export const updateLastSaveTime = stats.updateLastSaveTime;
@@ -41,6 +43,7 @@ export const showLevelUpFeedback = feedback.showLevelUpFeedback;
 export const showOfflineProgress = feedback.showOfflineProgress;
 
 export const checkUpgradeAffordability = affordability.checkUpgradeAffordability;
+export const updateShopButtonStates = affordability.updateShopButtonStates;
 
 // Labels
 export const updateClickSoundsToggleText = labels.updateClickSoundsToggleText;
