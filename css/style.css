@@ -232,38 +232,7 @@ body {
     padding: 0 1rem;
 }
 
-.tab-btn {
-    min-width: 150px;
-    min-height: 50px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: 2px solid #00B36B;
-    background-color: #001789;
-    color: #00B36B;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: bold;
-}
 
-.tab-btn:hover {
-    background-color: #00B36B;
-    color: #001789;
-    transform: translateY(-2px);
-}
-
-.tab-btn.active {
-    background-color: #00B36B;
-    color: #001789;
-    border-color: #FF3D02;
-    box-shadow: 0 4px 8px rgba(0, 179, 107, 0.3);
-}
-
-.tab-btn:active {
-    transform: scale(0.95);
-    background: var(--primary-green);
-    color: var(--primary-blue);
-}
 
 
 
@@ -476,34 +445,7 @@ body {
     gap: 1rem;
 }
 
-.dev-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: var(--btn-padding-md);
-    border: 2px solid var(--primary-green);
-    background-color: var(--primary-blue);
-    color: var(--primary-green);
-    border-radius: var(--btn-radius-md);
-    cursor: pointer;
-    transition: var(--btn-transition);
-    min-height: var(--btn-xl);
-    justify-content: center;
-}
 
-.dev-btn:hover {
-    background-color: #00B36B;
-    color: #001789;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 179, 107, 0.3);
-}
-
-.dev-btn:active {
-    transform: scale(0.95);
-    background: var(--primary-green);
-    color: var(--primary-blue);
-}
 
 .dev-btn-icon {
     font-size: 1.5rem;
@@ -515,66 +457,7 @@ body {
     text-align: center;
 }
 
-/* Dev button variants */
-.dev-btn.unlock-all {
-    border-color: #FF3D02;
-    color: #FF3D02;
-}
 
-.dev-btn.unlock-all:hover {
-    background-color: #FF3D02;
-    color: #001789;
-}
-
-.dev-btn.unlock-shop {
-    border-color: #FF8E53;
-    color: #FF8E53;
-}
-
-.dev-btn.unlock-shop:hover {
-    background-color: #FF8E53;
-    color: #001789;
-}
-
-.dev-btn.unlock-upgrades {
-    border-color: #BC00FF;
-    color: #BC00FF;
-}
-
-.dev-btn.unlock-upgrades:hover {
-    background-color: #BC00FF;
-    color: #001789;
-}
-
-.dev-btn.reset {
-    border-color: #FF6B6B;
-    color: #FF6B6B;
-}
-
-.dev-btn.reset:hover {
-    background-color: #FF6B6B;
-    color: #001789;
-}
-
-.dev-btn.time-travel {
-    border-color: #4ECDC4;
-    color: #4ECDC4;
-}
-
-.dev-btn.time-travel:hover {
-    background-color: #4ECDC4;
-    color: #001789;
-}
-
-.dev-btn.resources {
-    border-color: #45B7D1;
-    color: #45B7D1;
-}
-
-.dev-btn.resources:hover {
-    background-color: #45B7D1;
-    color: #001789;
-}
 
 .dev-btn.testing {
     border-color: #96CEB4;
@@ -637,29 +520,7 @@ body {
     flex-wrap: wrap;
 }
 
-.save-btn {
-    min-width: 120px;
-    min-height: var(--btn-sm);
-    padding: var(--btn-padding-sm);
-    font-size: 1rem;
-    border: 2px solid var(--primary-green);
-    background-color: var(--primary-blue);
-    color: var(--primary-green);
-    border-radius: var(--btn-radius-md);
-    cursor: pointer;
-    transition: var(--btn-transition);
-}
 
-.save-btn:hover {
-    background-color: var(--primary-green);
-    color: var(--primary-blue);
-}
-
-.save-btn:active {
-    transform: scale(0.95);
-    background: var(--primary-green);
-    color: var(--primary-blue);
-}
 
 /* Auto-save Controls */
 .autosave-controls {
@@ -719,18 +580,7 @@ body {
     align-items: flex-start;
 }
 
-.sound-toggle-btn {
-    padding: var(--btn-padding-md);
-    font-size: 1rem;
-    font-weight: bold;
-    border: 2px solid var(--primary-green);
-    background-color: var(--primary-green);
-    color: var(--neutral-white);
-    border-radius: var(--btn-radius-md);
-    cursor: pointer;
-    transition: var(--btn-transition);
-    min-width: 200px;
-}
+
 
 .sound-toggle-btn:hover {
     background-color: #00D97F;
@@ -1250,23 +1100,7 @@ h3 {
 }
 
 /* Level Up Button */
-.level-up-btn {
-    min-width: 200px;
-    min-height: var(--btn-xl);
-    padding: var(--btn-padding-md);
-    font-size: 1.1rem;
-    font-weight: bold;
-    border: 2px solid var(--primary-purple);
-    background-color: var(--primary-blue);
-    color: var(--primary-purple);
-    border-radius: var(--btn-radius-lg);
-    cursor: pointer;
-    transition: var(--btn-transition);
-    line-height: 1.3;
-    white-space: nowrap;
-    margin: 1rem auto;
-    display: block;
-}
+
 
 .level-up-btn:hover {
     background-color: var(--primary-purple);
@@ -1360,42 +1194,7 @@ h3 {
     box-shadow: 0 8px 25px rgba(0, 179, 107, 0.25);
 }
 
-.clicking-upgrade-btn {
-    width: 160px;
-    height: var(--btn-lg);
-    padding: var(--btn-padding-md);
-    font-size: 1rem;
-    font-weight: bold;
-    border: 2px solid var(--primary-green);
-    background: var(--primary-blue);
-    color: var(--primary-green);
-    border-radius: var(--btn-radius-lg);
-    cursor: pointer;
-    transition: var(--btn-transition);
-    line-height: 1.2;
-    white-space: nowrap;
-    box-shadow: var(--btn-shadow-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
 
-
-
-.clicking-upgrade-btn:hover {
-    background-color: var(--primary-green);
-    color: var(--primary-blue);
-    transform: translateY(-2px);
-    box-shadow: var(--btn-shadow-md);
-}
-
-.clicking-upgrade-btn:active {
-    transform: scale(0.98);
-    background: var(--primary-green);
-    color: var(--primary-blue);
-}
 
 .clicking-upgrade-icon {
     font-size: 1.1rem;
@@ -1563,69 +1362,7 @@ h3 {
     opacity: 0.8;
 }
 
-.shop-btn {
-    min-width: 180px;
-    min-height: var(--btn-lg);
-    padding: var(--btn-padding-md);
-    font-size: 1rem;
-    font-weight: bold;
-    border: 2px solid var(--primary-green);
-    background: var(--primary-blue);
-    color: var(--primary-green);
-    border-radius: var(--btn-radius-lg);
-    cursor: pointer;
-    transition: var(--btn-transition);
-    line-height: 1.2;
-    white-space: nowrap;
-    box-shadow: var(--btn-shadow-sm);
-}
 
-
-
-.shop-btn:hover:not(.affordable):not(.disabled) {
-    background-color: var(--primary-green);
-    color: var(--primary-blue);
-    transform: translateY(-2px);
-    box-shadow: var(--btn-shadow-md);
-}
-
-.shop-btn:active {
-    transform: scale(0.98);
-    background-color: var(--primary-green);
-    color: var(--primary-blue);
-    box-shadow: var(--btn-shadow-sm);
-}
-
-.shop-btn.affordable {
-    background-color: var(--primary-green) !important;
-    color: var(--neutral-white) !important;
-    box-shadow: var(--btn-shadow-md) !important;
-    border-color: var(--primary-green-light) !important;
-}
-
-.shop-btn.affordable * {
-    color: var(--neutral-white) !important;
-}
-
-.shop-btn.disabled {
-    background-color: var(--neutral-dark);
-    color: var(--neutral-medium);
-    border-color: var(--neutral-medium);
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Focus state for accessibility */
-.shop-btn:focus {
-    outline: 2px solid var(--primary-green-light);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
-}
-
-/* Ensure text is always readable in all states */
-.shop-btn * {
-    color: inherit;
-}
 
 .shop-stats {
     display: grid;
@@ -1799,41 +1536,7 @@ h3 {
     margin-right: auto;
 }
 
-.drink-speed-upgrade-btn {
-    width: 100%;
-    min-width: 200px;
-    min-height: var(--btn-lg);
-    padding: var(--btn-padding-md);
-    font-size: 1rem;
-    font-weight: bold;
-    border: 2px solid var(--primary-green);
-    background: var(--primary-blue);
-    color: var(--primary-green);
-    border-radius: var(--btn-radius-lg);
-    cursor: pointer;
-    transition: var(--btn-transition);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    box-shadow: var(--btn-shadow-sm);
-    line-height: 1.2;
-    white-space: nowrap;
-}
 
-
-
-.drink-speed-upgrade-btn:hover {
-    background-color: var(--primary-green);
-    color: var(--primary-blue);
-    transform: translateY(-2px);
-    box-shadow: var(--btn-shadow-md);
-}
-
-.drink-speed-upgrade-btn:active {
-    transform: scale(0.98);
-    background: var(--primary-green);
-    color: var(--primary-blue);
-}
 
 .drink-speed-upgrade-icon {
     font-size: 1.2rem;
@@ -2698,30 +2401,7 @@ h3 {
     color: #a8a8a8; /* Sacred muted color */
 }
 
-.chat-send-btn {
-    padding: 0.75rem 1.5rem;
-    background: #0000a8; /* Sacred blue */
-    color: #ffffff; /* Sacred white */
-    border: 2px solid #ffff57; /* Sacred yellow */
-    border-radius: 8px;
-    font-family: 'Courier New', monospace;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
 
-.chat-send-btn:hover {
-    background: #ffff57; /* TempleOS yellow on hover */
-    color: #0000a8; /* TempleOS blue text on hover */
-    box-shadow: 0 0 15px rgba(255, 255, 87, 0.6);
-}
-
-.chat-send-btn:active {
-    transform: translateY(1px);
-}
 
 .god-info {
     background: #101010; /* Sacred dark background */
@@ -3529,4 +3209,611 @@ h3 {
 
 /* ========================================
    END BUTTON DESIGN SYSTEM
+   ======================================== */
+
+/* ========================================
+   UNIFIED BUTTON DESIGN SYSTEM
+   ======================================== */
+
+/* CSS Custom Properties for consistent theming */
+:root {
+  /* Primary Colors */
+  --primary-blue: #001789;
+  --primary-blue-dark: #001f5e;
+  --primary-green: #00B36B;
+  --primary-green-light: #00D4FF;
+  --primary-orange: #FF3D02;
+  --primary-purple: #BC00FF;
+  
+  /* Secondary Colors */
+  --secondary-orange: #FF8E53;
+  --secondary-red: #FF6B6B;
+  --secondary-cyan: #4ECDC4;
+  --secondary-blue: #45B7D1;
+  
+  /* Neutral Colors */
+  --neutral-dark: #333;
+  --neutral-medium: #666;
+  --neutral-light: #999;
+  --neutral-white: #FFFFFF;
+  
+  /* Button Sizes */
+  --btn-xs: 32px;
+  --btn-sm: 44px;
+  --btn-md: 50px;
+  --btn-lg: 70px;
+  --btn-xl: 80px;
+  
+  /* Button Padding */
+  --btn-padding-xs: 0.5rem 0.75rem;
+  --btn-padding-sm: 0.75rem 1rem;
+  --btn-padding-md: 1rem 1.5rem;
+  --btn-padding-lg: 1.25rem 2rem;
+  
+  /* Border Radius */
+  --btn-radius-sm: 6px;
+  --btn-radius-md: 8px;
+  --btn-radius-lg: 12px;
+  --btn-radius-xl: 16px;
+  
+  /* Transitions */
+  --btn-transition: all 0.2s ease;
+  
+  /* Shadows */
+  --btn-shadow-sm: 0 2px 4px rgba(0, 179, 107, 0.2);
+  --btn-shadow-md: 0 4px 8px rgba(0, 179, 107, 0.3);
+  --btn-shadow-lg: 0 6px 16px rgba(0, 179, 107, 0.4);
+}
+
+/* ========================================
+   BASE BUTTON STYLES
+   ======================================== */
+
+/* All buttons inherit these base styles */
+button {
+  font-family: inherit;
+  font-weight: bold;
+  border: 2px solid;
+  border-radius: var(--btn-radius-md);
+  cursor: pointer;
+  transition: var(--btn-transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Remove default button styling */
+button {
+  background: none;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* ========================================
+   BUTTON SIZE VARIANTS
+   ======================================== */
+
+.btn-xs {
+  min-height: var(--btn-xs);
+  padding: var(--btn-padding-xs);
+  font-size: 0.875rem;
+}
+
+.btn-sm {
+  min-height: var(--btn-sm);
+  padding: var(--btn-padding-sm);
+  font-size: 0.875rem;
+}
+
+.btn-md {
+  min-height: var(--btn-md);
+  padding: var(--btn-padding-sm);
+  font-size: 1rem;
+}
+
+.btn-lg {
+  min-height: var(--btn-lg);
+  padding: var(--btn-padding-md);
+  font-size: 1rem;
+}
+
+.btn-xl {
+  min-height: var(--btn-xl);
+  padding: var(--btn-padding-md);
+  font-size: 1.1rem;
+}
+
+/* ========================================
+   BUTTON STYLE VARIANTS
+   ======================================== */
+
+/* Primary Button - Green theme */
+.btn-primary {
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+  box-shadow: var(--btn-shadow-sm);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-green-light);
+  border-color: var(--primary-green-light);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  background-color: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+/* Secondary Button - Blue theme */
+.btn-secondary {
+  background-color: var(--primary-blue);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+  box-shadow: var(--btn-shadow-sm);
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+}
+
+/* Purple Button - Special theme */
+.btn-purple {
+  background-color: var(--primary-blue);
+  color: var(--primary-purple);
+  border-color: var(--primary-purple);
+  box-shadow: var(--btn-shadow-sm);
+}
+
+.btn-purple:hover {
+  background-color: var(--primary-purple);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.btn-purple:active {
+  transform: scale(0.98);
+  background-color: var(--primary-purple);
+  color: var(--primary-blue);
+}
+
+/* ========================================
+   BUTTON STATES
+   ======================================== */
+
+/* Disabled state */
+button:disabled,
+button.disabled {
+  background-color: var(--neutral-dark) !important;
+  color: var(--neutral-medium) !important;
+  border-color: var(--neutral-medium) !important;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+button:disabled:hover,
+button.disabled:hover {
+  background-color: var(--neutral-dark) !important;
+  color: var(--neutral-medium) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Affordable state - when item can be purchased */
+button.affordable {
+  background-color: var(--primary-green) !important;
+  color: var(--neutral-white) !important;
+  border-color: var(--primary-green-light) !important;
+  box-shadow: var(--btn-shadow-md) !important;
+}
+
+button.affordable:hover {
+  background-color: var(--primary-green-light) !important;
+  border-color: var(--primary-green-light) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-lg) !important;
+}
+
+/* Focus state for accessibility */
+button:focus {
+  outline: 2px solid var(--primary-green-light);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+}
+
+/* ========================================
+   SPECIFIC BUTTON TYPES
+   ======================================== */
+
+/* Tab Buttons */
+.tab-btn {
+  min-width: 150px;
+  min-height: var(--btn-md);
+  padding: var(--btn-padding-sm);
+  font-size: 1rem;
+  background-color: var(--primary-blue);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+.tab-btn:hover {
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.tab-btn.active {
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+  border-color: var(--primary-orange);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.tab-btn:active {
+  transform: scale(0.95);
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+}
+
+/* God Tab - Special styling but consistent behavior */
+.tab-btn[onclick*="god"] {
+  background-color: var(--primary-blue);
+  color: var(--primary-purple);
+  border-color: var(--primary-purple);
+}
+
+.tab-btn[onclick*="god"]:hover {
+  background-color: var(--primary-purple);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.tab-btn[onclick*="god"].active {
+  background-color: var(--primary-purple);
+  color: var(--primary-blue);
+  border-color: var(--primary-orange);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.tab-btn[onclick*="god"]:active {
+  transform: scale(0.95);
+  background-color: var(--primary-purple);
+  color: var(--primary-blue);
+}
+
+/* Shop Buttons */
+.shop-btn {
+  min-width: 180px;
+  min-height: var(--btn-lg);
+  padding: var(--btn-padding-md);
+  font-size: 1rem;
+  background-color: var(--primary-blue);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+.shop-btn:hover:not(.affordable):not(.disabled) {
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.shop-btn:active {
+  transform: scale(0.98);
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+}
+
+/* Clicking Upgrade Buttons */
+.clicking-upgrade-btn {
+  width: 160px;
+  height: var(--btn-lg);
+  padding: var(--btn-padding-md);
+  font-size: 1rem;
+  background-color: var(--primary-blue);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+  margin-bottom: 1rem;
+}
+
+.clicking-upgrade-btn:hover {
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.clicking-upgrade-btn:active {
+  transform: scale(0.98);
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+}
+
+/* Drink Speed Upgrade Buttons */
+.drink-speed-upgrade-btn {
+  width: 100%;
+  min-width: 200px;
+  min-height: var(--btn-lg);
+  padding: var(--btn-padding-md);
+  font-size: 1rem;
+  background-color: var(--primary-blue);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+.drink-speed-upgrade-btn:hover {
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.drink-speed-upgrade-btn:active {
+  transform: scale(0.98);
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+}
+
+/* Level Up Button */
+.level-up-btn {
+  min-width: 200px;
+  min-height: var(--btn-xl);
+  padding: var(--btn-padding-md);
+  font-size: 1.1rem;
+  background-color: var(--primary-blue);
+  color: var(--primary-purple);
+  border-color: var(--primary-purple);
+  margin: 1rem auto;
+  display: block;
+}
+
+.level-up-btn:hover {
+  background-color: var(--primary-purple);
+  color: var(--primary-blue);
+  transform: scale(1.02);
+}
+
+.level-up-btn:active {
+  transform: scale(0.98);
+  background-color: var(--primary-purple);
+  color: var(--primary-blue);
+}
+
+/* Save Buttons */
+.save-btn {
+  min-width: 120px;
+  min-height: var(--btn-sm);
+  padding: var(--btn-padding-sm);
+  font-size: 1rem;
+  background-color: var(--primary-blue);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+.save-btn:hover {
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+}
+
+.save-btn:active {
+  transform: scale(0.95);
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+}
+
+/* Sound Toggle Button */
+.sound-toggle-btn {
+  padding: var(--btn-padding-md);
+  font-size: 1rem;
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+  min-width: 200px;
+}
+
+.sound-toggle-btn:hover {
+  background-color: var(--primary-green-light);
+  border-color: var(--primary-green-light);
+  transform: translateY(-2px);
+}
+
+.sound-toggle-btn:active {
+  transform: scale(0.98);
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+}
+
+/* Dev Buttons */
+.dev-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: var(--btn-padding-md);
+  background-color: var(--primary-blue);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+  min-height: var(--btn-xl);
+  justify-content: center;
+}
+
+.dev-btn:hover {
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--btn-shadow-md);
+}
+
+.dev-btn:active {
+  transform: scale(0.95);
+  background-color: var(--primary-green);
+  color: var(--primary-blue);
+}
+
+/* Dev Button Variants */
+.dev-btn.unlock-all {
+  border-color: var(--primary-orange);
+  color: var(--primary-orange);
+}
+
+.dev-btn.unlock-all:hover {
+  background-color: var(--primary-orange);
+  color: var(--primary-blue);
+}
+
+.dev-btn.unlock-shop {
+  border-color: var(--secondary-orange);
+  color: var(--secondary-orange);
+}
+
+.dev-btn.unlock-shop:hover {
+  background-color: var(--secondary-orange);
+  color: var(--primary-blue);
+}
+
+.dev-btn.unlock-upgrades {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+}
+
+.dev-btn.unlock-upgrades:hover {
+  background-color: var(--primary-purple);
+  color: var(--primary-blue);
+}
+
+.dev-btn.reset {
+  border-color: var(--secondary-red);
+  color: var(--secondary-red);
+}
+
+.dev-btn.reset:hover {
+  background-color: var(--secondary-red);
+  color: var(--primary-blue);
+}
+
+.dev-btn.time-travel {
+  border-color: var(--secondary-cyan);
+  color: var(--secondary-cyan);
+}
+
+.dev-btn.time-travel:hover {
+  background-color: var(--secondary-cyan);
+  color: var(--primary-blue);
+}
+
+.dev-btn.resources {
+  border-color: var(--secondary-blue);
+  color: var(--secondary-blue);
+}
+
+.dev-btn.resources:hover {
+  background-color: var(--secondary-blue);
+  color: var(--primary-blue);
+}
+
+.dev-btn.testing {
+  border-color: var(--neutral-light);
+  color: var(--neutral-light);
+}
+
+.dev-btn.testing:hover {
+  background-color: var(--neutral-light);
+  color: var(--primary-blue);
+}
+
+/* Chat Send Button */
+.chat-send-btn {
+  padding: var(--btn-padding-sm);
+  font-size: 1rem;
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+}
+
+.chat-send-btn:hover {
+  background-color: var(--primary-green-light);
+  border-color: var(--primary-green-light);
+  transform: translateY(-2px);
+}
+
+.chat-send-btn:active {
+  transform: scale(0.98);
+  background-color: var(--primary-green);
+  color: var(--neutral-white);
+}
+
+/* ========================================
+   BUTTON CONTENT STYLING
+   ======================================== */
+
+/* Button with Icon */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2em;
+  height: 1.2em;
+  flex-shrink: 0;
+}
+
+/* Button with Text */
+.btn-text {
+  flex: 1;
+  text-align: center;
+}
+
+/* Dev Button Content */
+.dev-btn-icon {
+  font-size: 1.5rem;
+}
+
+.dev-btn-text {
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ========================================
+   BUTTON TEXT READABILITY
+   ======================================== */
+
+/* Ensure all button text is readable */
+button * {
+  color: inherit;
+}
+
+/* Cost and stat displays - always white for readability */
+.clicking-upgrade-cost,
+.drink-speed-upgrade-cost,
+.clicking-stat,
+.drink-speed-stat {
+  color: var(--neutral-white) !important;
+  font-weight: bold;
+}
+
+/* ========================================
+   END UNIFIED BUTTON DESIGN SYSTEM
    ======================================== */
