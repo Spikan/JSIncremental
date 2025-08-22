@@ -1,5 +1,9 @@
+// @ts-check
 // Save system: queueing and performing saves via App.storage
 
+/**
+ * @param {{ now: number; lastOp: number; minIntervalMs: number; schedule: (ms:number)=>void; perform: ()=>void }} args
+ */
 export function queueSave({ now, lastOp, minIntervalMs, schedule, perform }) {
 	const elapsed = Number(now) - Number(lastOp || 0);
 	if (elapsed < Number(minIntervalMs)) {
@@ -11,6 +15,9 @@ export function queueSave({ now, lastOp, minIntervalMs, schedule, perform }) {
 	return { queued: false };
 }
 
+/**
+ * @returns {any}
+ */
 export function performSaveSnapshot() {
 	try {
 		const payload = {

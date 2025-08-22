@@ -1,6 +1,10 @@
+// @ts-check
 import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../rules/economy.js';
 
 // Helper function to get configuration with proper fallbacks
+/**
+ * @returns {{ upgrades: any; config: any }}
+ */
 function getConfig() {
     // Try to get from App.data.upgrades first (from upgrades.json)
     const upgrades = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
@@ -13,6 +17,18 @@ function getConfig() {
 // Centralized production recalculation
 // All inputs are numbers; outputs are numbers for easy wrapping in Decimal by callers
 // base and multipliers are optional; when omitted, values are sourced from App.data.upgrades or GAME_CONFIG
+/**
+ * Centralized production recalculation.
+ * @param {{
+ *  straws: number;
+ *  cups: number;
+ *  widerStraws: number;
+ *  betterCups: number;
+ *  base?: { strawBaseSPD?: number; cupBaseSPD?: number; baseSipsPerDrink?: number };
+ *  multipliers?: { widerStrawsPerLevel?: number; betterCupsPerLevel?: number };
+ * }} params
+ * @returns {{ strawSPD: number; cupSPD: number; sipsPerDrink: number }}
+ */
 export function recalcProduction({
     straws,
     cups,

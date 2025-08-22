@@ -1,7 +1,18 @@
+// @ts-check
 // Loop system: centralizes requestAnimationFrame game loop
 
 let rafId = null;
 
+/**
+ * @param {{
+ *  updateDrinkProgress?: () => void;
+ *  processDrink?: () => void;
+ *  updateStats?: () => void;
+ *  updatePlayTime?: () => void;
+ *  updateLastSaveTime?: () => void;
+ *  getNow?: () => number;
+ * }} args
+ */
 export function start({
 	updateDrinkProgress,
 	processDrink,

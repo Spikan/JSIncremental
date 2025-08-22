@@ -1,16 +1,20 @@
+// @ts-check
 // Pure helpers for click outcomes
 
 /**
  * Compute click outcome.
- * @param {object} params
- * @param {string|number} params.baseClick - base click amount
- * @param {string|number} params.suctionBonus - additive bonus per click
- * @param {number} params.criticalChance - probability 0..1
- * @param {string|number} params.criticalMultiplier - multiplier applied when critical
+ * @param {{ baseClick: number|string; suctionBonus: number|string; criticalChance: number; criticalMultiplier: number|string }} params
  * @returns {{ gained: string, critical: boolean }}
  */
 export function computeClick({ baseClick, suctionBonus, criticalChance, criticalMultiplier }) {
-    const Decimal = window.Decimal || (v => ({ toString: () => String(v) }));
+    /** @type {new (v:any)=>{ toString(): string; plus:(x:any)=>any; times:(x:any)=>any }} */
+    const Decimal = window.Decimal || class {
+        /** @param {any} v */
+        constructor(v) { this._v = Number(v) || 0; }
+        toString() { return String(this._v); }
+        /** @param {any} x */ plus(x) { return new Decimal(this._v + Number((x && x.toString) ? x.toString() : x)); }
+        /** @param {any} x */ times(x) { return new Decimal(this._v * Number((x && x.toString) ? x.toString() : x)); }
+    };
     const base = new Decimal(baseClick);
     const bonus = new Decimal(suctionBonus);
     const mult = new Decimal(criticalMultiplier);

@@ -1,7 +1,11 @@
+// @ts-check
 import { nextStrawCost, nextCupCost } from '../rules/purchases.js';
 import { recalcProduction } from './resources.js';
 
 // Helper function to get configuration with proper fallbacks
+/**
+ * @returns {{ upgrades: any; config: any }}
+ */
 function getConfig() {
     // Try to get from App.data.upgrades first (from upgrades.json)
     const upgrades = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
@@ -11,6 +15,9 @@ function getConfig() {
     return { upgrades, config };
 }
 
+/**
+ * @param {{ sips: number; straws: number; cups: number; widerStraws: number; betterCups: number }} args
+ */
 export function purchaseStraw({ sips, straws, cups, widerStraws, betterCups }) {
     const { upgrades, config } = getConfig();
 
@@ -30,6 +37,9 @@ export function purchaseStraw({ sips, straws, cups, widerStraws, betterCups }) {
     return { spent: cost, straws: newStraws, strawSPD, cupSPD, sipsPerDrink };
 }
 
+/**
+ * @param {{ sips: number; straws: number; cups: number; widerStraws: number; betterCups: number }} args
+ */
 export function purchaseCup({ sips, straws, cups, widerStraws, betterCups }) {
     const { upgrades, config } = getConfig();
 
@@ -49,6 +59,9 @@ export function purchaseCup({ sips, straws, cups, widerStraws, betterCups }) {
     return { spent: cost, cups: newCups, strawSPD, cupSPD, sipsPerDrink };
 }
 
+/**
+ * @param {{ sips: number; straws: number; cups: number; widerStraws: number; betterCups: number }} args
+ */
 export function purchaseWiderStraws({ sips, straws, cups, widerStraws, betterCups }) {
     const { upgrades, config } = getConfig();
 
@@ -67,6 +80,9 @@ export function purchaseWiderStraws({ sips, straws, cups, widerStraws, betterCup
     return { spent: cost, widerStraws: newWiderStraws, strawSPD, cupSPD, sipsPerDrink };
 }
 
+/**
+ * @param {{ sips: number; straws: number; cups: number; widerStraws: number; betterCups: number }} args
+ */
 export function purchaseBetterCups({ sips, straws, cups, widerStraws, betterCups }) {
     const { upgrades, config } = getConfig();
 
@@ -85,6 +101,9 @@ export function purchaseBetterCups({ sips, straws, cups, widerStraws, betterCups
     return { spent: cost, betterCups: newBetterCups, strawSPD, cupSPD, sipsPerDrink };
 }
 
+/**
+ * @param {{ sips: number; suctions: number }} args
+ */
 export function purchaseSuction({ sips, suctions }) {
     const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
     const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
@@ -99,6 +118,9 @@ export function purchaseSuction({ sips, suctions }) {
     return { spent: cost, suctions: newSuctions, suctionClickBonus };
 }
 
+/**
+ * @param {{ sips: number; suctionUpCounter: number }} args
+ */
 export function upgradeSuction({ sips, suctionUpCounter }) {
     const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
     const cost = (config.SUCTION_UPGRADE_BASE_COST ?? 0) * Number(suctionUpCounter);
@@ -108,6 +130,9 @@ export function upgradeSuction({ sips, suctionUpCounter }) {
     return { spent: cost, suctionUpCounter: newCounter, suctionClickBonus };
 }
 
+/**
+ * @param {{ sips: number; fasterDrinks: number }} args
+ */
 export function purchaseFasterDrinks({ sips, fasterDrinks }) {
     const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
     const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
@@ -129,6 +154,9 @@ export function purchaseFasterDrinks({ sips, fasterDrinks }) {
     return { spent: cost, fasterDrinks: newFasterDrinks };
 }
 
+/**
+ * @param {{ sips: number; fasterDrinksUpCounter: number }} args
+ */
 export function upgradeFasterDrinks({ sips, fasterDrinksUpCounter }) {
     const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
     const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
@@ -139,6 +167,9 @@ export function upgradeFasterDrinks({ sips, fasterDrinksUpCounter }) {
     return { spent: cost, fasterDrinksUpCounter: newCounter };
 }
 
+/**
+ * @param {{ sips: number; criticalClicks: number; criticalClickChance: number }} args
+ */
 export function purchaseCriticalClick({ sips, criticalClicks, criticalClickChance }) {
     const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
     const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
@@ -151,6 +182,9 @@ export function purchaseCriticalClick({ sips, criticalClicks, criticalClickChanc
     return { spent: cost, criticalClicks: newCriticalClicks, criticalClickChance: newChance };
 }
 
+/**
+ * @param {{ sips: number; criticalClickUpCounter: number; criticalClickMultiplier: number }} args
+ */
 export function upgradeCriticalClick({ sips, criticalClickUpCounter, criticalClickMultiplier }) {
     const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
     const cost = (config.CRITICAL_CLICK_UPGRADE_BASE_COST ?? 0) * Number(criticalClickUpCounter);
@@ -160,6 +194,9 @@ export function upgradeCriticalClick({ sips, criticalClickUpCounter, criticalCli
     return { spent: cost, criticalClickUpCounter: newCounter, criticalClickMultiplier: newMultiplier };
 }
 
+/**
+ * @param {{ sips: number; level: number; sipsPerDrink: number }} args
+ */
 export function levelUp({ sips, level, sipsPerDrink }) {
     const config = (typeof window !== 'undefined' && window.GAME_CONFIG?.BALANCE) || {};
     const base = config.LEVEL_UP_BASE_COST ?? 0;
