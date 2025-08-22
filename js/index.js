@@ -1,6 +1,5 @@
 // Entry module providing a small public API surface and environment checks
-import { createEnhancedStore } from './core/state/index.js';
-import { createPersistenceMiddleware, createValidationMiddleware, createDebugMiddleware } from './core/state/middleware.js';
+import { createStore } from './core/state/index.js';
 import { defaultState } from './core/state/shape.js';
 import { storage } from './services/storage.js';
 import { bus as eventBus } from './services/event-bus.js';
@@ -18,16 +17,12 @@ import * as buttonAudio from './core/systems/button-audio.js';
 import * as optionsSys from './core/systems/options-system.js';
 import * as gameInit from './core/systems/game-init.js';
 import { createStateBridge } from './core/state/bridge.js';
-import { selectors } from './core/state/selectors.js';
 import * as ui from './ui/index.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
 
-// Create enhanced state store with middleware
-const enhancedStore = createEnhancedStore(defaultState);
-
-// Bootstrap the App global object with enhanced state management
+// Bootstrap the App global object
 window.App = {
-    state: enhancedStore,
+    state: createStore(defaultState),
     storage,
     events: eventBus,
     EVENT_NAMES,
@@ -48,7 +43,6 @@ window.App = {
                 gameInit
              },
              ui,
-             selectors,
     data: {}
 };
 
@@ -96,16 +90,12 @@ async function loadDataFiles() {
 
 // Initialize data files and UI system
 loadDataFiles().then(() => {
-    // Initialize enhanced state bridge (comprehensive legacy global synchronization)
+    // Initialize state bridge (mirror selected legacy globals)
     try {
         const bridge = createStateBridge(window.App);
         bridge.init();
-        bridge.startAutoSync(); // Enable automatic synchronization
         window.App.stateBridge = bridge;
-        console.log('🔄 Enhanced state bridge initialized with auto-sync');
-    } catch (error) {
-        console.warn('Failed to initialize state bridge:', error);
-    }
+    } catch {}
     // Initialize UI system
     if (window.App.ui?.initializeUI) {
         window.App.ui.initializeUI();
