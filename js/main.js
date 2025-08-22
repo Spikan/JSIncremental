@@ -1007,14 +1007,7 @@ function updateTopSipsPerSecond() {
         const drinkRateSeconds = drinkRate / 1000;
         const totalSipsPerSecond = totalSipsPerDrink.div(drinkRateSeconds);
 
-        // Debug logging to check the calculation
-        console.log('Total/s Debug:', {
-            baseSipsPerDrink: baseSipsPerDrink.toString(),
-            passiveSipsPerDrink: passiveSipsPerDrink.toString(),
-            totalSipsPerDrink: totalSipsPerDrink.toString(),
-            drinkRateSeconds: drinkRateSeconds,
-            totalSipsPerSecond: totalSipsPerSecond.toString()
-        });
+        
 
         topSipsPerSecondElement.textContent = prettify(totalSipsPerSecond);
     }
@@ -1370,7 +1363,7 @@ function toggleClickSounds() {
         }
     }
     
-    console.log('Click sounds:', clickSoundsEnabled ? 'enabled' : 'disabled');
+    
 }
 
 // Load click sounds preference from storage
@@ -1437,7 +1430,7 @@ function sodaClick(number) {
         // Play critical button click sound
         try { window.App?.systems?.audio?.button?.playButtonCriticalClickSound?.(); } catch {}
         
-        console.log('CRITICAL CLICK! Multiplier: ' + criticalMultiplier.toString());
+        
     }
     
     // Calculate total sips gained from this click (use systems if available)
@@ -2132,7 +2125,7 @@ function delete_save() {
         // Show success message
         alert("Save deleted successfully! Your game has been reset to the beginning.");
         
-        console.log('Game save deleted and all variables reset to initial values');
+        
     }
 }
 
@@ -2279,11 +2272,10 @@ function reload() {
         // Debug: Check level up button state
         const levelUpButton = document.querySelector('button[onclick*="levelUp"]');
         if (levelUpButton) {
-            console.log('Level up button classes after reload:', levelUpButton.className);
-            console.log('Level up button disabled state:', levelUpButton.disabled);
+            
         }
         
-        console.log('Reload completed successfully');
+        
         
     } catch (error) {
         console.error('Error in reload function:', error);
@@ -2296,7 +2288,7 @@ window.addEventListener('error', (e) => {
     
     // Attempt to recover gracefully
     if (e.error && e.error.message.includes('audio')) {
-        console.log('Audio error detected, attempting recovery...');
+        
         try {
             if (audioContext) {
                 audioContext.close();
@@ -2345,7 +2337,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 initSplashScreen();
                 loadOptions(); // Load options on page load
                 updatePlayTime(); // Start play time tracking
-                console.log('Splash screen initialization complete');
+                
                 
                 if (typeof eruda !== 'undefined') {
                     eruda.get('console').log('Splash screen initialization complete');
