@@ -2211,46 +2211,28 @@ window.addEventListener('unhandledrejection', (e) => {
 
 // Initialize splash screen when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // Eruda debugging for mobile
-    if (typeof eruda !== 'undefined') {
-        eruda.get('console').log('DOM loaded, initializing splash screen...');
-    }
-    
     // Load the word bank for the god feature
     loadWordBank().catch(error => {
         console.error('Failed to load word bank:', error);
     });
-    
-            // Small delay to ensure everything is ready
-        const config = window.GAME_CONFIG?.TIMING || {};
-        const domReadyDelay = config.DOM_READY_DELAY;
-        setTimeout(() => {
-            try {
-                initSplashScreen();
-                loadOptions(); // Load options on page load
-                updatePlayTime(); // Start play time tracking
-                
-                
-                if (typeof eruda !== 'undefined') {
-                    eruda.get('console').log('Splash screen initialization complete');
-                }
-            } catch (error) {
-                console.error('Error during splash screen initialization:', error);
-                // Fallback: try to show game content directly
-                const splashScreen = document.getElementById('splashScreen');
-                const gameContent = document.getElementById('gameContent');
-                if (splashScreen && gameContent) {
-                    splashScreen.style.display = 'none';
-                    gameContent.style.display = 'block';
-                    try {
-                        initGame();
-                    } catch (gameError) {
-                        console.error('Game initialization also failed:', gameError);
-                    }
-                }
+    const config = window.GAME_CONFIG?.TIMING || {};
+    const domReadyDelay = config.DOM_READY_DELAY;
+    setTimeout(() => {
+        try {
+            window.App?.systems?.gameInit?.initSplashScreen?.();
+            loadOptions();
+            updatePlayTime();
+        } catch (error) {
+            console.error('Error during splash screen initialization:', error);
+            const splashScreen = document.getElementById('splashScreen');
+            const gameContent = document.getElementById('gameContent');
+            if (splashScreen && gameContent) {
+                splashScreen.style.display = 'none';
+                gameContent.style.display = 'block';
+                try { initGame(); } catch {}
             }
-        }, domReadyDelay);
+        }
+    }, domReadyDelay);
 });
 
 
