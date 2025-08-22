@@ -3288,13 +3288,13 @@ button {
   overflow: hidden;
 }
 
-/* Remove default button styling */
+/* Base button defaults - will be overridden by specific button types */
 button {
-  background: none;
-  padding: 0;
-  margin: 0;
-  font-size: inherit;
-  line-height: inherit;
+  background-color: var(--primary-blue);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+  font-size: 1rem;
+  line-height: 1.2;
 }
 
 /* ========================================
