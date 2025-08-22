@@ -7,8 +7,11 @@ import { formatNumber } from './utils.js';
 // Update play time display
 export function updatePlayTime() {
     const playTimeElement = window.DOM_CACHE?.playTime;
-    if (playTimeElement && window.totalPlayTime !== undefined) {
-        const totalSeconds = Math.floor(window.totalPlayTime / 1000);
+    try {
+        const state = window.App?.state?.getState?.();
+        if (playTimeElement && state?.options) {
+        	const totalMs = Number(window.totalPlayTime || 0);
+            const totalSeconds = Math.floor(totalMs / 1000);
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
@@ -20,15 +23,18 @@ export function updatePlayTime() {
         } else {
             playTimeElement.textContent = `${seconds}s`;
         }
-    }
+        }
+    } catch {}
 }
 
 // Update last save time display
 export function updateLastSaveTime() {
     const lastSaveElement = window.DOM_CACHE?.lastSaveTime;
-    if (lastSaveElement && window.lastSaveTime) {
+    try {
+        const lastSaveMs = Number(window.lastSaveTime || 0);
+        if (lastSaveElement && lastSaveMs) {
         const now = new Date();
-        const lastSave = new Date(window.lastSaveTime);
+        const lastSave = new Date(lastSaveMs);
         const diffSeconds = Math.floor((now - lastSave) / 1000);
         
         if (diffSeconds < 60) {
@@ -40,7 +46,8 @@ export function updateLastSaveTime() {
             const hours = Math.floor(diffSeconds / 3600);
             lastSaveElement.textContent = `${hours}h ago`;
         }
-    }
+        }
+    } catch {}
 }
 
 // Update all statistics (main coordinator function)
@@ -59,8 +66,9 @@ export function updateAllStats() {
 export function updateTimeStats() {
     // Total play time (including previous sessions)
     const totalPlayTimeElement = window.DOM_CACHE?.totalPlayTime;
-    if (totalPlayTimeElement && window.totalPlayTime !== undefined) {
-        const totalSeconds = Math.floor(window.totalPlayTime / 1000);
+    if (totalPlayTimeElement) {
+        const totalMs = Number(window.totalPlayTime || 0);
+        const totalSeconds = Math.floor(totalMs / 1000);
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
@@ -77,7 +85,7 @@ export function updateTimeStats() {
     // Current session time
     const sessionTimeElement = window.DOM_CACHE?.sessionTime;
     if (sessionTimeElement && window.sessionStartTime) {
-        const sessionTime = Date.now() - window.sessionStartTime;
+        const sessionTime = Date.now() - Number(window.sessionStartTime || 0);
         const sessionSeconds = Math.floor(sessionTime / 1000);
         const hours = Math.floor(sessionSeconds / 3600);
         const minutes = Math.floor((sessionSeconds % 3600) / 60);
@@ -97,26 +105,26 @@ export function updateTimeStats() {
 export function updateClickStats() {
     // Total clicks
     const totalClicksElement = window.DOM_CACHE?.totalClicks;
-    if (totalClicksElement && window.totalClicks !== undefined) {
-        totalClicksElement.textContent = formatNumber(window.totalClicks);
+    if (totalClicksElement) {
+        totalClicksElement.textContent = formatNumber(Number(window.totalClicks || 0));
     }
     
     // Critical clicks
     const criticalClicksElement = window.DOM_CACHE?.criticalClicksStats;
-    if (criticalClicksElement && window.criticalClicks) {
-        criticalClicksElement.textContent = formatNumber(window.criticalClicks);
+    if (criticalClicksElement) {
+        criticalClicksElement.textContent = formatNumber(Number(window.criticalClicks || 0));
     }
     
     // Click streak
     const clickStreakElement = window.DOM_CACHE?.clickStreak;
-    if (clickStreakElement && window.currentClickStreak !== undefined) {
-        clickStreakElement.textContent = window.currentClickStreak.toString();
+    if (clickStreakElement) {
+        clickStreakElement.textContent = String(Number(window.currentClickStreak || 0));
     }
     
     // Best click streak
     const bestClickStreakElement = window.DOM_CACHE?.bestClickStreak;
-    if (bestClickStreakElement && window.bestClickStreak !== undefined) {
-        bestClickStreakElement.textContent = window.bestClickStreak.toString();
+    if (bestClickStreakElement) {
+        bestClickStreakElement.textContent = String(Number(window.bestClickStreak || 0));
     }
 }
 
@@ -124,14 +132,14 @@ export function updateClickStats() {
 export function updateEconomyStats() {
     // Total sips earned
     const totalSipsEarnedElement = window.DOM_CACHE?.totalSipsEarned;
-    if (totalSipsEarnedElement && window.totalSipsEarned) {
-        totalSipsEarnedElement.textContent = formatNumber(window.totalSipsEarned);
+    if (totalSipsEarnedElement) {
+        totalSipsEarnedElement.textContent = formatNumber(Number(window.totalSipsEarned || 0));
     }
     
     // Highest sips per second
     const highestSipsPerSecondElement = window.DOM_CACHE?.highestSipsPerSecond;
-    if (highestSipsPerSecondElement && window.highestSipsPerSecond) {
-        highestSipsPerSecondElement.textContent = formatNumber(window.highestSipsPerSecond);
+    if (highestSipsPerSecondElement) {
+        highestSipsPerSecondElement.textContent = formatNumber(Number(window.highestSipsPerSecond || 0));
     }
 }
 
@@ -139,26 +147,26 @@ export function updateEconomyStats() {
 export function updateShopStats() {
     // Straws purchased
     const strawsPurchasedElement = window.DOM_CACHE?.strawsPurchased;
-    if (strawsPurchasedElement && window.straws) {
-        strawsPurchasedElement.textContent = formatNumber(window.straws);
+    if (strawsPurchasedElement) {
+        strawsPurchasedElement.textContent = formatNumber(Number(window.straws || 0));
     }
     
     // Cups purchased
     const cupsPurchasedElement = window.DOM_CACHE?.cupsPurchased;
-    if (cupsPurchasedElement && window.cups) {
-        cupsPurchasedElement.textContent = formatNumber(window.cups);
+    if (cupsPurchasedElement) {
+        cupsPurchasedElement.textContent = formatNumber(Number(window.cups || 0));
     }
     
     // Suctions purchased
     const suctionsPurchasedElement = window.DOM_CACHE?.suctionsPurchased;
-    if (suctionsPurchasedElement && window.suctions) {
-        suctionsPurchasedElement.textContent = formatNumber(window.suctions);
+    if (suctionsPurchasedElement) {
+        suctionsPurchasedElement.textContent = formatNumber(Number(window.suctions || 0));
     }
     
     // Critical clicks purchased
     const criticalClicksPurchasedElement = window.DOM_CACHE?.criticalClicksPurchased;
-    if (criticalClicksPurchasedElement && window.criticalClicks) {
-        criticalClicksPurchasedElement.textContent = formatNumber(window.criticalClicks);
+    if (criticalClicksPurchasedElement) {
+        criticalClicksPurchasedElement.textContent = formatNumber(Number(window.criticalClicks || 0));
     }
 }
 
@@ -174,8 +182,8 @@ export function updateAchievementStats() {
     
     // Current level
     const currentLevelElement = window.DOM_CACHE?.currentLevel;
-    if (currentLevelElement && window.level) {
-        currentLevelElement.textContent = safeToNumber(window.level).toString();
+    if (currentLevelElement) {
+        currentLevelElement.textContent = String(safeToNumber(window.level));
     }
     
     // Total upgrades (sum of all upgrade counters)
@@ -193,7 +201,7 @@ export function updateAchievementStats() {
     
     // Faster drinks owned
     const fasterDrinksOwnedElement = window.DOM_CACHE?.fasterDrinksOwned;
-    if (fasterDrinksOwnedElement && window.fasterDrinks) {
-        fasterDrinksOwnedElement.textContent = formatNumber(window.fasterDrinks);
+    if (fasterDrinksOwnedElement) {
+        fasterDrinksOwnedElement.textContent = formatNumber(Number(window.fasterDrinks || 0));
     }
 }

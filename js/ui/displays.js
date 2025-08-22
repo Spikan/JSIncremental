@@ -8,91 +8,93 @@ import { updateCostDisplay, updateButtonState, formatNumber } from './utils.js';
 export function updateTopSipsPerDrink() {
 	if (typeof window === 'undefined') return;
 	const topSipsPerDrinkElement = window.DOM_CACHE?.topSipsPerDrink;
-	if (topSipsPerDrinkElement && window.sps) {
-		topSipsPerDrinkElement.innerHTML = formatNumber(window.sps);
-	}
+	try {
+		const state = window.App?.state?.getState?.();
+		if (topSipsPerDrinkElement && state) {
+			const sps = Number(state.sps || 0);
+			topSipsPerDrinkElement.innerHTML = formatNumber(sps);
+		}
+	} catch {}
 }
 
 // Update the top total sips per second display (passive production only)
 export function updateTopSipsPerSecond() {
 	if (typeof window === 'undefined') return;
 	const topSipsPerSecondElement = window.DOM_CACHE?.topSipsPerSecond;
-	if (topSipsPerSecondElement && window.sps && window.drinkRate && typeof window.sps.div === 'function') {
-		const drinkRateSeconds = window.drinkRate / 1000;
-		const sipsPerSecond = window.sps.div(drinkRateSeconds);
-		topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
-	}
+	try {
+		const state = window.App?.state?.getState?.();
+		if (topSipsPerSecondElement && state) {
+			const sipsPerDrink = Number(state.sps || 0);
+			const drinkRateMs = Number(state.drinkRate || 0) || 1000;
+			const drinkRateSeconds = drinkRateMs / 1000;
+			const sipsPerSecond = sipsPerDrink / drinkRateSeconds;
+			topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
+		}
+	} catch {}
 }
 
 // Update the critical click chance display
 export function updateCriticalClickDisplay() {
 	if (typeof window === 'undefined') return;
 	const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
-	if (criticalClickChanceCompact && window.criticalClickChance) {
-		const percentage = window.criticalClickChance.times(100).toFixed(1);
-		criticalClickChanceCompact.textContent = `${percentage}%`;
+	// State does not currently hold critical chance; derive if available via config/global
+	if (criticalClickChanceCompact) {
+		let percentage = null;
+		try {
+			const chance = (window.criticalClickChance && typeof window.criticalClickChance.toNumber === 'function')
+				? window.criticalClickChance.toNumber()
+				: Number(window.criticalClickChance ?? NaN);
+			if (!Number.isNaN(chance)) percentage = (chance * 100).toFixed(1);
+		} catch {}
+		if (percentage != null) {
+			criticalClickChanceCompact.textContent = `${percentage}%`;
+		}
 	}
 }
 
 // Update drink speed display
 export function updateDrinkSpeedDisplay() {
 	if (typeof window === 'undefined') return;
-	// Update compact drink speed display elements
 	const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
-	if (currentDrinkSpeedCompact && window.drinkRate) {
-		const drinkRateSeconds = window.drinkRate / 1000;
-		currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
-	}
+	try {
+		const state = window.App?.state?.getState?.();
+		if (currentDrinkSpeedCompact && state) {
+			const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
+			currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
+		}
+	} catch {}
 }
 
 // Update autosave status display
 export function updateAutosaveStatus() {
 	if (typeof window === 'undefined') return;
 	const status = document.getElementById('autosaveStatus');
-	if (status && window.autosaveEnabled !== undefined && window.autosaveInterval !== undefined) {
-		if (window.autosaveEnabled) {
-			status.textContent = `Autosave: ON (${window.autosaveInterval}s)`;
-			status.className = 'autosave-on';
-		} else {
-			status.textContent = 'Autosave: OFF';
-			status.className = 'autosave-off';
+	try {
+		const opts = window.App?.state?.getState?.()?.options;
+		if (status && opts) {
+			if (opts.autosaveEnabled) {
+				status.textContent = `Autosave: ON (${opts.autosaveInterval}s)`;
+				status.className = 'autosave-on';
+			} else {
+				status.textContent = 'Autosave: OFF';
+				status.className = 'autosave-off';
+			}
 		}
-	}
+	} catch {}
 }
 
 // Update drink progress bar
 export function updateDrinkProgress(progress, drinkRate) {
 	if (typeof window === 'undefined') return;
-
-	console.log('🎨 updateDrinkProgress called with:', { progress, drinkRate });
-
-	// Get progress and drinkRate from multiple sources with fallbacks
-	let currentProgress = progress;
-	let currentDrinkRate = drinkRate;
-
-	// If progress not provided, try to get from globals or state
-	if (typeof currentProgress !== 'number') {
-		if (typeof window.drinkProgress === 'number') {
-			currentProgress = window.drinkProgress;
-		} else if (window.App?.state) {
-			try {
-				const state = window.App.state.getState();
-				currentProgress = state.drinkProgress || 0;
-			} catch {}
+	let currentProgress = typeof progress === 'number' ? progress : undefined;
+	let currentDrinkRate = typeof drinkRate === 'number' ? drinkRate : undefined;
+	try {
+		const state = window.App?.state?.getState?.();
+		if (state) {
+			if (currentProgress == null) currentProgress = Number(state.drinkProgress || 0);
+			if (currentDrinkRate == null) currentDrinkRate = Number(state.drinkRate || 0);
 		}
-	}
-
-	// If drinkRate not provided, try to get from globals or state
-	if (typeof currentDrinkRate !== 'number') {
-		if (typeof window.drinkRate === 'number') {
-			currentDrinkRate = window.drinkRate;
-		} else if (window.App?.state) {
-			try {
-				const state = window.App.state.getState();
-				currentDrinkRate = state.drinkRate || 0;
-			} catch {}
-		}
-	}
+	} catch {}
 
 	// Get elements from DOM cache or fallback to direct DOM access
 	const progressFill = window.DOM_CACHE?.progressFill || document.getElementById('drinkProgressFill');
