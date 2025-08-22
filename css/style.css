@@ -2998,6 +2998,23 @@ button.affordable:hover {
   box-shadow: var(--btn-shadow-lg) !important;
 }
 
+/* Specific button types override affordable state to maintain their design */
+.shop-btn.affordable,
+.clicking-upgrade-btn.affordable,
+.drink-speed-upgrade-btn.affordable {
+  background-color: var(--primary-blue) !important;
+  color: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
+}
+
+.shop-btn.affordable:hover,
+.clicking-upgrade-btn.affordable:hover,
+.drink-speed-upgrade-btn.affordable:hover {
+  background-color: var(--primary-green) !important;
+  color: var(--primary-blue) !important;
+  border-color: var(--primary-green) !important;
+}
+
 /* Focus state for accessibility */
 button:focus {
   outline: 2px solid var(--primary-green-light);
