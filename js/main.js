@@ -915,275 +915,62 @@ function updateCriticalClickDisplay() {
 // Auto-save management functions
 function toggleAutosave() {
     const checkbox = document.getElementById('autosaveToggle');
-    autosaveEnabled = checkbox.checked;
-    updateAutosaveStatus();
+    autosaveEnabled = !!(checkbox && checkbox.checked);
     try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_TOGGLED, { enabled: autosaveEnabled }); } catch {}
     saveOptions();
+    updateAutosaveStatus();
 }
 
 function changeAutosaveInterval() {
     const select = document.getElementById('autosaveInterval');
-    autosaveInterval = parseInt(select.value);
+    autosaveInterval = parseInt(select?.value || autosaveInterval, 10);
     autosaveCounter = 0; // Reset counter when changing interval
-    updateAutosaveStatus();
     try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_INTERVAL_CHANGED, { seconds: autosaveInterval }); } catch {}
     saveOptions();
+    updateAutosaveStatus();
 }
 
 function updateAutosaveStatus() {
-    if (window.App?.ui?.updateAutosaveStatus) { try { return window.App.ui.updateAutosaveStatus(); } catch {}
-    }
-    const status = document.getElementById('autosaveStatus');
-    if (status) {
-        if (autosaveEnabled) {
-            status.textContent = `Auto-save enabled (${autosaveInterval}s)`;
-        } else {
-            status.textContent = 'Auto-save disabled';
-        }
-    }
+    if (window.App?.ui?.updateAutosaveStatus) { try { return window.App.ui.updateAutosaveStatus(); } catch {} }
 }
 
 function saveOptions() {
     const options = { autosaveEnabled, autosaveInterval };
-    try {
-        if (window.App?.systems?.options?.saveOptions) {
-            window.App.systems.options.saveOptions(options);
-            return;
-        }
-    } catch {}
-    try { localStorage.setItem('gameOptions', JSON.stringify(options)); } catch (e) { console.warn('saveOptions failed:', e); }
+    try { if (window.App?.systems?.options?.saveOptions) { window.App.systems.options.saveOptions(options); return; } } catch {}
+    try { localStorage.setItem('gameOptions', JSON.stringify(options)); } catch {}
 }
 
 function loadOptions() {
     const defaults = { autosaveEnabled: true, autosaveInterval: window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL };
     let options = null;
-    try {
-        if (window.App?.systems?.options?.loadOptions) {
-            options = window.App.systems.options.loadOptions(defaults);
-        }
-    } catch {}
-    if (!options) {
-        try {
-            const saved = localStorage.getItem('gameOptions');
-            options = saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
-        } catch { options = defaults; }
-    }
+    try { if (window.App?.systems?.options?.loadOptions) { options = window.App.systems.options.loadOptions(defaults); } } catch {}
+    if (!options) { try { const saved = localStorage.getItem('gameOptions'); options = saved ? { ...defaults, ...JSON.parse(saved) } : defaults; } catch { options = defaults; } }
     autosaveEnabled = options.autosaveEnabled !== undefined ? options.autosaveEnabled : true;
     autosaveInterval = options.autosaveInterval || window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL;
-    
-    // Update UI to match loaded options
     const checkbox = document.getElementById('autosaveToggle');
     const select = document.getElementById('autosaveInterval');
-    
     if (checkbox) checkbox.checked = autosaveEnabled;
-    if (select) select.value = autosaveInterval.toString();
-    
+    if (select) select.value = String(autosaveInterval);
     updateAutosaveStatus();
 }
 
 // Play time tracking
-function updatePlayTime() {
-    const playTimeElement = DOM_CACHE.playTime;
-    if (playTimeElement) {
-        const currentTime = Date.now();
-        const playTimeMs = currentTime - gameStartTime;
-        const playTimeSeconds = Math.floor(playTimeMs / 1000);
-        const hours = Math.floor(playTimeSeconds / 3600);
-        const minutes = Math.floor((playTimeSeconds % 3600) / 60);
-        const seconds = playTimeSeconds % 60;
-        playTimeElement.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-}
+function updatePlayTime() { if (window.App?.ui?.updatePlayTime) { try { return window.App.ui.updatePlayTime(); } catch {} } }
 
-function updateLastSaveTime() {
-    const lastSaveElement = DOM_CACHE.lastSaveTime;
-    if (lastSaveElement) {
-        if (lastSaveTime) {
-            const timeAgo = Math.floor((Date.now() - lastSaveTime) / 1000);
-            if (timeAgo < 60) {
-                lastSaveElement.textContent = `${timeAgo} seconds ago`;
-            } else if (timeAgo < 3600) {
-                lastSaveElement.textContent = `${Math.floor(timeAgo / 60)} minutes ago`;
-            } else {
-                lastSaveElement.textContent = `${Math.floor(timeAgo / 3600)} hours ago`;
-            }
-        } else {
-            lastSaveElement.textContent = 'Never';
-        }
-    }
-}
+function updateLastSaveTime() { if (window.App?.ui?.updateLastSaveTime) { try { return window.App.ui.updateLastSaveTime(); } catch {} } }
 
 // Statistics update functions
-function updateAllStats() {
-    if (window.App?.ui?.updateAllStats) {
-        try { return window.App.ui.updateAllStats(); } catch {}
-    }
-    // Only update stats if the stats tab is active and elements exist
-    const statsTab = DOM_CACHE.statsTab;
-    if (statsTab && statsTab.classList.contains('active')) {
-        updateTimeStats();
-        updateClickStats();
-        updateEconomyStats();
-        updateShopStats();
-        updateAchievementStats();
-    }
-}
+function updateAllStats() { if (window.App?.ui?.updateAllStats) { try { return window.App.ui.updateAllStats(); } catch {} } }
 
-function updateTimeStats() {
-    if (window.App?.ui?.updateTimeStats) {
-        try { return window.App.ui.updateTimeStats(); } catch {}
-    }
-    // Total play time (including previous sessions)
-    const totalPlayTimeElement = DOM_CACHE.totalPlayTime;
-    if (totalPlayTimeElement) {
-        const totalTime = Date.now() - gameStartDate;
-        const totalSeconds = Math.floor(totalTime / 1000);
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        totalPlayTimeElement.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-    
-    // Current session time
-    const sessionTimeElement = DOM_CACHE.sessionTime;
-    if (sessionTimeElement) {
-        const sessionTime = Date.now() - gameStartTime;
-        const sessionSeconds = Math.floor(sessionTime / 1000);
-        const hours = Math.floor(sessionSeconds / 3600);
-        const minutes = Math.floor((sessionSeconds % 3600) / 60);
-        const seconds = sessionSeconds % 60;
-        sessionTimeElement.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-    
-    // Days since start
-    const daysSinceStartElement = DOM_CACHE.daysSinceStart;
-    if (daysSinceStartElement) {
-        const daysSinceStart = Math.floor((Date.now() - gameStartDate) / (1000 * 60 * 60 * 24));
-        daysSinceStartElement.textContent = daysSinceStart.toString();
-    }
-}
+function updateTimeStats() { if (window.App?.ui?.updateTimeStats) { try { return window.App.ui.updateTimeStats(); } catch {} } }
 
-function updateClickStats() {
-    if (window.App?.ui?.updateClickStats) {
-        try { return window.App.ui.updateClickStats(); } catch {}
-    }
-    // Total clicks
-            const totalClicksElement = DOM_CACHE.totalClicks;
-        if (totalClicksElement) {
-            totalClicksElement.textContent = prettify(window.totalClicks);
-    }
-    
-    // Clicks per second (last 10 seconds)
-    const clicksPerSecondElement = DOM_CACHE.clicksPerSecond;
-    if (clicksPerSecondElement) {
-        const now = Date.now();
-        const tenSecondsAgo = now - 10000;
-        const recentClicks = clickTimes.filter(time => time > tenSecondsAgo).length;
-        clicksPerSecondElement.textContent = (recentClicks / 10).toFixed(2);
-    }
-    
-    // Best click streak
-    const bestClickStreakElement = DOM_CACHE.bestClickStreak;
-    if (bestClickStreakElement) {
-        bestClickStreakElement.textContent = bestClickStreak.toString();
-    }
-}
+function updateClickStats() { if (window.App?.ui?.updateClickStats) { try { return window.App.ui.updateClickStats(); } catch {} } }
 
-function updateEconomyStats() {
-    if (window.App?.ui?.updateEconomyStats) {
-        try { return window.App.ui.updateEconomyStats(); } catch {}
-    }
-    // Total sips earned
-    const totalSipsEarnedElement = DOM_CACHE.totalSipsEarned;
-    if (totalSipsEarnedElement) {
-        totalSipsEarnedElement.textContent = prettify(totalSipsEarned);
-    }
-    
-    // Current sips per second
-    const currentSipsPerSecondElement = DOM_CACHE.currentSipsPerSecond;
-    if (currentSipsPerSecondElement) {
-        // Include base configured sips per drink in the calculation
-        const config = window.GAME_CONFIG?.BALANCE || {};
-        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-        const totalSipsPerDrink = baseSipsPerDrink.plus(passiveSipsPerDrink);
-        
-        const drinkRateSeconds = drinkRate / 1000;
-        const currentSPS = totalSipsPerDrink.div(drinkRateSeconds);
-        currentSipsPerSecondElement.textContent = prettify(currentSPS);
-    }
-    
-    // Highest sips per second achieved
-    const highestSipsPerSecondElement = DOM_CACHE.highestSipsPerSecond;
-    if (highestSipsPerSecondElement) {
-        highestSipsPerSecondElement.textContent = prettify(highestSipsPerSecond);
-    }
-}
+function updateEconomyStats() { if (window.App?.ui?.updateEconomyStats) { try { return window.App.ui.updateEconomyStats(); } catch {} } }
 
-function updateShopStats() {
-    if (window.App?.ui?.updateShopStats) {
-        try { return window.App.ui.updateShopStats(); } catch {}
-    }
-    // Straws purchased
-    const strawsPurchasedElement = DOM_CACHE.strawsPurchased;
-    if (strawsPurchasedElement) {
-        strawsPurchasedElement.textContent = prettify(straws);
-    }
-    
-    // Cups purchased
-    const cupsPurchasedElement = DOM_CACHE.cupsPurchased;
-    if (cupsPurchasedElement) {
-        cupsPurchasedElement.textContent = prettify(cups);
-    }
-    
-    // Wider straws purchased
-    const widerStrawsPurchasedElement = DOM_CACHE.widerStrawsPurchased;
-    if (widerStrawsPurchasedElement) {
-        widerStrawsPurchasedElement.textContent = prettify(widerStraws);
-    }
-    
-    // Better cups purchased
-    const betterCupsPurchasedElement = DOM_CACHE.betterCupsPurchased;
-    if (betterCupsPurchasedElement) {
-        betterCupsPurchasedElement.textContent = prettify(betterCups);
-    }
-    
-    // Suctions purchased
-    const suctionsPurchasedElement = DOM_CACHE.suctionsPurchased;
-    if (suctionsPurchasedElement) {
-        suctionsPurchasedElement.textContent = prettify(suctions);
-    }
-    
-    // Critical clicks purchased
-    const criticalClicksPurchasedElement = DOM_CACHE.criticalClicksPurchased;
-    if (criticalClicksPurchasedElement) {
-        criticalClicksPurchasedElement.textContent = prettify(criticalClicks);
-    }
-}
+function updateShopStats() { if (window.App?.ui?.updateShopStats) { try { return window.App.ui.updateShopStats(); } catch {} } }
 
-function updateAchievementStats() {
-    if (window.App?.ui?.updateAchievementStats) {
-        try { return window.App.ui.updateAchievementStats(); } catch {}
-    }
-    // Current level
-    const currentLevelElement = DOM_CACHE.currentLevel;
-    if (currentLevelElement) {
-        currentLevelElement.textContent = level.toString();
-    }
-    
-    // Total upgrades (sum of all upgrade counters)
-    const totalUpgradesElement = DOM_CACHE.totalUpgrades;
-    if (totalUpgradesElement) {
-        const totalUpgrades = widerStraws.plus(betterCups).plus(suctionUpCounter).plus(fasterDrinksUpCounter).plus(criticalClickUpCounter);
-        totalUpgradesElement.textContent = prettify(totalUpgrades);
-    }
-    
-    // Faster drinks owned
-    const fasterDrinksOwnedElement = DOM_CACHE.fasterDrinksOwned;
-    if (fasterDrinksOwnedElement) {
-        fasterDrinksOwnedElement.textContent = prettify(fasterDrinks);
-    }
-}
+function updateAchievementStats() { if (window.App?.ui?.updateAchievementStats) { try { return window.App.ui.updateAchievementStats(); } catch {} } }
 
 // Click tracking function
 function trackClick() {
