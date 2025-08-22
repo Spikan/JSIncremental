@@ -1584,6 +1584,8 @@ h3 {
     box-shadow: 0 4px 12px rgba(0, 179, 107, 0.2);
     position: relative;
     overflow: hidden;
+    /* Ensure text is always readable */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .shop-btn::before {
@@ -1602,21 +1604,28 @@ h3 {
 }
 
 .shop-btn:hover:not(.affordable):not(.disabled) {
-    background-color: #00B36B;
+    background: linear-gradient(135deg, #00B36B, #00D4FF);
     color: #001789;
     transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 179, 107, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .shop-btn:active {
     transform: scale(0.98);
+    background: linear-gradient(135deg, #002299, #003366);
+    color: #00D4FF;
+    box-shadow: 0 2px 8px rgba(0, 179, 107, 0.4);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 .shop-btn.affordable {
-    background-color: #00B36B !important;
+    background: linear-gradient(135deg, #00B36B, #00D4FF) !important;
     color: #FFFFFF !important;
     box-shadow: 0 0 20px rgba(0, 179, 107, 0.6) !important;
     animation: affordableGlow 2s ease-in-out infinite alternate;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    border-color: #00D4FF !important;
 }
 
 .shop-btn.disabled {
@@ -1625,6 +1634,19 @@ h3 {
     border-color: #555;
     cursor: not-allowed;
     transform: none;
+}
+
+/* Focus state for accessibility */
+.shop-btn:focus {
+    outline: 2px solid #00D4FF;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+}
+
+/* Ensure text is always readable in all states */
+.shop-btn * {
+    color: inherit;
+    text-shadow: inherit;
 }
 
 .shop-stats {
