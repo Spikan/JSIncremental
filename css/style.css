@@ -913,10 +913,27 @@ body {
     animation: drinkComplete 0.5s ease;
 }
 
+.drink-progress-fill.progress-complete {
+    background: linear-gradient(90deg, #FF3D02, #FF6B6B);
+    animation: drinkComplete 0.5s ease;
+    box-shadow: 0 0 20px rgba(255, 61, 2, 0.6);
+}
+
+.drink-countdown.countdown-warning {
+    color: #FF3D02;
+    font-weight: bold;
+    animation: countdownPulse 0.5s ease-in-out infinite alternate;
+}
+
 @keyframes drinkComplete {
     0% { transform: scaleX(1); }
     50% { transform: scaleX(1.05); }
     100% { transform: scaleX(1); }
+}
+
+@keyframes countdownPulse {
+    0% { opacity: 1; }
+    100% { opacity: 0.5; }
 }
 
 @keyframes fadeInTab {

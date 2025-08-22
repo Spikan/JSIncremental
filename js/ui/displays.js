@@ -63,17 +63,36 @@ export function updateAutosaveStatus() {
 // Update drink progress bar
 export function updateDrinkProgress(progress, drinkRate) {
 	if (typeof window === 'undefined') return;
-	const progressFill = window.DOM_CACHE?.progressFill;
-	const countdown = window.DOM_CACHE?.countdown;
 	
+	// Get elements from DOM cache or fallback to direct DOM access
+	const progressFill = window.DOM_CACHE?.progressFill || document.getElementById('drinkProgressFill');
+	const countdown = window.DOM_CACHE?.countdown || document.getElementById('drinkCountdown');
+	
+	// Update progress bar fill
 	if (progressFill && typeof progress === 'number') {
-		progressFill.style.width = `${Math.min(progress, 100)}%`;
+		const clampedProgress = Math.min(Math.max(progress, 0), 100);
+		progressFill.style.width = `${clampedProgress}%`;
+		
+		// Add visual feedback when progress is complete
+		if (clampedProgress >= 100) {
+			progressFill.classList.add('progress-complete');
+		} else {
+			progressFill.classList.remove('progress-complete');
+		}
 	}
 	
-	if (countdown && drinkRate) {
+	// Update countdown timer
+	if (countdown && drinkRate && typeof progress === 'number') {
 		const remainingTime = Math.max(0, drinkRate - (progress / 100 * drinkRate));
 		const remainingSeconds = (remainingTime / 1000).toFixed(1);
 		countdown.textContent = `${remainingSeconds}s`;
+		
+		// Add visual feedback for countdown
+		if (remainingTime <= 1000) { // Less than 1 second
+			countdown.classList.add('countdown-warning');
+		} else {
+			countdown.classList.remove('countdown-warning');
+		}
 	}
 }
 

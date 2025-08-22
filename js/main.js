@@ -618,7 +618,14 @@ function startGameLoop() {
     if (window.App?.systems?.loop?.start) {
         window.App.systems.loop.start({
             // UI functions now called through App.ui namespace (was: updateDrinkProgress())
-            updateDrinkProgress: () => window.App?.ui?.updateDrinkProgress?.(),
+            updateDrinkProgress: () => {
+                // Calculate current drink progress percentage
+                const currentTime = Date.now();
+                const timeSinceLastDrink = currentTime - lastDrinkTime;
+                const progressPercentage = Math.min((timeSinceLastDrink / drinkRate) * 100, 100);
+                drinkProgress = progressPercentage;
+                window.App?.ui?.updateDrinkProgress?.(drinkProgress, drinkRate);
+            },
             processDrink,
             // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
             updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) FEATURE_UNLOCKS.checkAllUnlocks(); },
@@ -635,7 +642,16 @@ function startGameLoop() {
     const statsInterval = window.GAME_CONFIG.LIMITS.STATS_UPDATE_INTERVAL;
     function gameLoop(currentTime) {
         if (currentTime - lastUpdate >= frameInterval) {
-            try { window.App?.ui?.updateDrinkProgress?.(); } catch {}
+            // Calculate current drink progress percentage
+            const timeSinceLastDrink = currentTime - lastDrinkTime;
+            const progressPercentage = Math.min((timeSinceLastDrink / drinkRate) * 100, 100);
+            drinkProgress = progressPercentage;
+            
+            // Update drink progress bar with current progress
+            try { 
+                window.App?.ui?.updateDrinkProgress?.(drinkProgress, drinkRate); 
+            } catch {}
+            
             processDrink();
             const affordabilityInterval = window.GAME_CONFIG.LIMITS.AFFORDABILITY_CHECK_INTERVAL;
             if (currentTime - lastUpdate >= affordabilityInterval) {

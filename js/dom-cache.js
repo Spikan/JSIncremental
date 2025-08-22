@@ -30,9 +30,9 @@ const DOM_CACHE = {
     // Stats elements
     statsTab: null,
 
-    // Progress elements
-    drinkProgressFill: null,
-    drinkCountdown: null,
+            // Progress elements
+        progressFill: null,
+        countdown: null,
 
     // Additional elements that are frequently accessed
     playTime: null,
@@ -90,8 +90,8 @@ const DOM_CACHE = {
         this.statsTab = document.getElementById('statsTab');
 
         // Progress elements
-        this.drinkProgressFill = document.getElementById('drinkProgressFill');
-        this.drinkCountdown = document.getElementById('drinkCountdown');
+        this.progressFill = document.getElementById('drinkProgressFill');
+        this.countdown = document.getElementById('drinkCountdown');
 
         // Additional frequently accessed elements
         this.playTime = document.getElementById('playTime');
