@@ -2205,6 +2205,12 @@ window.testButtonAudio = function() {
 
 // Feature unlock functions
 function devUnlockAll() {
+    if (!window.FEATURE_UNLOCKS) {
+        console.error('🔧 Dev: FEATURE_UNLOCKS system not available');
+        alert('Feature unlock system not available. Please refresh the page.');
+        return;
+    }
+    
     if (!confirm('🔓 Unlock ALL features? This will make everything available immediately.')) return;
     
     const allFeatures = [
@@ -2223,11 +2229,19 @@ function devUnlockAll() {
         window.FEATURE_UNLOCKS.updateFeatureVisibility();
     }
     
-    showPurchaseFeedback('🔓 All Features Unlocked!', 0);
+    if (typeof showPurchaseFeedback === 'function') {
+        showPurchaseFeedback('🔓 All Features Unlocked!', 0);
+    }
     console.log('🔧 Dev: All features unlocked');
 }
 
 function devUnlockShop() {
+    if (!window.FEATURE_UNLOCKS) {
+        console.error('🔧 Dev: FEATURE_UNLOCKS system not available');
+        alert('Feature unlock system not available. Please refresh the page.');
+        return;
+    }
+    
     if (!confirm('🛒 Unlock shop and all shop items?')) return;
     
     const shopFeatures = ['shop', 'straws', 'cups', 'widerStraws', 'betterCups'];
@@ -2242,11 +2256,19 @@ function devUnlockShop() {
         window.FEATURE_UNLOCKS.updateFeatureVisibility();
     }
     
-    showPurchaseFeedback('🛒 Shop Unlocked!', 0);
+    if (typeof showPurchaseFeedback === 'function') {
+        showPurchaseFeedback('🛒 Shop Unlocked!', 0);
+    }
     console.log('🔧 Dev: Shop unlocked');
 }
 
 function devUnlockUpgrades() {
+    if (!window.FEATURE_UNLOCKS) {
+        console.error('🔧 Dev: FEATURE_UNLOCKS system not available');
+        alert('Feature unlock system not available. Please refresh the page.');
+        return;
+    }
+    
     if (!confirm('⚡ Unlock all upgrade systems?')) return;
     
     const upgradeFeatures = ['suction', 'criticalClick', 'fasterDrinks', 'levelUp'];
@@ -2261,11 +2283,19 @@ function devUnlockUpgrades() {
         window.FEATURE_UNLOCKS.updateFeatureVisibility();
     }
     
-    showPurchaseFeedback('⚡ Upgrades Unlocked!', 0);
+    if (typeof showPurchaseFeedback === 'function') {
+        showPurchaseFeedback('⚡ Upgrades Unlocked!', 0);
+    }
     console.log('🔧 Dev: Upgrades unlocked');
 }
 
 function devResetUnlocks() {
+    if (!window.FEATURE_UNLOCKS) {
+        console.error('🔧 Dev: FEATURE_UNLOCKS system not available');
+        alert('Feature unlock system not available. Please refresh the page.');
+        return;
+    }
+    
     if (!confirm('🔄 Reset all feature unlocks? This will lock everything except basic soda clicking.')) return;
     
     if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.reset) {
@@ -2276,7 +2306,9 @@ function devResetUnlocks() {
         window.FEATURE_UNLOCKS.updateFeatureVisibility();
     }
     
-    showPurchaseFeedback('🔄 Unlocks Reset!', 0);
+    if (typeof showPurchaseFeedback === 'function') {
+        showPurchaseFeedback('🔄 Unlocks Reset!', 0);
+    }
     console.log('🔧 Dev: Unlocks reset');
 }
 
@@ -2306,7 +2338,9 @@ function devAddTime(milliseconds) {
         window.lastSaveTime = Date.now() - milliseconds;
     }
     
-    showPurchaseFeedback(`⏰ +${timeLabel} Time Travel!`, 0);
+    if (typeof showPurchaseFeedback === 'function') {
+        showPurchaseFeedback(`⏰ +${timeLabel} Time Travel!`, 0);
+    }
     console.log(`🔧 Dev: Added ${timeLabel} of offline time, gained ${offlineSips} sips`);
     
     // Refresh UI
@@ -2328,12 +2362,18 @@ function devAddSips(amount) {
     
     window.sips = window.sips.plus(amount);
     
-    showPurchaseFeedback(`🥤 +${amount.toLocaleString()} Sips!`, 0);
+    if (typeof showPurchaseFeedback === 'function') {
+        showPurchaseFeedback(`🥤 +${amount.toLocaleString()} Sips!`, 0);
+    }
     console.log(`🔧 Dev: Added ${amount} sips`);
     
     // Refresh UI
-    updateAllStats();
-    checkUpgradeAffordability();
+    if (typeof updateAllStats === 'function') {
+        updateAllStats();
+    }
+    if (typeof checkUpgradeAffordability === 'function') {
+        checkUpgradeAffordability();
+    }
 }
 
 // Testing tools
@@ -2365,7 +2405,9 @@ function devToggleGodMode() {
         criticalClickCost = 0;
         levelUpCost = 0;
         
-        showPurchaseFeedback('👑 God Mode Enabled!', 0);
+        if (typeof showPurchaseFeedback === 'function') {
+            showPurchaseFeedback('👑 God Mode Enabled!', 0);
+        }
         console.log('🔧 Dev: God mode enabled - all purchases are free');
     } else {
         // Disable god mode - restore original costs
@@ -2380,7 +2422,9 @@ function devToggleGodMode() {
             levelUpCost = window.originalCosts.levelUp;
         }
         
-        showPurchaseFeedback('👑 God Mode Disabled!', 0);
+        if (typeof showPurchaseFeedback === 'function') {
+            showPurchaseFeedback('👑 God Mode Disabled!', 0);
+        }
         console.log('🔧 Dev: God mode disabled - normal costs restored');
     }
     
@@ -2538,18 +2582,19 @@ function quickUnlock() {
 window.quickUnlock = quickUnlock;
 window.q = quickUnlock; // Short alias
 
-// Testing tools
-let godMode = false;
-
 function devToggleDevMode() {
     if (window.FEATURE_UNLOCKS && window.FEATURE_UNLOCKS.toggleDevMode) {
         const isEnabled = window.FEATURE_UNLOCKS.toggleDevMode();
         
         if (isEnabled) {
-            showPurchaseFeedback('🔧 Dev Mode Enabled!', 0);
+            if (typeof showPurchaseFeedback === 'function') {
+                showPurchaseFeedback('🔧 Dev Mode Enabled!', 0);
+            }
             console.log('🔧 Dev: Dev mode enabled - all features unlocked');
         } else {
-            showPurchaseFeedback('🔧 Dev Mode Disabled!', 0);
+            if (typeof showPurchaseFeedback === 'function') {
+                showPurchaseFeedback('🔧 Dev Mode Disabled!', 0);
+            }
             console.log('🔧 Dev: Dev mode disabled - normal unlock conditions restored');
         }
         

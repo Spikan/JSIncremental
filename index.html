@@ -3,9 +3,9 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Soda Clicker Pro!</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soda Clicker Pro</title>
     <meta name="description" content="Soda Clicker Pro">
     <meta name="author" content="Spikan">
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
@@ -14,6 +14,17 @@
     <!-- Eruda Mobile Debug Tool -->
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
+    <script>
+        // Safety check to ensure functions are available
+        window.addEventListener('load', function() {
+            if (typeof window.switchTab === 'undefined') {
+                console.error('switchTab function not available');
+            }
+            if (typeof window.devUnlockAll === 'undefined') {
+                console.error('devUnlockAll function not available');
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -693,10 +704,10 @@
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
     <script src="js/config.js"></script>
     <script src="js/dom-cache.js"></script>
+    <script src="js/main.js"></script>
     <script src="js/god.js"></script>
     <script src="js/feature-unlocks.js"></script>
     <script src="js/services/error-overlay.js"></script>
     <script type="module" src="js/index.js"></script>
-    <script src="js/main.js"></script>
 </body>
 </html>
