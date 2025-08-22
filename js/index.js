@@ -63,6 +63,17 @@ try {
     console.warn('⚠️ State bridge initialization failed:', error);
 }
 
+// Attach UI module into App and initialize
+try {
+    const uiModule = await import('./ui/index.js');
+    Object.assign(window.App.ui, uiModule);
+    if (typeof window.App.ui.initializeUI === 'function') {
+        window.App.ui.initializeUI();
+    }
+} catch (e) {
+    console.warn('⚠️ UI module load failed (ok during early bootstrap):', e);
+}
+
 // Signal that App is ready
 console.log('✅ App object created and ready');
 

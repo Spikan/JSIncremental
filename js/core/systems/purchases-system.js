@@ -1,22 +1,10 @@
 // @ts-check
 import { nextStrawCost, nextCupCost } from '../rules/purchases.js';
 import { recalcProduction } from './resources.js';
+import { getUpgradesAndConfig } from './config-accessor.js';
 
 // Helper function to get configuration with proper fallbacks
-/**
- * @returns {{ upgrades: any; config: any }}
- */
-/**
- * @returns {{ upgrades: any; config: any }}
- */
-function getConfig() {
-    // Try to get from App.data.upgrades first (from upgrades.json)
-    const upgrades = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
-    // Fallback to GAME_CONFIG (from config.js)
-    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
-    
-    return { upgrades, config };
-}
+function getConfig() { return getUpgradesAndConfig(); }
 
 /**
  * Ensures returned config is typed as any to satisfy property access in JS.

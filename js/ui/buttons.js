@@ -243,8 +243,9 @@ function setupSpecialButtonHandlers() {
     const tabButtons = document.querySelectorAll('.tab-btn');
     tabButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            const tabName = button.textContent.toLowerCase().match(/\b\w+/)?.[0];
-            if (tabName && window.switchTab) {
+            const action = button.getAttribute('data-action');
+            if (action && action.startsWith('switchTab:') && window.switchTab) {
+                const tabName = action.split(':')[1];
                 window.switchTab(tabName, e);
             }
         });
@@ -263,6 +264,24 @@ function setupSpecialButtonHandlers() {
             }
         });
     }
+
+    // Generic data-action dispatcher for buttons
+    document.body.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const button = target.closest('button');
+        if (!button) return;
+        const action = button.getAttribute('data-action');
+        if (!action) return;
+        const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
+        const argsAttr = button.getAttribute('data-args') || argStr;
+        const args = argsAttr ? [Number(argsAttr)] : [];
+        if (typeof window[fnName] === 'function') {
+            e.preventDefault();
+            e.stopPropagation();
+            try { window[fnName](...args); } catch (err) { console.warn('action failed', fnName, err); }
+        }
+    }, { capture: true });
 }
 
 // Initialize button system when global functions are ready
