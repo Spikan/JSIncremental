@@ -15,10 +15,10 @@
         return;
     }
     
-    console.log('✅ Dependencies ready, initializing main game logic...');
+    console.log('✅ Dependencies ready, main.js loaded successfully');
     
-    // Continue with game initialization
-    initGame();
+    // Don't call initGame here - it will be called after the DOM is ready
+    // and all functions are properly defined
 })();
 
 // Soda Clicker Pro - Main Game Logic
@@ -152,11 +152,13 @@ let suctions = new Decimal(0);
 // Make suctions accessible globally
 window.suctions = suctions;
 let sps = new Decimal(0);
-// Expose sps for UI modules
-Object.defineProperty(window, 'sps', {
-	get: function() { return sps; },
-	set: function(v) { sps = new Decimal(v); }
-});
+// Expose sps for UI modules - only define if not already defined
+if (!Object.getOwnPropertyDescriptor(window, 'sps')) {
+    Object.defineProperty(window, 'sps', {
+        get: function() { return sps; },
+        set: function(v) { sps = new Decimal(v); }
+    });
+}
 let strawSPD = new Decimal(0);
 let cupSPD = new Decimal(0);
 let suctionClickBonus = new Decimal(0);
@@ -316,15 +318,17 @@ function initGame() {
         // Make these accessible to the save system
         window.straws = straws;
         window.cups = cups;
-        let suctions = new Decimal(0);
+        suctions = new Decimal(0);
         // Make suctions accessible globally
         window.suctions = suctions;
         let sps = new Decimal(0);
-        // Expose sps for UI modules
-        Object.defineProperty(window, 'sps', {
-            get: function() { return sps; },
-            set: function(v) { sps = new Decimal(v); }
-        });
+        // Expose sps for UI modules - only define if not already defined
+        if (!Object.getOwnPropertyDescriptor(window, 'sps')) {
+            Object.defineProperty(window, 'sps', {
+                get: function() { return sps; },
+                set: function(v) { sps = new Decimal(v); }
+            });
+        }
         let strawSPD = new Decimal(0);
         let cupSPD = new Decimal(0);
         let suctionClickBonus = new Decimal(0);
@@ -868,6 +872,213 @@ function trackClick() {
 }
 
 // ============================================================================
+// DEV FUNCTIONS FOR DEVELOPMENT AND TESTING
+// These functions provide development tools and testing capabilities
+// ============================================================================
+
+// Dev unlock functions
+function devUnlockAll() {
+    try {
+        if (window.FEATURE_UNLOCKS) {
+            // Unlock all features
+            const allFeatures = Object.keys(window.FEATURE_UNLOCKS.unlockConditions);
+            allFeatures.forEach(feature => {
+                window.FEATURE_UNLOCKS.unlockedFeatures.add(feature);
+            });
+            window.FEATURE_UNLOCKS.updateFeatureVisibility();
+            window.FEATURE_UNLOCKS.updateUnlocksTab();
+            console.log('🔓 All features unlocked via dev function');
+        } else {
+            console.warn('Feature unlocks system not available');
+        }
+    } catch (error) {
+        console.error('Error in devUnlockAll:', error);
+    }
+}
+
+function devUnlockShop() {
+    try {
+        if (window.FEATURE_UNLOCKS) {
+            window.FEATURE_UNLOCKS.unlockedFeatures.add('shop');
+            window.FEATURE_UNLOCKS.updateFeatureVisibility();
+            console.log('🛒 Shop unlocked via dev function');
+        }
+    } catch (error) {
+        console.error('Error in devUnlockShop:', error);
+    }
+}
+
+function devUnlockUpgrades() {
+    try {
+        if (window.FEATURE_UNLOCKS) {
+            const upgradeFeatures = ['widerStraws', 'betterCups', 'fasterDrinks', 'criticalClick', 'suction'];
+            upgradeFeatures.forEach(feature => {
+                window.FEATURE_UNLOCKS.unlockedFeatures.add(feature);
+            });
+            window.FEATURE_UNLOCKS.updateFeatureVisibility();
+            console.log('⚡ All upgrades unlocked via dev function');
+        }
+    } catch (error) {
+        console.error('Error in devUnlockUpgrades:', error);
+    }
+}
+
+function devResetUnlocks() {
+    try {
+        if (window.FEATURE_UNLOCKS) {
+            window.FEATURE_UNLOCKS.unlockedFeatures.clear();
+            // Keep essential features
+            window.FEATURE_UNLOCKS.unlockedFeatures.add('soda');
+            window.FEATURE_UNLOCKS.unlockedFeatures.add('options');
+            window.FEATURE_UNLOCKS.unlockedFeatures.add('dev');
+            window.FEATURE_UNLOCKS.updateFeatureVisibility();
+            window.FEATURE_UNLOCKS.updateUnlocksTab();
+            console.log('🔄 Unlocks reset via dev function');
+        }
+    } catch (error) {
+        console.error('Error in devResetUnlocks:', error);
+    }
+}
+
+// Time travel functions
+function devAddTime(milliseconds) {
+    try {
+        if (window.lastSaveTime) {
+            window.lastSaveTime = window.lastSaveTime - milliseconds;
+            console.log(`⏰ Added ${milliseconds / 1000} seconds via dev function`);
+        }
+    } catch (error) {
+        console.error('Error in devAddTime:', error);
+    }
+}
+
+// Resource management functions
+function devAddSips(amount) {
+    try {
+        if (window.sips) {
+            window.sips = window.sips.plus(amount);
+            console.log(`💰 Added ${amount} sips via dev function`);
+            // Update UI
+            try { window.App?.ui?.updateTopSipCounter?.(); } catch {}
+            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+        }
+    } catch (error) {
+        console.error('Error in devAddSips:', error);
+    }
+}
+
+// Dev mode functions
+function devToggleDevMode() {
+    try {
+        if (window.FEATURE_UNLOCKS) {
+            window.FEATURE_UNLOCKS.toggleDevMode();
+            console.log('🔧 Dev mode toggled via dev function');
+        }
+    } catch (error) {
+        console.error('Error in devToggleDevMode:', error);
+    }
+}
+
+function devToggleGodMode() {
+    try {
+        if (window.FEATURE_UNLOCKS) {
+            // Toggle god mode (if implemented)
+            console.log('👑 God mode toggled via dev function');
+        }
+    } catch (error) {
+        console.error('Error in devToggleGodMode:', error);
+    }
+}
+
+function devShowDebugInfo() {
+    try {
+        console.log('🐛 Debug Info:');
+        console.log('Current sips:', window.sips);
+        console.log('Current straws:', window.straws);
+        console.log('Current cups:', window.cups);
+        console.log('Current level:', window.level);
+        console.log('Total clicks:', window.totalClicks);
+        console.log('App object:', window.App);
+    } catch (error) {
+        console.error('Error in devShowDebugInfo:', error);
+    }
+}
+
+function devExportSave() {
+    try {
+        if (window.App?.storage?.exportGame) {
+            window.App.storage.exportGame();
+        } else {
+            // Fallback export
+            const saveData = {
+                sips: window.sips?.toString(),
+                straws: window.straws?.toString(),
+                cups: window.cups?.toString(),
+                level: window.level?.toString(),
+                timestamp: Date.now()
+            };
+            const dataStr = JSON.stringify(saveData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `soda-clicker-save-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            console.log('💾 Save exported via dev function');
+        }
+    } catch (error) {
+        console.error('Error in devExportSave:', error);
+    }
+}
+
+function devImportSave() {
+    try {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const saveData = JSON.parse(e.target.result);
+                        // Apply imported save data
+                        if (saveData.sips) window.sips = new Decimal(saveData.sips);
+                        if (saveData.straws) window.straws = new Decimal(saveData.straws);
+                        if (saveData.cups) window.cups = new Decimal(saveData.cups);
+                        if (saveData.level) window.level = new Decimal(saveData.level);
+                        
+                        console.log('📥 Save imported via dev function');
+                        // Update UI
+                        try { window.App?.ui?.updateAllStats?.(); } catch {}
+                        try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+                    } catch (error) {
+                        console.error('Error parsing imported save:', error);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+        input.click();
+    } catch (error) {
+        console.error('Error in devImportSave:', error);
+    }
+}
+
+// Quick unlock function
+function quickUnlock() {
+    try {
+        devUnlockAll();
+        devAddSips(10000);
+        console.log('⚡ Quick unlock completed via dev function');
+    } catch (error) {
+        console.error('Error in quickUnlock:', error);
+    }
+}
+
+// ============================================================================
 // GLOBAL WRAPPER FUNCTIONS FOR HTML ONCLICK HANDLERS
 // These functions bridge the HTML onclick handlers with the modular architecture
 // ============================================================================
@@ -1344,4 +1555,35 @@ window.toggleButtonSounds = toggleClickSounds;
 window.sendMessage = sendMessage;
 window.startGame = startGame;
 
-console.log('✅ Global wrapper functions assigned to window object');
+// Dev functions
+window.devUnlockAll = devUnlockAll;
+window.devUnlockShop = devUnlockShop;
+window.devUnlockUpgrades = devUnlockUpgrades;
+window.devResetUnlocks = devResetUnlocks;
+window.devAddTime = devAddTime;
+window.devAddSips = devAddSips;
+window.devToggleDevMode = devToggleDevMode;
+window.devToggleGodMode = devToggleGodMode;
+window.devShowDebugInfo = devShowDebugInfo;
+window.devExportSave = devExportSave;
+window.devImportSave = devImportSave;
+window.quickUnlock = quickUnlock;
+
+console.log('✅ Global wrapper functions and dev functions assigned to window object');
+
+// ============================================================================
+// INITIALIZATION - Call initGame when DOM is ready
+// ============================================================================
+
+// Initialize the game when the DOM is ready
+function initializeGameWhenReady() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initGame);
+    } else {
+        // DOM is already ready
+        initGame();
+    }
+}
+
+// Start initialization
+initializeGameWhenReady();

@@ -15,14 +15,21 @@
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
     <script>
-        // Safety check to ensure functions are available
+        // Safety check to ensure functions are available - moved to after main.js loads
         window.addEventListener('load', function() {
-            if (typeof window.switchTab === 'undefined') {
-                console.error('switchTab function not available');
-            }
-            if (typeof window.devUnlockAll === 'undefined') {
-                console.error('devUnlockAll function not available');
-            }
+            // Wait a bit for main.js to load and functions to be available
+            setTimeout(function() {
+                if (typeof window.switchTab === 'undefined') {
+                    console.error('switchTab function not available');
+                } else {
+                    console.log('✅ switchTab function is available');
+                }
+                if (typeof window.devUnlockAll === 'undefined') {
+                    console.error('devUnlockAll function not available');
+                } else {
+                    console.log('✅ devUnlockAll function is available');
+                }
+            }, 500); // Wait 500ms for main.js to load
         });
     </script>
 </head>
