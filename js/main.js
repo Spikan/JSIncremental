@@ -178,7 +178,11 @@ function switchTab(tabName, event) {
     
     // Update unlocks when switching to the unlocks tab
     if (tabName === 'unlocks') {
-        FEATURE_UNLOCKS.updateUnlocksTab();
+        if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.updateUnlocksTab) {
+            FEATURE_UNLOCKS.updateUnlocksTab();
+        } else {
+            console.warn('⚠️ FEATURE_UNLOCKS.updateUnlocksTab not available');
+        }
     }
 }
 
@@ -205,6 +209,39 @@ window.switchTab = switchTab;
 
 function initGame() {
     try {
+        // ============================================================================
+        // DEPENDENCY VALIDATION - Ensure all required objects are available
+        // ============================================================================
+        
+        // Check if FEATURE_UNLOCKS is available
+        if (typeof FEATURE_UNLOCKS === 'undefined') {
+            console.error('❌ FEATURE_UNLOCKS not available! Game cannot initialize properly.');
+            console.log('⏳ Waiting for FEATURE_UNLOCKS to load...');
+            // Retry after a short delay
+            setTimeout(initGame, 100);
+            return;
+        }
+        
+        // Check if DOM_CACHE is available
+        if (typeof DOM_CACHE === 'undefined') {
+            console.error('❌ DOM_CACHE not available! Game cannot initialize properly.');
+            console.log('⏳ Waiting for DOM_CACHE to load...');
+            // Retry after a short delay
+            setTimeout(initGame, 100);
+            return;
+        }
+        
+        // Check if GAME_CONFIG is available
+        if (typeof window.GAME_CONFIG === 'undefined') {
+            console.error('❌ GAME_CONFIG not available! Game cannot initialize properly.');
+            console.log('⏳ Waiting for GAME_CONFIG to load...');
+            // Retry after a short delay
+            setTimeout(initGame, 100);
+            return;
+        }
+        
+        console.log('✅ All dependencies validated, proceeding with game initialization...');
+        
         // Soda Clicker Pro - Main Game Logic
         // 
         // ARCHITECTURE OVERVIEW:
@@ -542,7 +579,11 @@ function initGame() {
 
         // Initialize progressive feature unlock system after game variables are set up
         
-        FEATURE_UNLOCKS.init();
+        if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.init) {
+            FEATURE_UNLOCKS.init();
+        } else {
+            console.warn('⚠️ FEATURE_UNLOCKS.init not available, skipping feature unlock initialization');
+        }
 
         
         // Start the game loop
@@ -580,7 +621,7 @@ function startGameLoop() {
             updateDrinkProgress: () => window.App?.ui?.updateDrinkProgress?.(),
             processDrink,
             // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
-            updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); FEATURE_UNLOCKS.checkAllUnlocks(); },
+            updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) FEATURE_UNLOCKS.checkAllUnlocks(); },
             updatePlayTime: () => window.App?.ui?.updatePlayTime?.(),
             updateLastSaveTime: () => window.App?.ui?.updateLastSaveTime?.(),
             performBatchUIUpdate: window.App?.ui?.performBatchUIUpdate,
@@ -607,7 +648,9 @@ function startGameLoop() {
             window.App?.ui?.updateLastSaveTime?.();
             window.App?.ui?.updateAllStats?.();
             window.App?.ui?.checkUpgradeAffordability?.();
-            FEATURE_UNLOCKS.checkAllUnlocks();
+            if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) {
+                FEATURE_UNLOCKS.checkAllUnlocks();
+            }
             lastStatsUpdate = currentTime;
         }
         requestAnimationFrame(gameLoop);
@@ -704,7 +747,9 @@ function processDrink() {
         } catch {}
         
         // Check for feature unlocks after processing a drink
-        FEATURE_UNLOCKS.checkAllUnlocks();
+        if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) {
+            FEATURE_UNLOCKS.checkAllUnlocks();
+        }
         
         // Update auto-save counter based on configurable interval via system helper
         if (window.App?.systems?.autosave?.computeAutosaveCounter) {
@@ -1494,16 +1539,54 @@ window.quickUnlock = quickUnlock;
 console.log('✅ Global wrapper functions and dev functions assigned to window object');
 
 // ============================================================================
-// INITIALIZATION - Call initGame when DOM is ready
+// INITIALIZATION - Call initGame when DOM is ready and dependencies are available
 // ============================================================================
 
-// Initialize the game when the DOM is ready
+// Check if all dependencies are available
+function areDependenciesReady() {
+    const dependencies = {
+        FEATURE_UNLOCKS: typeof FEATURE_UNLOCKS !== 'undefined',
+        DOM_CACHE: typeof DOM_CACHE !== 'undefined',
+        GAME_CONFIG: typeof window.GAME_CONFIG !== 'undefined',
+        Decimal: typeof Decimal !== 'undefined',
+        App: typeof window.App !== 'undefined'
+    };
+    
+    const missingDeps = Object.entries(dependencies)
+        .filter(([name, available]) => !available)
+        .map(([name]) => name);
+    
+    if (missingDeps.length > 0) {
+        console.log('⏳ Waiting for dependencies:', missingDeps.join(', '));
+        return false;
+    }
+    
+    console.log('✅ All dependencies are ready');
+    return true;
+}
+
+// Initialize the game when the DOM is ready and dependencies are available
 function initializeGameWhenReady() {
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initGame);
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ DOM ready, checking dependencies...');
+            waitForDependencies();
+        });
     } else {
         // DOM is already ready
+        console.log('✅ DOM already ready, checking dependencies...');
+        waitForDependencies();
+    }
+}
+
+// Wait for all dependencies to be available
+function waitForDependencies() {
+    if (areDependenciesReady()) {
+        console.log('🚀 All dependencies ready, initializing game...');
         initGame();
+    } else {
+        console.log('⏳ Dependencies not ready, retrying in 100ms...');
+        setTimeout(waitForDependencies, 100);
     }
 }
 

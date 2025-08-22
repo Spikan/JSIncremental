@@ -738,23 +738,29 @@ if (typeof Decimal === 'undefined') {
 // Ensure App object is available before loading main.js
 function waitForApp() {
     if (window.App && window.App.ui) {
-        console.log('✅ App object ready, loading main.js');
-        // Load main.js only after App is ready
-        const script = document.createElement('script');
-        script.src = 'js/main.js';
-        script.onload = () => console.log('✅ main.js loaded successfully');
-        script.onerror = (e) => console.error('❌ Failed to load main.js:', e);
-        document.body.appendChild(script);
+        console.log('✅ App object ready, loading dependencies');
+        // Dependencies will be loaded first, then main.js will be loaded after they're ready
+        
+        // Load dependencies BEFORE main.js to ensure they're available
+        const featureScript = document.createElement('script');
+        featureScript.src = 'js/feature-unlocks.js';
+        featureScript.onload = () => {
+            console.log('✅ feature-unlocks.js loaded successfully');
+            // Now load main.js after dependencies are ready
+            const mainScript = document.createElement('script');
+            mainScript.src = 'js/main.js';
+            mainScript.onload = () => console.log('✅ main.js loaded successfully');
+            mainScript.onerror = (e) => console.error('❌ Failed to load main.js:', e);
+            document.body.appendChild(mainScript);
+        };
+        featureScript.onerror = (e) => console.error('❌ Failed to load feature-unlocks.js:', e);
+        document.body.appendChild(featureScript);
         
         // Load other scripts after main.js
         setTimeout(() => {
             const godScript = document.createElement('script');
             godScript.src = 'js/god.js';
             document.body.appendChild(godScript);
-            
-            const featureScript = document.createElement('script');
-            featureScript.src = 'js/feature-unlocks.js';
-            document.body.appendChild(featureScript);
             
             const errorScript = document.createElement('script');
             errorScript.src = 'js/services/error-overlay.js';
