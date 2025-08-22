@@ -141,92 +141,12 @@ if (typeof DOM_CACHE === 'undefined') {
 
 // Debug checks removed for production
 
-window.sips = new Decimal(0);
-let straws = new Decimal(0);
-let cups = new Decimal(0);
-
-// Make these accessible to the save system
-window.straws = straws;
-window.cups = cups;
-let suctions = new Decimal(0);
-// Make suctions accessible globally
-window.suctions = suctions;
-let sps = new Decimal(0);
-// Expose sps for UI modules - only define if not already defined
-if (!Object.getOwnPropertyDescriptor(window, 'sps')) {
-    Object.defineProperty(window, 'sps', {
-        get: function() { return sps; },
-        set: function(v) { sps = new Decimal(v); }
-    });
-}
-let strawSPD = new Decimal(0);
-let cupSPD = new Decimal(0);
-let suctionClickBonus = new Decimal(0);
-let widerStraws = new Decimal(0);
-// Make widerStraws accessible globally
-window.widerStraws = widerStraws;
-let betterCups = new Decimal(0);
-// Make betterCups accessible globally
-window.betterCups = betterCups;
-
-let level = new Decimal(1);
-
-// Drink system variables
-    const DEFAULT_DRINK_RATE = window.GAME_CONFIG.TIMING.DEFAULT_DRINK_RATE;
-let drinkRate = DEFAULT_DRINK_RATE;
-// Expose drinkRate for UI modules
-Object.defineProperty(window, 'drinkRate', {
-	get: function() { return drinkRate; },
-	set: function(v) { drinkRate = Number(v) || drinkRate; }
-});
-let drinkProgress = 0;
-let lastDrinkTime = Date.now();
-
-// Faster Drinks upgrade variables
-let fasterDrinks = new Decimal(0);
-// Make fasterDrinks accessible globally
-window.fasterDrinks = fasterDrinks;
-let fasterDrinksUpCounter = new Decimal(1);
-// Make fasterDrinksUpCounter accessible globally
-window.fasterDrinksUpCounter = fasterDrinksUpCounter;
-
-// Critical Click system variables - IMPROVED BALANCE
-    let criticalClickChance = new Decimal(window.GAME_CONFIG.BALANCE.CRITICAL_CLICK_BASE_CHANCE); // 0.1% base chance (10x higher)
-    // Make criticalClickChance accessible globally
-    window.criticalClickChance = criticalClickChance;
-    let criticalClickMultiplier = new Decimal(window.GAME_CONFIG.BALANCE.CRITICAL_CLICK_BASE_MULTIPLIER); // 5x multiplier (more balanced)
-    // Make criticalClickMultiplier accessible globally
-    window.criticalClickMultiplier = criticalClickMultiplier;
-let criticalClicks = new Decimal(0); // Total critical clicks achieved
-let criticalClickUpCounter = new Decimal(1); // Upgrade counter for critical chance
-
-// Suction upgrade system variables
-let suctionUpCounter = new Decimal(1); // Upgrade counter for suction upgrades
-
-// Sound system variables (now handled by simple audio system below)
-
-// Auto-save and options variables
-let autosaveEnabled = true;
-    let autosaveInterval = window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL; // seconds
-let autosaveCounter = 0;
-let gameStartTime = Date.now();
-let lastSaveTime = null;
-
-// Save optimization - batch save operations
-let saveQueue = [];
-let saveTimeout = null;
-let lastSaveOperation = 0;
-    const MIN_SAVE_INTERVAL = window.GAME_CONFIG.TIMING.MIN_SAVE_INTERVAL; // Minimum 1 second between saves
-
-// Statistics tracking variables
-window.totalClicks = 0;
-let currentClickStreak = 0;
-let bestClickStreak = 0;
-let totalSipsEarned = new Decimal(0);
-let highestSipsPerSecond = new Decimal(0);
-let gameStartDate = Date.now();
-let lastClickTime = 0;
-let clickTimes = []; // For calculating clicks per second
+// ============================================================================
+// DUPLICATE CODE REMOVED - CONSOLIDATED INTO initGame() FUNCTION
+// ============================================================================
+// The following duplicate variable declarations and property definitions have been removed
+// to prevent "can't redefine non-configurable property" errors.
+// All game state variables are now properly managed within the initGame() function.
 
 // Splash init handled by App.systems.gameInit; keep a passthrough for legacy calls
 function initSplashScreen() { try { window.App?.systems?.gameInit?.initSplashScreen?.(); } catch {} }
@@ -318,7 +238,7 @@ function initGame() {
         // Make these accessible to the save system
         window.straws = straws;
         window.cups = cups;
-        suctions = new Decimal(0);
+        let suctions = new Decimal(0);
         // Make suctions accessible globally
         window.suctions = suctions;
         let sps = new Decimal(0);
@@ -351,11 +271,13 @@ function initGame() {
         // Drink system variables
             const DEFAULT_DRINK_RATE = window.GAME_CONFIG.TIMING.DEFAULT_DRINK_RATE;
         let drinkRate = DEFAULT_DRINK_RATE;
-        // Expose drinkRate for UI modules
-        Object.defineProperty(window, 'drinkRate', {
-            get: function() { return drinkRate; },
-            set: function(v) { drinkRate = Number(v) || drinkRate; }
-        });
+        // Expose drinkRate for UI modules - only define if not already defined
+        if (!Object.getOwnPropertyDescriptor(window, 'drinkRate')) {
+            Object.defineProperty(window, 'drinkRate', {
+                get: function() { return drinkRate; },
+                set: function(v) { drinkRate = Number(v) || drinkRate; }
+            });
+        }
         let drinkProgress = 0;
         let lastDrinkTime = Date.now();
 
