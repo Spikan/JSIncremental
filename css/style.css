@@ -3096,15 +3096,42 @@ button:focus {
 }
 
 /* Shop button content styling */
+.shop-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
 .shop-btn span {
   color: inherit;
   font-weight: bold;
+  font-size: 1.1rem;
 }
 
 .shop-btn small {
   color: var(--secondary-orange);
   font-size: 0.7rem;
   font-weight: normal;
+}
+
+/* Cost and text alignment */
+.shop-btn .cost-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.shop-btn .cost-number {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.shop-btn .cost-text {
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 .shop-btn:hover:not(.affordable):not(.disabled) {
@@ -3116,8 +3143,9 @@ button:focus {
 
 .shop-btn:active {
   transform: scale(0.98);
-  background-color: var(--primary-green);
-  color: var(--primary-blue);
+  background-color: var(--primary-orange);
+  color: var(--neutral-white);
+  border-color: var(--primary-orange);
 }
 
 /* Clicking Upgrade Buttons */
@@ -3143,8 +3171,9 @@ button:focus {
 
 .clicking-upgrade-btn:active {
   transform: scale(0.98);
-  background-color: var(--primary-green);
-  color: var(--primary-blue);
+  background-color: var(--primary-orange);
+  color: var(--neutral-white);
+  border-color: var(--primary-orange);
 }
 
 /* Drink Speed Upgrade Buttons */
@@ -3168,8 +3197,9 @@ button:focus {
 
 .drink-speed-upgrade-btn:active {
   transform: scale(0.98);
-  background-color: var(--primary-green);
-  color: var(--primary-blue);
+  background-color: var(--primary-orange);
+  color: var(--neutral-white);
+  border-color: var(--primary-orange);
 }
 
 /* Level Up Button */
@@ -3183,6 +3213,26 @@ button:focus {
   border-color: var(--primary-purple);
   margin: 1rem auto;
   display: block;
+  text-align: center;
+}
+
+/* Level up button content styling */
+.level-up-btn .cost-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.level-up-btn .cost-number {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.level-up-btn .cost-text {
+  font-size: 1rem;
+  opacity: 0.9;
 }
 
 .level-up-btn:hover {
