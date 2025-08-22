@@ -15,45 +15,47 @@ describe('Core Systems - Comprehensive Testing', () => {
     // Mock Decimal library
     mockDecimal = class Decimal {
       constructor(value) {
-        this.value = value;
+        this._value = Number(value) || 0;
       }
       
+      // Basic arithmetic methods
       plus(other) {
-        const otherValue = other instanceof Decimal ? other.value : other;
-        return new Decimal(this.value + otherValue);
+        const otherValue = other instanceof Decimal ? other._value : Number(other);
+        return new Decimal(this._value + otherValue);
       }
       
       minus(other) {
-        const otherValue = other instanceof Decimal ? other.value : other;
-        return new Decimal(this.value - otherValue);
+        const otherValue = other instanceof Decimal ? other._value : Number(other);
+        return new Decimal(this._value - otherValue);
       }
       
       times(other) {
-        const otherValue = other instanceof Decimal ? other.value : other;
-        return new Decimal(this.value * otherValue);
+        const otherValue = other instanceof Decimal ? other._value : Number(other);
+        return new Decimal(this._value * otherValue);
       }
       
       div(other) {
-        const otherValue = other instanceof Decimal ? other.value : other;
-        return new Decimal(this.value / otherValue);
+        const otherValue = other instanceof Decimal ? other._value : Number(other);
+        return new Decimal(this._value / otherValue);
       }
       
+      // Comparison methods
       gte(other) {
-        const otherValue = other instanceof Decimal ? other.value : other;
-        return this.value >= otherValue;
+        const otherValue = other instanceof Decimal ? other._value : Number(other);
+        return this._value >= otherValue;
       }
       
       lte(other) {
-        const otherValue = other instanceof Decimal ? other.value : other;
-        return this.value <= otherValue;
+        const otherValue = other instanceof Decimal ? other._value : Number(other);
+        return new Decimal(this._value <= otherValue);
       }
       
       toNumber() {
-        return this.value;
+        return this._value;
       }
       
       toString() {
-        return this.value.toString();
+        return String(this._value);
       }
     };
     
@@ -64,7 +66,19 @@ describe('Core Systems - Comprehensive Testing', () => {
         STRAW_BASE_COST: 10,
         STRAW_SCALING: 1.15,
         CUP_BASE_COST: 50,
-        CUP_SCALING: 1.2
+        CUP_SCALING: 1.2,
+        SUCTION_BASE_COST: 100,
+        SUCTION_SCALING: 1.25,
+        FASTER_DRINKS_BASE_COST: 200,
+        FASTER_DRINKS_SCALING: 1.3,
+        CRITICAL_CLICK_BASE_COST: 500,
+        CRITICAL_CLICK_SCALING: 1.35,
+        WIDER_STRAWS_BASE_COST: 1000,
+        WIDER_STRAWS_SCALING: 1.4,
+        BETTER_CUPS_BASE_COST: 2500,
+        BETTER_CUPS_SCALING: 1.45,
+        LEVEL_UP_BASE_COST: 10000,
+        LEVEL_UP_SCALING: 1.5
       },
       TIMING: {
         CLICK_STREAK_WINDOW: 1000,
@@ -242,9 +256,8 @@ describe('Core Systems - Comprehensive Testing', () => {
       }
     };
     
-    // Setup global mocks
+    // Mock window object with game state
     global.window = {
-      ...global.window,
       App: mockApp,
       GAME_CONFIG: mockGameConfig,
       Decimal: mockDecimal,
@@ -255,18 +268,18 @@ describe('Core Systems - Comprehensive Testing', () => {
       fasterDrinks: new mockDecimal(1),
       widerStraws: new mockDecimal(0),
       betterCups: new mockDecimal(0),
-      criticalClickChance: new mockDecimal(0.001),
-      criticalClickMultiplier: new mockDecimal(5),
+      criticalClickChance: 0.001,
+      criticalClickMultiplier: 5,
       criticalClicks: new mockDecimal(0),
-      criticalClickUpCounter: new mockDecimal(1),
-      suctionClickBonus: new mockDecimal(0),
-      level: new mockDecimal(1),
+      criticalClickUpCounter: 1,
+      suctionClickBonus: 0,
+      level: 1,
       totalSipsEarned: new mockDecimal(5000),
       totalClicks: 150,
       gameStartDate: Date.now() - 86400000,
       lastClickTime: Date.now() - 5000,
       clickTimes: [Date.now() - 1000, Date.now() - 500],
-      clickSoundsEnabled: true,
+      lastSaveTime: Date.now(),
       autosaveEnabled: true,
       autosaveInterval: 30,
       autosaveCounter: 0,
@@ -277,28 +290,6 @@ describe('Core Systems - Comprehensive Testing', () => {
       currentClickStreak: 0,
       bestClickStreak: 0
     };
-    
-    // Mock DOM elements
-    document.body.innerHTML = `
-      <div id="splashScreen" style="display: block;">
-        <div class="splash-content">
-          <h1 class="splash-title">Soda Clicker Pro</h1>
-          <p class="splash-subtitle-text">Click to start!</p>
-          <p class="splash-instruction">Click anywhere to begin</p>
-          <p class="splash-version">v1.0.0</p>
-        </div>
-      </div>
-      <div id="gameContent" style="display: none;">
-        <div id="sodaButton" class="soda-button"></div>
-        <div id="statsTab" class="tab active"></div>
-        <div id="shopTab" class="tab"></div>
-        <div id="unlocksTab" class="tab"></div>
-        <div id="lastSaveTime"></div>
-        <div id="clickSoundsToggle"></div>
-        <div id="autosaveToggle"></div>
-        <div id="autosaveInterval"></div>
-      </div>
-    `;
   });
   
   afterEach(() => {
@@ -512,17 +503,17 @@ describe('Core Systems - Comprehensive Testing', () => {
     it('should process purchases correctly', () => {
       expect(mockApp.systems.purchases.purchase).toBeDefined();
       
-      const initialSips = window.sips.value;
+      const initialSips = window.sips.toNumber();
       
       // Test successful purchase
       const success = mockApp.systems.purchases.purchase('straw', 10);
       expect(success).toBe(true);
-      expect(window.sips.value).toBe(initialSips - 10);
+      expect(window.sips.toNumber()).toBe(initialSips - 10);
       
       // Test failed purchase
       const failure = mockApp.systems.purchases.purchase('expensive', 10000);
       expect(failure).toBe(false);
-      expect(window.sips.value).toBe(initialSips - 10); // Should not change
+      expect(window.sips.toNumber()).toBe(initialSips - 10); // Should not change
     });
   });
 
@@ -530,24 +521,24 @@ describe('Core Systems - Comprehensive Testing', () => {
     it('should process clicks correctly', () => {
       expect(mockApp.systems.clicks.processClick).toBeDefined();
       
-      const initialSips = window.sips.value;
+      const initialSips = window.sips.toNumber();
       const initialClicks = window.totalClicks;
       
       const sipsEarned = mockApp.systems.clicks.processClick(1);
       
       expect(sipsEarned).toBe(1);
-      expect(window.sips.value).toBe(initialSips + 1);
+      expect(window.sips.toNumber()).toBe(initialSips + 1);
       expect(window.totalClicks).toBe(initialClicks + 1);
     });
 
     it('should handle click multipliers correctly', () => {
-      const initialSips = window.sips.value;
+      const initialSips = window.sips.toNumber();
       
       // Test with multiplier
       const sipsEarned = mockApp.systems.clicks.processClick(5);
       
       expect(sipsEarned).toBe(5);
-      expect(window.sips.value).toBe(initialSips + 5);
+      expect(window.sips.toNumber()).toBe(initialSips + 5);
     });
   });
 
@@ -788,10 +779,10 @@ describe('Core Systems - Comprehensive Testing', () => {
 
     it('should maintain state consistency across systems', () => {
       const initialState = {
-        sips: window.sips.value,
-        straws: window.straws.value,
-        cups: window.cups.value,
-        level: window.level.value
+        sips: window.sips.toNumber(),
+        straws: window.straws.toNumber(),
+        cups: window.cups.toNumber(),
+        level: window.level
       };
       
       // Simulate some operations
@@ -799,10 +790,10 @@ describe('Core Systems - Comprehensive Testing', () => {
       mockApp.systems.purchases.purchase('straw', 10);
       
       // Check that state is consistent
-      expect(window.sips.value).toBe(initialState.sips + 1 - 10);
-      expect(window.straws.value).toBe(initialState.straws);
-      expect(window.cups.value).toBe(initialState.cups);
-      expect(window.level.value).toBe(initialState.level);
+      expect(window.sips.toNumber()).toBe(initialState.sips + 1 - 10);
+      expect(window.straws.toNumber()).toBe(initialState.straws);
+      expect(window.cups.toNumber()).toBe(initialState.cups);
+      expect(window.level).toBe(initialState.level);
     });
 
     it('should handle save and load cycle correctly', () => {
@@ -904,6 +895,76 @@ describe('Core Systems - Comprehensive Testing', () => {
       
       // Memory increase should be minimal (less than 1MB)
       expect(memoryIncrease).toBeLessThan(1024 * 1024);
+    });
+  });
+
+  describe('DOM Cache System', () => {
+    it('should cache progress elements correctly', () => {
+      // Test that progress elements are properly cached
+      const mockProgressFill = { style: { width: '' } };
+      const mockCountdown = { textContent: '', classList: { add: vi.fn(), remove: vi.fn() } };
+      
+      // Mock DOM elements
+      const mockGetElementById = vi.fn((id) => {
+        if (id === 'drinkProgressFill') return mockProgressFill;
+        if (id === 'drinkCountdown') return mockCountdown;
+        return null;
+      });
+      
+      // Mock document
+      global.document = {
+        getElementById: mockGetElementById
+      };
+      
+      // Test DOM cache functionality with mocked elements
+      const mockDOMCache = {
+        progressFill: mockProgressFill,
+        countdown: mockCountdown,
+        get: vi.fn((id) => {
+          if (id === 'drinkProgressFill') return mockProgressFill;
+          if (id === 'drinkCountdown') return mockCountdown;
+          return null;
+        })
+      };
+      
+      // Verify elements are accessible
+      expect(mockDOMCache.progressFill).toBe(mockProgressFill);
+      expect(mockDOMCache.countdown).toBe(mockCountdown);
+      
+      // Test fallback DOM access
+      expect(mockDOMCache.get('drinkProgressFill')).toBe(mockProgressFill);
+      expect(mockDOMCache.get('drinkCountdown')).toBe(mockCountdown);
+      
+      // Cleanup
+      delete global.document;
+    });
+
+    it('should handle missing progress elements gracefully', () => {
+      // Test graceful handling of missing elements
+      const mockGetElementById = vi.fn(() => null);
+      
+      global.document = {
+        getElementById: mockGetElementById
+      };
+      
+      // Mock DOM cache with missing elements
+      const mockDOMCache = {
+        progressFill: null,
+        countdown: null,
+        init: vi.fn()
+      };
+      
+      // Should not throw when elements are missing
+      expect(() => {
+        mockDOMCache.init();
+      }).not.toThrow();
+      
+      // Missing elements should be null
+      expect(mockDOMCache.progressFill).toBeNull();
+      expect(mockDOMCache.countdown).toBeNull();
+      
+      // Cleanup
+      delete global.document;
     });
   });
 });

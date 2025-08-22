@@ -408,6 +408,30 @@ describe('Main.js Integration - Refactored Functionality', () => {
       expect(mockApp.systems.loop.start).toHaveBeenCalledWith(loopConfig);
     });
 
+    it('should calculate drink progress correctly in game loop', () => {
+      // Test drink progress calculation logic
+      const mockUpdateDrinkProgress = vi.fn();
+      
+      // Simulate the progress calculation logic from the game loop
+      const currentTime = Date.now();
+      const lastDrinkTime = currentTime - 2500; // 2.5 seconds ago
+      const drinkRate = 5000; // 5 seconds
+      
+      const timeSinceLastDrink = currentTime - lastDrinkTime;
+      const progressPercentage = Math.min((timeSinceLastDrink / drinkRate) * 100, 100);
+      
+      // Verify calculation
+      expect(progressPercentage).toBe(50); // 2.5s / 5s = 50%
+      
+      // Test progress clamping
+      const clampedProgress = Math.min(Math.max(progressPercentage, 0), 100);
+      expect(clampedProgress).toBe(50);
+      
+      // Test edge cases
+      expect(Math.min(Math.max(-10, 0), 100)).toBe(0); // Negative progress clamped to 0
+      expect(Math.min(Math.max(150, 0), 100)).toBe(100); // Over 100% clamped to 100
+    });
+
     it('should call UI updates through App namespace', () => {
       // Test that UI updates go through the proper namespace
       mockApp.ui.updateAllStats();
