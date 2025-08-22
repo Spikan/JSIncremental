@@ -269,17 +269,29 @@ function setupSpecialButtonHandlers() {
     document.body.addEventListener('click', (e) => {
         const target = e.target;
         if (!(target instanceof HTMLElement)) return;
-        const button = target.closest('button');
-        if (!button) return;
-        const action = button.getAttribute('data-action');
+        const el = target.closest('[data-action]');
+        if (!el) return;
+        const action = el.getAttribute('data-action');
         if (!action) return;
         const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
-        const argsAttr = button.getAttribute('data-args') || argStr;
+        const argsAttr = el.getAttribute('data-args') || argStr;
         const args = argsAttr ? [Number(argsAttr)] : [];
         if (typeof window[fnName] === 'function') {
             e.preventDefault();
             e.stopPropagation();
             try { window[fnName](...args); } catch (err) { console.warn('action failed', fnName, err); }
+        }
+    }, { capture: true });
+
+    // Generic data-action dispatcher for inputs/selects (change events)
+    document.body.addEventListener('change', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const action = target.getAttribute('data-action');
+        if (!action) return;
+        const [fnName] = action.split(':');
+        if (typeof window[fnName] === 'function') {
+            try { window[fnName](); } catch (err) { console.warn('change action failed', fnName, err); }
         }
     }, { capture: true });
 }

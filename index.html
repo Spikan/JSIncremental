@@ -56,7 +56,7 @@
             ⚠️ This game is under active development. Things WILL stop working randomly.
         </div>
         <div class="splash-buttons">
-            <button onclick="startGame()" class="splash-start-btn">▶️ START</button>
+            <button class="splash-start-btn" data-action="startGame">▶️ START</button>
         </div>
         <div class="splash-version">
             <p>v1.0 - Inspired by Soda Drinker Pro</p>
@@ -97,13 +97,13 @@
 
 <!-- Tab Navigation -->
 <div class="tab-navigation">
-            <button class="tab-btn active" onclick="switchTab('soda', event)">🥤 Soda Clicking</button>
-    <button class="tab-btn" onclick="switchTab('unlocks', event)">🔓 Unlocks</button>
-    <button class="tab-btn" onclick="switchTab('shop', event)">🛒 Shop & Upgrades</button>
-    <button class="tab-btn" onclick="switchTab('stats', event)">📊 Statistics</button>
-            <button class="tab-btn" onclick="switchTab('god', event)">🙏 Talk to God</button>
-    <button class="tab-btn" onclick="switchTab('options', event)">⚙️ Options</button>
-    <button class="tab-btn" onclick="switchTab('dev', event)">🔧 Dev Tools</button>
+            <button class="tab-btn active" data-action="switchTab:soda">🥤 Soda Clicking</button>
+    <button class="tab-btn" data-action="switchTab:unlocks">🔓 Unlocks</button>
+    <button class="tab-btn" data-action="switchTab:shop">🛒 Shop & Upgrades</button>
+    <button class="tab-btn" data-action="switchTab:stats">📊 Statistics</button>
+            <button class="tab-btn" data-action="switchTab:god">🙏 Talk to God</button>
+    <button class="tab-btn" data-action="switchTab:options">⚙️ Options</button>
+    <button class="tab-btn" data-action="switchTab:dev">🔧 Dev Tools</button>
 </div>
 
     <!-- Drink Progress Bar - Moved to Header -->
@@ -117,7 +117,7 @@
         </div>
         <!-- Drink Speed Upgrade Button - Compact layout below progress bar -->
         <div class="drink-speed-upgrade-container">
-            <button onclick="buyFasterDrinks()" class="drink-speed-upgrade-btn">
+            <button class="drink-speed-upgrade-btn" data-action="buyFasterDrinks">
                 <div class="drink-speed-upgrade-icon">⚡</div>
                 <div class="drink-speed-upgrade-info">
                     <div class="drink-speed-upgrade-name">Faster Drinks</div>
@@ -128,7 +128,7 @@
                 <span class="drink-speed-stat">Speed: <span id="currentDrinkSpeedCompact">5.00s</span></span>
                 <span class="drink-speed-stat">Bonus: <span id="drinkSpeedBonusCompact">0%</span></span>
             </div>
-            <button onclick="upgradeFasterDrinks()" class="drink-speed-upgrade-btn upgrade">
+            <button class="drink-speed-upgrade-btn upgrade" data-action="upgradeFasterDrinks">
                 <div class="drink-speed-upgrade-icon">🔧</div>
                 <div class="drink-speed-upgrade-info">
                     <div class="drink-speed-upgrade-name">Upgrade Faster Drinks</div>
@@ -142,14 +142,14 @@
 <div id="sodaTab" class="tab-content active">
     <div id="sodaDiv" class="center">
         <div class="soda-container">
-            <img src="images/regSoda.png" id="sodaButton" onclick="sodaClick(1)"
+            <img src="images/regSoda.png" id="sodaButton" data-action="sodaClick" data-args="1"
                  alt="a picture of soda for you to click"/>
         </div>
 
         <!-- Clicking Upgrades Section - Compact layout next to soda button -->
         <div class="clicking-upgrades-container">
             <div class="clicking-upgrade-item">
-                <button onclick="buySuction()" class="clicking-upgrade-btn">
+                <button class="clicking-upgrade-btn" data-action="buySuction">
                     <div class="clicking-upgrade-icon">💨</div>
                     <div class="clicking-upgrade-info">
                         <div class="clicking-upgrade-name">Suction</div>
@@ -162,7 +162,7 @@
             </div>
             
             <div class="clicking-upgrade-item">
-                <button onclick="buyCriticalClick()" class="clicking-upgrade-btn">
+                <button class="clicking-upgrade-btn" data-action="buyCriticalClick">
                     <div class="clicking-upgrade-icon">⚡</div>
                     <div class="clicking-upgrade-info">
                         <div class="clicking-upgrade-name">Critical Click</div>
@@ -179,7 +179,7 @@
     </div>
 
     <div id="levelUpDiv" class="center">
-        <button onclick="levelUp()" class="level-up-btn disabled">
+        <button class="level-up-btn disabled" data-action="levelUp">
             <div class="cost-line">
                 <span id="levelCost" class="cost-number">3000</span>
                 <span class="cost-text">Sips</span>
@@ -220,7 +220,7 @@
         <div class="shop-container">
                         <div class="shop-item">
                 <div class="shop-header">
-                                         <button onclick="buyStraw()" class="shop-btn">
+                                         <button class="shop-btn" data-action="buyStraw">
                          <div class="cost-line">
                              <span id="strawCost" class="cost-number">5</span>
                              <span class="cost-text">Sips</span>
@@ -246,7 +246,7 @@
 
             <div class="shop-item">
                 <div class="shop-header">
-                                         <button onclick="buyWiderStraws()" class="shop-btn">
+                                         <button class="shop-btn" data-action="buyWiderStraws">
                          <div class="cost-line">
                              <span id="widerStrawsCost" class="cost-number">150</span>
                              <span class="cost-text">Sips</span>
@@ -273,7 +273,7 @@
 
                         <div class="shop-item">
                 <div class="shop-header">
-                                         <button onclick="buyCup()" class="shop-btn">
+                                         <button class="shop-btn" data-action="buyCup">
                          <div class="cost-line">
                              <span id="cupCost" class="cost-number">15</span>
                              <span class="cost-text">Sips</span>
@@ -299,7 +299,7 @@
 
             <div class="shop-item">
                 <div class="shop-header">
-                                         <button onclick="buyBetterCups()" class="shop-btn">
+                                         <button class="shop-btn" data-action="buyBetterCups">
                          <div class="cost-line">
                              <span id="betterCupsCost" class="cost-number">400</span>
                              <span class="cost-text">Sips</span>
@@ -358,13 +358,13 @@
             <h3>⏰ Auto-Save Settings</h3>
             <div class="autosave-controls">
                 <label class="autosave-toggle">
-                    <input type="checkbox" id="autosaveToggle" onchange="toggleAutosave()">
+                    <input type="checkbox" id="autosaveToggle" data-action="toggleAutosave">
                     <span class="toggle-slider"></span>
                     Enable Auto-Save
                 </label>
                 <div class="autosave-interval">
                     <label for="autosaveInterval">Auto-Save Interval:</label>
-                    <select id="autosaveInterval" onchange="changeAutosaveInterval()">
+                    <select id="autosaveInterval" data-action="changeAutosaveInterval">
                         <option value="5">5 seconds</option>
                         <option value="10" selected>10 seconds</option>
                         <option value="15">15 seconds</option>
