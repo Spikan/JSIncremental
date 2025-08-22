@@ -117,8 +117,7 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
 
 // Show purchase feedback
 export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = null) {
-    const shopDiv = window.DOM_CACHE?.shopDiv;
-    if (!shopDiv) return;
+    console.log('🔧 showPurchaseFeedback called with:', { itemName, cost, clickX, clickY });
     
     // Create feedback element
     const feedback = document.createElement('div');
@@ -135,26 +134,34 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
     
     // Position feedback - prefer click coordinates if available, otherwise center on shop
     let left, top;
-    console.log('🔧 Feedback positioning - clickX:', clickX, 'clickY:', clickY);
     
     if (clickX !== null && clickY !== null) {
-        // Position near click location with slight offset for visual appeal
-        left = clickX + (Math.random() * 30 - 15); // Random offset ±15px for natural feel
-        top = clickY - 50; // Above click location, closer for better visibility
-        console.log('🔧 Using click coordinates - left:', left, 'top:', top);
+        // Use click coordinates directly - no offset, no transform
+        left = clickX;
+        top = clickY;
+        console.log('🔧 Using click coordinates directly - left:', left, 'top:', top);
     } else {
         // Fallback to shop center positioning
-        const shopRect = shopDiv.getBoundingClientRect();
-        left = shopRect.left + shopRect.width/2;
-        top = shopRect.top;
-        console.log('🔧 Using fallback positioning - left:', left, 'top:', top);
+        const shopDiv = window.DOM_CACHE?.shopDiv;
+        if (shopDiv) {
+            const shopRect = shopDiv.getBoundingClientRect();
+            left = shopRect.left + shopRect.width/2;
+            top = shopRect.top + shopRect.height/2;
+            console.log('🔧 Using fallback positioning - left:', left, 'top:', top);
+        } else {
+            // Last resort - center of viewport
+            left = window.innerWidth / 2;
+            top = window.innerHeight / 2;
+            console.log('🔧 Using viewport center - left:', left, 'top:', top);
+        }
     }
     
+    // Set initial position - NO transform, NO offset
     feedback.style.cssText = `
-        position: absolute;
+        position: fixed;
         left: ${left}px;
         top: ${top}px;
-        transform: translate(-50%, -100%);
+        transform: none;
         pointer-events: none;
         z-index: 1000;
         background: rgba(76, 175, 80, 0.9);
@@ -164,27 +171,31 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
         font-weight: bold;
         text-align: center;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        /* Ensure positioning is not overridden */
-        transform-origin: center bottom;
+        /* Center the feedback on the click point */
+        transform-origin: center center;
     `;
     
-    // Add custom animation using JavaScript for better control
+    // Center the feedback on the click point
+    feedback.style.transform = 'translate(-50%, -50%)';
+    
+    console.log('🔧 Final feedback positioning - left:', left, 'top:', top);
+    console.log('🔧 Feedback element style:', feedback.style.cssText);
+    
+    document.body.appendChild(feedback);
+    
+    // Simple fade out animation
     let startTime = Date.now();
     const animate = () => {
         const elapsed = Date.now() - startTime;
         const duration = 2000; // 2 seconds
         const progress = Math.min(elapsed / duration, 1);
         
-        // Easing function for smooth animation
-        const easeOut = 1 - Math.pow(1 - progress, 3);
+        // Simple fade out and slight upward movement
+        const opacity = 1 - progress;
+        const moveUp = 20 * progress; // Only move up 20px total
         
-        // Calculate new position (move up and fade out)
-        const moveUp = 40 * easeOut;
-        const opacity = 1 - easeOut;
-        const scale = 1 + (0.2 * easeOut);
-        
-        feedback.style.transform = `translate(-50%, calc(-100% - ${moveUp}px)) scale(${scale})`;
         feedback.style.opacity = opacity;
+        feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
         
         if (progress < 1) {
             requestAnimationFrame(animate);
@@ -192,11 +203,6 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
     };
     
     requestAnimationFrame(animate);
-    
-    console.log('🔧 Final feedback positioning - left:', left, 'top:', top);
-    console.log('🔧 Feedback element style:', feedback.style.cssText);
-    
-    document.body.appendChild(feedback);
     
     // Remove after animation
     const config = window.GAME_CONFIG?.TIMING || {};
