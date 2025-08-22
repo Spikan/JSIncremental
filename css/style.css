@@ -1367,16 +1367,14 @@ h3 {
     font-size: 1rem;
     font-weight: bold;
     border: 2px solid var(--primary-green);
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+    background: var(--primary-blue);
     color: var(--primary-green);
     border-radius: var(--btn-radius-lg);
     cursor: pointer;
-    transition: var(--btn-transition-slow);
+    transition: var(--btn-transition);
     line-height: 1.2;
     white-space: nowrap;
     box-shadow: var(--btn-shadow-sm);
-    position: relative;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1384,25 +1382,13 @@ h3 {
     margin-bottom: 1rem;
 }
 
-.clicking-upgrade-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 179, 107, 0.1), transparent);
-    transition: left 0.5s ease;
-}
 
-.clicking-upgrade-btn:hover::before {
-    left: 100%;
-}
 
 .clicking-upgrade-btn:hover {
     background-color: var(--primary-green);
     color: var(--primary-blue);
-    transform: scale(1.02);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-md);
 }
 
 .clicking-upgrade-btn:active {
@@ -1438,9 +1424,10 @@ h3 {
 
 .clicking-upgrade-cost {
     font-size: 0.8rem;
-    opacity: 0.9;
+    color: var(--neutral-white);
     text-align: center;
     line-height: 1.2;
+    font-weight: bold;
 }
 
 .clicking-upgrade-stats {
@@ -1455,7 +1442,7 @@ h3 {
 
 .clicking-stat {
     font-size: 0.8rem;
-    color: #FF8E53;
+    color: var(--neutral-white);
     font-weight: bold;
 }
 
@@ -1583,62 +1570,41 @@ h3 {
     font-size: 1rem;
     font-weight: bold;
     border: 2px solid var(--primary-green);
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+    background: var(--primary-blue);
     color: var(--primary-green);
     border-radius: var(--btn-radius-lg);
     cursor: pointer;
-    transition: var(--btn-transition-slow);
+    transition: var(--btn-transition);
     line-height: 1.2;
     white-space: nowrap;
     box-shadow: var(--btn-shadow-sm);
-    position: relative;
-    overflow: hidden;
-    /* Ensure text is always readable */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.shop-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 179, 107, 0.1), transparent);
-    transition: left 0.5s ease;
-}
 
-.shop-btn:hover::before {
-    left: 100%;
-}
 
 .shop-btn:hover:not(.affordable):not(.disabled) {
-    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+    background-color: var(--primary-green);
     color: var(--primary-blue);
-    transform: scale(1.02);
-    box-shadow: var(--btn-shadow-lg);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-md);
 }
 
 .shop-btn:active {
     transform: scale(0.98);
-    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+    background-color: var(--primary-green);
     color: var(--primary-blue);
     box-shadow: var(--btn-shadow-sm);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 .shop-btn.affordable {
-    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light)) !important;
+    background-color: var(--primary-green) !important;
     color: var(--neutral-white) !important;
     box-shadow: var(--btn-shadow-md) !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
     border-color: var(--primary-green-light) !important;
 }
 
 .shop-btn.affordable * {
-    color: #FFFFFF !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+    color: var(--neutral-white) !important;
 }
 
 .shop-btn.disabled {
@@ -1659,7 +1625,6 @@ h3 {
 /* Ensure text is always readable in all states */
 .shop-btn * {
     color: inherit;
-    text-shadow: inherit;
 }
 
 .shop-stats {
@@ -1842,40 +1807,26 @@ h3 {
     font-size: 1rem;
     font-weight: bold;
     border: 2px solid var(--primary-green);
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+    background: var(--primary-blue);
     color: var(--primary-green);
     border-radius: var(--btn-radius-lg);
     cursor: pointer;
-    transition: var(--btn-transition-slow);
+    transition: var(--btn-transition);
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    position: relative;
-    overflow: hidden;
     box-shadow: var(--btn-shadow-sm);
     line-height: 1.2;
     white-space: nowrap;
 }
 
-.drink-speed-upgrade-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 179, 107, 0.1), transparent);
-    transition: left 0.5s ease;
-}
 
-.drink-speed-upgrade-btn:hover::before {
-    left: 100%;
-}
 
 .drink-speed-upgrade-btn:hover {
     background-color: var(--primary-green);
     color: var(--primary-blue);
-    transform: scale(1.02);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-md);
 }
 
 .drink-speed-upgrade-btn:active {
@@ -1901,7 +1852,8 @@ h3 {
 
 .drink-speed-upgrade-cost {
     font-size: 0.8rem;
-    opacity: 0.9;
+    color: var(--neutral-white);
+    font-weight: bold;
 }
 
 .drink-speed-upgrade-stats {
@@ -1914,15 +1866,14 @@ h3 {
 
 .drink-speed-stat {
     font-size: 0.8rem;
-    color: #FF8E53;
+    color: var(--neutral-white);
     font-weight: bold;
 }
 
 .drink-speed-upgrade-btn.affordable {
-    background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light)) !important;
+    background-color: var(--primary-green) !important;
     color: var(--neutral-white) !important;
     box-shadow: var(--btn-shadow-md) !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     border-color: var(--primary-green-light) !important;
 }
 
