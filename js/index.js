@@ -15,6 +15,7 @@ import * as saveSys from './core/systems/save-system.js';
 import * as loopSys from './core/systems/loop-system.js';
 import * as buttonAudio from './core/systems/button-audio.js';
 import * as optionsSys from './core/systems/options-system.js';
+import * as gameInit from './core/systems/game-init.js';
 import { createStateBridge } from './core/state/bridge.js';
 import * as ui from './ui/index.js';
 import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
@@ -38,7 +39,8 @@ window.App = {
                 save: saveSys,
                 options: optionsSys,
                 loop: loopSys,
-                audio: { button: buttonAudio }
+                audio: { button: buttonAudio },
+                gameInit
              },
              ui,
     data: {}

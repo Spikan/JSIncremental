@@ -176,115 +176,8 @@ let gameStartDate = Date.now();
 let lastClickTime = 0;
 let clickTimes = []; // For calculating clicks per second
 
-// Splash screen functionality
-function initSplashScreen() {
-    
-    // Eruda debugging for mobile
-    if (typeof eruda !== 'undefined') {
-        eruda.get('console').log('initSplashScreen called');
-    }
-    
-    // No music: removed splash screen music initialization
-    
-    const splashScreen = document.getElementById('splashScreen');
-    const gameContent = document.getElementById('gameContent');
-    
-    
-    
-    if (typeof eruda !== 'undefined') {
-        eruda.get('console').log('Splash screen element:', splashScreen);
-        eruda.get('console').log('Game content element:', gameContent);
-    }
-    
-    if (!splashScreen || !gameContent) {
-        console.error('Splash screen elements not found!');
-        if (typeof eruda !== 'undefined') {
-            eruda.get('console').error('Splash screen elements not found!');
-        }
-        return;
-    }
-    
-    if (typeof eruda !== 'undefined') {
-        eruda.get('console').log('Setting up splash screen event listeners...');
-    }
-    
-    // Function to start the game
-    function startGame() {
-        if (typeof eruda !== 'undefined') {
-        }
-        
-        // Stop title music when transitioning to game (legacy no-op)
-        try { window.App?.systems?.audio?.music?.stopTitleMusic?.(); } catch {}
-        
-        // Super simple approach - just hide splash and show game
-        const splashScreen = document.getElementById('splashScreen');
-        const gameContent = document.getElementById('gameContent');
-        
-        if (splashScreen && gameContent) {
-            if (typeof eruda !== 'undefined') {
-                eruda.get('console').log('Hiding splash, showing game...');
-            }
-            splashScreen.style.display = 'none';
-            gameContent.style.display = 'block';
-            
-            // Try to initialize game, but don't let it fail
-            try {
-                initGame();
-            } catch (error) {
-                console.error('Game init failed, but showing game anyway:', error);
-                if (typeof eruda !== 'undefined') {
-                    eruda.get('console').error('Game init failed, but showing game anyway:', error);
-                }
-            }
-        } else {
-            console.error('Could not find splash or game elements');
-            if (typeof eruda !== 'undefined') {
-                eruda.get('console').error('Could not find splash or game elements');
-            }
-        }
-    }
-    
-    // Expose global start for splash button
-    window.startGame = startGame;
-    
-    // No special splash buttons to handle
-
-    // Add click-through functionality for splash background
-    splashScreen.addEventListener('click', function(e) {
-        // Only start game if clicking on the splash screen background itself
-        // Don't start if clicking on buttons or other elements
-        if (e.target === splashScreen || e.target.classList.contains('splash-content') || 
-            e.target.classList.contains('splash-title') || e.target.classList.contains('splash-subtitle-text') ||
-            e.target.classList.contains('splash-instruction') || e.target.classList.contains('splash-version') ||
-            e.target.tagName === 'H1' || e.target.tagName === 'H2' || e.target.tagName === 'P') {
-            
-            if (typeof eruda !== 'undefined') {
-                eruda.get('console').log('Splash background clicked, starting game...');
-            }
-            // Start game directly
-            startGame();
-        }
-    });
-    
-    // Also allow keyboard input to start (space or enter)
-    document.addEventListener('keydown', function(event) {
-        if (splashScreen.style.display !== 'none') {
-            if (event.code === 'Space' || event.code === 'Enter') {
-                
-                if (typeof eruda !== 'undefined') {
-                    eruda.get('console').log('Keyboard input detected, starting game...');
-                }
-                event.preventDefault();
-                // Start game directly
-                startGame();
-            }
-        }
-    });
-    
-    if (typeof eruda !== 'undefined') {
-        eruda.get('console').log('Splash screen event listeners set up successfully');
-    }
-}
+// Splash init handled by App.systems.gameInit; keep a passthrough for legacy calls
+function initSplashScreen() { try { window.App?.systems?.gameInit?.initSplashScreen?.(); } catch {} }
 
 // Tab switching functionality
 function switchTab(tabName, event) {
@@ -2365,45 +2258,7 @@ document.addEventListener('DOMContentLoaded', function() {
  
 
 // Core game start function used by both music options
-function startGameCore() {
-    
-    // Eruda debugging for mobile
-    if (typeof eruda !== 'undefined') {
-    }
-    
-    // Hide splash and show game
-    const splashScreen = document.getElementById('splashScreen');
-    const gameContent = document.getElementById('gameContent');
-    
-    if (splashScreen && gameContent) {
-        
-        if (typeof eruda !== 'undefined') {
-            eruda.get('console').log('Hiding splash, showing game...');
-        }
-        splashScreen.style.display = 'none';
-        gameContent.style.display = 'block';
-        
-            // Music will handle its own transition when title music ends
-        
-        // Title music will handle its own transition when it ends
-        // No need for a fixed timer - the 'ended' event will trigger the switch
-        
-        // Try to initialize game, but don't let it fail
-        try {
-            initGame();
-        } catch (error) {
-            console.error('Game init failed, but showing game anyway:', error);
-            if (typeof eruda !== 'undefined') {
-                eruda.get('console').error('Game init failed, but showing game anyway:', error);
-            }
-        }
-    } else {
-        console.error('Could not find splash or game elements');
-        if (typeof eruda !== 'undefined') {
-            eruda.get('console').error('Could not find splash or game elements');
-        }
-    }
-}
+function startGameCore() { try { window.App?.systems?.gameInit?.startGameCore?.(); } catch {} }
 
 // Keep the old function for compatibility (call global start if available)
 window.startGameFromButton = function() {
