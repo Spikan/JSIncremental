@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Function Test</title>
+</head>
+<body>
+    <h1>Global Function Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Test if our global functions are defined
+        const results = document.getElementById('results');
+        
+        function testFunction(name) {
+            if (typeof window[name] === 'function') {
+                return `<div style="color: green;">✅ ${name} is defined</div>`;
+            } else {
+                return `<div style="color: red;">❌ ${name} is NOT defined</div>`;
+            }
+        }
+        
+        const functionsToTest = [
+            'buyStraw',
+            'buyCup', 
+            'buySuction',
+            'buyCriticalClick',
+            'buyFasterDrinks',
+            'buyWiderStraws',
+            'buyBetterCups',
+            'upgradeFasterDrinks',
+            'sodaClick',
+            'levelUp',
+            'save',
+            'delete_save',
+            'toggleButtonSounds',
+            'sendMessage',
+            'startGame'
+        ];
+        
+        let html = '<h2>Function Status:</h2>';
+        functionsToTest.forEach(funcName => {
+            html += testFunction(funcName);
+        });
+        
+        results.innerHTML = html;
+        
+        // Test if Decimal is available
+        if (typeof Decimal !== 'undefined') {
+            results.innerHTML += '<div style="color: green;">✅ Decimal library is available</div>';
+        } else {
+            results.innerHTML += '<div style="color: red;">❌ Decimal library is NOT available</div>';
+        }
+        
+        // Test if App object is available
+        if (window.App) {
+            results.innerHTML += '<div style="color: green;">✅ App object is available</div>';
+        } else {
+            results.innerHTML += '<div style="color: red;">❌ App object is NOT available</div>';
+        }
+    </script>
+</body>
+</html>
