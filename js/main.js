@@ -1256,7 +1256,6 @@ function spsClick(amount) {
 }
 
 function buyStraw() {
-    alert('🔧 buyStraw function called!'); // Simple test to see if onclick works
     try {
         console.log('🔧 DEBUG: buyStraw FUNCTION CALLED - TESTING');
         console.log('🔧 Debug: buyStraw called');
@@ -1288,12 +1287,21 @@ function buyStraw() {
         
         console.log('🔧 Debug: Purchase successful, updating game state...');
         
-        window.sips = window.sips.minus(res.spent);
-        straws = new Decimal(res.straws);
+        // Validate and safely convert response data
+        const spent = Number(res.spent) || 0;
+        const newStraws = Number(res.straws) || 0;
+        const newStrawSPD = Number(res.strawSPD) || 0;
+        const newCupSPD = Number(res.cupSPD) || 0;
+        const newSipsPerDrink = Number(res.sipsPerDrink) || 0;
+        
+        console.log('🔧 Debug: Validated data - spent:', spent, 'straws:', newStraws, 'strawSPD:', newStrawSPD);
+        
+        window.sips = window.sips.minus(spent);
+        straws = new Decimal(newStraws);
         window.straws = straws;
-        strawSPD = new Decimal(res.strawSPD);
-        cupSPD = new Decimal(res.cupSPD);
-        sps = new Decimal(res.sipsPerDrink);
+        strawSPD = new Decimal(newStrawSPD);
+        cupSPD = new Decimal(newCupSPD);
+        sps = new Decimal(newSipsPerDrink);
         
         updateTopSipsPerDrink();
         updateTopSipsPerSecond();
@@ -1304,28 +1312,28 @@ function buyStraw() {
         const clickX = clickEvent?.clientX || null;
         const clickY = clickEvent?.clientY || null;
         
-        showPurchaseFeedback('Extra Straw', res.spent, clickX, clickY);
+        showPurchaseFeedback('Extra Straw', spent, clickX, clickY);
         
-        // Update UI directly
+        // Update UI directly with validated data
         const strawsElement = document.getElementById('straws');
         if (strawsElement) {
-            console.log('🔧 Debug: Setting straws to:', res.straws);
-            strawsElement.textContent = res.straws.toString();
+            console.log('🔧 Debug: Setting straws to:', newStraws);
+            strawsElement.textContent = newStraws.toString();
         }
         
         const strawSPDElement = document.getElementById('strawSPD');
         if (strawSPDElement) {
-            console.log('🔧 Debug: Setting strawSPD to:', res.strawSPD);
-            strawSPDElement.textContent = res.strawSPD.toString();
+            console.log('🔧 Debug: Setting strawSPD to:', newStrawSPD);
+            strawSPDElement.textContent = newStrawSPD.toString();
         }
         
         const totalStrawSPDElement = document.getElementById('totalStrawSPD');
         if (totalStrawSPDElement) {
-            const totalProduction = res.strawSPD * res.straws;
-            console.log('🔧 Debug: Calculating total production:', res.strawSPD, '*', res.straws, '=', totalProduction);
+            const totalProduction = newStrawSPD * newStraws;
+            console.log('🔧 Debug: Calculating total production:', newStrawSPD, '*', newStraws, '=', totalProduction);
             
             if (isNaN(totalProduction)) {
-                console.error('🔧 Debug: Total production is NaN! res.strawSPD:', res.strawSPD, 'res.straws:', res.straws);
+                console.error('🔧 Debug: Total production is NaN! newStrawSPD:', newStrawSPD, 'newStraws:', newStraws);
                 totalStrawSPDElement.textContent = '0 per drink';
             } else {
                 totalStrawSPDElement.textContent = totalProduction.toString() + ' per drink';
@@ -1343,7 +1351,6 @@ function buyStraw() {
 
 
 function buyCup() {
-    alert('🔧 buyCup function called!'); // Simple test to see if onclick works
     try {
         console.log('🔧 DEBUG: buyCup FUNCTION CALLED - TESTING');
         console.log('🔧 Debug: buyCup called');
@@ -1375,12 +1382,21 @@ function buyCup() {
         
         console.log('🔧 Debug: Purchase successful, updating game state...');
         
-        window.sips = window.sips.minus(res.spent);
-        cups = new Decimal(res.cups);
+        // Validate and safely convert response data
+        const spent = Number(res.spent) || 0;
+        const newCups = Number(res.cups) || 0;
+        const newStrawSPD = Number(res.strawSPD) || 0;
+        const newCupSPD = Number(res.cupSPD) || 0;
+        const newSipsPerDrink = Number(res.sipsPerDrink) || 0;
+        
+        console.log('🔧 Debug: Validated data - spent:', spent, 'cups:', newCups, 'cupSPD:', newCupSPD);
+        
+        window.sips = window.sips.minus(spent);
+        cups = new Decimal(newCups);
         window.cups = cups;
-        strawSPD = new Decimal(res.strawSPD);
-        cupSPD = new Decimal(res.cupSPD);
-        sps = new Decimal(res.sipsPerDrink);
+        strawSPD = new Decimal(newStrawSPD);
+        cupSPD = new Decimal(newCupSPD);
+        sps = new Decimal(newSipsPerDrink);
         
         updateTopSipsPerDrink();
         updateTopSipsPerSecond();
@@ -1391,28 +1407,28 @@ function buyCup() {
         const clickX = clickEvent?.clientX || null;
         const clickY = clickEvent?.clientY || null;
         
-        showPurchaseFeedback('Bigger Cup', res.spent, clickX, clickY);
+        showPurchaseFeedback('Bigger Cup', spent, clickX, clickY);
         
-        // Update UI directly
+        // Update UI directly with validated data
         const cupsElement = document.getElementById('cups');
         if (cupsElement) {
-            console.log('🔧 Debug: Setting cups to:', res.cups);
-            cupsElement.textContent = res.cups.toString();
+            console.log('🔧 Debug: Setting cups to:', newCups);
+            cupsElement.textContent = newCups.toString();
         }
         
         const cupSPDElement = document.getElementById('cupSPD');
         if (cupSPDElement) {
-            console.log('🔧 Debug: Setting cupSPD to:', res.cupSPD);
-            cupSPDElement.textContent = res.cupSPD.toString();
+            console.log('🔧 Debug: Setting cupSPD to:', newCupSPD);
+            cupSPDElement.textContent = newCupSPD.toString();
         }
         
         const totalCupSPDElement = document.getElementById('totalCupSPD');
         if (totalCupSPDElement) {
-            const totalProduction = res.cupSPD * res.cups;
-            console.log('🔧 Debug: Calculating total cup production:', res.cupSPD, '*', res.cups, '=', totalProduction);
+            const totalProduction = newCupSPD * newCups;
+            console.log('🔧 Debug: Calculating total cup production:', newCupSPD, '*', newCups, '=', totalProduction);
             
             if (isNaN(totalProduction)) {
-                console.error('🔧 Debug: Total cup production is NaN! res.cupSPD:', res.cupSPD, 'res.cups:', res.cups);
+                console.error('🔧 Debug: Total cup production is NaN! newCupSPD:', newCupSPD, 'newCups:', newCups);
                 totalCupSPDElement.textContent = '0 per drink';
             } else {
                 totalCupSPDElement.textContent = totalProduction.toString() + ' per drink';
