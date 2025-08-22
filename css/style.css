@@ -3491,5 +3491,20 @@ button * {
 }
 
 /* ========================================
+   BUTTON CLICK ANIMATIONS
+   ======================================== */
+
+/* Click animation for all buttons */
+.button-clicked {
+  transform: scale(0.95);
+  transition: transform 0.15s ease;
+}
+
+/* Ensure smooth transitions for all button states */
+button {
+  transition: all 0.2s ease, transform 0.15s ease;
+}
+
+/* ========================================
    END UNIFIED BUTTON DESIGN SYSTEM
    ======================================== */
