@@ -73,8 +73,9 @@ const BUTTON_CONFIG = {
 
 // Unified button click handler
 function handleButtonClick(event, button, actionName) {
-    event.preventDefault();
-    event.stopPropagation();
+    // Don't prevent default - let the original onclick work
+    // event.preventDefault();
+    // event.stopPropagation();
     
     // Get button configuration
     const action = BUTTON_CONFIG.actions[actionName];
@@ -112,33 +113,23 @@ function handleButtonClick(event, button, actionName) {
         button.classList.remove('button-clicked');
     }, 150);
     
-    // Execute the action with coordinates
-    try {
-        const actionFunc = window[action.func];
-        if (actionFunc && typeof actionFunc === 'function') {
-            actionFunc(clickX, clickY);
-        } else {
-            console.warn(`Action function ${action.func} not found`);
-        }
-    } catch (error) {
-        console.error('Button action failed:', error);
-    }
+    // Note: We don't execute the action here since the original onclick will handle it
+    // This prevents double-execution of button actions
 }
 
 // Setup unified button event listeners
 function setupUnifiedButtonSystem() {
-    // console.log('🔧 Setting up unified button event handler system...');
+    console.log('🔧 Setting up unified button event handler system...');
     
-    // Remove all onclick attributes and replace with event listeners
+    // Find all buttons with onclick attributes
     const allButtons = document.querySelectorAll('button');
     console.log(`🔧 Found ${allButtons.length} buttons to process`);
     
     allButtons.forEach(button => {
-        // Remove onclick attribute
+        // Check if button has onclick attribute
         const onclick = button.getAttribute('onclick');
         if (onclick) {
             console.log(`🔧 Processing button with onclick: ${onclick}`);
-            button.removeAttribute('onclick');
             
             // Parse onclick to determine action
             const actionMatch = onclick.match(/(\w+)\(/);
@@ -148,7 +139,8 @@ function setupUnifiedButtonSystem() {
                 const action = BUTTON_CONFIG.actions[actionName];
                 
                 if (action) {
-                    // Add unified event listener
+                    // Add unified event listener WITHOUT removing onclick
+                    // This ensures the original functionality still works
                     button.addEventListener('click', (e) => handleButtonClick(e, button, actionName));
                     
                     // Add appropriate CSS classes for styling
@@ -168,7 +160,7 @@ function setupUnifiedButtonSystem() {
     // Special handling for buttons without onclick attributes
     setupSpecialButtonHandlers();
     
-    // console.log('🔧 Unified button event handler system setup complete');
+    console.log('🔧 Unified button event handler system setup complete');
 }
 
 // Setup special button handlers that don't use onclick
@@ -244,11 +236,15 @@ function initButtonSystem() {
         }
     }
     
+    // Wait for both DOM and main.js to be fully loaded
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', tryInitialize);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait a bit more for main.js to finish loading
+            setTimeout(tryInitialize, 100);
+        });
     } else {
-        // DOM already loaded, try to initialize
-        tryInitialize();
+        // DOM already loaded, wait for main.js
+        setTimeout(tryInitialize, 100);
     }
 }
 
