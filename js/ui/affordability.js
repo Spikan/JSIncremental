@@ -15,8 +15,8 @@ export function checkUpgradeAffordability() {
         return;
     }
     
-    const config = window.GAME_CONFIG.BALANCE || {};
-    const dataUp = window.App.data.upgrades;
+    const config = window.GAME_CONFIG?.BALANCE || {};
+    const dataUp = window.App?.data?.upgrades || {};
     
     // Calculate all costs using rules if available, otherwise fallback to config
     const costs = calculateAllCosts(config, dataUp);
@@ -83,6 +83,14 @@ function calculateAllCosts(config, dataUp) {
     const fasterDrinksBaseCost = dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST;
     const fasterDrinksScaling = dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING;
     costs.fasterDrinks = Math.floor(fasterDrinksBaseCost * Math.pow(fasterDrinksScaling, safeToNumber(window.fasterDrinks)));
+    console.log('🔧 Faster Drinks cost calculation:', {
+        baseCost: fasterDrinksBaseCost,
+        scaling: fasterDrinksScaling,
+        count: safeToNumber(window.fasterDrinks),
+        calculatedCost: costs.fasterDrinks,
+        dataUp: dataUp?.fasterDrinks,
+        config: config.FASTER_DRINKS_BASE_COST
+    });
     
     // Critical click cost
     const criticalClickBaseCost = dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST;

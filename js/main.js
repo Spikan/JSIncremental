@@ -1880,17 +1880,16 @@ function buyFasterDrinks() {
                 window.sips = window.sips.minus(res.spent);
             }
             fasterDrinks = new Decimal(res.fasterDrinks);
-        updateDrinkRate();
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        
-        // Get click coordinates from the event if available
-        const clickEvent = window.lastClickEvent;
-        const clickX = clickEvent?.clientX || null;
-        const clickY = clickEvent?.clientY || null;
-        
-        showPurchaseFeedback('Faster Drinks', res.spent, clickX, clickY);
-        // reload(); // Removed - causing issues
-        checkUpgradeAffordability();
+            updateDrinkRate();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            
+            // Get click coordinates from the event if available
+            const clickEvent = window.lastClickEvent;
+            const clickX = clickEvent?.clientX || null;
+            const clickY = clickEvent?.clientY || null;
+            
+            showPurchaseFeedback('Faster Drinks', res.spent, clickX, clickY);
+            checkUpgradeAffordability();
             return;
     }
     }
@@ -1911,10 +1910,9 @@ function upgradeFasterDrinks() {
                 window.sips = window.sips.minus(res.spent);
             }
             fasterDrinksUpCounter = new Decimal(res.fasterDrinksUpCounter);
-        updateDrinkRate();
-        try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
-        // reload(); // Removed - causing issues
-        checkUpgradeAffordability();
+            updateDrinkRate();
+            try { window.App?.systems?.audio?.button?.playButtonPurchaseSound?.(); } catch {}
+            checkUpgradeAffordability();
             return;
         }
     }

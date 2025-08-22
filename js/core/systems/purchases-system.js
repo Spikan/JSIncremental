@@ -114,6 +114,16 @@ export function purchaseFasterDrinks({ sips, fasterDrinks }) {
     const baseCost = up?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST;
     const scaling = up?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING;
     const cost = Math.floor(baseCost * Math.pow(scaling, Number(fasterDrinks)));
+    
+    console.log('🔧 Purchase system Faster Drinks cost calculation:', {
+        baseCost,
+        scaling,
+        count: Number(fasterDrinks),
+        calculatedCost: cost,
+        dataUp: up?.fasterDrinks,
+        config: config.FASTER_DRINKS_BASE_COST
+    });
+    
     if (sips < cost) return null;
     const newFasterDrinks = Number(fasterDrinks) + 1;
     return { spent: cost, fasterDrinks: newFasterDrinks };

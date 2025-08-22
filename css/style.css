@@ -1782,10 +1782,11 @@ h3 {
 
 /* Compact clicking upgrade affordability styling */
 .clicking-upgrade-btn.affordable {
-    background-color: #00B36B !important;
+    background: linear-gradient(135deg, #00B36B, #00D4FF) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3) !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    border-color: #00D4FF !important;
 }
 
 .clicking-upgrade-btn.disabled {
@@ -1901,11 +1902,11 @@ h3 {
 }
 
 .drink-speed-upgrade-btn.affordable {
-    background-color: #00B36B !important;
+    background: linear-gradient(135deg, #00B36B, #00D4FF) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 0 20px rgba(0, 179, 107, 0.6);
-    animation: affordableGlow 2s ease-in-out infinite alternate;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3) !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    border-color: #00D4FF !important;
 }
 
 .drink-speed-upgrade-btn.disabled {
