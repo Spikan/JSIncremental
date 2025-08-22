@@ -5,7 +5,7 @@
  * Consolidated number formatting utility
  * Handles Decimal objects and regular numbers with consistent formatting
  */
-export function formatNumber(value) {
+function formatNumber(value) {
     // If we have the global prettify function, use it
     if (typeof window?.prettify === 'function') {
         return window.prettify(value);

@@ -1,12 +1,11 @@
-import { validateGameSave, validateGameOptions } from '../core/validation/schemas.js';
-
+// Storage service - validation functions will be available globally
 const STORAGE_PREFIX = 'game_';
 
 function getKey(key) {
     return STORAGE_PREFIX + key;
 }
 
-export const storage = {
+const storage = {
     loadGame: () => {
         try {
             const saved = localStorage.getItem(getKey('save'));
@@ -16,7 +15,7 @@ export const storage = {
 
 
 
-            const validated = validateGameSave(parsed);
+            const validated = (window.validateGameSave ? window.validateGameSave(parsed) : parsed);
 
             if (validated) {
                 return validated;
@@ -78,7 +77,7 @@ export const storage = {
             
             // Validate specific keys
             if (key === 'options') {
-                const validated = validateGameOptions(parsed);
+                const validated = (window.validateGameOptions ? window.validateGameOptions(parsed) : parsed);
                 return validated || parsed; // Return parsed for backward compatibility
             }
             
@@ -120,5 +119,8 @@ export const storage = {
         }
     }
 };
+
+// Make available globally
+window.storage = storage;
 
 

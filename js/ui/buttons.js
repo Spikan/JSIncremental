@@ -253,37 +253,9 @@ function setupSpecialButtonHandlers() {
         });
     });
     
-    // Soda button (special case - not using onclick)
-    const sodaButton = window.DOM_CACHE?.sodaButton;
-    if (sodaButton) {
-        sodaButton.addEventListener('click', (e) => {
-            const clickX = e.clientX;
-            const clickY = e.clientY;
-            
-            // Play audio
-            try {
-                if (window.App?.systems?.audio?.button) {
-                    window.App.systems.audio.button.playButtonClickSound();
-                } else if (window.playButtonClickSound) {
-                    // Fallback to global audio function
-                    window.playButtonClickSound();
-                }
-            } catch (error) {
-                console.warn('Audio playback failed:', error);
-            }
-            
-            // Add click animation using existing CSS classes
-            sodaButton.classList.add('soda-clicked');
-            setTimeout(() => {
-                sodaButton.classList.remove('soda-clicked');
-            }, 150);
-            
-            // Call sodaClick with coordinates
-            if (window.sodaClick) {
-                window.sodaClick(1, clickX, clickY);
-            }
-        });
-    }
+    // Soda button - don't add duplicate handler since it already has onclick="sodaClick(1)"
+    // The HTML onclick attribute is sufficient and will call sodaClick(1)
+    console.log('🔧 Soda button already has onclick handler, skipping duplicate event listener');
     
     // Chat input keyboard support
     const chatInput = document.getElementById('chatInput');

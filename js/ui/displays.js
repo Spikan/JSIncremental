@@ -63,16 +63,53 @@ export function updateAutosaveStatus() {
 // Update drink progress bar
 export function updateDrinkProgress(progress, drinkRate) {
 	if (typeof window === 'undefined') return;
-	
+
+	console.log('🎨 updateDrinkProgress called with:', { progress, drinkRate });
+
+	// Get progress and drinkRate from multiple sources with fallbacks
+	let currentProgress = progress;
+	let currentDrinkRate = drinkRate;
+
+	// If progress not provided, try to get from globals or state
+	if (typeof currentProgress !== 'number') {
+		if (typeof window.drinkProgress === 'number') {
+			currentProgress = window.drinkProgress;
+		} else if (window.App?.state) {
+			try {
+				const state = window.App.state.getState();
+				currentProgress = state.drinkProgress || 0;
+			} catch {}
+		}
+	}
+
+	// If drinkRate not provided, try to get from globals or state
+	if (typeof currentDrinkRate !== 'number') {
+		if (typeof window.drinkRate === 'number') {
+			currentDrinkRate = window.drinkRate;
+		} else if (window.App?.state) {
+			try {
+				const state = window.App.state.getState();
+				currentDrinkRate = state.drinkRate || 0;
+			} catch {}
+		}
+	}
+
 	// Get elements from DOM cache or fallback to direct DOM access
 	const progressFill = window.DOM_CACHE?.progressFill || document.getElementById('drinkProgressFill');
 	const countdown = window.DOM_CACHE?.countdown || document.getElementById('drinkCountdown');
-	
+
+	console.log('🎨 DOM elements found:', {
+		progressFill: !!progressFill,
+		countdown: !!countdown,
+		progressFillElement: progressFill,
+		countdownElement: countdown
+	});
+
 	// Update progress bar fill
-	if (progressFill && typeof progress === 'number') {
-		const clampedProgress = Math.min(Math.max(progress, 0), 100);
+	if (progressFill && typeof currentProgress === 'number') {
+		const clampedProgress = Math.min(Math.max(currentProgress, 0), 100);
 		progressFill.style.width = `${clampedProgress}%`;
-		
+
 		// Add visual feedback when progress is complete
 		if (clampedProgress >= 100) {
 			progressFill.classList.add('progress-complete');
@@ -80,13 +117,13 @@ export function updateDrinkProgress(progress, drinkRate) {
 			progressFill.classList.remove('progress-complete');
 		}
 	}
-	
+
 	// Update countdown timer
-	if (countdown && drinkRate && typeof progress === 'number') {
-		const remainingTime = Math.max(0, drinkRate - (progress / 100 * drinkRate));
+	if (countdown && currentDrinkRate && typeof currentProgress === 'number') {
+		const remainingTime = Math.max(0, currentDrinkRate - (currentProgress / 100 * currentDrinkRate));
 		const remainingSeconds = (remainingTime / 1000).toFixed(1);
 		countdown.textContent = `${remainingSeconds}s`;
-		
+
 		// Add visual feedback for countdown
 		if (remainingTime <= 1000) { // Less than 1 second
 			countdown.classList.add('countdown-warning');

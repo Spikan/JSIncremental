@@ -1,4 +1,4 @@
-export const EVENT_NAMES = {
+const EVENT_NAMES = {
     GAME: {
         LOADED: 'game:loaded',
         SAVED: 'game:saved',
@@ -34,5 +34,8 @@ export const EVENT_NAMES = {
         CLICK_SOUNDS_TOGGLED: 'options:click_sounds_toggled',
     },
 };
+
+// Make available globally
+window.EVENT_NAMES = EVENT_NAMES;
 
 

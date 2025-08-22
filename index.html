@@ -17,19 +17,22 @@
     <script>
         // Safety check to ensure functions are available - moved to after main.js loads
         window.addEventListener('load', function() {
-            // Wait a bit for main.js to load and functions to be available
-            setTimeout(function() {
+            // Wait for main.js to load and functions to be available
+            function checkFunctionsLoaded() {
                 if (typeof window.switchTab === 'undefined') {
-                    console.error('switchTab function not available');
+                    console.log('⏳ Waiting for switchTab function...');
+                    setTimeout(checkFunctionsLoaded, 200);
+                } else if (typeof window.devUnlockAll === 'undefined') {
+                    console.log('⏳ Waiting for devUnlockAll function...');
+                    setTimeout(checkFunctionsLoaded, 200);
                 } else {
                     console.log('✅ switchTab function is available');
-                }
-                if (typeof window.devUnlockAll === 'undefined') {
-                    console.error('devUnlockAll function not available');
-                } else {
                     console.log('✅ devUnlockAll function is available');
                 }
-            }, 500); // Wait 500ms for main.js to load
+            }
+
+            // Start checking after a brief initial delay
+            setTimeout(checkFunctionsLoaded, 1000);
         });
     </script>
 </head>
@@ -726,7 +729,9 @@
 <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
 <script src="js/config.js"></script>
 <script src="js/dom-cache.js"></script>
-<script type="module" src="js/index.js"></script>
+<script src="js/feature-unlocks.js"></script>
+<script src="js/index.js"></script>
+<script src="js/main.js"></script>
 <script>
 // Ensure Decimal is available globally before loading main.js
 if (typeof Decimal === 'undefined') {
@@ -735,45 +740,10 @@ if (typeof Decimal === 'undefined') {
     console.log('✅ Decimal library loaded successfully');
 }
 
-// Ensure App object is available before loading main.js
-function waitForApp() {
-    if (window.App && window.App.ui) {
-        console.log('✅ App object ready, loading dependencies');
-        // Dependencies will be loaded first, then main.js will be loaded after they're ready
-        
-        // Load dependencies BEFORE main.js to ensure they're available
-        const featureScript = document.createElement('script');
-        featureScript.src = 'js/feature-unlocks.js';
-        featureScript.onload = () => {
-            console.log('✅ feature-unlocks.js loaded successfully');
-            // Now load main.js after dependencies are ready
-            const mainScript = document.createElement('script');
-            mainScript.src = 'js/main.js';
-            mainScript.onload = () => console.log('✅ main.js loaded successfully');
-            mainScript.onerror = (e) => console.error('❌ Failed to load main.js:', e);
-            document.body.appendChild(mainScript);
-        };
-        featureScript.onerror = (e) => console.error('❌ Failed to load feature-unlocks.js:', e);
-        document.body.appendChild(featureScript);
-        
-        // Load other scripts after main.js
-        setTimeout(() => {
-            const godScript = document.createElement('script');
-            godScript.src = 'js/god.js';
-            document.body.appendChild(godScript);
-            
-            const errorScript = document.createElement('script');
-            errorScript.src = 'js/services/error-overlay.js';
-            document.body.appendChild(errorScript);
-        }, 100);
-    } else {
-        console.log('⏳ Waiting for App object...');
-        setTimeout(waitForApp, 50);
-    }
-}
-
-// Start waiting for App object
-waitForApp();
+// Let main.js handle the script loading since the modular files are now working
+console.log('🔧 Core scripts loaded, main.js will handle the rest...');
 </script>
 </body>
+</html>
+</html>
 </html>

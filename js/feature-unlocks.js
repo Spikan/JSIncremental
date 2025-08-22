@@ -400,6 +400,12 @@ const FEATURE_UNLOCKS = {
                 name: 'Unlocks',
                 description: 'Track your feature unlock progress',
                 category: 'Interface'
+            },
+            'dev': {
+                icon: '🛠️',
+                name: 'Developer Tools',
+                description: 'Access developer tools and debugging features',
+                category: 'Development'
             }
         };
         
@@ -408,20 +414,26 @@ const FEATURE_UNLOCKS = {
             const info = featureInfo[feature];
             const condition = this.unlockConditions[feature];
             const isUnlocked = this.unlockedFeatures.has(feature);
-            
+
+            // Skip if feature info is missing (defensive programming)
+            if (!info) {
+                console.warn(`Missing feature info for: ${feature}, available features:`, Object.keys(featureInfo));
+                return;
+            }
+
             const unlockItem = document.createElement('div');
             unlockItem.className = `unlock-item ${isUnlocked ? 'unlocked' : 'locked'}`;
-            
+
             const sipsMet = typeof window.sips !== 'undefined' && window.sips.gte ? window.sips.gte(condition.sips) : false;
             const clicksMet = typeof window.totalClicks !== 'undefined' && window.totalClicks >= condition.clicks;
-            
+
             unlockItem.innerHTML = `
                 <div class="unlock-status">${isUnlocked ? '🔓' : '🔒'}</div>
                 <div class="unlock-header">
-                    <div class="unlock-icon">${info.icon}</div>
+                    <div class="unlock-icon">${info?.icon || '❓'}</div>
                     <div class="unlock-info">
-                        <div class="unlock-name">${info.name}</div>
-                        <div class="unlock-description">${info.description}</div>
+                        <div class="unlock-name">${info?.name || feature}</div>
+                        <div class="unlock-description">${info?.description || 'No description available'}</div>
                     </div>
                 </div>
                 <div class="unlock-requirements">

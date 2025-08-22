@@ -209,6 +209,10 @@ window.switchTab = switchTab;
 
 function initGame() {
     try {
+        console.log('🚀 initGame called - starting game initialization...');
+        console.log('🔧 GAME_CONFIG available:', !!window.GAME_CONFIG);
+        console.log('🔧 DOM_CACHE available:', !!window.DOM_CACHE);
+        console.log('🔧 FEATURE_UNLOCKS available:', !!window.FEATURE_UNLOCKS);
         // ============================================================================
         // DEPENDENCY VALIDATION - Ensure all required objects are available
         // ============================================================================
@@ -268,6 +272,7 @@ function initGame() {
         
         // Game state variables
         // Core resources
+        console.log('🔧 Initializing game state variables...');
         window.sips = new Decimal(0);
         let straws = new Decimal(0);
         let cups = new Decimal(0);
@@ -278,6 +283,18 @@ function initGame() {
         let suctions = new Decimal(0);
         // Make suctions accessible globally
         window.suctions = suctions;
+
+        console.log('🔧 Game state initialized:', {
+            sips: window.sips.toNumber(),
+            straws: window.straws.toNumber(),
+            cups: window.cups.toNumber(),
+            suctions: window.suctions.toNumber(),
+            suctionsType: typeof window.suctions,
+            totalClicks: window.totalClicks,
+            lastClickTime: window.lastClickTime,
+            currentClickStreak: window.currentClickStreak,
+            bestClickStreak: window.bestClickStreak
+        });
         let sps = new Decimal(0);
         // Expose sps for UI modules - only define if not already defined
         if (!Object.getOwnPropertyDescriptor(window, 'sps')) {
@@ -316,7 +333,7 @@ function initGame() {
             });
         }
         let drinkProgress = 0;
-        let lastDrinkTime = Date.now();
+        let lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE; // Start with progress at 0
 
         // Faster Drinks upgrade variables
         let fasterDrinks = new Decimal(0);
@@ -356,13 +373,13 @@ function initGame() {
 
         // Statistics tracking variables
         window.totalClicks = 0;
-        let currentClickStreak = 0;
-        let bestClickStreak = 0;
+        window.currentClickStreak = 0;
+        window.bestClickStreak = 0;
         let totalSipsEarned = new Decimal(0);
         let highestSipsPerSecond = new Decimal(0);
         let gameStartDate = Date.now();
-        let lastClickTime = 0;
-        let clickTimes = []; // For calculating clicks per second
+        window.lastClickTime = 0;
+        window.clickTimes = []; // For calculating clicks per second
 
         // Initialize DOM cache first
         DOM_CACHE.init();
@@ -401,23 +418,31 @@ function initGame() {
             window.straws = straws;
             window.cups = cups;
             suctions = new Decimal(savegame.suctions || 0);
+            window.suctions = suctions;
             fasterDrinks = new Decimal(savegame.fasterDrinks || 0);
+            window.fasterDrinks = fasterDrinks;
             // Load sps from save, but we'll recalculate it to include base sips per drink
             const savedSps = new Decimal(savegame.sps || 0);
             widerStraws = new Decimal(savegame.widerStraws || 0);
+            window.widerStraws = widerStraws;
             betterCups = new Decimal(savegame.betterCups || 0);
+            window.betterCups = betterCups;
             criticalClickChance = new Decimal(savegame.criticalClickChance || 0.001);
+            window.criticalClickChance = criticalClickChance;
             criticalClickMultiplier = new Decimal(savegame.criticalClickMultiplier || 5);
+            window.criticalClickMultiplier = criticalClickMultiplier;
             criticalClicks = new Decimal(savegame.criticalClicks || 0);
+            window.criticalClicks = criticalClicks;
             criticalClickUpCounter = new Decimal(savegame.criticalClickUpCounter || 1);
             suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
             level = new Decimal(typeof savegame.level === 'number' ? savegame.level : (savegame.level || 1));
+            window.level = level;
             try { window.App?.stateBridge?.setLevel(level); } catch {}
             totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
             window.totalClicks = Number(savegame.totalClicks || 0);
             gameStartDate = savegame.gameStartDate || Date.now();
-            lastClickTime = savegame.lastClickTime || 0;
-            clickTimes = savegame.clickTimes || [];
+            window.lastClickTime = savegame.lastClickTime || 0;
+            window.clickTimes = savegame.clickTimes || [];
         }
 
         try {
@@ -493,20 +518,22 @@ function initGame() {
             window.straws = straws;
             window.cups = cups;
             suctions = new Decimal(0);
+            window.suctions = suctions;
             fasterDrinks = new Decimal(0);
-            widerStraws = new Decimal(0);
-            betterCups = new Decimal(0);
+            window.fasterDrinks = fasterDrinks;
             criticalClickChance = new Decimal(config.CRITICAL_CLICK_BASE_CHANCE);
+            window.criticalClickChance = criticalClickChance;
             criticalClickMultiplier = new Decimal(config.CRITICAL_CLICK_BASE_MULTIPLIER);
-            criticalClicks = new Decimal(0);
+            window.criticalClickMultiplier = criticalClickMultiplier;
             criticalClickUpCounter = new Decimal(1);
             suctionClickBonus = new Decimal(0);
             level = new Decimal(1);
+            window.level = level;
             try { window.App?.stateBridge?.setLevel(level); } catch {}
             totalSipsEarned = new Decimal(0);
             gameStartDate = Date.now();
-            lastClickTime = 0;
-            clickTimes = [];
+            window.lastClickTime = 0;
+            window.clickTimes = [];
         }
 
 
@@ -646,10 +673,21 @@ function startGameLoop() {
             const timeSinceLastDrink = currentTime - lastDrinkTime;
             const progressPercentage = Math.min((timeSinceLastDrink / drinkRate) * 100, 100);
             drinkProgress = progressPercentage;
-            
+
+            // Debug progress every 5 seconds to avoid spam
+            if (currentTime - (window.lastDebugTime || 0) > 5000) {
+                console.log('🔧 Drink progress:', Math.round(drinkProgress), '%');
+                window.lastDebugTime = currentTime;
+            }
+
+            // Sync drink progress with state bridge
+            try {
+                window.App?.stateBridge?.setDrinkProgress(drinkProgress);
+            } catch {}
+
             // Update drink progress bar with current progress
-            try { 
-                window.App?.ui?.updateDrinkProgress?.(drinkProgress, drinkRate); 
+            try {
+                window.App?.ui?.updateDrinkProgress?.(drinkProgress, drinkRate);
             } catch {}
             
             processDrink();
@@ -671,6 +709,8 @@ function startGameLoop() {
         }
         requestAnimationFrame(gameLoop);
     }
+    console.log('🎮 Starting game loop...');
+    console.log('🔧 Game loop function exists:', typeof gameLoop);
     requestAnimationFrame(gameLoop);
 }
 
@@ -754,12 +794,15 @@ function processDrink() {
         const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         window.sips = window.sips.plus(baseSipsPerDrink);
         totalSipsEarned = totalSipsEarned.plus(baseSipsPerDrink);
+
+        console.log('🥤 Drink processed! Added', baseSipsPerDrink.toNumber(), 'sips');
         
         lastDrinkTime = currentTime;
         drinkProgress = 0;
         try {
             window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
             window.App?.stateBridge?.setDrinkProgress(drinkProgress);
+            window.App?.stateBridge?.autoSync?.();
         } catch {}
         
         // Check for feature unlocks after processing a drink
@@ -821,28 +864,29 @@ function getDrinkRateSeconds() {
 
 // Click tracking function
 function trackClick() {
+    console.log('🔧 trackClick called');
     window.totalClicks++;
     const now = Date.now();
-    
+
     // Track click streak
     const config = window.GAME_CONFIG?.TIMING || {};
-    const clickStreakWindow = config.CLICK_STREAK_WINDOW;
-    if (now - lastClickTime < clickStreakWindow) { // Within configured time window
-        currentClickStreak++;
-        if (currentClickStreak > bestClickStreak) {
-            bestClickStreak = currentClickStreak;
+    const clickStreakWindow = config.CLICK_STREAK_WINDOW || 3000; // Default 3 seconds
+    if (now - window.lastClickTime < clickStreakWindow) { // Within configured time window
+        window.currentClickStreak++;
+        if (window.currentClickStreak > window.bestClickStreak) {
+            window.bestClickStreak = window.currentClickStreak;
         }
     } else {
-        currentClickStreak = 1;
+        window.currentClickStreak = 1;
     }
-    
-    lastClickTime = now;
-    clickTimes.push(now);
-    
+
+    window.lastClickTime = now;
+    window.clickTimes.push(now);
+
     // Keep only last configured number of clicks for performance
-    const maxClickTimes = window.GAME_CONFIG.LIMITS.MAX_CLICK_TIMES;
-    if (clickTimes.length > maxClickTimes) {
-        clickTimes.shift();
+    const maxClickTimes = window.GAME_CONFIG?.LIMITS?.MAX_CLICK_TIMES || 100;
+    if (window.clickTimes.length > maxClickTimes) {
+        window.clickTimes.shift();
     }
     
     // Play button click sound effect
@@ -1082,7 +1126,7 @@ function buyStraw() {
         if (result) {
             // Update global state
             window.sips = window.sips.minus(result.spent);
-            window.straws = result.straws;
+            window.straws = new Decimal(result.straws);
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1111,7 +1155,7 @@ function buyCup() {
         if (result) {
             // Update global state
             window.sips = window.sips.minus(result.spent);
-            window.cups = result.cups;
+            window.cups = new Decimal(result.cups);
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1140,7 +1184,8 @@ function buySuction() {
         if (result) {
             // Update global state
             window.sips = window.sips.minus(result.spent);
-            window.suctions = result.suctions;
+            // Ensure suctions is a Decimal object
+            window.suctions = new Decimal(result.suctions);
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1170,8 +1215,8 @@ function buyCriticalClick() {
         if (result) {
             // Update global state
             window.sips = window.sips.minus(result.spent);
-            window.criticalClicks = result.criticalClicks;
-            window.criticalClickChance = result.criticalClickChance;
+            window.criticalClicks = new Decimal(result.criticalClicks);
+            window.criticalClickChance = new Decimal(result.criticalClickChance);
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1200,7 +1245,7 @@ function buyFasterDrinks() {
         if (result) {
             // Update global state
             window.sips = window.sips.minus(result.spent);
-            window.fasterDrinks = result.fasterDrinks;
+            window.fasterDrinks = new Decimal(result.fasterDrinks);
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1229,7 +1274,7 @@ function buyWiderStraws() {
         if (result) {
             // Update global state
             window.sips = window.sips.minus(result.spent);
-            window.widerStraws = result.widerStraws;
+            window.widerStraws = new Decimal(result.widerStraws);
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1258,7 +1303,7 @@ function buyBetterCups() {
         if (result) {
             // Update global state
             window.sips = window.sips.minus(result.spent);
-            window.betterCups = result.betterCups;
+            window.betterCups = new Decimal(result.betterCups);
             
             // Trigger UI updates
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1305,16 +1350,44 @@ function upgradeFasterDrinks() {
 // Other game functions
 function sodaClick(multiplier = 1) {
     try {
+        console.log('🔧 sodaClick called with multiplier:', multiplier);
+        console.log('🔧 Current sips before click:', window.sips?.toNumber?.());
+        console.log('🔧 Current suctions:', window.suctions?.toNumber?.(), 'Type:', typeof window.suctions, 'Value:', window.suctions);
+
         // Track the click
         trackClick();
-        
+
         // Calculate base click value
         const baseClickValue = new Decimal(1);
-        const suctionBonus = new Decimal(window.suctions || 0) * 0.3;
+
+        // Safely get suction bonus with proper Decimal handling
+        let suctionValue = 0;
+        try {
+            if (window.suctions && typeof window.suctions.toNumber === 'function') {
+                suctionValue = window.suctions.toNumber();
+            } else if (typeof window.suctions === 'number') {
+                suctionValue = window.suctions;
+            } else if (window.suctions) {
+                suctionValue = Number(window.suctions) || 0;
+            }
+        } catch (error) {
+            console.warn('🔧 Error getting suction value:', error);
+            suctionValue = 0;
+        }
+
+        const suctionBonus = new Decimal(suctionValue * 0.3);
         const totalClickValue = baseClickValue.plus(suctionBonus).times(multiplier);
-        
+
+        console.log('🔧 Click calculation:', {
+            baseClickValue: baseClickValue.toNumber(),
+            suctionValue: suctionValue,
+            suctionBonus: suctionBonus.toNumber(),
+            totalClickValue: totalClickValue.toNumber()
+        });
+
         // Add to sips
         window.sips = window.sips.plus(totalClickValue);
+        console.log('🔧 New sips after click:', window.sips?.toNumber?.());
         
         // Check for critical click
         const criticalChance = window.criticalClickChance || 0;
@@ -1330,6 +1403,9 @@ function sodaClick(multiplier = 1) {
         // Emit click event
         try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.SODA, { value: totalClickValue }); } catch {}
         
+        // Sync state bridge to keep globals and state in sync
+        try { window.App?.stateBridge?.autoSync?.(); } catch {}
+
         // Update UI
         try { window.App?.ui?.updateTopSipsPerDrink?.(); } catch {}
         try { window.App?.ui?.updateTopSipsPerSecond?.(); } catch {}
@@ -1531,6 +1607,7 @@ window.upgradeFasterDrinks = upgradeFasterDrinks;
 
 // Game functions
 window.sodaClick = sodaClick;
+console.log('🔧 main.js loaded, sodaClick function available:', typeof window.sodaClick);
 window.levelUp = levelUp;
 window.save = save;
 window.delete_save = delete_save;

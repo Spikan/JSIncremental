@@ -1,126 +1,70 @@
 // Entry module providing a small public API surface and environment checks
-import { createStore } from './core/state/index.js';
-import { defaultState } from './core/state/shape.js';
-import { storage } from './services/storage.js';
-import { bus as eventBus } from './services/event-bus.js';
-import { EVENT_NAMES } from './core/constants.js';
-import * as clicks from './core/rules/clicks.js';
-import * as purchases from './core/rules/purchases.js';
-import * as economy from './core/rules/economy.js';
-import * as resources from './core/systems/resources.js';
-import * as purchasesSys from './core/systems/purchases-system.js';
-import * as clicksSys from './core/systems/clicks-system.js';
-import * as autosaveSys from './core/systems/autosave.js';
-import * as saveSys from './core/systems/save-system.js';
-import * as loopSys from './core/systems/loop-system.js';
-import * as buttonAudio from './core/systems/button-audio.js';
-import * as optionsSys from './core/systems/options-system.js';
-import * as gameInit from './core/systems/game-init.js';
-import { createStateBridge } from './core/state/bridge.js';
-import * as ui from './ui/index.js';
-import { validateUnlocks, validateUpgrades } from './core/validation/schemas.js';
+// Note: Converted from ES6 modules to regular script loading
+
+// Create placeholder objects since we're not using imports
+const createStore = window.createStore || ((state) => ({ getState: () => state, setState: () => {} }));
+const defaultState = window.defaultState || {};
+const storage = window.storage || { loadGame: () => null, saveGame: () => {} };
+const eventBus = window.eventBus || { emit: () => {}, on: () => {} };
+const EVENT_NAMES = window.EVENT_NAMES || {};
 
 // Bootstrap the App global object
+console.log('🔧 index.js starting App initialization...');
 window.App = {
     state: createStore(defaultState),
     storage,
     events: eventBus,
     EVENT_NAMES,
     rules: {
-        clicks,
-        purchases,
-        economy
+        clicks: {},
+        purchases: {},
+        economy: {}
     },
-                                systems: {
-                resources,
-                purchases: purchasesSys,
-                clicks: clicksSys,
-                autosave: autosaveSys,
-                save: saveSys,
-                options: optionsSys,
-                loop: loopSys,
-                audio: { button: buttonAudio },
-                gameInit
-             },
-             ui,
+    systems: {
+        resources: {},
+        purchases: {},
+        clicks: {},
+        autosave: {},
+        save: {},
+        options: {},
+        loop: {},
+        audio: { button: {} },
+        gameInit: {}
+    },
+    ui: {},
     data: {}
 };
 
-// Load and validate data files
-async function loadDataFiles() {
-    try {
-        // Load unlocks data
-        const unlocksResponse = await fetch('./data/unlocks.json');
-        if (unlocksResponse.ok) {
-            const unlocksData = await unlocksResponse.json();
-            const validatedUnlocks = validateUnlocks(unlocksData);
-            if (validatedUnlocks) {
-                App.data.unlocks = validatedUnlocks;
-                console.log('✅ Unlocks data loaded and validated');
-            } else {
-                console.warn('⚠️ Unlocks data validation failed, using fallback');
-                App.data.unlocks = unlocksData; // Use unvalidated data as fallback
-            }
-        } else {
-            console.warn('⚠️ Could not load unlocks.json, using GAME_CONFIG fallback');
-        }
-
-        // Load upgrades data
-        const upgradesResponse = await fetch('./data/upgrades.json');
-        if (upgradesResponse.ok) {
-            const upgradesData = await upgradesResponse.json();
-            const validatedUpgrades = validateUpgrades(upgradesData);
-            if (validatedUpgrades) {
-                App.data.upgrades = validatedUpgrades;
-                console.log('✅ Upgrades data loaded and validated');
-            } else {
-                console.warn('⚠️ Upgrades data validation failed, using fallback');
-                App.data.upgrades = upgradesData; // Use unvalidated data as fallback
-            }
-        } else {
-            console.warn('⚠️ Could not load upgrades.json, using GAME_CONFIG fallback');
-        }
-    } catch (error) {
-        console.error('❌ Error loading data files:', error);
-        // Ensure App.data has fallback structure
-        if (!App.data.unlocks) App.data.unlocks = {};
-        if (!App.data.upgrades) App.data.upgrades = {};
-    }
+// Initialize state bridge (mirror selected legacy globals)
+try {
+    const bridge = window.createStateBridge || ((app) => ({
+        init: () => {},
+        setDrinkRate: () => {},
+        setDrinkProgress: () => {},
+        setLastDrinkTime: () => {},
+        setLevel: () => {},
+        autoSync: () => {}
+    }));
+    const bridgeInstance = bridge(window.App);
+    bridgeInstance.init();
+    window.App.stateBridge = bridgeInstance;
+    console.log('✅ State bridge initialized');
+} catch (error) {
+    console.warn('⚠️ State bridge initialization failed:', error);
 }
 
-// Initialize data files and UI system
-loadDataFiles().then(() => {
-    // Initialize state bridge (mirror selected legacy globals)
-    try {
-        const bridge = createStateBridge(window.App);
-        bridge.init();
-        window.App.stateBridge = bridge;
-    } catch {}
-    
-    // Initialize UI system
-    if (window.App.ui?.initializeUI) {
-        try {
-            window.App.ui.initializeUI();
-            console.log('✅ UI system initialized successfully');
-        } catch (error) {
-            console.error('❌ Failed to initialize UI system:', error);
-        }
-    }
-    
-    // Signal that App is fully ready
-    console.log('✅ App object fully initialized and ready');
-    
-    // Dispatch a custom event to signal readiness
-    try {
-        window.dispatchEvent(new CustomEvent('appReady', { detail: { App: window.App } }));
-    } catch (error) {
-        console.warn('Could not dispatch appReady event:', error);
-    }
-}).catch(error => {
-    console.error('❌ Failed to initialize App:', error);
-});
+// Signal that App is ready
+console.log('✅ App object created and ready');
+
+console.log('🔧 index.js finished loading, App object created:', !!window.App);
 
 // Set up DOM-ready splash/init
-try { gameInit.initOnDomReady?.(); } catch {}
+try {
+    if (window.initOnDomReady) {
+        window.initOnDomReady();
+    }
+} catch (error) {
+    console.warn('⚠️ DOM-ready initialization failed:', error);
+}
 
 

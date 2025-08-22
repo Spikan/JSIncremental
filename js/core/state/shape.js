@@ -1,7 +1,7 @@
 // Centralized default state shape for the game. This is an internal mirror
 // that we will gradually make authoritative as we migrate away from globals.
 
-export const defaultState = {
+const defaultState = {
 	// Core resources
 	sips: 0,
 	straws: 0,
@@ -35,5 +35,8 @@ export const defaultState = {
 		}
 	},
 };
+
+// Make available globally
+window.defaultState = defaultState;
 
 

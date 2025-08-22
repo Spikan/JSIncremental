@@ -1,6 +1,6 @@
 // Simple pub/sub event bus
 
-export function createEventBus() {
+function createEventBus() {
     const listeners = new Map(); // event -> Set<fn>
 
     function on(event, handler) {
@@ -25,6 +25,11 @@ export function createEventBus() {
     return { on, off, emit };
 }
 
-export const bus = createEventBus();
+const bus = createEventBus();
+
+// Make available globally
+window.createEventBus = createEventBus;
+window.eventBus = bus;
+window.bus = bus;
 
 
