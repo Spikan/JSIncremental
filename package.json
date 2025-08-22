@@ -10,12 +10,19 @@
     "lint": "eslint . --ext .js,.ts",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "test:debug": "vitest run --reporter=verbose"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.8.0",
     "@vitest/ui": "^1.0.0",
     "eslint": "^8.0.0",
     "eslint-plugin-import": "^2.29.1",
+    "happy-dom": "^18.0.1",
+    "jsdom": "^26.1.0",
     "prettier": "^3.0.0",
     "vite": "^5.0.0",
     "vitest": "^1.0.0"
