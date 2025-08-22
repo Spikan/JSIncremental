@@ -583,10 +583,9 @@ body {
 
 
 .sound-toggle-btn:hover {
-    background-color: #00D97F;
-    border-color: #00D97F;
+    background-color: var(--primary-blue-dark);
+    border-color: var(--primary-blue-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3);
 }
 
 .sound-toggle-btn.sounds-off {
@@ -1489,11 +1488,10 @@ h3 {
 }
 
 .upgrade-btn.affordable {
-    background-color: #FF3D02 !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 0 20px rgba(255, 61, 2, 0.6) !important;
-    animation: affordableGlow 2s ease-in-out infinite alternate;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    background-color: var(--primary-blue-dark) !important;
+    color: var(--neutral-white) !important;
+    border-color: var(--primary-green-light) !important;
+    box-shadow: var(--btn-shadow-md) !important;
 }
 
 .upgrade-btn.disabled {
@@ -2959,7 +2957,7 @@ button {
 }
 
 .btn-secondary:hover {
-  background-color: var(--primary-green);
+  background-color: var(--primary-blue-dark);
   color: var(--neutral-white);
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
@@ -2967,7 +2965,7 @@ button {
 
 .btn-secondary:active {
   transform: scale(0.98);
-  background-color: var(--primary-green);
+  background-color: var(--primary-blue-dark);
   color: var(--neutral-white);
   border-color: var(--primary-green);
 }
@@ -3018,14 +3016,14 @@ button.disabled:hover {
 
 /* Affordable state - when item can be purchased */
 button.affordable {
-  background-color: var(--primary-green) !important;
+  background-color: var(--primary-blue-dark) !important;
   color: var(--neutral-white) !important;
   border-color: var(--primary-green-light) !important;
   box-shadow: var(--btn-shadow-md) !important;
 }
 
 button.affordable:hover {
-  background-color: var(--primary-green-light) !important;
+  background-color: var(--primary-blue) !important;
   border-color: var(--primary-green-light) !important;
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-lg) !important;
@@ -3043,7 +3041,7 @@ button.affordable:hover {
 .shop-btn.affordable:hover,
 .clicking-upgrade-btn.affordable:hover,
 .drink-speed-upgrade-btn.affordable:hover {
-  background-color: var(--primary-green) !important;
+  background-color: var(--primary-blue) !important;
   color: var(--neutral-white) !important;
   border-color: var(--primary-green) !important;
 }
@@ -3168,7 +3166,7 @@ button:focus {
 }
 
 .shop-btn:hover:not(.affordable):not(.disabled) {
-  background-color: var(--primary-green);
+  background-color: var(--primary-blue-dark);
   color: var(--neutral-white) !important;
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
@@ -3196,7 +3194,7 @@ button:focus {
 }
 
 .clicking-upgrade-btn:hover {
-  background-color: var(--primary-green);
+  background-color: var(--primary-blue-dark);
   color: var(--neutral-white) !important;
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
@@ -3222,8 +3220,8 @@ button:focus {
 }
 
 .drink-speed-upgrade-btn:hover {
-  background-color: var(--primary-green);
-  color: var(--neutral-white);
+  background-color: var(--primary-blue-dark);
+  color: var(--neutral-white) !important;
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
@@ -3339,16 +3337,16 @@ button:focus {
 }
 
 .dev-btn:hover {
-  background-color: var(--primary-green);
-  color: var(--neutral-white);
+  background-color: var(--primary-blue-dark);
+  color: var(--neutral-white) !important;
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow-md);
 }
 
 .dev-btn:active {
   transform: scale(0.95);
-  background-color: var(--primary-green);
-  color: var(--neutral-white);
+  background-color: var(--primary-blue-dark);
+  color: var(--neutral-white) !important;
 }
 
 /* Dev Button Variants */
