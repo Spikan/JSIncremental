@@ -1,52 +1,15 @@
 // UI Display Updates
 // Handles all display updates for game stats, costs, and progress indicators
 
-// Fallback prettify function if not available in global scope
-function safePrettify(value) {
-	if (typeof window?.prettify === 'function') {
-		return window.prettify(value);
-	}
-	return value?.toString?.() ?? String(value);
-}
-
-// Update cost display with affordability indicators
-export function updateCostDisplay(elementId, cost, isAffordable) {
-	if (typeof window === 'undefined') return;
-	const element = document.getElementById(elementId);
-	if (element) {
-		element.innerHTML = safePrettify(cost);
-		element.classList.toggle('affordable', isAffordable);
-		element.classList.toggle('unaffordable', !isAffordable);
-	}
-}
-
-// Update button state based on affordability
-export function updateButtonState(buttonId, isAffordable, cost) {
-	if (typeof window === 'undefined') return;
-	// Try multiple selectors to find the button
-	const button = document.getElementById(buttonId) || 
-				  document.querySelector(`[data-button-id="${buttonId}"]`) ||
-				  document.querySelector(`button[onclick*="${buttonId}"]`);
-	
-	if (button) {
-		button.disabled = !isAffordable;
-		button.classList.toggle('affordable', isAffordable);
-		button.classList.toggle('unaffordable', !isAffordable);
-		
-		// Update button text with cost if it has a cost span
-		const costSpan = button.querySelector('.cost');
-		if (costSpan && typeof cost !== 'undefined') {
-			costSpan.textContent = safePrettify(cost);
-		}
-	}
-}
+// Import consolidated utilities
+import { updateCostDisplay, updateButtonState, formatNumber } from './utils.js';
 
 // Update the top sips per drink display
 export function updateTopSipsPerDrink() {
 	if (typeof window === 'undefined') return;
 	const topSipsPerDrinkElement = window.DOM_CACHE?.topSipsPerDrink;
 	if (topSipsPerDrinkElement && window.sps) {
-		topSipsPerDrinkElement.innerHTML = safePrettify(window.sps);
+		topSipsPerDrinkElement.innerHTML = formatNumber(window.sps);
 	}
 }
 
@@ -57,7 +20,7 @@ export function updateTopSipsPerSecond() {
 	if (topSipsPerSecondElement && window.sps && window.drinkRate) {
 		const drinkRateSeconds = window.drinkRate / 1000;
 		const sipsPerSecond = window.sps.div(drinkRateSeconds);
-		topSipsPerSecondElement.innerHTML = safePrettify(sipsPerSecond);
+		topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
 	}
 }
 
@@ -120,7 +83,7 @@ export function updateTopSipCounter() {
 	const topSipElement = window.DOM_CACHE?.topSipValue || document.getElementById('topSipValue');
 	if (topSipElement) {
 		const value = (window.sips != null) ? window.sips : 0;
-		topSipElement.textContent = safePrettify(value);
+		topSipElement.textContent = formatNumber(value);
 	}
 }
 

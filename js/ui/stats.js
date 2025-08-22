@@ -1,6 +1,9 @@
 // UI Statistics Updates
 // Handles all statistics display updates for different tabs and categories
 
+// Import consolidated utilities
+import { formatNumber } from './utils.js';
+
 // Update play time display
 export function updatePlayTime() {
     const playTimeElement = window.DOM_CACHE?.playTime;
@@ -95,13 +98,13 @@ export function updateClickStats() {
     // Total clicks
     const totalClicksElement = window.DOM_CACHE?.totalClicks;
     if (totalClicksElement && window.totalClicks !== undefined) {
-        totalClicksElement.textContent = prettify(window.totalClicks);
+        totalClicksElement.textContent = formatNumber(window.totalClicks);
     }
     
     // Critical clicks
     const criticalClicksElement = window.DOM_CACHE?.criticalClicksStats;
     if (criticalClicksElement && window.criticalClicks) {
-        criticalClicksElement.textContent = prettify(window.criticalClicks);
+        criticalClicksElement.textContent = formatNumber(window.criticalClicks);
     }
     
     // Click streak
@@ -122,13 +125,13 @@ export function updateEconomyStats() {
     // Total sips earned
     const totalSipsEarnedElement = window.DOM_CACHE?.totalSipsEarned;
     if (totalSipsEarnedElement && window.totalSipsEarned) {
-        totalSipsEarnedElement.textContent = prettify(window.totalSipsEarned);
+        totalSipsEarnedElement.textContent = formatNumber(window.totalSipsEarned);
     }
     
     // Highest sips per second
     const highestSipsPerSecondElement = window.DOM_CACHE?.highestSipsPerSecond;
     if (highestSipsPerSecondElement && window.highestSipsPerSecond) {
-        highestSipsPerSecondElement.textContent = prettify(window.highestSipsPerSecond);
+        highestSipsPerSecondElement.textContent = formatNumber(window.highestSipsPerSecond);
     }
 }
 
@@ -137,25 +140,25 @@ export function updateShopStats() {
     // Straws purchased
     const strawsPurchasedElement = window.DOM_CACHE?.strawsPurchased;
     if (strawsPurchasedElement && window.straws) {
-        strawsPurchasedElement.textContent = prettify(window.straws);
+        strawsPurchasedElement.textContent = formatNumber(window.straws);
     }
     
     // Cups purchased
     const cupsPurchasedElement = window.DOM_CACHE?.cupsPurchased;
     if (cupsPurchasedElement && window.cups) {
-        cupsPurchasedElement.textContent = prettify(window.cups);
+        cupsPurchasedElement.textContent = formatNumber(window.cups);
     }
     
     // Suctions purchased
     const suctionsPurchasedElement = window.DOM_CACHE?.suctionsPurchased;
     if (suctionsPurchasedElement && window.suctions) {
-        suctionsPurchasedElement.textContent = prettify(window.suctions);
+        suctionsPurchasedElement.textContent = formatNumber(window.suctions);
     }
     
     // Critical clicks purchased
     const criticalClicksPurchasedElement = window.DOM_CACHE?.criticalClicksPurchased;
     if (criticalClicksPurchasedElement && window.criticalClicks) {
-        criticalClicksPurchasedElement.textContent = prettify(window.criticalClicks);
+        criticalClicksPurchasedElement.textContent = formatNumber(window.criticalClicks);
     }
 }
 
@@ -185,12 +188,12 @@ export function updateAchievementStats() {
         const criticalClickUpCounter = safeToNumber(window.criticalClickUpCounter);
         
         const totalUpgrades = widerStraws + betterCups + suctionUpCounter + fasterDrinksUpCounter + criticalClickUpCounter;
-        totalUpgradesElement.textContent = prettify(totalUpgrades);
+        totalUpgradesElement.textContent = formatNumber(totalUpgrades);
     }
     
     // Faster drinks owned
     const fasterDrinksOwnedElement = window.DOM_CACHE?.fasterDrinksOwned;
     if (fasterDrinksOwnedElement && window.fasterDrinks) {
-        fasterDrinksOwnedElement.textContent = prettify(window.fasterDrinks);
+        fasterDrinksOwnedElement.textContent = formatNumber(window.fasterDrinks);
     }
 }

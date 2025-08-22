@@ -6,14 +6,15 @@ import * as stats from './stats.js';
 import * as feedback from './feedback.js';
 import * as affordability from './affordability.js';
 import * as labels from './labels.js';
+import * as utils from './utils.js';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability };
 export { labels };
 
-// Convenience functions that delegate to specific modules
-export const updateCostDisplay = displays.updateCostDisplay;
-export const updateButtonState = displays.updateButtonState;
+// Convenience functions using consolidated utilities
+export const updateCostDisplay = utils.updateCostDisplay;
+export const updateButtonState = utils.updateButtonState;
 export const updateTopSipsPerDrink = displays.updateTopSipsPerDrink;
 export const updateTopSipsPerSecond = displays.updateTopSipsPerSecond;
 export const updateCriticalClickDisplay = displays.updateCriticalClickDisplay;

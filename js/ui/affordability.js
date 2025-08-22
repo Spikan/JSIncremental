@@ -107,32 +107,5 @@ function calculateAllCosts(config, dataUp) {
     return costs;
 }
 
-// Update button state based on affordability
-function updateButtonState(buttonId, isAffordable, cost) {
-    // Try multiple selectors to find the button
-    const button = document.getElementById(buttonId) || 
-                  document.querySelector(`[data-button-id="${buttonId}"]`) ||
-                  document.querySelector(`button[onclick*="${buttonId}"]`);
-    
-    if (button) {
-        button.disabled = !isAffordable;
-        button.classList.toggle('affordable', isAffordable);
-        button.classList.toggle('unaffordable', !isAffordable);
-        
-        // Update button text with cost if it has a cost span
-        const costSpan = button.querySelector('.cost');
-        if (costSpan && typeof cost !== 'undefined') {
-            costSpan.textContent = prettify(cost);
-        }
-    }
-}
-
-// Update cost display with affordability indicators
-function updateCostDisplay(elementId, cost, isAffordable) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = prettify(cost);
-        element.classList.toggle('affordable', isAffordable);
-        element.classList.toggle('unaffordable', !isAffordable);
-    }
-}
+// Import consolidated utilities
+import { updateButtonState, updateCostDisplay, formatNumber } from './utils.js';

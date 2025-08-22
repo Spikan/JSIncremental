@@ -1,13 +1,8 @@
 // UI Feedback System
 // Handles visual feedback for user actions like clicks, purchases, level ups
 
-// Fallback prettify function if not available
-function safePrettify(value) {
-    if (typeof window?.prettify === 'function') {
-        return window.prettify(value);
-    }
-    return value?.toString() || '0';
-}
+// Import consolidated utilities
+import { formatNumber } from './utils.js';
 
 // Detect mobile device
 function isMobileDevice() {
@@ -72,8 +67,8 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
     feedback.setAttribute('aria-label', isCritical ? 
-        `Critical hit! Gained ${safePrettify(sipsGained)} sips` : 
-        `Gained ${safePrettify(sipsGained)} sips`
+        `Critical hit! Gained ${formatNumber(sipsGained)} sips` :
+        `Gained ${formatNumber(sipsGained)} sips`
     );
     
     // Get safe positioning for mobile/desktop
@@ -136,7 +131,7 @@ export function showPurchaseFeedback(itemName, cost) {
     // Accessibility
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
-    feedback.setAttribute('aria-label', `Purchased ${itemName} for ${safePrettify(cost)} sips`);
+    feedback.setAttribute('aria-label', `Purchased ${itemName} for ${formatNumber(cost)} sips`);
     
     // Position relative to shop
     const shopRect = shopDiv.getBoundingClientRect();
@@ -232,7 +227,7 @@ export function showOfflineProgress(timeSeconds, earnings) {
                 </div>
                 <div class="offline-earnings">
                     <span class="label">Sips Earned:</span>
-                    <span class="value">+${safePrettify(earnings)}</span>
+                    <span class="value">+${formatNumber(earnings)}</span>
                 </div>
             </div>
             <button class="offline-continue-btn" onclick="this.closest('.offline-progress-modal').remove()">
