@@ -2547,18 +2547,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const sodaTab = document.getElementById('sodaTab');
             const activeTab = document.querySelector('.tab-content.active');
 
-            // Debug logging
-            console.log('Space pressed - Active tab:', activeTab ? activeTab.id : 'none');
-            console.log('Soda tab active:', sodaTab && sodaTab.classList.contains('active'));
-            console.log('Target element:', e.target.tagName, e.target.id);
 
             // Only activate space hotkey when on the soda clicking tab
             if (!sodaTab || !sodaTab.classList.contains('active')) {
-                console.log('Allowing normal space behavior');
+                
                 return; // Allow normal spacebar behavior on other tabs
             }
 
-            console.log('Triggering soda click');
+            
             e.preventDefault();
             e.stopPropagation();
             const sodaButton = DOM_CACHE.sodaButton;
@@ -2637,25 +2633,20 @@ function initSplashMusic() {
     
     // Add comprehensive event listeners for debugging
     splashAudio.addEventListener('loadstart', () => {
-        console.log('Title music: loadstart event');
     });
     
     splashAudio.addEventListener('loadedmetadata', () => {
-        console.log('Title music: loadedmetadata event');
     });
     
     splashAudio.addEventListener('loadeddata', () => {
-        console.log('Title music: loadeddata event');
     });
     
     splashAudio.addEventListener('canplay', () => {
-        console.log('Title music: canplay event - ready to play');
         // Audio is ready to play
         console.log('Title music ready to play');
     });
     
     splashAudio.addEventListener('canplaythrough', () => {
-        console.log('Title music: canplaythrough event');
     });
     
     splashAudio.addEventListener('ended', () => {
@@ -2711,7 +2702,6 @@ function updateSplashAudioMuteState() {
 
 // ===== BUTTON AUDIO SYSTEM (moved to App.systems.audio.button) =====
 function playTitleMusic() {
-    console.log('playTitleMusic function called');
 
     // Check user's music preference first
     let musicEnabled = true;
@@ -2738,14 +2728,7 @@ function playTitleMusic() {
         return;
     }
     
-    console.log('splashAudio details:', {
-        src: splashAudio.src,
-        readyState: splashAudio.readyState,
-        networkState: splashAudio.networkState,
-        paused: splashAudio.paused,
-        volume: splashAudio.volume,
-        loop: splashAudio.loop
-    });
+    
     
     console.log('Attempting to play title music...');
     
@@ -2787,7 +2770,7 @@ function stopTitleMusic() {
 }
 
 function startMainGameMusic() {
-    console.log('Starting main game music...');
+    
 
     // Check user's music preference first
     let musicEnabled = true;
@@ -3105,7 +3088,7 @@ function initMusicPlayer() {
     // Load saved stream preference
     loadSavedStreamPreference();
     
-    console.log('Music player initialized');
+    
 }
 
 // Function to update stream information and display
@@ -3702,7 +3685,7 @@ window.testPurchaseSound = function() { try { window.App?.systems?.audio?.button
 window.testCriticalClickSound = function() { try { window.App?.systems?.audio?.button?.playButtonCriticalClickSound?.(); } catch {} };
 // Test function for button audio
 window.testButtonAudio = function() {
-    console.log('=== BUTTON AUDIO TEST ===');
+    
 
     try { window.App?.systems?.audio?.button?.initButtonAudioSystem?.(); } catch {}
 
