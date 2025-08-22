@@ -131,16 +131,20 @@ function setupUnifiedButtonSystem() {
     
     // Remove all onclick attributes and replace with event listeners
     const allButtons = document.querySelectorAll('button');
+    console.log(`🔧 Found ${allButtons.length} buttons to process`);
+    
     allButtons.forEach(button => {
         // Remove onclick attribute
         const onclick = button.getAttribute('onclick');
         if (onclick) {
+            console.log(`🔧 Processing button with onclick: ${onclick}`);
             button.removeAttribute('onclick');
             
             // Parse onclick to determine action
             const actionMatch = onclick.match(/(\w+)\(/);
             if (actionMatch) {
                 const actionName = actionMatch[1];
+                console.log(`🔧 Parsed action name: ${actionName}`);
                 const action = BUTTON_CONFIG.actions[actionName];
                 
                 if (action) {
@@ -152,7 +156,7 @@ function setupUnifiedButtonSystem() {
                         button.classList.add(action.type);
                     }
                     
-                    // console.log(`🔧 Added unified listener for ${actionName} button`);
+                    console.log(`🔧 Successfully configured button: ${actionName} (${action.type})`);
                 } else {
                     // Don't warn about unknown actions - they might be added later
                     console.log(`Button action ${actionName} not yet configured, skipping`);
@@ -225,14 +229,18 @@ function initButtonSystem() {
     // Wait for both DOM and game functions to be ready
     function tryInitialize() {
         // Check if essential game functions are available
-        const essentialFunctions = ['buyStraw', 'buyCup', 'sodaClick', 'switchTab'];
+        const essentialFunctions = ['buyStraw', 'buyCup', 'buySuction', 'buyCriticalClick', 'buyFasterDrinks', 'buyWiderStraws', 'buyBetterCups', 'sodaClick', 'switchTab'];
         const functionsAvailable = essentialFunctions.every(func => typeof window[func] === 'function');
         
         if (functionsAvailable) {
+            console.log('🔧 All game functions available, setting up button system');
             setupUnifiedButtonSystem();
         } else {
+            // Log which functions are missing for debugging
+            const missingFunctions = essentialFunctions.filter(func => typeof window[func] !== 'function');
+            console.log('🔧 Waiting for game functions:', missingFunctions.join(', '));
             // Try again in a bit
-            setTimeout(tryInitialize, 100);
+            setTimeout(tryInitialize, 200);
         }
     }
     
