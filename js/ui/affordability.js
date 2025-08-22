@@ -30,7 +30,8 @@ export function checkUpgradeAffordability() {
     updateButtonState('buyWiderStraws', window.sips.gte(costs.widerStraws), costs.widerStraws);
     updateButtonState('buyBetterCups', window.sips.gte(costs.betterCups), costs.betterCups);
     updateButtonState('upgradeFasterDrinks', window.sips.gte(costs.fasterDrinksUp), costs.fasterDrinksUp);
-    updateButtonState('upgradeCriticalClick', window.sips.gte(costs.criticalClickUp), costs.criticalClickUp);
+    // Critical click upgrade button doesn't exist, so don't try to update it
+    // updateButtonState('upgradeCriticalClick', window.sips.gte(costs.criticalClickUp), costs.criticalClickUp);
     updateButtonState('levelUp', window.sips.gte(costs.levelUp), costs.levelUp);
     
     // Update cost displays with affordability indicators
@@ -42,7 +43,8 @@ export function checkUpgradeAffordability() {
     updateCostDisplay('widerStrawsCost', costs.widerStraws, window.sips.gte(costs.widerStraws));
     updateCostDisplay('betterCupsCost', costs.betterCups, window.sips.gte(costs.betterCups));
     updateCostDisplay('fasterDrinksUpCost', costs.fasterDrinksUp, window.sips.gte(costs.fasterDrinksUp));
-    updateCostDisplay('criticalClickUpCost', costs.criticalClickUp, window.sips.gte(costs.criticalClickUp));
+    // Critical click upgrade cost display doesn't exist, so don't try to update it
+    // updateCostDisplay('criticalClickUpCost', costs.criticalClickUp, window.sips.gte(costs.criticalClickUp));
     updateCostDisplay('levelUpCost', costs.levelUp, window.sips.gte(costs.levelUp));
 }
 
@@ -106,8 +108,8 @@ function calculateAllCosts(config, dataUp) {
     // Faster drinks upgrade cost
     costs.fasterDrinksUp = (dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST) * safeToNumber(window.fasterDrinksUpCounter);
     
-    // Critical click upgrade cost
-    costs.criticalClickUp = config.CRITICAL_CLICK_UPGRADE_BASE_COST * safeToNumber(window.criticalClickUpCounter);
+    // Critical click upgrade cost - button doesn't exist, so don't calculate
+    // costs.criticalClickUp = config.CRITICAL_CLICK_UPGRADE_BASE_COST * safeToNumber(window.criticalClickUpCounter);
     
     // Level up cost
     costs.levelUp = config.LEVEL_UP_BASE_COST * safeToNumber(window.level);

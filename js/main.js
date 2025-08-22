@@ -262,12 +262,12 @@ function checkUpgradeAffordability() {
     const strawCost = Math.floor((dataUp.straws?.baseCost ?? config.STRAW_BASE_COST) * Math.pow(dataUp.straws?.scaling ?? config.STRAW_SCALING, straws.toNumber()));
     const cupCost = Math.floor((dataUp.cups?.baseCost ?? config.CUP_BASE_COST) * Math.pow(dataUp.cups?.scaling ?? config.CUP_SCALING, cups.toNumber()));
     const suctionCost = Math.floor(config.SUCTION_BASE_COST * Math.pow(config.SUCTION_SCALING, suctions.toNumber()));
-    const fasterDrinksCost = Math.floor(config.FASTER_DRINKS_BASE_COST * Math.pow(config.FASTER_DRINKS_SCALING, fasterDrinks.toNumber()));
-    const criticalClickCost = Math.floor(config.CRITICAL_CLICK_BASE_COST * Math.pow(config.CRITICAL_CLICK_SCALING, criticalClicks.toNumber()));
+    const fasterDrinksCost = Math.floor((dataUp.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST) * Math.pow(dataUp.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING, fasterDrinks.toNumber()));
+    const criticalClickCost = Math.floor((dataUp.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST) * Math.pow(dataUp.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING, criticalClicks.toNumber()));
     const widerStrawsCost = Math.floor((dataUp.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST) * (widerStraws.toNumber() + 1));
     const betterCupsCost = Math.floor((dataUp.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST) * (betterCups.toNumber() + 1));
-    const fasterDrinksUpCost = config.FASTER_DRINKS_UPGRADE_BASE_COST * fasterDrinksUpCounter.toNumber();
-    const criticalClickUpCost = config.CRITICAL_CLICK_UPGRADE_BASE_COST * criticalClickUpCounter.toNumber();
+    const fasterDrinksUpCost = (dataUp.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST) * fasterDrinksUpCounter.toNumber();
+    const criticalClickUpCost = (dataUp.criticalClick?.upgradeBaseCost ?? config.CRITICAL_CLICK_UPGRADE_BASE_COST) * criticalClickUpCounter.toNumber();
     const levelUpCost = config.LEVEL_UP_BASE_COST * Math.pow(config.LEVEL_UP_SCALING, level.toNumber());
     
 
@@ -283,7 +283,8 @@ function checkUpgradeAffordability() {
         updateButtonState('buyWiderStraws', window.sips.gte(widerStrawsCost), widerStrawsCost);
         updateButtonState('buyBetterCups', window.sips.gte(betterCupsCost), betterCupsCost);
         updateButtonState('upgradeFasterDrinks', window.sips.gte(fasterDrinksUpCost), fasterDrinksUpCost);
-        updateButtonState('upgradeCriticalClick', window.sips.gte(criticalClickUpCost), criticalClickUpCost);
+        // Critical click upgrade button doesn't exist, so don't try to update it
+        // updateButtonState('upgradeCriticalClick', window.sips.gte(criticalClickUpCost), criticalClickUpCost);
         updateButtonState('levelUp', window.sips.gte(levelUpCost), levelUpCost);
     
     // Update cost displays with affordability indicators
@@ -295,7 +296,8 @@ function checkUpgradeAffordability() {
         updateCostDisplay('widerStrawsCost', widerStrawsCost, window.sips.gte(widerStrawsCost));
         updateCostDisplay('betterCupsCost', betterCupsCost, window.sips.gte(betterCupsCost));
         updateCostDisplay('fasterDrinksUpCost', fasterDrinksUpCost, window.sips.gte(fasterDrinksUpCost));
-        updateCostDisplay('criticalClickUpCost', criticalClickUpCost, window.sips.gte(criticalClickUpCost));
+        // Critical click upgrade cost display doesn't exist, so don't try to update it
+        // updateCostDisplay('criticalClickUpCost', criticalClickUpCost, window.sips.gte(criticalClickUpCost));
         updateCostDisplay('levelCost', levelUpCost, window.sips.gte(levelUpCost));
     
     // Update compact clicking upgrade displays
