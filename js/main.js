@@ -1758,8 +1758,8 @@ function delete_save() {
         lastClickTime = 0;
         clickTimes = [];
         
-        // Reset unlocked features to soda and options (options should always be available)
-        FEATURE_UNLOCKS.unlockedFeatures = new Set(['soda', 'options']);
+        // Reset unlocked features to soda, options, and dev tools (these should always be available)
+        FEATURE_UNLOCKS.unlockedFeatures = new Set(['soda', 'options', 'dev']);
         try {
             if (window.App?.storage?.remove) {
                 window.App.storage.remove('unlockedFeatures');

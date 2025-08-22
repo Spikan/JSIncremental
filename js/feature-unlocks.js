@@ -8,7 +8,7 @@ console.log('=== FEATURE-UNLOCKS.JS LOADING ===');
 // Feature unlock conditions and configuration
 const FEATURE_UNLOCKS = {
     // Track unlocked features
-    unlockedFeatures: new Set(['soda', 'options']), // Start with soda clicking and options always available
+    unlockedFeatures: new Set(['soda', 'options', 'dev']), // Start with soda clicking, options, and dev tools always available
     
     // Dev mode - when enabled, all features are unlocked
     devMode: false,
@@ -32,7 +32,8 @@ const FEATURE_UNLOCKS = {
             'shop': config.UNLOCKS?.SHOP || { sips: 500, clicks: 30 },
             'stats': config.UNLOCKS?.STATS || { sips: 1000, clicks: 60 },
             'god': config.UNLOCKS?.GOD || { sips: 5000, clicks: 300 },
-            'unlocks': config.UNLOCKS?.UNLOCKS_TAB || { sips: 25, clicks: 8 }
+            'unlocks': config.UNLOCKS?.UNLOCKS_TAB || { sips: 25, clicks: 8 },
+            'dev': { sips: 0, clicks: 0 } // Always unlocked for development
         };
     },
     
@@ -273,13 +274,13 @@ const FEATURE_UNLOCKS = {
             }
         } catch (e) {
             console.error('Error loading unlocked features:', e);
-            this.unlockedFeatures = new Set(['soda', 'options']);
+            this.unlockedFeatures = new Set(['soda', 'options', 'dev']);
         }
     },
     
     // Reset all unlocked features (for save deletion)
     reset() {
-        this.unlockedFeatures = new Set(['soda', 'options']);
+        this.unlockedFeatures = new Set(['soda', 'options', 'dev']);
         try {
             if (window.App?.storage?.remove) {
                 window.App.storage.remove('unlockedFeatures');
