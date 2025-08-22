@@ -151,7 +151,7 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
     }
     
     feedback.style.cssText = `
-        position: fixed;
+        position: absolute;
         left: ${left}px;
         top: ${top}px;
         transform: translate(-50%, -100%);

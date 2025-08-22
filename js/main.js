@@ -1608,7 +1608,7 @@ function buyStraw(clickX = null, clickY = null) {
             cups: cups,
             widerStraws: widerStraws,
             betterCups: betterCups,
-        });
+        }, clickX, clickY);
         console.log('🔧 handlePurchase result:', result);
         return result;
     }
@@ -1682,7 +1682,7 @@ function buyCup(clickX = null, clickY = null) {
             cups: cups,
             widerStraws: widerStraws,
             betterCups: betterCups,
-        });
+        }, clickX, clickY);
         console.log('🔧 handlePurchase result:', result);
         return result;
     }
@@ -2452,8 +2452,16 @@ window.startGameFromButton = function() {
 };
 
 // Function to show purchase feedback
-function showPurchaseFeedback(itemName, cost) {
-    if (window.App?.ui?.showPurchaseFeedback) { try { return window.App.ui.showPurchaseFeedback(itemName, cost); } catch {}
+function showPurchaseFeedback(itemName, cost, clickX = null, clickY = null) {
+    console.log('🔧 main.js showPurchaseFeedback called with:', { itemName, cost, clickX, clickY });
+    if (window.App?.ui?.showPurchaseFeedback) { 
+        try { 
+            return window.App.ui.showPurchaseFeedback(itemName, cost, clickX, clickY); 
+        } catch (e) {
+            console.error('🔧 Error calling UI system showPurchaseFeedback:', e);
+        }
+    } else {
+        console.warn('🔧 UI system showPurchaseFeedback not available');
     }
 }
 
