@@ -12,6 +12,23 @@
 4. **Pure Functions**: Business logic extracted into testable, pure functions
 5. **Runtime Validation**: Zod schemas ensure data integrity
 6. **Progressive Enhancement**: Graceful degradation for different browser capabilities
+7. **No Duplicate Functions**: All duplicate code eliminated through modular architecture
+
+## 🔄 Recent Refactoring (Duplicate Function Elimination)
+
+### **Problem Solved**
+The codebase had significant duplicate functions across `main.js`, UI modules, and core systems. This created maintenance issues and code bloat.
+
+### **Solution Implemented**
+- **Removed 15+ duplicate functions** from `main.js` (~2,500+ lines of duplicate code)
+- **Updated 20+ function calls** to use modular versions
+- **Consolidated functionality** into proper UI and core system modules
+- **Maintained backward compatibility** through proper App object structure
+
+### **Functions Moved**
+- **UI Functions**: `checkUpgradeAffordability`, `updateButtonState`, `updateCostDisplay`, `updateAllStats`, etc. → `App.ui.*`
+- **Core Systems**: `saveOptions`, `loadOptions`, `performSaveSnapshot` → `App.systems.*`
+- **Display Functions**: `updateTopSipsPerDrink`, `updateDrinkProgress`, etc. → `App.ui.*`
 
 ## 📁 Complete File Structure
 
@@ -290,12 +307,18 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 ```javascript
 // UI automatically updates based on game events
 App.events.on(App.EVENT_NAMES.CLICK.SODA, () => {
-  updateTopSipsPerDrink();
-  updateTopSipsPerSecond();
-  updateTopSipCounter();
-  checkUpgradeAffordability();
+  App.ui.updateTopSipsPerDrink();
+  App.ui.updateTopSipsPerSecond();
+  App.ui.updateTopSipCounter();
+  App.ui.checkUpgradeAffordability();
 });
 ```
+
+**Duplicate Function Elimination**:
+All duplicate functions have been removed from `main.js` and consolidated into the modular UI and core systems. Functions are now accessed via:
+- **UI Functions**: `App.ui.functionName()`
+- **Core Systems**: `App.systems.systemName.functionName()`
+- **Storage**: `App.storage.functionName()`
 
 ## 📊 Data Flow Architecture
 

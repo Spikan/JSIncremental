@@ -1,5 +1,28 @@
 // Soda Clicker Pro - Main Game Logic
 // 
+// ARCHITECTURE OVERVIEW:
+// This file contains core game logic and legacy functions that haven't been fully modularized yet.
+// 
+// MODULAR STRUCTURE (Post-Refactoring):
+// - UI Functions: Moved to js/ui/* modules, accessed via App.ui.*
+// - Core Systems: Moved to js/core/systems/* modules, accessed via App.systems.*
+// - Storage: Moved to js/services/storage.js, accessed via App.storage.*
+// - Validation: Located in js/core/validation/schemas.js
+// 
+// DUPLICATE FUNCTION ELIMINATION:
+// All duplicate functions have been removed from this file and consolidated into
+// the appropriate modular systems. Function calls now use the App namespace:
+// - App.ui.checkUpgradeAffordability() instead of checkUpgradeAffordability()
+// - App.systems.save.performSaveSnapshot() instead of save()
+// - App.systems.options.saveOptions() instead of saveOptions()
+// 
+// REMAINING IN THIS FILE:
+// - Game initialization logic (initGame, startGameLoop)
+// - Core game mechanics (processDrink, trackClick)
+// - Mobile touch handling
+// - Legacy global variables and DOM cache
+// - Tab switching and UI event handlers
+// 
 
 // Progressive enhancement - detect advanced features
 const FEATURE_DETECTION = {
@@ -205,14 +228,21 @@ window.switchTab = switchTab;
 
 // Note: Button system has been moved to js/ui/buttons.js as part of the UI system
 
-// Check if upgrades are affordable and update UI accordingly
-// Function moved to js/ui/affordability.js - use App.ui.checkUpgradeAffordability()
+// ============================================================================
+// DUPLICATE FUNCTIONS REMOVED - NOW USING MODULAR ARCHITECTURE
+// ============================================================================
+// The following functions were duplicated between main.js and modular systems.
+// They have been removed from main.js and consolidated into the appropriate modules.
+// All calls now use the App namespace for better organization and maintainability.
 
-// Update button state based on affordability
-// Function moved to js/ui/utils.js - use App.ui.updateButtonState()
+// Check if upgrades are affordable and update UI accordingly
+// MOVED TO: js/ui/affordability.js - use App.ui.checkUpgradeAffordability()
+
+// Update button state based on affordability  
+// MOVED TO: js/ui/utils.js - use App.ui.updateButtonState()
 
 // Update cost display with affordability indicators
-// Function moved to js/ui/utils.js - use App.ui.updateCostDisplay()
+// MOVED TO: js/ui/utils.js - use App.ui.updateCostDisplay()
 
 function initGame() {
     
@@ -465,10 +495,13 @@ function initGame() {
 }
 
 function startGameLoop() {
+    // MODULAR ARCHITECTURE: Use centralized loop system if available
     if (window.App?.systems?.loop?.start) {
         window.App.systems.loop.start({
+            // UI functions now called through App.ui namespace (was: updateDrinkProgress())
             updateDrinkProgress: () => window.App?.ui?.updateDrinkProgress?.(),
             processDrink,
+            // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
             updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); FEATURE_UNLOCKS.checkAllUnlocks(); },
             updatePlayTime: () => window.App?.ui?.updatePlayTime?.(),
             updateLastSaveTime: () => window.App?.ui?.updateLastSaveTime?.(),
