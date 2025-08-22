@@ -1457,6 +1457,27 @@ function isGameReady() {
     return !!(window.App?.systems?.purchases && window.App.data?.upgrades);
 }
 
+// Wait for App to be available with a timeout
+function waitForApp(timeout = 5000) {
+    return new Promise((resolve, reject) => {
+        if (window.App?.systems?.purchases) {
+            resolve(window.App);
+            return;
+        }
+        
+        const startTime = Date.now();
+        const checkInterval = setInterval(() => {
+            if (window.App?.systems?.purchases) {
+                clearInterval(checkInterval);
+                resolve(window.App);
+            } else if (Date.now() - startTime > timeout) {
+                clearInterval(checkInterval);
+                reject(new Error('App initialization timeout'));
+            }
+        }, 100);
+    });
+}
+
 // Update shop button states based on game readiness
 function updateShopButtonStates() {
     const isReady = isGameReady();
@@ -1491,12 +1512,25 @@ function updateShopButtonStates() {
     console.log(`🔧 Shop buttons ${isReady ? 'enabled' : 'disabled'} - Game ready: ${isReady}`);
 }
 
-// Simplified purchase functions that check if game is ready
+// Simplified purchase functions that poll for App to be ready
 function buyStraw() {
+    console.log('🔧 buyStraw called - checking App availability...');
+    
+    if (!window.App?.systems?.purchases) {
+        console.warn('🔧 App not available yet - purchase will be queued');
+        // Queue the purchase to retry after a short delay
+        setTimeout(() => {
+            console.log('🔧 Retrying buyStraw...');
+            buyStraw();
+        }, 100);
+        return false;
+    }
+    
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
         return false;
     }
+    
     return handlePurchase('Straw', {
         sips: window.sips,
         straws: straws,
@@ -1507,10 +1541,23 @@ function buyStraw() {
 }
 
 function buyCup() {
+    console.log('🔧 buyCup called - checking App availability...');
+    
+    if (!window.App?.systems?.purchases) {
+        console.warn('🔧 App not available yet - purchase will be queued');
+        // Queue the purchase to retry after a short delay
+        setTimeout(() => {
+            console.log('🔧 Retrying buyCup...');
+            buyCup();
+        }, 100);
+        return false;
+    }
+    
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
         return false;
     }
+    
     return handlePurchase('Cup', {
         sips: window.sips,
         straws: straws,
@@ -1521,10 +1568,23 @@ function buyCup() {
 }
 
 function buyWiderStraws() {
+    console.log('🔧 buyWiderStraws called - checking App availability...');
+    
+    if (!window.App?.systems?.purchases) {
+        console.warn('🔧 App not available yet - purchase will be queued');
+        // Queue the purchase to retry after a short delay
+        setTimeout(() => {
+            console.log('🔧 Retrying buyWiderStraws...');
+            buyWiderStraws();
+        }, 100);
+        return false;
+    }
+    
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
         return false;
     }
+    
     return handlePurchase('WiderStraws', {
         sips: window.sips,
         straws: straws,
@@ -1535,10 +1595,23 @@ function buyWiderStraws() {
 }
 
 function buyBetterCups() {
+    console.log('🔧 buyBetterCups called - checking App availability...');
+    
+    if (!window.App?.systems?.purchases) {
+        console.warn('🔧 App not available yet - purchase will be queued');
+        // Queue the purchase to retry after a short delay
+        setTimeout(() => {
+            console.log('🔧 Retrying buyBetterCups...');
+            buyBetterCups();
+        }, 100);
+        return false;
+    }
+    
     if (!isGameReady()) {
         console.warn('🔧 Game not ready yet - please wait for initialization');
         return false;
     }
+    
     return handlePurchase('BetterCups', {
         sips: window.sips,
         straws: straws,
