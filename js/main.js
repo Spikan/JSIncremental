@@ -1809,23 +1809,45 @@ function save() {
     try {
         if (window.App?.systems?.save?.performSaveSnapshot) {
             window.App.systems.save.performSaveSnapshot();
-        } else {
-            console.warn('Save system not available');
+            return true;
         }
+        if (window.App?.storage?.saveGame) {
+            // Fallback minimal payload from App.state
+            const st = window.App?.state?.getState?.() || {};
+            const payload = {
+                sips: String(window.sips || 0),
+                totalSipsEarned: String(window.totalSipsEarned || 0),
+                drinkRate: Number(window.drinkRate || 0),
+                lastDrinkTime: Number(window.lastDrinkTime || 0),
+                drinkProgress: Number(window.drinkProgress || 0),
+                lastSaveTime: Date.now(),
+                totalPlayTime: Number(st.totalPlayTime || 0),
+                totalClicks: Number(window.totalClicks || 0),
+                level: Number(window.level?.toNumber?.() || window.level || 1)
+            };
+            window.App.storage.saveGame(payload);
+            try { window.App?.state?.setState?.({ lastSaveTime: payload.lastSaveTime }); } catch {}
+            return true;
+        }
+        console.warn('Save system not available');
+        return false;
     } catch (error) {
         console.error('Error in save:', error);
+        return false;
     }
 }
 
 function delete_save() {
     try {
-        if (window.App?.storage?.deleteGame) {
-            window.App.storage.deleteGame();
-            // Reload the page after deletion
-            window.location.reload();
-        } else {
-            console.warn('Storage system not available');
+        let ok = false;
+        if (window.App?.systems?.save?.deleteSave) {
+            ok = !!window.App.systems.save.deleteSave();
+        } else if (window.App?.storage?.deleteSave) {
+            ok = !!window.App.storage.deleteSave();
         }
+        if (!ok) console.warn('Delete save not available');
+        // Reload the page after deletion (if any)
+        if (ok) window.location.reload();
     } catch (error) {
         console.error('Error in delete_save:', error);
     }
