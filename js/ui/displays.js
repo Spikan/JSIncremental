@@ -37,18 +37,13 @@ export function updateTopSipsPerSecond() {
 export function updateCriticalClickDisplay() {
 	if (typeof window === 'undefined') return;
 	const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
-	// State does not currently hold critical chance; derive if available via config/global
 	if (criticalClickChanceCompact) {
-		let percentage = null;
 		try {
-			const chance = (window.criticalClickChance && typeof window.criticalClickChance.toNumber === 'function')
-				? window.criticalClickChance.toNumber()
-				: Number(window.criticalClickChance ?? NaN);
-			if (!Number.isNaN(chance)) percentage = (chance * 100).toFixed(1);
+			const chance = Number(window.App?.state?.getState?.()?.criticalClickChance ?? NaN);
+			if (!Number.isNaN(chance)) {
+				criticalClickChanceCompact.textContent = `${(chance * 100).toFixed(1)}%`;
+			}
 		} catch {}
-		if (percentage != null) {
-			criticalClickChanceCompact.textContent = `${percentage}%`;
-		}
 	}
 }
 
@@ -140,8 +135,10 @@ export function updateTopSipCounter() {
 	if (typeof window === 'undefined') return;
 	const topSipElement = window.DOM_CACHE?.topSipValue || document.getElementById('topSipValue');
 	if (topSipElement) {
-		const value = (window.sips != null) ? window.sips : 0;
-		topSipElement.textContent = formatNumber(value);
+		try {
+			const sipsNum = Number(window.App?.state?.getState?.()?.sips || 0);
+			topSipElement.textContent = formatNumber(sipsNum);
+		} catch {}
 	}
 }
 
@@ -149,9 +146,11 @@ export function updateTopSipCounter() {
 export function updateLevelNumber() {
 	if (typeof window === 'undefined') return;
 	const levelEl = window.DOM_CACHE?.levelNumber;
-	if (levelEl && window.level != null) {
-		const val = typeof window.level?.toNumber === 'function' ? window.level.toNumber() : window.level;
-		levelEl.innerHTML = String(val);
+	if (levelEl) {
+		try {
+			const level = Number(window.App?.state?.getState?.()?.level || 1);
+			levelEl.innerHTML = String(level);
+		} catch {}
 	}
 }
 
@@ -159,10 +158,12 @@ export function updateLevelNumber() {
 export function updateLevelText() {
 	if (typeof window === 'undefined') return;
 	const levelTextEl = window.DOM_CACHE?.levelText;
-	if (levelTextEl && window.level != null) {
-		const level = typeof window.level?.toNumber === 'function' ? window.level.toNumber() : window.level;
-		const levelText = getLevelText(level);
-		levelTextEl.innerHTML = levelText;
+	if (levelTextEl) {
+		try {
+			const level = Number(window.App?.state?.getState?.()?.level || 1);
+			const levelText = getLevelText(level);
+			levelTextEl.innerHTML = levelText;
+		} catch {}
 	}
 }
 
@@ -170,10 +171,13 @@ export function updateLevelText() {
 export function updateDrinkRate() {
 	if (typeof window === 'undefined') return;
 	const drinkRateElement = document.getElementById('drinkRate');
-	if (drinkRateElement && window.drinkRate) {
-		const drinkRateSeconds = window.drinkRate / 1000;
-		drinkRateElement.textContent = drinkRateSeconds.toFixed(2) + 's';
-	}
+	try {
+		const state = window.App?.state?.getState?.();
+		if (drinkRateElement && state) {
+			const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
+			drinkRateElement.textContent = drinkRateSeconds.toFixed(2) + 's';
+		}
+	} catch {}
 }
 
 // Update compact drink speed displays
@@ -182,17 +186,24 @@ export function updateCompactDrinkSpeedDisplays() {
 	
 	// Update compact drink speed display elements
 	const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
-	if (currentDrinkSpeedCompact && window.drinkRate) {
-		const drinkRateSeconds = window.drinkRate / 1000;
-		currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
-	}
+	try {
+		const state = window.App?.state?.getState?.();
+		if (currentDrinkSpeedCompact && state) {
+			const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
+			currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
+		}
+	} catch {}
 	
 	// Update other compact displays if they exist
 	const compactDisplays = document.querySelectorAll('[id*="Compact"]');
 	compactDisplays.forEach(display => {
-		if (display.id.includes('DrinkSpeed') && window.drinkRate) {
-			const drinkRateSeconds = window.drinkRate / 1000;
-			display.textContent = drinkRateSeconds.toFixed(2) + 's';
+		try {
+			const state = window.App?.state?.getState?.();
+			if (display.id.includes('DrinkSpeed') && state) {
+				const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
+				display.textContent = drinkRateSeconds.toFixed(2) + 's';
+			}
+		} catch {}
 		}
 	});
 }

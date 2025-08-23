@@ -113,7 +113,11 @@ export function updateButtonState(buttonId, isAffordable, cost) {
 
     // Update button title for accessibility
     const formattedCost = formatNumber(cost);
-    const currentSips = typeof window.sips !== 'undefined' ? formatNumber(window.sips) : '0';
+    let currentSips = '0';
+    try {
+        const sipsNum = Number(window.App?.state?.getState?.()?.sips || 0);
+        currentSips = formatNumber(sipsNum);
+    } catch {}
 
     if (isAffordable) {
         button.title = `Click to purchase for ${formattedCost} Sips`;
