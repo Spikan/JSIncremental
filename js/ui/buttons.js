@@ -1,6 +1,131 @@
 // Modern Button System - Unified button event handling and management
 // Part of the UI system for coordinated user interaction
 
+// Mobile detection utility
+const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           ('ontouchstart' in window) ||
+           (navigator.maxTouchPoints > 0);
+};
+
+// Touch event handling for mobile devices
+const setupTouchEvents = (button, actionName) => {
+    if (!isMobileDevice()) return;
+    
+    let touchStartTime = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTouchActive = false;
+    
+    // Prevent default touch behaviors that could interfere
+    button.style.touchAction = 'manipulation';
+    button.style.webkitTouchCallout = 'none';
+    button.style.webkitUserSelect = 'none';
+    button.style.userSelect = 'none';
+    
+    // Touch start - immediate visual feedback
+    button.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        touchStartTime = Date.now();
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isTouchActive = true;
+        
+        // Add visual feedback immediately
+        button.classList.add('button-touched');
+        
+        // Add ripple effect for visual feedback
+        addTouchRipple(button, touchStartX, touchStartY);
+    }, { passive: false });
+    
+    // Touch end - process the action
+    button.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        const touchDuration = Date.now() - touchStartTime;
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        
+        // Calculate touch distance to detect if it's a tap vs drag
+        const touchDistance = Math.sqrt(
+            Math.pow(touchEndX - touchStartX, 2) + 
+            Math.pow(touchEndY - touchStartY, 2)
+        );
+        
+        // Only process if it was a short touch (tap) and hasn't moved much
+        if (touchDuration < 300 && touchDistance < 20 && isTouchActive) {
+            // Create a synthetic click event with touch coordinates
+            const syntheticEvent = new MouseEvent('click', {
+                clientX: touchEndX,
+                clientY: touchEndY,
+                bubbles: true,
+                cancelable: true
+            });
+            
+            // Trigger the button action
+            handleButtonClick(syntheticEvent, button, actionName);
+        }
+        
+        // Remove visual feedback
+        setTimeout(() => {
+            button.classList.remove('button-touched');
+        }, 150);
+        
+        isTouchActive = false;
+    }, { passive: false });
+    
+    // Touch move - cancel if user drags too far
+    button.addEventListener('touchmove', function(e) {
+        if (!isTouchActive) return;
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const touchDistance = Math.sqrt(
+            Math.pow(currentX - touchStartX, 2) + 
+            Math.pow(currentY - touchStartY, 2)
+        );
+        
+        // Cancel touch if moved too far (drag threshold)
+        if (touchDistance > 30) {
+            isTouchActive = false;
+            button.classList.remove('button-touched');
+        }
+    }, { passive: false });
+    
+    // Prevent context menu on long press
+    button.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+};
+
+// Add visual touch ripple effect
+const addTouchRipple = (button, x, y) => {
+    const ripple = document.createElement('div');
+    ripple.className = 'touch-ripple';
+    ripple.style.cssText = `
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(0);
+        animation: ripple-animation 0.6s linear;
+        pointer-events: none;
+        left: ${x - button.getBoundingClientRect().left}px;
+        top: ${y - button.getBoundingClientRect().top}px;
+        width: 20px;
+        height: 20px;
+        z-index: 1000;
+    `;
+    
+    button.style.position = 'relative';
+    button.appendChild(ripple);
+    
+    // Remove ripple after animation
+    setTimeout(() => {
+        if (ripple.parentNode) {
+            ripple.parentNode.removeChild(ripple);
+        }
+    }, 600);
+};
+
 // Button configuration for consistent behavior
 const BUTTON_CONFIG = {
     // Button types and their configurations
@@ -220,6 +345,9 @@ function setupUnifiedButtonSystem() {
                     // Add modern event listener
                     button.addEventListener('click', (e) => handleButtonClick(e, button, actionName));
                     
+                    // Setup touch events for mobile devices
+                    setupTouchEvents(button, actionName);
+                    
                     // Add appropriate CSS classes for styling
                     if (action.type) {
                         button.classList.add(action.type);
@@ -254,6 +382,9 @@ function setupSpecialButtonHandlers() {
                 window.switchTab(tabName, e);
             }
         });
+        
+        // Setup touch events for mobile
+        setupTouchEvents(button, 'switchTab');
     });
     
     // Soda button handler (tests expect explicit listener)
@@ -269,6 +400,9 @@ function setupSpecialButtonHandlers() {
                 }
             } catch {}
         });
+        
+        // Setup touch events for mobile
+        setupTouchEvents(sodaButton, 'sodaClick');
     }
     
     // Chat input keyboard support
@@ -291,6 +425,9 @@ function setupSpecialButtonHandlers() {
             e.stopPropagation();
             try { window.startGame?.(); } catch {}
         });
+        
+        // Setup touch events for mobile
+        setupTouchEvents(splashStartBtn, 'startGame');
     }
 
     // Generic data-action dispatcher for buttons (guard for test env)
@@ -459,5 +596,7 @@ export {
     handleButtonClick,
     setupUnifiedButtonSystem,
     setupSpecialButtonHandlers,
-    initButtonSystem
+    initButtonSystem,
+    isMobileDevice,
+    setupTouchEvents
 };

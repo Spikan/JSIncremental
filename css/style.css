@@ -3544,3 +3544,148 @@ button {
 /* ========================================
    END UNIFIED BUTTON DESIGN SYSTEM
    ======================================== */
+
+/* ========================================
+   MOBILE TOUCH ENHANCEMENTS
+   ======================================== */
+
+/* Touch ripple animation */
+@keyframes ripple-animation {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Touch ripple element */
+.touch-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Button touch state */
+button.button-touched {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+}
+
+/* Mobile-specific touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Ensure buttons are properly sized for touch */
+    button {
+        min-height: 44px; /* iOS recommended minimum */
+        min-width: 44px;
+    }
+    
+    /* Prevent text selection on touch */
+    button {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+    }
+    
+    /* Enhanced touch feedback */
+    button:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Disable hover effects on touch devices */
+    button:hover {
+        transform: none;
+    }
+    
+    /* Ensure proper touch handling for all interactive elements */
+    .tab-btn, .shop-btn, .upgrade-btn, .level-up-btn, .save-btn, .dev-btn {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Soda button specific touch handling */
+    #sodaButton {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    /* Splash button touch handling */
+    .splash-start-btn {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+}
+
+/* Touch feedback for splash screen */
+.splash-overlay {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Enhanced touch feedback for shop items */
+.shop-item, .clicking-upgrade-item, .drink-speed-upgrade-container {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch-friendly spacing for mobile */
+@media (max-width: 768px) {
+    .tab-navigation {
+        gap: 0.75rem;
+        padding: 0 0.5rem;
+    }
+    
+    .tab-btn {
+        min-height: 48px;
+        padding: 0.75rem 1rem;
+    }
+    
+    .shop-container {
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+    
+    .shop-item {
+        padding: 1rem;
+    }
+    
+    .upgrade-btn {
+        min-height: 60px;
+        padding: 1rem 1.5rem;
+    }
+}
+
+/* Ensure all buttons can properly position touch ripples */
+button {
+    position: relative;
+    overflow: visible;
+}
+
+/* Touch ripple positioning for different button types */
+.shop-btn .touch-ripple,
+.upgrade-btn .touch-ripple,
+.level-up-btn .touch-ripple,
+.tab-btn .touch-ripple,
+.save-btn .touch-ripple,
+.dev-btn .touch-ripple {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Special touch ripple for splash button */
+.splash-start-btn .touch-ripple {
+    background: rgba(255, 255, 255, 0.5);
+}
+
