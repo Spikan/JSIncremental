@@ -1073,13 +1073,15 @@ function processDrink() {
     const last = Number(st.lastDrinkTime ?? (typeof lastDrinkTime !== 'undefined' ? lastDrinkTime : 0));
     const rate = Number(st.drinkRate ?? (typeof drinkRate !== 'undefined' ? drinkRate : 1000));
     if (currentTime - last >= rate) {
-        // Add base sips per drink (configured value, regardless of straws/cups)
+        // Add full sips-per-drink (base + production)
         const config = BAL || {};
-        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-        window.sips = window.sips.plus(baseSipsPerDrink);
-        totalSipsEarned = totalSipsEarned.plus(baseSipsPerDrink);
+        const sipsPerDrinkDec = (sps && typeof sps.toNumber === 'function')
+            ? sps
+            : new Decimal(Number(window.App?.state?.getState?.()?.sps || config.BASE_SIPS_PER_DRINK));
+        window.sips = window.sips.plus(sipsPerDrinkDec);
+        totalSipsEarned = totalSipsEarned.plus(sipsPerDrinkDec);
 
-        console.log('🥤 Drink processed! Added', baseSipsPerDrink.toNumber(), 'sips');
+        try { console.log('🥤 Drink processed! Added', (typeof sipsPerDrinkDec.toNumber === 'function') ? sipsPerDrinkDec.toNumber() : Number(sipsPerDrinkDec), 'sips'); } catch {}
         
         const nextLast = currentTime;
         lastDrinkTime = nextLast;
@@ -1096,7 +1098,12 @@ function processDrink() {
             const prevHigh = Number(window.App?.state?.getState?.()?.highestSipsPerSecond || 0);
             const highest = Math.max(prevHigh, currentSipsPerSecond);
             const prevTotal = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
-            window.App?.state?.setState?.({ sips: sipsNum, highestSipsPerSecond: highest, totalSipsEarned: prevTotal + toNum(baseSipsPerDrink), lastDrinkTime: nextLast, drinkProgress });
+            window.App?.state?.setState?.({ sips: sipsNum, highestSipsPerSecond: highest, totalSipsEarned: prevTotal + toNum(sipsPerDrinkDec), lastDrinkTime: nextLast, drinkProgress });
+            // Trigger key UI updates
+            try { window.App?.ui?.updateTopSipsPerDrink?.(); } catch {}
+            try { window.App?.ui?.updateTopSipsPerSecond?.(); } catch {}
+            try { window.App?.ui?.updateTopSipCounter?.(); } catch {}
+            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
         } catch {}
         
         // Check for feature unlocks after processing a drink
@@ -1104,25 +1111,23 @@ function processDrink() {
             FEATURE_UNLOCKS.checkAllUnlocks();
         }
         
-        // Update auto-save counter based on configurable interval via system helper
-        if (window.App?.systems?.autosave?.computeAutosaveCounter) {
-            const { nextCounter, shouldSave } = window.App.systems.autosave.computeAutosaveCounter({
-                enabled: autosaveEnabled,
-                counter: autosaveCounter,
-                intervalSec: autosaveInterval,
-                drinkRateMs: drinkRate,
-            });
-            autosaveCounter = nextCounter;
-            if (shouldSave) try { window.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
-        } else if (autosaveEnabled) {
-            autosaveCounter += 1;
-            const drinksPerSecond = 1000 / drinkRate;
-            const drinksForAutosave = Math.ceil(autosaveInterval * drinksPerSecond);
-            if (autosaveCounter >= drinksForAutosave) {
-                try { window.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
-                autosaveCounter = 1;
+        // Update auto-save counter based on configurable interval via system helper (scope-safe reads)
+        try {
+            const st2 = window.App?.state?.getState?.() || {};
+            const opts = st2.options || {};
+            let enabled = typeof autosaveEnabled !== 'undefined' ? autosaveEnabled : !!opts.autosaveEnabled;
+            let intervalSec = typeof autosaveInterval !== 'undefined' ? autosaveInterval : Number(opts.autosaveInterval || 10);
+            if (window.App?.systems?.autosave?.computeAutosaveCounter) {
+                const result = window.App.systems.autosave.computeAutosaveCounter({
+                    enabled,
+                    counter: (typeof autosaveCounter !== 'undefined' ? autosaveCounter : 0),
+                    intervalSec,
+                    drinkRateMs: rate,
+                });
+                if (typeof autosaveCounter !== 'undefined') autosaveCounter = result.nextCounter;
+                if (result.shouldSave) try { window.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
             }
-        }
+        } catch {}
     }
 }
 
@@ -1244,10 +1249,56 @@ function devResetUnlocks() {
 // Time travel functions
 function devAddTime(milliseconds) {
     try {
-        if (window.lastSaveTime) {
-            window.lastSaveTime = window.lastSaveTime - milliseconds;
-            console.log(`⏰ Added ${milliseconds / 1000} seconds via dev function`);
-        }
+        const ms = Number(milliseconds) || 0;
+        if (!ms) return;
+        // Fast-forward: compute how many drinks should have occurred and award them immediately
+        try {
+            const st = window.App?.state?.getState?.() || {};
+            const rate = Number(st.drinkRate || window.drinkRate || 1000);
+            const now = Date.now();
+            const last = Number(st.lastDrinkTime ?? window.lastDrinkTime ?? now);
+            const totalElapsed = ms;
+            const drinks = Math.floor(totalElapsed / Math.max(rate, 1));
+            const remainder = totalElapsed % Math.max(rate, 1);
+
+            // Add sips for all completed drinks
+            if (drinks > 0) {
+                // Determine sips-per-drink (base + production)
+                const config = window.GAME_CONFIG?.BALANCE || {};
+                const spsFallback = (typeof window.sipsPerDrink?.toNumber === 'function') ? window.sipsPerDrink.toNumber() : (typeof window.sipsPerDrink !== 'undefined' ? Number(window.sipsPerDrink) : undefined);
+                const spsVal = (st && typeof st.sps !== 'undefined') ? Number(st.sps) : Number((spsFallback ?? config.BASE_SIPS_PER_DRINK) || 1);
+                const gain = spsVal * drinks;
+
+                // Update global and state sips
+                try {
+                    const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+                    const currentSips = toNum(window.sips);
+                    const nextSips = currentSips + gain;
+                    window.sips = window.Decimal ? new window.Decimal(nextSips) : nextSips;
+                    const prevTotal = Number(st.totalSipsEarned || 0);
+                    window.App?.state?.setState?.({ sips: nextSips, totalSipsEarned: prevTotal + gain });
+                } catch {}
+            }
+
+            // Position lastDrinkTime so progress reflects the remainder
+            const nextLast = now - remainder;
+            window.lastDrinkTime = nextLast;
+            const prevPlay = Number(st.totalPlayTime || 0);
+            window.App?.state?.setState?.({ lastDrinkTime: nextLast, totalPlayTime: prevPlay + ms });
+            window.App?.ui?.updateDrinkProgress?.();
+            window.App?.ui?.updateTopSipCounter?.();
+            window.App?.ui?.updateTopSipsPerSecond?.();
+        } catch {}
+        // Also age the lastSaveTime so offline calc on reload reflects time travel
+        try {
+            const st = window.App?.state?.getState?.() || {};
+            const prevSave = Number(st.lastSaveTime || window.lastSaveTime || Date.now());
+            const nextSave = prevSave - ms;
+            window.lastSaveTime = nextSave;
+            window.App?.state?.setState?.({ lastSaveTime: nextSave });
+            window.App?.ui?.updateLastSaveTime?.();
+        } catch {}
+        console.log(`⏰ Added ${ms / 1000} seconds via dev function`);
     } catch (error) {
         console.error('Error in devAddTime:', error);
     }
