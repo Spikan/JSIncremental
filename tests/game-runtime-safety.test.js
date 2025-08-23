@@ -220,7 +220,7 @@ describe('Game Runtime Safety Tests', () => {
 
         beforeEach(async () => {
             vi.clearAllMocks();
-            feedback = await import('../js/ui/feedback.js');
+            feedback = await import('../js/ui/feedback.ts');
         });
 
         it('should handle missing soda button gracefully in showClickFeedback', () => {

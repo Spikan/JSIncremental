@@ -1,78 +1,59 @@
-// UI Feedback System
+// UI Feedback System (TypeScript)
 // Handles visual feedback for user actions like clicks, purchases, level ups
 
 // Import consolidated utilities
 import { formatNumber, prettify } from './utils';
 
 // Detect mobile device
-function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           ('ontouchstart' in window) ||
-           (navigator.maxTouchPoints > 0);
+function isMobileDevice(): boolean {
+    try {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+            ('ontouchstart' in window) ||
+            ((navigator as any).maxTouchPoints > 0);
+    } catch {
+        return false;
+    }
 }
 
 // Get safe positioning for mobile devices
-function getSafePosition(container, rangeX, rangeY) {
+function getSafePosition(container: HTMLElement, rangeX: number, rangeY: number): { left: number; top: number } {
     if (isMobileDevice()) {
-        // On mobile, use viewport-relative positioning for better reliability
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        
-        // Center the feedback in the viewport with some randomness
         const centerX = viewportWidth / 2;
         const centerY = viewportHeight / 2;
-        
-        // Reduce range on mobile to prevent feedback from going off-screen
         const mobileRangeX = Math.min(rangeX, 80);
         const mobileRangeY = Math.min(rangeY, 60);
-        
         const randomX = (Math.random() - 0.5) * mobileRangeX;
         const randomY = (Math.random() - 0.5) * mobileRangeY;
-        
-        return {
-            left: centerX + randomX,
-            top: centerY + randomY
-        };
+        return { left: centerX + randomX, top: centerY + randomY };
     } else {
-        // Desktop positioning using container bounds
         const containerRect = container.getBoundingClientRect();
         const randomX = (Math.random() - 0.5) * rangeX;
         const randomY = (Math.random() - 0.5) * rangeY;
-        
         return {
-            left: containerRect.left + containerRect.width/2 + randomX,
-            top: containerRect.top + containerRect.height/2 + randomY
+            left: containerRect.left + containerRect.width / 2 + randomX,
+            top: containerRect.top + containerRect.height / 2 + randomY
         };
     }
 }
 
 // Show feedback at specific click coordinates
-function showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY) {
+function showFeedbackAtCoordinates(sipsGained: number, isCritical: boolean, clickX: number, clickY: number): void {
     console.log('🔧 showFeedbackAtCoordinates called with:', { sipsGained, isCritical, clickX, clickY });
-    
-    // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
     feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
-    
-    // Accessibility improvements
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
-    feedback.setAttribute('aria-label', isCritical ? 
+    feedback.setAttribute('aria-label', isCritical ?
         `Critical hit! Gained ${formatNumber(sipsGained)} sips` :
         `Gained ${formatNumber(sipsGained)} sips`
     );
-    
-    // Mobile-optimized styling
     const isMobile = isMobileDevice();
-    const fontSize = isMobile ? 
-        (isCritical ? '1.3em' : '1.1em') : 
-        (isCritical ? '1.5em' : '1.2em');
-    
-    // Position feedback directly at click coordinates with slight offset
-    const offsetX = (Math.random() - 0.5) * 20; // ±10px horizontal offset
-    const offsetY = (Math.random() - 0.5) * 20; // ±10px vertical offset
-    
+    const fontSize = isMobile ? (isCritical ? '1.3em' : '1.1em') : (isCritical ? '1.5em' : '1.2em');
+    const offsetX = (Math.random() - 0.5) * 20;
+    const offsetY = (Math.random() - 0.5) * 20;
     feedback.style.cssText = `
         position: fixed;
         left: ${clickX + offsetX}px;
@@ -87,85 +68,39 @@ function showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY) {
         ${isMobile ? 'touch-action: none; -webkit-touch-callout: none;' : ''}
         ${isMobile ? 'will-change: transform, opacity;' : ''}
     `;
-    
-    // Add to body for proper positioning
     document.body.appendChild(feedback);
-    
-    // Simple fade out and slight upward animation
     let startTime = Date.now();
     const animate = () => {
         const elapsed = Date.now() - startTime;
-        const duration = isCritical ? 2500 : 2000; // Longer for critical hits
+        const duration = isCritical ? 2500 : 2000;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Simple fade out and slight upward movement
         const opacity = 1 - progress;
-        const moveUp = 15 * progress; // Only move up 15px total
-        
-        feedback.style.opacity = opacity;
+        const moveUp = 15 * progress;
+        feedback.style.opacity = String(opacity);
         feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
-        
-        if (progress < 1) {
-            try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
-        }
+        if (progress < 1) { try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); } }
     };
-    
     try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
-    
-    // Remove after animation
-    setTimeout(() => {
-        if (feedback.parentNode) {
-            feedback.parentNode.removeChild(feedback);
-        }
-    }, isCritical ? 2500 : 2000);
+    setTimeout(() => { if (feedback.parentNode) feedback.parentNode.removeChild(feedback); }, isCritical ? 2500 : 2000);
 }
 
-// Show click feedback numbers
-export function showClickFeedback(sipsGained, isCritical = false, clickX = null, clickY = null) {
-    console.log('🔧 showClickFeedback called with:', { sipsGained, isCritical, clickX, clickY });
-    
-    // If we have click coordinates, use them directly
-    if (clickX !== null && clickY !== null) {
-        showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY);
-        return;
-    }
-    
-    // Fallback to container-based positioning
-    const sodaContainer =
-        window.DOM_CACHE?.sodaButton?.parentNode ||
-        document.getElementById('sodaButton')?.parentNode;
-    if (!sodaContainer) return;
-    showFeedbackWithContainer(sipsGained, isCritical, sodaContainer);
-}
-
-// Helper function to show feedback with a given container
-function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
-    
-    // Create feedback element
+// Helper to show feedback with a given container
+function showFeedbackWithContainer(sipsGained: number, isCritical: boolean, sodaContainer: HTMLElement): void {
     const feedback = document.createElement('div');
     feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
     feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
-    
-    // Accessibility improvements
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
-    feedback.setAttribute('aria-label', isCritical ? 
+    feedback.setAttribute('aria-label', isCritical ?
         `Critical hit! Gained ${formatNumber(sipsGained)} sips` :
         `Gained ${formatNumber(sipsGained)} sips`
     );
-    
-    // Get safe positioning for mobile/desktop
-    const config = window.GAME_CONFIG?.LIMITS || {};
-    const rangeX = config.CLICK_FEEDBACK_RANGE_X || 100;
-    const rangeY = config.CLICK_FEEDBACK_RANGE_Y || 80;
+    const config = (window as any).GAME_CONFIG?.LIMITS || {};
+    const rangeX = (config as any).CLICK_FEEDBACK_RANGE_X || 100;
+    const rangeY = (config as any).CLICK_FEEDBACK_RANGE_Y || 80;
     const position = getSafePosition(sodaContainer, rangeX, rangeY);
-    
-    // Mobile-optimized styling
     const isMobile = isMobileDevice();
-    const fontSize = isMobile ? 
-        (isCritical ? '1.3em' : '1.1em') : 
-        (isCritical ? '1.5em' : '1.2em');
-    
+    const fontSize = isMobile ? (isCritical ? '1.3em' : '1.1em') : (isCritical ? '1.5em' : '1.2em');
     feedback.style.cssText = `
         position: fixed;
         left: ${position.left}px;
@@ -180,81 +115,63 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
         ${isMobile ? 'touch-action: none; -webkit-touch-callout: none;' : ''}
         ${isMobile ? 'will-change: transform, opacity;' : ''}
     `;
-    
-    // Add to body for proper positioning
     document.body.appendChild(feedback);
-    
-    // Simple fade out and slight upward animation (replacing CSS animation)
     let startTime = Date.now();
     const animate = () => {
         const elapsed = Date.now() - startTime;
         const duration = isCritical ? 2500 : 2000;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Simple fade out and slight upward movement
         const opacity = 1 - progress;
-        const moveUp = 15 * progress; // Only move up 15px total
-        
-        feedback.style.opacity = opacity;
+        const moveUp = 15 * progress;
+        feedback.style.opacity = String(opacity);
         feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
-        
-        if (progress < 1) {
-            try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
-        }
+        if (progress < 1) { try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); } }
     };
-    
     try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
-    
-    // Remove after animation
-    setTimeout(() => {
-        if (feedback.parentNode) {
-            feedback.parentNode.removeChild(feedback);
-        }
-    }, isCritical ? 2500 : 2000);
+    setTimeout(() => { if (feedback.parentNode) feedback.parentNode.removeChild(feedback); }, isCritical ? 2500 : 2000);
+}
+
+// Show click feedback numbers
+export function showClickFeedback(sipsGained: number, isCritical: boolean = false, clickX: number | null = null, clickY: number | null = null): void {
+    console.log('🔧 showClickFeedback called with:', { sipsGained, isCritical, clickX, clickY });
+    if (clickX !== null && clickY !== null) {
+        showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY);
+        return;
+    }
+    const sodaContainer = ((window as any).DOM_CACHE?.sodaButton?.parentNode || document.getElementById('sodaButton')?.parentNode) as HTMLElement | null;
+    if (!sodaContainer) return;
+    showFeedbackWithContainer(sipsGained, isCritical, sodaContainer);
 }
 
 // Show purchase feedback
-export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = null) {
+export function showPurchaseFeedback(itemName: string, cost: number, clickX: number | null = null, clickY: number | null = null): void {
     console.log('🔧 showPurchaseFeedback called with:', { itemName, cost, clickX, clickY });
-    
-    // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = 'purchase-feedback';
     feedback.innerHTML = `
         <div class="purchase-item">${itemName}</div>
         <div class="purchase-cost">-${prettify(cost)} sips</div>
     `;
-    
-    // Accessibility
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-live', 'polite');
     feedback.setAttribute('aria-label', `Purchased ${itemName} for ${formatNumber(cost)} sips`);
-    
-    // Position feedback - prefer click coordinates if available, otherwise center on shop
-    let left, top;
-    
+    let left: number, top: number;
     if (clickX !== null && clickY !== null) {
-        // Use click coordinates directly - no offset, no transform
-        left = clickX;
-        top = clickY;
+        left = clickX; top = clickY;
         console.log('🔧 Using click coordinates directly - left:', left, 'top:', top);
     } else {
-        // Fallback to shop center positioning
-        const shopDiv = window.DOM_CACHE?.shopDiv;
+        const shopDiv = (window as any).DOM_CACHE?.shopDiv as HTMLElement | undefined;
         if (shopDiv) {
             const shopRect = shopDiv.getBoundingClientRect();
-            left = shopRect.left + shopRect.width/2;
-            top = shopRect.top + shopRect.height/2;
+            left = shopRect.left + shopRect.width / 2;
+            top = shopRect.top + shopRect.height / 2;
             console.log('🔧 Using fallback positioning - left:', left, 'top:', top);
         } else {
-            // Last resort - center of viewport
             left = window.innerWidth / 2;
             top = window.innerHeight / 2;
             console.log('🔧 Using viewport center - left:', left, 'top:', top);
         }
     }
-    
-    // Set initial position - NO transform, NO offset
     feedback.style.cssText = `
         position: fixed;
         left: ${left}px;
@@ -269,72 +186,46 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
         font-weight: bold;
         text-align: center;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        /* Center the feedback on the click point */
         transform-origin: center center;
     `;
-    
-    // Center the feedback on the click point
     feedback.style.transform = 'translate(-50%, -50%)';
-    
     console.log('🔧 Final feedback positioning - left:', left, 'top:', top);
-    console.log('🔧 Feedback element style:', feedback.style.cssText);
-    
+    console.log('🔧 Feedback element style:', (feedback as any).style?.cssText);
     document.body.appendChild(feedback);
-    
-    // Simple fade out animation
     let startTime = Date.now();
     const animate = () => {
         const elapsed = Date.now() - startTime;
-        const duration = 2000; // 2 seconds
+        const duration = 2000;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Simple fade out and slight upward movement
         const opacity = 1 - progress;
-        const moveUp = 20 * progress; // Only move up 20px total
-        
-        feedback.style.opacity = opacity;
+        const moveUp = 20 * progress;
+        feedback.style.opacity = String(opacity);
         feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
-        
-        if (progress < 1) {
-            try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
-        }
+        if (progress < 1) { try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); } }
     };
-    
     try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
-    
-    // Remove after animation
-    const config = window.GAME_CONFIG?.TIMING || {};
-    setTimeout(() => {
-        if (feedback.parentNode) {
-            feedback.parentNode.removeChild(feedback);
-        }
-    }, config.PURCHASE_FEEDBACK_DURATION || 2000);
+    const config = (window as any).GAME_CONFIG?.TIMING || {};
+    setTimeout(() => { if (feedback.parentNode) feedback.parentNode.removeChild(feedback); }, (config as any).PURCHASE_FEEDBACK_DURATION || 2000);
 }
 
 // Show level up feedback
-export function showLevelUpFeedback(sipsGained) {
-    const levelUpDiv = window.DOM_CACHE?.levelUpDiv;
+export function showLevelUpFeedback(sipsGained: number): void {
+    const levelUpDiv = (window as any).DOM_CACHE?.levelUpDiv as HTMLElement | undefined;
     if (!levelUpDiv) return;
-    
-    // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = 'levelup-feedback';
     feedback.innerHTML = `
         <div class="levelup-title">🎉 LEVEL UP! 🎉</div>
         <div class="levelup-bonus">+${prettify(sipsGained)} sips bonus!</div>
     `;
-    
-    // Accessibility
     feedback.setAttribute('role', 'alert');
     feedback.setAttribute('aria-live', 'assertive');
     feedback.setAttribute('aria-label', `Level up! Gained ${prettify(sipsGained)} bonus sips`);
-    
-    // Position relative to level up section
     const levelRect = levelUpDiv.getBoundingClientRect();
     feedback.style.cssText = `
         position: fixed;
-        left: ${levelRect.left + levelRect.width/2}px;
-        top: ${levelRect.top + levelRect.height/2}px;
+        left: ${levelRect.left + levelRect.width / 2}px;
+        top: ${levelRect.top + levelRect.height / 2}px;
         transform: translate(-50%, -50%);
         pointer-events: none;
         z-index: 1000;
@@ -347,21 +238,13 @@ export function showLevelUpFeedback(sipsGained) {
         animation: levelUpPulse 3s ease-out forwards;
         box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
     `;
-    
     document.body.appendChild(feedback);
-    
-    // Remove after animation
-    const config = window.GAME_CONFIG?.TIMING || {};
-    setTimeout(() => {
-        if (feedback.parentNode) {
-            feedback.parentNode.removeChild(feedback);
-        }
-    }, config.LEVELUP_FEEDBACK_DURATION || 3000);
+    const config = (window as any).GAME_CONFIG?.TIMING || {};
+    setTimeout(() => { if (feedback.parentNode) feedback.parentNode.removeChild(feedback); }, (config as any).LEVELUP_FEEDBACK_DURATION || 3000);
 }
 
 // Show offline progress modal
-export function showOfflineProgress(timeSeconds, earnings) {
-    // Create modal overlay
+export function showOfflineProgress(timeSeconds: number, earnings: number): void {
     const modal = document.createElement('div');
     modal.className = 'offline-progress-modal';
     modal.innerHTML = `
@@ -383,8 +266,6 @@ export function showOfflineProgress(timeSeconds, earnings) {
             </button>
         </div>
     `;
-    
-    // Style the modal
     modal.style.cssText = `
         position: fixed;
         top: 0;
@@ -396,9 +277,7 @@ export function showOfflineProgress(timeSeconds, earnings) {
         align-items: center;
         justify-content: center;
     `;
-
-    // Style the background overlay
-    const overlay = modal.querySelector('.modal-overlay');
+    const overlay = modal.querySelector('.modal-overlay') as HTMLElement | null;
     if (overlay) {
         overlay.style.cssText = `
             position: absolute;
@@ -409,9 +288,7 @@ export function showOfflineProgress(timeSeconds, earnings) {
             background: rgba(0, 0, 0, 0.7);
         `;
     }
-
-    // Style the content panel
-    const content = modal.querySelector('.modal-content');
+    const content = modal.querySelector('.modal-content') as HTMLElement | null;
     if (content) {
         content.style.cssText = `
             position: relative;
@@ -425,7 +302,7 @@ export function showOfflineProgress(timeSeconds, earnings) {
             z-index: 1;
             text-align: left;
         `;
-        const h2 = content.querySelector('h2');
+        const h2 = content.querySelector('h2') as HTMLElement | null;
         if (h2) {
             h2.style.cssText = `
                 margin: 0 0 12px 0;
@@ -433,14 +310,14 @@ export function showOfflineProgress(timeSeconds, earnings) {
                 color: #60A5FA;
             `;
         }
-        const stats = content.querySelector('.offline-stats');
+        const stats = content.querySelector('.offline-stats') as HTMLElement | null;
         if (stats) {
             stats.style.cssText = `
                 display: grid;
                 gap: 8px;
             `;
         }
-        const btn = content.querySelector('.offline-continue-btn');
+        const btn = content.querySelector('.offline-continue-btn') as HTMLButtonElement | null;
         if (btn) {
             btn.style.cssText = `
                 margin-top: 16px;
@@ -454,20 +331,12 @@ export function showOfflineProgress(timeSeconds, earnings) {
             `;
         }
     }
-    
-    // Add to document
     document.body.appendChild(modal);
-    
-    // Auto-close after 10 seconds if user doesn't interact
-    setTimeout(() => {
-        if (modal.parentNode) {
-            modal.remove();
-        }
-    }, 10000);
+    setTimeout(() => { if (modal.parentNode) { modal.remove(); } }, 10000);
 }
 
 // Helper function to format time duration
-function formatTime(seconds) {
+function formatTime(seconds: number): string {
     if (seconds < 60) {
         return `${Math.floor(seconds)} seconds`;
     } else if (seconds < 3600) {
@@ -483,3 +352,5 @@ function formatTime(seconds) {
         return `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''}`;
     }
 }
+
+

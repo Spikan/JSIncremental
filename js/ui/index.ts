@@ -2,10 +2,10 @@
 // Main entry point for all UI-related functionality
 
 import * as displays from './displays';
-import * as stats from './stats.js';
-import * as feedback from './feedback.js';
+import * as stats from './stats';
+import * as feedback from './feedback';
 import * as affordability from './affordability';
-import * as labels from './labels.js';
+import * as labels from './labels';
 import * as utils from './utils';
 import * as buttons from './buttons';
 
