@@ -6,7 +6,7 @@ import * as Clicks from '../js/core/rules/clicks';
 import * as Purchases from '../js/core/rules/purchases';
 import * as Economy from '../js/core/rules/economy';
 import * as Resources from '../js/core/systems/resources';
-import * as EventBus from '../js/services/event-bus.js';
+import * as EventBus from '../js/services/event-bus.ts';
 
 describe('Module exports sanity', () => {
   it('constants exports EVENT_NAMES', () => {
