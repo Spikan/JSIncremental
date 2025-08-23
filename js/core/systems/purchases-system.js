@@ -105,8 +105,7 @@ export function purchaseBetterCups({ sips, straws, cups, widerStraws, betterCups
  * @param {{ sips: number; suctions: number }} args
  */
 export function purchaseSuction({ sips, suctions }) {
-    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
-    const up = (typeof window !== 'undefined' && window.App?.data?.upgrades) || {};
+    const { upgrades: up, config } = getTypedConfig();
 
     const baseCost = up?.suction?.baseCost ?? config.SUCTION_BASE_COST;
     const scaling = up?.suction?.scaling ?? config.SUCTION_SCALING;
@@ -122,7 +121,7 @@ export function purchaseSuction({ sips, suctions }) {
  * @param {{ sips: number; suctionUpCounter: number }} args
  */
 export function upgradeSuction({ sips, suctionUpCounter }) {
-    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
+    const { config } = getTypedConfig();
     const cost = (config.SUCTION_UPGRADE_BASE_COST ?? 0) * Number(suctionUpCounter);
     if (sips < cost) return null;
     const newCounter = Number(suctionUpCounter) + 1;
@@ -134,20 +133,12 @@ export function upgradeSuction({ sips, suctionUpCounter }) {
  * @param {{ sips: number; fasterDrinks: number }} args
  */
 export function purchaseFasterDrinks({ sips, fasterDrinks }) {
-    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
-    const up = (typeof window !== 'undefined' && (/** @type {any} */(window)).App?.data?.upgrades) || {};
+    const { upgrades: up, config } = getTypedConfig();
     const baseCost = up?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST;
     const scaling = up?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING;
     const cost = Math.floor(baseCost * Math.pow(scaling, Number(fasterDrinks)));
     
-    console.log('🔧 Purchase system Faster Drinks cost calculation:', {
-        baseCost,
-        scaling,
-        count: Number(fasterDrinks),
-        calculatedCost: cost,
-        dataUp: up?.fasterDrinks,
-        config: config.FASTER_DRINKS_BASE_COST
-    });
+    // Diagnostic logs can be enabled if needed
     
     if (sips < cost) return null;
     const newFasterDrinks = Number(fasterDrinks) + 1;
@@ -158,8 +149,7 @@ export function purchaseFasterDrinks({ sips, fasterDrinks }) {
  * @param {{ sips: number; fasterDrinksUpCounter: number }} args
  */
 export function upgradeFasterDrinks({ sips, fasterDrinksUpCounter }) {
-    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
-    const up = (typeof window !== 'undefined' && (/** @type {any} */(window)).App?.data?.upgrades) || {};
+    const { upgrades: up, config } = getTypedConfig();
     const base = up?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 0;
     const cost = base * Number(fasterDrinksUpCounter);
     if (sips < cost) return null;
@@ -171,8 +161,7 @@ export function upgradeFasterDrinks({ sips, fasterDrinksUpCounter }) {
  * @param {{ sips: number; criticalClicks: number; criticalClickChance: number }} args
  */
 export function purchaseCriticalClick({ sips, criticalClicks, criticalClickChance }) {
-    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
-    const up = (typeof window !== 'undefined' && (/** @type {any} */(window)).App?.data?.upgrades) || {};
+    const { upgrades: up, config } = getTypedConfig();
     const baseCost = up?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST;
     const scaling = up?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING;
     const cost = Math.floor(baseCost * Math.pow(scaling, Number(criticalClicks)));
@@ -186,7 +175,7 @@ export function purchaseCriticalClick({ sips, criticalClicks, criticalClickChanc
  * @param {{ sips: number; criticalClickUpCounter: number; criticalClickMultiplier: number }} args
  */
 export function upgradeCriticalClick({ sips, criticalClickUpCounter, criticalClickMultiplier }) {
-    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
+    const { config } = getTypedConfig();
     const cost = (config.CRITICAL_CLICK_UPGRADE_BASE_COST ?? 0) * Number(criticalClickUpCounter);
     if (sips < cost) return null;
     const newCounter = Number(criticalClickUpCounter) + 1;
@@ -198,7 +187,7 @@ export function upgradeCriticalClick({ sips, criticalClickUpCounter, criticalCli
  * @param {{ sips: number; level: number; sipsPerDrink: number }} args
  */
 export function levelUp({ sips, level, sipsPerDrink }) {
-    const config = (typeof window !== 'undefined' && /** @type {any} */(window).GAME_CONFIG?.BALANCE) || /** @type {any} */({});
+    const { config } = getTypedConfig();
     const base = config.LEVEL_UP_BASE_COST ?? 0;
     const scaling = config.LEVEL_UP_SCALING ?? 1;
     const cost = base * Math.pow(scaling, Number(level));
