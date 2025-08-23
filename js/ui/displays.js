@@ -204,7 +204,6 @@ export function updateCompactDrinkSpeedDisplays() {
 				display.textContent = drinkRateSeconds.toFixed(2) + 's';
 			}
 		} catch {}
-		}
 	});
 }
 
