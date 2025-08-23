@@ -4,9 +4,12 @@
 // Import typed store and default state
 import { createStore } from './core/state/index.ts';
 import { defaultState } from './core/state/shape.ts';
+import { createEventBus } from './services/event-bus.ts';
 // Prefer typed storage service when available
 let storage = (window && window.storage) || { loadGame: () => null, saveGame: () => {} };
-const eventBus = window.eventBus || { emit: () => {}, on: () => {} };
+// Initialize a single, shared event bus BEFORE UI hooks into it
+const eventBus = createEventBus();
+try { window.eventBus = eventBus; window.bus = eventBus; } catch {}
 // Pull event names from module export if available; fallback to global
 let EVENT_NAMES = window.EVENT_NAMES || {};
 try {
@@ -82,15 +85,6 @@ try {
     storage = (st && st.AppStorage) ? st.AppStorage : storage;
     try { window.storage = storage; } catch {}
 } catch (e) { console.warn('⚠️ storage service load failed:', e); }
-
-// Attach core systems (TypeScript modules) into App.systems with safe fallbacks
-try {
-    const eb = await import('./services/event-bus.ts');
-    // Recreate the bus so UI gets the same instance
-    const typedBus = eb.createEventBus();
-    window.App.events = typedBus;
-    try { window.eventBus = typedBus; window.bus = typedBus; } catch {}
-} catch (e) { console.warn('⚠️ event-bus service load failed:', e); }
 
 try {
     const res = await import('./core/systems/resources.ts');
