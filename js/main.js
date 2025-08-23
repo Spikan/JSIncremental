@@ -997,11 +997,73 @@ function startGameLoop() {
 }
 
 // Mobile touch event handling for reliable click feedback
-// Mobile touch handling is now managed by the unified button system in js/ui/buttons.js
-// This provides comprehensive touch support for all buttons including the soda button
 function setupMobileTouchHandling() {
-    // Touch events are now handled by the button system
-    // No additional setup needed here
+    const sodaButton = DOM_CACHE.sodaButton;
+    if (!sodaButton) {
+        console.warn('Soda button not found for mobile touch setup, retrying...');
+        // Retry after a short delay in case DOM cache isn't ready yet
+        setTimeout(setupMobileTouchHandling, 100);
+        return;
+    }
+
+    // Detect mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                    ('ontouchstart' in window) ||
+                    (navigator.maxTouchPoints > 0);
+
+    if (isMobile) {
+        
+        
+        // Prevent default touch behaviors that could interfere
+        let touchStartTime = 0;
+        window.isTouchClick = false;
+        window.touchProcessed = false;
+        
+        sodaButton.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            touchStartTime = Date.now();
+            window.isTouchClick = true;
+            window.touchProcessed = false;
+            // Add visual feedback immediately
+            sodaButton.classList.add('soda-clicked');
+        }, { passive: false });
+
+        sodaButton.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // Only process if it was a short touch and hasn't been processed yet
+            if (touchDuration < 300 && window.isTouchClick && !window.touchProcessed) {
+                window.touchProcessed = true;
+                // Get touch coordinates for feedback positioning
+                const touch = e.changedTouches[0];
+                const clickX = touch.clientX;
+                const clickY = touch.clientY;
+                // Directly trigger click logic for mobile since default click is prevented
+                // Note: sodaClick function has been moved to UI system
+            }
+            
+            // Remove visual feedback after a short delay
+            setTimeout(() => {
+                sodaButton.classList.remove('soda-clicked');
+            }, 150);
+            
+            window.isTouchClick = false;
+        }, { passive: false });
+
+        // Prevent context menu on long press
+        sodaButton.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Add touch-action CSS property for better mobile handling
+        sodaButton.style.touchAction = 'manipulation';
+        sodaButton.style.webkitTouchCallout = 'none';
+        sodaButton.style.webkitUserSelect = 'none';
+        sodaButton.style.userSelect = 'none';
+        
+        
+    }
 }
 
 // Function moved to js/ui/displays.js - use App.ui.updateDrinkProgress()

@@ -36,13 +36,6 @@ export function initSplashScreen(): void {
                     e.stopPropagation();
                     startGame();
                 });
-                
-                // Add touch event support for mobile devices
-                startBtn.addEventListener('touchstart', function (e: Event) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    startGame();
-                }, { passive: false });
             }
         } catch {}
 
@@ -52,13 +45,6 @@ export function initSplashScreen(): void {
             e.stopPropagation();
             startGame();
         });
-
-        // Add touch event support for mobile devices
-        splashScreen.addEventListener('touchstart', function (e: Event) {
-            e.preventDefault();
-            e.stopPropagation();
-            startGame();
-        }, { passive: false });
 
         document.addEventListener('keydown', function (event: KeyboardEvent) {
             if (splashScreen.style.display !== 'none') {
