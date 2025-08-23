@@ -1040,6 +1040,11 @@ function devAddSips(amount) {
         if (window.sips) {
             window.sips = window.sips.plus(amount);
             console.log(`💰 Added ${amount} sips via dev function`);
+            // Sync App.state.sips and update UI
+            try {
+                const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+                window.App?.state?.setState?.({ sips: toNum(window.sips) });
+            } catch {}
             // Update UI
             try { window.App?.ui?.updateTopSipCounter?.(); } catch {}
             try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
@@ -1506,6 +1511,11 @@ function sodaClick(multiplier = 1) {
         // Add to sips
         window.sips = window.sips.plus(totalClickValue);
         console.log('🔧 New sips after click:', window.sips?.toNumber?.());
+        // Sync App.state.sips for UI-only reads
+        try {
+            const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+            window.App?.state?.setState?.({ sips: toNum(window.sips) });
+        } catch {}
         
         // Check for critical click
         const criticalChance = window.criticalClickChance || 0;
