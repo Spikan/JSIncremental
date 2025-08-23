@@ -18,12 +18,12 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       const now = getNow();
       if (now - lastDrinkTime < drinkRate) return;
 
-      // Add base sips per drink
-      const base = Number(BAL.BASE_SIPS_PER_DRINK ?? 1);
+      // Add full sips-per-drink (base + production)
+      const spsVal = Number(state.sps ?? (w.sipsPerDrink?.toNumber?.() ?? w.sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1));
       if (typeof w.sips?.plus === 'function') {
-        w.sips = w.sips.plus(base);
+        w.sips = w.sips.plus(spsVal);
       } else {
-        w.sips = Number(w.sips || 0) + base;
+        w.sips = Number(w.sips || 0) + spsVal;
       }
 
       // Mirror totals
@@ -44,7 +44,7 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
         const toNum = (v: any) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
         w.App?.state?.setState?.({
           sips: toNum(w.sips),
-          totalSipsEarned: prevTotal + base,
+          totalSipsEarned: prevTotal + spsVal,
           highestSipsPerSecond: highest,
           lastDrinkTime: nextLast,
           drinkProgress: nextProgress,
@@ -52,7 +52,25 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       } catch {}
 
       try { w.App?.ui?.updateDrinkProgress?.(nextProgress, drinkRate); } catch {}
-      try { w.App?.systems?.autosave?.computeAutosaveCounter && w.App.systems.autosave.computeAutosaveCounter; } catch {}
+      // Update top counters immediately after awarding sips
+      try { w.App?.ui?.updateTopSipsPerDrink?.(); } catch {}
+      try { w.App?.ui?.updateTopSipsPerSecond?.(); } catch {}
+      try { w.App?.ui?.updateTopSipCounter?.(); } catch {}
+      // Autosave integration with counter stored on window
+      try {
+        const enabled = !!(state?.options?.autosaveEnabled);
+        const intervalSec = Number(state?.options?.autosaveInterval || 10);
+        if (enabled && w.App?.systems?.autosave?.computeAutosaveCounter) {
+          const result = w.App.systems.autosave.computeAutosaveCounter({
+            enabled,
+            counter: Number(w.__autosaveCounter || 0),
+            intervalSec,
+            drinkRateMs: drinkRate,
+          });
+          w.__autosaveCounter = result.nextCounter;
+          if (result.shouldSave) try { w.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
+        }
+      } catch {}
       try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
     } catch {}
   };

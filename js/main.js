@@ -935,8 +935,11 @@ function startGameLoop() {
                     window.App?.ui?.updateDrinkProgress?.(drinkProgress, rate);
                 } catch {}
             },
-            // Prefer local legacy processDrink (working) until TS drink-system is fully wired
-            processDrink: () => { try { processDrink(); } catch (e) { console.error('processDrink error', e); } },
+            // Use TS drink system when available; fallback to legacy if needed
+            processDrink: () => {
+                try { window.App?.systems?.drink?.processDrink?.(); }
+                catch (e) { try { processDrink(); } catch (err) { console.error('processDrink error', err); } }
+            },
             // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
             updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) FEATURE_UNLOCKS.checkAllUnlocks(); },
             updatePlayTime: () => window.App?.ui?.updatePlayTime?.(),
