@@ -893,8 +893,8 @@ function initGame() {
         // Initialize button audio system (delegated to module)
         try {
             window.App?.systems?.audio?.button?.initButtonAudioSystem?.();
-            // Resume context on first user interaction (mobile/autoplay policies)
-            const resume = () => { try { window.App?.systems?.audio?.button?.playButtonClickSound?.(); } catch {};
+            // Resume context on first user interaction (mobile/autoplay policies) without playing a sound
+            const resume = () => { try { window.App?.systems?.audio?.button?.initButtonAudioSystem?.(); } catch {};
                 try { document.removeEventListener('touchstart', resume, true); document.removeEventListener('pointerdown', resume, true); document.removeEventListener('keydown', resume, true);} catch {}
             };
             document.addEventListener('touchstart', resume, true);

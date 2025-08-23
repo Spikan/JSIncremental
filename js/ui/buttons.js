@@ -307,7 +307,20 @@ function setupSpecialButtonHandlers() {
             e.preventDefault();
             e.stopPropagation();
             try {
+                // Play audio for non-soda, non-tab actions via mapping
+                try {
+                    const meta = BUTTON_CONFIG.actions[fnName];
+                    const btnType = meta && meta.type;
+                    if (window.App?.systems?.audio?.button && fnName !== 'sodaClick' && fnName !== 'switchTab') {
+                        if (btnType === 'shop-btn' || btnType === 'clicking-upgrade-btn' || btnType === 'drink-speed-upgrade-btn' || btnType === 'level-up-btn') {
+                            window.App.systems.audio.button.playButtonPurchaseSound?.();
+                        } else {
+                            window.App.systems.audio.button.playButtonClickSound?.();
+                        }
+                    }
+                } catch {}
                 if (fnName === 'switchTab') {
+                    try { window.App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
                     window[fnName](args[0], e);
                 } else {
                     window[fnName](...args);
