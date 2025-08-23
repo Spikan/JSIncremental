@@ -48,19 +48,19 @@ export function handleSodaClick(multiplier: number = 1) {
     try { trackClick(); } catch {}
 
     const state = w.App?.state?.getState?.() || {};
-    const DecimalCtor = w.Decimal || Number;
-
-    // Base and suction bonus
-    const baseClickValue = new DecimalCtor(1);
     const suctionValue = Number(state.suctions ?? (w.suctions?.toNumber?.() ?? Number(w.suctions) ?? 0));
-    const suctionBonus = new DecimalCtor(suctionValue * 0.3);
-    const totalClickValue = baseClickValue.plus ? baseClickValue.plus(suctionBonus).times(multiplier) : (baseClickValue + suctionBonus) * multiplier;
+    const totalClickValueNum = (1 + suctionValue * 0.3) * Number(multiplier || 1);
 
-    // Add to sips and mirror to state
-    if (w.sips?.plus) {
-      w.sips = w.sips.plus(totalClickValue);
-    } else {
-      w.sips = Number(w.sips || 0) + Number(totalClickValue || 0);
+    // Add to sips and mirror to state (use Decimal if available, numerically safe)
+    try {
+      const toNum = (v: any) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+      const current = toNum(w.sips);
+      const next = current + totalClickValueNum;
+      w.sips = w.Decimal ? new w.Decimal(next) : next;
+      w.App?.state?.setState?.({ sips: next });
+    } catch {
+      w.sips = Number(w.sips || 0) + totalClickValueNum;
+      try { w.App?.state?.setState?.({ sips: Number(w.sips) }); } catch {}
     }
     try {
       const toNum = (v: any) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
@@ -71,26 +71,27 @@ export function handleSodaClick(multiplier: number = 1) {
     const criticalChance = Number(state.criticalClickChance ?? w.criticalClickChance ?? 0);
     if (Math.random() < criticalChance) {
       const criticalMultiplier = Number(state.criticalClickMultiplier ?? w.criticalClickMultiplier ?? 5);
-      const criticalBonus = (totalClickValue.times ? totalClickValue.times(criticalMultiplier - 1) : totalClickValue * (criticalMultiplier - 1));
-      if (w.sips?.plus) {
-        w.sips = w.sips.plus(criticalBonus);
-      } else {
-        w.sips = Number(w.sips || 0) + Number(criticalBonus || 0);
-      }
+      const criticalBonusNum = totalClickValueNum * (criticalMultiplier - 1);
       try {
         const toNum = (v: any) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
-        w.App?.state?.setState?.({ sips: toNum(w.sips) });
-      } catch {}
-      try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, { bonus: criticalBonus }); } catch {}
+        const current = toNum(w.sips);
+        const next = current + criticalBonusNum;
+        w.sips = w.Decimal ? new w.Decimal(next) : next;
+        w.App?.state?.setState?.({ sips: next });
+      } catch {
+        w.sips = Number(w.sips || 0) + criticalBonusNum;
+        try { w.App?.state?.setState?.({ sips: Number(w.sips) }); } catch {}
+      }
+      try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, { bonus: criticalBonusNum }); } catch {}
     }
 
     // Emit soda click and sync totals
-    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, { value: totalClickValue }); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, { value: totalClickValueNum }); } catch {}
     try {
       w.App?.stateBridge?.autoSync?.();
-      const toNum = (v: any) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
       const st = w.App?.state?.getState?.() || {};
-      w.App?.state?.setState?.({ sips: toNum(w.sips), totalSipsEarned: Number(st.totalSipsEarned || 0) });
+      const prevTotal = Number(st.totalSipsEarned || 0);
+      w.App?.state?.setState?.({ totalSipsEarned: prevTotal + totalClickValueNum });
     } catch {}
   } catch {}
 }

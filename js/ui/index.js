@@ -61,29 +61,24 @@ export function initializeUI() {
     if (window.App?.events) {
         // Listen for game events and update UI accordingly
         window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA, (data) => {
-            // Only update UI if game is ready
-            if (window.sips && typeof window.sips.gte === 'function') {
-                updateTopSipsPerDrink();
-                updateTopSipsPerSecond();
-                updateTopSipCounter();
-                checkUpgradeAffordability();
-                if (data.gained) {
-                    showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
-                }
+            // Update UI regardless of Decimal implementation
+            updateTopSipsPerDrink();
+            updateTopSipsPerSecond();
+            updateTopSipCounter();
+            checkUpgradeAffordability();
+            if (data && data.gained) {
+                showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
             }
         });
         
         window.App.events.on(window.App.EVENT_NAMES?.ECONOMY?.PURCHASE, (data) => {
-            // Only update UI if game is ready
-            if (window.sips && typeof window.sips.gte === 'function') {
-                updateTopSipsPerDrink();
-                updateTopSipsPerSecond();
-                updateTopSipCounter();
-                checkUpgradeAffordability();
-                updateCriticalClickDisplay();
-                if (data.item && data.cost) {
-                    showPurchaseFeedback(data.item, data.cost);
-                }
+            updateTopSipsPerDrink();
+            updateTopSipsPerSecond();
+            updateTopSipCounter();
+            checkUpgradeAffordability();
+            updateCriticalClickDisplay();
+            if (data && data.item && data.cost) {
+                showPurchaseFeedback(data.item, data.cost);
             }
         });
         

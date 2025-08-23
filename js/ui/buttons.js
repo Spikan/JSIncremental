@@ -294,11 +294,21 @@ function setupSpecialButtonHandlers() {
         if (!action) return;
         const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
         const argsAttr = el.getAttribute('data-args') || argStr;
-        const args = argsAttr ? [Number(argsAttr)] : [];
+        let args = [];
+        if (argsAttr) {
+            const maybeNum = Number(argsAttr);
+            args = Number.isNaN(maybeNum) ? [argsAttr] : [maybeNum];
+        }
         if (typeof window[fnName] === 'function') {
             e.preventDefault();
             e.stopPropagation();
-            try { window[fnName](...args); } catch (err) { console.warn('action failed', fnName, err); }
+            try {
+                if (fnName === 'switchTab') {
+                    window[fnName](args[0], e);
+                } else {
+                    window[fnName](...args);
+                }
+            } catch (err) { console.warn('action failed', fnName, err); }
         }
     }, { capture: true });
     }

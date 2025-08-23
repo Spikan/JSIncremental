@@ -179,30 +179,16 @@ const FEATURE_UNLOCKS = {
         console.log('Updating feature visibility...');
         console.log('Unlocked features:', Array.from(this.unlockedFeatures));
         
-        // Update tab buttons
+        // Update tab buttons (modern data-action based)
         const tabButtons = document.querySelectorAll('.tab-btn');
         tabButtons.forEach(btn => {
-            const onclick = btn.getAttribute('onclick');
-            console.log('Button onclick:', onclick);
-            
-            if (onclick) {
-                const match = onclick.match(/switchTab\('([^']+)'/);
-                const tabName = match ? match[1] : null;
-                console.log('Extracted tab name:', tabName);
-                
-                if (tabName && tabName !== 'soda') {
-                    const isUnlocked = this.unlockedFeatures.has(tabName);
-                    console.log(`Tab ${tabName} unlocked:`, isUnlocked);
-                    
-                    if (isUnlocked) {
-                        btn.style.display = 'inline-block';
-                        btn.classList.remove('locked');
-                    } else {
-                        btn.style.display = 'none';
-                        btn.classList.add('locked');
-                    }
-                }
-            }
+            const dataAction = btn.getAttribute('data-action') || '';
+            const isSwitch = dataAction.startsWith('switchTab:');
+            const tabName = isSwitch ? dataAction.split(':')[1] : null;
+            if (!tabName || tabName === 'soda') return;
+            const isUnlocked = this.unlockedFeatures.has(tabName);
+            btn.style.display = isUnlocked ? 'inline-block' : 'none';
+            btn.classList.toggle('locked', !isUnlocked);
         });
         
         // Update upgrade buttons and sections
