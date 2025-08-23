@@ -1487,34 +1487,10 @@ function buyBetterCups() {
 // Upgrade wrapper functions
 function upgradeFasterDrinks() {
     try {
-        if (!window.App?.systems?.purchases?.upgradeFasterDrinks) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.upgradeFasterDrinks) {
+            return !!window.App.systems.purchases.execute.upgradeFasterDrinks();
         }
-        
-        const result = window.App.systems.purchases.upgradeFasterDrinks({
-            sips: window.sips,
-            fasterDrinksUpCounter: window.fasterDrinksUpCounter
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent);
-            window.fasterDrinksUpCounter = result.fasterDrinksUpCounter;
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    fasterDrinksUpCounter: Number(result.fasterDrinksUpCounter)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.UPGRADE_PURCHASED, { item: 'fasterDrinksUp', cost: result.spent }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in upgradeFasterDrinks:', error);
     }
@@ -1537,36 +1513,10 @@ function sodaClick(multiplier = 1) {
 
 function levelUp() {
     try {
-        if (!window.App?.systems?.purchases?.levelUp) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.levelUp) {
+            return !!window.App.systems.purchases.execute.levelUp();
         }
-        
-        const st = window.App?.state?.getState?.() || {};
-        const result = window.App.systems.purchases.levelUp({
-            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
-            level: Number((typeof st.level !== 'undefined' ? st.level : (window.level?.toNumber?.() ?? Number(window.level))) || 0),
-            sipsPerDrink: Number(st.sps ?? 0)
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent).plus(result.sipsGained);
-            window.level = result.level;
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    level: Number(result.level)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'levelUp', cost: result.spent, gained: result.sipsGained }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in levelUp:', error);
     }
