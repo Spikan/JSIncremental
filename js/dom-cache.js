@@ -1,6 +1,55 @@
+// @ts-check
 // DOM Cache - Centralized DOM element management for Soda Clicker Pro
 // This file manages all cached DOM element references for better performance and maintainability
 
+/** @type {{
+ *  levelNumber: HTMLElement|null;
+ *  levelText: HTMLElement|null;
+ *  sodaButton: HTMLElement|null;
+ *  topSipValue: HTMLElement|null;
+ *  topSipsPerDrink: HTMLElement|null;
+ *  topSipsPerSecond: HTMLElement|null;
+ *  musicPlayer: HTMLElement|null;
+ *  musicToggleBtn: HTMLElement|null;
+ *  musicMuteBtn: HTMLElement|null;
+ *  musicStatus: HTMLElement|null;
+ *  musicStreamSelect: HTMLElement|null;
+ *  currentStreamInfo: HTMLElement|null;
+ *  shopDiv: HTMLElement|null;
+ *  widerStraws: HTMLElement|null;
+ *  betterCups: HTMLElement|null;
+ *  widerStrawsSPD: HTMLElement|null;
+ *  betterCupsSPD: HTMLElement|null;
+ *  totalWiderStrawsSPD: HTMLElement|null;
+ *  totalBetterCupsSPD: HTMLElement|null;
+ *  statsTab: HTMLElement|null;
+ *  progressFill: HTMLElement|null;
+ *  countdown: HTMLElement|null;
+ *  playTime: HTMLElement|null;
+ *  lastSaveTime: HTMLElement|null;
+ *  totalPlayTime: HTMLElement|null;
+ *  sessionTime: HTMLElement|null;
+ *  daysSinceStart: HTMLElement|null;
+ *  totalClicks: HTMLElement|null;
+ *  clicksPerSecond: HTMLElement|null;
+ *  bestClickStreak: HTMLElement|null;
+ *  totalSipsEarned: HTMLElement|null;
+ *  currentSipsPerSecond: HTMLElement|null;
+ *  highestSipsPerSecond: HTMLElement|null;
+ *  strawsPurchased: HTMLElement|null;
+ *  cupsPurchased: HTMLElement|null;
+ *  widerStrawsPurchased: HTMLElement|null;
+ *  betterCupsPurchased: HTMLElement|null;
+ *  suctionsPurchased: HTMLElement|null;
+ *  criticalClicksPurchased: HTMLElement|null;
+ *  currentLevel: HTMLElement|null;
+ *  totalUpgrades: HTMLElement|null;
+ *  fasterDrinksOwned: HTMLElement|null;
+ *  levelUpDiv: HTMLElement|null;
+ *  init: () => void;
+ *  get: (id: string) => HTMLElement|null;
+ *  isReady: () => boolean;
+ * }} */
 const DOM_CACHE = {
     // Game elements
     levelNumber: null,
@@ -131,7 +180,7 @@ const DOM_CACHE = {
 };
 
 // Expose DOM cache to window for module access
-window.DOM_CACHE = DOM_CACHE;
+/** @type {any} */ (window).DOM_CACHE = DOM_CACHE;
 
 // Auto-initialize when DOM is ready if not already initialized
 if (document.readyState === 'loading') {

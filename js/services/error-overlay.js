@@ -1,6 +1,8 @@
+// @ts-check
 (function attachErrorOverlay() {
-	if (window.__ERROR_OVERLAY_ATTACHED__) return;
-	window.__ERROR_OVERLAY_ATTACHED__ = true;
+	const w = /** @type {any} */ (window);
+	if (w.__ERROR_OVERLAY_ATTACHED__) return;
+	w.__ERROR_OVERLAY_ATTACHED__ = true;
 
 	const overlay = document.createElement('div');
 	overlay.id = 'error-overlay';
