@@ -344,6 +344,39 @@ function initGame() {
             });
         }
         let drinkProgress = 0;
+        
+        // Bridge click sound preference to App.state.options and storage
+        if (!Object.getOwnPropertyDescriptor(window, 'clickSoundsEnabled')) {
+            let _clickSounds = true;
+            Object.defineProperty(window, 'clickSoundsEnabled', {
+                get: function() {
+                    try { return !!(window.App?.state?.getState?.()?.options?.clickSoundsEnabled); } catch {}
+                    return _clickSounds;
+                },
+                set: function(v) {
+                    const next = !!v;
+                    _clickSounds = next;
+                    try {
+                        const prev = window.App?.state?.getState?.()?.options || {};
+                        window.App?.state?.setState?.({ options: { ...prev, clickSoundsEnabled: next } });
+                    } catch {}
+                    try {
+                        if (window.App?.storage?.setBoolean) window.App.storage.setBoolean('clickSoundsEnabled', next);
+                        else localStorage.setItem('clickSoundsEnabled', String(next));
+                    } catch {}
+                    try {
+                        if (window.App?.ui?.updateClickSoundsToggleText) window.App.ui.updateClickSoundsToggleText(next);
+                        else {
+                            const toggleButton = document.getElementById('clickSoundsToggle');
+                            if (toggleButton) {
+                                toggleButton.textContent = next ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
+                                toggleButton.classList.toggle('sounds-off', !next);
+                            }
+                        }
+                    } catch {}
+                }
+            });
+        }
         let lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE; // Start with progress at 0
 
         // Faster Drinks upgrade variables
@@ -1613,42 +1646,20 @@ function startGame() {
 
 // Function to toggle click sounds on/off
 function toggleClickSounds() {
-    clickSoundsEnabled = !clickSoundsEnabled;
-    
-    // Save preference to localStorage
-    try {
-        if (window.App?.storage?.setBoolean) {
-            window.App.storage.setBoolean('clickSoundsEnabled', clickSoundsEnabled);
-        } else {
-            localStorage.setItem('clickSoundsEnabled', clickSoundsEnabled.toString());
-        }
-    } catch (e) {
-        console.warn('persist clickSoundsEnabled failed:', e);
-    }
-    
-    // Update UI if there's a toggle button
-    if (window.App?.ui?.updateClickSoundsToggleText) {
-        try { window.App.ui.updateClickSoundsToggleText(!!clickSoundsEnabled); } catch {}
-    } else {
-        const toggleButton = document.getElementById('clickSoundsToggle');
-        if (toggleButton) {
-            toggleButton.textContent = clickSoundsEnabled ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
-            toggleButton.classList.toggle('sounds-off', !clickSoundsEnabled);
-        }
-    }
+    try { window.clickSoundsEnabled = !window.clickSoundsEnabled; } catch {}
 }
 
 // Load click sounds preference from storage
 function loadClickSoundsPreference() {
     try {
+        let next = true;
         if (window.App?.storage?.getBoolean) {
-            clickSoundsEnabled = window.App.storage.getBoolean('clickSoundsEnabled', true);
+            next = window.App.storage.getBoolean('clickSoundsEnabled', true);
         } else {
             const saved = localStorage.getItem('clickSoundsEnabled');
-            if (saved !== null) {
-                clickSoundsEnabled = saved === 'true';
-            }
+            if (saved !== null) next = saved === 'true';
         }
+        window.clickSoundsEnabled = next;
     } catch (e) {
         console.warn('loadClickSoundsPreference failed:', e);
     }
