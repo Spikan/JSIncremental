@@ -41,4 +41,56 @@ export function trackClick() {
   } catch {}
 }
 
+export function handleSodaClick(multiplier: number = 1) {
+  try {
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    // Track click via system
+    try { trackClick(); } catch {}
 
+    const state = w.App?.state?.getState?.() || {};
+    const DecimalCtor = w.Decimal || Number;
+
+    // Base and suction bonus
+    const baseClickValue = new DecimalCtor(1);
+    const suctionValue = Number(state.suctions ?? (w.suctions?.toNumber?.() ?? Number(w.suctions) ?? 0));
+    const suctionBonus = new DecimalCtor(suctionValue * 0.3);
+    const totalClickValue = baseClickValue.plus ? baseClickValue.plus(suctionBonus).times(multiplier) : (baseClickValue + suctionBonus) * multiplier;
+
+    // Add to sips and mirror to state
+    if (w.sips?.plus) {
+      w.sips = w.sips.plus(totalClickValue);
+    } else {
+      w.sips = Number(w.sips || 0) + Number(totalClickValue || 0);
+    }
+    try {
+      const toNum = (v: any) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+      w.App?.state?.setState?.({ sips: toNum(w.sips) });
+    } catch {}
+
+    // Critical check using state-first
+    const criticalChance = Number(state.criticalClickChance ?? w.criticalClickChance ?? 0);
+    if (Math.random() < criticalChance) {
+      const criticalMultiplier = Number(state.criticalClickMultiplier ?? w.criticalClickMultiplier ?? 5);
+      const criticalBonus = (totalClickValue.times ? totalClickValue.times(criticalMultiplier - 1) : totalClickValue * (criticalMultiplier - 1));
+      if (w.sips?.plus) {
+        w.sips = w.sips.plus(criticalBonus);
+      } else {
+        w.sips = Number(w.sips || 0) + Number(criticalBonus || 0);
+      }
+      try {
+        const toNum = (v: any) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+        w.App?.state?.setState?.({ sips: toNum(w.sips) });
+      } catch {}
+      try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, { bonus: criticalBonus }); } catch {}
+    }
+
+    // Emit soda click and sync totals
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, { value: totalClickValue }); } catch {}
+    try {
+      w.App?.stateBridge?.autoSync?.();
+      const toNum = (v: any) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+      const st = w.App?.state?.getState?.() || {};
+      w.App?.state?.setState?.({ sips: toNum(w.sips), totalSipsEarned: Number(st.totalSipsEarned || 0) });
+    } catch {}
+  } catch {}
+}
