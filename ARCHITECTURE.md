@@ -97,8 +97,8 @@ soda-clicker-pro/
 │   │   │   ├── 📄 save-system.ts # Save/load operations with validation
 │   │   │   ├── 📄 options-system.js # Game options and preferences
 │   │   │   ├── 📄 loop-system.ts # Game loop and timing management
-│   │   │   ├── 📄 button-audio.js # Sound effects and audio preferences
-│   │   │   └── 📄 game-init.js   # Game initialization system
+│   │   │   ├── 📄 button-audio.ts # Sound effects and audio preferences
+│   │   │   └── 📄 game-init.ts   # Game initialization system
 │   │   │
 │   │   └── 📁 validation/        # Data validation schemas
 │   │       └── 📄 schemas.ts     # Zod validation schemas

@@ -25,7 +25,7 @@ This guide covers two migrations:
 1. Pure rules in `js/core/rules/*.js` → converted to `.ts` (clicks, economy, purchases)
 2. Core systems in `js/core/systems/*.js` → converted to `.ts` (resources, purchases-system, save-system, loop-system, drink-system, clicks-system)
 3. UI modules in `js/ui/*.js` (remain JS with JSDoc for now)
-4. Remaining legacy modules (`main.js`, `game-init.js`) use `// @ts-nocheck`
+4. Remaining legacy modules (`main.js`) use `// @ts-nocheck`
 
 ---
 

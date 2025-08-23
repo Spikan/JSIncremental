@@ -136,7 +136,7 @@ window.App?.ui?.updateAllStats?.();
 ### **Core Changes:**
 - `js/main.js` - Major refactoring, duplicate function removal
 - `js/index.js` - Updated function calls
-- `js/core/systems/game-init.js` - Updated system calls
+- `js/core/systems/game-init.ts` - Converted and wired into index
 
 ### **Documentation:**
 - `ARCHITECTURE.md` - Updated with refactoring details
