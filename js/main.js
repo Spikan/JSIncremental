@@ -311,7 +311,11 @@ function initGame() {
         if (!Object.getOwnPropertyDescriptor(window, 'sps')) {
             Object.defineProperty(window, 'sps', {
                 get: function() { return sps; },
-                set: function(v) { sps = new Decimal(v); }
+                set: function(v) {
+                    sps = new Decimal(v);
+                    try { window.App?.stateBridge?.syncSps(sps); } catch {}
+                    try { window.sipsPerDrink = new Decimal(sps); } catch {}
+                }
             });
         }
         let strawSPD = new Decimal(0);
@@ -340,10 +344,22 @@ function initGame() {
         if (!Object.getOwnPropertyDescriptor(window, 'drinkRate')) {
             Object.defineProperty(window, 'drinkRate', {
                 get: function() { return drinkRate; },
-                set: function(v) { drinkRate = Number(v) || drinkRate; }
+                set: function(v) {
+                    drinkRate = Number(v) || drinkRate;
+                    try { window.App?.stateBridge?.setDrinkRate(drinkRate); } catch {}
+                }
             });
         }
         let drinkProgress = 0;
+        if (!Object.getOwnPropertyDescriptor(window, 'drinkProgress')) {
+            Object.defineProperty(window, 'drinkProgress', {
+                get: function() { return drinkProgress; },
+                set: function(v) {
+                    drinkProgress = Number(v) || 0;
+                    try { window.App?.stateBridge?.setDrinkProgress(drinkProgress); } catch {}
+                }
+            });
+        }
         
         // Bridge click sound preference to App.state.options and storage
         if (!Object.getOwnPropertyDescriptor(window, 'clickSoundsEnabled')) {
@@ -460,6 +476,18 @@ function initGame() {
         }
         let gameStartTime = Date.now();
         let lastSaveTime = null;
+        if (!Object.getOwnPropertyDescriptor(window, 'lastSaveTime')) {
+            Object.defineProperty(window, 'lastSaveTime', {
+                get: function() {
+                    try { return Number(window.App?.state?.getState?.()?.lastSaveTime ?? lastSaveTime ?? 0); } catch {}
+                    return Number(lastSaveTime || 0);
+                },
+                set: function(v) {
+                    lastSaveTime = Number(v) || 0;
+                    try { window.App?.state?.setState?.({ lastSaveTime }); } catch {}
+                }
+            });
+        }
         try { window.App?.state?.setState?.({ sessionStartTime: gameStartTime, totalPlayTime: 0 }); } catch {}
 
         // Save optimization - batch save operations
