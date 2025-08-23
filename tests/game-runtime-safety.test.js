@@ -366,7 +366,7 @@ describe('Game Runtime Safety Tests', () => {
             vi.clearAllMocks();
             // Import core systems
             coreSystems = {
-                save: await import('../js/core/systems/save-system.js'),
+                save: await import('../js/core/systems/save-system'),
                 options: await import('../js/core/systems/options-system.js'),
                 autosave: await import('../js/core/systems/autosave.js')
             };
