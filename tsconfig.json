@@ -14,7 +14,9 @@
     "baseUrl": ".",
     "allowImportingTsExtensions": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "useUnknownInCatchVariables": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "js/core/**/*.ts",
