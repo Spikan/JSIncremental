@@ -1,5 +1,5 @@
 // @ts-check
-import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../rules/economy.js';
+import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../rules/economy';
 import { getUpgradesAndConfig } from './config-accessor.js';
 
 // Helper function to get configuration with proper fallbacks

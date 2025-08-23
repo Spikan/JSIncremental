@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { computeClick } from '../js/core/rules/clicks.js';
+import { computeClick } from '../js/core/rules/clicks';
 
 // Mock Decimal for tests
 beforeEach(() => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../js/core/rules/economy.js';
+import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../js/core/rules/economy';
 
 describe('economy rules', () => {
   it('computes SPD with multipliers', () => {

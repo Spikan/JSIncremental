@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 
 // Import public modules to assert they load and have expected exports
 import * as Constants from '../js/core/constants.js';
-import * as Clicks from '../js/core/rules/clicks.js';
+import * as Clicks from '../js/core/rules/clicks';
 import * as Purchases from '../js/core/rules/purchases';
-import * as Economy from '../js/core/rules/economy.js';
+import * as Economy from '../js/core/rules/economy';
 import * as Resources from '../js/core/systems/resources.js';
 import * as EventBus from '../js/services/event-bus.js';
 
