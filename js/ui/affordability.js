@@ -42,15 +42,22 @@ export function checkUpgradeAffordability() {
     // Update cost displays with affordability indicators
     updateCostDisplay('strawCost', costs.straw, sipsForComparison.gte(costs.straw));
     updateCostDisplay('cupCost', costs.cup, sipsForComparison.gte(costs.cup));
+    // Standard and compact cost displays
     updateCostDisplay('suctionCost', costs.suction, sipsForComparison.gte(costs.suction));
+    updateCostDisplay('suctionCostCompact', costs.suction, sipsForComparison.gte(costs.suction));
     updateCostDisplay('fasterDrinksCost', costs.fasterDrinks, sipsForComparison.gte(costs.fasterDrinks));
+    updateCostDisplay('fasterDrinksCostCompact', costs.fasterDrinks, sipsForComparison.gte(costs.fasterDrinks));
     updateCostDisplay('criticalClickCost', costs.criticalClick, sipsForComparison.gte(costs.criticalClick));
+    updateCostDisplay('criticalClickCostCompact', costs.criticalClick, sipsForComparison.gte(costs.criticalClick));
     updateCostDisplay('widerStrawsCost', costs.widerStraws, sipsForComparison.gte(costs.widerStraws));
     updateCostDisplay('betterCupsCost', costs.betterCups, sipsForComparison.gte(costs.betterCups));
     updateCostDisplay('fasterDrinksUpCost', costs.fasterDrinksUp, sipsForComparison.gte(costs.fasterDrinksUp));
+    updateCostDisplay('fasterDrinksUpCostCompact', costs.fasterDrinksUp, sipsForComparison.gte(costs.fasterDrinksUp));
     // Critical click upgrade cost display doesn't exist, so don't try to update it
     // updateCostDisplay('criticalClickUpCost', costs.criticalClickUp, sipsForComparison.gte(costs.criticalClickUp));
     updateCostDisplay('levelUpCost', costs.levelUp, sipsForComparison.gte(costs.levelUp));
+    // Legacy/compact id in DOM
+    updateCostDisplay('levelCost', costs.levelUp, sipsForComparison.gte(costs.levelUp));
 }
 
 // Update shop button states based on current affordability
