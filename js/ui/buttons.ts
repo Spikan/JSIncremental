@@ -27,7 +27,7 @@ const BUTTON_CONFIG: { types: Record<string, ButtonTypeMeta>; actions: Record<st
         levelUp: { func: () => ((window as any).App?.systems?.purchases?.execute?.levelUp ? (window as any).App.systems.purchases.execute.levelUp() : (window as any).levelUp?.()), type: 'level-up-btn', label: 'Level Up' },
         save: { func: () => { const sys = (window as any).App?.systems?.save; if (sys?.performSaveSnapshot) return sys.performSaveSnapshot(); return (window as any).save?.(); }, type: 'save-btn', label: 'Save Game' },
         delete_save: { func: () => { const sys = (window as any).App?.systems?.save; if (sys?.deleteSave) return sys.deleteSave(); return (window as any).delete_save?.(); }, type: 'save-btn', label: 'Delete Save' },
-        toggleButtonSounds: { func: () => { const audio = (window as any).App?.systems?.audio?.button; if (audio?.toggleButtonSounds) return audio.toggleButtonSounds(); return (window as any).toggleButtonSounds?.(); }, type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
+        toggleButtonSounds: { func: () => { const audio = (window as any).App?.systems?.audio?.button; if (audio?.toggleButtonSounds) { audio.toggleButtonSounds(); try { (window as any).App?.ui?.updateAutosaveStatus?.(); } catch {} return; } return (window as any).toggleButtonSounds?.(); }, type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
         sendMessage: { func: () => (window as any).sendMessage?.(), type: 'chat-send-btn', label: 'Send Message' },
         startGame: { func: () => (window as any).startGame?.(), type: 'splash-start-btn', label: 'Start Game' },
     }
@@ -164,13 +164,18 @@ function setupSpecialButtonHandlers(): void {
                 }
                 const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') as any : el as any;
                 if (buttonEl) markPointerHandled(buttonEl);
-                if (typeof (window as any)[fnName] === 'function' || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
+                const meta = (BUTTON_CONFIG.actions as any)[fnName];
+                if (meta || typeof (window as any)[fnName] === 'function' || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
                     e.preventDefault(); e.stopPropagation();
                     try {
                         let success = true;
                         if (fnName === 'switchTab') {
                             try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
                             (window as any)[fnName](args[0], e);
+                        } else if (meta && typeof meta.func === 'function') {
+                            const ret = meta.func();
+                            success = (typeof ret === 'undefined') ? true : !!ret;
+                            try { if (fnName === 'toggleButtonSounds') { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } } catch {}
                         } else {
                             if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) { success = !!(window as any).App.systems.purchases.execute[fnName](); }
                             else { const ret = (window as any)[fnName](...args); success = (typeof ret === 'undefined') ? true : !!ret; }
@@ -221,13 +226,18 @@ function setupSpecialButtonHandlers(): void {
                 const disabled = !!(buttonEl && (buttonEl.disabled || buttonEl.classList?.contains('disabled') || buttonEl.classList?.contains('unaffordable')));
                 if (disabled) return;
             }
-            if (typeof (window as any)[fnName] === 'function' || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
+            const meta = (BUTTON_CONFIG.actions as any)[fnName];
+            if (meta || typeof (window as any)[fnName] === 'function' || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
                 e.preventDefault(); e.stopPropagation();
                 try {
                     let success = true;
                     if (fnName === 'switchTab') {
                         try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
                         (window as any)[fnName](args[0], e);
+                    } else if (meta && typeof meta.func === 'function') {
+                        const ret = meta.func();
+                        success = (typeof ret === 'undefined') ? true : !!ret;
+                        try { if (fnName === 'toggleButtonSounds') { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } } catch {}
                     } else {
                         if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) { success = !!(window as any).App.systems.purchases.execute[fnName](); }
                         else { const ret = (window as any)[fnName](...args); success = (typeof ret === 'undefined') ? true : !!ret; }

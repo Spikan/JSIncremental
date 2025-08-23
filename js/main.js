@@ -336,11 +336,11 @@ function initGame() {
         let autosaveCounter = 0;
         // Load options via system and seed App.state + locals
         try {
-            const defaults = (window.App?.state?.getState?.()?.options) || { autosaveEnabled: true, autosaveInterval: 30, clickSoundsEnabled: true, musicEnabled: true };
+            const defaults = (window.App?.state?.getState?.()?.options) || { autosaveEnabled: true, autosaveInterval: 10, clickSoundsEnabled: true, musicEnabled: true };
             const loaded = (window.App?.systems?.options?.loadOptions && window.App.systems.options.loadOptions(defaults)) || defaults;
             try { window.App?.state?.setState?.({ options: loaded }); } catch {}
             autosaveEnabled = !!loaded.autosaveEnabled;
-            autosaveInterval = Number(loaded.autosaveInterval || autosaveInterval);
+            autosaveInterval = Number(loaded.autosaveInterval || 10);
             try { window.clickSoundsEnabled = !!loaded.clickSoundsEnabled; } catch {}
         } catch {}
 
@@ -583,6 +583,8 @@ function initGame() {
             gameStartDate = Date.now();
             window.lastClickTime = 0;
             window.clickTimes = [];
+            // Reset feature unlocks on brand new games to avoid stale persisted unlocks
+            try { if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.reset) { FEATURE_UNLOCKS.reset(); } } catch {}
         }
 
 

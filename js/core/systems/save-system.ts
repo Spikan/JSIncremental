@@ -55,6 +55,7 @@ export function performSaveSnapshot(): any {
 export function deleteSave() {
     try {
         (window as any).App?.storage?.deleteSave?.();
+        try { if (typeof (window as any).FEATURE_UNLOCKS !== 'undefined' && (window as any).FEATURE_UNLOCKS.reset) { (window as any).FEATURE_UNLOCKS.reset(); } } catch {}
         (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.GAME?.DELETED, {});
         return true;
     } catch (e) {

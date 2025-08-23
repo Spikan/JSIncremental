@@ -54,6 +54,9 @@ export const setMusicStatusText = labels.setMusicStatusText;
 export function initializeUI(): void {
     console.log('UI system initialized');
     buttons.initButtonSystem();
+    // Sync options UI on init
+    try { updateAutosaveStatus(); } catch {}
+    try { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } catch {}
     if ((window as any).App?.events) {
         (window as any).App.events.on((window as any).App.EVENT_NAMES?.CLICK?.SODA, (data: any) => {
             updateTopSipsPerDrink();

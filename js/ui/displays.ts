@@ -63,6 +63,8 @@ export function updateDrinkSpeedDisplay(): void {
 export function updateAutosaveStatus(): void {
     if (typeof window === 'undefined') return;
     const status = document.getElementById('autosaveStatus');
+    const checkbox = document.getElementById('autosaveToggle') as HTMLInputElement | null;
+    const select = document.getElementById('autosaveInterval') as HTMLSelectElement | null;
     try {
         const opts = (window as any).App?.state?.getState?.()?.options;
         if (status && opts) {
@@ -72,6 +74,13 @@ export function updateAutosaveStatus(): void {
             } else {
                 status.textContent = 'Autosave: OFF';
                 (status as any).className = 'autosave-off';
+            }
+            if (checkbox) { try { checkbox.checked = !!opts.autosaveEnabled; } catch {} }
+            if (select) {
+                try {
+                    const val = String(opts.autosaveInterval ?? '10');
+                    if (select.value !== val) select.value = val;
+                } catch {}
             }
         }
     } catch {}

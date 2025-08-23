@@ -25,12 +25,15 @@ export const FEATURE_UNLOCKS = {
       stats: config.UNLOCKS?.STATS || { sips: 1000, clicks: 60 },
       god: config.UNLOCKS?.GOD || { sips: 5000, clicks: 300 },
       unlocks: config.UNLOCKS?.UNLOCKS_TAB || { sips: 25, clicks: 8 },
-      dev: { sips: 0, clicks: 0 },
     } as UnlockMap;
   },
   init() {
     try {
       this.loadUnlockedFeatures();
+      // Ensure only default feature is unlocked if saved data is malformed or overly permissive
+      if (!this.unlockedFeatures || !(this.unlockedFeatures instanceof Set) || this.unlockedFeatures.size === 0) {
+        this.unlockedFeatures = new Set<string>(['soda']);
+      }
       this.updateFeatureVisibility();
       this.updateUnlocksTab();
       console.log('FEATURE_UNLOCKS system initialized');
@@ -97,6 +100,12 @@ export const FEATURE_UNLOCKS = {
         const isSwitch = dataAction.startsWith('switchTab:');
         const tabName = isSwitch ? dataAction.split(':')[1] : null;
         if (!tabName || tabName === 'soda') return;
+        // Options and Dev are always available; do not gate behind unlocks
+        if (tabName === 'options' || tabName === 'dev') {
+          (btn as HTMLElement).style.display = 'inline-block';
+          try { (btn as HTMLElement).classList.remove('locked'); } catch {}
+          return;
+        }
         const isUnlocked = this.unlockedFeatures.has(tabName);
         (btn as HTMLElement).style.display = isUnlocked ? 'inline-block' : 'none';
         try { (btn as HTMLElement).classList.toggle('locked', !isUnlocked); } catch {}
