@@ -70,7 +70,7 @@ try {
 
 // Attach UI module into App and initialize
 try {
-    const uiModule = await import('./ui/index.js');
+    const uiModule = await import('./ui/index.ts');
     Object.assign(window.App.ui, uiModule);
     if (typeof window.App.ui.initializeUI === 'function') {
         window.App.ui.initializeUI();
