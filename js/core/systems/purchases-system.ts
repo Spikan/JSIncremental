@@ -227,7 +227,16 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
     try { w.fasterDrinks = new (w.Decimal || Number)(result.fasterDrinks); } catch {}
-    setAppState({ sips: toNum(w.sips), fasterDrinks: result.fasterDrinks });
+    // Compute next drink rate based on config and new fasterDrinks count
+    const { config } = getTypedConfig();
+    const baseMs = Number((w.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE) ?? 5000);
+    const perLevelReduction = Number(config.FASTER_DRINKS_REDUCTION_PER_LEVEL ?? 0);
+    const minMs = Number(config.MIN_DRINK_RATE ?? 500);
+    const factor = Math.pow(1 - perLevelReduction, Number(result.fasterDrinks || 0));
+    const nextRate = Math.max(minMs, Math.round(baseMs * factor));
+    // Apply to state (authoritative)
+    setAppState({ sips: toNum(w.sips), fasterDrinks: result.fasterDrinks, drinkRate: nextRate });
+    try { w.App?.stateBridge?.setDrinkRate?.(nextRate); } catch {}
     try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
     try { w.App?.ui?.updateAllStats?.(); } catch {}
     try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'fasterDrinks', cost: result.spent }); } catch {}
