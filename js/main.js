@@ -245,6 +245,11 @@ function initGame() {
         }
         
         console.log('✅ All dependencies validated, proceeding with game initialization...');
+        // Cache config groups locally to avoid repeated global reads
+        const CONF = window.GAME_CONFIG || {};
+        const BAL = CONF.BALANCE || {};
+        const TIMING = CONF.TIMING || {};
+        const LIMITS = CONF.LIMITS || {};
         
         // Soda Clicker Pro - Main Game Logic
         // 
@@ -323,7 +328,7 @@ function initGame() {
         window.sipsPerDrink = sipsPerDrink;
 
         // Drink system variables
-            const DEFAULT_DRINK_RATE = window.GAME_CONFIG.TIMING.DEFAULT_DRINK_RATE;
+            const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE;
         let drinkRate = DEFAULT_DRINK_RATE;
         // Expose drinkRate for UI modules - only define if not already defined
         if (!Object.getOwnPropertyDescriptor(window, 'drinkRate')) {
@@ -344,10 +349,10 @@ function initGame() {
         window.fasterDrinksUpCounter = fasterDrinksUpCounter;
 
         // Critical Click system variables - IMPROVED BALANCE
-            let criticalClickChance = new Decimal(window.GAME_CONFIG.BALANCE.CRITICAL_CLICK_BASE_CHANCE); // 0.1% base chance (10x higher)
+            let criticalClickChance = new Decimal(BAL.CRITICAL_CLICK_BASE_CHANCE); // 0.1% base chance (10x higher)
             // Make criticalClickChance accessible globally
             window.criticalClickChance = criticalClickChance;
-            let criticalClickMultiplier = new Decimal(window.GAME_CONFIG.BALANCE.CRITICAL_CLICK_BASE_MULTIPLIER); // 5x multiplier (more balanced)
+            let criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER); // 5x multiplier (more balanced)
             // Make criticalClickMultiplier accessible globally
             window.criticalClickMultiplier = criticalClickMultiplier;
         let criticalClicks = new Decimal(0); // Total critical clicks achieved
@@ -360,7 +365,7 @@ function initGame() {
 
         // Auto-save and options variables
         let autosaveEnabled = true;
-            let autosaveInterval = window.GAME_CONFIG.TIMING.AUTOSAVE_INTERVAL; // seconds
+            let autosaveInterval = TIMING.AUTOSAVE_INTERVAL; // seconds
         let autosaveCounter = 0;
         let gameStartTime = Date.now();
         let lastSaveTime = null;
@@ -370,7 +375,7 @@ function initGame() {
         let saveQueue = [];
         let saveTimeout = null;
         let lastSaveOperation = 0;
-            const MIN_SAVE_INTERVAL = window.GAME_CONFIG.TIMING.MIN_SAVE_INTERVAL; // Minimum 1 second between saves
+            const MIN_SAVE_INTERVAL = TIMING.MIN_SAVE_INTERVAL; // Minimum 1 second between saves
 
         // Statistics tracking variables
         window.totalClicks = 0;
@@ -462,12 +467,12 @@ function initGame() {
             offlineTimeSeconds = Math.floor((now - lastSave) / 1000);
 
             // Only calculate offline earnings if at least configured minimum time offline
-            const minOfflineTime = window.GAME_CONFIG.TIMING.OFFLINE_MIN_TIME;
+            const minOfflineTime = TIMING.OFFLINE_MIN_TIME;
             if (offlineTimeSeconds >= minOfflineTime) {
                 // Load temporary SPS values to calculate earnings
                 let tempStrawSPD;
                 let tempCupSPD;
-                const BAL = window.GAME_CONFIG.BALANCE;
+                // Using BAL from cached config
                 if (window.App?.rules?.economy?.computeStrawSPD) {
                     tempStrawSPD = new Decimal(window.App.rules.economy.computeStrawSPD(
                         straws.toNumber(), BAL.STRAW_BASE_SPD, widerStraws.toNumber(), BAL.WIDER_STRAWS_MULTIPLIER));
@@ -499,7 +504,7 @@ function initGame() {
                 const totalSipsPerSecond = baseSipsPerSecond.plus(passiveSipsPerSecond);
 
                 // Cap offline earnings to prevent abuse (max configured time worth)
-                const maxOfflineTime = window.GAME_CONFIG.TIMING.OFFLINE_MAX_TIME;
+                const maxOfflineTime = TIMING.OFFLINE_MAX_TIME;
                 const cappedOfflineSeconds = Math.min(offlineTimeSeconds, maxOfflineTime);
                 offlineEarnings = totalSipsPerSecond.times(cappedOfflineSeconds);
 
@@ -514,7 +519,7 @@ function initGame() {
 
         // Initialize base values for new games
         if (!savegame) {
-            const config = window.GAME_CONFIG?.BALANCE || {};
+            const config = BAL || {};
             window.sips = new Decimal(0);
             straws = new Decimal(0);
             cups = new Decimal(0);
@@ -541,7 +546,7 @@ function initGame() {
 
 
 
-        const config = window.GAME_CONFIG?.BALANCE || {};
+        const config = BAL || {};
         // Use centralized resources system for production values when available
         if (window.App?.systems?.resources?.recalcProduction) {
             const up = window.App?.data?.upgrades || {};
@@ -694,9 +699,9 @@ function startGameLoop() {
     }
     let lastUpdate = 0;
     let lastStatsUpdate = 0;
-    const targetFPS = window.GAME_CONFIG.LIMITS.TARGET_FPS;
+    const targetFPS = LIMITS.TARGET_FPS;
     const frameInterval = 1000 / targetFPS;
-    const statsInterval = window.GAME_CONFIG.LIMITS.STATS_UPDATE_INTERVAL;
+    const statsInterval = LIMITS.STATS_UPDATE_INTERVAL;
     function gameLoop(currentTime) {
         if (currentTime - lastUpdate >= frameInterval) {
             // Calculate current drink progress percentage
@@ -721,7 +726,7 @@ function startGameLoop() {
             } catch {}
             
             processDrink();
-            const affordabilityInterval = window.GAME_CONFIG.LIMITS.AFFORDABILITY_CHECK_INTERVAL;
+            const affordabilityInterval = LIMITS.AFFORDABILITY_CHECK_INTERVAL;
             if (currentTime - lastUpdate >= affordabilityInterval) {
                 window.App?.ui?.checkUpgradeAffordability?.();
             }
@@ -912,8 +917,7 @@ function trackClick() {
     const now = Date.now();
 
     // Track click streak
-    const config = window.GAME_CONFIG?.TIMING || {};
-    const clickStreakWindow = config.CLICK_STREAK_WINDOW || 3000; // Default 3 seconds
+    const clickStreakWindow = TIMING.CLICK_STREAK_WINDOW || 3000; // Default 3 seconds
     if (now - window.lastClickTime < clickStreakWindow) { // Within configured time window
         window.currentClickStreak++;
         if (window.currentClickStreak > window.bestClickStreak) {
@@ -927,7 +931,7 @@ function trackClick() {
     window.clickTimes.push(now);
 
     // Keep only last configured number of clicks for performance
-    const maxClickTimes = window.GAME_CONFIG?.LIMITS?.MAX_CLICK_TIMES || 100;
+    const maxClickTimes = LIMITS?.MAX_CLICK_TIMES || 100;
     if (window.clickTimes.length > maxClickTimes) {
         window.clickTimes.shift();
     }
@@ -943,7 +947,7 @@ function trackClick() {
         const st = window.App?.state?.getState?.() || {};
         const current = Number(st.currentClickStreak || 0);
         const best = Number(st.bestClickStreak || 0);
-        const nextCurrent = (now - window.lastClickTime) < (window.GAME_CONFIG?.TIMING?.CLICK_STREAK_WINDOW || 3000) ? current + 1 : 1;
+        const nextCurrent = (now - window.lastClickTime) < (TIMING?.CLICK_STREAK_WINDOW || 3000) ? current + 1 : 1;
         const nextBest = Math.max(best, nextCurrent);
         window.App?.state?.setState?.({ currentClickStreak: nextCurrent, bestClickStreak: nextBest, totalClicks: Number(st.totalClicks || 0) });
     } catch {}

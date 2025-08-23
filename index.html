@@ -339,7 +339,7 @@
         <div class="options-section">
             <h3>🔊 Button Audio</h3>
             <div class="sound-controls">
-                <button id="buttonSoundsToggle" onclick="toggleButtonSounds()" class="sound-toggle-btn">
+                <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="sound-toggle-btn">
                     🔊 Button Sounds ON
                 </button>
                 <p class="sound-description">Enable or disable button click sound effects</p>
@@ -349,8 +349,8 @@
         <div class="options-section">
             <h3>💾 Save & Load</h3>
             <div class="save-controls">
-                <button onclick="save()" class="save-btn">Save Game</button>
-                <button onclick="delete_save()" class="save-btn">Delete Save</button>
+                <button data-action="save" class="save-btn">Save Game</button>
+                <button data-action="delete_save" class="save-btn">Delete Save</button>
             </div>
         </div>
         
@@ -585,7 +585,7 @@
             
             <div class="chat-input-container">
                 <input type="text" id="chatInput" class="chat-input" placeholder="Type your message to God..." maxlength="100">
-                <button onclick="sendMessage()" class="chat-send-btn">🙏 Send</button>
+                <button data-action="sendMessage" class="chat-send-btn">🙏 Send</button>
             </div>
         </div>
         
@@ -617,19 +617,19 @@
         <div class="dev-section">
             <h3>🚀 Feature Unlocks</h3>
             <div class="dev-grid">
-                <button onclick="devUnlockAll()" class="dev-btn unlock-all">
+                <button data-action="devUnlockAll" class="dev-btn unlock-all">
                     <div class="dev-btn-icon">🔓</div>
                     <div class="dev-btn-text">Unlock All Features</div>
                 </button>
-                <button onclick="devUnlockShop()" class="dev-btn unlock-shop">
+                <button data-action="devUnlockShop" class="dev-btn unlock-shop">
                     <div class="dev-btn-icon">🛒</div>
                     <div class="dev-btn-text">Unlock Shop</div>
                 </button>
-                <button onclick="devUnlockUpgrades()" class="dev-btn unlock-upgrades">
+                <button data-action="devUnlockUpgrades" class="dev-btn unlock-upgrades">
                     <div class="dev-btn-icon">⚡</div>
                     <div class="dev-btn-text">Unlock All Upgrades</div>
                 </button>
-                <button onclick="devResetUnlocks()" class="dev-btn reset">
+                <button data-action="devResetUnlocks" class="dev-btn reset">
                     <div class="dev-btn-icon">🔄</div>
                     <div class="dev-btn-text">Reset Unlocks</div>
                 </button>
@@ -639,19 +639,19 @@
         <div class="dev-section">
             <h3>⏰ Time Travel</h3>
             <div class="dev-grid">
-                <button onclick="devAddTime(3600000)" class="dev-btn time-travel">
+                <button data-action="devAddTime:3600000" class="dev-btn time-travel">
                     <div class="dev-btn-icon">⏰</div>
                     <div class="dev-btn-text">+1 Hour</div>
                 </button>
-                <button onclick="devAddTime(86400000)" class="dev-btn time-travel">
+                <button data-action="devAddTime:86400000" class="dev-btn time-travel">
                     <div class="dev-btn-icon">📅</div>
                     <div class="dev-btn-text">+1 Day</div>
                 </button>
-                <button onclick="devAddTime(604800000)" class="dev-btn time-travel">
+                <button data-action="devAddTime:604800000" class="dev-btn time-travel">
                     <div class="dev-btn-icon">📆</div>
                     <div class="dev-btn-text">+1 Week</div>
                 </button>
-                <button onclick="devAddTime(2592000000)" class="dev-btn time-travel">
+                <button data-action="devAddTime:2592000000" class="dev-btn time-travel">
                     <div class="dev-btn-icon">🗓️</div>
                     <div class="dev-btn-text">+1 Month</div>
                 </button>
@@ -661,19 +661,19 @@
         <div class="dev-section">
             <h3>💰 Resource Management</h3>
             <div class="dev-grid">
-                <button onclick="devAddSips(1000)" class="dev-btn resources">
+                <button data-action="devAddSips:1000" class="dev-btn resources">
                     <div class="dev-btn-icon">🥤</div>
                     <div class="dev-btn-text">+1000 Sips</div>
                 </button>
-                <button onclick="devAddSips(10000)" class="dev-btn resources">
+                <button data-action="devAddSips:10000" class="dev-btn resources">
                     <div class="dev-btn-icon">🥤</div>
                     <div class="dev-btn-text">+10K Sips</div>
                 </button>
-                <button onclick="devAddSips(100000)" class="dev-btn resources">
+                <button data-action="devAddSips:100000" class="dev-btn resources">
                     <div class="dev-btn-icon">🥤</div>
                     <div class="dev-btn-text">+100K Sips</div>
                 </button>
-                <button onclick="devAddSips(1000000)" class="dev-btn resources">
+                <button data-action="devAddSips:1000000" class="dev-btn resources">
                     <div class="dev-btn-icon">🥤</div>
                     <div class="dev-btn-text">+1M Sips</div>
                 </button>
@@ -683,19 +683,19 @@
         <div class="dev-section">
             <h3>🎯 Testing Tools</h3>
             <div class="dev-grid">
-                <button onclick="devToggleDevMode()" class="dev-btn testing">
+                <button data-action="devToggleDevMode" class="dev-btn testing">
                     <div class="dev-btn-icon">🔧</div>
                     <div class="dev-btn-text">Toggle Dev Mode</div>
                 </button>
-                <button onclick="devToggleGodMode()" class="dev-btn testing">
+                <button data-action="devToggleGodMode" class="dev-btn testing">
                     <div class="dev-btn-icon">👑</div>
                     <div class="dev-btn-text">Toggle God Mode</div>
                 </button>
-                <button onclick="devShowDebugInfo()" class="dev-btn testing">
+                <button data-action="devShowDebugInfo" class="dev-btn testing">
                     <div class="dev-btn-icon">🐛</div>
                     <div class="dev-btn-text">Show Debug Info</div>
                 </button>
-                <button onclick="devExportSave()" class="dev-btn testing">
+                <button data-action="devExportSave" class="dev-btn testing">
                     <div class="dev-btn-icon">💾</div>
                     <div class="dev-btn-text">Export Save</div>
                 </button>
@@ -705,11 +705,11 @@
         <div class="dev-section">
             <h3>📁 Save Management</h3>
             <div class="dev-grid">
-                <button onclick="devImportSave()" class="dev-btn testing">
+                <button data-action="devImportSave" class="dev-btn testing">
                     <div class="dev-btn-icon">📥</div>
                     <div class="dev-btn-text">Import Save</div>
                 </button>
-                <button onclick="quickUnlock()" class="dev-btn unlock-all">
+                <button data-action="quickUnlock" class="dev-btn unlock-all">
                     <div class="dev-btn-icon">⚡</div>
                     <div class="dev-btn-text">Quick Unlock</div>
                 </button>
