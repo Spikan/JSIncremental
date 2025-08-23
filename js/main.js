@@ -1173,9 +1173,13 @@ function buyStraw() {
             return;
         }
         
+        const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.purchaseStraw({
-            sips: window.sips,
-            straws: window.straws
+            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
+            straws: Number((typeof st.straws !== 'undefined' ? st.straws : (window.straws?.toNumber?.() ?? Number(window.straws))) || 0),
+            cups: Number((typeof st.cups !== 'undefined' ? st.cups : (window.cups?.toNumber?.() ?? Number(window.cups))) || 0),
+            widerStraws: Number((typeof st.widerStraws !== 'undefined' ? st.widerStraws : (window.widerStraws?.toNumber?.() ?? Number(window.widerStraws))) || 0),
+            betterCups: Number((typeof st.betterCups !== 'undefined' ? st.betterCups : (window.betterCups?.toNumber?.() ?? Number(window.betterCups))) || 0)
         });
         
         if (result) {
@@ -1219,9 +1223,13 @@ function buyCup() {
             return;
         }
         
+        const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.purchaseCup({
-            sips: window.sips,
-            cups: window.cups
+            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
+            straws: Number((typeof st.straws !== 'undefined' ? st.straws : (window.straws?.toNumber?.() ?? Number(window.straws))) || 0),
+            cups: Number((typeof st.cups !== 'undefined' ? st.cups : (window.cups?.toNumber?.() ?? Number(window.cups))) || 0),
+            widerStraws: Number((typeof st.widerStraws !== 'undefined' ? st.widerStraws : (window.widerStraws?.toNumber?.() ?? Number(window.widerStraws))) || 0),
+            betterCups: Number((typeof st.betterCups !== 'undefined' ? st.betterCups : (window.betterCups?.toNumber?.() ?? Number(window.betterCups))) || 0)
         });
         
         if (result) {
@@ -1264,9 +1272,10 @@ function buySuction() {
             return;
         }
         
+        const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.purchaseSuction({
-            sips: window.sips,
-            suctions: window.suctions
+            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
+            suctions: Number((typeof st.suctions !== 'undefined' ? st.suctions : (window.suctions?.toNumber?.() ?? Number(window.suctions))) || 0)
         });
         
         if (result) {
@@ -1301,10 +1310,11 @@ function buyCriticalClick() {
             return;
         }
         
+        const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.purchaseCriticalClick({
-            sips: window.sips,
-            criticalClicks: window.criticalClicks,
-            criticalClickChance: window.criticalClickChance
+            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
+            criticalClicks: Number((typeof st.criticalClicks !== 'undefined' ? st.criticalClicks : (window.criticalClicks?.toNumber?.() ?? Number(window.criticalClicks))) || 0),
+            criticalClickChance: Number((typeof st.criticalClickChance !== 'undefined' ? st.criticalClickChance : (window.criticalClickChance?.toNumber?.() ?? Number(window.criticalClickChance))) || 0)
         });
         
         if (result) {
@@ -1339,9 +1349,10 @@ function buyFasterDrinks() {
             return;
         }
         
+        const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.purchaseFasterDrinks({
-            sips: window.sips,
-            fasterDrinks: window.fasterDrinks
+            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
+            fasterDrinks: Number((typeof st.fasterDrinks !== 'undefined' ? st.fasterDrinks : (window.fasterDrinks?.toNumber?.() ?? Number(window.fasterDrinks))) || 0)
         });
         
         if (result) {
@@ -1374,9 +1385,13 @@ function buyWiderStraws() {
             return;
         }
         
+        const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.purchaseWiderStraws({
-            sips: window.sips,
-            widerStraws: window.widerStraws
+            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
+            straws: Number((typeof st.straws !== 'undefined' ? st.straws : (window.straws?.toNumber?.() ?? Number(window.straws))) || 0),
+            cups: Number((typeof st.cups !== 'undefined' ? st.cups : (window.cups?.toNumber?.() ?? Number(window.cups))) || 0),
+            widerStraws: Number((typeof st.widerStraws !== 'undefined' ? st.widerStraws : (window.widerStraws?.toNumber?.() ?? Number(window.widerStraws))) || 0),
+            betterCups: Number((typeof st.betterCups !== 'undefined' ? st.betterCups : (window.betterCups?.toNumber?.() ?? Number(window.betterCups))) || 0)
         });
         
         if (result) {
@@ -1419,9 +1434,13 @@ function buyBetterCups() {
             return;
         }
         
+        const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.purchaseBetterCups({
-            sips: window.sips,
-            betterCups: window.betterCups
+            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
+            straws: Number((typeof st.straws !== 'undefined' ? st.straws : (window.straws?.toNumber?.() ?? Number(window.straws))) || 0),
+            cups: Number((typeof st.cups !== 'undefined' ? st.cups : (window.cups?.toNumber?.() ?? Number(window.cups))) || 0),
+            widerStraws: Number((typeof st.widerStraws !== 'undefined' ? st.widerStraws : (window.widerStraws?.toNumber?.() ?? Number(window.widerStraws))) || 0),
+            betterCups: Number((typeof st.betterCups !== 'undefined' ? st.betterCups : (window.betterCups?.toNumber?.() ?? Number(window.betterCups))) || 0)
         });
         
         if (result) {
