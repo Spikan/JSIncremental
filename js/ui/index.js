@@ -125,7 +125,7 @@ export function performBatchUIUpdate() {
         updatePlayTime();
         
         // Only update stats if stats tab is active
-        if (window.DOM_CACHE?.statsTab?.classList?.contains('active')) {
+        if (typeof window !== 'undefined' && window.DOM_CACHE?.statsTab?.classList?.contains('active')) {
             updateAllStats();
         }
         

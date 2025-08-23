@@ -300,7 +300,7 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
         }
     };
     
-    requestAnimationFrame(animate);
+    try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
     
     // Remove after animation
     const config = window.GAME_CONFIG?.TIMING || {};
