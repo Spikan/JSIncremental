@@ -709,7 +709,7 @@ function startGameLoop() {
                 window.App?.ui?.updateDrinkProgress?.(drinkProgress, drinkRate);
                 try { window.App?.state?.setState?.({ drinkProgress }); } catch {}
             },
-            processDrink,
+            processDrink: window.App?.systems?.drink?.processDrink || processDrink,
             // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
             updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) FEATURE_UNLOCKS.checkAllUnlocks(); },
             updatePlayTime: () => window.App?.ui?.updatePlayTime?.(),

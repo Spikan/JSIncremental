@@ -36,7 +36,8 @@ window.App = {
         options: {},
         loop: {},
         audio: { button: {} },
-        gameInit: {}
+        gameInit: {},
+        drink: {}
     },
     ui: {},
     data: {}
@@ -73,6 +74,35 @@ try {
 } catch (e) {
     console.warn('⚠️ UI module load failed (ok during early bootstrap):', e);
 }
+
+// Attach core systems (TypeScript modules) into App.systems with safe fallbacks
+try {
+    const res = await import('./core/systems/resources.ts');
+    Object.assign(window.App.systems.resources, res);
+} catch (e) { console.warn('⚠️ resources system load failed:', e); }
+
+try {
+    const pur = await import('./core/systems/purchases-system.ts');
+    Object.assign(window.App.systems.purchases, pur);
+} catch (e) { console.warn('⚠️ purchases system load failed:', e); }
+
+try {
+    const loop = await import('./core/systems/loop-system.ts');
+    Object.assign(window.App.systems.loop, loop);
+} catch (e) { console.warn('⚠️ loop system load failed:', e); }
+
+try {
+    const save = await import('./core/systems/save-system.ts');
+    Object.assign(window.App.systems.save, save);
+} catch (e) { console.warn('⚠️ save system load failed:', e); }
+
+try {
+    const drink = await import('./core/systems/drink-system.ts');
+    const factory = drink.processDrinkFactory?.();
+    if (factory) {
+        window.App.systems.drink.processDrink = factory;
+    }
+} catch (e) { console.warn('⚠️ drink system load failed:', e); }
 
 // Signal that App is ready
 console.log('✅ App object created and ready');
