@@ -41,7 +41,9 @@ export const FEATURE_UNLOCKS = {
   },
   checkUnlocks(sips: any, clicks: number): string[] {
     const out: string[] = [];
-    for (const [feature, cond] of Object.entries(this.unlockConditions)) {
+    const entries = Object.keys(this.unlockConditions) as string[];
+    for (const feature of entries) {
+      const cond: UnlockCondition = (this.unlockConditions as UnlockMap)[feature];
       const sipsMet = sips?.gte ? sips.gte(cond.sips) : Number(sips || 0) >= cond.sips;
       const clicksMet = Number(clicks || 0) >= cond.clicks;
       if (!this.unlockedFeatures.has(feature) && sipsMet && clicksMet) out.push(feature);

@@ -541,7 +541,7 @@ function initGame() {
             gameStartDate = Date.now();
             try { window.App?.state?.setState?.({ lastClickTime: 0 }); } catch {}
             // Reset feature unlocks on brand new games to avoid stale persisted unlocks
-            try { (window as any).App?.systems?.unlocks?.reset?.(); } catch {}
+            try { window.App?.systems?.unlocks?.reset?.(); } catch {}
         }
 
 
