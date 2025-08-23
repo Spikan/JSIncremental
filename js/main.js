@@ -1212,6 +1212,12 @@ function buyStraw() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.straws = new Decimal(result.straws);
+            // Keep local production stats in sync for loop calculations
+            try {
+                strawSPD = new Decimal(result.strawSPD ?? 0);
+                cupSPD = new Decimal(result.cupSPD ?? 0);
+                sps = new Decimal(result.sipsPerDrink ?? 0);
+            } catch {}
             // Update App.state snapshot
             try {
                 window.App?.state?.setState?.({
@@ -1251,6 +1257,12 @@ function buyCup() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.cups = new Decimal(result.cups);
+            // Keep local production stats in sync for loop calculations
+            try {
+                strawSPD = new Decimal(result.strawSPD ?? 0);
+                cupSPD = new Decimal(result.cupSPD ?? 0);
+                sps = new Decimal(result.sipsPerDrink ?? 0);
+            } catch {}
             try {
                 window.App?.state?.setState?.({
                     sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
@@ -1399,6 +1411,12 @@ function buyWiderStraws() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.widerStraws = new Decimal(result.widerStraws);
+            // Keep local production stats in sync for loop calculations
+            try {
+                strawSPD = new Decimal(result.strawSPD ?? 0);
+                cupSPD = new Decimal(result.cupSPD ?? 0);
+                sps = new Decimal(result.sipsPerDrink ?? 0);
+            } catch {}
             try {
                 window.App?.state?.setState?.({
                     sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
@@ -1437,6 +1455,12 @@ function buyBetterCups() {
             // Update global state
             window.sips = window.sips.minus(result.spent);
             window.betterCups = new Decimal(result.betterCups);
+            // Keep local production stats in sync for loop calculations
+            try {
+                strawSPD = new Decimal(result.strawSPD ?? 0);
+                cupSPD = new Decimal(result.cupSPD ?? 0);
+                sps = new Decimal(result.sipsPerDrink ?? 0);
+            } catch {}
             try {
                 window.App?.state?.setState?.({
                     sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
