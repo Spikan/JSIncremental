@@ -806,17 +806,7 @@ function trackClick() {
 
 // sendMessage handled in js/god.js; legacy placeholder removed
 
-function startGame() {
-    try {
-        if (window.App?.systems?.gameInit?.startGame) {
-            window.App.systems.gameInit.startGame();
-        } else {
-            console.warn('Game init system not available');
-        }
-    } catch (error) {
-        console.error('Error in startGame:', error);
-    }
-}
+function startGame() { try { window.App?.systems?.gameInit?.startGame?.(); } catch (error) { console.error('Error in startGame:', error); } }
 
 // Function to toggle click sounds on/off
 // toggleClickSounds legacy helper removed; use App.systems.audio.button.toggleButtonSounds
