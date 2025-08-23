@@ -155,7 +155,7 @@ describe('Global Functions and Dependencies Integration', () => {
 
     it('should have all game management functions defined globally', () => {
       const managementFunctions = [
-        'save', 'delete_save', 'toggleButtonSounds', 
+        'save', 'toggleButtonSounds', 
         'sendMessage', 'startGame', 'switchTab'
       ];
       

@@ -46,7 +46,6 @@ const mockWindow = {
     sendMessage: vi.fn(),
     startGame: vi.fn(),
     save: vi.fn(),
-    delete_save: vi.fn(),
     levelUp: vi.fn(),
     toggleButtonSounds: vi.fn()
 };
@@ -73,7 +72,6 @@ mockWindow.switchTab = vi.fn();
 mockWindow.sendMessage = vi.fn();
 mockWindow.startGame = function() {};
 mockWindow.save = vi.fn();
-mockWindow.delete_save = vi.fn();
 mockWindow.levelUp = vi.fn();
 mockWindow.toggleButtonSounds = vi.fn();
 
@@ -95,7 +93,6 @@ describe('Button System', () => {
         mockWindow.buyBetterCups = vi.fn();
         mockWindow.levelUp = vi.fn();
         mockWindow.save = vi.fn();
-        mockWindow.delete_save = vi.fn();
         mockWindow.toggleButtonSounds = vi.fn();
         mockWindow.sendMessage = vi.fn();
         mockWindow.startGame = vi.fn();
@@ -341,7 +338,6 @@ describe('Button System', () => {
             global.window.sodaClick = vi.fn();
             
             // Add missing functions that initButtonSystem checks for
-            global.window.delete_save = vi.fn();
             global.window.toggleButtonSounds = vi.fn();
             global.window.sendMessage = vi.fn();
             
@@ -445,7 +441,6 @@ describe('Button System', () => {
             global.window.sodaClick = vi.fn();
             
             // Add missing functions that initButtonSystem checks for
-            global.window.delete_save = vi.fn();
             global.window.toggleButtonSounds = vi.fn();
             global.window.sendMessage = vi.fn();
             

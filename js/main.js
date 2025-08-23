@@ -995,21 +995,7 @@ function save() {
     }
 }
 
-function delete_save() {
-    try {
-        let ok = false;
-        if (window.App?.systems?.save?.deleteSave) {
-            ok = !!window.App.systems.save.deleteSave();
-        } else if (window.App?.storage?.deleteSave) {
-            ok = !!window.App.storage.deleteSave();
-        }
-        if (!ok) console.warn('Delete save not available');
-        // Reload the page after deletion (if any)
-        if (ok) window.location.reload();
-    } catch (error) {
-        console.error('Error in delete_save:', error);
-    }
-}
+// delete_save legacy wrapper removed; UI routes to App.systems.save
 
 function sendMessage() {
     try {
@@ -1125,7 +1111,7 @@ window.sodaClick = sodaClick;
 console.log('🔧 main.js loaded, sodaClick function available:', typeof window.sodaClick);
 window.levelUp = levelUp;
 window.save = save;
-window.delete_save = delete_save;
+// legacy delete_save global removed
 window.initGame = initGame;
 window.toggleButtonSounds = toggleClickSounds;
 if (typeof window.sendMessage !== 'function') {
