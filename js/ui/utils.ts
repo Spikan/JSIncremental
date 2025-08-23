@@ -37,6 +37,16 @@ export function findButton(buttonId: string): HTMLElement | null {
     let button: Element | null = null;
     button = document.getElementById(buttonId);
     if (button) return button as HTMLElement;
+    // Strategy: data-action exact match on a button
+    button = document.querySelector(`button[data-action="${buttonId}"]`);
+    if (button) return button as HTMLElement;
+    // Strategy: any element with data-action, prefer its containing button
+    let actionEl = document.querySelector(`[data-action="${buttonId}"]`);
+    if (actionEl) {
+        const parentBtn = (actionEl as HTMLElement).closest('button');
+        if (parentBtn) return parentBtn as HTMLElement;
+        return actionEl as HTMLElement;
+    }
     button = document.querySelector(`[data-button-id="${buttonId}"]`);
     if (button) return button as HTMLElement;
     button = document.querySelector(`button[onclick*="${buttonId}"]`);
@@ -91,11 +101,11 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
 function updateCompactButtonVariants(buttonId: string, isAffordable: boolean): void {
     let compactSelector: string | null = null;
     if (buttonId === 'buySuction' || buttonId === 'upgradeSuction') {
-        compactSelector = '.clicking-upgrade-btn[onclick*="buySuction"], .clicking-upgrade-btn[onclick*="upgradeSuction"]';
+        compactSelector = '.clicking-upgrade-btn[data-action="buySuction"], .clicking-upgrade-btn[data-action="upgradeSuction"]';
     } else if (buttonId === 'buyCriticalClick' || buttonId === 'upgradeCriticalClick') {
-        compactSelector = '.clicking-upgrade-btn[onclick*="buyCriticalClick"], .clicking-upgrade-btn[onclick*="upgradeCriticalClick"]';
+        compactSelector = '.clicking-upgrade-btn[data-action="buyCriticalClick"], .clicking-upgrade-btn[data-action="upgradeCriticalClick"]';
     } else if (buttonId === 'buyFasterDrinks' || buttonId === 'upgradeFasterDrinks') {
-        compactSelector = '.drink-speed-upgrade-btn[onclick*="buyFasterDrinks"], .drink-speed-upgrade-btn[onclick*="upgradeFasterDrinks"]';
+        compactSelector = '.drink-speed-upgrade-btn[data-action="buyFasterDrinks"], .drink-speed-upgrade-btn[data-action="upgradeFasterDrinks"]';
     }
     if (!compactSelector) return;
     try {
