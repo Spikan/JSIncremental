@@ -122,6 +122,11 @@ try {
 } catch (e) { console.warn('⚠️ button-audio system load failed:', e); }
 
 try {
+    const dev = await import('./core/systems/dev.ts');
+    window.App.systems.dev = dev;
+} catch (e) { console.warn('⚠️ dev system load failed:', e); }
+
+try {
     const gameInit = await import('./core/systems/game-init.ts');
     Object.assign(window.App.systems.gameInit, gameInit);
     // Expose DOM-ready initializer for index bootstrap

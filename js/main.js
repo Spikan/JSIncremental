@@ -1148,18 +1148,8 @@ function trackClick() {
 // Dev unlock functions
 function devUnlockAll() {
     try {
-        if (window.FEATURE_UNLOCKS) {
-            // Unlock all features
-            const allFeatures = Object.keys(window.FEATURE_UNLOCKS.unlockConditions);
-            allFeatures.forEach(feature => {
-                window.FEATURE_UNLOCKS.unlockedFeatures.add(feature);
-            });
-            window.FEATURE_UNLOCKS.updateFeatureVisibility();
-            window.FEATURE_UNLOCKS.updateUnlocksTab();
-            console.log('🔓 All features unlocked via dev function');
-        } else {
-            console.warn('Feature unlocks system not available');
-        }
+        if (window.App?.systems?.dev?.unlockAll) return !!window.App.systems.dev.unlockAll();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devUnlockAll:', error);
     }
@@ -1167,11 +1157,8 @@ function devUnlockAll() {
 
 function devUnlockShop() {
     try {
-        if (window.FEATURE_UNLOCKS) {
-            window.FEATURE_UNLOCKS.unlockedFeatures.add('shop');
-            window.FEATURE_UNLOCKS.updateFeatureVisibility();
-            console.log('🛒 Shop unlocked via dev function');
-        }
+        if (window.App?.systems?.dev?.unlockShop) return !!window.App.systems.dev.unlockShop();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devUnlockShop:', error);
     }
@@ -1179,14 +1166,8 @@ function devUnlockShop() {
 
 function devUnlockUpgrades() {
     try {
-        if (window.FEATURE_UNLOCKS) {
-            const upgradeFeatures = ['widerStraws', 'betterCups', 'fasterDrinks', 'criticalClick', 'suction'];
-            upgradeFeatures.forEach(feature => {
-                window.FEATURE_UNLOCKS.unlockedFeatures.add(feature);
-            });
-            window.FEATURE_UNLOCKS.updateFeatureVisibility();
-            console.log('⚡ All upgrades unlocked via dev function');
-        }
+        if (window.App?.systems?.dev?.unlockUpgrades) return !!window.App.systems.dev.unlockUpgrades();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devUnlockUpgrades:', error);
     }
@@ -1194,16 +1175,8 @@ function devUnlockUpgrades() {
 
 function devResetUnlocks() {
     try {
-        if (window.FEATURE_UNLOCKS) {
-            window.FEATURE_UNLOCKS.unlockedFeatures.clear();
-            // Keep essential features
-            window.FEATURE_UNLOCKS.unlockedFeatures.add('soda');
-            window.FEATURE_UNLOCKS.unlockedFeatures.add('options');
-            window.FEATURE_UNLOCKS.unlockedFeatures.add('dev');
-            window.FEATURE_UNLOCKS.updateFeatureVisibility();
-            window.FEATURE_UNLOCKS.updateUnlocksTab();
-            console.log('🔄 Unlocks reset via dev function');
-        }
+        if (window.App?.systems?.dev?.resetUnlocks) return !!window.App.systems.dev.resetUnlocks();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devResetUnlocks:', error);
     }
@@ -1212,55 +1185,8 @@ function devResetUnlocks() {
 // Time travel functions
 function devAddTime(milliseconds) {
     try {
-        const ms = Number(milliseconds) || 0;
-        if (!ms) return;
-        // Fast-forward: compute how many drinks should have occurred and award them immediately
-        try {
-            const st = window.App?.state?.getState?.() || {};
-            const rate = Number(st.drinkRate || window.drinkRate || 1000);
-            const now = Date.now();
-            const last = Number(st.lastDrinkTime ?? window.lastDrinkTime ?? now);
-            const totalElapsed = ms;
-            const drinks = Math.floor(totalElapsed / Math.max(rate, 1));
-            const remainder = totalElapsed % Math.max(rate, 1);
-
-            // Add sips for all completed drinks
-            if (drinks > 0) {
-                // Determine sips-per-drink (base + production)
-                const config = window.GAME_CONFIG?.BALANCE || {};
-                const spsVal = (st && typeof st.sps !== 'undefined') ? Number(st.sps) : Number((config.BASE_SIPS_PER_DRINK) || 1);
-                const gain = spsVal * drinks;
-
-                // Update global and state sips
-                try {
-                    const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
-                    const currentSips = toNum(window.sips);
-                    const nextSips = currentSips + gain;
-                    window.sips = window.Decimal ? new window.Decimal(nextSips) : nextSips;
-                    const prevTotal = Number(st.totalSipsEarned || 0);
-                    window.App?.state?.setState?.({ sips: nextSips, totalSipsEarned: prevTotal + gain });
-                } catch {}
-            }
-
-            // Position lastDrinkTime so progress reflects the remainder
-            const nextLast = now - remainder;
-            window.lastDrinkTime = nextLast;
-            const prevPlay = Number(st.totalPlayTime || 0);
-            window.App?.state?.setState?.({ lastDrinkTime: nextLast, totalPlayTime: prevPlay + ms });
-            window.App?.ui?.updateDrinkProgress?.();
-            window.App?.ui?.updateTopSipCounter?.();
-            window.App?.ui?.updateTopSipsPerSecond?.();
-        } catch {}
-        // Also age the lastSaveTime so offline calc on reload reflects time travel
-        try {
-            const st = window.App?.state?.getState?.() || {};
-            const prevSave = Number(st.lastSaveTime || window.lastSaveTime || Date.now());
-            const nextSave = prevSave - ms;
-            window.lastSaveTime = nextSave;
-            window.App?.state?.setState?.({ lastSaveTime: nextSave });
-            window.App?.ui?.updateLastSaveTime?.();
-        } catch {}
-        console.log(`⏰ Added ${ms / 1000} seconds via dev function`);
+        if (window.App?.systems?.dev?.addTime) return !!window.App.systems.dev.addTime(Number(milliseconds));
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devAddTime:', error);
     }
@@ -1269,18 +1195,8 @@ function devAddTime(milliseconds) {
 // Resource management functions
 function devAddSips(amount) {
     try {
-        if (window.sips) {
-            window.sips = window.sips.plus(amount);
-            console.log(`💰 Added ${amount} sips via dev function`);
-            // Sync App.state.sips and update UI
-            try {
-                const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
-                window.App?.state?.setState?.({ sips: toNum(window.sips) });
-            } catch {}
-            // Update UI
-            try { window.App?.ui?.updateTopSipCounter?.(); } catch {}
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-        }
+        if (window.App?.systems?.dev?.addSips) return !!window.App.systems.dev.addSips(Number(amount));
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devAddSips:', error);
     }
@@ -1289,10 +1205,8 @@ function devAddSips(amount) {
 // Dev mode functions
 function devToggleDevMode() {
     try {
-        if (window.FEATURE_UNLOCKS) {
-            window.FEATURE_UNLOCKS.toggleDevMode();
-            console.log('🔧 Dev mode toggled via dev function');
-        }
+        if (window.App?.systems?.dev?.toggleDevMode) return !!window.App.systems.dev.toggleDevMode();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devToggleDevMode:', error);
     }
@@ -1300,10 +1214,8 @@ function devToggleDevMode() {
 
 function devToggleGodMode() {
     try {
-        if (window.FEATURE_UNLOCKS) {
-            // Toggle god mode (if implemented)
-            console.log('👑 God mode toggled via dev function');
-        }
+        if (window.App?.systems?.dev?.toggleGodMode) return !!window.App.systems.dev.toggleGodMode();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devToggleGodMode:', error);
     }
@@ -1311,16 +1223,8 @@ function devToggleGodMode() {
 
 function devShowDebugInfo() {
     try {
-        console.log('🐛 Debug Info:');
-        console.log('Current sips:', window.sips);
-        console.log('Current straws:', window.straws);
-        console.log('Current cups:', window.cups);
-        try {
-            const st = window.App?.state?.getState?.();
-            console.log('Current level:', (st && typeof st.level !== 'undefined') ? st.level : window.level);
-        } catch { console.log('Current level:', window.level); }
-        console.log('Total clicks:', window.totalClicks);
-        console.log('App object:', window.App);
+        if (window.App?.systems?.dev?.showDebugInfo) return !!window.App.systems.dev.showDebugInfo();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devShowDebugInfo:', error);
     }
