@@ -514,6 +514,15 @@ function initGame() {
                 // Add offline earnings to total sips
                 window.sips = window.sips.plus(offlineEarnings);
                 totalSipsEarned = totalSipsEarned.plus(offlineEarnings);
+                // Sync App.state snapshot for UI
+                try {
+                    const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+                    const prevTotal = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
+                    window.App?.state?.setState?.({
+                        sips: toNum(window.sips),
+                        totalSipsEarned: prevTotal + toNum(offlineEarnings)
+                    });
+                } catch {}
             }
         }
 
@@ -1531,8 +1540,13 @@ function sodaClick(multiplier = 1) {
         // Emit click event
         try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.SODA, { value: totalClickValue }); } catch {}
         
-        // Sync state bridge to keep globals and state in sync
-        try { window.App?.stateBridge?.autoSync?.(); } catch {}
+        // Sync state bridge to keep globals and state in sync, and update App.state
+        try {
+            window.App?.stateBridge?.autoSync?.();
+            const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+            const prevTotal = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
+            window.App?.state?.setState?.({ sips: toNum(window.sips), totalSipsEarned: prevTotal });
+        } catch {}
 
         // Update UI
         try { window.App?.ui?.updateTopSipsPerDrink?.(); } catch {}
