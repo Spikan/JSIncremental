@@ -145,7 +145,7 @@ App.systems.options.saveOptions({ autosaveEnabled: true });
 | Stats Management | `js/ui/stats.js` | `App.ui.functionName()` |
 | Button Logic | `js/ui/utils.js` | `App.ui.functionName()` |
 | Game Mechanics | `js/core/rules/` | `App.rules.functionName()` |
-| Storage Operations | `js/services/storage.js` | `App.storage.functionName()` |
+| Storage Operations | `js/services/storage.ts` | `App.storage.functionName()` |
 | System Operations | `js/core/systems/` | `App.systems.systemName.functionName()` |
 
 ### **Testing Considerations**

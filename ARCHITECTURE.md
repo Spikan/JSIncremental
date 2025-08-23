@@ -38,7 +38,7 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 - **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `js/ui/buttons.js`.
 - **Configuration access**: Added `js/core/systems/config-accessor.ts` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
 - **Event names**: `EVENT_NAMES` exported from `js/core/constants.js` and attached in `js/index.js` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
-- **Storage**: Validation functions are imported directly from `js/core/validation/schemas.js`. The storage facade is exposed as `AppStorage` and attached to `window.storage` by `js/services/storage.js`.
+ - **Storage**: Validation functions are imported directly from `js/core/validation/schemas.ts`. The typed storage facade `AppStorage` lives in `js/services/storage.ts` and is attached to `window.storage` during bootstrap.
 - **State bridge**: `js/core/state/bridge.js` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
 - **TypeScript infra**: Added `tsconfig.json` with `allowJs` + `checkJs`, a `types/global.d.ts` for ambient globals, and pervasive `@ts-check`/JSDoc annotations across core systems and rules. New script: `npm run typecheck`.
 
@@ -216,7 +216,7 @@ App.events.emit(App.EVENT_NAMES.ECONOMY.PURCHASE, {
 });
 ```
 
-### 3. **Storage System** (`js/services/storage.js`)
+### 3. **Storage System** (`js/services/storage.ts`)
 
 **Purpose**: Abstracted localStorage with validation and namespacing
 
