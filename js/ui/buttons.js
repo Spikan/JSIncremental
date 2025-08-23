@@ -409,6 +409,8 @@ function setupSpecialButtonHandlers() {
         const action = el.getAttribute('data-action');
         if (!action) return;
         const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
+        // Allow natural scrolling for soda image: handle in dedicated soda handler on release
+        if (fnName === 'sodaClick') return;
         const argsAttr = el.getAttribute('data-args') || argStr;
         let args = [];
         if (argsAttr) {
