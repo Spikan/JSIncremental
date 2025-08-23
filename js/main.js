@@ -314,7 +314,7 @@ function initGame() {
                 set: function(v) {
                     sps = new Decimal(v);
                     try { window.App?.stateBridge?.syncSps(sps); } catch {}
-                    try { window.sipsPerDrink = new Decimal(sps); } catch {}
+                    
                 }
             });
         }
@@ -351,9 +351,7 @@ function initGame() {
         window.level = level;
         
         // Calculate and store sips per drink
-        let sipsPerDrink = new Decimal(0);
-        // Make sipsPerDrink accessible globally
-        window.sipsPerDrink = sipsPerDrink;
+        // sps value is maintained in App.state (and mirrored where necessary)
 
         // Drink system variables
             const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE;
@@ -796,8 +794,6 @@ function initGame() {
             strawSPD = new Decimal(result.strawSPD);
             cupSPD = new Decimal(result.cupSPD);
             sps = new Decimal(result.sipsPerDrink);
-            // Keep window.sipsPerDrink in sync with computed sps
-            try { window.sipsPerDrink = new Decimal(sps); } catch {}
         } else {
             strawSPD = new Decimal(config.STRAW_BASE_SPD);
             cupSPD = new Decimal(config.CUP_BASE_SPD);
@@ -812,8 +808,7 @@ function initGame() {
             const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
             const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
             sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-            // Keep window.sipsPerDrink in sync with computed sps
-            try { window.sipsPerDrink = new Decimal(sps); } catch {}
+            
         }
         // Suction click bonus stays multiplicative on suctions
         suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
@@ -834,12 +829,7 @@ function initGame() {
             }
         } catch {}
         
-        // Ensure sps is properly calculated after loading save data
-        // This is critical to prevent passive production from being 0 after refresh
-        const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-        const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-        sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
-        try { window.sipsPerDrink = new Decimal(sps); } catch {}
+        // sps already computed above (prefer resources.recalcProduction when available)
         
         // Seed App.state with authoritative numeric snapshot
         try {
@@ -1277,8 +1267,7 @@ function devAddTime(milliseconds) {
             if (drinks > 0) {
                 // Determine sips-per-drink (base + production)
                 const config = window.GAME_CONFIG?.BALANCE || {};
-                const spsFallback = (typeof window.sipsPerDrink?.toNumber === 'function') ? window.sipsPerDrink.toNumber() : (typeof window.sipsPerDrink !== 'undefined' ? Number(window.sipsPerDrink) : undefined);
-                const spsVal = (st && typeof st.sps !== 'undefined') ? Number(st.sps) : Number((spsFallback ?? config.BASE_SIPS_PER_DRINK) || 1);
+                const spsVal = (st && typeof st.sps !== 'undefined') ? Number(st.sps) : Number((config.BASE_SIPS_PER_DRINK) || 1);
                 const gain = spsVal * drinks;
 
                 // Update global and state sips
@@ -1482,7 +1471,7 @@ function buyStraw() {
                 strawSPD = new Decimal(result.strawSPD ?? 0);
                 cupSPD = new Decimal(result.cupSPD ?? 0);
                 sps = new Decimal(result.sipsPerDrink ?? 0);
-                window.sipsPerDrink = new Decimal(sps);
+                
             } catch {}
             // Update App.state snapshot
             try {
@@ -1532,7 +1521,7 @@ function buyCup() {
                 strawSPD = new Decimal(result.strawSPD ?? 0);
                 cupSPD = new Decimal(result.cupSPD ?? 0);
                 sps = new Decimal(result.sipsPerDrink ?? 0);
-                window.sipsPerDrink = new Decimal(sps);
+                
             } catch {}
             try {
                 window.App?.state?.setState?.({
@@ -1694,7 +1683,7 @@ function buyWiderStraws() {
                 strawSPD = new Decimal(result.strawSPD ?? 0);
                 cupSPD = new Decimal(result.cupSPD ?? 0);
                 sps = new Decimal(result.sipsPerDrink ?? 0);
-                window.sipsPerDrink = new Decimal(sps);
+                
             } catch {}
             try {
                 window.App?.state?.setState?.({
@@ -1743,7 +1732,7 @@ function buyBetterCups() {
                 strawSPD = new Decimal(result.strawSPD ?? 0);
                 cupSPD = new Decimal(result.cupSPD ?? 0);
                 sps = new Decimal(result.sipsPerDrink ?? 0);
-                window.sipsPerDrink = new Decimal(sps);
+                
             } catch {}
             try {
                 window.App?.state?.setState?.({
@@ -1829,7 +1818,7 @@ function levelUp() {
         const result = window.App.systems.purchases.levelUp({
             sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
             level: Number((typeof st.level !== 'undefined' ? st.level : (window.level?.toNumber?.() ?? Number(window.level))) || 0),
-            sipsPerDrink: Number(st.sps ?? (window.sipsPerDrink?.toNumber?.() ?? Number(window.sipsPerDrink)))
+            sipsPerDrink: Number(st.sps ?? 0)
         });
         
         if (result) {
