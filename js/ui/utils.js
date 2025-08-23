@@ -181,19 +181,27 @@ export function updateCostDisplay(elementId, cost, isAffordable) {
  */
 export const GameState = {
     get sips() {
-        return typeof window !== 'undefined' ? window.sips : 0;
+        if (typeof window === 'undefined') return 0;
+        const st = window.App?.state?.getState?.();
+        return (st && typeof st.sips !== 'undefined') ? st.sips : window.sips;
     },
 
     get level() {
-        return typeof window !== 'undefined' ? window.level : 1;
+        if (typeof window === 'undefined') return 1;
+        const st = window.App?.state?.getState?.();
+        return (st && typeof st.level !== 'undefined') ? st.level : window.level;
     },
 
     get sps() {
-        return typeof window !== 'undefined' ? window.sps : 0;
+        if (typeof window === 'undefined') return 0;
+        const st = window.App?.state?.getState?.();
+        return (st && typeof st.sps !== 'undefined') ? st.sps : window.sps;
     },
 
     get drinkRate() {
-        return typeof window !== 'undefined' ? window.drinkRate : 0;
+        if (typeof window === 'undefined') return 0;
+        const st = window.App?.state?.getState?.();
+        return (st && typeof st.drinkRate !== 'undefined') ? st.drinkRate : window.drinkRate;
     }
 };
 
