@@ -25,8 +25,8 @@ const BUTTON_CONFIG: { types: Record<string, ButtonTypeMeta>; actions: Record<st
         buyFasterDrinks: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyFasterDrinks ? (window as any).App.systems.purchases.execute.buyFasterDrinks() : (window as any).buyFasterDrinks?.()), type: 'drink-speed-upgrade-btn', label: 'Buy Faster Drinks' },
         upgradeFasterDrinks: { func: () => ((window as any).App?.systems?.purchases?.execute?.upgradeFasterDrinks ? (window as any).App.systems.purchases.execute.upgradeFasterDrinks() : (window as any).upgradeFasterDrinks?.()), type: 'drink-speed-upgrade-btn', label: 'Upgrade Faster Drinks' },
         levelUp: { func: () => ((window as any).App?.systems?.purchases?.execute?.levelUp ? (window as any).App.systems.purchases.execute.levelUp() : (window as any).levelUp?.()), type: 'level-up-btn', label: 'Level Up' },
-        save: { func: () => (window as any).save?.(), type: 'save-btn', label: 'Save Game' },
-        delete_save: { func: () => (window as any).delete_save?.(), type: 'save-btn', label: 'Delete Save' },
+        save: { func: () => { const sys = (window as any).App?.systems?.save; if (sys?.performSaveSnapshot) return sys.performSaveSnapshot(); return (window as any).save?.(); }, type: 'save-btn', label: 'Save Game' },
+        delete_save: { func: () => { const sys = (window as any).App?.systems?.save; if (sys?.deleteSave) return sys.deleteSave(); return (window as any).delete_save?.(); }, type: 'save-btn', label: 'Delete Save' },
         toggleButtonSounds: { func: () => { const audio = (window as any).App?.systems?.audio?.button; if (audio?.toggleButtonSounds) return audio.toggleButtonSounds(); return (window as any).toggleButtonSounds?.(); }, type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
         sendMessage: { func: () => (window as any).sendMessage?.(), type: 'chat-send-btn', label: 'Send Message' },
         startGame: { func: () => (window as any).startGame?.(), type: 'splash-start-btn', label: 'Start Game' },
@@ -103,9 +103,9 @@ function setupSpecialButtonHandlers(): void {
         if (!button || !button.addEventListener) return;
         button.addEventListener('click', (e: any) => {
             const action = button.getAttribute('data-action');
-            if (action && action.startsWith('switchTab:') && (window as any).switchTab) {
+            if (action && action.startsWith('switchTab:')) {
                 const tabName = action.split(':')[1];
-                (window as any).switchTab(tabName, e);
+                try { (window as any).App?.ui?.switchTab?.(tabName, e); } catch { try { (window as any).switchTab?.(tabName, e); } catch {} }
             }
         });
     });

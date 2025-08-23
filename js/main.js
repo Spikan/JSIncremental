@@ -157,43 +157,7 @@ if (typeof DOM_CACHE === 'undefined') {
 // Splash init handled by App.systems.gameInit; keep a passthrough for legacy calls
 function initSplashScreen() { try { window.App?.systems?.gameInit?.initSplashScreen?.(); } catch {} }
 
-// Tab switching functionality
-function switchTab(tabName, event) {
-    // Hide all tab contents
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(tab => tab.classList.remove('active'));
-    
-    // Remove active class from all tab buttons
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    
-    // Show selected tab content
-    const selectedTab = document.getElementById(tabName + 'Tab');
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-    }
-    
-    // Add active class to clicked button
-    const clickedButton = event.target;
-    clickedButton.classList.add('active');
-
-    // Refresh stats when switching to the stats tab
-    if (tabName === 'stats') {
-        window.App?.ui?.updateAllStats?.();
-    }
-    
-    // Update unlocks when switching to the unlocks tab
-    if (tabName === 'unlocks') {
-        if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.updateUnlocksTab) {
-            FEATURE_UNLOCKS.updateUnlocksTab();
-        } else {
-            console.warn('⚠️ FEATURE_UNLOCKS.updateUnlocksTab not available');
-        }
-    }
-}
-
-// Make switchTab globally available for HTML onclick attributes
-window.switchTab = switchTab;
+// Tab switching moved to UI module (App.ui.switchTab)
 
 // Note: Button system has been moved to js/ui/buttons.js as part of the UI system
 
@@ -403,37 +367,7 @@ function initGame() {
         let lastSaveOperation = 0;
             const MIN_SAVE_INTERVAL = TIMING.MIN_SAVE_INTERVAL; // Minimum 1 second between saves
 
-        // Statistics tracking variables
-        if (!Object.getOwnPropertyDescriptor(window, 'totalClicks')) {
-            let _totalClicks = 0;
-            Object.defineProperty(window, 'totalClicks', {
-                get: function() { return _totalClicks; },
-                set: function(v) {
-                    _totalClicks = Number(v) || 0;
-                    try { window.App?.state?.setState?.({ totalClicks: _totalClicks }); } catch {}
-                }
-            });
-        }
-        if (!Object.getOwnPropertyDescriptor(window, 'currentClickStreak')) {
-            let _currentClickStreak = 0;
-            Object.defineProperty(window, 'currentClickStreak', {
-                get: function() { return _currentClickStreak; },
-                set: function(v) {
-                    _currentClickStreak = Number(v) || 0;
-                    try { window.App?.state?.setState?.({ currentClickStreak: _currentClickStreak }); } catch {}
-                }
-            });
-        }
-        if (!Object.getOwnPropertyDescriptor(window, 'bestClickStreak')) {
-            let _bestClickStreak = 0;
-            Object.defineProperty(window, 'bestClickStreak', {
-                get: function() { return _bestClickStreak; },
-                set: function(v) {
-                    _bestClickStreak = Number(v) || 0;
-                    try { window.App?.state?.setState?.({ bestClickStreak: _bestClickStreak }); } catch {}
-                }
-            });
-        }
+        // Statistics tracking values now maintained in App.state via clicks system
         let totalSipsEarned = new Decimal(0);
         if (!Object.getOwnPropertyDescriptor(window, 'totalSipsEarned')) {
             Object.defineProperty(window, 'totalSipsEarned', {

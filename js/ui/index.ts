@@ -100,6 +100,25 @@ export function updateAllDisplays(): void {
     checkUpgradeAffordability();
 }
 
+// Move switchTab into UI to eliminate window.switchTab
+export function switchTab(tabName: string, event: any): void {
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach((tab: any) => tab.classList.remove('active'));
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach((btn: any) => btn.classList.remove('active'));
+    const selectedTab = document.getElementById(tabName + 'Tab');
+    if (selectedTab) { selectedTab.classList.add('active'); }
+    const clickedButton = event?.target as any;
+    try { clickedButton?.classList?.add('active'); } catch {}
+    if (tabName === 'stats') { try { updateAllStats(); } catch {} }
+    if (tabName === 'unlocks') {
+        try {
+            const sys = (window as any).App?.systems?.unlocks;
+            if (sys?.updateUnlocksTab) sys.updateUnlocksTab();
+        } catch {}
+    }
+}
+
 // Batch UI updates for performance (use in game loop)
 export function performBatchUIUpdate(): void {
     requestAnimationFrame(() => {
