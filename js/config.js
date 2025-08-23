@@ -59,6 +59,8 @@ const config = {
         
         // Faster drinks system
         FASTER_DRINKS_REDUCTION_PER_LEVEL: 0.01, // 1% reduction per level
+        // Each upgrade increases per-level reduction effectiveness
+        FASTER_DRINKS_UPGRADE_BONUS_PER_LEVEL: 0.002, // +0.2% per upgrade
         MIN_DRINK_RATE: 500, // Minimum 0.5 seconds between drinks
     },
     

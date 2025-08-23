@@ -230,11 +230,13 @@ export const execute = {
     // Compute next drink rate based on config and new fasterDrinks count
     const { config } = getTypedConfig();
     const baseMs = Number((w.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE) ?? 5000);
-    const perLevelReduction = Number(config.FASTER_DRINKS_REDUCTION_PER_LEVEL ?? 0);
+    const baseReduction = Number(config.FASTER_DRINKS_REDUCTION_PER_LEVEL ?? 0);
+    const bonusPerUpgrade = Number(config.FASTER_DRINKS_UPGRADE_BONUS_PER_LEVEL ?? 0);
     const minMs = Number(config.MIN_DRINK_RATE ?? 500);
-    // Treat upgrade counter as additional effective levels
-    const effectiveLevels = Number(result.fasterDrinks || 0) + Number(st.fasterDrinksUpCounter || 0);
-    const factor = Math.pow(1 - perLevelReduction, effectiveLevels);
+    const upgrades = Number(st.fasterDrinksUpCounter || 0);
+    const effectiveReduction = Math.max(0, baseReduction + (bonusPerUpgrade * upgrades));
+    const effectiveLevels = Number(result.fasterDrinks || 0);
+    const factor = Math.pow(1 - effectiveReduction, effectiveLevels);
     const nextRate = Math.max(minMs, Math.round(baseMs * factor));
     // Apply to state (authoritative)
     setAppState({ sips: toNum(w.sips), fasterDrinks: result.fasterDrinks, drinkRate: nextRate });
@@ -272,11 +274,13 @@ export const execute = {
     // Recalculate drinkRate factoring in upgrades (if any modifiers apply, integrate here)
     const { config } = getTypedConfig();
     const baseMs = Number((w.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE) ?? 5000);
-    const perLevelReduction = Number(config.FASTER_DRINKS_REDUCTION_PER_LEVEL ?? 0);
+    const baseReduction = Number(config.FASTER_DRINKS_REDUCTION_PER_LEVEL ?? 0);
+    const bonusPerUpgrade = Number(config.FASTER_DRINKS_UPGRADE_BONUS_PER_LEVEL ?? 0);
     const minMs = Number(config.MIN_DRINK_RATE ?? 500);
-    // Effective levels = fasterDrinks + upgrades purchased
-    const totalLevels = Number(st.fasterDrinks || 0) + Number(result.fasterDrinksUpCounter || 0);
-    const factor = Math.pow(1 - perLevelReduction, totalLevels);
+    const upgrades = Number(result.fasterDrinksUpCounter || 0);
+    const effectiveReduction = Math.max(0, baseReduction + (bonusPerUpgrade * upgrades));
+    const totalLevels = Number(st.fasterDrinks || 0);
+    const factor = Math.pow(1 - effectiveReduction, totalLevels);
     const nextRate = Math.max(minMs, Math.round(baseMs * factor));
     setAppState({ sips: toNum(w.sips), fasterDrinksUpCounter: result.fasterDrinksUpCounter, drinkRate: nextRate });
     try { w.App?.stateBridge?.setDrinkRate?.(nextRate); } catch {}
