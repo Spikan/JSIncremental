@@ -106,7 +106,7 @@ function showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY) {
         feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
         
         if (progress < 1) {
-            requestAnimationFrame(animate);
+            try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
         }
     };
     
@@ -199,7 +199,7 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
         feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
         
         if (progress < 1) {
-            requestAnimationFrame(animate);
+            try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
         }
     };
     
@@ -296,7 +296,7 @@ export function showPurchaseFeedback(itemName, cost, clickX = null, clickY = nul
         feedback.style.transform = `translate(-50%, calc(-50% - ${moveUp}px))`;
         
         if (progress < 1) {
-            requestAnimationFrame(animate);
+            try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
         }
     };
     

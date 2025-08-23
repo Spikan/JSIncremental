@@ -367,8 +367,8 @@ describe('Game Runtime Safety Tests', () => {
             // Import core systems
             coreSystems = {
                 save: await import('../js/core/systems/save-system'),
-                options: await import('../js/core/systems/options-system.js'),
-                autosave: await import('../js/core/systems/autosave.js')
+                options: await import('../js/core/systems/options-system'),
+                autosave: await import('../js/core/systems/autosave')
             };
         });
 
