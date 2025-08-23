@@ -1620,10 +1620,11 @@ function levelUp() {
             return;
         }
         
+        const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.levelUp({
             sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
             level: Number(window.level?.toNumber?.() ?? Number(window.level)),
-            sipsPerDrink: Number(window.sipsPerDrink?.toNumber?.() ?? Number(window.sipsPerDrink))
+            sipsPerDrink: Number(st.sps ?? (window.sipsPerDrink?.toNumber?.() ?? Number(window.sipsPerDrink)))
         });
         
         if (result) {
