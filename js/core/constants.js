@@ -1,4 +1,4 @@
-const EVENT_NAMES = {
+export const EVENT_NAMES = {
     GAME: {
         LOADED: 'game:loaded',
         SAVED: 'game:saved',
@@ -36,6 +36,6 @@ const EVENT_NAMES = {
 };
 
 // Make available globally (runtime uses non-module script loading)
-window.EVENT_NAMES = EVENT_NAMES;
+try { window.EVENT_NAMES = EVENT_NAMES; } catch {}
 
 

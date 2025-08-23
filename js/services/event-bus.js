@@ -5,7 +5,7 @@
  * @template {Record<string, any>} [E=Record<string, any>]
  * @returns {{ on: (event: keyof E & string, handler: (payload: E[keyof E]) => void) => () => void; off: (event: keyof E & string, handler: (payload: E[keyof E]) => void) => void; emit: (event: keyof E & string, payload?: E[keyof E]) => void }}
  */
-function createEventBus() {
+export function createEventBus() {
     /** @type {Map<string, Set<Function>>} */
     const listeners = new Map(); // event -> Set<fn>
 
@@ -35,11 +35,11 @@ function createEventBus() {
     return { on, off, emit };
 }
 
-const bus = createEventBus();
+export const bus = createEventBus();
 
 // Make available globally
-(/** @type {any} */(window)).createEventBus = createEventBus;
-(/** @type {any} */(window)).eventBus = bus;
-(/** @type {any} */(window)).bus = bus;
+try { (/** @type {any} */(window)).createEventBus = createEventBus; } catch {}
+try { (/** @type {any} */(window)).eventBus = bus; } catch {}
+try { (/** @type {any} */(window)).bus = bus; } catch {}
 
 

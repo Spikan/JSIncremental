@@ -200,3 +200,4 @@ export const GameState = {
 // Backward compatibility exports
 export const safePrettify = formatNumber;
 export const prettify = formatNumber;
+export { formatNumber };

@@ -1,5 +1,5 @@
 // @ts-check
-import { nextStrawCost, nextCupCost } from '../rules/purchases.js';
+import { nextStrawCost, nextCupCost } from '../rules/purchases';
 import { recalcProduction } from './resources.js';
 import { getUpgradesAndConfig } from './config-accessor.js';
 

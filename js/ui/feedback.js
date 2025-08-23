@@ -110,7 +110,7 @@ function showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY) {
         }
     };
     
-    requestAnimationFrame(animate);
+    try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
     
     // Remove after animation
     setTimeout(() => {
@@ -203,7 +203,7 @@ function showFeedbackWithContainer(sipsGained, isCritical, sodaContainer) {
         }
     };
     
-    requestAnimationFrame(animate);
+    try { requestAnimationFrame(animate); } catch { setTimeout(animate, 16); }
     
     // Remove after animation
     setTimeout(() => {
