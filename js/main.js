@@ -182,7 +182,7 @@ function initGame() {
         console.log('🚀 initGame called - starting game initialization...');
         console.log('🔧 GAME_CONFIG available:', !!GC && Object.keys(GC).length > 0);
         console.log('🔧 DOM_CACHE available:', !!window.DOM_CACHE);
-        console.log('🔧 FEATURE_UNLOCKS available:', !!(window.App?.systems?.unlocks));
+        console.log('🔧 Unlocks system available:', !!(window.App?.systems?.unlocks));
         // ============================================================================
         // DEPENDENCY VALIDATION - Ensure all required objects are available
         // ============================================================================
@@ -882,21 +882,7 @@ window.initGame = initGame;
 // legacy toggleButtonSounds/sendMessage globals removed; routed via systems/god
 window.startGame = startGame;
 
-// Dev functions
-window.devUnlockAll = devUnlockAll;
-window.devUnlockShop = devUnlockShop;
-window.devUnlockUpgrades = devUnlockUpgrades;
-window.devResetUnlocks = devResetUnlocks;
-window.devAddTime = devAddTime;
-window.devAddSips = devAddSips;
-window.devToggleDevMode = devToggleDevMode;
-window.devToggleGodMode = devToggleGodMode;
-window.devShowDebugInfo = devShowDebugInfo;
-window.devExportSave = devExportSave;
-window.devImportSave = devImportSave;
-window.quickUnlock = quickUnlock;
-
-console.log('✅ Global wrapper functions and dev functions assigned to window object');
+console.log('✅ Global wrapper functions assigned to window object');
 
 // ============================================================================
 // INITIALIZATION - Call initGame when DOM is ready and dependencies are available
