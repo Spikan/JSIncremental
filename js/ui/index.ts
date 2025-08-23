@@ -51,17 +51,11 @@ export const updateCountdownText = labels.updateCountdownText;
 export const setMusicStatusText = labels.setMusicStatusText;
 
 // Initialize UI event listeners
-export function initializeUI() {
+export function initializeUI(): void {
     console.log('UI system initialized');
-    
-    // Initialize button system
     buttons.initButtonSystem();
-    
-    // Set up event listeners for UI updates
-    if (window.App?.events) {
-        // Listen for game events and update UI accordingly
-        window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA, (data) => {
-            // Update UI regardless of Decimal implementation
+    if ((window as any).App?.events) {
+        (window as any).App.events.on((window as any).App.EVENT_NAMES?.CLICK?.SODA, (data: any) => {
             updateTopSipsPerDrink();
             updateTopSipsPerSecond();
             updateTopSipCounter();
@@ -70,26 +64,20 @@ export function initializeUI() {
                 showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
             }
         });
-        
-        window.App.events.on(window.App.EVENT_NAMES?.ECONOMY?.PURCHASE, (data) => {
+        (window as any).App.events.on((window as any).App.EVENT_NAMES?.ECONOMY?.PURCHASE, (data: any) => {
             updateTopSipsPerDrink();
             updateTopSipsPerSecond();
             updateTopSipCounter();
             checkUpgradeAffordability();
             updateCriticalClickDisplay();
-            // Only show event-based purchase feedback when coordinates are provided.
-            // Click-based feedback is already handled by the global dispatcher.
             if (data && data.item && data.cost && typeof data.clickX === 'number' && typeof data.clickY === 'number') {
                 showPurchaseFeedback(data.item, data.cost, data.clickX, data.clickY);
             }
         });
-        
-        window.App.events.on(window.App.EVENT_NAMES?.GAME?.SAVED, () => {
+        (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.SAVED, () => {
             updateLastSaveTime();
         });
-        
-        window.App.events.on(window.App.EVENT_NAMES?.GAME?.LOADED, () => {
-            // Wait a bit for game state to be fully initialized
+        (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.LOADED, () => {
             setTimeout(() => {
                 updateAllDisplays();
                 checkUpgradeAffordability();
@@ -99,7 +87,7 @@ export function initializeUI() {
 }
 
 // Update all UI displays (useful for initialization and major state changes)
-export function updateAllDisplays() {
+export function updateAllDisplays(): void {
     updateTopSipsPerDrink();
     updateTopSipsPerSecond();
     updateTopSipCounter();
@@ -113,21 +101,16 @@ export function updateAllDisplays() {
 }
 
 // Batch UI updates for performance (use in game loop)
-export function performBatchUIUpdate() {
-    // Only update visible elements to improve performance
+export function performBatchUIUpdate(): void {
     requestAnimationFrame(() => {
         updateTopSipsPerDrink();
         updateTopSipsPerSecond();
         updateTopSipCounter();
         updatePlayTime();
-        
-        // Only update stats if stats tab is active
-        if (typeof window !== 'undefined' && window.DOM_CACHE?.statsTab?.classList?.contains('active')) {
+        if (typeof window !== 'undefined' && (window as any).DOM_CACHE?.statsTab?.classList?.contains('active')) {
             updateAllStats();
         }
-        
-        // Update affordability less frequently
-        if (Math.random() < 0.1) { // 10% chance per frame
+        if (Math.random() < 0.1) {
             checkUpgradeAffordability();
         }
     });

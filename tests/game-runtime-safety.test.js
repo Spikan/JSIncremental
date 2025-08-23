@@ -120,7 +120,7 @@ describe('Game Runtime Safety Tests', () => {
 
         beforeEach(async () => {
             vi.clearAllMocks();
-            ui = await import('../js/ui/index.js');
+            ui = await import('../js/ui/index.ts');
         });
 
         it('should handle missing DOM elements gracefully in updateCostDisplay', () => {
