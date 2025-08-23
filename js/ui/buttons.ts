@@ -127,7 +127,7 @@ function setupSpecialButtonHandlers(): void {
             sodaButton.addEventListener('touchend', (e: any) => { if (!active) { reset(); return; } if (!moved) { markPointerHandled(sodaButton); try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e); } catch {} } reset(); });
             sodaButton.addEventListener('touchcancel', reset);
         }
-        sodaButton.addEventListener('click', (e: any) => { if (shouldSuppressClick(sodaButton)) return; try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { if ((window as any).App?.systems?.clicks?.handleSodaClick) { (window as any).App.systems.clicks.handleSodaClick(1, e); } else { (window as any).sodaClick?.(1, e); } } catch {} });
+        sodaButton.addEventListener('click', (e: any) => { if (shouldSuppressClick(sodaButton)) return; try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e); } catch {} });
     }
     const chatInput = document.getElementById('chatInput') as any;
     if (chatInput) { chatInput.addEventListener('keypress', function (e: any) { if (e.key === 'Enter' && (window as any).sendMessage) { (window as any).sendMessage(); } }); }

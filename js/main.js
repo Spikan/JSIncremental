@@ -758,28 +758,12 @@ function processDrink() {
     }
 }
 
-// Function to adjust drink rate (for future upgrades)
-function setDrinkRate(newDrinkRate) {
-    drinkRate = newDrinkRate;
-    // Reset progress when changing drink rate
-    drinkProgress = 0;
-    lastDrinkTime = Date.now();
-    try {
-        window.App?.stateBridge?.setDrinkRate(drinkRate);
-        window.App?.stateBridge?.setDrinkProgress(drinkProgress);
-        window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
-        // Mirror into App.state for UI-only reads
-        window.App?.state?.setState?.({ drinkRate, drinkProgress, lastDrinkTime });
-    } catch {}
-}
+// setDrinkRate legacy helper removed; owned by systems
 
 // Function to calculate and update drink rate based on upgrades
 // Function moved to js/ui/displays.js - use App.ui.updateDrinkRate()
 
-// Function to get current drink rate in seconds
-function getDrinkRateSeconds() {
-    return drinkRate / 1000;
-}
+// getDrinkRateSeconds legacy helper removed
 
 // Function to update the top sips per drink display
 // Function moved to js/ui/displays.js - use App.ui.updateTopSipsPerDrink()
@@ -931,30 +915,7 @@ function quickUnlock() {
 // Purchase wrapper functions removed; UI dispatches directly via data-action
 
 // Other game functions
-function sodaClick(multiplier = 1) {
-    try {
-        try { window.App?.systems?.clicks?.handleSodaClick?.(multiplier); } catch {}
-        // Update UI
-        try { window.App?.ui?.updateTopSipsPerDrink?.(); } catch {}
-        try { window.App?.ui?.updateTopSipsPerSecond?.(); } catch {}
-        try { window.App?.ui?.updateTopSipCounter?.(); } catch {}
-        try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-        
-    } catch (error) {
-        console.error('Error in sodaClick:', error);
-    }
-}
-
-function levelUp() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.levelUp) {
-            return !!window.App.systems.purchases.execute.levelUp();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in levelUp:', error);
-    }
-}
+// sodaClick/levelUp legacy wrappers removed; UI routes to App.systems
 
 // legacy save() wrapper removed; use App.systems.save.performSaveSnapshot instead
 
@@ -1026,9 +987,7 @@ function startGame() {
 // Purchase/upgrade globals no longer exposed; handled by UI dispatcher
 
 // Game functions
-window.sodaClick = sodaClick;
-console.log('🔧 main.js loaded, sodaClick function available:', typeof window.sodaClick);
-window.levelUp = levelUp;
+// legacy sodaClick/levelUp globals removed; dispatched via App.systems
 // legacy window.save removed; UI dispatch calls App.systems.save directly
 // legacy delete_save global removed
 window.initGame = initGame;
