@@ -265,10 +265,10 @@ function initGame() {
             cups: window.cups.toNumber(),
             suctions: window.suctions.toNumber(),
             suctionsType: typeof window.suctions,
-            totalClicks: window.totalClicks,
-            lastClickTime: window.lastClickTime,
-            currentClickStreak: window.currentClickStreak,
-            bestClickStreak: window.bestClickStreak
+            totalClicks: 0,
+            lastClickTime: 0,
+            currentClickStreak: 0,
+            bestClickStreak: 0
         });
         let sps = new Decimal(0);
         let strawSPD = new Decimal(0);
@@ -370,55 +370,13 @@ function initGame() {
 
         // Statistics tracking values now maintained in App.state via clicks system
         let totalSipsEarned = new Decimal(0);
-        if (!Object.getOwnPropertyDescriptor(window, 'totalSipsEarned')) {
-            Object.defineProperty(window, 'totalSipsEarned', {
-                get: function() { return totalSipsEarned; },
-                set: function(v) {
-                    totalSipsEarned = new Decimal(v);
-                    try {
-                        const prev = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
-                        const next = (typeof totalSipsEarned?.toNumber === 'function') ? totalSipsEarned.toNumber() : Number(totalSipsEarned) || prev;
-                        window.App?.state?.setState?.({ totalSipsEarned: next });
-                    } catch {}
-                }
-            });
-        }
+        try { window.App?.state?.setState?.({ totalSipsEarned: 0 }); } catch {}
         let highestSipsPerSecond = new Decimal(0);
-        if (!Object.getOwnPropertyDescriptor(window, 'highestSipsPerSecond')) {
-            Object.defineProperty(window, 'highestSipsPerSecond', {
-                get: function() { return highestSipsPerSecond; },
-                set: function(v) {
-                    highestSipsPerSecond = new Decimal(v);
-                    try {
-                        const numeric = (typeof highestSipsPerSecond?.toNumber === 'function') ? highestSipsPerSecond.toNumber() : Number(highestSipsPerSecond) || 0;
-                        window.App?.state?.setState?.({ highestSipsPerSecond: numeric });
-                    } catch {}
-                }
-            });
-        }
+        try { window.App?.state?.setState?.({ highestSipsPerSecond: 0 }); } catch {}
         let gameStartDate = Date.now();
-        if (!Object.getOwnPropertyDescriptor(window, 'gameStartDate')) {
-            Object.defineProperty(window, 'gameStartDate', {
-                get: function() { return gameStartDate; },
-                set: function(v) {
-                    gameStartDate = Number(v) || Date.now();
-                    try { window.App?.state?.setState?.({ sessionStartTime: Number(gameStartDate) }); } catch {}
-                }
-            });
-        }
-        if (!Object.getOwnPropertyDescriptor(window, 'lastClickTime')) {
-            let _lastClickTime = 0;
-            Object.defineProperty(window, 'lastClickTime', {
-                get: function() { return _lastClickTime; },
-                set: function(v) {
-                    _lastClickTime = Number(v) || 0;
-                    try { window.App?.state?.setState?.({ lastClickTime: _lastClickTime }); } catch {}
-                }
-            });
-        } else {
-            window.lastClickTime = 0;
-        }
-        window.clickTimes = []; // For calculating clicks per second
+        try { window.App?.state?.setState?.({ sessionStartTime: Number(gameStartDate) }); } catch {}
+        try { window.App?.state?.setState?.({ lastClickTime: 0 }); } catch {}
+        // clickTimes kept only for legacy CPS display in dev; state tracks official counters
 
         // Initialize DOM cache first
         DOM_CACHE.init();
@@ -478,10 +436,10 @@ function initGame() {
             window.level = level;
             try { window.App?.stateBridge?.setLevel(level); } catch {}
             totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
-            window.totalClicks = Number(savegame.totalClicks || 0);
+            try { window.App?.state?.setState?.({ totalClicks: Number(savegame.totalClicks || 0) }); } catch {}
             gameStartDate = savegame.gameStartDate || Date.now();
-            window.lastClickTime = savegame.lastClickTime || 0;
-            window.clickTimes = savegame.clickTimes || [];
+            try { window.App?.state?.setState?.({ lastClickTime: Number(savegame.lastClickTime || 0) }); } catch {}
+            // no-op: clickTimes deprecated; state counters are authoritative
             // Seed totalPlayTime from save
             try { window.App?.state?.setState?.({ totalPlayTime: Number(savegame.totalPlayTime || 0) }); } catch {}
         }
@@ -582,8 +540,7 @@ function initGame() {
             try { window.App?.stateBridge?.setLevel(level); } catch {}
             totalSipsEarned = new Decimal(0);
             gameStartDate = Date.now();
-            window.lastClickTime = 0;
-            window.clickTimes = [];
+            try { window.App?.state?.setState?.({ lastClickTime: 0 }); } catch {}
             // Reset feature unlocks on brand new games to avoid stale persisted unlocks
             try { if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.reset) { FEATURE_UNLOCKS.reset(); } } catch {}
         }
@@ -1019,11 +976,11 @@ function save() {
                 sips: String(window.sips || 0),
                 totalSipsEarned: String(window.totalSipsEarned || 0),
                 drinkRate: Number(window.drinkRate || 0),
-                lastDrinkTime: Number(window.lastDrinkTime || 0),
+                lastDrinkTime: Number(st.lastDrinkTime || 0),
                 drinkProgress: Number(window.drinkProgress || 0),
                 lastSaveTime: Date.now(),
                 totalPlayTime: Number(st.totalPlayTime || 0),
-                totalClicks: Number(window.totalClicks || 0),
+                totalClicks: Number(st.totalClicks || 0),
                 level: Number(window.level?.toNumber?.() || window.level || 1)
             };
             window.App.storage.saveGame(payload);
