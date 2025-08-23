@@ -216,7 +216,7 @@ window.switchTab = switchTab;
 function initGame() {
     try {
         console.log('🚀 initGame called - starting game initialization...');
-        console.log('🔧 GAME_CONFIG available:', !!GC);
+        console.log('🔧 GAME_CONFIG available:', !!GC && Object.keys(GC).length > 0);
         console.log('🔧 DOM_CACHE available:', !!window.DOM_CACHE);
         console.log('🔧 FEATURE_UNLOCKS available:', !!window.FEATURE_UNLOCKS);
         // ============================================================================
@@ -242,7 +242,7 @@ function initGame() {
         }
         
         // Check if GAME_CONFIG is available
-        if (typeof window.GAME_CONFIG === 'undefined') {
+        if (!GC || (typeof GC === 'object' && Object.keys(GC).length === 0)) {
             console.error('❌ GAME_CONFIG not available! Game cannot initialize properly.');
             console.log('⏳ Waiting for GAME_CONFIG to load...');
             // Retry after a short delay
@@ -1816,7 +1816,7 @@ function areDependenciesReady() {
     const dependencies = {
         FEATURE_UNLOCKS: typeof FEATURE_UNLOCKS !== 'undefined',
         DOM_CACHE: typeof DOM_CACHE !== 'undefined',
-        GAME_CONFIG: typeof window.GAME_CONFIG !== 'undefined',
+        GAME_CONFIG: !!GC && Object.keys(GC).length > 0,
         Decimal: typeof Decimal !== 'undefined',
         App: typeof window.App !== 'undefined'
     };
