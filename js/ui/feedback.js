@@ -2,7 +2,7 @@
 // Handles visual feedback for user actions like clicks, purchases, level ups
 
 // Import consolidated utilities
-import { formatNumber, prettify } from './utils.js';
+import { formatNumber, prettify } from './utils';
 
 // Detect mobile device
 function isMobileDevice() {

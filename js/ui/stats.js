@@ -2,7 +2,7 @@
 // Handles all statistics display updates for different tabs and categories
 
 // Import consolidated utilities
-import { formatNumber } from './utils.js';
+import { formatNumber } from './utils';
 
 // Update play time display
 export function updatePlayTime() {

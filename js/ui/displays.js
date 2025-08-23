@@ -2,7 +2,7 @@
 // Handles all display updates for game stats, costs, and progress indicators
 
 // Import consolidated utilities
-import { updateCostDisplay, updateButtonState, formatNumber } from './utils.js';
+import { updateCostDisplay, updateButtonState, formatNumber } from './utils';
 
 // Update the top sips per drink display
 export function updateTopSipsPerDrink() {

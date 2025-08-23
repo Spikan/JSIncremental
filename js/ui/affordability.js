@@ -150,4 +150,4 @@ function calculateAllCosts() {
 }
 
 // Import consolidated utilities
-import { updateButtonState, updateCostDisplay, formatNumber } from './utils.js';
+import { updateButtonState, updateCostDisplay, formatNumber } from './utils';
