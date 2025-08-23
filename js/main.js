@@ -515,9 +515,36 @@ function initGame() {
             const MIN_SAVE_INTERVAL = TIMING.MIN_SAVE_INTERVAL; // Minimum 1 second between saves
 
         // Statistics tracking variables
-        window.totalClicks = 0;
-        window.currentClickStreak = 0;
-        window.bestClickStreak = 0;
+        if (!Object.getOwnPropertyDescriptor(window, 'totalClicks')) {
+            let _totalClicks = 0;
+            Object.defineProperty(window, 'totalClicks', {
+                get: function() { return _totalClicks; },
+                set: function(v) {
+                    _totalClicks = Number(v) || 0;
+                    try { window.App?.state?.setState?.({ totalClicks: _totalClicks }); } catch {}
+                }
+            });
+        }
+        if (!Object.getOwnPropertyDescriptor(window, 'currentClickStreak')) {
+            let _currentClickStreak = 0;
+            Object.defineProperty(window, 'currentClickStreak', {
+                get: function() { return _currentClickStreak; },
+                set: function(v) {
+                    _currentClickStreak = Number(v) || 0;
+                    try { window.App?.state?.setState?.({ currentClickStreak: _currentClickStreak }); } catch {}
+                }
+            });
+        }
+        if (!Object.getOwnPropertyDescriptor(window, 'bestClickStreak')) {
+            let _bestClickStreak = 0;
+            Object.defineProperty(window, 'bestClickStreak', {
+                get: function() { return _bestClickStreak; },
+                set: function(v) {
+                    _bestClickStreak = Number(v) || 0;
+                    try { window.App?.state?.setState?.({ bestClickStreak: _bestClickStreak }); } catch {}
+                }
+            });
+        }
         let totalSipsEarned = new Decimal(0);
         if (!Object.getOwnPropertyDescriptor(window, 'totalSipsEarned')) {
             Object.defineProperty(window, 'totalSipsEarned', {
@@ -555,7 +582,18 @@ function initGame() {
                 }
             });
         }
-        window.lastClickTime = 0;
+        if (!Object.getOwnPropertyDescriptor(window, 'lastClickTime')) {
+            let _lastClickTime = 0;
+            Object.defineProperty(window, 'lastClickTime', {
+                get: function() { return _lastClickTime; },
+                set: function(v) {
+                    _lastClickTime = Number(v) || 0;
+                    try { window.App?.state?.setState?.({ lastClickTime: _lastClickTime }); } catch {}
+                }
+            });
+        } else {
+            window.lastClickTime = 0;
+        }
         window.clickTimes = []; // For calculating clicks per second
 
         // Initialize DOM cache first
