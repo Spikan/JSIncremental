@@ -533,6 +533,18 @@ function initGame() {
             });
         }
         let highestSipsPerSecond = new Decimal(0);
+        if (!Object.getOwnPropertyDescriptor(window, 'highestSipsPerSecond')) {
+            Object.defineProperty(window, 'highestSipsPerSecond', {
+                get: function() { return highestSipsPerSecond; },
+                set: function(v) {
+                    highestSipsPerSecond = new Decimal(v);
+                    try {
+                        const numeric = (typeof highestSipsPerSecond?.toNumber === 'function') ? highestSipsPerSecond.toNumber() : Number(highestSipsPerSecond) || 0;
+                        window.App?.state?.setState?.({ highestSipsPerSecond: numeric });
+                    } catch {}
+                }
+            });
+        }
         let gameStartDate = Date.now();
         window.lastClickTime = 0;
         window.clickTimes = []; // For calculating clicks per second
