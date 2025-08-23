@@ -108,6 +108,10 @@ try {
     const clicks = await import('./core/systems/clicks-system.ts');
     Object.assign(window.App.systems.clicks, clicks);
 } catch (e) { console.warn('⚠️ clicks system load failed:', e); }
+try {
+    const audio = await import('./core/systems/button-audio.ts');
+    Object.assign(window.App.systems.audio.button, audio);
+} catch (e) { console.warn('⚠️ button-audio system load failed:', e); }
 
 try {
     const gameInit = await import('./core/systems/game-init.ts');

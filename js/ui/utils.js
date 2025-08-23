@@ -6,24 +6,26 @@
  * Handles Decimal objects and regular numbers with consistent formatting
  */
 function formatNumber(value) {
-    // If we have the global prettify function, use it
+    // If we have the global prettify function, use it (external libs)
     if (typeof window?.prettify === 'function') {
-        return window.prettify(value);
+        try { return window.prettify(value); } catch {}
     }
 
-    // Fallback formatting for when prettify isn't available
-    if (typeof value === 'undefined' || value === null) {
-        return '0';
+    // Fallback formatting
+    if (value == null) return '0';
+
+    // Handle Decimal-like objects
+    if (typeof value?.toNumber === 'function') {
+        try { value = value.toNumber(); } catch {}
     }
 
-    if (typeof value === 'string') {
-        return value;
+    if (typeof value === 'number' && Number.isFinite(value)) {
+        // Avoid float artifacts like 11.799999999 by rounding visually
+        return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
     }
 
-    if (typeof value?.toString === 'function') {
-        return value.toString();
-    }
-
+    if (typeof value === 'string') return value;
+    if (typeof value?.toString === 'function') return value.toString();
     return String(value);
 }
 

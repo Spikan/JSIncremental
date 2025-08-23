@@ -17,6 +17,8 @@ function initButtonAudioContext() {
 
 export function initButtonAudioSystem() {
   initButtonAudioContext();
+  // iOS Safari requires a user gesture to resume the audio context
+  try { (audioContext as any)?.resume?.(); } catch {}
   try {
     const stored = localStorage.getItem('buttonSoundsEnabled');
     buttonSoundsEnabled = stored !== null ? stored === 'true' : true;
@@ -45,6 +47,7 @@ export function updateButtonSoundsToggleButton() {
 export function playButtonClickSound() {
   if (!buttonSoundsEnabled || !audioContext) return;
   try {
+    try { (audioContext as any)?.resume?.(); } catch {}
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     oscillator.connect(gainNode);
@@ -63,6 +66,7 @@ export function playButtonClickSound() {
 export function playButtonPurchaseSound() {
   if (!buttonSoundsEnabled || !audioContext) return;
   try {
+    try { (audioContext as any)?.resume?.(); } catch {}
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     oscillator.connect(gainNode);
@@ -81,6 +85,7 @@ export function playButtonPurchaseSound() {
 export function playButtonCriticalClickSound() {
   if (!buttonSoundsEnabled || !audioContext) return;
   try {
+    try { (audioContext as any)?.resume?.(); } catch {}
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     oscillator.connect(gainNode);

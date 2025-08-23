@@ -891,7 +891,16 @@ function initGame() {
         // updateCriticalClickDisplay() // This function has been moved to js/ui/displays.js
         
         // Initialize button audio system (delegated to module)
-        try { window.App?.systems?.audio?.button?.initButtonAudioSystem?.(); } catch {}
+        try {
+            window.App?.systems?.audio?.button?.initButtonAudioSystem?.();
+            // Resume context on first user interaction (mobile/autoplay policies)
+            const resume = () => { try { window.App?.systems?.audio?.button?.playButtonClickSound?.(); } catch {};
+                try { document.removeEventListener('touchstart', resume, true); document.removeEventListener('pointerdown', resume, true); document.removeEventListener('keydown', resume, true);} catch {}
+            };
+            document.addEventListener('touchstart', resume, true);
+            document.addEventListener('pointerdown', resume, true);
+            document.addEventListener('keydown', resume, true);
+        } catch {}
         
         // Update button sounds toggle button (delegated to module)
         try { window.App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } catch {}

@@ -150,13 +150,13 @@ function handleButtonClick(event, button, actionName) {
     const clickX = event.clientX;
     const clickY = event.clientY;
     
-    // Play appropriate audio
+    // Play appropriate audio and show feedback where relevant
     try {
         if (window.App?.systems?.audio?.button) {
             if (buttonType.audio === 'purchase') {
-                window.App.systems.audio.button.playButtonPurchaseSound();
+                try { window.App.systems.audio.button.playButtonPurchaseSound(); } catch {}
             } else {
-                window.App.systems.audio.button.playButtonClickSound();
+                try { window.App.systems.audio.button.playButtonClickSound(); } catch {}
             }
         } else if (window.playButtonPurchaseSound && window.playButtonClickSound) {
             // Fallback to global audio functions
@@ -179,7 +179,11 @@ function handleButtonClick(event, button, actionName) {
     // Execute the modern function reference
     try {
         if (action.func && typeof action.func === 'function') {
-            action.func();
+            const result = action.func();
+            // Level up feedback (purchase feedback handled globally)
+            if (buttonType.feedback === 'levelup') {
+                try { window.App?.ui?.showLevelUpFeedback?.(0); } catch {}
+            }
         } else {
             console.warn(`Action function for ${actionName} is not available`);
         }
@@ -307,6 +311,30 @@ function setupSpecialButtonHandlers() {
                     window[fnName](args[0], e);
                 } else {
                     window[fnName](...args);
+                }
+                // Show purchase feedback for shop/upgrade actions at click point
+                const purchaseActions = new Set([
+                    'buyStraw','buyCup','buyWiderStraws','buyBetterCups',
+                    'buySuction','buyFasterDrinks','upgradeFasterDrinks','buyCriticalClick'
+                ]);
+                if (purchaseActions.has(fnName) && typeof window.App?.ui?.showPurchaseFeedback === 'function') {
+                    let costValue;
+                    try {
+                        // Prefer an explicit cost-number span inside the button element
+                        const costSpan = el.querySelector('.cost-number');
+                        if (costSpan) {
+                            costValue = Number(costSpan.textContent);
+                        } else {
+                            // Fallback: try to parse any number in the button text
+                            const match = (el.textContent || '').replace(/[,]/g,'').match(/\d+(?:\.\d+)?/);
+                            costValue = match ? Number(match[0]) : undefined;
+                        }
+                    } catch {}
+                    const cx = (typeof e.clientX === 'number') ? e.clientX : (el.getBoundingClientRect().left + el.getBoundingClientRect().width/2);
+                    const cy = (typeof e.clientY === 'number') ? e.clientY : (el.getBoundingClientRect().top + el.getBoundingClientRect().height/2);
+                    if (typeof costValue === 'number' && !Number.isNaN(costValue)) {
+                        window.App.ui.showPurchaseFeedback(fnName, costValue, cx, cy);
+                    }
                 }
             } catch (err) { console.warn('action failed', fnName, err); }
         }

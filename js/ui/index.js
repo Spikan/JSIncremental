@@ -77,8 +77,10 @@ export function initializeUI() {
             updateTopSipCounter();
             checkUpgradeAffordability();
             updateCriticalClickDisplay();
-            if (data && data.item && data.cost) {
-                showPurchaseFeedback(data.item, data.cost);
+            // Only show event-based purchase feedback when coordinates are provided.
+            // Click-based feedback is already handled by the global dispatcher.
+            if (data && data.item && data.cost && typeof data.clickX === 'number' && typeof data.clickY === 'number') {
+                showPurchaseFeedback(data.item, data.cost, data.clickX, data.clickY);
             }
         });
         
