@@ -1958,7 +1958,9 @@ window.save = save;
 window.delete_save = delete_save;
 window.initGame = initGame;
 window.toggleButtonSounds = toggleClickSounds;
-window.sendMessage = sendMessage;
+if (typeof window.sendMessage !== 'function') {
+    window.sendMessage = sendMessage;
+}
 window.startGame = startGame;
 
 // Dev functions
