@@ -1091,11 +1091,12 @@ function devExportSave() {
             window.App.storage.exportGame();
         } else {
             // Fallback export
+            const st = window.App?.state?.getState?.() || {};
             const saveData = {
-                sips: window.sips?.toString(),
-                straws: window.straws?.toString(),
-                cups: window.cups?.toString(),
-                level: window.level?.toString(),
+                sips: (typeof st.sips !== 'undefined') ? String(st.sips) : window.sips?.toString(),
+                straws: (typeof st.straws !== 'undefined') ? String(st.straws) : window.straws?.toString(),
+                cups: (typeof st.cups !== 'undefined') ? String(st.cups) : window.cups?.toString(),
+                level: (typeof st.level !== 'undefined') ? String(st.level) : window.level?.toString(),
                 timestamp: Date.now()
             };
             const dataStr = JSON.stringify(saveData, null, 2);
