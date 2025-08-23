@@ -185,7 +185,7 @@ function safeCall() {
 ### **Files Modified:**
 - `js/main.js` - Removed duplicate functions, updated calls
 - `js/index.js` - Removed obsolete function calls
-- `js/core/systems/game-init.js` - Updated function calls
+- `js/core/systems/game-init.ts` - Updated function calls
 - `ARCHITECTURE.md` - Updated documentation
 
 ### **Lines of Code:**

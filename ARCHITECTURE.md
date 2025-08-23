@@ -314,7 +314,7 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 - Performance optimization
 - Frame rate control
 
-**Audio System** (`button-audio.js`):
+**Audio System** (`button-audio.ts`):
 - Sound effect management
 - Audio preferences
 - Volume control
@@ -453,8 +453,8 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 3. Check `js/config.js` - Game balance and constants
 
 ### **For Understanding State Management**
-1. Review `js/core/state/shape.js` - State structure
-2. Examine `js/core/state/index.js` - Store implementation
+1. Review `js/core/state/shape.ts` - State structure
+2. Examine `js/core/state/index.ts` - Store implementation
 3. Check `js/index.js` - App bootstrap and state initialization
 
 ### **For Understanding UI Updates**
