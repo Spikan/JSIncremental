@@ -188,7 +188,7 @@ store.setState({ sips: newValue });
 const currentState = store.getState();
 ```
 
-### 2. **Event System** (`js/services/event-bus.js`)
+### 2. **Event System** (`js/services/event-bus.ts`)
 
 **Purpose**: Decoupled communication between systems via pub/sub pattern
 
@@ -466,8 +466,8 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 3. Check event listeners and update functions
 
 ### **For Understanding Data Flow**
-1. Review `js/core/constants.js` - Event definitions
-2. Examine `js/services/event-bus.js` - Event system
+1. Review `js/core/constants.ts` - Event definitions
+2. Examine `js/services/event-bus.ts` - Event system
 3. Check how systems emit and listen to events
 
 ### **For Understanding Game Configuration**
