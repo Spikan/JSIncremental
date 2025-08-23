@@ -305,6 +305,7 @@ function setupSpecialButtonHandlers() {
                 if (!active || !e || e.pointerType === 'mouse') { reset(); return; }
                 if (!moved) {
                     markPointerHandled(sodaButton);
+                    try { sodaButton.classList.add('soda-clicked'); setTimeout(() => { sodaButton.classList.remove('soda-clicked'); }, 140); } catch {}
                     try {
                         if (window.App?.systems?.clicks?.handleSodaClick) {
                             window.App.systems.clicks.handleSodaClick(1, e);
@@ -332,6 +333,7 @@ function setupSpecialButtonHandlers() {
                 if (!active) { reset(); return; }
                 if (!moved) {
                     markPointerHandled(sodaButton);
+                    try { sodaButton.classList.add('soda-clicked'); setTimeout(() => { sodaButton.classList.remove('soda-clicked'); }, 140); } catch {}
                     try {
                         if (window.App?.systems?.clicks?.handleSodaClick) {
                             window.App.systems.clicks.handleSodaClick(1, e);
@@ -346,6 +348,7 @@ function setupSpecialButtonHandlers() {
         }
         sodaButton.addEventListener('click', (e) => {
             if (shouldSuppressClick(sodaButton)) return;
+            try { sodaButton.classList.add('soda-clicked'); setTimeout(() => { sodaButton.classList.remove('soda-clicked'); }, 140); } catch {}
             try {
                 if (window.App?.systems?.clicks?.handleSodaClick) {
                     window.App.systems.clicks.handleSodaClick(1, e);
