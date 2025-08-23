@@ -1012,57 +1012,18 @@ function setupMobileTouchHandling() {
                     (navigator.maxTouchPoints > 0);
 
     if (isMobile) {
-        
-        
-        // Prevent default touch behaviors that could interfere
-        let touchStartTime = 0;
-        window.isTouchClick = false;
-        window.touchProcessed = false;
-        
-        sodaButton.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            touchStartTime = Date.now();
-            window.isTouchClick = true;
-            window.touchProcessed = false;
-            // Add visual feedback immediately
-            sodaButton.classList.add('soda-clicked');
-        }, { passive: false });
-
-        sodaButton.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            const touchDuration = Date.now() - touchStartTime;
-            
-            // Only process if it was a short touch and hasn't been processed yet
-            if (touchDuration < 300 && window.isTouchClick && !window.touchProcessed) {
-                window.touchProcessed = true;
-                // Get touch coordinates for feedback positioning
-                const touch = e.changedTouches[0];
-                const clickX = touch.clientX;
-                const clickY = touch.clientY;
-                // Directly trigger click logic for mobile since default click is prevented
-                // Note: sodaClick function has been moved to UI system
-            }
-            
-            // Remove visual feedback after a short delay
-            setTimeout(() => {
-                sodaButton.classList.remove('soda-clicked');
-            }, 150);
-            
-            window.isTouchClick = false;
-        }, { passive: false });
-
-        // Prevent context menu on long press
-        sodaButton.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // Add touch-action CSS property for better mobile handling
-        sodaButton.style.touchAction = 'manipulation';
-        sodaButton.style.webkitTouchCallout = 'none';
-        sodaButton.style.webkitUserSelect = 'none';
-        sodaButton.style.userSelect = 'none';
-        
-        
+        // Let native scrolling work; unified button system handles taps.
+        // Keep only non-intrusive styling hints.
+        try {
+            sodaButton.style.touchAction = 'pan-y';
+            sodaButton.style.webkitTouchCallout = 'none';
+            sodaButton.style.webkitUserSelect = 'none';
+            sodaButton.style.userSelect = 'none';
+        } catch {}
+        // Optional: keep context menu disabled on long press without affecting scroll
+        try {
+            sodaButton.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        } catch {}
     }
 }
 
