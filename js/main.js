@@ -943,7 +943,8 @@ function trackClick() {
 
     // Track click streak
     const clickStreakWindow = TIMING.CLICK_STREAK_WINDOW || 3000; // Default 3 seconds
-    if (now - window.lastClickTime < clickStreakWindow) { // Within configured time window
+    const prevLastClick = Number(window.App?.state?.getState?.()?.lastClickTime || window.lastClickTime || 0);
+    if (now - prevLastClick < clickStreakWindow) { // Within configured time window
         window.currentClickStreak++;
         if (window.currentClickStreak > window.bestClickStreak) {
             window.bestClickStreak = window.currentClickStreak;
