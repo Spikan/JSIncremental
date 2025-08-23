@@ -1074,7 +1074,10 @@ function devShowDebugInfo() {
         console.log('Current sips:', window.sips);
         console.log('Current straws:', window.straws);
         console.log('Current cups:', window.cups);
-        console.log('Current level:', window.level);
+        try {
+            const st = window.App?.state?.getState?.();
+            console.log('Current level:', (st && typeof st.level !== 'undefined') ? st.level : window.level);
+        } catch { console.log('Current level:', window.level); }
         console.log('Total clicks:', window.totalClicks);
         console.log('App object:', window.App);
     } catch (error) {
@@ -1586,8 +1589,8 @@ function levelUp() {
         
         const st = window.App?.state?.getState?.() || {};
         const result = window.App.systems.purchases.levelUp({
-            sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-            level: Number(window.level?.toNumber?.() ?? Number(window.level)),
+            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
+            level: Number((typeof st.level !== 'undefined' ? st.level : (window.level?.toNumber?.() ?? Number(window.level))) || 0),
             sipsPerDrink: Number(st.sps ?? (window.sipsPerDrink?.toNumber?.() ?? Number(window.sipsPerDrink)))
         });
         
