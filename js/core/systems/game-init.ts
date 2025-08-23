@@ -157,7 +157,12 @@ export function initOnDomReady(): void {
             setTimeout(() => {
                 try {
                     initSplashScreen();
-                    try { (window as any).App?.systems?.options?.loadOptions?.({ autosaveEnabled: true, autosaveInterval: 30 }); } catch {}
+                    try {
+                        const defaults = { autosaveEnabled: true, autosaveInterval: 10, clickSoundsEnabled: true, musicEnabled: true } as any;
+                        const loaded = (window as any).App?.systems?.options?.loadOptions?.(defaults) || defaults;
+                        (window as any).App?.state?.setState?.({ options: loaded });
+                        (window as any).App?.ui?.updateAutosaveStatus?.();
+                    } catch {}
                     try { (window as any).App?.ui?.updatePlayTime?.(); } catch {}
                 } catch (error) {
                     console.error('Error during splash screen initialization:', error);

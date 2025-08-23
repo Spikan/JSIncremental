@@ -56,19 +56,21 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       try { w.App?.ui?.updateTopSipsPerDrink?.(); } catch {}
       try { w.App?.ui?.updateTopSipsPerSecond?.(); } catch {}
       try { w.App?.ui?.updateTopSipCounter?.(); } catch {}
-      // Autosave integration with counter stored on window
+      // Autosave handled by wall-clock timer below
+      // Wall-clock autosave: also trigger by elapsed real time regardless of drink cadence
       try {
         const enabled = !!(state?.options?.autosaveEnabled);
         const intervalSec = Number(state?.options?.autosaveInterval || 10);
-        if (enabled && w.App?.systems?.autosave?.computeAutosaveCounter) {
-          const result = w.App.systems.autosave.computeAutosaveCounter({
-            enabled,
-            counter: Number(w.__autosaveCounter || 0),
-            intervalSec,
-            drinkRateMs: drinkRate,
-          });
-          w.__autosaveCounter = result.nextCounter;
-          if (result.shouldSave) try { w.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
+        if (enabled) {
+          const nowMs = Date.now();
+          const last = Number(w.__lastAutosaveClockMs || 0);
+          const intervalMs = Math.max(0, intervalSec * 1000);
+          if (!last) {
+            w.__lastAutosaveClockMs = nowMs;
+          } else if (nowMs - last >= intervalMs) {
+            try { w.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
+            w.__lastAutosaveClockMs = nowMs;
+          }
         }
       } catch {}
       try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}

@@ -129,6 +129,11 @@ try {
 } catch (e) { console.warn('⚠️ button-audio system load failed:', e); }
 
 try {
+    const autosave = await import('./core/systems/autosave.ts');
+    Object.assign(window.App.systems.autosave, autosave);
+} catch (e) { console.warn('⚠️ autosave system load failed:', e); }
+
+try {
     const dev = await import('./core/systems/dev.ts');
     window.App.systems.dev = dev;
 } catch (e) { console.warn('⚠️ dev system load failed:', e); }

@@ -344,7 +344,8 @@ function initGame() {
             try { window.clickSoundsEnabled = !!loaded.clickSoundsEnabled; } catch {}
         } catch {}
 
-        // autosaveEnabled/autosaveInterval now owned by options system; no window proxies
+        // autosaveEnabled/autosaveInterval now owned by options system; ensure UI reflects
+        try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
         let gameStartTime = Date.now();
         let lastSaveTime = null;
         if (!Object.getOwnPropertyDescriptor(window, 'lastSaveTime')) {
@@ -803,23 +804,7 @@ function processDrink() {
             FEATURE_UNLOCKS.checkAllUnlocks();
         }
         
-        // Update auto-save counter based on configurable interval via system helper (scope-safe reads)
-        try {
-            const st2 = window.App?.state?.getState?.() || {};
-            const opts = st2.options || {};
-            let enabled = typeof autosaveEnabled !== 'undefined' ? autosaveEnabled : !!opts.autosaveEnabled;
-            let intervalSec = typeof autosaveInterval !== 'undefined' ? autosaveInterval : Number(opts.autosaveInterval || 10);
-            if (window.App?.systems?.autosave?.computeAutosaveCounter) {
-                const result = window.App.systems.autosave.computeAutosaveCounter({
-                    enabled,
-                    counter: (typeof autosaveCounter !== 'undefined' ? autosaveCounter : 0),
-                    intervalSec,
-                    drinkRateMs: rate,
-                });
-                if (typeof autosaveCounter !== 'undefined') autosaveCounter = result.nextCounter;
-                if (result.shouldSave) try { window.App?.systems?.save?.performSaveSnapshot?.(); } catch {}
-            }
-        } catch {}
+        // Autosave handled by core drink-system; legacy block removed
     }
 }
 
