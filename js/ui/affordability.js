@@ -1,11 +1,11 @@
 // UI Affordability System
 // Handles checking and updating button states based on resource availability
+import { getUpgradesAndConfig } from '../core/systems/config-accessor.js';
 
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability() {
     // Safety checks - ensure game is fully initialized
-    const config = window.GAME_CONFIG?.BALANCE || {};
-    const dataUp = window.App?.data?.upgrades || {};
+    const { upgrades: dataUp, config } = getUpgradesAndConfig();
 
     // Get current sips from App.state (preferred)
     const currentSips = Number(window.App?.state?.getState?.()?.sips || 0);
@@ -25,7 +25,7 @@ export function checkUpgradeAffordability() {
     };
 
     // Calculate all costs using rules if available, otherwise fallback to config
-    const costs = calculateAllCosts(config, dataUp);
+    const costs = calculateAllCosts();
 
     // Update button states based on affordability
     updateButtonState('buyStraw', sipsForComparison.gte(costs.straw), costs.straw);
@@ -62,7 +62,8 @@ export function updateShopButtonStates() {
 }
 
 // Calculate all upgrade costs
-function calculateAllCosts(config, dataUp) {
+function calculateAllCosts() {
+    const { upgrades: dataUp, config } = getUpgradesAndConfig();
     const costs = {};
 
     // Helper function to safely get number value from multiple sources
