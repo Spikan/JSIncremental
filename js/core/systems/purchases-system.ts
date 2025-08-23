@@ -1,6 +1,6 @@
 import { nextStrawCost, nextCupCost } from '../rules/purchases';
 import { recalcProduction } from './resources';
-import { getUpgradesAndConfig } from './config-accessor.js';
+import { getUpgradesAndConfig } from './config-accessor';
 
 function getTypedConfig(): { upgrades: any; config: any } {
   const { upgrades, config } = getUpgradesAndConfig();
