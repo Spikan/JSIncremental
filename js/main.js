@@ -960,14 +960,7 @@ function levelUp() {
 
 // delete_save legacy wrapper removed; UI routes to App.systems.save
 
-function sendMessage() {
-    try {
-        // Placeholder for chat functionality
-        console.log('Send message functionality not implemented yet');
-    } catch (error) {
-        console.error('Error in sendMessage:', error);
-    }
-}
+// sendMessage handled in js/god.js; legacy placeholder removed
 
 function startGame() {
     try {
@@ -982,25 +975,10 @@ function startGame() {
 }
 
 // Function to toggle click sounds on/off
-function toggleClickSounds() {
-    try { window.clickSoundsEnabled = !window.clickSoundsEnabled; } catch {}
-}
+// toggleClickSounds legacy helper removed; use App.systems.audio.button.toggleButtonSounds
 
 // Load click sounds preference from storage
-function loadClickSoundsPreference() {
-    try {
-        let next = true;
-        if (window.App?.storage?.getBoolean) {
-            next = window.App.storage.getBoolean('clickSoundsEnabled', true);
-        } else {
-            const saved = localStorage.getItem('clickSoundsEnabled');
-            if (saved !== null) next = saved === 'true';
-        }
-        window.clickSoundsEnabled = next;
-    } catch (e) {
-        console.warn('loadClickSoundsPreference failed:', e);
-    }
-}
+// loadClickSoundsPreference legacy helper removed; options/audio systems own persistence
 
 // Function to update drink speed display
 // Function moved to js/ui/displays.js - use App.ui.updateDrinkSpeedDisplay()
@@ -1009,31 +987,9 @@ function loadClickSoundsPreference() {
 // Function moved to js/ui/displays.js - use App.ui.updateCriticalClickDisplay()
 
 // Auto-save management functions
-function toggleAutosave() {
-    const checkbox = document.getElementById('autosaveToggle');
-    autosaveEnabled = !!(checkbox && checkbox.checked);
-    try {
-        window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_TOGGLED, { enabled: autosaveEnabled });
-        // Update state options
-        const prev = window.App?.state?.getState?.()?.options || {};
-        window.App?.state?.setState?.({ options: { ...prev, autosaveEnabled } });
-        window.App?.systems?.options?.saveOptions?.({ autosaveEnabled, autosaveInterval });
-    } catch {}
-    try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
-}
+// toggleAutosave legacy helper removed; options system handles UI and persistence
 
-function changeAutosaveInterval() {
-    const select = document.getElementById('autosaveInterval');
-    autosaveInterval = parseInt(select?.value || autosaveInterval, 10);
-    autosaveCounter = 0; // Reset counter when changing interval
-    try {
-        window.App?.events?.emit?.(window.App?.EVENT_NAMES?.OPTIONS?.AUTOSAVE_INTERVAL_CHANGED, { seconds: autosaveInterval });
-        const prev = window.App?.state?.getState?.()?.options || {};
-        window.App?.state?.setState?.({ options: { ...prev, autosaveInterval } });
-        window.App?.systems?.options?.saveOptions?.({ autosaveEnabled, autosaveInterval });
-    } catch {}
-    try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
-}
+// changeAutosaveInterval legacy helper removed; options system handles UI and persistence
 
 // Function moved to js/ui/displays.js - use App.ui.updateAutosaveStatus()
 
@@ -1076,10 +1032,7 @@ window.levelUp = levelUp;
 // legacy window.save removed; UI dispatch calls App.systems.save directly
 // legacy delete_save global removed
 window.initGame = initGame;
-window.toggleButtonSounds = toggleClickSounds;
-if (typeof window.sendMessage !== 'function') {
-    window.sendMessage = sendMessage;
-}
+// legacy toggleButtonSounds/sendMessage globals removed; routed via systems/god
 window.startGame = startGame;
 
 // Dev functions
