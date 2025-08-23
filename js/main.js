@@ -327,59 +327,10 @@ function initGame() {
         // Drink system variables
             const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE;
         let drinkRate = DEFAULT_DRINK_RATE;
-        // Expose drinkRate for UI modules - only define if not already defined
-        if (!Object.getOwnPropertyDescriptor(window, 'drinkRate')) {
-            Object.defineProperty(window, 'drinkRate', {
-                get: function() { return drinkRate; },
-                set: function(v) {
-                    drinkRate = Number(v) || drinkRate;
-                    try { window.App?.stateBridge?.setDrinkRate(drinkRate); } catch {}
-                }
-            });
-        }
         let drinkProgress = 0;
-        if (!Object.getOwnPropertyDescriptor(window, 'drinkProgress')) {
-            Object.defineProperty(window, 'drinkProgress', {
-                get: function() { return drinkProgress; },
-                set: function(v) {
-                    drinkProgress = Number(v) || 0;
-                    try { window.App?.stateBridge?.setDrinkProgress(drinkProgress); } catch {}
-                }
-            });
-        }
         
         // Bridge click sound preference to App.state.options and storage
-        if (!Object.getOwnPropertyDescriptor(window, 'clickSoundsEnabled')) {
-            let _clickSounds = true;
-            Object.defineProperty(window, 'clickSoundsEnabled', {
-                get: function() {
-                    try { return !!(window.App?.state?.getState?.()?.options?.clickSoundsEnabled); } catch {}
-                    return _clickSounds;
-                },
-                set: function(v) {
-                    const next = !!v;
-                    _clickSounds = next;
-                    try {
-                        const prev = window.App?.state?.getState?.()?.options || {};
-                        window.App?.state?.setState?.({ options: { ...prev, clickSoundsEnabled: next } });
-                    } catch {}
-                    try {
-                        if (window.App?.storage?.setBoolean) window.App.storage.setBoolean('clickSoundsEnabled', next);
-                        else localStorage.setItem('clickSoundsEnabled', String(next));
-                    } catch {}
-                    try {
-                        if (window.App?.ui?.updateClickSoundsToggleText) window.App.ui.updateClickSoundsToggleText(next);
-                        else {
-                            const toggleButton = document.getElementById('clickSoundsToggle');
-                            if (toggleButton) {
-                                toggleButton.textContent = next ? '🔊 Click Sounds ON' : '🔇 Click Sounds OFF';
-                                toggleButton.classList.toggle('sounds-off', !next);
-                            }
-                        }
-                    } catch {}
-                }
-            });
-        }
+        // clickSoundsEnabled now owned by audio system + options; no window proxy
         let lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE; // Start with progress at 0
         try { window.App?.state?.setState?.({ lastDrinkTime, drinkRate }); } catch {}
         if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
@@ -429,48 +380,7 @@ function initGame() {
             try { window.clickSoundsEnabled = !!loaded.clickSoundsEnabled; } catch {}
         } catch {}
 
-        // Bridge autosave options to App.state and storage
-        if (!Object.getOwnPropertyDescriptor(window, 'autosaveEnabled')) {
-            Object.defineProperty(window, 'autosaveEnabled', {
-                get: function() {
-                    try { return !!(window.App?.state?.getState?.()?.options?.autosaveEnabled); } catch {}
-                    return !!autosaveEnabled;
-                },
-                set: function(v) {
-                    const next = !!v;
-                    autosaveEnabled = next;
-                    try {
-                        const prev = window.App?.state?.getState?.()?.options || {};
-                        window.App?.state?.setState?.({ options: { ...prev, autosaveEnabled: next } });
-                    } catch {}
-                    try {
-                        if (window.App?.systems?.options?.saveOptions) window.App.systems.options.saveOptions({ autosaveEnabled: next, autosaveInterval });
-                    } catch {}
-                    try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
-                }
-            });
-        }
-        if (!Object.getOwnPropertyDescriptor(window, 'autosaveInterval')) {
-            Object.defineProperty(window, 'autosaveInterval', {
-                get: function() {
-                    try { return Number(window.App?.state?.getState?.()?.options?.autosaveInterval ?? autosaveInterval); } catch {}
-                    return Number(autosaveInterval);
-                },
-                set: function(v) {
-                    const next = parseInt(String(v), 10) || autosaveInterval;
-                    autosaveInterval = next;
-                    autosaveCounter = 0;
-                    try {
-                        const prev = window.App?.state?.getState?.()?.options || {};
-                        window.App?.state?.setState?.({ options: { ...prev, autosaveInterval: next } });
-                    } catch {}
-                    try {
-                        if (window.App?.systems?.options?.saveOptions) window.App.systems.options.saveOptions({ autosaveEnabled, autosaveInterval: next });
-                    } catch {}
-                    try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
-                }
-            });
-        }
+        // autosaveEnabled/autosaveInterval now owned by options system; no window proxies
         let gameStartTime = Date.now();
         let lastSaveTime = null;
         if (!Object.getOwnPropertyDescriptor(window, 'lastSaveTime')) {

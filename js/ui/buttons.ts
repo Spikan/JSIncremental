@@ -27,7 +27,7 @@ const BUTTON_CONFIG: { types: Record<string, ButtonTypeMeta>; actions: Record<st
         levelUp: { func: () => ((window as any).App?.systems?.purchases?.execute?.levelUp ? (window as any).App.systems.purchases.execute.levelUp() : (window as any).levelUp?.()), type: 'level-up-btn', label: 'Level Up' },
         save: { func: () => (window as any).save?.(), type: 'save-btn', label: 'Save Game' },
         delete_save: { func: () => (window as any).delete_save?.(), type: 'save-btn', label: 'Delete Save' },
-        toggleButtonSounds: { func: () => (window as any).toggleButtonSounds?.(), type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
+        toggleButtonSounds: { func: () => { const audio = (window as any).App?.systems?.audio?.button; if (audio?.toggleButtonSounds) return audio.toggleButtonSounds(); return (window as any).toggleButtonSounds?.(); }, type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
         sendMessage: { func: () => (window as any).sendMessage?.(), type: 'chat-send-btn', label: 'Send Message' },
         startGame: { func: () => (window as any).startGame?.(), type: 'splash-start-btn', label: 'Start Game' },
     }
