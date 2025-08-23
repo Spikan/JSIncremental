@@ -6,6 +6,7 @@ import { formatNumber } from './utils.js';
 
 // Update play time display
 export function updatePlayTime() {
+    if (typeof window === 'undefined') return;
     const playTimeElement = window.DOM_CACHE?.playTime;
     try {
         const state = window.App?.state?.getState?.();
