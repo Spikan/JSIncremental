@@ -328,7 +328,6 @@ function setupSpecialButtonHandlers() {
                 let success = true;
                 if (fnName === 'switchTab') {
                     try { window.App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
-                    try { window.App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
                     window[fnName](args[0], e);
                 } else {
                     if (isPurchase && window.App?.systems?.purchases?.execute?.[fnName]) {
