@@ -9,6 +9,44 @@ export function initSplashScreen(): void {
             return;
         }
 
+        function maybeStartLoop(): void {
+            try {
+                const w: any = window as any;
+                const loopStart = w.App?.systems?.loop?.start;
+                if (!loopStart) {
+                    setTimeout(maybeStartLoop, 100);
+                    return;
+                }
+                loopStart({
+                    updateDrinkProgress: () => {
+                        try {
+                            const st = w.App?.state?.getState?.() || {};
+                            const now = Date.now();
+                            const last = Number(st.lastDrinkTime ?? w.lastDrinkTime ?? 0);
+                            const rate = Number(st.drinkRate ?? w.drinkRate ?? 1000);
+                            const pct = Math.min((now - last) / Math.max(rate, 1) * 100, 100);
+                            w.App?.state?.setState?.({ drinkProgress: pct });
+                            w.App?.ui?.updateDrinkProgress?.(pct, rate);
+                        } catch {}
+                    },
+                    processDrink: () => {
+                        try { w.App?.systems?.drink?.processDrink?.(); } catch {}
+                    },
+                    updateStats: () => {
+                        try {
+                            w.App?.ui?.updatePlayTime?.();
+                            w.App?.ui?.updateLastSaveTime?.();
+                            w.App?.ui?.updateAllStats?.();
+                            w.App?.ui?.checkUpgradeAffordability?.();
+                            if (typeof (w as any).FEATURE_UNLOCKS !== 'undefined') (w as any).FEATURE_UNLOCKS.checkAllUnlocks?.();
+                        } catch {}
+                    },
+                    updatePlayTime: () => { try { w.App?.ui?.updatePlayTime?.(); } catch {} },
+                    updateLastSaveTime: () => { try { w.App?.ui?.updateLastSaveTime?.(); } catch {} },
+                });
+            } catch {}
+        }
+
         function startGame(): void {
             try {
                 const splash = document.getElementById('splashScreen');
@@ -19,6 +57,8 @@ export function initSplashScreen(): void {
                     try { (window as any).initGame?.(); } catch (error) {
                         console.error('Game init failed, but showing game anyway:', error);
                     }
+                    // Start loop via system (authoritative)
+                    try { maybeStartLoop(); } catch {}
                 } else {
                     console.error('Could not find splash or game elements');
                 }
@@ -67,6 +107,40 @@ export function startGameCore(): void {
             try { (window as any).initGame?.(); } catch (error) {
                 console.error('Game init failed, but showing game anyway:', error);
             }
+            // Start loop via system (authoritative)
+            try {
+                const restart = () => {
+                    const w: any = window as any;
+                    const loopStart = w.App?.systems?.loop?.start;
+                    if (!loopStart) return void setTimeout(restart, 100);
+                    loopStart({
+                        updateDrinkProgress: () => {
+                            try {
+                                const st = w.App?.state?.getState?.() || {};
+                                const now = Date.now();
+                                const last = Number(st.lastDrinkTime ?? w.lastDrinkTime ?? 0);
+                                const rate = Number(st.drinkRate ?? w.drinkRate ?? 1000);
+                                const pct = Math.min((now - last) / Math.max(rate, 1) * 100, 100);
+                                w.App?.state?.setState?.({ drinkProgress: pct });
+                                w.App?.ui?.updateDrinkProgress?.(pct, rate);
+                            } catch {}
+                        },
+                        processDrink: () => { try { w.App?.systems?.drink?.processDrink?.(); } catch {} },
+                        updateStats: () => {
+                            try {
+                                w.App?.ui?.updatePlayTime?.();
+                                w.App?.ui?.updateLastSaveTime?.();
+                                w.App?.ui?.updateAllStats?.();
+                                w.App?.ui?.checkUpgradeAffordability?.();
+                                if (typeof (w as any).FEATURE_UNLOCKS !== 'undefined') (w as any).FEATURE_UNLOCKS.checkAllUnlocks?.();
+                            } catch {}
+                        },
+                        updatePlayTime: () => { try { w.App?.ui?.updatePlayTime?.(); } catch {} },
+                        updateLastSaveTime: () => { try { w.App?.ui?.updateLastSaveTime?.(); } catch {} },
+                    });
+                };
+                restart();
+            } catch {}
         } else {
             console.error('Could not find splash or game elements');
         }

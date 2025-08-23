@@ -871,8 +871,7 @@ function initGame() {
         }
 
         
-        // Start the game loop
-        startGameLoop();
+        // Game loop is now started from game-init.ts via App.systems.loop.start
         
         // Setup mobile touch handling for reliable click feedback
         setupMobileTouchHandling();
@@ -907,94 +906,7 @@ function initGame() {
     }
 } // End of initGame function
 
-function startGameLoop() {
-    // MODULAR ARCHITECTURE: Use centralized loop system if available
-    if (window.App?.systems?.loop?.start) {
-        window.App.systems.loop.start({
-            // UI functions now called through App.ui namespace (was: updateDrinkProgress())
-            updateDrinkProgress: () => {
-                try {
-                    const st = window.App?.state?.getState?.() || {};
-                    const currentTime = Date.now();
-                    const last = Number(st.lastDrinkTime ?? window.lastDrinkTime ?? 0);
-                    const rate = Number(st.drinkRate ?? window.drinkRate ?? 1000);
-                    const timeSinceLastDrink = currentTime - last;
-                    const progressPercentage = Math.min((timeSinceLastDrink / Math.max(rate, 1)) * 100, 100);
-                    drinkProgress = progressPercentage;
-                    window.App?.state?.setState?.({ drinkProgress });
-                    window.App?.ui?.updateDrinkProgress?.(drinkProgress, rate);
-                } catch {}
-            },
-            // Use TS drink system when available; fallback to legacy if needed
-            processDrink: () => {
-                try { window.App?.systems?.drink?.processDrink?.(); }
-                catch (e) { try { processDrink(); } catch (err) { console.error('processDrink error', err); } }
-            },
-            // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
-            updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) FEATURE_UNLOCKS.checkAllUnlocks(); },
-            updatePlayTime: () => window.App?.ui?.updatePlayTime?.(),
-            updateLastSaveTime: () => window.App?.ui?.updateLastSaveTime?.(),
-            performBatchUIUpdate: window.App?.ui?.performBatchUIUpdate,
-        });
-        return;
-    }
-    // Defer legacy fallback until loop system becomes available to avoid undefined locals
-    if (!window.App?.systems?.loop?.start) {
-        setTimeout(startGameLoop, 100);
-        return;
-    }
-    let lastUpdate = 0;
-    let lastStatsUpdate = 0;
-    const targetFPS = LIMITS.TARGET_FPS;
-    const frameInterval = 1000 / targetFPS;
-    const statsInterval = LIMITS.STATS_UPDATE_INTERVAL;
-    function gameLoop(currentTime) {
-        if (currentTime - lastUpdate >= frameInterval) {
-            // Calculate current drink progress percentage
-            const timeSinceLastDrink = currentTime - lastDrinkTime;
-            const progressPercentage = Math.min((timeSinceLastDrink / drinkRate) * 100, 100);
-            drinkProgress = progressPercentage;
-
-            // Debug progress every 5 seconds to avoid spam
-            if (currentTime - (window.lastDebugTime || 0) > 5000) {
-                console.log('🔧 Drink progress:', Math.round(drinkProgress), '%');
-                window.lastDebugTime = currentTime;
-            }
-
-            // Sync drink progress with state bridge and state
-            try {
-                window.App?.stateBridge?.setDrinkProgress(drinkProgress);
-                window.App?.state?.setState?.({ drinkProgress });
-            } catch {}
-
-            // Update drink progress bar with current progress
-            try {
-                window.App?.ui?.updateDrinkProgress?.(drinkProgress, drinkRate);
-            } catch {}
-            
-            processDrink();
-            const affordabilityInterval = LIMITS.AFFORDABILITY_CHECK_INTERVAL;
-            if (currentTime - lastUpdate >= affordabilityInterval) {
-                window.App?.ui?.checkUpgradeAffordability?.();
-            }
-            lastUpdate = currentTime;
-        }
-        if (currentTime - lastStatsUpdate >= statsInterval) {
-            window.App?.ui?.updatePlayTime?.();
-            window.App?.ui?.updateLastSaveTime?.();
-            window.App?.ui?.updateAllStats?.();
-            window.App?.ui?.checkUpgradeAffordability?.();
-            if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) {
-                FEATURE_UNLOCKS.checkAllUnlocks();
-            }
-            lastStatsUpdate = currentTime;
-        }
-        requestAnimationFrame(gameLoop);
-    }
-    console.log('🎮 Starting game loop...');
-    console.log('🔧 Game loop function exists:', typeof gameLoop);
-    requestAnimationFrame(gameLoop);
-}
+// Legacy startGameLoop removed; loop is owned by App.systems.loop
 
 // Mobile touch event handling for reliable click feedback
 function setupMobileTouchHandling() {
