@@ -27,7 +27,8 @@ const mockWindow = {
                     playButtonClickSound: vi.fn(),
                     playButtonPurchaseSound: vi.fn()
                 }
-            }
+            },
+            purchases: { execute: { buyStraw: vi.fn() } }
         }
     },
     DOM_CACHE: {
@@ -164,8 +165,7 @@ describe('Button System', () => {
             expect(mockEvent.preventDefault).toHaveBeenCalled();
             expect(mockEvent.stopPropagation).toHaveBeenCalled();
             expect(mockButtonElement.classList.add).toHaveBeenCalledWith('button-clicked');
-            // The function is called without parameters, just the function reference
-            expect(mockWindow.buyStraw).toHaveBeenCalled();
+            expect(mockWindow.App.systems.purchases.execute.buyStraw).toHaveBeenCalled();
         });
 
             it('should play purchase sound for shop buttons', () => {

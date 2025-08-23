@@ -16,18 +16,18 @@ const BUTTON_CONFIG: { types: Record<string, ButtonTypeMeta>; actions: Record<st
         'splash-start-btn': { audio: 'click', feedback: 'info', className: 'splash-start-btn' },
     },
     actions: {
-        buyStraw: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyStraw ? (window as any).App.systems.purchases.execute.buyStraw() : (window as any).buyStraw?.()), type: 'shop-btn', label: 'Buy Straw' },
-        buyCup: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyCup ? (window as any).App.systems.purchases.execute.buyCup() : (window as any).buyCup?.()), type: 'shop-btn', label: 'Buy Cup' },
-        buyWiderStraws: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyWiderStraws ? (window as any).App.systems.purchases.execute.buyWiderStraws() : (window as any).buyWiderStraws?.()), type: 'shop-btn', label: 'Buy Wider Straws' },
-        buyBetterCups: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyBetterCups ? (window as any).App.systems.purchases.execute.buyBetterCups() : (window as any).buyBetterCups?.()), type: 'shop-btn', label: 'Buy Better Cups' },
-        buySuction: { func: () => ((window as any).App?.systems?.purchases?.execute?.buySuction ? (window as any).App.systems.purchases.execute.buySuction() : (window as any).buySuction?.()), type: 'clicking-upgrade-btn', label: 'Buy Suction' },
-        buyCriticalClick: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyCriticalClick ? (window as any).App.systems.purchases.execute.buyCriticalClick() : (window as any).buyCriticalClick?.()), type: 'clicking-upgrade-btn', label: 'Buy Critical Click' },
-        buyFasterDrinks: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyFasterDrinks ? (window as any).App.systems.purchases.execute.buyFasterDrinks() : (window as any).buyFasterDrinks?.()), type: 'drink-speed-upgrade-btn', label: 'Buy Faster Drinks' },
-        upgradeFasterDrinks: { func: () => ((window as any).App?.systems?.purchases?.execute?.upgradeFasterDrinks ? (window as any).App.systems.purchases.execute.upgradeFasterDrinks() : (window as any).upgradeFasterDrinks?.()), type: 'drink-speed-upgrade-btn', label: 'Upgrade Faster Drinks' },
-        levelUp: { func: () => ((window as any).App?.systems?.purchases?.execute?.levelUp ? (window as any).App.systems.purchases.execute.levelUp() : (window as any).levelUp?.()), type: 'level-up-btn', label: 'Level Up' },
+        buyStraw: { func: () => (window as any).App?.systems?.purchases?.execute?.buyStraw?.(), type: 'shop-btn', label: 'Buy Straw' },
+        buyCup: { func: () => (window as any).App?.systems?.purchases?.execute?.buyCup?.(), type: 'shop-btn', label: 'Buy Cup' },
+        buyWiderStraws: { func: () => (window as any).App?.systems?.purchases?.execute?.buyWiderStraws?.(), type: 'shop-btn', label: 'Buy Wider Straws' },
+        buyBetterCups: { func: () => (window as any).App?.systems?.purchases?.execute?.buyBetterCups?.(), type: 'shop-btn', label: 'Buy Better Cups' },
+        buySuction: { func: () => (window as any).App?.systems?.purchases?.execute?.buySuction?.(), type: 'clicking-upgrade-btn', label: 'Buy Suction' },
+        buyCriticalClick: { func: () => (window as any).App?.systems?.purchases?.execute?.buyCriticalClick?.(), type: 'clicking-upgrade-btn', label: 'Buy Critical Click' },
+        buyFasterDrinks: { func: () => (window as any).App?.systems?.purchases?.execute?.buyFasterDrinks?.(), type: 'drink-speed-upgrade-btn', label: 'Buy Faster Drinks' },
+        upgradeFasterDrinks: { func: () => (window as any).App?.systems?.purchases?.execute?.upgradeFasterDrinks?.(), type: 'drink-speed-upgrade-btn', label: 'Upgrade Faster Drinks' },
+        levelUp: { func: () => (window as any).App?.systems?.purchases?.execute?.levelUp?.(), type: 'level-up-btn', label: 'Level Up' },
         save: { func: () => { const sys = (window as any).App?.systems?.save; if (sys?.performSaveSnapshot) return sys.performSaveSnapshot(); }, type: 'save-btn', label: 'Save Game' },
         delete_save: { func: () => { const sys = (window as any).App?.systems?.save; if (sys?.deleteSave) return sys.deleteSave(); }, type: 'save-btn', label: 'Delete Save' },
-        toggleButtonSounds: { func: () => { const audio = (window as any).App?.systems?.audio?.button; if (audio?.toggleButtonSounds) { audio.toggleButtonSounds(); try { (window as any).App?.ui?.updateAutosaveStatus?.(); } catch {} return; } return (window as any).toggleButtonSounds?.(); }, type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
+        toggleButtonSounds: { func: () => { const audio = (window as any).App?.systems?.audio?.button; if (audio?.toggleButtonSounds) { audio.toggleButtonSounds(); try { (window as any).App?.ui?.updateAutosaveStatus?.(); } catch {} } }, type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
         sendMessage: { func: () => (window as any).sendMessage?.(), type: 'chat-send-btn', label: 'Send Message' },
         startGame: { func: () => (window as any).startGame?.(), type: 'splash-start-btn', label: 'Start Game' },
     }
@@ -105,7 +105,7 @@ function setupSpecialButtonHandlers(): void {
             const action = button.getAttribute('data-action');
             if (action && action.startsWith('switchTab:')) {
                 const tabName = action.split(':')[1];
-                try { (window as any).App?.ui?.switchTab?.(tabName, e); } catch { try { (window as any).switchTab?.(tabName, e); } catch {} }
+                try { (window as any).App?.ui?.switchTab?.(tabName, e); } catch {}
             }
         });
     });
@@ -117,14 +117,14 @@ function setupSpecialButtonHandlers(): void {
             const reset = () => { active = false; moved = false; };
             sodaButton.addEventListener('pointerdown', (e: any) => { if (!e || e.pointerType === 'mouse') return; active = true; moved = false; sx = e.clientX || 0; sy = e.clientY || 0; });
             sodaButton.addEventListener('pointermove', (e: any) => { if (!active || !e || e.pointerType === 'mouse') return; const dx = (e.clientX || 0) - sx; const dy = (e.clientY || 0) - sy; if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true; });
-            sodaButton.addEventListener('pointerup', (e: any) => { if (!active || !e || e.pointerType === 'mouse') { reset(); return; } if (!moved) { markPointerHandled(sodaButton); try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { if ((window as any).App?.systems?.clicks?.handleSodaClick) { (window as any).App.systems.clicks.handleSodaClick(1, e); } else { (window as any).sodaClick?.(1, e); } } catch {} } reset(); });
+            sodaButton.addEventListener('pointerup', (e: any) => { if (!active || !e || e.pointerType === 'mouse') { reset(); return; } if (!moved) { markPointerHandled(sodaButton); try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e); } catch {} } reset(); });
             sodaButton.addEventListener('pointercancel', reset);
         } else if ('ontouchstart' in window) {
             let active = false; let moved = false; let sx = 0; let sy = 0;
             const reset = () => { active = false; moved = false; };
             sodaButton.addEventListener('touchstart', (e: any) => { if (!e || !e.touches || !e.touches[0]) return; active = true; moved = false; sx = e.touches[0].clientX || 0; sy = e.touches[0].clientY || 0; }, { passive: true });
             sodaButton.addEventListener('touchmove', (e: any) => { if (!active || !e || !e.touches || !e.touches[0]) return; const dx = (e.touches[0].clientX || 0) - sx; const dy = (e.touches[0].clientY || 0) - sy; if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true; }, { passive: true });
-            sodaButton.addEventListener('touchend', (e: any) => { if (!active) { reset(); return; } if (!moved) { markPointerHandled(sodaButton); try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { if ((window as any).App?.systems?.clicks?.handleSodaClick) { (window as any).App.systems.clicks.handleSodaClick(1, e); } else { (window as any).sodaClick?.(1, e); } } catch {} } reset(); });
+            sodaButton.addEventListener('touchend', (e: any) => { if (!active) { reset(); return; } if (!moved) { markPointerHandled(sodaButton); try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e); } catch {} } reset(); });
             sodaButton.addEventListener('touchcancel', reset);
         }
         sodaButton.addEventListener('click', (e: any) => { if (shouldSuppressClick(sodaButton)) return; try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { if ((window as any).App?.systems?.clicks?.handleSodaClick) { (window as any).App.systems.clicks.handleSodaClick(1, e); } else { (window as any).sodaClick?.(1, e); } } catch {} });
@@ -165,20 +165,19 @@ function setupSpecialButtonHandlers(): void {
                 const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') as any : el as any;
                 if (buttonEl) markPointerHandled(buttonEl);
                 const meta = (BUTTON_CONFIG.actions as any)[fnName];
-                if (meta || typeof (window as any)[fnName] === 'function' || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
+                if (meta || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
                     e.preventDefault(); e.stopPropagation();
                     try {
                         let success = true;
                         if (fnName === 'switchTab') {
                             try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
-                            (window as any)[fnName](args[0], e);
+                            (window as any).App?.ui?.switchTab?.(args[0], e);
                         } else if (meta && typeof meta.func === 'function') {
                             const ret = meta.func();
                             success = (typeof ret === 'undefined') ? true : !!ret;
                             try { if (fnName === 'toggleButtonSounds') { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } } catch {}
                         } else {
                             if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) { success = !!(window as any).App.systems.purchases.execute[fnName](); }
-                            else { const ret = (window as any)[fnName](...args); success = (typeof ret === 'undefined') ? true : !!ret; }
                             try {
                                 const meta = BUTTON_CONFIG.actions[fnName];
                                 const btnType = meta && meta.type;
@@ -227,20 +226,19 @@ function setupSpecialButtonHandlers(): void {
                 if (disabled) return;
             }
             const meta = (BUTTON_CONFIG.actions as any)[fnName];
-            if (meta || typeof (window as any)[fnName] === 'function' || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
+            if (meta || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
                 e.preventDefault(); e.stopPropagation();
                 try {
                     let success = true;
                     if (fnName === 'switchTab') {
                         try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
-                        (window as any)[fnName](args[0], e);
+                        (window as any).App?.ui?.switchTab?.(args[0], e);
                     } else if (meta && typeof meta.func === 'function') {
                         const ret = meta.func();
                         success = (typeof ret === 'undefined') ? true : !!ret;
                         try { if (fnName === 'toggleButtonSounds') { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } } catch {}
                     } else {
                         if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) { success = !!(window as any).App.systems.purchases.execute[fnName](); }
-                        else { const ret = (window as any)[fnName](...args); success = (typeof ret === 'undefined') ? true : !!ret; }
                         try {
                             const meta = BUTTON_CONFIG.actions[fnName];
                             const btnType = meta && meta.type;
