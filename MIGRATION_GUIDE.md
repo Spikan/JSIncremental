@@ -23,7 +23,7 @@ This guide covers two migrations:
 
 ### Priorities
 1. Pure rules in `js/core/rules/*.js` → converted to `.ts` (clicks, economy, purchases)
-2. Core systems in `js/core/systems/*.js` → converted to `.ts` (resources, purchases-system, save-system, loop-system)
+2. Core systems in `js/core/systems/*.js` → converted to `.ts` (resources, purchases-system, save-system, loop-system, drink-system, clicks-system)
 3. UI modules in `js/ui/*.js` (remain JS with JSDoc for now)
 4. Remaining legacy modules (`main.js`, `game-init.js`) use `// @ts-nocheck`
 
@@ -46,7 +46,7 @@ This guide covers two migrations:
 
 ## Config Access
 
-- Use `js/core/systems/config-accessor.js` to read upgrade/config data
+- Use `js/core/systems/config-accessor.ts` to read upgrade/config data
 - It prefers `App.data.upgrades` and falls back to `GAME_CONFIG.BALANCE`
 
 ---

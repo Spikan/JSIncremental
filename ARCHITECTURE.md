@@ -36,7 +36,7 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 
 - **Single source of truth**: All UI modules read from `App.state` only. Legacy `window.*` UI reads have been eliminated.
 - **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `js/ui/buttons.js`.
-- **Configuration access**: Added `js/core/systems/config-accessor.js` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
+- **Configuration access**: Added `js/core/systems/config-accessor.ts` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
 - **Event names**: `EVENT_NAMES` exported from `js/core/constants.js` and attached in `js/index.js` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
 - **Storage**: Validation functions are imported directly from `js/core/validation/schemas.js`. The storage facade is exposed as `AppStorage` and attached to `window.storage` by `js/services/storage.js`.
 - **State bridge**: `js/core/state/bridge.js` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
@@ -49,7 +49,7 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 - `tsconfig.json` — JS-with-types configuration
 - TypeScript conversions with extensionless imports:
   - `js/core/rules/*.ts` (`clicks`, `economy`, `purchases`)
-  - `js/core/systems/resources.ts`, `purchases-system.ts`, `save-system.ts`, `loop-system.ts`
+  - `js/core/systems/resources.ts`, `purchases-system.ts`, `save-system.ts`, `loop-system.ts`, `drink-system.ts`, `clicks-system.ts`
   - `js/core/validation/schemas.ts`
 
 ## 📁 Complete File Structure
@@ -91,7 +91,8 @@ soda-clicker-pro/
 │   │   ├── 📁 systems/           # Game systems
 │   │   │   ├── 📄 resources.ts   # Resource production calculations
 │   │   │   ├── 📄 purchases-system.ts # Purchase logic for all upgrades
-│   │   │   ├── 📄 clicks-system.js # Click handling and feedback
+│   │   │   ├── 📄 clicks-system.ts # Click handling and feedback
+│   │   │   ├── 📄 drink-system.ts # Drink processing and timing
 │   │   │   ├── 📄 autosave.js    # Autosave counter and timing logic
 │   │   │   ├── 📄 save-system.ts # Save/load operations with validation
 │   │   │   ├── 📄 options-system.js # Game options and preferences
@@ -288,10 +289,15 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 - Cost calculations
 - Purchase validation
 
-**Clicks System** (`clicks-system.js`):
+**Clicks System** (`clicks-system.ts`):
 - Click handling and feedback
 - Critical hit system
 - Click statistics
+
+**Drink System** (`drink-system.ts`):
+- Centralized drink processing
+- Syncs `lastDrinkTime`, `drinkProgress`, and `sips`
+- Integrated with loop system when available
 
 **Save System** (`save-system.ts`):
 - Game state persistence

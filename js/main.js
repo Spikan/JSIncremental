@@ -216,7 +216,7 @@ window.switchTab = switchTab;
 function initGame() {
     try {
         console.log('🚀 initGame called - starting game initialization...');
-        console.log('🔧 GAME_CONFIG available:', !!window.GAME_CONFIG);
+        console.log('🔧 GAME_CONFIG available:', !!GC);
         console.log('🔧 DOM_CACHE available:', !!window.DOM_CACHE);
         console.log('🔧 FEATURE_UNLOCKS available:', !!window.FEATURE_UNLOCKS);
         // ============================================================================
@@ -252,7 +252,7 @@ function initGame() {
         
         console.log('✅ All dependencies validated, proceeding with game initialization...');
         // Cache config groups locally to avoid repeated global reads
-        const CONF = window.GAME_CONFIG || {};
+        const CONF = GC || {};
         const BAL = CONF.BALANCE || {};
         const TIMING = CONF.TIMING || {};
         const LIMITS = CONF.LIMITS || {};

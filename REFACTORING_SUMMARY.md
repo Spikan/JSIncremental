@@ -142,7 +142,7 @@ window.App?.ui?.updateAllStats?.();
 - `ARCHITECTURE.md` - Updated with refactoring details
 - `MIGRATION_GUIDE.md` - **NEW** - Developer migration guide
 - `REFACTORING_SUMMARY.md` - **NEW** - This summary document
- - 2025 updates: TypeScript modules (`rules`, `resources`, `purchases-system`, `save-system`, `loop-system`, `validation/schemas`) and extensionless imports
+ - 2025 updates: TypeScript modules (`rules`, `resources`, `purchases-system`, `save-system`, `loop-system`, `drink-system`, `clicks-system`, `validation/schemas`) and extensionless imports
 
 ### **No Breaking Changes:**
 - All existing functionality preserved
@@ -228,7 +228,7 @@ The project is ready for continued development with a solid, maintainable founda
 ### Summary
 - UI now reads exclusively from `App.state`; remaining `window.*` UI reads removed
 - Centralized UI event handling via `data-action` in `js/ui/buttons.js`
-- Introduced `js/core/systems/config-accessor.js` for consistent config access
+- Introduced `js/core/systems/config-accessor.ts` for consistent config access
 - `EVENT_NAMES` exported from `js/core/constants.js` and attached in `js/index.js`
 - Storage validators imported directly; storage exposed as `AppStorage`
 - TypeScript infra added: `tsconfig.json`, `types/global.d.ts`, `@ts-check` and JSDoc across core; selected modules migrated to `.ts` with extensionless imports
