@@ -855,7 +855,7 @@ function processDrink() {
             const prevHigh = Number(window.App?.state?.getState?.()?.highestSipsPerSecond || 0);
             const highest = Math.max(prevHigh, currentSipsPerSecond);
             const prevTotal = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
-            window.App?.state?.setState?.({ sips: sipsNum, highestSipsPerSecond: highest, totalSipsEarned: prevTotal + toNum(baseSipsPerDrink) });
+            window.App?.state?.setState?.({ sips: sipsNum, highestSipsPerSecond: highest, totalSipsEarned: prevTotal + toNum(baseSipsPerDrink), lastDrinkTime, drinkProgress });
         } catch {}
         
         // Check for feature unlocks after processing a drink
@@ -1538,6 +1538,10 @@ function sodaClick(multiplier = 1) {
             const criticalMultiplier = window.criticalClickMultiplier || 5;
             const criticalBonus = totalClickValue.times(criticalMultiplier - 1);
             window.sips = window.sips.plus(criticalBonus);
+            try {
+                const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
+                window.App?.state?.setState?.({ sips: toNum(window.sips) });
+            } catch {}
             
             // Emit critical click event
             try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.CLICK?.CRITICAL, { bonus: criticalBonus }); } catch {}
@@ -1550,8 +1554,8 @@ function sodaClick(multiplier = 1) {
         try {
             window.App?.stateBridge?.autoSync?.();
             const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
-            const prevTotal = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
-            window.App?.state?.setState?.({ sips: toNum(window.sips), totalSipsEarned: prevTotal });
+            const st = window.App?.state?.getState?.() || {};
+            window.App?.state?.setState?.({ sips: toNum(window.sips), totalSipsEarned: Number(st.totalSipsEarned || 0) });
         } catch {}
 
         // Update UI
