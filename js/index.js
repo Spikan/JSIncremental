@@ -109,6 +109,13 @@ try {
     Object.assign(window.App.systems.clicks, clicks);
 } catch (e) { console.warn('⚠️ clicks system load failed:', e); }
 
+try {
+    const gameInit = await import('./core/systems/game-init.ts');
+    Object.assign(window.App.systems.gameInit, gameInit);
+    // Expose DOM-ready initializer for index bootstrap
+    window.initOnDomReady = gameInit.initOnDomReady;
+} catch (e) { console.warn('⚠️ game-init system load failed:', e); }
+
 // Signal that App is ready
 console.log('✅ App object created and ready');
 
