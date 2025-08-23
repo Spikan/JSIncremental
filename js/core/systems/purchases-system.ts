@@ -267,7 +267,17 @@ export const execute = {
     if (!result) return false;
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
-    setAppState({ sips: toNum(w.sips), fasterDrinksUpCounter: result.fasterDrinksUpCounter });
+    // Recalculate drinkRate factoring in upgrades (if any modifiers apply, integrate here)
+    const { config } = getTypedConfig();
+    const baseMs = Number((w.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE) ?? 5000);
+    const perLevelReduction = Number(config.FASTER_DRINKS_REDUCTION_PER_LEVEL ?? 0);
+    const minMs = Number(config.MIN_DRINK_RATE ?? 500);
+    const totalLevels = Number(st.fasterDrinks || 0); // upgrades may not change levels directly
+    const factor = Math.pow(1 - perLevelReduction, totalLevels);
+    const nextRate = Math.max(minMs, Math.round(baseMs * factor));
+    setAppState({ sips: toNum(w.sips), fasterDrinksUpCounter: result.fasterDrinksUpCounter, drinkRate: nextRate });
+    try { w.App?.stateBridge?.setDrinkRate?.(nextRate); } catch {}
+    try { w.App?.ui?.updateCompactDrinkSpeedDisplays?.(); } catch {}
     try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
     try { w.App?.ui?.updateAllStats?.(); } catch {}
     try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.UPGRADE_PURCHASED, { item: 'fasterDrinksUp', cost: result.spent }); } catch {}

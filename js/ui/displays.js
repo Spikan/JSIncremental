@@ -51,11 +51,18 @@ export function updateCriticalClickDisplay() {
 export function updateDrinkSpeedDisplay() {
 	if (typeof window === 'undefined') return;
 	const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
+	const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
 	try {
 		const state = window.App?.state?.getState?.();
 		if (currentDrinkSpeedCompact && state) {
 			const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
 			currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
+		}
+		if (drinkSpeedBonusCompact && state) {
+			const baseMs = Number(window.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
+			const currMs = Number(state.drinkRate || baseMs) || baseMs;
+			const bonusPct = Math.max(0, (1 - (currMs / baseMs)) * 100);
+			drinkSpeedBonusCompact.textContent = Math.round(bonusPct) + '%';
 		}
 	} catch {}
 }
@@ -188,11 +195,18 @@ export function updateCompactDrinkSpeedDisplays() {
 	
 	// Update compact drink speed display elements
 	const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
+	const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
 	try {
 		const state = window.App?.state?.getState?.();
 		if (currentDrinkSpeedCompact && state) {
 			const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
 			currentDrinkSpeedCompact.textContent = drinkRateSeconds.toFixed(2) + 's';
+		}
+		if (drinkSpeedBonusCompact && state) {
+			const baseMs = Number(window.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
+			const currMs = Number(state.drinkRate || baseMs) || baseMs;
+			const bonusPct = Math.max(0, (1 - (currMs / baseMs)) * 100);
+			drinkSpeedBonusCompact.textContent = Math.round(bonusPct) + '%';
 		}
 	} catch {}
 	
