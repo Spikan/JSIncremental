@@ -895,6 +895,8 @@ function setDrinkRate(newDrinkRate) {
         window.App?.stateBridge?.setDrinkRate(drinkRate);
         window.App?.stateBridge?.setDrinkProgress(drinkProgress);
         window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
+        // Mirror into App.state for UI-only reads
+        window.App?.state?.setState?.({ drinkRate, drinkProgress, lastDrinkTime });
     } catch {}
 }
 
