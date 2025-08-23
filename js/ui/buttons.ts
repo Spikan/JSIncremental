@@ -286,10 +286,14 @@ function setupSpecialButtonHandlers(): void {
 
 function initButtonSystem(): void {
     function tryInitialize() {
-        const essentialFunctions = ['buyStraw','buyCup','buySuction','buyCriticalClick','buyFasterDrinks','buyWiderStraws','buyBetterCups','levelUp','save','delete_save','toggleButtonSounds','sendMessage','startGame'];
-        const functionsAvailable = (typeof window !== 'undefined') && essentialFunctions.every((func) => typeof (window as any)[func] === 'function');
-        if (functionsAvailable) { console.log('🔧 All global functions available, setting up modern button system'); setupUnifiedButtonSystem(); }
-        else { const missingFunctions = essentialFunctions.filter((func) => typeof (window as any)[func] !== 'function'); console.log('🔧 Waiting for global functions:', missingFunctions.join(', ')); setTimeout(tryInitialize, 200); }
+        const appReady = (typeof window !== 'undefined') && !!(window as any).App;
+        if (appReady) {
+            console.log('🔧 App ready, setting up modern button system');
+            setupUnifiedButtonSystem();
+        } else {
+            console.log('🔧 Waiting for App bootstrap...');
+            setTimeout(tryInitialize, 200);
+        }
     }
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => { setTimeout(tryInitialize, 100); }); }
     else { setTimeout(tryInitialize, 100); }

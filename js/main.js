@@ -1176,95 +1176,7 @@ function quickUnlock() {
 // These functions bridge the HTML onclick handlers with the modular architecture
 // ============================================================================
 
-// Purchase wrapper functions
-function buyStraw() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.buyStraw) {
-            return !!window.App.systems.purchases.execute.buyStraw();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in buyStraw:', error);
-    }
-}
-
-function buyCup() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.buyCup) {
-            return !!window.App.systems.purchases.execute.buyCup();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in buyCup:', error);
-    }
-}
-
-function buySuction() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.buySuction) {
-            return !!window.App.systems.purchases.execute.buySuction();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in buySuction:', error);
-    }
-}
-
-function buyCriticalClick() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.buyCriticalClick) {
-            return !!window.App.systems.purchases.execute.buyCriticalClick();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in buyCriticalClick:', error);
-    }
-}
-
-function buyFasterDrinks() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.buyFasterDrinks) {
-            return !!window.App.systems.purchases.execute.buyFasterDrinks();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in buyFasterDrinks:', error);
-    }
-}
-
-function buyWiderStraws() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.buyWiderStraws) {
-            return !!window.App.systems.purchases.execute.buyWiderStraws();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in buyWiderStraws:', error);
-    }
-}
-
-function buyBetterCups() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.buyBetterCups) {
-            return !!window.App.systems.purchases.execute.buyBetterCups();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in buyBetterCups:', error);
-    }
-}
-
-// Upgrade wrapper functions
-function upgradeFasterDrinks() {
-    try {
-        if (window.App?.systems?.purchases?.execute?.upgradeFasterDrinks) {
-            return !!window.App.systems.purchases.execute.upgradeFasterDrinks();
-        }
-        console.warn('Purchase system not available');
-    } catch (error) {
-        console.error('Error in upgradeFasterDrinks:', error);
-    }
-}
+// Purchase wrapper functions removed; UI dispatches directly via data-action
 
 // Other game functions
 function sodaClick(multiplier = 1) {
@@ -1447,17 +1359,7 @@ function changeAutosaveInterval() {
 // These assignments make the wrapper functions available to HTML onclick handlers
 // ============================================================================
 
-// Purchase functions
-window.buyStraw = buyStraw;
-window.buyCup = buyCup;
-window.buySuction = buySuction;
-window.buyCriticalClick = buyCriticalClick;
-window.buyFasterDrinks = buyFasterDrinks;
-window.buyWiderStraws = buyWiderStraws;
-window.buyBetterCups = buyBetterCups;
-
-// Upgrade functions
-window.upgradeFasterDrinks = upgradeFasterDrinks;
+// Purchase/upgrade globals no longer exposed; handled by UI dispatcher
 
 // Game functions
 window.sodaClick = sodaClick;
