@@ -1409,49 +1409,10 @@ function quickUnlock() {
 // Purchase wrapper functions
 function buyStraw() {
     try {
-        if (!window.App?.systems?.purchases?.purchaseStraw) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.buyStraw) {
+            return !!window.App.systems.purchases.execute.buyStraw();
         }
-        
-        const st = window.App?.state?.getState?.() || {};
-        const result = window.App.systems.purchases.purchaseStraw({
-            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
-            straws: Number((typeof st.straws !== 'undefined' ? st.straws : (window.straws?.toNumber?.() ?? Number(window.straws))) || 0),
-            cups: Number((typeof st.cups !== 'undefined' ? st.cups : (window.cups?.toNumber?.() ?? Number(window.cups))) || 0),
-            widerStraws: Number((typeof st.widerStraws !== 'undefined' ? st.widerStraws : (window.widerStraws?.toNumber?.() ?? Number(window.widerStraws))) || 0),
-            betterCups: Number((typeof st.betterCups !== 'undefined' ? st.betterCups : (window.betterCups?.toNumber?.() ?? Number(window.betterCups))) || 0)
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent);
-            window.straws = new Decimal(result.straws);
-            // Keep local production stats in sync for loop calculations
-            try {
-                strawSPD = new Decimal(result.strawSPD ?? 0);
-                cupSPD = new Decimal(result.cupSPD ?? 0);
-                sps = new Decimal(result.sipsPerDrink ?? 0);
-                
-            } catch {}
-            // Update App.state snapshot
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    straws: Number(result.straws),
-                    strawSPD: Number(result.strawSPD ?? 0),
-                    cupSPD: Number(result.cupSPD ?? 0),
-                    sps: Number(result.sipsPerDrink ?? 0)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'straw', cost: result.spent }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in buyStraw:', error);
     }
@@ -1459,48 +1420,10 @@ function buyStraw() {
 
 function buyCup() {
     try {
-        if (!window.App?.systems?.purchases?.purchaseCup) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.buyCup) {
+            return !!window.App.systems.purchases.execute.buyCup();
         }
-        
-        const st = window.App?.state?.getState?.() || {};
-        const result = window.App.systems.purchases.purchaseCup({
-            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
-            straws: Number((typeof st.straws !== 'undefined' ? st.straws : (window.straws?.toNumber?.() ?? Number(window.straws))) || 0),
-            cups: Number((typeof st.cups !== 'undefined' ? st.cups : (window.cups?.toNumber?.() ?? Number(window.cups))) || 0),
-            widerStraws: Number((typeof st.widerStraws !== 'undefined' ? st.widerStraws : (window.widerStraws?.toNumber?.() ?? Number(window.widerStraws))) || 0),
-            betterCups: Number((typeof st.betterCups !== 'undefined' ? st.betterCups : (window.betterCups?.toNumber?.() ?? Number(window.betterCups))) || 0)
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent);
-            window.cups = new Decimal(result.cups);
-            // Keep local production stats in sync for loop calculations
-            try {
-                strawSPD = new Decimal(result.strawSPD ?? 0);
-                cupSPD = new Decimal(result.cupSPD ?? 0);
-                sps = new Decimal(result.sipsPerDrink ?? 0);
-                
-            } catch {}
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    cups: Number(result.cups),
-                    strawSPD: Number(result.strawSPD ?? 0),
-                    cupSPD: Number(result.cupSPD ?? 0),
-                    sps: Number(result.sipsPerDrink ?? 0)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'cup', cost: result.spent }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in buyCup:', error);
     }
@@ -1508,37 +1431,10 @@ function buyCup() {
 
 function buySuction() {
     try {
-        if (!window.App?.systems?.purchases?.purchaseSuction) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.buySuction) {
+            return !!window.App.systems.purchases.execute.buySuction();
         }
-        
-        const st = window.App?.state?.getState?.() || {};
-        const result = window.App.systems.purchases.purchaseSuction({
-            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
-            suctions: Number((typeof st.suctions !== 'undefined' ? st.suctions : (window.suctions?.toNumber?.() ?? Number(window.suctions))) || 0)
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent);
-            // Ensure suctions is a Decimal object
-            window.suctions = new Decimal(result.suctions);
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    suctions: Number(result.suctions),
-                    suctionClickBonus: Number(result.suctionClickBonus ?? 0)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'suction', cost: result.spent }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in buySuction:', error);
     }
@@ -1546,38 +1442,10 @@ function buySuction() {
 
 function buyCriticalClick() {
     try {
-        if (!window.App?.systems?.purchases?.purchaseCriticalClick) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.buyCriticalClick) {
+            return !!window.App.systems.purchases.execute.buyCriticalClick();
         }
-        
-        const st = window.App?.state?.getState?.() || {};
-        const result = window.App.systems.purchases.purchaseCriticalClick({
-            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
-            criticalClicks: Number((typeof st.criticalClicks !== 'undefined' ? st.criticalClicks : (window.criticalClicks?.toNumber?.() ?? Number(window.criticalClicks))) || 0),
-            criticalClickChance: Number((typeof st.criticalClickChance !== 'undefined' ? st.criticalClickChance : (window.criticalClickChance?.toNumber?.() ?? Number(window.criticalClickChance))) || 0)
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent);
-            window.criticalClicks = new Decimal(result.criticalClicks);
-            window.criticalClickChance = new Decimal(result.criticalClickChance);
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    criticalClicks: Number(result.criticalClicks),
-                    criticalClickChance: Number(result.criticalClickChance)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'criticalClick', cost: result.spent }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in buyCriticalClick:', error);
     }
@@ -1585,35 +1453,10 @@ function buyCriticalClick() {
 
 function buyFasterDrinks() {
     try {
-        if (!window.App?.systems?.purchases?.purchaseFasterDrinks) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.buyFasterDrinks) {
+            return !!window.App.systems.purchases.execute.buyFasterDrinks();
         }
-        
-        const st = window.App?.state?.getState?.() || {};
-        const result = window.App.systems.purchases.purchaseFasterDrinks({
-            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
-            fasterDrinks: Number((typeof st.fasterDrinks !== 'undefined' ? st.fasterDrinks : (window.fasterDrinks?.toNumber?.() ?? Number(window.fasterDrinks))) || 0)
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent);
-            window.fasterDrinks = new Decimal(result.fasterDrinks);
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    fasterDrinks: Number(result.fasterDrinks)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'fasterDrinks', cost: result.spent }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in buyFasterDrinks:', error);
     }
@@ -1621,48 +1464,10 @@ function buyFasterDrinks() {
 
 function buyWiderStraws() {
     try {
-        if (!window.App?.systems?.purchases?.purchaseWiderStraws) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.buyWiderStraws) {
+            return !!window.App.systems.purchases.execute.buyWiderStraws();
         }
-        
-        const st = window.App?.state?.getState?.() || {};
-        const result = window.App.systems.purchases.purchaseWiderStraws({
-            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
-            straws: Number((typeof st.straws !== 'undefined' ? st.straws : (window.straws?.toNumber?.() ?? Number(window.straws))) || 0),
-            cups: Number((typeof st.cups !== 'undefined' ? st.cups : (window.cups?.toNumber?.() ?? Number(window.cups))) || 0),
-            widerStraws: Number((typeof st.widerStraws !== 'undefined' ? st.widerStraws : (window.widerStraws?.toNumber?.() ?? Number(window.widerStraws))) || 0),
-            betterCups: Number((typeof st.betterCups !== 'undefined' ? st.betterCups : (window.betterCups?.toNumber?.() ?? Number(window.betterCups))) || 0)
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent);
-            window.widerStraws = new Decimal(result.widerStraws);
-            // Keep local production stats in sync for loop calculations
-            try {
-                strawSPD = new Decimal(result.strawSPD ?? 0);
-                cupSPD = new Decimal(result.cupSPD ?? 0);
-                sps = new Decimal(result.sipsPerDrink ?? 0);
-                
-            } catch {}
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    widerStraws: Number(result.widerStraws),
-                    strawSPD: Number(result.strawSPD ?? 0),
-                    cupSPD: Number(result.cupSPD ?? 0),
-                    sps: Number(result.sipsPerDrink ?? 0)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'widerStraws', cost: result.spent }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in buyWiderStraws:', error);
     }
@@ -1670,48 +1475,10 @@ function buyWiderStraws() {
 
 function buyBetterCups() {
     try {
-        if (!window.App?.systems?.purchases?.purchaseBetterCups) {
-            console.warn('Purchase system not available');
-            return;
+        if (window.App?.systems?.purchases?.execute?.buyBetterCups) {
+            return !!window.App.systems.purchases.execute.buyBetterCups();
         }
-        
-        const st = window.App?.state?.getState?.() || {};
-        const result = window.App.systems.purchases.purchaseBetterCups({
-            sips: Number((typeof st.sips !== 'undefined' ? st.sips : (window.sips?.toNumber?.() ?? Number(window.sips))) || 0),
-            straws: Number((typeof st.straws !== 'undefined' ? st.straws : (window.straws?.toNumber?.() ?? Number(window.straws))) || 0),
-            cups: Number((typeof st.cups !== 'undefined' ? st.cups : (window.cups?.toNumber?.() ?? Number(window.cups))) || 0),
-            widerStraws: Number((typeof st.widerStraws !== 'undefined' ? st.widerStraws : (window.widerStraws?.toNumber?.() ?? Number(window.widerStraws))) || 0),
-            betterCups: Number((typeof st.betterCups !== 'undefined' ? st.betterCups : (window.betterCups?.toNumber?.() ?? Number(window.betterCups))) || 0)
-        });
-        
-        if (result) {
-            // Update global state
-            window.sips = window.sips.minus(result.spent);
-            window.betterCups = new Decimal(result.betterCups);
-            // Keep local production stats in sync for loop calculations
-            try {
-                strawSPD = new Decimal(result.strawSPD ?? 0);
-                cupSPD = new Decimal(result.cupSPD ?? 0);
-                sps = new Decimal(result.sipsPerDrink ?? 0);
-                
-            } catch {}
-            try {
-                window.App?.state?.setState?.({
-                    sips: Number(window.sips?.toNumber?.() ?? Number(window.sips)),
-                    betterCups: Number(result.betterCups),
-                    strawSPD: Number(result.strawSPD ?? 0),
-                    cupSPD: Number(result.cupSPD ?? 0),
-                    sps: Number(result.sipsPerDrink ?? 0)
-                });
-            } catch {}
-            
-            // Trigger UI updates
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-            try { window.App?.ui?.updateAllStats?.(); } catch {}
-            
-            // Emit events
-            try { window.App?.events?.emit?.(window.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'betterCups', cost: result.spent }); } catch {}
-        }
+        console.warn('Purchase system not available');
     } catch (error) {
         console.error('Error in buyBetterCups:', error);
     }
