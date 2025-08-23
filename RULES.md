@@ -118,8 +118,11 @@ Avoid duplicating logic or reading config directly in multiple places.
 
 ---
 
-## Rule: Extensionless Imports for TS/JS Interop
+## Rule: Imports and Extensions
 
 **What this means:**
-- Import internal modules without the `.js`/`.ts` extension: `import { x } from '../core/rules/economy'`
-- This keeps imports stable across JS→TS migrations and Vite resolves them correctly.
+- Prefer extensionless imports during authoring to keep paths stable across JS→TS.
+- When importing `.ts` files directly in the browser (dynamic imports from JS), we allow `.ts` extensions via tsconfig. Keep consistency within the repo:
+  - TS→TS: extensionless is preferred.
+  - JS→TS dynamic imports: explicit `.ts` is acceptable (enabled by `allowImportingTsExtensions`).
+  - Do not import `.js` files for modules that now exist as `.ts`.

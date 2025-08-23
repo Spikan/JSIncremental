@@ -38,10 +38,10 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 
 ### File Structure (high level)
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
-- `js/index.js` — Bootstraps `App`, attaches `EVENT_NAMES`, loads UI
-- `js/core/state/` — Central `App.state` store and legacy bridge
+- `js/index.js` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
+- `js/core/state/` — Central `App.state` store (`index.ts`, `shape.ts`) and bridge
 - `js/ui/` — Displays, stats, buttons (event delegation), utils
-- `js/core/systems/` — Save, loop, options, purchases, resources (TypeScript where noted)
+- `js/core/systems/` — Save, loop, options, purchases, resources, audio, game-init (TypeScript)
 - `js/core/rules/` — Pure business logic (clicks, purchases, economy) in `.ts`
 - `js/core/validation/` — Zod schemas and validators (`schemas.ts`)
 - `types/global.d.ts` — Ambient types for globals
@@ -59,6 +59,7 @@ The game is fully responsive and works great on:
 You can customize various aspects of the game:
 - Colors and themes in `css/style.css`
 - Game mechanics in `js/core/rules/*` and systems in `js/core/systems/*`
+- State boot is ESM: no `window.defaultState`; see `js/core/state/shape.ts`
 - Configuration options via `data/upgrades.json` and `js/config.js` (access with `config-accessor.ts`)
 
 ## 🤝 Contributing
