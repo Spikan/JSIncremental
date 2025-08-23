@@ -66,7 +66,7 @@ export function initializeUI() {
             updateTopSipsPerSecond();
             updateTopSipCounter();
             checkUpgradeAffordability();
-            if (data && data.gained) {
+            if (data && typeof data.gained === 'number') {
                 showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
             }
         });

@@ -412,6 +412,16 @@ function initGame() {
             });
         }
         let lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE; // Start with progress at 0
+        try { window.App?.state?.setState?.({ lastDrinkTime, drinkRate }); } catch {}
+        if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
+            Object.defineProperty(window, 'lastDrinkTime', {
+                get: function() { return lastDrinkTime; },
+                set: function(v) {
+                    lastDrinkTime = Number(v) || 0;
+                    try { window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime); } catch {}
+                }
+            });
+        }
 
         // Faster Drinks upgrade variables
         let fasterDrinks = new Decimal(0);
@@ -917,7 +927,7 @@ function startGameLoop() {
                 } catch {}
             },
             // Prefer local legacy processDrink (working) until TS drink-system is fully wired
-            processDrink: processDrink,
+            processDrink: () => { try { processDrink(); } catch (e) { console.error('processDrink error', e); } },
             // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
             updateStats: () => { window.App?.ui?.updatePlayTime?.(); window.App?.ui?.updateLastSaveTime?.(); window.App?.ui?.updateAllStats?.(); window.App?.ui?.checkUpgradeAffordability?.(); if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) FEATURE_UNLOCKS.checkAllUnlocks(); },
             updatePlayTime: () => window.App?.ui?.updatePlayTime?.(),
@@ -1058,7 +1068,11 @@ function setupMobileTouchHandling() {
 
 function processDrink() {
     const currentTime = Date.now();
-    if (currentTime - lastDrinkTime >= drinkRate) {
+    // Read from App.state with safe fallbacks
+    const st = (typeof window !== 'undefined' && window.App?.state?.getState?.()) || {};
+    const last = Number(st.lastDrinkTime ?? (typeof lastDrinkTime !== 'undefined' ? lastDrinkTime : 0));
+    const rate = Number(st.drinkRate ?? (typeof drinkRate !== 'undefined' ? drinkRate : 1000));
+    if (currentTime - last >= rate) {
         // Add base sips per drink (configured value, regardless of straws/cups)
         const config = BAL || {};
         const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
@@ -1067,21 +1081,22 @@ function processDrink() {
 
         console.log('🥤 Drink processed! Added', baseSipsPerDrink.toNumber(), 'sips');
         
-        lastDrinkTime = currentTime;
+        const nextLast = currentTime;
+        lastDrinkTime = nextLast;
         drinkProgress = 0;
         try {
-            window.App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
+            window.App?.stateBridge?.setLastDrinkTime(nextLast);
             window.App?.stateBridge?.setDrinkProgress(drinkProgress);
             // Also write sips to state directly
             const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
             const sipsNum = toNum(window.sips);
-            const drinkRateSec = drinkRate ? (1000 / drinkRate) : 0;
+            const drinkRateSec = rate ? (1000 / rate) : 0;
             const spsNum = toNum(sps);
             const currentSipsPerSecond = spsNum * drinkRateSec;
             const prevHigh = Number(window.App?.state?.getState?.()?.highestSipsPerSecond || 0);
             const highest = Math.max(prevHigh, currentSipsPerSecond);
             const prevTotal = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
-            window.App?.state?.setState?.({ sips: sipsNum, highestSipsPerSecond: highest, totalSipsEarned: prevTotal + toNum(baseSipsPerDrink), lastDrinkTime, drinkProgress });
+            window.App?.state?.setState?.({ sips: sipsNum, highestSipsPerSecond: highest, totalSipsEarned: prevTotal + toNum(baseSipsPerDrink), lastDrinkTime: nextLast, drinkProgress });
         } catch {}
         
         // Check for feature unlocks after processing a drink

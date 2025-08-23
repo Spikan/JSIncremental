@@ -118,7 +118,8 @@ export function updateDrinkProgress(progress, drinkRate) {
 
 	// Update countdown timer
 	if (countdown && currentDrinkRate && typeof currentProgress === 'number') {
-		const remainingTime = Math.max(0, currentDrinkRate - (currentProgress / 100 * currentDrinkRate));
+		const clampedProgress = Math.min(Math.max(currentProgress, 0), 100);
+		const remainingTime = Math.max(0, currentDrinkRate - (clampedProgress / 100 * currentDrinkRate));
 		const remainingSeconds = (remainingTime / 1000).toFixed(1);
 		countdown.textContent = `${remainingSeconds}s`;
 

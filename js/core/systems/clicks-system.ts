@@ -86,7 +86,7 @@ export function handleSodaClick(multiplier: number = 1) {
     }
 
     // Emit soda click and sync totals
-    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, { value: totalClickValueNum }); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, { value: totalClickValueNum, gained: totalClickValueNum }); } catch {}
     try {
       w.App?.stateBridge?.autoSync?.();
       const st = w.App?.state?.getState?.() || {};
