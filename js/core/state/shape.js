@@ -29,6 +29,8 @@ const defaultState = {
 	totalSipsEarned: 0,
 	totalClicks: 0,
 	highestSipsPerSecond: 0,
+	currentClickStreak: 0,
+	bestClickStreak: 0,
 
 	// Click/crit systems (migrate from globals)
 	criticalClickChance: 0,

@@ -2,7 +2,56 @@
 
 ## 🎯 Overview
 
-This guide helps developers understand the changes made during the duplicate function elimination refactoring. All duplicate functions have been removed from `main.js` and consolidated into modular systems.
+This guide covers two migrations:
+1) Duplicate function elimination to modular systems (complete)
+2) TypeScript-ready JSDoc typing and UI decoupling (in progress, infra complete)
+
+---
+
+## TypeScript Migration (Incremental, JS-first)
+
+### Setup (Completed)
+- `tsconfig.json` with `allowJs: true`, `checkJs: true`, `noEmit: true`, `strict: true`
+- `types/global.d.ts` with ambient types for `window.App`, `GameState`, and globals
+- Script: `npm run typecheck`
+
+### Authoring Pattern
+- Add `// @ts-check` to JS modules that are stable
+- Use JSDoc: `@typedef`, `@param`, `@returns` for functions and shapes
+- Prefer direct imports over global fallbacks; model globals in `global.d.ts` when needed
+- For complex legacy modules, temporarily use `// @ts-nocheck` while migrating
+
+### Priorities
+1. Pure rules in `js/core/rules/*.js`
+2. Core systems in `js/core/systems/*.js` (save, loop, resources, purchases)
+3. UI modules in `js/ui/*.js`
+4. Remaining legacy modules (`main.js`, `game-init.js`)
+
+---
+
+## UI Decoupling and No-Global-Reads (Completed for UI)
+
+### Changes
+- Removed all inline `onclick` from `index.html`
+- Introduced `data-action` attributes and centralized dispatcher in `js/ui/buttons.js`
+- UI reads exclusively from `App.state`; eliminated `window.*` reads in UI
+- Centralized `EVENT_NAMES` export and attachment via `js/index.js`
+
+### How to Add a New Button
+1. Add an element with `data-action="myAction"`
+2. In `js/ui/buttons.js`, handle `myAction` in the dispatcher
+3. Call into `App.systems` or `App.ui` rather than globals
+
+---
+
+## Config Access
+
+- Use `js/core/systems/config-accessor.js` to read upgrade/config data
+- It prefers `App.data.upgrades` and falls back to `GAME_CONFIG.BALANCE`
+
+---
+
+## Migration Map (Duplicate Function Elimination)
 
 ## 📋 Function Migration Map
 

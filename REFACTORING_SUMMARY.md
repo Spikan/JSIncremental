@@ -219,3 +219,22 @@ The project is ready for continued development with a solid, maintainable founda
 **Refactoring Completed By**: AI Assistant (Claude Sonnet 4)  
 **Quality Assurance**: Comprehensive testing and validation completed  
 **Status**: ✅ **PRODUCTION READY**
+
+---
+
+## Addendum (2025): State-Driven UI and TypeScript Infrastructure
+
+### Summary
+- UI now reads exclusively from `App.state`; remaining `window.*` UI reads removed
+- Centralized UI event handling via `data-action` in `js/ui/buttons.js`
+- Introduced `js/core/systems/config-accessor.js` for consistent config access
+- `EVENT_NAMES` exported from `js/core/constants.js` and attached in `js/index.js`
+- Storage validators imported directly; storage exposed as `AppStorage`
+- TypeScript infra added: `tsconfig.json`, `types/global.d.ts`, `@ts-check` and JSDoc across core
+
+### Impact
+- Further decoupling, clearer data flow, and safer refactors via type-checking
+- Easier testing of UI and systems due to removal of global dependencies
+
+### Scripts
+- `npm run typecheck` to verify JSDoc types with the TS compiler (no emit)

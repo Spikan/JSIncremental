@@ -67,7 +67,7 @@ export function updateTimeStats() {
     // Total play time (including previous sessions)
     const totalPlayTimeElement = window.DOM_CACHE?.totalPlayTime;
     if (totalPlayTimeElement) {
-        const totalMs = Number(window.App?.state?.getState?.()?.totalPlayTime || window.totalPlayTime || 0);
+        const totalMs = Number(window.App?.state?.getState?.()?.totalPlayTime || 0);
         const totalSeconds = Math.floor(totalMs / 1000);
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -85,7 +85,7 @@ export function updateTimeStats() {
     // Current session time
     const sessionTimeElement = window.DOM_CACHE?.sessionTime;
     if (sessionTimeElement) {
-        const start = Number(window.App?.state?.getState?.()?.sessionStartTime || window.sessionStartTime || 0);
+        const start = Number(window.App?.state?.getState?.()?.sessionStartTime || 0);
         if (start) {
         const sessionTime = Date.now() - start;
         const sessionSeconds = Math.floor(sessionTime / 1000);
@@ -109,25 +109,29 @@ export function updateClickStats() {
     // Total clicks
     const totalClicksElement = window.DOM_CACHE?.totalClicks;
     if (totalClicksElement) {
-        totalClicksElement.textContent = formatNumber(Number(window.totalClicks || 0));
+        const clicks = Number(window.App?.state?.getState?.()?.totalClicks || 0);
+        totalClicksElement.textContent = formatNumber(clicks);
     }
     
     // Critical clicks
     const criticalClicksElement = window.DOM_CACHE?.criticalClicksStats;
     if (criticalClicksElement) {
-        criticalClicksElement.textContent = formatNumber(Number(window.criticalClicks || 0));
+        const crit = Number(window.App?.state?.getState?.()?.criticalClicks || 0);
+        criticalClicksElement.textContent = formatNumber(crit);
     }
     
     // Click streak
     const clickStreakElement = window.DOM_CACHE?.clickStreak;
     if (clickStreakElement) {
-        clickStreakElement.textContent = String(Number(window.currentClickStreak || 0));
+        const st = window.App?.state?.getState?.() || {};
+        clickStreakElement.textContent = String(Number(st.currentClickStreak || 0));
     }
     
     // Best click streak
     const bestClickStreakElement = window.DOM_CACHE?.bestClickStreak;
     if (bestClickStreakElement) {
-        bestClickStreakElement.textContent = String(Number(window.bestClickStreak || 0));
+        const st = window.App?.state?.getState?.() || {};
+        bestClickStreakElement.textContent = String(Number(st.bestClickStreak || 0));
     }
 }
 
@@ -136,13 +140,15 @@ export function updateEconomyStats() {
     // Total sips earned
     const totalSipsEarnedElement = window.DOM_CACHE?.totalSipsEarned;
     if (totalSipsEarnedElement) {
-        totalSipsEarnedElement.textContent = formatNumber(Number(window.totalSipsEarned || 0));
+        const total = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
+        totalSipsEarnedElement.textContent = formatNumber(total);
     }
     
     // Highest sips per second
     const highestSipsPerSecondElement = window.DOM_CACHE?.highestSipsPerSecond;
     if (highestSipsPerSecondElement) {
-        highestSipsPerSecondElement.textContent = formatNumber(Number(window.highestSipsPerSecond || 0));
+        const high = Number(window.App?.state?.getState?.()?.highestSipsPerSecond || 0);
+        highestSipsPerSecondElement.textContent = formatNumber(high);
     }
 }
 
@@ -151,25 +157,29 @@ export function updateShopStats() {
     // Straws purchased
     const strawsPurchasedElement = window.DOM_CACHE?.strawsPurchased;
     if (strawsPurchasedElement) {
-        strawsPurchasedElement.textContent = formatNumber(Number(window.straws || 0));
+        const v = Number(window.App?.state?.getState?.()?.straws || 0);
+        strawsPurchasedElement.textContent = formatNumber(v);
     }
     
     // Cups purchased
     const cupsPurchasedElement = window.DOM_CACHE?.cupsPurchased;
     if (cupsPurchasedElement) {
-        cupsPurchasedElement.textContent = formatNumber(Number(window.cups || 0));
+        const v = Number(window.App?.state?.getState?.()?.cups || 0);
+        cupsPurchasedElement.textContent = formatNumber(v);
     }
     
     // Suctions purchased
     const suctionsPurchasedElement = window.DOM_CACHE?.suctionsPurchased;
     if (suctionsPurchasedElement) {
-        suctionsPurchasedElement.textContent = formatNumber(Number(window.suctions || 0));
+        const v = Number(window.App?.state?.getState?.()?.suctions || 0);
+        suctionsPurchasedElement.textContent = formatNumber(v);
     }
     
     // Critical clicks purchased
     const criticalClicksPurchasedElement = window.DOM_CACHE?.criticalClicksPurchased;
     if (criticalClicksPurchasedElement) {
-        criticalClicksPurchasedElement.textContent = formatNumber(Number(window.criticalClicks || 0));
+        const v = Number(window.App?.state?.getState?.()?.criticalClicks || 0);
+        criticalClicksPurchasedElement.textContent = formatNumber(v);
     }
 }
 
@@ -186,17 +196,19 @@ export function updateAchievementStats() {
     // Current level
     const currentLevelElement = window.DOM_CACHE?.currentLevel;
     if (currentLevelElement) {
-        currentLevelElement.textContent = String(safeToNumber(window.level));
+        const level = Number(window.App?.state?.getState?.()?.level || 1);
+        currentLevelElement.textContent = String(level);
     }
     
     // Total upgrades (sum of all upgrade counters)
     const totalUpgradesElement = window.DOM_CACHE?.totalUpgrades;
     if (totalUpgradesElement) {
-        const widerStraws = safeToNumber(window.widerStraws);
-        const betterCups = safeToNumber(window.betterCups);
-        const suctionUpCounter = safeToNumber(window.suctionUpCounter);
-        const fasterDrinksUpCounter = safeToNumber(window.fasterDrinksUpCounter);
-        const criticalClickUpCounter = safeToNumber(window.criticalClickUpCounter);
+        const st = window.App?.state?.getState?.() || {};
+        const widerStraws = Number(st.widerStraws || 0);
+        const betterCups = Number(st.betterCups || 0);
+        const suctionUpCounter = Number(st.suctionUpCounter || 0);
+        const fasterDrinksUpCounter = Number(st.fasterDrinksUpCounter || 0);
+        const criticalClickUpCounter = Number(st.criticalClickUpCounter || 0);
         
         const totalUpgrades = widerStraws + betterCups + suctionUpCounter + fasterDrinksUpCounter + criticalClickUpCounter;
         totalUpgradesElement.textContent = formatNumber(totalUpgrades);
@@ -205,6 +217,7 @@ export function updateAchievementStats() {
     // Faster drinks owned
     const fasterDrinksOwnedElement = window.DOM_CACHE?.fasterDrinksOwned;
     if (fasterDrinksOwnedElement) {
-        fasterDrinksOwnedElement.textContent = formatNumber(Number(window.fasterDrinks || 0));
+        const owned = Number(window.App?.state?.getState?.()?.fasterDrinks || 0);
+        fasterDrinksOwnedElement.textContent = formatNumber(owned);
     }
 }

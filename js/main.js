@@ -937,6 +937,14 @@ function trackClick() {
     if (DOM_CACHE.statsTab && DOM_CACHE.statsTab.classList.contains('active')) {
         try { window.App?.ui?.updateClickStats?.(); } catch {}
     }
+    try {
+        const st = window.App?.state?.getState?.() || {};
+        const current = Number(st.currentClickStreak || 0);
+        const best = Number(st.bestClickStreak || 0);
+        const nextCurrent = (now - window.lastClickTime) < (window.GAME_CONFIG?.TIMING?.CLICK_STREAK_WINDOW || 3000) ? current + 1 : 1;
+        const nextBest = Math.max(best, nextCurrent);
+        window.App?.state?.setState?.({ currentClickStreak: nextCurrent, bestClickStreak: nextBest, totalClicks: Number(st.totalClicks || 0) });
+    } catch {}
 }
 
 // ============================================================================

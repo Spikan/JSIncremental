@@ -65,3 +65,53 @@ return window.App.systems.purchases.buy();
 - When the fallback is temporary and there's a plan to fix the root cause
 
 **Remember:** It's better to spend time fixing the real problem than to add layers of complexity to work around it.
+
+---
+
+## Rule: No Global Reads in UI (Use App.state)
+
+**What this means:**
+- UI modules must read from `App.state` exclusively
+- Do not read or write `window.*` in UI code
+
+**Do this:**
+```javascript
+// ✅ GOOD
+const state = App.state.getState();
+elements.totalClicks.textContent = String(state.totalClicks);
+```
+
+**Not this:**
+```javascript
+// ❌ BAD
+elements.totalClicks.textContent = String(window.totalClicks);
+```
+
+---
+
+## Rule: No Inline Handlers (Use data-action + Central Dispatcher)
+
+**What this means:**
+- Remove `onclick`/inline handlers from HTML
+- Use `data-action` attributes and dispatch in `js/ui/buttons.js`
+
+**Pattern:**
+```html
+<button data-action="buy-straw"></button>
+```
+
+```javascript
+// in js/ui/buttons.js
+document.body.addEventListener('click', (e) => {
+  const action = e.target?.closest('[data-action]')?.dataset?.action;
+  if (!action) return;
+  // route to App.systems / App.ui implementations
+});
+```
+
+---
+
+## Rule: Configuration via Accessor
+
+**Use** `js/core/systems/config-accessor.js` to read upgrades and balance.
+Avoid duplicating logic or reading config directly in multiple places.

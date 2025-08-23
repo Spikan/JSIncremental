@@ -25,10 +25,28 @@ The codebase had significant duplicate functions across `main.js`, UI modules, a
 - **Consolidated functionality** into proper UI and core system modules
 - **Maintained backward compatibility** through proper App object structure
 
-### **Functions Moved**
+-### **Functions Moved**
 - **UI Functions**: `checkUpgradeAffordability`, `updateButtonState`, `updateCostDisplay`, `updateAllStats`, etc. → `App.ui.*`
 - **Core Systems**: `saveOptions`, `loadOptions`, `performSaveSnapshot` → `App.systems.*`
 - **Display Functions**: `updateTopSipsPerDrink`, `updateDrinkProgress`, etc. → `App.ui.*`
+
+## 🔧 2025 Architecture Updates (State-Driven UI + TypeScript)
+
+Recent work completed a full UI decoupling and established TypeScript infrastructure while keeping the codebase in JavaScript via JSDoc typing.
+
+- **Single source of truth**: All UI modules read from `App.state` only. Legacy `window.*` UI reads have been eliminated.
+- **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `js/ui/buttons.js`.
+- **Configuration access**: Added `js/core/systems/config-accessor.js` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
+- **Event names**: `EVENT_NAMES` exported from `js/core/constants.js` and attached in `js/index.js` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
+- **Storage**: Validation functions are imported directly from `js/core/validation/schemas.js`. The storage facade is exposed as `AppStorage` and attached to `window.storage` by `js/services/storage.js`.
+- **State bridge**: `js/core/state/bridge.js` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
+- **TypeScript infra**: Added `tsconfig.json` with `allowJs` + `checkJs`, a `types/global.d.ts` for ambient globals, and pervasive `@ts-check`/JSDoc annotations across core systems and rules. New script: `npm run typecheck`.
+
+### New/Updated Files
+- `js/core/systems/config-accessor.js` — central config access
+- `js/ui/buttons.js` — event delegation via `data-action`
+- `types/global.d.ts` — ambient global types (`App`, `GameState`, etc.)
+- `tsconfig.json` — JS-with-types configuration
 
 ## 📁 Complete File Structure
 

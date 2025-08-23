@@ -26,14 +26,25 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 
 ### Running Locally
 1. Clone the repository
-2. Open `index.html` in a web browser
-3. Start clicking soda and talking to God!
+2. Install dependencies: `npm install`
+3. Start dev server: `npm run dev`
+4. Open the provided local URL (e.g., `http://localhost:5173`)
 
-### File Structure
-- `index.html` - Main game interface
-- `css/style.css` - Game styling and animations
-- `js/main.js` - Core game logic and features
-- `js/config.js` - Configuration file
+### Scripts
+- `npm run dev` — Vite dev server with HMR
+- `npm run build` — Production build
+- `npm test` — Vitest test suite
+- `npm run typecheck` — TypeScript type-check (JS with JSDoc)
+
+### File Structure (high level)
+- `index.html` — Main interface; no inline `onclick` (uses `data-action`)
+- `js/index.js` — Bootstraps `App`, attaches `EVENT_NAMES`, loads UI
+- `js/core/state/` — Central `App.state` store and legacy bridge
+- `js/ui/` — Displays, stats, buttons (event delegation), utils
+- `js/core/systems/` — Save, loop, options, purchases, resources
+- `js/core/rules/` — Pure business logic (clicks, purchases, economy)
+- `js/core/validation/` — Zod schemas and validators
+- `types/global.d.ts` — Ambient types for globals
 
 ## 📱 Mobile Support
 
@@ -47,8 +58,8 @@ The game is fully responsive and works great on:
 
 You can customize various aspects of the game:
 - Colors and themes in `css/style.css`
-- Game mechanics in `js/main.js`
-- Configuration options in `js/config.js`
+- Game mechanics in `js/core/rules/*` and systems in `js/core/systems/*`
+- Configuration options via `data/upgrades.json` and `js/config.js` (access with `config-accessor`)
 
 ## 🤝 Contributing
 
