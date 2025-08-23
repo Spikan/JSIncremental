@@ -320,6 +320,24 @@ function initGame() {
         }
         let strawSPD = new Decimal(0);
         let cupSPD = new Decimal(0);
+        if (!Object.getOwnPropertyDescriptor(window, 'strawSPD')) {
+            Object.defineProperty(window, 'strawSPD', {
+                get: function() { return strawSPD; },
+                set: function(v) {
+                    strawSPD = new Decimal(v);
+                    try { window.App?.stateBridge?.syncStrawSPD?.(strawSPD); } catch {}
+                }
+            });
+        }
+        if (!Object.getOwnPropertyDescriptor(window, 'cupSPD')) {
+            Object.defineProperty(window, 'cupSPD', {
+                get: function() { return cupSPD; },
+                set: function(v) {
+                    cupSPD = new Decimal(v);
+                    try { window.App?.stateBridge?.syncCupSPD?.(cupSPD); } catch {}
+                }
+            });
+        }
         let suctionClickBonus = new Decimal(0);
         let widerStraws = new Decimal(0);
         // Make widerStraws accessible globally
@@ -501,6 +519,19 @@ function initGame() {
         window.currentClickStreak = 0;
         window.bestClickStreak = 0;
         let totalSipsEarned = new Decimal(0);
+        if (!Object.getOwnPropertyDescriptor(window, 'totalSipsEarned')) {
+            Object.defineProperty(window, 'totalSipsEarned', {
+                get: function() { return totalSipsEarned; },
+                set: function(v) {
+                    totalSipsEarned = new Decimal(v);
+                    try {
+                        const prev = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
+                        const next = (typeof totalSipsEarned?.toNumber === 'function') ? totalSipsEarned.toNumber() : Number(totalSipsEarned) || prev;
+                        window.App?.state?.setState?.({ totalSipsEarned: next });
+                    } catch {}
+                }
+            });
+        }
         let highestSipsPerSecond = new Decimal(0);
         let gameStartDate = Date.now();
         window.lastClickTime = 0;
