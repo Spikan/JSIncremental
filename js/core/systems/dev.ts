@@ -73,7 +73,6 @@ export function addTime(milliseconds: number): boolean {
     const st = w.App?.state?.getState?.() || {};
     const rate = Number(st.drinkRate || w.drinkRate || 1000);
     const now = Date.now();
-    const last = Number(st.lastDrinkTime ?? w.lastDrinkTime ?? now);
     const totalElapsed = ms;
     const drinks = Math.floor(totalElapsed / Math.max(rate, 1));
     const remainder = totalElapsed % Math.max(rate, 1);

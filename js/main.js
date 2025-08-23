@@ -35,8 +35,8 @@ const LIMITS = GC.LIMITS || {};
 // MODULAR STRUCTURE (Post-Refactoring):
 // - UI Functions: Moved to js/ui/* modules, accessed via App.ui.*
 // - Core Systems: Moved to js/core/systems/* modules, accessed via App.systems.*
-// - Storage: Moved to js/services/storage.js, accessed via App.storage.*
-// - Validation: Located in js/core/validation/schemas.js
+// - Storage: Moved to js/services/storage.ts, accessed via App.storage.*
+// - Validation: Located in js/core/validation/schemas.ts
 // 
 // DUPLICATE FUNCTION ELIMINATION:
 // All duplicate functions have been removed from this file and consolidated into
@@ -812,7 +812,7 @@ console.log('✅ Global wrapper functions assigned to window object');
 // Check if all dependencies are available
 function areDependenciesReady() {
     const dependencies = {
-        FEATURE_UNLOCKS: !!(window.App?.systems?.unlocks),
+        UNLOCKS_SYSTEM: !!(window.App?.systems?.unlocks),
         DOM_CACHE: typeof DOM_CACHE !== 'undefined',
         GAME_CONFIG: !!GC && Object.keys(GC).length > 0,
         Decimal: typeof Decimal !== 'undefined',

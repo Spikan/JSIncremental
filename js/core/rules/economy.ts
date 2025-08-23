@@ -6,6 +6,7 @@ export function computeStrawSPD(
   widerStrawsCount: number | string,
   widerMultiplierPerLevel: number | string = 0
 ): number {
+  void straws; // parameter kept for API compatibility
   const multiplier = 1 + Number(widerStrawsCount) * Number(widerMultiplierPerLevel);
   return Number(baseSPD) * multiplier;
 }
@@ -16,6 +17,7 @@ export function computeCupSPD(
   betterCupsCount: number | string,
   betterMultiplierPerLevel: number | string = 0
 ): number {
+  void cups; // parameter kept for API compatibility
   const multiplier = 1 + Number(betterCupsCount) * Number(betterMultiplierPerLevel);
   return Number(baseSPD) * multiplier;
 }
