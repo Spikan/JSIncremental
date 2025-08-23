@@ -934,29 +934,6 @@ function getDrinkRateSeconds() {
 function trackClick() {
     console.log('🔧 trackClick called');
     try { window.App?.systems?.clicks?.trackClick?.(); } catch {}
-    const now = Date.now();
-
-    // Track click streak
-    const clickStreakWindow = TIMING.CLICK_STREAK_WINDOW || 3000; // Default 3 seconds
-    const prevLastClick = Number(window.App?.state?.getState?.()?.lastClickTime || window.lastClickTime || 0);
-    if (now - prevLastClick < clickStreakWindow) { // Within configured time window
-        window.currentClickStreak++;
-        if (window.currentClickStreak > window.bestClickStreak) {
-            window.bestClickStreak = window.currentClickStreak;
-        }
-    } else {
-        window.currentClickStreak = 1;
-    }
-
-    window.lastClickTime = now;
-    window.clickTimes.push(now);
-
-    // Keep only last configured number of clicks for performance
-    const maxClickTimes = LIMITS?.MAX_CLICK_TIMES || 100;
-    if (window.clickTimes.length > maxClickTimes) {
-        window.clickTimes.shift();
-    }
-    
     // Play button click sound effect handled in clicks system as well; keep fallback
     try { window.App?.systems?.audio?.button?.playButtonClickSound?.(); } catch {}
     
@@ -964,19 +941,7 @@ function trackClick() {
     if (DOM_CACHE.statsTab && DOM_CACHE.statsTab.classList.contains('active')) {
         try { window.App?.ui?.updateClickStats?.(); } catch {}
     }
-    try {
-        const st = window.App?.state?.getState?.() || {};
-        const current = Number(st.currentClickStreak || 0);
-        const best = Number(st.bestClickStreak || 0);
-        const nextCurrent = (now - window.lastClickTime) < (TIMING?.CLICK_STREAK_WINDOW || 3000) ? current + 1 : 1;
-        const nextBest = Math.max(best, nextCurrent);
-        window.App?.state?.setState?.({
-            currentClickStreak: nextCurrent,
-            bestClickStreak: nextBest,
-            totalClicks: Number(st.totalClicks || 0),
-            lastClickTime: now
-        });
-    } catch {}
+    // State updates handled by clicks system
 }
 
 // ============================================================================
