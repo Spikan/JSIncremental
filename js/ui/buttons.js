@@ -261,7 +261,13 @@ function setupSpecialButtonHandlers() {
     const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
     if (sodaButton && sodaButton.addEventListener) {
         sodaButton.addEventListener('click', (e) => {
-            try { window.sodaClick?.(1, e); } catch {}
+            try {
+                if (window.App?.systems?.clicks?.handleSodaClick) {
+                    window.App.systems.clicks.handleSodaClick(1, e);
+                } else {
+                    window.sodaClick?.(1, e);
+                }
+            } catch {}
         });
     }
     
