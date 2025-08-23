@@ -296,7 +296,7 @@ describe('Game Runtime Safety Tests', () => {
 
         beforeEach(async () => {
             vi.clearAllMocks();
-            buttonSystem = await import('../js/ui/buttons.js');
+            buttonSystem = await import('../js/ui/buttons.ts');
         });
 
         it('should handle missing audio system gracefully', () => {

@@ -1,0 +1,300 @@
+// Modern Button System - Unified button event handling and management (TypeScript)
+
+type ButtonActionMeta = { func: () => any; type: string; label: string };
+type ButtonTypeMeta = { audio: 'purchase' | 'click'; feedback: 'purchase' | 'levelup' | 'info'; className: string };
+
+const BUTTON_CONFIG: { types: Record<string, ButtonTypeMeta>; actions: Record<string, ButtonActionMeta> } = {
+    types: {
+        'shop-btn': { audio: 'purchase', feedback: 'purchase', className: 'shop-btn' },
+        'clicking-upgrade-btn': { audio: 'purchase', feedback: 'purchase', className: 'clicking-upgrade-btn' },
+        'drink-speed-upgrade-btn': { audio: 'purchase', feedback: 'purchase', className: 'drink-speed-upgrade-btn' },
+        'level-up-btn': { audio: 'purchase', feedback: 'levelup', className: 'level-up-btn' },
+        'save-btn': { audio: 'click', feedback: 'info', className: 'save-btn' },
+        'sound-toggle-btn': { audio: 'click', feedback: 'info', className: 'sound-toggle-btn' },
+        'dev-btn': { audio: 'click', feedback: 'info', className: 'dev-btn' },
+        'chat-send-btn': { audio: 'click', feedback: 'info', className: 'chat-send-btn' },
+        'splash-start-btn': { audio: 'click', feedback: 'info', className: 'splash-start-btn' },
+    },
+    actions: {
+        buyStraw: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyStraw ? (window as any).App.systems.purchases.execute.buyStraw() : (window as any).buyStraw?.()), type: 'shop-btn', label: 'Buy Straw' },
+        buyCup: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyCup ? (window as any).App.systems.purchases.execute.buyCup() : (window as any).buyCup?.()), type: 'shop-btn', label: 'Buy Cup' },
+        buyWiderStraws: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyWiderStraws ? (window as any).App.systems.purchases.execute.buyWiderStraws() : (window as any).buyWiderStraws?.()), type: 'shop-btn', label: 'Buy Wider Straws' },
+        buyBetterCups: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyBetterCups ? (window as any).App.systems.purchases.execute.buyBetterCups() : (window as any).buyBetterCups?.()), type: 'shop-btn', label: 'Buy Better Cups' },
+        buySuction: { func: () => ((window as any).App?.systems?.purchases?.execute?.buySuction ? (window as any).App.systems.purchases.execute.buySuction() : (window as any).buySuction?.()), type: 'clicking-upgrade-btn', label: 'Buy Suction' },
+        buyCriticalClick: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyCriticalClick ? (window as any).App.systems.purchases.execute.buyCriticalClick() : (window as any).buyCriticalClick?.()), type: 'clicking-upgrade-btn', label: 'Buy Critical Click' },
+        buyFasterDrinks: { func: () => ((window as any).App?.systems?.purchases?.execute?.buyFasterDrinks ? (window as any).App.systems.purchases.execute.buyFasterDrinks() : (window as any).buyFasterDrinks?.()), type: 'drink-speed-upgrade-btn', label: 'Buy Faster Drinks' },
+        upgradeFasterDrinks: { func: () => ((window as any).App?.systems?.purchases?.execute?.upgradeFasterDrinks ? (window as any).App.systems.purchases.execute.upgradeFasterDrinks() : (window as any).upgradeFasterDrinks?.()), type: 'drink-speed-upgrade-btn', label: 'Upgrade Faster Drinks' },
+        levelUp: { func: () => ((window as any).App?.systems?.purchases?.execute?.levelUp ? (window as any).App.systems.purchases.execute.levelUp() : (window as any).levelUp?.()), type: 'level-up-btn', label: 'Level Up' },
+        save: { func: () => (window as any).save?.(), type: 'save-btn', label: 'Save Game' },
+        delete_save: { func: () => (window as any).delete_save?.(), type: 'save-btn', label: 'Delete Save' },
+        toggleButtonSounds: { func: () => (window as any).toggleButtonSounds?.(), type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
+        sendMessage: { func: () => (window as any).sendMessage?.(), type: 'chat-send-btn', label: 'Send Message' },
+        startGame: { func: () => (window as any).startGame?.(), type: 'splash-start-btn', label: 'Start Game' },
+    }
+};
+
+const POINTER_SUPPRESS_MS = 500;
+function markPointerHandled(element: any): void { try { element.__lastPointerTs = Date.now(); } catch {} }
+function shouldSuppressClick(element: any): boolean { try { const last = Number(element && element.__lastPointerTs || 0); return (Date.now() - last) < POINTER_SUPPRESS_MS; } catch { return false; } }
+
+function handleButtonClick(event: any, button: any, actionName: string): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const action = BUTTON_CONFIG.actions[actionName];
+    if (!action) return;
+    const buttonType = BUTTON_CONFIG.types[action.type];
+    if (!buttonType) return;
+    const clickX = event.clientX;
+    const clickY = event.clientY;
+    try {
+        const audio = (window as any).App?.systems?.audio?.button;
+        if (audio) {
+            if (buttonType.audio === 'purchase') { try { audio.playButtonPurchaseSound(); } catch {} }
+            else { try { audio.playButtonClickSound(); } catch {} }
+        } else if ((window as any).playButtonPurchaseSound && (window as any).playButtonClickSound) {
+            if (buttonType.audio === 'purchase') { (window as any).playButtonPurchaseSound(); } else { (window as any).playButtonClickSound(); }
+        }
+    } catch {}
+    try { button.classList.add('button-clicked'); setTimeout(() => { try { button.classList.remove('button-clicked'); } catch {} }, 150); } catch {}
+    try {
+        if (action.func && typeof action.func === 'function') {
+            const result = action.func();
+            if (buttonType.feedback === 'levelup') {
+                try { (window as any).App?.ui?.showLevelUpFeedback?.(0); } catch {}
+            }
+        }
+    } catch (error) { console.error(`Button action ${actionName} failed:`, error); }
+}
+
+function setupUnifiedButtonSystem(): void {
+    console.log('🔧 Setting up modern button event handler system...');
+    const allButtons = document.querySelectorAll('button');
+    console.log(`🔧 Found ${allButtons.length} buttons with inline onclick to process`);
+    allButtons.forEach((button: any) => {
+        const onclick = button.getAttribute('onclick');
+        if (onclick) {
+            const actionMatch = onclick.match(/(\w+)\(/);
+            if (actionMatch) {
+                const actionName = actionMatch[1];
+                const action = BUTTON_CONFIG.actions[actionName];
+                if (action) {
+                    button.removeAttribute('onclick');
+                    if ((window as any).PointerEvent) {
+                        button.addEventListener('pointerdown', (e: any) => {
+                            if (e && e.pointerType && e.pointerType !== 'mouse') { markPointerHandled(button); handleButtonClick(e, button, actionName); }
+                        });
+                    } else if ('ontouchstart' in window) {
+                        button.addEventListener('touchstart', (e: any) => { markPointerHandled(button); handleButtonClick(e, button, actionName); }, { passive: true });
+                    }
+                    button.addEventListener('click', (e: any) => { if (shouldSuppressClick(button)) return; handleButtonClick(e, button, actionName); });
+                    if (action.type) { try { button.classList.add(action.type); } catch {} }
+                    console.log(`🔧 Successfully configured button: ${actionName} (${action.type})`);
+                }
+            }
+        }
+    });
+    setupSpecialButtonHandlers();
+    console.log('🔧 Modern button event handler system setup complete');
+}
+
+function setupSpecialButtonHandlers(): void {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach((button: any) => {
+        if (!button || !button.addEventListener) return;
+        button.addEventListener('click', (e: any) => {
+            const action = button.getAttribute('data-action');
+            if (action && action.startsWith('switchTab:') && (window as any).switchTab) {
+                const tabName = action.split(':')[1];
+                (window as any).switchTab(tabName, e);
+            }
+        });
+    });
+    const sodaDomCacheBtn = (window as any).DOM_CACHE?.sodaButton;
+    const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
+    if (sodaButton && (sodaButton as any).addEventListener) {
+        if ((window as any).PointerEvent) {
+            let active = false; let moved = false; let sx = 0; let sy = 0;
+            const reset = () => { active = false; moved = false; };
+            sodaButton.addEventListener('pointerdown', (e: any) => { if (!e || e.pointerType === 'mouse') return; active = true; moved = false; sx = e.clientX || 0; sy = e.clientY || 0; });
+            sodaButton.addEventListener('pointermove', (e: any) => { if (!active || !e || e.pointerType === 'mouse') return; const dx = (e.clientX || 0) - sx; const dy = (e.clientY || 0) - sy; if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true; });
+            sodaButton.addEventListener('pointerup', (e: any) => { if (!active || !e || e.pointerType === 'mouse') { reset(); return; } if (!moved) { markPointerHandled(sodaButton); try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { if ((window as any).App?.systems?.clicks?.handleSodaClick) { (window as any).App.systems.clicks.handleSodaClick(1, e); } else { (window as any).sodaClick?.(1, e); } } catch {} } reset(); });
+            sodaButton.addEventListener('pointercancel', reset);
+        } else if ('ontouchstart' in window) {
+            let active = false; let moved = false; let sx = 0; let sy = 0;
+            const reset = () => { active = false; moved = false; };
+            sodaButton.addEventListener('touchstart', (e: any) => { if (!e || !e.touches || !e.touches[0]) return; active = true; moved = false; sx = e.touches[0].clientX || 0; sy = e.touches[0].clientY || 0; }, { passive: true });
+            sodaButton.addEventListener('touchmove', (e: any) => { if (!active || !e || !e.touches || !e.touches[0]) return; const dx = (e.touches[0].clientX || 0) - sx; const dy = (e.touches[0].clientY || 0) - sy; if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true; }, { passive: true });
+            sodaButton.addEventListener('touchend', (e: any) => { if (!active) { reset(); return; } if (!moved) { markPointerHandled(sodaButton); try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { if ((window as any).App?.systems?.clicks?.handleSodaClick) { (window as any).App.systems.clicks.handleSodaClick(1, e); } else { (window as any).sodaClick?.(1, e); } } catch {} } reset(); });
+            sodaButton.addEventListener('touchcancel', reset);
+        }
+        sodaButton.addEventListener('click', (e: any) => { if (shouldSuppressClick(sodaButton)) return; try { (sodaButton as any).classList.add('soda-clicked'); setTimeout(() => { try { (sodaButton as any).classList.remove('soda-clicked'); } catch {} }, 140); } catch {} try { if ((window as any).App?.systems?.clicks?.handleSodaClick) { (window as any).App.systems.clicks.handleSodaClick(1, e); } else { (window as any).sodaClick?.(1, e); } } catch {} });
+    }
+    const chatInput = document.getElementById('chatInput') as any;
+    if (chatInput) { chatInput.addEventListener('keypress', function (e: any) { if (e.key === 'Enter' && (window as any).sendMessage) { (window as any).sendMessage(); } }); }
+    const splashStartBtn = (typeof document !== 'undefined' && (document as any).querySelector) ? (document as any).querySelector('.splash-start-btn') : null;
+    if (splashStartBtn && (splashStartBtn as any).addEventListener) {
+        if ((window as any).PointerEvent) {
+            (splashStartBtn as any).addEventListener('pointerdown', (e: any) => { if (e && e.pointerType && e.pointerType === 'mouse') return; markPointerHandled(splashStartBtn); e.preventDefault(); e.stopPropagation(); try { (window as any).startGame?.(); } catch {} });
+        } else if ('ontouchstart' in window) {
+            (splashStartBtn as any).addEventListener('touchstart', (e: any) => { markPointerHandled(splashStartBtn); e.preventDefault(); e.stopPropagation(); try { (window as any).startGame?.(); } catch {} }, { passive: true });
+        }
+        (splashStartBtn as any).addEventListener('click', (e: any) => { if (shouldSuppressClick(splashStartBtn)) return; e.preventDefault(); e.stopPropagation(); try { (window as any).startGame?.(); } catch {} });
+    }
+    if (document && (document as any).body && (document as any).body.addEventListener) {
+        if ((window as any).PointerEvent) {
+            (document as any).body.addEventListener('pointerdown', (e: any) => {
+                const target = e.target as any;
+                if (!(target instanceof HTMLElement)) return;
+                const el = (target as HTMLElement).closest('[data-action]') as HTMLElement | null;
+                if (!el) return;
+                if (e && e.pointerType && e.pointerType === 'mouse') return;
+                const action = el.getAttribute('data-action');
+                if (!action) return;
+                const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
+                if (fnName === 'sodaClick') return;
+                const argsAttr = el.getAttribute('data-args') || argStr;
+                let args: any[] = [];
+                if (argsAttr) { const maybeNum = Number(argsAttr); args = Number.isNaN(maybeNum) ? [argsAttr] : [maybeNum]; }
+                const purchaseActions = new Set(['buyStraw','buyCup','buyWiderStraws','buyBetterCups','buySuction','buyFasterDrinks','upgradeFasterDrinks','buyCriticalClick']);
+                const isPurchase = purchaseActions.has(fnName);
+                if (isPurchase) {
+                    const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') as any : el as any;
+                    const disabled = !!(buttonEl && (buttonEl.disabled || buttonEl.classList?.contains('disabled') || buttonEl.classList?.contains('unaffordable')));
+                    if (disabled) return;
+                }
+                const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') as any : el as any;
+                if (buttonEl) markPointerHandled(buttonEl);
+                if (typeof (window as any)[fnName] === 'function' || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
+                    e.preventDefault(); e.stopPropagation();
+                    try {
+                        let success = true;
+                        if (fnName === 'switchTab') {
+                            try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
+                            (window as any)[fnName](args[0], e);
+                        } else {
+                            if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) { success = !!(window as any).App.systems.purchases.execute[fnName](); }
+                            else { const ret = (window as any)[fnName](...args); success = (typeof ret === 'undefined') ? true : !!ret; }
+                            try {
+                                const meta = BUTTON_CONFIG.actions[fnName];
+                                const btnType = meta && meta.type;
+                                if ((window as any).App?.systems?.audio?.button && fnName !== 'sodaClick') {
+                                    if ((btnType === 'shop-btn' || btnType === 'clicking-upgrade-btn' || btnType === 'drink-speed-upgrade-btn' || btnType === 'level-up-btn')) {
+                                        if (success) (window as any).App.systems.audio.button.playButtonPurchaseSound?.();
+                                    } else {
+                                        (window as any).App.systems.audio.button.playButtonClickSound?.();
+                                    }
+                                }
+                            } catch {}
+                        }
+                        if (isPurchase && typeof (window as any).App?.ui?.showPurchaseFeedback === 'function' && success) {
+                            let costValue: number | undefined;
+                            try {
+                                const costSpan = el.querySelector('.cost-number') as HTMLElement | null;
+                                if (costSpan) { costValue = Number(costSpan.textContent); }
+                                else { const match = (el.textContent || '').replace(/[,]/g,'').match(/\d+(?:\.\d+)?/); costValue = match ? Number(match[0]) : undefined; }
+                            } catch {}
+                            const rect = el.getBoundingClientRect();
+                            const cx = (typeof e.clientX === 'number') ? e.clientX : (rect.left + rect.width/2);
+                            const cy = (typeof e.clientY === 'number') ? e.clientY : (rect.top + rect.height/2);
+                            if (typeof costValue === 'number' && !Number.isNaN(costValue)) { (window as any).App.ui.showPurchaseFeedback(fnName, costValue, cx, cy); }
+                        }
+                    } catch (err) { console.warn('action failed', fnName, err); }
+                }
+            }, { capture: true });
+        }
+        (document as any).body.addEventListener('click', (e: any) => {
+            const target = e.target as any;
+            if (!(target instanceof HTMLElement)) return;
+            const el = (target as HTMLElement).closest('[data-action]') as HTMLElement | null;
+            if (!el) return;
+            const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') as any : el as any;
+            if (buttonEl && shouldSuppressClick(buttonEl)) return;
+            const action = el.getAttribute('data-action');
+            if (!action) return;
+            const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
+            const argsAttr = el.getAttribute('data-args') || argStr;
+            let args: any[] = [];
+            if (argsAttr) { const maybeNum = Number(argsAttr); args = Number.isNaN(maybeNum) ? [argsAttr] : [maybeNum]; }
+            const purchaseActions = new Set(['buyStraw','buyCup','buyWiderStraws','buyBetterCups','buySuction','buyFasterDrinks','upgradeFasterDrinks','buyCriticalClick']);
+            const isPurchase = purchaseActions.has(fnName);
+            if (isPurchase) {
+                const disabled = !!(buttonEl && (buttonEl.disabled || buttonEl.classList?.contains('disabled') || buttonEl.classList?.contains('unaffordable')));
+                if (disabled) return;
+            }
+            if (typeof (window as any)[fnName] === 'function' || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
+                e.preventDefault(); e.stopPropagation();
+                try {
+                    let success = true;
+                    if (fnName === 'switchTab') {
+                        try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
+                        (window as any)[fnName](args[0], e);
+                    } else {
+                        if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) { success = !!(window as any).App.systems.purchases.execute[fnName](); }
+                        else { const ret = (window as any)[fnName](...args); success = (typeof ret === 'undefined') ? true : !!ret; }
+                        try {
+                            const meta = BUTTON_CONFIG.actions[fnName];
+                            const btnType = meta && meta.type;
+                            if ((window as any).App?.systems?.audio?.button && fnName !== 'sodaClick') {
+                                if ((btnType === 'shop-btn' || btnType === 'clicking-upgrade-btn' || btnType === 'drink-speed-upgrade-btn' || btnType === 'level-up-btn')) {
+                                    if (success) (window as any).App.systems.audio.button.playButtonPurchaseSound?.();
+                                } else {
+                                    (window as any).App.systems.audio.button.playButtonClickSound?.();
+                                }
+                            }
+                        } catch {}
+                    }
+                    if (isPurchase && typeof (window as any).App?.ui?.showPurchaseFeedback === 'function' && success) {
+                        let costValue: number | undefined;
+                        try {
+                            const costSpan = el.querySelector('.cost-number') as HTMLElement | null;
+                            if (costSpan) { costValue = Number(costSpan.textContent); }
+                            else { const match = (el.textContent || '').replace(/[,]/g,'').match(/\d+(?:\.\d+)?/); costValue = match ? Number(match[0]) : undefined; }
+                        } catch {}
+                        const cx = (typeof e.clientX === 'number') ? e.clientX : (el.getBoundingClientRect().left + el.getBoundingClientRect().width/2);
+                        const cy = (typeof e.clientY === 'number') ? e.clientY : (el.getBoundingClientRect().top + el.getBoundingClientRect().height/2);
+                        if (typeof costValue === 'number' && !Number.isNaN(costValue)) { (window as any).App.ui.showPurchaseFeedback(fnName, costValue, cx, cy); }
+                    }
+                } catch (err) { console.warn('action failed', fnName, err); }
+            }
+        }, { capture: true });
+    }
+    if (document && (document as any).body && (document as any).body.addEventListener) {
+        if ((window as any).PointerEvent) {
+            (document as any).body.addEventListener('pointerdown', (e: any) => {
+                const target = e.target as any;
+                if (!(target instanceof HTMLElement)) return;
+                const startEl = (target as HTMLElement).closest('.splash-start-btn') as HTMLElement | null;
+                if (!startEl) return; if (e && e.pointerType && e.pointerType === 'mouse') return; markPointerHandled(startEl); e.preventDefault(); e.stopPropagation(); try { (window as any).startGame?.(); } catch (err) { console.warn('startGame failed', err); }
+            }, { capture: true });
+        }
+        (document as any).body.addEventListener('click', (e: any) => {
+            const target = e.target as any;
+            if (!(target instanceof HTMLElement)) return;
+            const startEl = (target as HTMLElement).closest('.splash-start-btn') as HTMLElement | null;
+            if (!startEl) return; if (shouldSuppressClick(startEl)) return; e.preventDefault(); e.stopPropagation(); try { (window as any).startGame?.(); } catch (err) { console.warn('startGame failed', err); }
+        }, { capture: true });
+    }
+    if (document && (document as any).body && (document as any).body.addEventListener) {
+        (document as any).body.addEventListener('change', (e: any) => {
+            const target = e.target as any;
+            if (!(target instanceof HTMLElement)) return;
+            const action = target.getAttribute('data-action');
+            if (!action) return; const [fnName] = action.split(':'); if (typeof (window as any)[fnName] === 'function') { try { (window as any)[fnName](); } catch (err) { console.warn('change action failed', fnName, err); } }
+        }, { capture: true });
+    }
+}
+
+function initButtonSystem(): void {
+    function tryInitialize() {
+        const essentialFunctions = ['buyStraw','buyCup','buySuction','buyCriticalClick','buyFasterDrinks','buyWiderStraws','buyBetterCups','levelUp','save','delete_save','toggleButtonSounds','sendMessage','startGame'];
+        const functionsAvailable = (typeof window !== 'undefined') && essentialFunctions.every((func) => typeof (window as any)[func] === 'function');
+        if (functionsAvailable) { console.log('🔧 All global functions available, setting up modern button system'); setupUnifiedButtonSystem(); }
+        else { const missingFunctions = essentialFunctions.filter((func) => typeof (window as any)[func] !== 'function'); console.log('🔧 Waiting for global functions:', missingFunctions.join(', ')); setTimeout(tryInitialize, 200); }
+    }
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => { setTimeout(tryInitialize, 100); }); }
+    else { setTimeout(tryInitialize, 100); }
+}
+
+export { BUTTON_CONFIG, handleButtonClick, setupUnifiedButtonSystem, setupSpecialButtonHandlers, initButtonSystem };
+
+

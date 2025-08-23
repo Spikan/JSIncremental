@@ -7,7 +7,7 @@ import * as feedback from './feedback.js';
 import * as affordability from './affordability';
 import * as labels from './labels.js';
 import * as utils from './utils';
-import * as buttons from './buttons.js';
+import * as buttons from './buttons';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability, buttons };
