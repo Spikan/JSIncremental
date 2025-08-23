@@ -21,6 +21,12 @@
     // and all functions are properly defined
 })();
 
+// Cache top-level config groups for non-init helpers
+const GC = (typeof window !== 'undefined' && window.GAME_CONFIG) || {};
+const BAL = GC.BALANCE || {};
+const TIMING = GC.TIMING || {};
+const LIMITS = GC.LIMITS || {};
+
 // Soda Clicker Pro - Main Game Logic
 // 
 // ARCHITECTURE OVERVIEW:
