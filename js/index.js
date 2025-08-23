@@ -85,6 +85,14 @@ try {
 
 // Attach core systems (TypeScript modules) into App.systems with safe fallbacks
 try {
+    const eb = await import('./services/event-bus.ts');
+    // Recreate the bus so UI gets the same instance
+    const typedBus = eb.createEventBus();
+    window.App.events = typedBus;
+    try { window.eventBus = typedBus; window.bus = typedBus; } catch {}
+} catch (e) { console.warn('⚠️ event-bus service load failed:', e); }
+
+try {
     const res = await import('./core/systems/resources.ts');
     Object.assign(window.App.systems.resources, res);
 } catch (e) { console.warn('⚠️ resources system load failed:', e); }

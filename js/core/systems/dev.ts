@@ -1,6 +1,19 @@
 // Dev system: unlock helpers, time travel, and resource tweaks (TypeScript)
 
-type Win = typeof window & { FEATURE_UNLOCKS?: any; Decimal?: any; App?: any; GAME_CONFIG?: any };
+type Win = typeof window & {
+  FEATURE_UNLOCKS?: any;
+  Decimal?: any;
+  App?: any;
+  GAME_CONFIG?: any;
+  // Legacy/global mirrors (optional during migration)
+  sips?: any;
+  straws?: any;
+  cups?: any;
+  level?: any;
+  drinkRate?: any;
+  lastDrinkTime?: any;
+  lastSaveTime?: any;
+};
 
 function toNum(v: any): number { return (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0); }
 
