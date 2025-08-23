@@ -1,73 +1,67 @@
-// @ts-check
-// DOM Cache - Centralized DOM element management for Soda Clicker Pro
-// This file manages all cached DOM element references for better performance and maintainability
+// DOM Cache - Centralized DOM element management (TypeScript)
 
-/** @type {{
- *  levelNumber: HTMLElement|null;
- *  levelText: HTMLElement|null;
- *  sodaButton: HTMLElement|null;
- *  topSipValue: HTMLElement|null;
- *  topSipsPerDrink: HTMLElement|null;
- *  topSipsPerSecond: HTMLElement|null;
- *  musicPlayer: HTMLElement|null;
- *  musicToggleBtn: HTMLElement|null;
- *  musicMuteBtn: HTMLElement|null;
- *  musicStatus: HTMLElement|null;
- *  musicStreamSelect: HTMLElement|null;
- *  currentStreamInfo: HTMLElement|null;
- *  shopDiv: HTMLElement|null;
- *  widerStraws: HTMLElement|null;
- *  betterCups: HTMLElement|null;
- *  widerStrawsSPD: HTMLElement|null;
- *  betterCupsSPD: HTMLElement|null;
- *  totalWiderStrawsSPD: HTMLElement|null;
- *  totalBetterCupsSPD: HTMLElement|null;
- *  statsTab: HTMLElement|null;
- *  progressFill: HTMLElement|null;
- *  countdown: HTMLElement|null;
- *  playTime: HTMLElement|null;
- *  lastSaveTime: HTMLElement|null;
- *  totalPlayTime: HTMLElement|null;
- *  sessionTime: HTMLElement|null;
- *  daysSinceStart: HTMLElement|null;
- *  totalClicks: HTMLElement|null;
- *  clicksPerSecond: HTMLElement|null;
- *  bestClickStreak: HTMLElement|null;
- *  totalSipsEarned: HTMLElement|null;
- *  currentSipsPerSecond: HTMLElement|null;
- *  highestSipsPerSecond: HTMLElement|null;
- *  strawsPurchased: HTMLElement|null;
- *  cupsPurchased: HTMLElement|null;
- *  widerStrawsPurchased: HTMLElement|null;
- *  betterCupsPurchased: HTMLElement|null;
- *  suctionsPurchased: HTMLElement|null;
- *  criticalClicksPurchased: HTMLElement|null;
- *  currentLevel: HTMLElement|null;
- *  totalUpgrades: HTMLElement|null;
- *  fasterDrinksOwned: HTMLElement|null;
- *  levelUpDiv: HTMLElement|null;
- *  init: () => void;
- *  get: (id: string) => HTMLElement|null;
- *  isReady: () => boolean;
- * }} */
-const DOM_CACHE = {
-    // Game elements
+type MaybeEl = HTMLElement | null;
+
+const DOM_CACHE: {
+    levelNumber: MaybeEl;
+    levelText: MaybeEl;
+    sodaButton: MaybeEl;
+    topSipValue: MaybeEl;
+    topSipsPerDrink: MaybeEl;
+    topSipsPerSecond: MaybeEl;
+    musicPlayer: MaybeEl;
+    musicToggleBtn: MaybeEl;
+    musicMuteBtn: MaybeEl;
+    musicStatus: MaybeEl;
+    musicStreamSelect: MaybeEl;
+    currentStreamInfo: MaybeEl;
+    shopDiv: MaybeEl;
+    widerStraws: MaybeEl;
+    betterCups: MaybeEl;
+    widerStrawsSPD: MaybeEl;
+    betterCupsSPD: MaybeEl;
+    totalWiderStrawsSPD: MaybeEl;
+    totalBetterCupsSPD: MaybeEl;
+    statsTab: MaybeEl;
+    progressFill: MaybeEl;
+    countdown: MaybeEl;
+    playTime: MaybeEl;
+    lastSaveTime: MaybeEl;
+    totalPlayTime: MaybeEl;
+    sessionTime: MaybeEl;
+    daysSinceStart: MaybeEl;
+    totalClicks: MaybeEl;
+    clicksPerSecond: MaybeEl;
+    bestClickStreak: MaybeEl;
+    totalSipsEarned: MaybeEl;
+    currentSipsPerSecond: MaybeEl;
+    highestSipsPerSecond: MaybeEl;
+    strawsPurchased: MaybeEl;
+    cupsPurchased: MaybeEl;
+    widerStrawsPurchased: MaybeEl;
+    betterCupsPurchased: MaybeEl;
+    suctionsPurchased: MaybeEl;
+    criticalClicksPurchased: MaybeEl;
+    currentLevel: MaybeEl;
+    totalUpgrades: MaybeEl;
+    fasterDrinksOwned: MaybeEl;
+    levelUpDiv: MaybeEl;
+    init: () => void;
+    get: (id: string) => MaybeEl;
+    isReady: () => boolean;
+} = {
     levelNumber: null,
     levelText: null,
     sodaButton: null,
     topSipValue: null,
     topSipsPerDrink: null,
     topSipsPerSecond: null,
-
-    // Music player elements
     musicPlayer: null,
     musicToggleBtn: null,
     musicMuteBtn: null,
     musicStatus: null,
     musicStreamSelect: null,
     currentStreamInfo: null,
-
-    // Shop elements
     shopDiv: null,
     widerStraws: null,
     betterCups: null,
@@ -75,15 +69,9 @@ const DOM_CACHE = {
     betterCupsSPD: null,
     totalWiderStrawsSPD: null,
     totalBetterCupsSPD: null,
-
-    // Stats elements
     statsTab: null,
-
-            // Progress elements
-        progressFill: null,
-        countdown: null,
-
-    // Additional elements that are frequently accessed
+    progressFill: null,
+    countdown: null,
     playTime: null,
     lastSaveTime: null,
     totalPlayTime: null,
@@ -105,28 +93,20 @@ const DOM_CACHE = {
     totalUpgrades: null,
     fasterDrinksOwned: null,
     levelUpDiv: null,
-
-    // Initialize all cached elements
-    init: function() {
+    init: function () {
         console.log('Initializing DOM cache...');
-
-        // Core game elements
         this.levelNumber = document.getElementById('levelNumber');
         this.levelText = document.getElementById('levelText');
         this.sodaButton = document.getElementById('sodaButton');
         this.topSipValue = document.getElementById('topSipValue');
         this.topSipsPerDrink = document.getElementById('topSipsPerDrink');
         this.topSipsPerSecond = document.getElementById('topSipsPerSecond');
-
-        // Music player elements
-        this.musicPlayer = document.querySelector('.music-player');
+        this.musicPlayer = document.querySelector('.music-player') as HTMLElement | null;
         this.musicToggleBtn = document.getElementById('musicToggleBtn');
         this.musicMuteBtn = document.getElementById('musicMuteBtn');
         this.musicStatus = document.getElementById('musicStatus');
         this.musicStreamSelect = document.getElementById('musicStreamSelect');
         this.currentStreamInfo = document.getElementById('currentStreamInfo');
-
-        // Shop elements
         this.shopDiv = document.getElementById('shopDiv');
         this.widerStraws = document.getElementById('widerStraws');
         this.betterCups = document.getElementById('betterCups');
@@ -134,15 +114,9 @@ const DOM_CACHE = {
         this.betterCupsSPD = document.getElementById('betterCupsSPD');
         this.totalWiderStrawsSPD = document.getElementById('totalWiderStrawsSPD');
         this.totalBetterCupsSPD = document.getElementById('totalBetterCupsSPD');
-
-        // Stats elements
         this.statsTab = document.getElementById('statsTab');
-
-        // Progress elements
         this.progressFill = document.getElementById('drinkProgressFill');
         this.countdown = document.getElementById('drinkCountdown');
-
-        // Additional frequently accessed elements
         this.playTime = document.getElementById('playTime');
         this.lastSaveTime = document.getElementById('lastSaveTime');
         this.totalPlayTime = document.getElementById('totalPlayTime');
@@ -164,36 +138,26 @@ const DOM_CACHE = {
         this.totalUpgrades = document.getElementById('totalUpgrades');
         this.fasterDrinksOwned = document.getElementById('fasterDrinksOwned');
         this.levelUpDiv = document.getElementById('levelUpDiv');
-
         console.log('DOM cache initialized successfully');
     },
-
-    // Utility method to get an element by ID if it's not already cached
-    get: function(id) {
-        return document.getElementById(id);
-    },
-
-    // Utility method to check if all critical elements are loaded
-    isReady: function() {
-        return !!(this.sodaButton && this.musicPlayer && this.shopDiv);
-    }
+    get: function (id: string) { return document.getElementById(id); },
+    isReady: function () { return !!(this.sodaButton && this.shopDiv); }
 };
 
-// Expose DOM cache to window for module access
-/** @type {any} */ (window).DOM_CACHE = DOM_CACHE;
+// Expose globally
+try { (window as any).DOM_CACHE = DOM_CACHE; } catch {}
 
 // Auto-initialize when DOM is ready if not already initialized
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         console.log('DOMContentLoaded - initializing DOM_CACHE');
-        if (!DOM_CACHE.isReady()) {
-            DOM_CACHE.init();
-        }
+        if (!DOM_CACHE.isReady()) DOM_CACHE.init();
     });
 } else {
-    // DOM already loaded
     console.log('DOM already loaded - initializing DOM_CACHE');
-    if (!DOM_CACHE.isReady()) {
-        DOM_CACHE.init();
-    }
+    if (!DOM_CACHE.isReady()) DOM_CACHE.init();
 }
+
+export {}
+
+
