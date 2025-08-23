@@ -288,9 +288,22 @@ function setupSpecialButtonHandlers() {
     const sodaDomCacheBtn = window.DOM_CACHE?.sodaButton;
     const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
     if (sodaButton && sodaButton.addEventListener) {
+        // Tap-to-click gesture: trigger on release if not scrolled
         if (window.PointerEvent) {
+            let active = false; let moved = false; let sx = 0; let sy = 0;
+            const reset = () => { active = false; moved = false; };
             sodaButton.addEventListener('pointerdown', (e) => {
-                if (e && e.pointerType && e.pointerType !== 'mouse') {
+                if (!e || e.pointerType === 'mouse') return; // mouse handled by click
+                active = true; moved = false; sx = e.clientX || 0; sy = e.clientY || 0;
+            });
+            sodaButton.addEventListener('pointermove', (e) => {
+                if (!active || !e || e.pointerType === 'mouse') return;
+                const dx = (e.clientX || 0) - sx; const dy = (e.clientY || 0) - sy;
+                if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true; // small threshold
+            });
+            sodaButton.addEventListener('pointerup', (e) => {
+                if (!active || !e || e.pointerType === 'mouse') { reset(); return; }
+                if (!moved) {
                     markPointerHandled(sodaButton);
                     try {
                         if (window.App?.systems?.clicks?.handleSodaClick) {
@@ -300,18 +313,36 @@ function setupSpecialButtonHandlers() {
                         }
                     } catch {}
                 }
+                reset();
             });
+            sodaButton.addEventListener('pointercancel', reset);
         } else if ('ontouchstart' in window) {
+            let active = false; let moved = false; let sx = 0; let sy = 0;
+            const reset = () => { active = false; moved = false; };
             sodaButton.addEventListener('touchstart', (e) => {
-                markPointerHandled(sodaButton);
-                try {
-                    if (window.App?.systems?.clicks?.handleSodaClick) {
-                        window.App.systems.clicks.handleSodaClick(1, e);
-                    } else {
-                        window.sodaClick?.(1, e);
-                    }
-                } catch {}
+                if (!e || !e.touches || !e.touches[0]) return;
+                active = true; moved = false; sx = e.touches[0].clientX || 0; sy = e.touches[0].clientY || 0;
             }, { passive: true });
+            sodaButton.addEventListener('touchmove', (e) => {
+                if (!active || !e || !e.touches || !e.touches[0]) return;
+                const dx = (e.touches[0].clientX || 0) - sx; const dy = (e.touches[0].clientY || 0) - sy;
+                if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
+            }, { passive: true });
+            sodaButton.addEventListener('touchend', (e) => {
+                if (!active) { reset(); return; }
+                if (!moved) {
+                    markPointerHandled(sodaButton);
+                    try {
+                        if (window.App?.systems?.clicks?.handleSodaClick) {
+                            window.App.systems.clicks.handleSodaClick(1, e);
+                        } else {
+                            window.sodaClick?.(1, e);
+                        }
+                    } catch {}
+                }
+                reset();
+            });
+            sodaButton.addEventListener('touchcancel', reset);
         }
         sodaButton.addEventListener('click', (e) => {
             if (shouldSuppressClick(sodaButton)) return;

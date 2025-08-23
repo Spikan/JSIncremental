@@ -1073,7 +1073,7 @@ h3 {
     width: auto;
     cursor: pointer;
     transition: transform 0.1s ease, filter 0.15s ease;
-    touch-action: manipulation;
+    touch-action: pan-y; /* allow vertical scroll while touching */
     /* Prevent layout shifts by maintaining consistent dimensions */
     min-height: 200px;
     min-width: 200px;
