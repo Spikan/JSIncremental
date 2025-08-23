@@ -108,7 +108,7 @@ soda-clicker-pro/
 │   ├── 📁 services/              # Service layer
 │   │   ├── 📄 storage.ts         # Abstracted localStorage operations
 │   │   ├── 📄 event-bus.ts       # Event bus implementation
-│   │   └── 📄 error-overlay.js   # Error handling and display
+│   │   └── 📄 error-overlay.ts   # Error handling and display
 │   │
 │   └── 📁 ui/                    # User interface system
 │       ├── 📄 index.ts           # UI system coordinator (switchTab lives here)

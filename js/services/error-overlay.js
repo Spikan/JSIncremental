@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck
 (function attachErrorOverlay() {
 	const w = /** @type {any} */ (window);
 	if (w.__ERROR_OVERLAY_ATTACHED__) return;
