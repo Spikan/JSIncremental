@@ -47,7 +47,7 @@ const LIMITS = GC.LIMITS || {};
 // 
 // REMAINING IN THIS FILE:
 // - Game initialization logic (initGame, startGameLoop)
-// - Core game mechanics (processDrink, trackClick)
+// - Legacy helper stubs only; core mechanics now handled by App.systems
 // - Mobile touch handling
 // - Legacy global variables and DOM cache
 // - Tab switching and UI event handlers
@@ -710,53 +710,6 @@ function setupMobileTouchHandling() {
 
 // Use App.ui.updateDrinkProgress() in js/ui/displays.ts
 
-function processDrink() {
-    const currentTime = Date.now();
-    // Read from App.state with safe fallbacks
-    const st = (typeof window !== 'undefined' && window.App?.state?.getState?.()) || {};
-    const last = Number(st.lastDrinkTime ?? (typeof lastDrinkTime !== 'undefined' ? lastDrinkTime : 0));
-    const rate = Number(st.drinkRate ?? (typeof drinkRate !== 'undefined' ? drinkRate : 1000));
-    if (currentTime - last >= rate) {
-        // Add full sips-per-drink (base + production)
-        const config = BAL || {};
-        const sipsPerDrinkDec = (sps && typeof sps.toNumber === 'function')
-            ? sps
-            : new Decimal(Number(window.App?.state?.getState?.()?.sps || config.BASE_SIPS_PER_DRINK));
-        window.sips = window.sips.plus(sipsPerDrinkDec);
-        totalSipsEarned = totalSipsEarned.plus(sipsPerDrinkDec);
-
-        try { console.log('🥤 Drink processed! Added', (typeof sipsPerDrinkDec.toNumber === 'function') ? sipsPerDrinkDec.toNumber() : Number(sipsPerDrinkDec), 'sips'); } catch {}
-        
-        const nextLast = currentTime;
-        lastDrinkTime = nextLast;
-        drinkProgress = 0;
-        try {
-            window.App?.stateBridge?.setLastDrinkTime(nextLast);
-            window.App?.stateBridge?.setDrinkProgress(drinkProgress);
-            // Also write sips to state directly
-            const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
-            const sipsNum = toNum(window.sips);
-            const drinkRateSec = rate ? (1000 / rate) : 0;
-            const spsNum = toNum(sps);
-            const currentSipsPerSecond = spsNum * drinkRateSec;
-            const prevHigh = Number(window.App?.state?.getState?.()?.highestSipsPerSecond || 0);
-            const highest = Math.max(prevHigh, currentSipsPerSecond);
-            const prevTotal = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
-            window.App?.state?.setState?.({ sips: sipsNum, highestSipsPerSecond: highest, totalSipsEarned: prevTotal + toNum(sipsPerDrinkDec), lastDrinkTime: nextLast, drinkProgress });
-            // Trigger key UI updates
-            try { window.App?.ui?.updateTopSipsPerDrink?.(); } catch {}
-            try { window.App?.ui?.updateTopSipsPerSecond?.(); } catch {}
-            try { window.App?.ui?.updateTopSipCounter?.(); } catch {}
-            try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-        } catch {}
-        
-        // Check for feature unlocks after processing a drink
-        try { window.App?.systems?.unlocks?.checkAllUnlocks?.(); } catch {}
-        
-        // Autosave handled by core drink-system; legacy block removed
-    }
-}
-
 // setDrinkRate legacy helper removed; owned by systems
 
 // Use App.ui.updateDrinkRate() in js/ui/displays.ts
@@ -769,19 +722,7 @@ function processDrink() {
 
 // Use App.ui.updateCompactDrinkSpeedDisplays() in js/ui/displays.ts
 
-// Click tracking function
-function trackClick() {
-    console.log('🔧 trackClick called');
-    try { window.App?.systems?.clicks?.trackClick?.(); } catch {}
-    // Play button click sound effect handled in clicks system as well; keep fallback
-    try { window.App?.systems?.audio?.button?.playButtonClickSound?.(); } catch {}
-    
-    // Update stats display if stats tab is active
-    if (DOM_CACHE.statsTab && DOM_CACHE.statsTab.classList.contains('active')) {
-        try { window.App?.ui?.updateClickStats?.(); } catch {}
-    }
-    // State updates handled by clicks system
-}
+// Click tracking handled by App.systems.clicks
 
 // ============================================================================
 // DEV FUNCTIONS FOR DEVELOPMENT AND TESTING
