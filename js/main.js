@@ -546,6 +546,15 @@ function initGame() {
             });
         }
         let gameStartDate = Date.now();
+        if (!Object.getOwnPropertyDescriptor(window, 'gameStartDate')) {
+            Object.defineProperty(window, 'gameStartDate', {
+                get: function() { return gameStartDate; },
+                set: function(v) {
+                    gameStartDate = Number(v) || Date.now();
+                    try { window.App?.state?.setState?.({ sessionStartTime: Number(gameStartDate) }); } catch {}
+                }
+            });
+        }
         window.lastClickTime = 0;
         window.clickTimes = []; // For calculating clicks per second
 
