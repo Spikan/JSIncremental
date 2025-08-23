@@ -1,6 +1,6 @@
 // UI Affordability System
 // Handles checking and updating button states based on resource availability
-import { getUpgradesAndConfig } from '../core/systems/config-accessor.ts';
+import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability() {
