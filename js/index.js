@@ -1,9 +1,9 @@
 // Entry module providing a small public API surface and environment checks
 // Note: Converted from ES6 modules to regular script loading
 
-// Create placeholder objects since we're not using imports
-const createStore = window.createStore || ((state) => ({ getState: () => state, setState: () => {} }));
-const defaultState = window.defaultState || {};
+// Import typed store and default state
+import { createStore } from './core/state/index.ts';
+import { defaultState } from './core/state/shape.ts';
 const storage = window.storage || { loadGame: () => null, saveGame: () => {} };
 const eventBus = window.eventBus || { emit: () => {}, on: () => {} };
 // Pull event names from module export if available; fallback to global

@@ -14,9 +14,8 @@
     "baseUrl": "."
   },
   "include": [
-    "js/core/rules/**/*.js",
-    "js/core/systems/**/*.js",
-    "js/core/validation/**/*.js",
+    "js/core/**/*.ts",
+    "js/core/**/*.js",
     "types/**/*.d.ts"
   ],
   "exclude": [

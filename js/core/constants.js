@@ -36,6 +36,6 @@ export const EVENT_NAMES = {
 };
 
 // Make available globally (runtime uses non-module script loading)
-try { window.EVENT_NAMES = EVENT_NAMES; } catch {}
+try { (/** @type {any} */ (window)).EVENT_NAMES = EVENT_NAMES; } catch {}
 
 

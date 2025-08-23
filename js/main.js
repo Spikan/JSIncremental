@@ -452,7 +452,7 @@ function initGame() {
         let autosaveCounter = 0;
         // Load options via system and seed App.state + locals
         try {
-            const defaults = (window.defaultState && window.defaultState.options) || { autosaveEnabled: true, autosaveInterval: 30, clickSoundsEnabled: true, musicEnabled: true };
+            const defaults = (window.App?.state?.getState?.()?.options) || { autosaveEnabled: true, autosaveInterval: 30, clickSoundsEnabled: true, musicEnabled: true };
             const loaded = (window.App?.systems?.options?.loadOptions && window.App.systems.options.loadOptions(defaults)) || defaults;
             try { window.App?.state?.setState?.({ options: loaded }); } catch {}
             autosaveEnabled = !!loaded.autosaveEnabled;
