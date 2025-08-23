@@ -1232,28 +1232,8 @@ function devShowDebugInfo() {
 
 function devExportSave() {
     try {
-        if (window.App?.storage?.exportGame) {
-            window.App.storage.exportGame();
-        } else {
-            // Fallback export
-            const st = window.App?.state?.getState?.() || {};
-            const saveData = {
-                sips: (typeof st.sips !== 'undefined') ? String(st.sips) : window.sips?.toString(),
-                straws: (typeof st.straws !== 'undefined') ? String(st.straws) : window.straws?.toString(),
-                cups: (typeof st.cups !== 'undefined') ? String(st.cups) : window.cups?.toString(),
-                level: (typeof st.level !== 'undefined') ? String(st.level) : window.level?.toString(),
-                timestamp: Date.now()
-            };
-            const dataStr = JSON.stringify(saveData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `soda-clicker-save-${Date.now()}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-            console.log('💾 Save exported via dev function');
-        }
+        if (window.App?.systems?.dev?.exportSave) return !!window.App.systems.dev.exportSave();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devExportSave:', error);
     }
@@ -1261,34 +1241,8 @@ function devExportSave() {
 
 function devImportSave() {
     try {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const saveData = JSON.parse(e.target.result);
-                        // Apply imported save data
-                        if (saveData.sips) window.sips = new Decimal(saveData.sips);
-                        if (saveData.straws) window.straws = new Decimal(saveData.straws);
-                        if (saveData.cups) window.cups = new Decimal(saveData.cups);
-                        if (saveData.level) window.level = new Decimal(saveData.level);
-                        
-                        console.log('📥 Save imported via dev function');
-                        // Update UI
-                        try { window.App?.ui?.updateAllStats?.(); } catch {}
-                        try { window.App?.ui?.checkUpgradeAffordability?.(); } catch {}
-                    } catch (error) {
-                        console.error('Error parsing imported save:', error);
-                    }
-                };
-                reader.readAsText(file);
-            }
-        };
-        input.click();
+        if (window.App?.systems?.dev?.openImportDialog) return !!window.App.systems.dev.openImportDialog();
+        console.warn('Dev system not available');
     } catch (error) {
         console.error('Error in devImportSave:', error);
     }

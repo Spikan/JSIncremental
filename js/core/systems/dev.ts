@@ -121,4 +121,62 @@ export function showDebugInfo(): boolean {
   } catch { return false; }
 }
 
+export function exportSave(): boolean {
+  try {
+    const w = window as Win;
+    const st = w.App?.state?.getState?.() || {};
+    const saveData: any = {
+      sips: String(st.sips ?? (w.sips?.toString?.() ?? 0)),
+      straws: String(st.straws ?? (w.straws?.toString?.() ?? 0)),
+      cups: String(st.cups ?? (w.cups?.toString?.() ?? 0)),
+      level: String(st.level ?? (w.level?.toString?.() ?? 1)),
+      timestamp: Date.now(),
+    };
+    const dataStr = JSON.stringify(saveData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `soda-clicker-save-${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    return true;
+  } catch { return false; }
+}
+
+export function openImportDialog(): boolean {
+  try {
+    const w = window as Win;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = function (e: any) {
+      const file = e?.target?.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev: any) {
+        try {
+          const saveData = JSON.parse(ev?.target?.result || '{}');
+          if (saveData.sips != null) w.sips = w.Decimal ? new w.Decimal(saveData.sips) : Number(saveData.sips);
+          if (saveData.straws != null) w.straws = w.Decimal ? new w.Decimal(saveData.straws) : Number(saveData.straws);
+          if (saveData.cups != null) w.cups = w.Decimal ? new w.Decimal(saveData.cups) : Number(saveData.cups);
+          if (saveData.level != null) w.level = w.Decimal ? new w.Decimal(saveData.level) : Number(saveData.level);
+          // Mirror to App.state minimally
+          w.App?.state?.setState?.({
+            sips: toNum(w.sips),
+            straws: toNum(w.straws),
+            cups: toNum(w.cups),
+            level: toNum(w.level),
+          });
+          w.App?.ui?.updateAllStats?.();
+          w.App?.ui?.checkUpgradeAffordability?.();
+        } catch {}
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+    return true;
+  } catch { return false; }
+}
+
 
