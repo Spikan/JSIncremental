@@ -5,6 +5,7 @@ import { updateButtonState, updateCostDisplay, formatNumber } from './utils';
 
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability(): void {
+    if (typeof window === 'undefined') return;
     const { upgrades: dataUp, config } = getUpgradesAndConfig();
 
     const currentSips = Number((window as any).App?.state?.getState?.()?.sips || 0);

@@ -238,7 +238,6 @@ export const FEATURE_UNLOCKS = {
   },
 };
 
-// Attach globally
-try { (window as any).FEATURE_UNLOCKS = FEATURE_UNLOCKS; console.log('=== FEATURE-UNLOCKS.TS FULLY LOADED ==='); } catch {}
+// No global attach; loaded into App.systems.unlocks by js/index.js
 
 
