@@ -128,8 +128,7 @@ const FEATURE_DETECTION = {
     }
 };
 
-// Feature Unlock System - Now imported from js/feature-unlocks.js
-// The FEATURE_UNLOCKS object is defined in the separate module file
+// Feature Unlock System lives at js/feature-unlocks.ts and attaches to App.systems.unlocks
 
 // Main module loaded
 
@@ -159,7 +158,7 @@ function initSplashScreen() { try { window.App?.systems?.gameInit?.initSplashScr
 
 // Tab switching moved to UI module (App.ui.switchTab)
 
-// Note: Button system has been moved to js/ui/buttons.js as part of the UI system
+// Note: Button system lives at js/ui/buttons.ts as part of the UI system
 
 // ============================================================================
 // DUPLICATE FUNCTIONS REMOVED - NOW USING MODULAR ARCHITECTURE
@@ -169,13 +168,13 @@ function initSplashScreen() { try { window.App?.systems?.gameInit?.initSplashScr
 // All calls now use the App namespace for better organization and maintainability.
 
 // Check if upgrades are affordable and update UI accordingly
-// MOVED TO: js/ui/affordability.js - use App.ui.checkUpgradeAffordability()
+// MOVED TO: js/ui/affordability.ts - use App.ui.checkUpgradeAffordability()
 
 // Update button state based on affordability  
-// MOVED TO: js/ui/utils.js - use App.ui.updateButtonState()
+// MOVED TO: js/ui/utils.ts - use App.ui.updateButtonState()
 
 // Update cost display with affordability indicators
-// MOVED TO: js/ui/utils.js - use App.ui.updateCostDisplay()
+// MOVED TO: js/ui/utils.ts - use App.ui.updateCostDisplay()
 
 function initGame() {
     try {
@@ -588,7 +587,7 @@ function initGame() {
         suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
 
         // Initialize drink rate based on upgrades
-        // updateDrinkRate(); // This function has been moved to js/ui/displays.js
+        // updateDrinkRate(); // This function lives in js/ui/displays.ts
 
         // Restore in-progress drink timing if present in save
         try {
@@ -647,7 +646,7 @@ function initGame() {
         setupMobileTouchHandling();
         
         // Update critical click display with initial value
-        // updateCriticalClickDisplay() // This function has been moved to js/ui/displays.js
+        // updateCriticalClickDisplay() // This function lives in js/ui/displays.ts
         
         // Initialize button audio system (delegated to module)
         try {
@@ -709,7 +708,7 @@ function setupMobileTouchHandling() {
     }
 }
 
-// Function moved to js/ui/displays.js - use App.ui.updateDrinkProgress()
+// Use App.ui.updateDrinkProgress() in js/ui/displays.ts
 
 function processDrink() {
     const currentTime = Date.now();
@@ -760,19 +759,15 @@ function processDrink() {
 
 // setDrinkRate legacy helper removed; owned by systems
 
-// Function to calculate and update drink rate based on upgrades
-// Function moved to js/ui/displays.js - use App.ui.updateDrinkRate()
+// Use App.ui.updateDrinkRate() in js/ui/displays.ts
 
 // getDrinkRateSeconds legacy helper removed
 
-// Function to update the top sips per drink display
-// Function moved to js/ui/displays.js - use App.ui.updateTopSipsPerDrink()
+// Use App.ui.updateTopSipsPerDrink() in js/ui/displays.ts
 
-// Function to update the top total sips per second display (passive production only)
-// Function moved to js/ui/displays.js - use App.ui.updateTopSipsPerSecond()
+// Use App.ui.updateTopSipsPerSecond() in js/ui/displays.ts
 
-// Function to update the compact drink speed displays
-// Function moved to js/ui/displays.js - use App.ui.updateCompactDrinkSpeedDisplays()
+// Use App.ui.updateCompactDrinkSpeedDisplays() in js/ui/displays.ts
 
 // Click tracking function
 function trackClick() {
@@ -829,41 +824,36 @@ function startGame() {
 // Load click sounds preference from storage
 // loadClickSoundsPreference legacy helper removed; options/audio systems own persistence
 
-// Function to update drink speed display
-// Function moved to js/ui/displays.js - use App.ui.updateDrinkSpeedDisplay()
+// Use App.ui.updateDrinkSpeedDisplay() in js/ui/displays.ts
 
-// Function to update crit chance stat
-// Function moved to js/ui/displays.js - use App.ui.updateCriticalClickDisplay()
+// Use App.ui.updateCriticalClickDisplay() in js/ui/displays.ts
 
 // Auto-save management functions
 // toggleAutosave legacy helper removed; options system handles UI and persistence
 
 // changeAutosaveInterval legacy helper removed; options system handles UI and persistence
 
-// Function moved to js/ui/displays.js - use App.ui.updateAutosaveStatus()
+// Use App.ui.updateAutosaveStatus() in js/ui/displays.ts
 
-// Options management functions
-// Function moved to js/core/systems/options-system.js - use App.systems.options.saveOptions
+// Options management functions live in js/core/systems/options-system.ts; use App.systems.options.saveOptions
 
-// Function moved to js/core/systems/options-system.js - use App.systems.options.loadOptions
+// Options management functions live in js/core/systems/options-system.ts; use App.systems.options.loadOptions
 
-// Play time tracking
-// Function moved to js/ui/stats.js - use App.ui.updatePlayTime()
+// Play time tracking lives in js/ui/stats.ts; use App.ui.updatePlayTime()
 
-// Function moved to js/ui/stats.js - use App.ui.updateLastSaveTime()
+// Use App.ui.updateLastSaveTime() in js/ui/stats.ts
 
-// Statistics update functions
-// Function moved to js/ui/stats.js - use App.ui.updateAllStats()
+// Statistics update functions live in js/ui/stats.ts; use App.ui.updateAllStats()
 
-// Function moved to js/ui/stats.js - use App.ui.updateTimeStats()
+// Use App.ui.updateTimeStats() in js/ui/stats.ts
 
-// Function moved to js/ui/stats.js - use App.ui.updateClickStats()
+// Use App.ui.updateClickStats() in js/ui/stats.ts
 
-// Function moved to js/ui/stats.js - use App.ui.updateEconomyStats()
+// Use App.ui.updateEconomyStats() in js/ui/stats.ts
 
-// Function moved to js/ui/stats.js - use App.ui.updateShopStats()
+// Use App.ui.updateShopStats() in js/ui/stats.ts
 
-// Function moved to js/ui/stats.js - use App.ui.updateAchievementStats()
+// Use App.ui.updateAchievementStats() in js/ui/stats.ts
 
 // Click tracking function
 
