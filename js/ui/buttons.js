@@ -127,6 +127,18 @@ const BUTTON_CONFIG = {
     }
 };
 
+// Pointer/click de-duplication helpers (avoid double-trigger on touch)
+const POINTER_SUPPRESS_MS = 500;
+function markPointerHandled(element) {
+    try { element.__lastPointerTs = Date.now(); } catch {}
+}
+function shouldSuppressClick(element) {
+    try {
+        const last = Number(element && element.__lastPointerTs || 0);
+        return (Date.now() - last) < POINTER_SUPPRESS_MS;
+    } catch { return false; }
+}
+
 // Modern button click handler
 function handleButtonClick(event, button, actionName) {
     // Prevent default to ensure our system handles everything
@@ -217,8 +229,24 @@ function setupUnifiedButtonSystem() {
                     // Remove the old onclick attribute
                     button.removeAttribute('onclick');
                     
-                    // Add modern event listener
-                    button.addEventListener('click', (e) => handleButtonClick(e, button, actionName));
+                    // Add modern event listeners (pointer for touch/pen, click for mouse/tests)
+                    if (window.PointerEvent) {
+                        button.addEventListener('pointerdown', (e) => {
+                            if (e && e.pointerType && e.pointerType !== 'mouse') {
+                                markPointerHandled(button);
+                                handleButtonClick(e, button, actionName);
+                            }
+                        });
+                    } else if ('ontouchstart' in window) {
+                        button.addEventListener('touchstart', (e) => {
+                            markPointerHandled(button);
+                            handleButtonClick(e, button, actionName);
+                        }, { passive: true });
+                    }
+                    button.addEventListener('click', (e) => {
+                        if (shouldSuppressClick(button)) return;
+                        handleButtonClick(e, button, actionName);
+                    });
                     
                     // Add appropriate CSS classes for styling
                     if (action.type) {
@@ -260,7 +288,33 @@ function setupSpecialButtonHandlers() {
     const sodaDomCacheBtn = window.DOM_CACHE?.sodaButton;
     const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
     if (sodaButton && sodaButton.addEventListener) {
+        if (window.PointerEvent) {
+            sodaButton.addEventListener('pointerdown', (e) => {
+                if (e && e.pointerType && e.pointerType !== 'mouse') {
+                    markPointerHandled(sodaButton);
+                    try {
+                        if (window.App?.systems?.clicks?.handleSodaClick) {
+                            window.App.systems.clicks.handleSodaClick(1, e);
+                        } else {
+                            window.sodaClick?.(1, e);
+                        }
+                    } catch {}
+                }
+            });
+        } else if ('ontouchstart' in window) {
+            sodaButton.addEventListener('touchstart', (e) => {
+                markPointerHandled(sodaButton);
+                try {
+                    if (window.App?.systems?.clicks?.handleSodaClick) {
+                        window.App.systems.clicks.handleSodaClick(1, e);
+                    } else {
+                        window.sodaClick?.(1, e);
+                    }
+                } catch {}
+            }, { passive: true });
+        }
         sodaButton.addEventListener('click', (e) => {
+            if (shouldSuppressClick(sodaButton)) return;
             try {
                 if (window.App?.systems?.clicks?.handleSodaClick) {
                     window.App.systems.clicks.handleSodaClick(1, e);
@@ -286,7 +340,25 @@ function setupSpecialButtonHandlers() {
         ? document.querySelector('.splash-start-btn')
         : null;
     if (splashStartBtn && splashStartBtn.addEventListener) {
+        if (window.PointerEvent) {
+            splashStartBtn.addEventListener('pointerdown', (e) => {
+                if (e && e.pointerType && e.pointerType !== 'mouse') {
+                    markPointerHandled(splashStartBtn);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try { window.startGame?.(); } catch {}
+                }
+            });
+        } else if ('ontouchstart' in window) {
+            splashStartBtn.addEventListener('touchstart', (e) => {
+                markPointerHandled(splashStartBtn);
+                e.preventDefault();
+                e.stopPropagation();
+                try { window.startGame?.(); } catch {}
+            }, { passive: true });
+        }
         splashStartBtn.addEventListener('click', (e) => {
+            if (shouldSuppressClick(splashStartBtn)) return;
             e.preventDefault();
             e.stopPropagation();
             try { window.startGame?.(); } catch {}
@@ -295,11 +367,14 @@ function setupSpecialButtonHandlers() {
 
     // Generic data-action dispatcher for buttons (guard for test env)
     if (document && document.body && document.body.addEventListener) {
-    document.body.addEventListener('click', (e) => {
+    // Pointer-first dispatcher for touch/pen
+    if (window.PointerEvent) {
+    document.body.addEventListener('pointerdown', (e) => {
         const target = e.target;
         if (!(target instanceof HTMLElement)) return;
         const el = target.closest('[data-action]');
         if (!el) return;
+        if (e && e.pointerType && e.pointerType === 'mouse') return; // let mouse use click handler
         const action = el.getAttribute('data-action');
         if (!action) return;
         const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
@@ -318,6 +393,89 @@ function setupSpecialButtonHandlers() {
         // Block unaffordable/disabled purchases before any side effects
         if (isPurchase) {
             const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') : el;
+            const disabled = !!(buttonEl && (buttonEl.disabled || buttonEl.classList?.contains('disabled') || buttonEl.classList?.contains('unaffordable')));
+            if (disabled) return; // silently ignore
+        }
+        const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') : el;
+        if (buttonEl) markPointerHandled(buttonEl);
+        if (typeof window[fnName] === 'function' || (isPurchase && window.App?.systems?.purchases?.execute?.[fnName])) {
+            e.preventDefault();
+            e.stopPropagation();
+            try {
+                let success = true;
+                if (fnName === 'switchTab') {
+                    try { window.App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
+                    window[fnName](args[0], e);
+                } else {
+                    if (isPurchase && window.App?.systems?.purchases?.execute?.[fnName]) {
+                        success = !!window.App.systems.purchases.execute[fnName]();
+                    } else {
+                        const ret = window[fnName](...args);
+                        success = (typeof ret === 'undefined') ? true : !!ret;
+                    }
+                    // Play audio only after successful action
+                    try {
+                        const meta = BUTTON_CONFIG.actions[fnName];
+                        const btnType = meta && meta.type;
+                        if (window.App?.systems?.audio?.button && fnName !== 'sodaClick') {
+                            if ((btnType === 'shop-btn' || btnType === 'clicking-upgrade-btn' || btnType === 'drink-speed-upgrade-btn' || btnType === 'level-up-btn')) {
+                                if (success) window.App.systems.audio.button.playButtonPurchaseSound?.();
+                            } else {
+                                window.App.systems.audio.button.playButtonClickSound?.();
+                            }
+                        }
+                    } catch {}
+                }
+                // Show purchase feedback for shop/upgrade actions at click point
+                if (isPurchase && typeof window.App?.ui?.showPurchaseFeedback === 'function' && success) {
+                    let costValue;
+                    try {
+                        // Prefer an explicit cost-number span inside the button element
+                        const costSpan = el.querySelector('.cost-number');
+                        if (costSpan) {
+                            costValue = Number(costSpan.textContent);
+                        } else {
+                            // Fallback: try to parse any number in the button text
+                            const match = (el.textContent || '').replace(/[,]/g,'').match(/\d+(?:\.\d+)?/);
+                            costValue = match ? Number(match[0]) : undefined;
+                        }
+                    } catch {}
+                    const rect = el.getBoundingClientRect();
+                    const cx = (typeof e.clientX === 'number') ? e.clientX : (rect.left + rect.width/2);
+                    const cy = (typeof e.clientY === 'number') ? e.clientY : (rect.top + rect.height/2);
+                    if (typeof costValue === 'number' && !Number.isNaN(costValue)) {
+                        window.App.ui.showPurchaseFeedback(fnName, costValue, cx, cy);
+                    }
+                }
+            } catch (err) { console.warn('action failed', fnName, err); }
+        }
+    }, { capture: true });
+    }
+    // Mouse/click dispatcher
+    document.body.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const el = target.closest('[data-action]');
+        if (!el) return;
+        const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') : el;
+        if (buttonEl && shouldSuppressClick(buttonEl)) return; // suppressed by recent touch/pointer
+        const action = el.getAttribute('data-action');
+        if (!action) return;
+        const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
+        const argsAttr = el.getAttribute('data-args') || argStr;
+        let args = [];
+        if (argsAttr) {
+            const maybeNum = Number(argsAttr);
+            args = Number.isNaN(maybeNum) ? [argsAttr] : [maybeNum];
+        }
+        // Define purchase actions set up-front
+        const purchaseActions = new Set([
+            'buyStraw','buyCup','buyWiderStraws','buyBetterCups',
+            'buySuction','buyFasterDrinks','upgradeFasterDrinks','buyCriticalClick'
+        ]);
+        const isPurchase = purchaseActions.has(fnName);
+        // Block unaffordable/disabled purchases before any side effects
+        if (isPurchase) {
             const disabled = !!(buttonEl && (buttonEl.disabled || buttonEl.classList?.contains('disabled') || buttonEl.classList?.contains('unaffordable')));
             if (disabled) return; // silently ignore
         }
@@ -376,11 +534,25 @@ function setupSpecialButtonHandlers() {
 
     // Redundant safety: capture clicks on START button by class as well
     if (document && document.body && document.body.addEventListener) {
+    if (window.PointerEvent) {
+    document.body.addEventListener('pointerdown', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const startEl = target.closest('.splash-start-btn');
+        if (!startEl) return;
+        if (e && e.pointerType && e.pointerType === 'mouse') return;
+        markPointerHandled(startEl);
+        e.preventDefault();
+        e.stopPropagation();
+        try { window.startGame?.(); } catch (err) { console.warn('startGame failed', err); }
+    }, { capture: true });
+    }
     document.body.addEventListener('click', (e) => {
         const target = e.target;
         if (!(target instanceof HTMLElement)) return;
         const startEl = target.closest('.splash-start-btn');
         if (!startEl) return;
+        if (shouldSuppressClick(startEl)) return;
         e.preventDefault();
         e.stopPropagation();
         try { window.startGame?.(); } catch (err) { console.warn('startGame failed', err); }
