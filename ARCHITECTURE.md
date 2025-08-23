@@ -47,6 +47,10 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 - `js/ui/buttons.js` — event delegation via `data-action`
 - `types/global.d.ts` — ambient global types (`App`, `GameState`, etc.)
 - `tsconfig.json` — JS-with-types configuration
+- TypeScript conversions with extensionless imports:
+  - `js/core/rules/*.ts` (`clicks`, `economy`, `purchases`)
+  - `js/core/systems/resources.ts`, `purchases-system.ts`, `save-system.ts`, `loop-system.ts`
+  - `js/core/validation/schemas.ts`
 
 ## 📁 Complete File Structure
 
@@ -80,23 +84,23 @@ soda-clicker-pro/
 │   │   │   └── 📄 bridge.js      # Legacy state bridge
 │   │   │
 │   │   ├── 📁 rules/             # Pure business logic
-│   │   │   ├── 📄 clicks.js      # Click calculations and mechanics
-│   │   │   ├── 📄 purchases.js   # Purchase cost calculations
-│   │   │   └── 📄 economy.js     # Economy calculations (SPD, SPS)
+│   │   │   ├── 📄 clicks.ts      # Click calculations and mechanics
+│   │   │   ├── 📄 purchases.ts   # Purchase cost calculations
+│   │   │   └── 📄 economy.ts     # Economy calculations (SPD, SPS)
 │   │   │
 │   │   ├── 📁 systems/           # Game systems
-│   │   │   ├── 📄 resources.js   # Resource production calculations
-│   │   │   ├── 📄 purchases-system.js # Purchase logic for all upgrades
+│   │   │   ├── 📄 resources.ts   # Resource production calculations
+│   │   │   ├── 📄 purchases-system.ts # Purchase logic for all upgrades
 │   │   │   ├── 📄 clicks-system.js # Click handling and feedback
 │   │   │   ├── 📄 autosave.js    # Autosave counter and timing logic
-│   │   │   ├── 📄 save-system.js # Save/load operations with validation
+│   │   │   ├── 📄 save-system.ts # Save/load operations with validation
 │   │   │   ├── 📄 options-system.js # Game options and preferences
-│   │   │   ├── 📄 loop-system.js # Game loop and timing management
+│   │   │   ├── 📄 loop-system.ts # Game loop and timing management
 │   │   │   ├── 📄 button-audio.js # Sound effects and audio preferences
 │   │   │   └── 📄 game-init.js   # Game initialization system
 │   │   │
 │   │   └── 📁 validation/        # Data validation schemas
-│   │       └── 📄 schemas.js     # Zod validation schemas
+│   │       └── 📄 schemas.ts     # Zod validation schemas
 │   │
 │   ├── 📁 services/              # Service layer
 │   │   ├── 📄 storage.js         # Abstracted localStorage operations
@@ -230,7 +234,7 @@ App.storage.setJSON('options', options);   // Store JSON data
 App.storage.getBoolean('clickSounds', true); // Get boolean with default
 ```
 
-### 4. **Validation System** (`js/core/validation/schemas.js`)
+### 4. **Validation System** (`js/core/validation/schemas.ts`)
 
 **Purpose**: Runtime data validation using Zod schemas
 
@@ -254,7 +258,7 @@ if (validatedUnlocks) {
 
 **Purpose**: Pure functions for game calculations
 
-**Economy Rules** (`economy.js`):
+**Economy Rules** (`economy.ts`):
 ```javascript
 computeStrawSPD(straws, baseSPD, widerStrawsCount, multiplier)
 computeCupSPD(cups, baseSPD, betterCupsCount, multiplier)
@@ -262,24 +266,24 @@ computeTotalSPD(straws, strawSPD, cups, cupSPD)
 computeTotalSipsPerDrink(baseSips, totalSPD)
 ```
 
-**Click Rules** (`clicks.js`):
+**Click Rules** (`clicks.ts`):
 - Click value calculations
 - Critical hit mechanics
 - Click streak tracking
 
-**Purchase Rules** (`purchases.js`):
+**Purchase Rules** (`purchases.ts`):
 - Cost scaling formulas
 - Affordability checking
 - Purchase validation
 
 ### 6. **Game Systems** (`js/core/systems/`)
 
-**Resources System** (`resources.js`):
+**Resources System** (`resources.ts`):
 - Centralized production recalculation
 - Configuration fallbacks (JSON → config.js → defaults)
 - Pure calculation functions
 
-**Purchases System** (`purchases-system.js`):
+**Purchases System** (`purchases-system.ts`):
 - Upgrade purchase logic
 - Cost calculations
 - Purchase validation
@@ -289,7 +293,7 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 - Critical hit system
 - Click statistics
 
-**Save System** (`save-system.js`):
+**Save System** (`save-system.ts`):
 - Game state persistence
 - Save validation
 - Auto-save functionality
@@ -299,7 +303,7 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 - Option persistence
 - Default value handling
 
-**Loop System** (`loop-system.js`):
+**Loop System** (`loop-system.ts`):
 - Game loop management
 - Performance optimization
 - Frame rate control
@@ -361,7 +365,7 @@ User Purchase → main.js → App.events.emit(ECONOMY.PURCHASE) → UI System �
 
 ### 4. **Save/Load Flow**
 ```
-Auto-save Timer → save-system.js → validateGameSave() → storage.saveGame() → App.events.emit(GAME.SAVED)
+Auto-save Timer → save-system.ts → validateGameSave() → storage.saveGame() → App.events.emit(GAME.SAVED)
 Load Game → storage.loadGame() → validateGameSave() → App.state.setState() → App.events.emit(GAME.LOADED)
 ```
 

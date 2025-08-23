@@ -115,3 +115,11 @@ document.body.addEventListener('click', (e) => {
 
 **Use** `js/core/systems/config-accessor.js` to read upgrades and balance.
 Avoid duplicating logic or reading config directly in multiple places.
+
+---
+
+## Rule: Extensionless Imports for TS/JS Interop
+
+**What this means:**
+- Import internal modules without the `.js`/`.ts` extension: `import { x } from '../core/rules/economy'`
+- This keeps imports stable across JS→TS migrations and Vite resolves them correctly.

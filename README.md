@@ -34,16 +34,16 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 - `npm run dev` — Vite dev server with HMR
 - `npm run build` — Production build
 - `npm test` — Vitest test suite
-- `npm run typecheck` — TypeScript type-check (JS with JSDoc)
+- `npm run typecheck` — TypeScript type-check (JS + .ts, no emit)
 
 ### File Structure (high level)
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
 - `js/index.js` — Bootstraps `App`, attaches `EVENT_NAMES`, loads UI
 - `js/core/state/` — Central `App.state` store and legacy bridge
 - `js/ui/` — Displays, stats, buttons (event delegation), utils
-- `js/core/systems/` — Save, loop, options, purchases, resources
-- `js/core/rules/` — Pure business logic (clicks, purchases, economy)
-- `js/core/validation/` — Zod schemas and validators
+- `js/core/systems/` — Save, loop, options, purchases, resources (TypeScript where noted)
+- `js/core/rules/` — Pure business logic (clicks, purchases, economy) in `.ts`
+- `js/core/validation/` — Zod schemas and validators (`schemas.ts`)
 - `types/global.d.ts` — Ambient types for globals
 
 ## 📱 Mobile Support

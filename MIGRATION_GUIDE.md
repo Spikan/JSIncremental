@@ -8,7 +8,7 @@ This guide covers two migrations:
 
 ---
 
-## TypeScript Migration (Incremental, JS-first)
+## TypeScript Migration (Incremental, JS-first → selective .ts)
 
 ### Setup (Completed)
 - `tsconfig.json` with `allowJs: true`, `checkJs: true`, `noEmit: true`, `strict: true`
@@ -22,10 +22,10 @@ This guide covers two migrations:
 - For complex legacy modules, temporarily use `// @ts-nocheck` while migrating
 
 ### Priorities
-1. Pure rules in `js/core/rules/*.js`
-2. Core systems in `js/core/systems/*.js` (save, loop, resources, purchases)
-3. UI modules in `js/ui/*.js`
-4. Remaining legacy modules (`main.js`, `game-init.js`)
+1. Pure rules in `js/core/rules/*.js` → converted to `.ts` (clicks, economy, purchases)
+2. Core systems in `js/core/systems/*.js` → converted to `.ts` (resources, purchases-system, save-system, loop-system)
+3. UI modules in `js/ui/*.js` (remain JS with JSDoc for now)
+4. Remaining legacy modules (`main.js`, `game-init.js`) use `// @ts-nocheck`
 
 ---
 
@@ -76,7 +76,7 @@ This guide covers two migrations:
 
 | Old Function Call | New Function Call | Module Location |
 |-------------------|-------------------|-----------------|
-| `save()` | `App.systems.save.performSaveSnapshot()` | `js/core/systems/save-system.js` |
+| `save()` | `App.systems.save.performSaveSnapshot()` | `js/core/systems/save-system.ts` |
 | `saveOptions(options)` | `App.systems.options.saveOptions(options)` | `js/core/systems/options-system.js` |
 | `loadOptions()` | `App.systems.options.loadOptions(defaults)` | `js/core/systems/options-system.js` |
 
