@@ -920,7 +920,8 @@ function trackClick() {
     console.log('🔧 trackClick called');
     window.totalClicks++;
     try {
-        const prev = Number(window.App?.state?.getState?.()?.totalClicks || 0);
+        const st = window.App?.state?.getState?.() || {};
+        const prev = Number(st.totalClicks || 0);
         window.App?.state?.setState?.({ totalClicks: prev + 1 });
     } catch {}
     const now = Date.now();
@@ -958,7 +959,12 @@ function trackClick() {
         const best = Number(st.bestClickStreak || 0);
         const nextCurrent = (now - window.lastClickTime) < (TIMING?.CLICK_STREAK_WINDOW || 3000) ? current + 1 : 1;
         const nextBest = Math.max(best, nextCurrent);
-        window.App?.state?.setState?.({ currentClickStreak: nextCurrent, bestClickStreak: nextBest, totalClicks: Number(st.totalClicks || 0) });
+        window.App?.state?.setState?.({
+            currentClickStreak: nextCurrent,
+            bestClickStreak: nextBest,
+            totalClicks: Number(st.totalClicks || 0),
+            lastClickTime: now
+        });
     } catch {}
 }
 
