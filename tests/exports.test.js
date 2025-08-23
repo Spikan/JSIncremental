@@ -5,7 +5,7 @@ import * as Constants from '../js/core/constants.js';
 import * as Clicks from '../js/core/rules/clicks';
 import * as Purchases from '../js/core/rules/purchases';
 import * as Economy from '../js/core/rules/economy';
-import * as Resources from '../js/core/systems/resources.js';
+import * as Resources from '../js/core/systems/resources';
 import * as EventBus from '../js/services/event-bus.js';
 
 describe('Module exports sanity', () => {
