@@ -25,13 +25,7 @@
                     setTimeout(checkFunctionsLoaded, 200);
                     return;
                 }
-                if (typeof window.devUnlockAll === 'undefined') {
-                    console.log('⏳ Waiting for devUnlockAll function...');
-                    setTimeout(checkFunctionsLoaded, 200);
-                    return;
-                }
                 console.log('✅ App.ui.switchTab is available');
-                console.log('✅ devUnlockAll function is available');
             }
 
             // Start checking after a brief initial delay
