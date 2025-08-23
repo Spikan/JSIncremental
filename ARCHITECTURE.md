@@ -43,7 +43,7 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 - **TypeScript infra**: Added `tsconfig.json` with `allowJs` + `checkJs`, a `types/global.d.ts` for ambient globals, and pervasive `@ts-check`/JSDoc annotations across core systems and rules. New script: `npm run typecheck`.
 
 ### New/Updated Files
-- `js/core/systems/config-accessor.js` — central config access
+- `js/core/systems/config-accessor.ts` — central config access
 - `js/ui/buttons.js` — event delegation via `data-action`
 - `types/global.d.ts` — ambient global types (`App`, `GameState`, etc.)
 - `tsconfig.json` — JS-with-types configuration

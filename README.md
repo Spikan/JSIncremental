@@ -59,7 +59,7 @@ The game is fully responsive and works great on:
 You can customize various aspects of the game:
 - Colors and themes in `css/style.css`
 - Game mechanics in `js/core/rules/*` and systems in `js/core/systems/*`
-- Configuration options via `data/upgrades.json` and `js/config.js` (access with `config-accessor`)
+- Configuration options via `data/upgrades.json` and `js/config.js` (access with `config-accessor.ts`)
 
 ## 🤝 Contributing
 

@@ -113,7 +113,7 @@ document.body.addEventListener('click', (e) => {
 
 ## Rule: Configuration via Accessor
 
-**Use** `js/core/systems/config-accessor.js` to read upgrades and balance.
+**Use** `js/core/systems/config-accessor.ts` to read upgrades and balance.
 Avoid duplicating logic or reading config directly in multiple places.
 
 ---
