@@ -71,13 +71,39 @@ interface Store<T> {
 	subscribe(listener: (state: T) => void): () => void;
 }
 
+type ButtonAudioAPI = {
+	initButtonAudioSystem?: () => void;
+	toggleButtonSounds?: () => void;
+	updateButtonSoundsToggleButton?: () => void;
+	playButtonClickSound?: () => void;
+	playButtonPurchaseSound?: () => void;
+	playButtonCriticalClickSound?: () => void;
+	playSodaClickSound?: () => void;
+	playLevelUpSound?: () => void;
+	playTabSwitchSound?: () => void;
+	getButtonSoundsEnabled?: () => boolean;
+};
+
+type SystemsAPI = {
+	resources?: Record<string, any>;
+	purchases?: Record<string, any>;
+	clicks?: Record<string, any>;
+	autosave?: Record<string, any>;
+	save?: Record<string, any>;
+	options?: Record<string, any>;
+	loop?: Record<string, any>;
+	audio?: { button?: ButtonAudioAPI };
+	gameInit?: Record<string, any>;
+	drink?: Record<string, any>;
+};
+
 interface AppNamespace {
 	state: Store<GameState>;
 	storage: any;
 	events: EventBusGeneric;
 	EVENT_NAMES: any;
 	rules: Record<string, any>;
-	systems: Record<string, any>;
+	systems: SystemsAPI;
 	ui: Record<string, any>;
 	data: Record<string, any>;
 	stateBridge?: Record<string, any>;
