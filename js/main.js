@@ -406,6 +406,58 @@ function initGame() {
         let autosaveEnabled = true;
             let autosaveInterval = TIMING.AUTOSAVE_INTERVAL; // seconds
         let autosaveCounter = 0;
+        // Load options via system and seed App.state + locals
+        try {
+            const defaults = (window.defaultState && window.defaultState.options) || { autosaveEnabled: true, autosaveInterval: 30, clickSoundsEnabled: true, musicEnabled: true };
+            const loaded = (window.App?.systems?.options?.loadOptions && window.App.systems.options.loadOptions(defaults)) || defaults;
+            try { window.App?.state?.setState?.({ options: loaded }); } catch {}
+            autosaveEnabled = !!loaded.autosaveEnabled;
+            autosaveInterval = Number(loaded.autosaveInterval || autosaveInterval);
+            try { window.clickSoundsEnabled = !!loaded.clickSoundsEnabled; } catch {}
+        } catch {}
+
+        // Bridge autosave options to App.state and storage
+        if (!Object.getOwnPropertyDescriptor(window, 'autosaveEnabled')) {
+            Object.defineProperty(window, 'autosaveEnabled', {
+                get: function() {
+                    try { return !!(window.App?.state?.getState?.()?.options?.autosaveEnabled); } catch {}
+                    return !!autosaveEnabled;
+                },
+                set: function(v) {
+                    const next = !!v;
+                    autosaveEnabled = next;
+                    try {
+                        const prev = window.App?.state?.getState?.()?.options || {};
+                        window.App?.state?.setState?.({ options: { ...prev, autosaveEnabled: next } });
+                    } catch {}
+                    try {
+                        if (window.App?.systems?.options?.saveOptions) window.App.systems.options.saveOptions({ autosaveEnabled: next, autosaveInterval });
+                    } catch {}
+                    try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
+                }
+            });
+        }
+        if (!Object.getOwnPropertyDescriptor(window, 'autosaveInterval')) {
+            Object.defineProperty(window, 'autosaveInterval', {
+                get: function() {
+                    try { return Number(window.App?.state?.getState?.()?.options?.autosaveInterval ?? autosaveInterval); } catch {}
+                    return Number(autosaveInterval);
+                },
+                set: function(v) {
+                    const next = parseInt(String(v), 10) || autosaveInterval;
+                    autosaveInterval = next;
+                    autosaveCounter = 0;
+                    try {
+                        const prev = window.App?.state?.getState?.()?.options || {};
+                        window.App?.state?.setState?.({ options: { ...prev, autosaveInterval: next } });
+                    } catch {}
+                    try {
+                        if (window.App?.systems?.options?.saveOptions) window.App.systems.options.saveOptions({ autosaveEnabled, autosaveInterval: next });
+                    } catch {}
+                    try { window.App?.ui?.updateAutosaveStatus?.(); } catch {}
+                }
+            });
+        }
         let gameStartTime = Date.now();
         let lastSaveTime = null;
         try { window.App?.state?.setState?.({ sessionStartTime: gameStartTime, totalPlayTime: 0 }); } catch {}
