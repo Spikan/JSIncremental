@@ -34,6 +34,14 @@ export function start({
 			try { updateStats && updateStats(); } catch {}
 			try { updatePlayTime && updatePlayTime(); } catch {}
 			try { updateLastSaveTime && updateLastSaveTime(); } catch {}
+			// Maintain authoritative totalPlayTime in App.state
+			try {
+				const st = window.App?.state?.getState?.();
+				if (st) {
+					const prev = Number(st.totalPlayTime || 0);
+					window.App?.state?.setState?.({ totalPlayTime: prev + 1000 });
+				}
+			} catch {}
 		}
 		rafId = requestAnimationFrame(tick);
 	}

@@ -66,7 +66,7 @@ export const UpgradesSchema = z.object({
 });
 
 // Schema for game save data (partial - we'll expand this)
-/** @typedef {{ sips: any; straws: number; cups: number; widerStraws: any; betterCups: any; suctions: any; criticalClicks: any; fasterDrinks: any; totalSipsEarned?: any; drinkRate?: number; lastDrinkTime?: number; drinkProgress?: number; lastSaveTime?: number; totalClicks?: number; totalSips?: any; level?: number }} GameSave */
+/** @typedef {{ sips: any; straws: number; cups: number; widerStraws: any; betterCups: any; suctions: any; criticalClicks: any; fasterDrinks: any; totalSipsEarned?: any; drinkRate?: number; lastDrinkTime?: number; drinkProgress?: number; lastSaveTime?: number; totalPlayTime?: number; totalClicks?: number; totalSips?: any; level?: number }} GameSave */
 export const GameSaveSchema = z.object({
   sips: z.any(), // Decimal.js object
   straws: z.number().min(0),
@@ -81,6 +81,7 @@ export const GameSaveSchema = z.object({
   lastDrinkTime: z.number().min(0).optional(),
   drinkProgress: z.number().min(0).optional(),
   lastSaveTime: z.number().optional(),
+  totalPlayTime: z.number().optional(),
   totalClicks: z.number().min(0).optional(),
   totalSips: z.any().optional(), // Decimal.js object
   level: z.number().min(1).optional()

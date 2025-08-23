@@ -21,6 +21,7 @@ export function queueSave({ now, lastOp, minIntervalMs, schedule, perform }) {
 export function performSaveSnapshot() {
 	try {
 		const w = /** @type {any} */(window);
+		const state = w.App?.state?.getState?.() || {};
 		const payload = {
 			sips: String(w.sips || 0),
 			straws: (w.straws && typeof w.straws.toNumber === 'function') ? w.straws.toNumber() : Number(w.straws || 0),
@@ -35,6 +36,7 @@ export function performSaveSnapshot() {
 			lastDrinkTime: Number(w.lastDrinkTime || 0),
 			drinkProgress: Number(w.drinkProgress || 0),
 			lastSaveTime: Date.now(),
+			totalPlayTime: Number(state.totalPlayTime || 0),
 			totalClicks: Number(w.totalClicks || 0),
 			level: (w.level && typeof w.level.toNumber === 'function') ? w.level.toNumber() : Number(w.level || 1)
 		};

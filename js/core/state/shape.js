@@ -26,6 +26,7 @@ const defaultState = {
 	// Session and persistence
 	lastSaveTime: 0,
 	sessionStartTime: 0,
+	totalPlayTime: 0,
 	totalSipsEarned: 0,
 	totalClicks: 0,
 	highestSipsPerSecond: 0,

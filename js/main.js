@@ -364,7 +364,7 @@ function initGame() {
         let autosaveCounter = 0;
         let gameStartTime = Date.now();
         let lastSaveTime = null;
-        try { window.App?.state?.setState?.({ sessionStartTime: gameStartTime }); } catch {}
+        try { window.App?.state?.setState?.({ sessionStartTime: gameStartTime, totalPlayTime: 0 }); } catch {}
 
         // Save optimization - batch save operations
         let saveQueue = [];
@@ -444,6 +444,8 @@ function initGame() {
             gameStartDate = savegame.gameStartDate || Date.now();
             window.lastClickTime = savegame.lastClickTime || 0;
             window.clickTimes = savegame.clickTimes || [];
+            // Seed totalPlayTime from save
+            try { window.App?.state?.setState?.({ totalPlayTime: Number(savegame.totalPlayTime || 0) }); } catch {}
         }
 
         try {
