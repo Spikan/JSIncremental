@@ -271,6 +271,18 @@ function setupSpecialButtonHandlers() {
         });
     }
 
+    // Splash start button (explicit handler to ensure start works)
+    const splashStartBtn = (typeof document !== 'undefined' && document.querySelector)
+        ? document.querySelector('.splash-start-btn')
+        : null;
+    if (splashStartBtn && splashStartBtn.addEventListener) {
+        splashStartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            try { window.startGame?.(); } catch {}
+        });
+    }
+
     // Generic data-action dispatcher for buttons (guard for test env)
     if (document && document.body && document.body.addEventListener) {
     document.body.addEventListener('click', (e) => {
@@ -288,6 +300,19 @@ function setupSpecialButtonHandlers() {
             e.stopPropagation();
             try { window[fnName](...args); } catch (err) { console.warn('action failed', fnName, err); }
         }
+    }, { capture: true });
+    }
+
+    // Redundant safety: capture clicks on START button by class as well
+    if (document && document.body && document.body.addEventListener) {
+    document.body.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const startEl = target.closest('.splash-start-btn');
+        if (!startEl) return;
+        e.preventDefault();
+        e.stopPropagation();
+        try { window.startGame?.(); } catch (err) { console.warn('startGame failed', err); }
     }, { capture: true });
     }
 
@@ -327,7 +352,7 @@ function initButtonSystem() {
             'startGame'
         ];
         
-        const functionsAvailable = essentialFunctions.every(func => 
+        const functionsAvailable = (typeof window !== 'undefined') && essentialFunctions.every(func => 
             typeof window[func] === 'function'
         );
         

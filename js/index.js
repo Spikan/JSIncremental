@@ -114,6 +114,12 @@ try {
     Object.assign(window.App.systems.gameInit, gameInit);
     // Expose DOM-ready initializer for index bootstrap
     window.initOnDomReady = gameInit.initOnDomReady;
+    // Back-compat alias so legacy main.js can call App.systems.gameInit.startGame
+    try {
+        if (!window.App.systems.gameInit.startGame && window.App.systems.gameInit.startGameCore) {
+            window.App.systems.gameInit.startGame = window.App.systems.gameInit.startGameCore;
+        }
+    } catch {}
 } catch (e) { console.warn('⚠️ game-init system load failed:', e); }
 
 // Signal that App is ready

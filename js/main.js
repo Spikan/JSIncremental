@@ -904,13 +904,17 @@ function startGameLoop() {
         window.App.systems.loop.start({
             // UI functions now called through App.ui namespace (was: updateDrinkProgress())
             updateDrinkProgress: () => {
-                // Calculate current drink progress percentage
-                const currentTime = Date.now();
-                const timeSinceLastDrink = currentTime - lastDrinkTime;
-                const progressPercentage = Math.min((timeSinceLastDrink / drinkRate) * 100, 100);
-                drinkProgress = progressPercentage;
-                window.App?.ui?.updateDrinkProgress?.(drinkProgress, drinkRate);
-                try { window.App?.state?.setState?.({ drinkProgress }); } catch {}
+                try {
+                    const st = window.App?.state?.getState?.() || {};
+                    const currentTime = Date.now();
+                    const last = Number(st.lastDrinkTime ?? window.lastDrinkTime ?? 0);
+                    const rate = Number(st.drinkRate ?? window.drinkRate ?? 1000);
+                    const timeSinceLastDrink = currentTime - last;
+                    const progressPercentage = Math.min((timeSinceLastDrink / Math.max(rate, 1)) * 100, 100);
+                    drinkProgress = progressPercentage;
+                    window.App?.state?.setState?.({ drinkProgress });
+                    window.App?.ui?.updateDrinkProgress?.(drinkProgress, rate);
+                } catch {}
             },
             processDrink: window.App?.systems?.drink?.processDrink || processDrink,
             // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
@@ -919,6 +923,11 @@ function startGameLoop() {
             updateLastSaveTime: () => window.App?.ui?.updateLastSaveTime?.(),
             performBatchUIUpdate: window.App?.ui?.performBatchUIUpdate,
         });
+        return;
+    }
+    // Defer legacy fallback until loop system becomes available to avoid undefined locals
+    if (!window.App?.systems?.loop?.start) {
+        setTimeout(startGameLoop, 100);
         return;
     }
     let lastUpdate = 0;
@@ -1918,6 +1927,7 @@ console.log('🔧 main.js loaded, sodaClick function available:', typeof window.
 window.levelUp = levelUp;
 window.save = save;
 window.delete_save = delete_save;
+window.initGame = initGame;
 window.toggleButtonSounds = toggleClickSounds;
 window.sendMessage = sendMessage;
 window.startGame = startGame;

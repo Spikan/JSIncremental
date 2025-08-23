@@ -95,12 +95,13 @@ export function updateDrinkProgress(progress, drinkRate) {
 	const progressFill = window.DOM_CACHE?.progressFill || document.getElementById('drinkProgressFill');
 	const countdown = window.DOM_CACHE?.countdown || document.getElementById('drinkCountdown');
 
-	console.log('🎨 DOM elements found:', {
-		progressFill: !!progressFill,
-		countdown: !!countdown,
-		progressFillElement: progressFill,
-		countdownElement: countdown
-	});
+    // Debug: comment out noisy DOM element logs to keep console readable in production
+    // console.log('🎨 DOM elements found:', {
+    // 	progressFill: !!progressFill,
+    // 	countdown: !!countdown,
+    // 	progressFillElement: progressFill,
+    // 	countdownElement: countdown
+    // });
 
 	// Update progress bar fill
 	if (progressFill && typeof currentProgress === 'number') {

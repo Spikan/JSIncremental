@@ -10,9 +10,8 @@ export function checkUpgradeAffordability() {
     // Get current sips from App.state (preferred)
     const currentSips = Number(window.App?.state?.getState?.()?.sips || 0);
 
-    // If we still don't have sips, skip the affordability check
+    // If we still don't have sips, skip the affordability check (mute noisy log)
     if (currentSips === 0) {
-        console.log('UI: No sips available yet, skipping affordability check');
         return;
     }
 

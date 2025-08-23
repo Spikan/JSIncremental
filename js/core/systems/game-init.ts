@@ -27,18 +27,23 @@ export function initSplashScreen(): void {
 
         (window as any).startGame = startGame;
 
-        splashScreen.addEventListener('click', function (e: Event) {
-            const target = e.target as HTMLElement | null;
-            if (!target) return;
-            if (target === splashScreen ||
-                target.classList?.contains('splash-content') ||
-                target.classList?.contains('splash-title') ||
-                target.classList?.contains('splash-subtitle-text') ||
-                target.classList?.contains('splash-instruction') ||
-                target.classList?.contains('splash-version') ||
-                target.tagName === 'H1' || target.tagName === 'H2' || target.tagName === 'P') {
-                startGame();
+        // Ensure the explicit START button triggers start regardless of other handlers
+        try {
+            const startBtn = document.querySelector('.splash-start-btn');
+            if (startBtn) {
+                startBtn.addEventListener('click', (e: Event) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    startGame();
+                });
             }
+        } catch {}
+
+        splashScreen.addEventListener('click', function (e: Event) {
+            // Click anywhere on the splash should start the game
+            e.preventDefault();
+            e.stopPropagation();
+            startGame();
         });
 
         document.addEventListener('keydown', function (event: KeyboardEvent) {
@@ -71,7 +76,7 @@ export function startGameCore(): void {
 // Initialize splash and basic options when DOM is ready
 export function initOnDomReady(): void {
     try {
-        document.addEventListener('DOMContentLoaded', function () {
+        const boot = () => {
             try { (window as any).loadWordBank?.(); } catch {}
             const config: any = (window as any).GAME_CONFIG?.TIMING || {};
             const domReadyDelay: number = Number(config.DOM_READY_DELAY || 0);
@@ -91,7 +96,13 @@ export function initOnDomReady(): void {
                     }
                 }
             }, domReadyDelay);
-        });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
     } catch {}
 }
 
