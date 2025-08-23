@@ -54,9 +54,11 @@ export const FEATURE_UNLOCKS = {
     const condition = this.unlockConditions[featureName];
     if (!condition) return false;
     const w: any = (window as any);
-    if (typeof w.sips === 'undefined' || typeof w.totalClicks === 'undefined') return false;
-    const sipsMet = w.sips?.gte ? w.sips.gte(condition.sips) : Number(w.sips || 0) >= condition.sips;
-    const clicksMet = Number(w.totalClicks || 0) >= condition.clicks;
+    const st = w.App?.state?.getState?.() || {};
+    const sipsNum = Number(st.sips ?? 0);
+    const clicksNum = Number(st.totalClicks ?? 0);
+    const sipsMet = sipsNum >= condition.sips;
+    const clicksMet = clicksNum >= condition.clicks;
     if (sipsMet && clicksMet) { this.unlockFeature(featureName); return true; }
     return false;
   },
@@ -159,7 +161,8 @@ export const FEATURE_UNLOCKS = {
   },
   checkAllUnlocks() {
     const w: any = (window as any);
-    if (typeof w.sips === 'undefined' || typeof w.totalClicks === 'undefined') return;
+    const st = w.App?.state?.getState?.() || {};
+    if (typeof st.sips === 'undefined' || typeof st.totalClicks === 'undefined') return;
     Object.keys(this.unlockConditions).forEach(f => this.checkUnlock(f));
     this.updateUnlocksTab();
   },
@@ -167,7 +170,8 @@ export const FEATURE_UNLOCKS = {
     const unlocksGrid = document.getElementById('unlocksGrid');
     if (!unlocksGrid) return;
     const w: any = (window as any);
-    if (typeof w.sips === 'undefined' || typeof w.totalClicks === 'undefined') return;
+    const st = w.App?.state?.getState?.() || {};
+    if (typeof st.sips === 'undefined' || typeof st.totalClicks === 'undefined') return;
     unlocksGrid.innerHTML = '';
     const featureInfo: Record<string, { icon: string; name: string; description: string; category: string }>
       = {
@@ -191,8 +195,8 @@ export const FEATURE_UNLOCKS = {
       const condition = this.unlockConditions[feature];
       const isUnlocked = this.unlockedFeatures.has(feature);
       if (!info) return;
-      const sipsMet = w.sips?.gte ? w.sips.gte(condition.sips) : Number(w.sips || 0) >= condition.sips;
-      const clicksMet = Number(w.totalClicks || 0) >= condition.clicks;
+      const sipsMet = Number(st.sips || 0) >= condition.sips;
+      const clicksMet = Number(st.totalClicks || 0) >= condition.clicks;
       const el = document.createElement('div');
       el.className = `unlock-item ${isUnlocked ? 'unlocked' : 'locked'}`;
       el.innerHTML = `
@@ -207,11 +211,11 @@ export const FEATURE_UNLOCKS = {
         <div class="unlock-requirements">
           <div class="requirement ${sipsMet ? 'met' : ''}">
             <span class="requirement-label">Total Sips:</span>
-            <span class="requirement-value">${typeof (window as any).prettify !== 'undefined' ? (window as any).prettify((window as any).sips) : '0'} / ${typeof (window as any).prettify !== 'undefined' ? (window as any).prettify(condition.sips) : '0'}</span>
+            <span class="requirement-value">${typeof (window as any).prettify !== 'undefined' ? (window as any).prettify(Number(st.sips || 0)) : String(Number(st.sips || 0))} / ${typeof (window as any).prettify !== 'undefined' ? (window as any).prettify(condition.sips) : String(condition.sips)}</span>
           </div>
           <div class="requirement ${clicksMet ? 'met' : ''}">
             <span class="requirement-label">Total Clicks:</span>
-            <span class="requirement-value">${typeof (window as any).totalClicks !== 'undefined' ? (window as any).totalClicks : 0} / ${condition.clicks}</span>
+            <span class="requirement-value">${Number(st.totalClicks || 0)} / ${condition.clicks}</span>
           </div>
         </div>`;
       unlocksGrid.appendChild(el);
@@ -220,7 +224,8 @@ export const FEATURE_UNLOCKS = {
   },
   updateUnlocksProgress() {
     const w: any = (window as any);
-    if (typeof w.sips === 'undefined' || typeof w.totalClicks === 'undefined') return;
+    const st = w.App?.state?.getState?.() || {};
+    if (typeof st.sips === 'undefined' || typeof st.totalClicks === 'undefined') return;
     const total = Object.keys(this.unlockConditions).length;
     const unlocked = this.unlockedFeatures.size - 1;
     const pct = (unlocked / total) * 100;
