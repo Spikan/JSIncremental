@@ -237,6 +237,7 @@ export const execute = {
     // Apply to state (authoritative)
     setAppState({ sips: toNum(w.sips), fasterDrinks: result.fasterDrinks, drinkRate: nextRate });
     try { w.App?.stateBridge?.setDrinkRate?.(nextRate); } catch {}
+    try { w.App?.ui?.updateCompactDrinkSpeedDisplays?.(); } catch {}
     try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
     try { w.App?.ui?.updateAllStats?.(); } catch {}
     try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'fasterDrinks', cost: result.spent }); } catch {}
