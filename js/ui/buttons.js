@@ -55,47 +55,47 @@ const BUTTON_CONFIG = {
     // Function mappings for button actions - using the actual working global functions
     actions: {
         'buyStraw': { 
-            func: () => window.buyStraw?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.buyStraw ? window.App.systems.purchases.execute.buyStraw() : window.buyStraw?.()),
             type: 'shop-btn',
             label: 'Buy Straw'
         },
         'buyCup': { 
-            func: () => window.buyCup?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.buyCup ? window.App.systems.purchases.execute.buyCup() : window.buyCup?.()),
             type: 'shop-btn',
             label: 'Buy Cup'
         },
         'buyWiderStraws': { 
-            func: () => window.buyWiderStraws?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.buyWiderStraws ? window.App.systems.purchases.execute.buyWiderStraws() : window.buyWiderStraws?.()),
             type: 'shop-btn',
             label: 'Buy Wider Straws'
         },
         'buyBetterCups': { 
-            func: () => window.buyBetterCups?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.buyBetterCups ? window.App.systems.purchases.execute.buyBetterCups() : window.buyBetterCups?.()),
             type: 'shop-btn',
             label: 'Buy Better Cups'
         },
         'buySuction': { 
-            func: () => window.buySuction?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.buySuction ? window.App.systems.purchases.execute.buySuction() : window.buySuction?.()),
             type: 'clicking-upgrade-btn',
             label: 'Buy Suction'
         },
         'buyCriticalClick': { 
-            func: () => window.buyCriticalClick?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.buyCriticalClick ? window.App.systems.purchases.execute.buyCriticalClick() : window.buyCriticalClick?.()),
             type: 'clicking-upgrade-btn',
             label: 'Buy Critical Click'
         },
         'buyFasterDrinks': { 
-            func: () => window.buyFasterDrinks?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.buyFasterDrinks ? window.App.systems.purchases.execute.buyFasterDrinks() : window.buyFasterDrinks?.()),
             type: 'drink-speed-upgrade-btn',
             label: 'Buy Faster Drinks'
         },
         'upgradeFasterDrinks': { 
-            func: () => window.upgradeFasterDrinks?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.upgradeFasterDrinks ? window.App.systems.purchases.execute.upgradeFasterDrinks() : window.upgradeFasterDrinks?.()),
             type: 'drink-speed-upgrade-btn',
             label: 'Upgrade Faster Drinks'
         },
         'levelUp': { 
-            func: () => window.levelUp?.(),
+            func: () => (window.App?.systems?.purchases?.execute?.levelUp ? window.App.systems.purchases.execute.levelUp() : window.levelUp?.()),
             type: 'level-up-btn',
             label: 'Level Up'
         },

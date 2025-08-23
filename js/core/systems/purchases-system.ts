@@ -121,3 +121,161 @@ export function levelUp({ sips, level, sipsPerDrink }: { sips: number; level: nu
 }
 
 
+// Convenience execute-style helpers that read/update App.state directly
+function getAppState(): any {
+  try { return (window as any).App?.state?.getState?.() || {}; } catch { return {}; }
+}
+function setAppState(patch: any): void {
+  try { (window as any).App?.state?.setState?.(patch); } catch {}
+}
+function toNum(v: any): number { return (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0); }
+
+export const execute = {
+  buyStraw(): boolean {
+    const st = getAppState();
+    const result = purchaseStraw({
+      sips: Number(st.sips || 0),
+      straws: Number(st.straws || 0),
+      cups: Number(st.cups || 0),
+      widerStraws: Number(st.widerStraws || 0),
+      betterCups: Number(st.betterCups || 0),
+    });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
+    try { w.straws = new (w.Decimal || Number)(result.straws); } catch {}
+    setAppState({ sips: toNum(w.sips), straws: result.straws, strawSPD: result.strawSPD ?? 0, cupSPD: result.cupSPD ?? 0, sps: result.sipsPerDrink ?? 0 });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'straw', cost: result.spent }); } catch {}
+    return true;
+  },
+  buyCup(): boolean {
+    const st = getAppState();
+    const result = purchaseCup({
+      sips: Number(st.sips || 0),
+      straws: Number(st.straws || 0),
+      cups: Number(st.cups || 0),
+      widerStraws: Number(st.widerStraws || 0),
+      betterCups: Number(st.betterCups || 0),
+    });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
+    try { w.cups = new (w.Decimal || Number)(result.cups); } catch {}
+    setAppState({ sips: toNum(w.sips), cups: result.cups, strawSPD: result.strawSPD ?? 0, cupSPD: result.cupSPD ?? 0, sps: result.sipsPerDrink ?? 0 });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'cup', cost: result.spent }); } catch {}
+    return true;
+  },
+  buyWiderStraws(): boolean {
+    const st = getAppState();
+    const result = purchaseWiderStraws({
+      sips: Number(st.sips || 0),
+      straws: Number(st.straws || 0),
+      cups: Number(st.cups || 0),
+      widerStraws: Number(st.widerStraws || 0),
+      betterCups: Number(st.betterCups || 0),
+    });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
+    try { w.widerStraws = new (w.Decimal || Number)(result.widerStraws); } catch {}
+    setAppState({ sips: toNum(w.sips), widerStraws: result.widerStraws, strawSPD: result.strawSPD ?? 0, cupSPD: result.cupSPD ?? 0, sps: result.sipsPerDrink ?? 0 });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'widerStraws', cost: result.spent }); } catch {}
+    return true;
+  },
+  buyBetterCups(): boolean {
+    const st = getAppState();
+    const result = purchaseBetterCups({
+      sips: Number(st.sips || 0),
+      straws: Number(st.straws || 0),
+      cups: Number(st.cups || 0),
+      widerStraws: Number(st.widerStraws || 0),
+      betterCups: Number(st.betterCups || 0),
+    });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
+    try { w.betterCups = new (w.Decimal || Number)(result.betterCups); } catch {}
+    setAppState({ sips: toNum(w.sips), betterCups: result.betterCups, strawSPD: result.strawSPD ?? 0, cupSPD: result.cupSPD ?? 0, sps: result.sipsPerDrink ?? 0 });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'betterCups', cost: result.spent }); } catch {}
+    return true;
+  },
+  buySuction(): boolean {
+    const st = getAppState();
+    const result = purchaseSuction({ sips: Number(st.sips || 0), suctions: Number(st.suctions || 0) });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
+    try { w.suctions = new (w.Decimal || Number)(result.suctions); } catch {}
+    setAppState({ sips: toNum(w.sips), suctions: result.suctions, suctionClickBonus: result.suctionClickBonus ?? 0 });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'suction', cost: result.spent }); } catch {}
+    return true;
+  },
+  buyFasterDrinks(): boolean {
+    const st = getAppState();
+    const result = purchaseFasterDrinks({ sips: Number(st.sips || 0), fasterDrinks: Number(st.fasterDrinks || 0) });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
+    try { w.fasterDrinks = new (w.Decimal || Number)(result.fasterDrinks); } catch {}
+    setAppState({ sips: toNum(w.sips), fasterDrinks: result.fasterDrinks });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'fasterDrinks', cost: result.spent }); } catch {}
+    return true;
+  },
+  buyCriticalClick(): boolean {
+    const st = getAppState();
+    const result = purchaseCriticalClick({
+      sips: Number(st.sips || 0),
+      criticalClicks: Number(st.criticalClicks || 0),
+      criticalClickChance: Number(st.criticalClickChance || 0),
+    });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
+    try { w.criticalClicks = new (w.Decimal || Number)(result.criticalClicks); } catch {}
+    try { w.criticalClickChance = new (w.Decimal || Number)(result.criticalClickChance); } catch {}
+    setAppState({ sips: toNum(w.sips), criticalClicks: result.criticalClicks, criticalClickChance: result.criticalClickChance });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'criticalClick', cost: result.spent }); } catch {}
+    return true;
+  },
+  upgradeFasterDrinks(): boolean {
+    const st = getAppState();
+    const result = upgradeFasterDrinks({ sips: Number(st.sips || 0), fasterDrinksUpCounter: Number(st.fasterDrinksUpCounter || 0) });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    try { w.sips = (w.sips && w.sips.minus) ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent; } catch {}
+    setAppState({ sips: toNum(w.sips), fasterDrinksUpCounter: result.fasterDrinksUpCounter });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.UPGRADE_PURCHASED, { item: 'fasterDrinksUp', cost: result.spent }); } catch {}
+    return true;
+  },
+  levelUp(): boolean {
+    const st = getAppState();
+    const result = levelUp({ sips: Number(st.sips || 0), level: Number(st.level || 0), sipsPerDrink: Number(st.sps || 0) });
+    if (!result) return false;
+    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    const nextSips = toNum(st.sips) - result.spent + result.sipsGained;
+    try { w.sips = (w.Decimal ? new w.Decimal(nextSips) : nextSips); } catch {}
+    setAppState({ sips: nextSips, level: result.level });
+    try { w.App?.ui?.checkUpgradeAffordability?.(); } catch {}
+    try { w.App?.ui?.updateAllStats?.(); } catch {}
+    try { w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, { item: 'levelUp', cost: result.spent, gained: result.sipsGained }); } catch {}
+    return true;
+  },
+};
+
+
