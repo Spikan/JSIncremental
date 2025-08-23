@@ -1,6 +1,6 @@
-import { nextStrawCost, nextCupCost } from '../rules/purchases';
-import { recalcProduction } from './resources';
-import { getUpgradesAndConfig } from './config-accessor';
+import { nextStrawCost, nextCupCost } from '../rules/purchases.ts';
+import { recalcProduction } from './resources.ts';
+import { getUpgradesAndConfig } from './config-accessor.ts';
 
 function getTypedConfig(): { upgrades: any; config: any } {
   const { upgrades, config } = getUpgradesAndConfig();

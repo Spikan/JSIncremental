@@ -1,5 +1,5 @@
-import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../rules/economy';
-import { getUpgradesAndConfig } from './config-accessor';
+import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../rules/economy.ts';
+import { getUpgradesAndConfig } from './config-accessor.ts';
 
 function getConfig(): { upgrades: any; config: any } { return getUpgradesAndConfig(); }
 
