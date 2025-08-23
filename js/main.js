@@ -103,7 +103,7 @@ const FEATURE_DETECTION = {
             frameCount++;
             const currentTime = performance.now();
             
-            const config = window.GAME_CONFIG?.PERFORMANCE || {};
+            const config = GC?.PERFORMANCE || {};
                     const frameCountInterval = config.FRAME_COUNT_INTERVAL;
         const lowFpsThreshold = config.LOW_FPS_WARNING_THRESHOLD;
             
@@ -702,6 +702,7 @@ function startGameLoop() {
                 const progressPercentage = Math.min((timeSinceLastDrink / drinkRate) * 100, 100);
                 drinkProgress = progressPercentage;
                 window.App?.ui?.updateDrinkProgress?.(drinkProgress, drinkRate);
+                try { window.App?.state?.setState?.({ drinkProgress }); } catch {}
             },
             processDrink,
             // Stats functions consolidated into App.ui namespace (was: updatePlayTime(), updateLastSaveTime(), etc.)
@@ -730,9 +731,10 @@ function startGameLoop() {
                 window.lastDebugTime = currentTime;
             }
 
-            // Sync drink progress with state bridge
+            // Sync drink progress with state bridge and state
             try {
                 window.App?.stateBridge?.setDrinkProgress(drinkProgress);
+                window.App?.state?.setState?.({ drinkProgress });
             } catch {}
 
             // Update drink progress bar with current progress
@@ -840,7 +842,7 @@ function processDrink() {
     const currentTime = Date.now();
     if (currentTime - lastDrinkTime >= drinkRate) {
         // Add base sips per drink (configured value, regardless of straws/cups)
-        const config = window.GAME_CONFIG?.BALANCE || {};
+        const config = BAL || {};
         const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
         window.sips = window.sips.plus(baseSipsPerDrink);
         totalSipsEarned = totalSipsEarned.plus(baseSipsPerDrink);
@@ -1540,10 +1542,11 @@ function sodaClick(multiplier = 1) {
             window.App?.state?.setState?.({ sips: toNum(window.sips) });
         } catch {}
         
-        // Check for critical click
-        const criticalChance = window.criticalClickChance || 0;
+        // Check for critical click (prefer App.state)
+        const stCrit = (window.App?.state?.getState?.() || {});
+        const criticalChance = Number(stCrit.criticalClickChance ?? window.criticalClickChance ?? 0);
         if (Math.random() < criticalChance) {
-            const criticalMultiplier = window.criticalClickMultiplier || 5;
+            const criticalMultiplier = Number(stCrit.criticalClickMultiplier ?? window.criticalClickMultiplier ?? 5);
             const criticalBonus = totalClickValue.times(criticalMultiplier - 1);
             window.sips = window.sips.plus(criticalBonus);
             try {
