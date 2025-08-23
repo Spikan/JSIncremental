@@ -132,10 +132,10 @@ const FEATURE_DETECTION = {
 
 // Main module loaded
 
-// DOM Element Cache - Imported from dom-cache.js
+// DOM Element Cache - Imported from dom-cache.ts
 // Ensures DOM_CACHE is available before proceeding
 if (typeof DOM_CACHE === 'undefined') {
-    console.error('DOM_CACHE not loaded. Please ensure dom-cache.js is loaded before main.js');
+    console.error('DOM_CACHE not loaded. Please ensure dom-cache.ts is loaded before main.js');
 } else {
     
     if (!DOM_CACHE.isReady()) {

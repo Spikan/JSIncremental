@@ -37,7 +37,7 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 - **Single source of truth**: All UI modules read from `App.state` only. Legacy `window.*` UI reads have been eliminated.
 - **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `js/ui/buttons.ts`.
 - **Configuration access**: Added `js/core/systems/config-accessor.ts` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
-- **Event names**: `EVENT_NAMES` exported from `js/core/constants.ts` and attached in `js/index.js` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
+- **Event names**: `EVENT_NAMES` exported from `js/core/constants.ts` and attached in `js/index.ts` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
  - **Storage**: Validation functions are imported directly from `js/core/validation/schemas.ts`. The typed storage facade `AppStorage` lives in `js/services/storage.ts` and is attached to `window.storage` during bootstrap.
 - **State bridge**: `js/core/state/bridge.ts` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
 - **TypeScript infra**: Added `tsconfig.json` with `allowJs` + `checkJs`, a `types/global.d.ts` for ambient globals, and pervasive `@ts-check`/JSDoc annotations across core systems and rules. New script: `npm run typecheck`.
@@ -74,8 +74,8 @@ soda-clicker-pro/
 │   ├── 📄 main.js                # Legacy game logic (refactoring in progress)
 │   ├── 📄 config.js              # Game configuration and constants
 │   ├── 📄 feature-unlocks.ts     # Feature unlock management system
-│   ├── 📄 god.js                 # God mode functionality
-│   ├── 📄 dom-cache.js           # DOM element caching system
+│   ├── 📄 god.ts                 # God mode functionality
+│   ├── 📄 dom-cache.ts           # DOM element caching system
 │   │
 │   ├── 📁 core/                  # Core game systems
 │   │   ├── 📄 constants.ts       # Event names and game constants
@@ -458,10 +458,10 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 ### **For Understanding State Management**
 1. Review `js/core/state/shape.ts` - State structure
 2. Examine `js/core/state/index.ts` - Store implementation
-3. Check `js/index.js` - App bootstrap and state initialization
+3. Check `js/index.ts` - App bootstrap and state initialization
 
 ### **For Understanding UI Updates**
-1. Start with `js/ui/index.js` - UI system coordinator
+1. Start with `js/ui/index.ts` - UI system coordinator
 2. Examine individual UI modules in `js/ui/`
 3. Check event listeners and update functions
 
@@ -478,7 +478,7 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 ### **For Understanding Legacy Code**
 1. Examine `js/main.js` - Legacy game logic (being refactored)
 2. Check `js/feature-unlocks.js` - Feature unlock system
-3. Review `js/dom-cache.js` - DOM element management
+3. Review `js/dom-cache.ts` - DOM element management
 
 ## 🔍 Key Design Patterns
 

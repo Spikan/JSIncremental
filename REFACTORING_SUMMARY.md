@@ -135,7 +135,7 @@ window.App?.ui?.updateAllStats?.();
 
 ### **Core Changes:**
 - `js/main.js` - Major refactoring, duplicate function removal
-- `js/index.js` - Updated function calls
+- `js/index.ts` - Updated function calls
 - `js/core/systems/game-init.ts` - Converted and wired into index
 
 ### **Documentation:**
@@ -229,7 +229,7 @@ The project is ready for continued development with a solid, maintainable founda
 - UI now reads exclusively from `App.state`; remaining `window.*` UI reads removed
 - Centralized UI event handling via `data-action` in `js/ui/buttons.ts`
 - Introduced `js/core/systems/config-accessor.ts` for consistent config access
-- `EVENT_NAMES` exported from `js/core/constants.ts` and attached in `js/index.js`
+- `EVENT_NAMES` exported from `js/core/constants.ts` and attached in `js/index.ts`
 - Storage validators imported directly; storage exposed as `AppStorage`
 - TypeScript infra added: `tsconfig.json`, `types/global.d.ts`, `@ts-check` and JSDoc across core; selected modules migrated to `.ts` with extensionless imports
 

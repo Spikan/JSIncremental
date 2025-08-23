@@ -47,7 +47,7 @@ return window.App.systems.purchases.buy();
 
 // ✅ GOOD: Fix the root cause (e.g., script loading order)
 // In index.html: Ensure dependencies load before main.js
-<script type="module" src="js/index.js"></script>  <!-- Initialize App -->
+<script type="module" src="js/index.ts"></script>  <!-- Initialize App -->
 <script src="js/main.js"></script>                 <!-- Use App -->
 ```
 

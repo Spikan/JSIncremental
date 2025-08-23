@@ -35,7 +35,7 @@ This guide covers two migrations:
 - Removed all inline `onclick` from `index.html`
 - Introduced `data-action` attributes and centralized dispatcher in `js/ui/buttons.ts`
 - UI reads exclusively from `App.state`; eliminated `window.*` reads in UI
-- Centralized `EVENT_NAMES` export and attachment via `js/index.js`
+- Centralized `EVENT_NAMES` export and attachment via `js/index.ts`
 
 ### How to Add a New Button
 1. Add an element with `data-action="myAction"`
@@ -184,7 +184,7 @@ function safeCall() {
 
 ### **Files Modified:**
 - `js/main.js` - Removed duplicate functions, updated calls
-- `js/index.js` - Removed obsolete function calls
+- `js/index.ts` - Removed obsolete function calls
 - `js/core/systems/game-init.ts` - Updated function calls
 - `ARCHITECTURE.md` - Updated documentation
 

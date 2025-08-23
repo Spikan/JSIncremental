@@ -38,7 +38,7 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 
 ### File Structure (high level)
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
-- `js/index.js` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
+- `js/index.ts` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
 - `js/core/state/` — Central `App.state` store (`index.ts`, `shape.ts`) and bridge
 - `js/ui/` — Displays, stats, buttons (event delegation), utils (TypeScript)
 - `js/core/systems/` — Save, loop, options, purchases, resources, audio, game-init (TypeScript)
