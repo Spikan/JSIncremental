@@ -309,34 +309,49 @@ function setupSpecialButtonHandlers() {
             const maybeNum = Number(argsAttr);
             args = Number.isNaN(maybeNum) ? [argsAttr] : [maybeNum];
         }
-        if (typeof window[fnName] === 'function') {
+        // Define purchase actions set up-front
+        const purchaseActions = new Set([
+            'buyStraw','buyCup','buyWiderStraws','buyBetterCups',
+            'buySuction','buyFasterDrinks','upgradeFasterDrinks','buyCriticalClick'
+        ]);
+        const isPurchase = purchaseActions.has(fnName);
+        // Block unaffordable/disabled purchases before any side effects
+        if (isPurchase) {
+            const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') : el;
+            const disabled = !!(buttonEl && (buttonEl.disabled || buttonEl.classList?.contains('disabled') || buttonEl.classList?.contains('unaffordable')));
+            if (disabled) return; // silently ignore
+        }
+        if (typeof window[fnName] === 'function' || (isPurchase && window.App?.systems?.purchases?.execute?.[fnName])) {
             e.preventDefault();
             e.stopPropagation();
             try {
-                // Play audio for non-soda, non-tab actions via mapping
-                try {
-                    const meta = BUTTON_CONFIG.actions[fnName];
-                    const btnType = meta && meta.type;
-                    if (window.App?.systems?.audio?.button && fnName !== 'sodaClick' && fnName !== 'switchTab') {
-                        if (btnType === 'shop-btn' || btnType === 'clicking-upgrade-btn' || btnType === 'drink-speed-upgrade-btn' || btnType === 'level-up-btn') {
-                            window.App.systems.audio.button.playButtonPurchaseSound?.();
-                        } else {
-                            window.App.systems.audio.button.playButtonClickSound?.();
-                        }
-                    }
-                } catch {}
+                let success = true;
                 if (fnName === 'switchTab') {
+                    try { window.App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
                     try { window.App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
                     window[fnName](args[0], e);
                 } else {
-                    window[fnName](...args);
+                    if (isPurchase && window.App?.systems?.purchases?.execute?.[fnName]) {
+                        success = !!window.App.systems.purchases.execute[fnName]();
+                    } else {
+                        const ret = window[fnName](...args);
+                        success = (typeof ret === 'undefined') ? true : !!ret;
+                    }
+                    // Play audio only after successful action
+                    try {
+                        const meta = BUTTON_CONFIG.actions[fnName];
+                        const btnType = meta && meta.type;
+                        if (window.App?.systems?.audio?.button && fnName !== 'sodaClick') {
+                            if ((btnType === 'shop-btn' || btnType === 'clicking-upgrade-btn' || btnType === 'drink-speed-upgrade-btn' || btnType === 'level-up-btn')) {
+                                if (success) window.App.systems.audio.button.playButtonPurchaseSound?.();
+                            } else {
+                                window.App.systems.audio.button.playButtonClickSound?.();
+                            }
+                        }
+                    } catch {}
                 }
                 // Show purchase feedback for shop/upgrade actions at click point
-                const purchaseActions = new Set([
-                    'buyStraw','buyCup','buyWiderStraws','buyBetterCups',
-                    'buySuction','buyFasterDrinks','upgradeFasterDrinks','buyCriticalClick'
-                ]);
-                if (purchaseActions.has(fnName) && typeof window.App?.ui?.showPurchaseFeedback === 'function') {
+                if (isPurchase && typeof window.App?.ui?.showPurchaseFeedback === 'function' && success) {
                     let costValue;
                     try {
                         // Prefer an explicit cost-number span inside the button element
