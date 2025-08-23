@@ -182,16 +182,15 @@ function initGame() {
         console.log('🚀 initGame called - starting game initialization...');
         console.log('🔧 GAME_CONFIG available:', !!GC && Object.keys(GC).length > 0);
         console.log('🔧 DOM_CACHE available:', !!window.DOM_CACHE);
-        console.log('🔧 FEATURE_UNLOCKS available:', !!window.FEATURE_UNLOCKS);
+        console.log('🔧 FEATURE_UNLOCKS available:', !!(window.App?.systems?.unlocks));
         // ============================================================================
         // DEPENDENCY VALIDATION - Ensure all required objects are available
         // ============================================================================
         
-        // Check if FEATURE_UNLOCKS is available
-        if (typeof FEATURE_UNLOCKS === 'undefined') {
-            console.error('❌ FEATURE_UNLOCKS not available! Game cannot initialize properly.');
-            console.log('⏳ Waiting for FEATURE_UNLOCKS to load...');
-            // Retry after a short delay
+        // Check if unlocks system is available
+        if (!window.App?.systems?.unlocks) {
+            console.error('❌ Unlocks system not available! Game cannot initialize properly.');
+            console.log('⏳ Waiting for unlocks system to load...');
             setTimeout(initGame, 100);
             return;
         }
@@ -542,7 +541,7 @@ function initGame() {
             gameStartDate = Date.now();
             try { window.App?.state?.setState?.({ lastClickTime: 0 }); } catch {}
             // Reset feature unlocks on brand new games to avoid stale persisted unlocks
-            try { if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.reset) { FEATURE_UNLOCKS.reset(); } } catch {}
+            try { (window as any).App?.systems?.unlocks?.reset?.(); } catch {}
         }
 
 
@@ -639,11 +638,7 @@ function initGame() {
 
         // Initialize progressive feature unlock system after game variables are set up
         
-        if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.init) {
-            FEATURE_UNLOCKS.init();
-        } else {
-            console.warn('⚠️ FEATURE_UNLOCKS.init not available, skipping feature unlock initialization');
-        }
+        try { window.App?.systems?.unlocks?.init?.(); } catch { console.warn('⚠️ unlocks.init not available'); }
 
         
         // Game loop is now started from game-init.ts via App.systems.loop.start
@@ -757,9 +752,7 @@ function processDrink() {
         } catch {}
         
         // Check for feature unlocks after processing a drink
-        if (typeof FEATURE_UNLOCKS !== 'undefined' && FEATURE_UNLOCKS.checkAllUnlocks) {
-            FEATURE_UNLOCKS.checkAllUnlocks();
-        }
+        try { window.App?.systems?.unlocks?.checkAllUnlocks?.(); } catch {}
         
         // Autosave handled by core drink-system; legacy block removed
     }
@@ -963,37 +956,7 @@ function levelUp() {
     }
 }
 
-function save() {
-    try {
-        if (window.App?.systems?.save?.performSaveSnapshot) {
-            window.App.systems.save.performSaveSnapshot();
-            return true;
-        }
-        if (window.App?.storage?.saveGame) {
-            // Fallback minimal payload from App.state
-            const st = window.App?.state?.getState?.() || {};
-            const payload = {
-                sips: String(window.sips || 0),
-                totalSipsEarned: String(window.totalSipsEarned || 0),
-                drinkRate: Number(window.drinkRate || 0),
-                lastDrinkTime: Number(st.lastDrinkTime || 0),
-                drinkProgress: Number(window.drinkProgress || 0),
-                lastSaveTime: Date.now(),
-                totalPlayTime: Number(st.totalPlayTime || 0),
-                totalClicks: Number(st.totalClicks || 0),
-                level: Number(window.level?.toNumber?.() || window.level || 1)
-            };
-            window.App.storage.saveGame(payload);
-            try { window.App?.state?.setState?.({ lastSaveTime: payload.lastSaveTime }); } catch {}
-            return true;
-        }
-        console.warn('Save system not available');
-        return false;
-    } catch (error) {
-        console.error('Error in save:', error);
-        return false;
-    }
-}
+// legacy save() wrapper removed; use App.systems.save.performSaveSnapshot instead
 
 // delete_save legacy wrapper removed; UI routes to App.systems.save
 
@@ -1110,7 +1073,7 @@ function changeAutosaveInterval() {
 window.sodaClick = sodaClick;
 console.log('🔧 main.js loaded, sodaClick function available:', typeof window.sodaClick);
 window.levelUp = levelUp;
-window.save = save;
+// legacy window.save removed; UI dispatch calls App.systems.save directly
 // legacy delete_save global removed
 window.initGame = initGame;
 window.toggleButtonSounds = toggleClickSounds;
@@ -1142,7 +1105,7 @@ console.log('✅ Global wrapper functions and dev functions assigned to window o
 // Check if all dependencies are available
 function areDependenciesReady() {
     const dependencies = {
-        FEATURE_UNLOCKS: typeof FEATURE_UNLOCKS !== 'undefined',
+        FEATURE_UNLOCKS: !!(window.App?.systems?.unlocks),
         DOM_CACHE: typeof DOM_CACHE !== 'undefined',
         GAME_CONFIG: !!GC && Object.keys(GC).length > 0,
         Decimal: typeof Decimal !== 'undefined',

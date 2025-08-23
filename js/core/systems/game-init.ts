@@ -38,7 +38,7 @@ export function initSplashScreen(): void {
                             w.App?.ui?.updateLastSaveTime?.();
                             w.App?.ui?.updateAllStats?.();
                             w.App?.ui?.checkUpgradeAffordability?.();
-                            if (typeof (w as any).FEATURE_UNLOCKS !== 'undefined') (w as any).FEATURE_UNLOCKS.checkAllUnlocks?.();
+                            w.App?.systems?.unlocks?.checkAllUnlocks?.();
                         } catch {}
                     },
                     updatePlayTime: () => { try { w.App?.ui?.updatePlayTime?.(); } catch {} },
@@ -132,7 +132,7 @@ export function startGameCore(): void {
                                 w.App?.ui?.updateLastSaveTime?.();
                                 w.App?.ui?.updateAllStats?.();
                                 w.App?.ui?.checkUpgradeAffordability?.();
-                                if (typeof (w as any).FEATURE_UNLOCKS !== 'undefined') (w as any).FEATURE_UNLOCKS.checkAllUnlocks?.();
+                                w.App?.systems?.unlocks?.checkAllUnlocks?.();
                             } catch {}
                         },
                         updatePlayTime: () => { try { w.App?.ui?.updatePlayTime?.(); } catch {} },

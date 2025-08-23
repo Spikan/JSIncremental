@@ -39,7 +39,7 @@ describe('Global Functions and Dependencies Integration', () => {
       }
     };
     
-    // Mock FEATURE_UNLOCKS
+    // Mock unlocks system
     mockFeatureUnlocks = {
       init: vi.fn(),
       checkAllUnlocks: vi.fn(),
@@ -113,10 +113,9 @@ describe('Global Functions and Dependencies Integration', () => {
     
     // Setup global mocks
     global.window = {
-      App: mockApp,
+      App: { ...mockApp, systems: { ...mockApp.systems, unlocks: mockFeatureUnlocks } },
       GAME_CONFIG: mockGameConfig,
       Decimal: mockDecimal,
-      FEATURE_UNLOCKS: mockFeatureUnlocks,
       DOM_CACHE: mockDomCache,
       sips: new mockDecimal(1000),
       straws: new mockDecimal(5),
@@ -125,7 +124,7 @@ describe('Global Functions and Dependencies Integration', () => {
     };
     
     global.Decimal = mockDecimal;
-    global.FEATURE_UNLOCKS = mockFeatureUnlocks;
+    global.FEATURE_UNLOCKS = mockFeatureUnlocks; // retained only for legacy references in code under test
     global.DOM_CACHE = mockDomCache;
   });
   
@@ -255,7 +254,7 @@ describe('Global Functions and Dependencies Integration', () => {
   describe('Dependency Availability', () => {
     it('should have all core dependencies available', () => {
       const dependencies = [
-        { name: 'FEATURE_UNLOCKS', obj: global.FEATURE_UNLOCKS },
+        { name: 'FEATURE_UNLOCKS', obj: global.window.App.systems.unlocks },
         { name: 'DOM_CACHE', obj: global.DOM_CACHE },
         { name: 'GAME_CONFIG', obj: global.window.GAME_CONFIG },
         { name: 'Decimal', obj: global.Decimal },
@@ -274,10 +273,10 @@ describe('Global Functions and Dependencies Integration', () => {
     });
 
     it('should have FEATURE_UNLOCKS methods available', () => {
-      expect(global.FEATURE_UNLOCKS.init).toBeDefined();
-      expect(global.FEATURE_UNLOCKS.checkAllUnlocks).toBeDefined();
-      expect(global.FEATURE_UNLOCKS.updateUnlocksTab).toBeDefined();
-      expect(global.FEATURE_UNLOCKS.updateFeatureVisibility).toBeDefined();
+      expect(global.window.App.systems.unlocks.init).toBeDefined();
+      expect(global.window.App.systems.unlocks.checkAllUnlocks).toBeDefined();
+      expect(global.window.App.systems.unlocks.updateUnlocksTab).toBeDefined();
+      expect(global.window.App.systems.unlocks.updateFeatureVisibility).toBeDefined();
       
       expect(typeof global.FEATURE_UNLOCKS.init).toBe('function');
       expect(typeof global.FEATURE_UNLOCKS.checkAllUnlocks).toBe('function');
@@ -293,8 +292,8 @@ describe('Global Functions and Dependencies Integration', () => {
 
     it('should handle dependency method calls without errors', () => {
       expect(() => {
-        global.FEATURE_UNLOCKS.init();
-        global.FEATURE_UNLOCKS.checkAllUnlocks();
+        global.window.App.systems.unlocks.init();
+        global.window.App.systems.unlocks.checkAllUnlocks();
         global.DOM_CACHE.init();
         global.DOM_CACHE.get('testElement');
       }).not.toThrow();

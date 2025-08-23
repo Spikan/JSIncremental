@@ -1,7 +1,6 @@
 // Dev system: unlock helpers, time travel, and resource tweaks (TypeScript)
 
 type Win = typeof window & {
-  FEATURE_UNLOCKS?: any;
   Decimal?: any;
   App?: any;
   GAME_CONFIG?: any;
@@ -20,7 +19,7 @@ function toNum(v: any): number { return (v && typeof v.toNumber === 'function') 
 export function unlockAll(): boolean {
   try {
     const w = window as Win;
-    const fu = w.FEATURE_UNLOCKS;
+    const fu = w.App?.systems?.unlocks;
     if (!fu) return false;
     const allFeatures = Object.keys(fu.unlockConditions || {});
     allFeatures.forEach((f) => fu.unlockedFeatures.add(f));
@@ -33,7 +32,7 @@ export function unlockAll(): boolean {
 export function unlockShop(): boolean {
   try {
     const w = window as Win;
-    const fu = w.FEATURE_UNLOCKS;
+    const fu = w.App?.systems?.unlocks;
     if (!fu) return false;
     fu.unlockedFeatures.add('shop');
     fu.updateFeatureVisibility?.();
@@ -44,7 +43,7 @@ export function unlockShop(): boolean {
 export function unlockUpgrades(): boolean {
   try {
     const w = window as Win;
-    const fu = w.FEATURE_UNLOCKS;
+    const fu = w.App?.systems?.unlocks;
     if (!fu) return false;
     ['widerStraws','betterCups','fasterDrinks','criticalClick','suction'].forEach((f)=> fu.unlockedFeatures.add(f));
     fu.updateFeatureVisibility?.();
@@ -55,7 +54,7 @@ export function unlockUpgrades(): boolean {
 export function resetUnlocks(): boolean {
   try {
     const w = window as Win;
-    const fu = w.FEATURE_UNLOCKS;
+    const fu = w.App?.systems?.unlocks;
     if (!fu) return false;
     fu.unlockedFeatures.clear();
     fu.unlockedFeatures.add('soda');
@@ -117,7 +116,7 @@ export function addSips(amount: number): boolean {
 }
 
 export function toggleDevMode(): boolean {
-  try { (window as Win).FEATURE_UNLOCKS?.toggleDevMode?.(); return true; } catch { return false; }
+  try { (window as Win).App?.systems?.unlocks?.toggleDevMode?.(); return true; } catch { return false; }
 }
 
 export function toggleGodMode(): boolean {
