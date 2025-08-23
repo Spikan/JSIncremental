@@ -1,5 +1,5 @@
 // Quick test to verify the Decimal conversion fix
-import { validateGameSave } from './js/core/validation/schemas.js';
+import { validateGameSave } from './js/core/validation/schemas';
 
 // Mock Decimal class
 class Decimal {

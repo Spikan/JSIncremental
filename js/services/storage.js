@@ -1,6 +1,6 @@
 // @ts-check
 // Storage service with explicit schema imports
-import { validateGameSave, validateGameOptions } from '../core/validation/schemas.js';
+import { validateGameSave, validateGameOptions } from '../core/validation/schemas';
 const STORAGE_PREFIX = 'game_';
 
 /**

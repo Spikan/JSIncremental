@@ -1,5 +1,5 @@
 // Test script to verify the null value fix
-import { validateGameSave } from './js/core/validation/schemas.js';
+import { validateGameSave } from './js/core/validation/schemas';
 
 // Mock Decimal class
 class Decimal {
