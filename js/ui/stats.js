@@ -9,8 +9,8 @@ export function updatePlayTime() {
     const playTimeElement = window.DOM_CACHE?.playTime;
     try {
         const state = window.App?.state?.getState?.();
-        if (playTimeElement && state?.options) {
-        	const totalMs = Number(window.totalPlayTime || 0);
+        if (playTimeElement && state) {
+            const totalMs = Number(state.totalPlayTime || window.totalPlayTime || 0);
             const totalSeconds = Math.floor(totalMs / 1000);
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -31,7 +31,7 @@ export function updatePlayTime() {
 export function updateLastSaveTime() {
     const lastSaveElement = window.DOM_CACHE?.lastSaveTime;
     try {
-        const lastSaveMs = Number(window.lastSaveTime || 0);
+        const lastSaveMs = Number(window.App?.state?.getState?.()?.lastSaveTime || window.lastSaveTime || 0);
         if (lastSaveElement && lastSaveMs) {
         const now = new Date();
         const lastSave = new Date(lastSaveMs);
@@ -67,7 +67,7 @@ export function updateTimeStats() {
     // Total play time (including previous sessions)
     const totalPlayTimeElement = window.DOM_CACHE?.totalPlayTime;
     if (totalPlayTimeElement) {
-        const totalMs = Number(window.totalPlayTime || 0);
+        const totalMs = Number(window.App?.state?.getState?.()?.totalPlayTime || window.totalPlayTime || 0);
         const totalSeconds = Math.floor(totalMs / 1000);
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -84,8 +84,10 @@ export function updateTimeStats() {
     
     // Current session time
     const sessionTimeElement = window.DOM_CACHE?.sessionTime;
-    if (sessionTimeElement && window.sessionStartTime) {
-        const sessionTime = Date.now() - Number(window.sessionStartTime || 0);
+    if (sessionTimeElement) {
+        const start = Number(window.App?.state?.getState?.()?.sessionStartTime || window.sessionStartTime || 0);
+        if (start) {
+        const sessionTime = Date.now() - start;
         const sessionSeconds = Math.floor(sessionTime / 1000);
         const hours = Math.floor(sessionSeconds / 3600);
         const minutes = Math.floor((sessionSeconds % 3600) / 60);
@@ -97,6 +99,7 @@ export function updateTimeStats() {
             sessionTimeElement.textContent = `${minutes}m ${seconds}s`;
         } else {
             sessionTimeElement.textContent = `${seconds}s`;
+        }
         }
     }
 }

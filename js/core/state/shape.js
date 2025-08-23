@@ -23,6 +23,13 @@ const defaultState = {
 	drinkProgress: 0,
 	lastDrinkTime: 0,
 
+	// Session and persistence
+	lastSaveTime: 0,
+	sessionStartTime: 0,
+	totalSipsEarned: 0,
+	totalClicks: 0,
+	highestSipsPerSecond: 0,
+
 	// Click/crit systems (migrate from globals)
 	criticalClickChance: 0,
 	criticalClickMultiplier: 0,
