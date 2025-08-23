@@ -50,6 +50,18 @@ interface GameState {
 	drinkRate: number;
 	drinkProgress: number;
 	lastDrinkTime: number;
+	// newly centralized
+	criticalClickChance: number;
+	criticalClickMultiplier: number;
+	suctionClickBonus: number;
+	fasterDrinksUpCounter: number;
+	criticalClickUpCounter: number;
+	lastSaveTime: number;
+	sessionStartTime: number;
+	totalSipsEarned: number;
+	totalClicks: number;
+	highestSipsPerSecond: number;
+	totalPlayTime: number;
 	options: GameOptions;
 }
 

@@ -364,6 +364,7 @@ function initGame() {
         let autosaveCounter = 0;
         let gameStartTime = Date.now();
         let lastSaveTime = null;
+        try { window.App?.state?.setState?.({ sessionStartTime: gameStartTime }); } catch {}
 
         // Save optimization - batch save operations
         let saveQueue = [];
@@ -831,7 +832,14 @@ function processDrink() {
             window.App?.stateBridge?.setDrinkProgress(drinkProgress);
             // Also write sips to state directly
             const toNum = (v) => (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0);
-            window.App?.state?.setState?.({ sips: toNum(window.sips) });
+            const sipsNum = toNum(window.sips);
+            const drinkRateSec = drinkRate ? (1000 / drinkRate) : 0;
+            const spsNum = toNum(sps);
+            const currentSipsPerSecond = spsNum * drinkRateSec;
+            const prevHigh = Number(window.App?.state?.getState?.()?.highestSipsPerSecond || 0);
+            const highest = Math.max(prevHigh, currentSipsPerSecond);
+            const prevTotal = Number(window.App?.state?.getState?.()?.totalSipsEarned || 0);
+            window.App?.state?.setState?.({ sips: sipsNum, highestSipsPerSecond: highest, totalSipsEarned: prevTotal + toNum(baseSipsPerDrink) });
         } catch {}
         
         // Check for feature unlocks after processing a drink
@@ -895,6 +903,10 @@ function getDrinkRateSeconds() {
 function trackClick() {
     console.log('🔧 trackClick called');
     window.totalClicks++;
+    try {
+        const prev = Number(window.App?.state?.getState?.()?.totalClicks || 0);
+        window.App?.state?.setState?.({ totalClicks: prev + 1 });
+    } catch {}
     const now = Date.now();
 
     // Track click streak

@@ -41,6 +41,7 @@ export function performSaveSnapshot() {
 
 
 		window.App?.storage?.saveGame?.(payload);
+		try { window.App?.state?.setState?.({ lastSaveTime: payload.lastSaveTime }); } catch {}
 		window.App?.events?.emit?.(window.App?.EVENT_NAMES?.GAME?.SAVED, payload);
 		return payload;
 	} catch (e) {
