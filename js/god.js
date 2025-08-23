@@ -20,7 +20,19 @@ function lcgRandomInt(min, max) {
 
 // Function to reset LCG seed (useful for testing or changing randomness)
 function resetLCGSeed(newSeed = null) {
-    lcgSeed = newSeed || Date.now();
+    // Accept string/number; hash strings to 32-bit
+    if (typeof newSeed === 'string') {
+        let h = 2166136261 >>> 0; // FNV-1a
+        for (let i = 0; i < newSeed.length; i++) {
+            h ^= newSeed.charCodeAt(i);
+            h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+        }
+        lcgSeed = h >>> 0;
+    } else if (typeof newSeed === 'number') {
+        lcgSeed = (newSeed >>> 0);
+    } else {
+        lcgSeed = Date.now() >>> 0;
+    }
     console.log('LCG seed reset to:', lcgSeed);
 }
 
@@ -32,7 +44,14 @@ async function loadWordBank() {
     if (!bibleWordBank) {
         try {
             console.log('Loading word bank from word_bank.json...');
-            const response = await fetch('word_bank.json');
+            // Resolve path relative to this module so it works under subpaths (e.g., GitHub Pages)
+            let url;
+            try {
+                url = new URL('../word_bank.json', import.meta.url);
+            } catch {
+                url = { href: (typeof window !== 'undefined' ? (window.__BASE_PATH__ ? (window.__BASE_PATH__ + 'word_bank.json') : 'word_bank.json') : 'word_bank.json') };
+            }
+            const response = await fetch(url.href);
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -83,6 +102,7 @@ function generateBibleWords() {
 
     // Generate exactly 32 words using LCG
     for (let i = 0; i < 32; i++) {
+        // Advance LCG between pulls to ensure sequence varies per call
         words.push(getRandomBibleWord());
     }
 
