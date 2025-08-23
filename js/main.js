@@ -307,37 +307,8 @@ function initGame() {
             bestClickStreak: window.bestClickStreak
         });
         let sps = new Decimal(0);
-        // Expose sps for UI modules - only define if not already defined
-        if (!Object.getOwnPropertyDescriptor(window, 'sps')) {
-            Object.defineProperty(window, 'sps', {
-                get: function() { return sps; },
-                set: function(v) {
-                    sps = new Decimal(v);
-                    try { window.App?.stateBridge?.syncSps(sps); } catch {}
-                    
-                }
-            });
-        }
         let strawSPD = new Decimal(0);
         let cupSPD = new Decimal(0);
-        if (!Object.getOwnPropertyDescriptor(window, 'strawSPD')) {
-            Object.defineProperty(window, 'strawSPD', {
-                get: function() { return strawSPD; },
-                set: function(v) {
-                    strawSPD = new Decimal(v);
-                    try { window.App?.stateBridge?.syncStrawSPD?.(strawSPD); } catch {}
-                }
-            });
-        }
-        if (!Object.getOwnPropertyDescriptor(window, 'cupSPD')) {
-            Object.defineProperty(window, 'cupSPD', {
-                get: function() { return cupSPD; },
-                set: function(v) {
-                    cupSPD = new Decimal(v);
-                    try { window.App?.stateBridge?.syncCupSPD?.(cupSPD); } catch {}
-                }
-            });
-        }
         let suctionClickBonus = new Decimal(0);
         let widerStraws = new Decimal(0);
         // Make widerStraws accessible globally
