@@ -300,7 +300,23 @@ function setupSpecialButtonHandlers(): void {
             const target = e.target as any;
             if (!(target instanceof HTMLElement)) return;
             const action = target.getAttribute('data-action');
-            if (!action) return; const [fnName] = action.split(':'); if (typeof (window as any)[fnName] === 'function') { try { (window as any)[fnName](); } catch (err) { console.warn('change action failed', fnName, err); } }
+            if (!action) return;
+            const [fnName] = action.split(':');
+            try {
+                if (fnName === 'toggleAutosave') {
+                    const checked = !!(target as HTMLInputElement).checked;
+                    const prev = (window as any).App?.state?.getState?.()?.options || {};
+                    (window as any).App?.state?.setState?.({ options: { ...prev, autosaveEnabled: checked } });
+                    (window as any).App?.systems?.options?.saveOptions?.({ autosaveEnabled: checked, autosaveInterval: Number(prev.autosaveInterval || 10) });
+                    (window as any).App?.ui?.updateAutosaveStatus?.();
+                } else if (fnName === 'changeAutosaveInterval') {
+                    const value = Number((target as HTMLSelectElement).value || 10);
+                    const prev = (window as any).App?.state?.getState?.()?.options || {};
+                    (window as any).App?.state?.setState?.({ options: { ...prev, autosaveInterval: value } });
+                    (window as any).App?.systems?.options?.saveOptions?.({ autosaveEnabled: !!prev.autosaveEnabled, autosaveInterval: value });
+                    (window as any).App?.ui?.updateAutosaveStatus?.();
+                }
+            } catch (err) { console.warn('change action failed', fnName, err); }
         }, { capture: true });
     }
 }
