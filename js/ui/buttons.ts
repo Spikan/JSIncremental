@@ -30,6 +30,19 @@ const BUTTON_CONFIG: { types: Record<string, ButtonTypeMeta>; actions: Record<st
         toggleButtonSounds: { func: () => { const audio = (window as any).App?.systems?.audio?.button; if (audio?.toggleButtonSounds) { audio.toggleButtonSounds(); try { (window as any).App?.ui?.updateAutosaveStatus?.(); } catch {} } }, type: 'sound-toggle-btn', label: 'Toggle Button Sounds' },
         sendMessage: { func: () => (window as any).sendMessage?.(), type: 'chat-send-btn', label: 'Send Message' },
         startGame: { func: () => (window as any).startGame?.(), type: 'splash-start-btn', label: 'Start Game' },
+        // Dev actions
+        devUnlockAll: { func: () => (window as any).App?.systems?.dev?.unlockAll?.(), type: 'dev-btn', label: 'Unlock All' },
+        devUnlockShop: { func: () => (window as any).App?.systems?.dev?.unlockShop?.(), type: 'dev-btn', label: 'Unlock Shop' },
+        devUnlockUpgrades: { func: () => (window as any).App?.systems?.dev?.unlockUpgrades?.(), type: 'dev-btn', label: 'Unlock Upgrades' },
+        devResetUnlocks: { func: () => (window as any).App?.systems?.dev?.resetUnlocks?.(), type: 'dev-btn', label: 'Reset Unlocks' },
+        devAddTime: { func: (ms?: any) => (window as any).App?.systems?.dev?.addTime?.(Number(ms) || 0), type: 'dev-btn', label: 'Add Time' },
+        devAddSips: { func: (amt?: any) => (window as any).App?.systems?.dev?.addSips?.(Number(amt) || 0), type: 'dev-btn', label: 'Add Sips' },
+        devToggleDevMode: { func: () => (window as any).App?.systems?.dev?.toggleDevMode?.(), type: 'dev-btn', label: 'Toggle Dev Mode' },
+        devToggleGodMode: { func: () => (window as any).App?.systems?.dev?.toggleGodMode?.(), type: 'dev-btn', label: 'Toggle God Mode' },
+        devShowDebugInfo: { func: () => (window as any).App?.systems?.dev?.showDebugInfo?.(), type: 'dev-btn', label: 'Show Debug Info' },
+        devExportSave: { func: () => (window as any).App?.systems?.dev?.exportSave?.(), type: 'dev-btn', label: 'Export Save' },
+        devImportSave: { func: () => (window as any).App?.systems?.dev?.openImportDialog?.(), type: 'dev-btn', label: 'Import Save' },
+        quickUnlock: { func: () => { try { (window as any).App?.systems?.dev?.unlockAll?.(); (window as any).App?.systems?.dev?.addSips?.(10000); return true; } catch { return false; } }, type: 'dev-btn', label: 'Quick Unlock' },
     }
 };
 
@@ -173,7 +186,7 @@ function setupSpecialButtonHandlers(): void {
                             try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
                             (window as any).App?.ui?.switchTab?.(args[0], e);
                         } else if (meta && typeof meta.func === 'function') {
-                            const ret = meta.func();
+                            const ret = meta.func(...args);
                             success = (typeof ret === 'undefined') ? true : !!ret;
                             try { if (fnName === 'toggleButtonSounds') { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } } catch {}
                         } else {
@@ -234,7 +247,7 @@ function setupSpecialButtonHandlers(): void {
                         try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
                         (window as any).App?.ui?.switchTab?.(args[0], e);
                     } else if (meta && typeof meta.func === 'function') {
-                        const ret = meta.func();
+                        const ret = meta.func(...args);
                         success = (typeof ret === 'undefined') ? true : !!ret;
                         try { if (fnName === 'toggleButtonSounds') { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } } catch {}
                     } else {
