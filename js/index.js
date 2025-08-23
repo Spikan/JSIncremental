@@ -4,7 +4,8 @@
 // Import typed store and default state
 import { createStore } from './core/state/index.ts';
 import { defaultState } from './core/state/shape.ts';
-const storage = window.storage || { loadGame: () => null, saveGame: () => {} };
+// Prefer typed storage service when available
+let storage = (window as any).storage || { loadGame: () => null, saveGame: () => {} };
 const eventBus = window.eventBus || { emit: () => {}, on: () => {} };
 // Pull event names from module export if available; fallback to global
 let EVENT_NAMES = window.EVENT_NAMES || {};
@@ -74,6 +75,13 @@ try {
 } catch (e) {
     console.warn('⚠️ UI module load failed (ok during early bootstrap):', e);
 }
+
+// Attach core systems (TypeScript modules) into App.systems with safe fallbacks
+try {
+    const st = await import('./services/storage.ts');
+    storage = (st && st.AppStorage) ? st.AppStorage : storage;
+    try { (window).storage = storage; } catch {}
+} catch (e) { console.warn('⚠️ storage service load failed:', e); }
 
 // Attach core systems (TypeScript modules) into App.systems with safe fallbacks
 try {
