@@ -40,7 +40,7 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
 - `js/index.js` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
 - `js/core/state/` — Central `App.state` store (`index.ts`, `shape.ts`) and bridge
-- `js/ui/` — Displays, stats, buttons (event delegation), utils
+- `js/ui/` — Displays, stats, buttons (event delegation), utils (TypeScript)
 - `js/core/systems/` — Save, loop, options, purchases, resources, audio, game-init (TypeScript)
 - `js/core/rules/` — Pure business logic (clicks, purchases, economy) in `.ts`
 - `js/core/validation/` — Zod schemas and validators (`schemas.ts`)

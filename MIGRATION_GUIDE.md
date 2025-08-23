@@ -4,7 +4,7 @@
 
 This guide covers two migrations:
 1) Duplicate function elimination to modular systems (complete)
-2) TypeScript-ready JSDoc typing and UI decoupling (in progress, infra complete)
+2) TypeScript-ready JSDoc typing and UI decoupling (infra complete; UI modules migrated to .ts)
 
 ---
 
@@ -24,7 +24,7 @@ This guide covers two migrations:
 ### Priorities
 1. Pure rules in `js/core/rules/*.js` → converted to `.ts` (clicks, economy, purchases)
 2. Core systems in `js/core/systems/*.js` → converted to `.ts` (resources, purchases-system, save-system, loop-system, drink-system, clicks-system)
-3. UI modules in `js/ui/*.js` (remain JS with JSDoc for now)
+3. UI modules in `js/ui/*.js` → converted to `.ts` (index.ts, buttons.ts, displays.ts, stats.ts, feedback.ts, affordability.ts, labels.ts, utils.ts)
 4. Remaining legacy modules (`main.js`) use `// @ts-nocheck`
 
 ---
@@ -33,13 +33,13 @@ This guide covers two migrations:
 
 ### Changes
 - Removed all inline `onclick` from `index.html`
-- Introduced `data-action` attributes and centralized dispatcher in `js/ui/buttons.js`
+- Introduced `data-action` attributes and centralized dispatcher in `js/ui/buttons.ts`
 - UI reads exclusively from `App.state`; eliminated `window.*` reads in UI
 - Centralized `EVENT_NAMES` export and attachment via `js/index.js`
 
 ### How to Add a New Button
 1. Add an element with `data-action="myAction"`
-2. In `js/ui/buttons.js`, handle `myAction` in the dispatcher
+2. In `js/ui/buttons.ts`, handle `myAction` in the dispatcher
 3. Call into `App.systems` or `App.ui` rather than globals
 
 ---

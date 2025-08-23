@@ -38,7 +38,7 @@ export function performSaveSnapshot(): any {
             drinkProgress: Number(w.drinkProgress || 0),
             lastSaveTime: Date.now(),
             totalPlayTime: Number(state.totalPlayTime || 0),
-            totalClicks: Number(w.totalClicks || 0),
+            totalClicks: Number(state.totalClicks || w.totalClicks || 0),
             level: (w.level && typeof w.level.toNumber === 'function') ? w.level.toNumber() : Number(w.level || 1)
         };
 

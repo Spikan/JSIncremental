@@ -227,9 +227,9 @@ The project is ready for continued development with a solid, maintainable founda
 
 ### Summary
 - UI now reads exclusively from `App.state`; remaining `window.*` UI reads removed
-- Centralized UI event handling via `data-action` in `js/ui/buttons.js`
+- Centralized UI event handling via `data-action` in `js/ui/buttons.ts`
 - Introduced `js/core/systems/config-accessor.ts` for consistent config access
-- `EVENT_NAMES` exported from `js/core/constants.js` and attached in `js/index.js`
+- `EVENT_NAMES` exported from `js/core/constants.ts` and attached in `js/index.js`
 - Storage validators imported directly; storage exposed as `AppStorage`
 - TypeScript infra added: `tsconfig.json`, `types/global.d.ts`, `@ts-check` and JSDoc across core; selected modules migrated to `.ts` with extensionless imports
 

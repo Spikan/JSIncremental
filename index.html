@@ -17,18 +17,21 @@
     <script>
         // Safety check to ensure functions are available - moved to after main.js loads
         window.addEventListener('load', function() {
-            // Wait for main.js to load and functions to be available
+            // Wait for modules to load and APIs to be available
             function checkFunctionsLoaded() {
-                if (typeof window.switchTab === 'undefined') {
-                    console.log('⏳ Waiting for switchTab function...');
+                var hasSwitchTab = !!(window.App && window.App.ui && typeof window.App.ui.switchTab === 'function');
+                if (!hasSwitchTab) {
+                    console.log('⏳ Waiting for App.ui.switchTab...');
                     setTimeout(checkFunctionsLoaded, 200);
-                } else if (typeof window.devUnlockAll === 'undefined') {
+                    return;
+                }
+                if (typeof window.devUnlockAll === 'undefined') {
                     console.log('⏳ Waiting for devUnlockAll function...');
                     setTimeout(checkFunctionsLoaded, 200);
-                } else {
-                    console.log('✅ switchTab function is available');
-                    console.log('✅ devUnlockAll function is available');
+                    return;
                 }
+                console.log('✅ App.ui.switchTab is available');
+                console.log('✅ devUnlockAll function is available');
             }
 
             // Start checking after a brief initial delay
