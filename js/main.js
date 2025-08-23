@@ -933,12 +933,7 @@ function getDrinkRateSeconds() {
 // Click tracking function
 function trackClick() {
     console.log('🔧 trackClick called');
-    window.totalClicks++;
-    try {
-        const st = window.App?.state?.getState?.() || {};
-        const prev = Number(st.totalClicks || 0);
-        window.App?.state?.setState?.({ totalClicks: prev + 1 });
-    } catch {}
+    try { window.App?.systems?.clicks?.trackClick?.(); } catch {}
     const now = Date.now();
 
     // Track click streak
@@ -962,7 +957,7 @@ function trackClick() {
         window.clickTimes.shift();
     }
     
-    // Play button click sound effect
+    // Play button click sound effect handled in clicks system as well; keep fallback
     try { window.App?.systems?.audio?.button?.playButtonClickSound?.(); } catch {}
     
     // Update stats display if stats tab is active
@@ -1545,7 +1540,10 @@ function sodaClick(multiplier = 1) {
         // Safely get suction bonus with proper Decimal handling
         let suctionValue = 0;
         try {
-            if (window.suctions && typeof window.suctions.toNumber === 'function') {
+            const st = window.App?.state?.getState?.() || {};
+            if (typeof st.suctions === 'number') {
+                suctionValue = st.suctions;
+            } else if (window.suctions && typeof window.suctions.toNumber === 'function') {
                 suctionValue = window.suctions.toNumber();
             } else if (typeof window.suctions === 'number') {
                 suctionValue = window.suctions;

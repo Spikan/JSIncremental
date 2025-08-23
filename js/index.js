@@ -104,6 +104,11 @@ try {
     }
 } catch (e) { console.warn('⚠️ drink system load failed:', e); }
 
+try {
+    const clicks = await import('./core/systems/clicks-system.ts');
+    Object.assign(window.App.systems.clicks, clicks);
+} catch (e) { console.warn('⚠️ clicks system load failed:', e); }
+
 // Signal that App is ready
 console.log('✅ App object created and ready');
 
