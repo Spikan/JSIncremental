@@ -81,6 +81,11 @@ try {
 
 // Attach core systems (TypeScript modules) into App.systems with safe fallbacks
 try {
+    const unlocks = await import('./feature-unlocks.ts');
+    window.App.systems.unlocks = (unlocks && unlocks.FEATURE_UNLOCKS) ? unlocks.FEATURE_UNLOCKS : {};
+} catch (e) { console.warn('⚠️ unlocks system load failed:', e); }
+
+try {
     const st = await import('./services/storage.ts');
     storage = (st && st.AppStorage) ? st.AppStorage : storage;
     try { window.storage = storage; } catch {}

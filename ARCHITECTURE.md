@@ -35,22 +35,24 @@ The codebase had significant duplicate functions across `main.js`, UI modules, a
 Recent work completed a full UI decoupling and established TypeScript infrastructure while keeping the codebase in JavaScript via JSDoc typing.
 
 - **Single source of truth**: All UI modules read from `App.state` only. Legacy `window.*` UI reads have been eliminated.
-- **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `js/ui/buttons.js`.
+- **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `js/ui/buttons.ts`.
 - **Configuration access**: Added `js/core/systems/config-accessor.ts` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
-- **Event names**: `EVENT_NAMES` exported from `js/core/constants.js` and attached in `js/index.js` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
+- **Event names**: `EVENT_NAMES` exported from `js/core/constants.ts` and attached in `js/index.js` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
  - **Storage**: Validation functions are imported directly from `js/core/validation/schemas.ts`. The typed storage facade `AppStorage` lives in `js/services/storage.ts` and is attached to `window.storage` during bootstrap.
-- **State bridge**: `js/core/state/bridge.js` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
+- **State bridge**: `js/core/state/bridge.ts` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
 - **TypeScript infra**: Added `tsconfig.json` with `allowJs` + `checkJs`, a `types/global.d.ts` for ambient globals, and pervasive `@ts-check`/JSDoc annotations across core systems and rules. New script: `npm run typecheck`.
 
 ### New/Updated Files
 - `js/core/systems/config-accessor.ts` — central config access
-- `js/ui/buttons.js` — event delegation via `data-action`
+- `js/ui/buttons.ts` — event delegation via `data-action`
 - `types/global.d.ts` — ambient global types (`App`, `GameState`, etc.)
 - `tsconfig.json` — JS-with-types configuration
 - TypeScript conversions with extensionless imports:
   - `js/core/rules/*.ts` (`clicks`, `economy`, `purchases`)
-  - `js/core/systems/resources.ts`, `purchases-system.ts`, `save-system.ts`, `loop-system.ts`, `drink-system.ts`, `clicks-system.ts`
+  - `js/core/systems/resources.ts`, `purchases-system.ts`, `save-system.ts`, `loop-system.ts`, `drink-system.ts`, `clicks-system.ts`, `options-system.ts`, `autosave.ts`, `button-audio.ts`, `game-init.ts`
   - `js/core/validation/schemas.ts`
+  - `js/services/event-bus.ts`, `js/services/storage.ts`
+  - `js/feature-unlocks.ts`
 
 ## 📁 Complete File Structure
 
@@ -69,19 +71,19 @@ soda-clicker-pro/
 │
 ├── 📁 js/                        # JavaScript source code
 │   ├── 📄 index.js               # Main entry point, bootstraps App global
-│   ├── 📄 main.js                # Legacy game logic (121KB, 3092 lines) - BEING REFACTORED
+│   ├── 📄 main.js                # Legacy game logic (refactoring in progress)
 │   ├── 📄 config.js              # Game configuration and constants
-│   ├── 📄 feature-unlocks.js     # Feature unlock management system
+│   ├── 📄 feature-unlocks.ts     # Feature unlock management system
 │   ├── 📄 god.js                 # God mode functionality
 │   ├── 📄 dom-cache.js           # DOM element caching system
 │   │
 │   ├── 📁 core/                  # Core game systems
-│   │   ├── 📄 constants.js       # Event names and game constants
+│   │   ├── 📄 constants.ts       # Event names and game constants
 │   │   │
 │   │   ├── 📁 state/             # State management
-│   │   │   ├── 📄 index.js       # State store implementation
-│   │   │   ├── 📄 shape.js       # Default state structure
-│   │   │   └── 📄 bridge.js      # Legacy state bridge
+│   │   │   ├── 📄 index.ts       # State store implementation
+│   │   │   ├── 📄 shape.ts       # Default state structure
+│   │   │   └── 📄 bridge.ts      # Legacy state bridge
 │   │   │
 │   │   ├── 📁 rules/             # Pure business logic
 │   │   │   ├── 📄 clicks.ts      # Click calculations and mechanics
@@ -93,9 +95,9 @@ soda-clicker-pro/
 │   │   │   ├── 📄 purchases-system.ts # Purchase logic for all upgrades
 │   │   │   ├── 📄 clicks-system.ts # Click handling and feedback
 │   │   │   ├── 📄 drink-system.ts # Drink processing and timing
-│   │   │   ├── 📄 autosave.js    # Autosave counter and timing logic
+│   │   │   ├── 📄 autosave.ts    # Autosave counter and timing logic
 │   │   │   ├── 📄 save-system.ts # Save/load operations with validation
-│   │   │   ├── 📄 options-system.js # Game options and preferences
+│   │   │   ├── 📄 options-system.ts # Game options and preferences
 │   │   │   ├── 📄 loop-system.ts # Game loop and timing management
 │   │   │   ├── 📄 button-audio.ts # Sound effects and audio preferences
 │   │   │   └── 📄 game-init.ts   # Game initialization system
@@ -104,18 +106,19 @@ soda-clicker-pro/
 │   │       └── 📄 schemas.ts     # Zod validation schemas
 │   │
 │   ├── 📁 services/              # Service layer
-│   │   ├── 📄 storage.js         # Abstracted localStorage operations
-│   │   ├── 📄 event-bus.js       # Event bus implementation
+│   │   ├── 📄 storage.ts         # Abstracted localStorage operations
+│   │   ├── 📄 event-bus.ts       # Event bus implementation
 │   │   └── 📄 error-overlay.js   # Error handling and display
 │   │
 │   └── 📁 ui/                    # User interface system
-│       ├── 📄 index.js           # UI system coordinator
-│       ├── 📄 displays.js        # Display update functions
-│       ├── 📄 stats.js           # Statistics display management
-│       ├── 📄 feedback.js        # Visual feedback system
-│       ├── 📄 affordability.js   # Upgrade affordability checking
-│       ├── 📄 labels.js          # Text label management
-│       └── 📄 utils.js           # UI utility functions
+│       ├── 📄 index.ts           # UI system coordinator (switchTab lives here)
+│       ├── 📄 displays.ts        # Display update functions
+│       ├── 📄 stats.ts           # Statistics display management
+│       ├── 📄 feedback.ts        # Visual feedback system
+│       ├── 📄 affordability.ts   # Upgrade affordability checking
+│       ├── 📄 labels.ts          # Text label management
+│       ├── 📄 buttons.ts         # Unified button dispatcher (data-action)
+│       └── 📄 utils.ts           # UI utility functions
 │
 ├── 📁 data/                      # Game data files
 │   ├── 📄 unlocks.json           # Feature unlock conditions
