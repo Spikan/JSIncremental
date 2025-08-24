@@ -178,17 +178,32 @@ function setupSpecialButtonHandlers(): void {
                 const buttonEl = (el.closest && el.closest('button')) ? el.closest('button') as any : el as any;
                 if (buttonEl) markPointerHandled(buttonEl);
                 const meta = (BUTTON_CONFIG.actions as any)[fnName];
+                // Handle tab switch explicitly (play sound always)
+                if (fnName === 'switchTab') {
+                    e.preventDefault(); e.stopPropagation();
+                    try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
+                    (window as any).App?.ui?.switchTab?.(args[0], e);
+                    return;
+                }
                 if (meta || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
                     e.preventDefault(); e.stopPropagation();
                     try {
                         let success = true;
-                        if (fnName === 'switchTab') {
-                            try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
-                            (window as any).App?.ui?.switchTab?.(args[0], e);
-                        } else if (meta && typeof meta.func === 'function') {
+                        if (meta && typeof meta.func === 'function') {
                             const ret = meta.func(...args);
                             success = (typeof ret === 'undefined') ? true : !!ret;
                             try { if (fnName === 'toggleButtonSounds') { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } } catch {}
+                            try {
+                                const btnType = meta.type;
+                                const audio = (window as any).App?.systems?.audio?.button;
+                                if (audio && fnName !== 'sodaClick' && fnName !== 'switchTab') {
+                                    if (btnType === 'shop-btn' || btnType === 'clicking-upgrade-btn' || btnType === 'drink-speed-upgrade-btn' || btnType === 'level-up-btn') {
+                                        if (success) audio.playButtonPurchaseSound?.();
+                                    } else {
+                                        audio.playButtonClickSound?.();
+                                    }
+                                }
+                            } catch {}
                         } else {
                             if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) { success = !!(window as any).App.systems.purchases.execute[fnName](); }
                             try {
@@ -239,17 +254,32 @@ function setupSpecialButtonHandlers(): void {
                 if (disabled) return;
             }
             const meta = (BUTTON_CONFIG.actions as any)[fnName];
+            // Handle tab switch explicitly (play sound always)
+            if (fnName === 'switchTab') {
+                e.preventDefault(); e.stopPropagation();
+                try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
+                (window as any).App?.ui?.switchTab?.(args[0], e);
+                return;
+            }
             if (meta || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
                 e.preventDefault(); e.stopPropagation();
                 try {
                     let success = true;
-                    if (fnName === 'switchTab') {
-                        try { (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.(); } catch {}
-                        (window as any).App?.ui?.switchTab?.(args[0], e);
-                    } else if (meta && typeof meta.func === 'function') {
+                    if (meta && typeof meta.func === 'function') {
                         const ret = meta.func(...args);
                         success = (typeof ret === 'undefined') ? true : !!ret;
                         try { if (fnName === 'toggleButtonSounds') { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } } catch {}
+                        try {
+                            const btnType = meta.type;
+                            const audio = (window as any).App?.systems?.audio?.button;
+                            if (audio && fnName !== 'sodaClick' && fnName !== 'switchTab') {
+                                if (btnType === 'shop-btn' || btnType === 'clicking-upgrade-btn' || btnType === 'drink-speed-upgrade-btn' || btnType === 'level-up-btn') {
+                                    if (success) audio.playButtonPurchaseSound?.();
+                                } else {
+                                    audio.playButtonClickSound?.();
+                                }
+                            }
+                        } catch {}
                     } else {
                         if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) { success = !!(window as any).App.systems.purchases.execute[fnName](); }
                         try {
