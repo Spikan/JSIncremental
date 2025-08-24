@@ -1,6 +1,7 @@
 // Zustand-based state store with dev tools and persistence
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
+import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
 
 // Extended state interface with actions
@@ -266,84 +267,186 @@ export const useGameStore = create<GameStore>()(
 // Export store instance for legacy compatibility
 export const gameStore = useGameStore;
 
-// Export selectors for performance optimization (only use in React components)
-export const useSips = () => {
-  // Check if we're in a test environment or if React hooks are available
-  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
-    return useGameStore.getState().sips;
-  }
-  try {
-    return useGameStore(state => state.sips);
-  } catch (error) {
-    console.warn('useSips hook failed, returning 0:', error);
-    return 0;
-  }
+// Optimized selectors with memoization and proper error handling
+
+// Selector creator with error boundary
+const createSelector = <T>(
+  selector: (state: GameStore) => T,
+  defaultValue: T,
+  selectorName: string
+) => {
+  return () => {
+    // Test environment bypass for performance
+    if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
+      return (useGameStore.getState()[selectorName as keyof GameStore] as T) || defaultValue;
+    }
+
+    try {
+      return useGameStore(selector);
+    } catch (error) {
+      console.warn(`${selectorName} selector failed, returning default:`, error);
+      return defaultValue;
+    }
+  };
 };
-export const useStraws = () => {
-  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
-    return useGameStore.getState().straws;
-  }
-  try {
-    return useGameStore(state => state.straws);
-  } catch (error) {
-    console.warn('useStraws hook failed, returning 0:', error);
-    return 0;
-  }
-};
-export const useCups = () => {
-  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
-    return useGameStore.getState().cups;
-  }
-  try {
-    return useGameStore(state => state.cups);
-  } catch (error) {
-    console.warn('useCups hook failed, returning 0:', error);
-    return 0;
-  }
-};
-export const useLevel = () => {
-  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
-    return useGameStore.getState().level;
-  }
-  try {
-    return useGameStore(state => state.level);
-  } catch (error) {
-    console.warn('useLevel hook failed, returning 1:', error);
-    return 1;
-  }
-};
-export const useSPS = () => {
-  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
-    return useGameStore.getState().sps;
-  }
-  try {
-    return useGameStore(state => state.sps);
-  } catch (error) {
-    console.warn('useSPS hook failed, returning 0:', error);
-    return 0;
-  }
-};
-export const useOptions = () => {
-  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
-    return useGameStore.getState().options;
-  }
-  try {
-    return useGameStore(state => state.options);
-  } catch (error) {
-    console.warn('useOptions hook failed, returning default options:', error);
-    return defaultState.options;
-  }
-};
+
+// Basic resource selectors
+export const useSips = createSelector(state => state.sips, 0, 'sips');
+
+export const useStraws = createSelector(state => state.straws, 0, 'straws');
+
+export const useCups = createSelector(state => state.cups, 0, 'cups');
+
+export const useSuctions = createSelector(state => state.suctions, 0, 'suctions');
+
+export const useWiderStraws = createSelector(state => state.widerStraws, 0, 'widerStraws');
+
+export const useBetterCups = createSelector(state => state.betterCups, 0, 'betterCups');
+
+export const useFasterDrinks = createSelector(state => state.fasterDrinks, 0, 'fasterDrinks');
+
+export const useCriticalClicks = createSelector(state => state.criticalClicks, 0, 'criticalClicks');
+
+export const useLevel = createSelector(state => state.level, 1, 'level');
+
+// Production and performance selectors
+export const useSPS = createSelector(state => state.sps, 0, 'sps');
+
+export const useStrawSPD = createSelector(state => state.strawSPD, 0, 'strawSPD');
+
+export const useCupSPD = createSelector(state => state.cupSPD, 0, 'cupSPD');
+
+// Drink system selectors
+export const useDrinkRate = createSelector(state => state.drinkRate, 0, 'drinkRate');
+
+export const useDrinkProgress = createSelector(state => state.drinkProgress, 0, 'drinkProgress');
+
+export const useLastDrinkTime = createSelector(state => state.lastDrinkTime, 0, 'lastDrinkTime');
+
+// Click system selectors
+export const useCriticalClickChance = createSelector(
+  state => state.criticalClickChance,
+  0,
+  'criticalClickChance'
+);
+
+export const useCriticalClickMultiplier = createSelector(
+  state => state.criticalClickMultiplier,
+  0,
+  'criticalClickMultiplier'
+);
+
+export const useSuctionClickBonus = createSelector(
+  state => state.suctionClickBonus,
+  0,
+  'suctionClickBonus'
+);
+
+// Session and statistics selectors
+export const useTotalClicks = createSelector(state => state.totalClicks, 0, 'totalClicks');
+
+export const useTotalSipsEarned = createSelector(
+  state => state.totalSipsEarned,
+  0,
+  'totalSipsEarned'
+);
+
+export const useTotalPlayTime = createSelector(state => state.totalPlayTime, 0, 'totalPlayTime');
+
+export const useHighestSipsPerSecond = createSelector(
+  state => state.highestSipsPerSecond,
+  0,
+  'highestSipsPerSecond'
+);
+
+export const useCurrentClickStreak = createSelector(
+  state => state.currentClickStreak,
+  0,
+  'currentClickStreak'
+);
+
+export const useBestClickStreak = createSelector(
+  state => state.bestClickStreak,
+  0,
+  'bestClickStreak'
+);
+
+// Options and settings selectors
+export const useOptions = createSelector(state => state.options, defaultState.options, 'options');
+
+// Actions selector (memoized to prevent unnecessary re-renders)
 export const useActions = () => {
   if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
     return useGameStore.getState().actions;
   }
-  try {
-    return useGameStore(state => state.actions);
-  } catch (error) {
-    console.warn('useActions hook failed, returning empty actions:', error);
-    return {};
-  }
+
+  return useGameStore(state => state.actions);
+};
+
+// Computed selectors for derived state
+export const useTotalResources = () => {
+  const sips = useSips();
+  const straws = useStraws();
+  const cups = useCups();
+  const suctions = useSuctions();
+
+  return useMemo(
+    () => ({
+      sips,
+      straws,
+      cups,
+      suctions,
+      total: sips + straws + cups + suctions,
+    }),
+    [sips, straws, cups, suctions]
+  );
+};
+
+export const useProductionStats = () => {
+  const sps = useSPS();
+  const strawSPD = useStrawSPD();
+  const cupSPD = useCupSPD();
+
+  return useMemo(
+    () => ({
+      sps,
+      strawSPD,
+      cupSPD,
+      totalSPD: strawSPD + cupSPD,
+    }),
+    [sps, strawSPD, cupSPD]
+  );
+};
+
+export const useClickStats = () => {
+  const totalClicks = useTotalClicks();
+  const criticalClickChance = useCriticalClickChance();
+  const criticalClickMultiplier = useCriticalClickMultiplier();
+  const suctionClickBonus = useSuctionClickBonus();
+
+  return useMemo(
+    () => ({
+      totalClicks,
+      criticalClickChance,
+      criticalClickMultiplier,
+      suctionClickBonus,
+      effectiveMultiplier: criticalClickMultiplier + suctionClickBonus,
+    }),
+    [totalClicks, criticalClickChance, criticalClickMultiplier, suctionClickBonus]
+  );
+};
+
+// Optimized subscription hooks
+export const useSubscribeToSips = (callback: (sips: number) => void) => {
+  return useGameStore.subscribe(state => state.sips, callback, { fireImmediately: false });
+};
+
+export const useSubscribeToLevel = (callback: (level: number) => void) => {
+  return useGameStore.subscribe(state => state.level, callback, { fireImmediately: false });
+};
+
+export const useSubscribeToSPS = (callback: (sps: number) => void) => {
+  return useGameStore.subscribe(state => state.sps, callback, { fireImmediately: false });
 };
 
 // Export store actions for direct access (useful in tests and non-React contexts)

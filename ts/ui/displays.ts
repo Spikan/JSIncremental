@@ -2,24 +2,59 @@
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
 import { useGameStore } from '../core/state/zustand-store';
 
+// Optimized display update functions using subscribeWithSelector
 export function updateTopSipsPerDrink(): void {
   if (typeof window === 'undefined') return;
   const topSipsPerDrinkElement: any = (window as any).DOM_CACHE?.topSipsPerDrink;
+
+  if (!topSipsPerDrinkElement) return;
+
   try {
+    // Subscribe to SPS changes only
+    useGameStore.subscribe(
+      state => state.sps,
+      sps => {
+        if (topSipsPerDrinkElement) {
+          topSipsPerDrinkElement.innerHTML = formatNumber(Number(sps || 0));
+        }
+      },
+      { fireImmediately: true }
+    );
+  } catch (error) {
+    console.warn('Failed to update top sips per drink:', error);
+    // Fallback: update once
     const state = useGameStore.getState();
     if (topSipsPerDrinkElement && state) {
       const sps = Number(state.sps || 0);
       topSipsPerDrinkElement.innerHTML = formatNumber(sps);
     }
-  } catch (error) {
-    console.warn('Failed to update top sips per drink:', error);
   }
 }
 
 export function updateTopSipsPerSecond(): void {
   if (typeof window === 'undefined') return;
   const topSipsPerSecondElement: any = (window as any).DOM_CACHE?.topSipsPerSecond;
+
+  if (!topSipsPerSecondElement) return;
+
   try {
+    // Subscribe to both SPS and drink rate changes
+    useGameStore.subscribe(
+      state => ({ sps: state.sps, drinkRate: state.drinkRate }),
+      ({ sps, drinkRate }) => {
+        if (topSipsPerSecondElement) {
+          const sipsPerDrink = Number(sps || 0);
+          const drinkRateMs = Number(drinkRate || 0) || 1000;
+          const drinkRateSeconds = drinkRateMs / 1000;
+          const sipsPerSecond = sipsPerDrink / drinkRateSeconds;
+          topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
+        }
+      },
+      { fireImmediately: true }
+    );
+  } catch (error) {
+    console.warn('Failed to update top sips per second:', error);
+    // Fallback: update once
     const state = useGameStore.getState();
     if (topSipsPerSecondElement && state) {
       const sipsPerDrink = Number(state.sps || 0);
@@ -28,23 +63,36 @@ export function updateTopSipsPerSecond(): void {
       const sipsPerSecond = sipsPerDrink / drinkRateSeconds;
       topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
     }
-  } catch (error) {
-    console.warn('Failed to update top sips per second:', error);
   }
 }
 
 export function updateCriticalClickDisplay(): void {
   if (typeof window === 'undefined') return;
   const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
-  if (criticalClickChanceCompact) {
-    try {
-      const state = useGameStore.getState();
-      const chance = Number(state.criticalClickChance ?? NaN);
-      if (!Number.isNaN(chance)) {
-        criticalClickChanceCompact.textContent = `${(chance * 100).toFixed(1)}%`;
-      }
-    } catch (error) {
-      console.warn('Failed to update critical click display:', error);
+
+  if (!criticalClickChanceCompact) return;
+
+  try {
+    // Subscribe to critical click chance changes only
+    useGameStore.subscribe(
+      state => state.criticalClickChance,
+      chance => {
+        if (criticalClickChanceCompact) {
+          const numericChance = Number(chance ?? NaN);
+          if (!Number.isNaN(numericChance)) {
+            criticalClickChanceCompact.textContent = `${(numericChance * 100).toFixed(1)}%`;
+          }
+        }
+      },
+      { fireImmediately: true }
+    );
+  } catch (error) {
+    console.warn('Failed to update critical click display:', error);
+    // Fallback: update once
+    const state = useGameStore.getState();
+    const chance = Number(state.criticalClickChance ?? NaN);
+    if (!Number.isNaN(chance)) {
+      criticalClickChanceCompact.textContent = `${(chance * 100).toFixed(1)}%`;
     }
   }
 }
