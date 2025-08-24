@@ -121,6 +121,8 @@ interface GameConfig {
 }
 
 declare global {
+    var Decimal: DecimalCtor;
+    var DOM_CACHE: any;
 	interface Window {
 		App: AppNamespace;
 		GAME_CONFIG: GameConfig;
