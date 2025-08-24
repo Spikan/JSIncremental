@@ -1,11 +1,12 @@
 // UI Display Updates (TypeScript)
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
+import { useGameStore } from '../core/state/zustand-store';
 
 export function updateTopSipsPerDrink(): void {
   if (typeof window === 'undefined') return;
   const topSipsPerDrinkElement: any = (window as any).DOM_CACHE?.topSipsPerDrink;
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (topSipsPerDrinkElement && state) {
       const sps = Number(state.sps || 0);
       topSipsPerDrinkElement.innerHTML = formatNumber(sps);
@@ -19,7 +20,7 @@ export function updateTopSipsPerSecond(): void {
   if (typeof window === 'undefined') return;
   const topSipsPerSecondElement: any = (window as any).DOM_CACHE?.topSipsPerSecond;
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (topSipsPerSecondElement && state) {
       const sipsPerDrink = Number(state.sps || 0);
       const drinkRateMs = Number(state.drinkRate || 0) || 1000;
@@ -37,7 +38,8 @@ export function updateCriticalClickDisplay(): void {
   const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
   if (criticalClickChanceCompact) {
     try {
-      const chance = Number((window as any).App?.state?.getState?.()?.criticalClickChance ?? NaN);
+      const state = useGameStore.getState();
+      const chance = Number(state.criticalClickChance ?? NaN);
       if (!Number.isNaN(chance)) {
         criticalClickChanceCompact.textContent = `${(chance * 100).toFixed(1)}%`;
       }
@@ -52,7 +54,7 @@ export function updateDrinkSpeedDisplay(): void {
   const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
   const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (currentDrinkSpeedCompact && state) {
       const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
       currentDrinkSpeedCompact.textContent = `${drinkRateSeconds.toFixed(2)}s`;
@@ -74,7 +76,8 @@ export function updateAutosaveStatus(): void {
   const checkbox = document.getElementById('autosaveToggle') as HTMLInputElement | null;
   const select = document.getElementById('autosaveInterval') as HTMLSelectElement | null;
   try {
-    const opts = (window as any).App?.state?.getState?.()?.options;
+    const state = useGameStore.getState();
+    const opts = state.options;
     if (status && opts) {
       if (opts.autosaveEnabled) {
         status.textContent = `Autosave: ON (${opts.autosaveInterval}s)`;
@@ -109,7 +112,7 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
   let currentProgress = typeof progress === 'number' ? progress : undefined;
   let currentDrinkRate = typeof drinkRate === 'number' ? drinkRate : undefined;
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (state) {
       if (currentProgress == null) currentProgress = Number(state.drinkProgress || 0);
       if (currentDrinkRate == null) currentDrinkRate = Number(state.drinkRate || 0);
@@ -152,7 +155,8 @@ export function updateTopSipCounter(): void {
     (window as any).DOM_CACHE?.topSipValue || document.getElementById('topSipValue');
   if (topSipElement) {
     try {
-      const sipsNum = Number((window as any).App?.state?.getState?.()?.sips || 0);
+      const state = useGameStore.getState();
+      const sipsNum = Number(state.sips || 0);
       (topSipElement as HTMLElement).textContent = formatNumber(sipsNum);
     } catch (error) {
       console.warn('Failed to update display:', error);
@@ -165,7 +169,8 @@ export function updateLevelNumber(): void {
   const levelEl: any = (window as any).DOM_CACHE?.levelNumber;
   if (levelEl) {
     try {
-      const level = Number((window as any).App?.state?.getState?.()?.level || 1);
+      const state = useGameStore.getState();
+      const level = Number(state.level || 1);
       levelEl.innerHTML = String(level);
     } catch (error) {
       console.warn('Failed to update display:', error);
@@ -178,7 +183,8 @@ export function updateLevelText(): void {
   const levelTextEl: any = (window as any).DOM_CACHE?.levelText;
   if (levelTextEl) {
     try {
-      const level = Number((window as any).App?.state?.getState?.()?.level || 1);
+      const state = useGameStore.getState();
+      const level = Number(state.level || 1);
       const levelText = getLevelText(level);
       levelTextEl.innerHTML = levelText;
     } catch (error) {
@@ -191,7 +197,7 @@ export function updateDrinkRate(): void {
   if (typeof window === 'undefined') return;
   const drinkRateElement = document.getElementById('drinkRate');
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (drinkRateElement && state) {
       const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
       drinkRateElement.textContent = `${drinkRateSeconds.toFixed(2)}s`;
@@ -206,7 +212,7 @@ export function updateCompactDrinkSpeedDisplays(): void {
   const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
   const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (currentDrinkSpeedCompact && state) {
       const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
       currentDrinkSpeedCompact.textContent = `${drinkRateSeconds.toFixed(2)}s`;
@@ -223,7 +229,7 @@ export function updateCompactDrinkSpeedDisplays(): void {
   const compactDisplays = document.querySelectorAll('[id*="Compact"]');
   compactDisplays.forEach(display => {
     try {
-      const state = (window as any).App?.state?.getState?.();
+      const state = useGameStore.getState();
       if ((display as HTMLElement).id.includes('DrinkSpeed') && state) {
         const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
         (display as HTMLElement).textContent = `${drinkRateSeconds.toFixed(2)}s`;

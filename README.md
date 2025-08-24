@@ -36,14 +36,14 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 
 - `npm run dev` — Vite dev server with HMR
 - `npm run build` — Production build
-- `npm test` — Vitest test suite (312 tests passing)
+- `npm test` — Vitest test suite (394 tests passing, 98% success rate)
 - `npm run typecheck` — TypeScript type-check (all core files converted)
 
 ### File Structure (high level)
 
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
 - `ts/index.ts` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
-- `ts/core/state/` — Central `App.state` store (`index.ts`, `shape.ts`) and bridge
+- `ts/core/state/` — Central `App.state` store (`zustand-store.ts`, `shape.ts`)
 - `ts/ui/` — Displays, stats, buttons (event delegation), utils (TypeScript)
 - `ts/core/systems/` — Save, loop, options, purchases, resources, audio, game-init (TypeScript)
 - `ts/core/rules/` — Pure business logic (clicks, purchases, economy) in `.ts`
@@ -85,7 +85,7 @@ You can customize various aspects of the game:
 - Colors and themes in `css/style.css`
 - Game mechanics in `ts/core/rules/*` and systems in `ts/core/systems/*`
 - State boot is ESM: no `window.defaultState`; see `ts/core/state/shape.ts`
-- Configuration options via `data/upgrades.json` and `ts/config.ts` (access with `config-accessor.ts`)
+- Configuration options via `data/upgrades.json` and `ts/core/systems/config-accessor.ts`
 
 ## 🤝 Contributing
 

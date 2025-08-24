@@ -1,7 +1,6 @@
 // Entry module providing a small public API surface and environment checks (TypeScript)
 
-import { createStore, useGameStore } from './core/state/index.ts';
-import { defaultState } from './core/state/shape.ts';
+import { useGameStore } from './core/state/zustand-store.ts';
 import { createEventBus } from './services/event-bus.ts';
 import { performanceMonitor } from './services/performance.ts';
 
@@ -32,8 +31,7 @@ console.log('🔧 Initializing Zustand store...');
 const zustandStore = useGameStore;
 
 (window as any).App = {
-  state: createStore(defaultState),
-  zustand: zustandStore, // New Zustand store
+  state: zustandStore, // Consolidated Zustand store
   storage,
   events: eventBus,
   EVENT_NAMES,

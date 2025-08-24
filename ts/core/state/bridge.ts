@@ -1,25 +1,31 @@
 // Typed legacy state bridge that mirrors globals into App.state
 
-type AppLike = { state: { setState?: (_partial: any) => void; getState?: () => any } };
+type AppLike = {
+  state: {
+    setState?: (_partial: any) => void;
+    getState?: () => any;
+    actions?: any; // Zustand actions
+  };
+};
 
 export function createStateBridge(app: AppLike) {
   function setDrinkRate(value: any) {
     try {
-      app.state.setState?.({ drinkRate: Number(value) || 0 });
+      app.state.actions?.setDrinkRate?.(Number(value) || 0);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function setDrinkProgress(value: any) {
     try {
-      app.state.setState?.({ drinkProgress: Number(value) || 0 });
+      app.state.actions?.setDrinkProgress?.(Number(value) || 0);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function setLastDrinkTime(value: any) {
     try {
-      app.state.setState?.({ lastDrinkTime: Number(value) || 0 });
+      app.state.actions?.setLastDrinkTime?.(Number(value) || 0);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -28,7 +34,7 @@ export function createStateBridge(app: AppLike) {
     const numeric =
       value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 1;
     try {
-      app.state.setState?.({ level: numeric });
+      app.state.actions?.setLevel?.(numeric);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -40,98 +46,98 @@ export function createStateBridge(app: AppLike) {
 
   function syncSips(value: any) {
     try {
-      app.state.setState?.({ sips: toNum(value) });
+      app.state.actions?.setSips?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncStraws(value: any) {
     try {
-      app.state.setState?.({ straws: toNum(value) });
+      app.state.actions?.setStraws?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncCups(value: any) {
     try {
-      app.state.setState?.({ cups: toNum(value) });
+      app.state.actions?.setCups?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncSuctions(value: any) {
     try {
-      app.state.setState?.({ suctions: toNum(value) });
+      app.state.actions?.setSuctions?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncWiderStraws(value: any) {
     try {
-      app.state.setState?.({ widerStraws: toNum(value) });
+      app.state.actions?.setWiderStraws?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncBetterCups(value: any) {
     try {
-      app.state.setState?.({ betterCups: toNum(value) });
+      app.state.actions?.setBetterCups?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncFasterDrinks(value: any) {
     try {
-      app.state.setState?.({ fasterDrinks: toNum(value) });
+      app.state.actions?.setFasterDrinks?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncCriticalClicks(value: any) {
     try {
-      app.state.setState?.({ criticalClicks: toNum(value) });
+      app.state.actions?.setCriticalClicks?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncCriticalClickChance(value: any) {
     try {
-      app.state.setState?.({ criticalClickChance: toNum(value) });
+      app.state.actions?.setCriticalClickChance?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncCriticalClickMultiplier(value: any) {
     try {
-      app.state.setState?.({ criticalClickMultiplier: toNum(value) });
+      app.state.actions?.setCriticalClickMultiplier?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncSuctionClickBonus(value: any) {
     try {
-      app.state.setState?.({ suctionClickBonus: toNum(value) });
+      app.state.actions?.setSuctionClickBonus?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncSps(value: any) {
     try {
-      app.state.setState?.({ sps: toNum(value) });
+      app.state.actions?.setSPS?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncStrawSPD(value: any) {
     try {
-      app.state.setState?.({ strawSPD: toNum(value) });
+      app.state.actions?.setStrawSPD?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
   function syncCupSPD(value: any) {
     try {
-      app.state.setState?.({ cupSPD: toNum(value) });
+      app.state.actions?.setCupSPD?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -166,7 +172,33 @@ export function createStateBridge(app: AppLike) {
       if (typeof w.criticalClickUpCounter !== 'undefined')
         seed.criticalClickUpCounter = toNum(w.criticalClickUpCounter);
       if (typeof w.sps !== 'undefined') seed.sps = toNum(w.sps);
-      if (Object.keys(seed).length) app.state.setState?.(seed);
+      // Apply seed values using individual actions
+      if (seed.drinkRate !== undefined) app.state.actions?.setDrinkRate?.(seed.drinkRate);
+      if (seed.drinkProgress !== undefined)
+        app.state.actions?.setDrinkProgress?.(seed.drinkProgress);
+      if (seed.lastDrinkTime !== undefined)
+        app.state.actions?.setLastDrinkTime?.(seed.lastDrinkTime);
+      if (seed.level !== undefined) app.state.actions?.setLevel?.(seed.level);
+      if (seed.sips !== undefined) app.state.actions?.setSips?.(seed.sips);
+      if (seed.straws !== undefined) app.state.actions?.setStraws?.(seed.straws);
+      if (seed.cups !== undefined) app.state.actions?.setCups?.(seed.cups);
+      if (seed.suctions !== undefined) app.state.actions?.setSuctions?.(seed.suctions);
+      if (seed.widerStraws !== undefined) app.state.actions?.setWiderStraws?.(seed.widerStraws);
+      if (seed.betterCups !== undefined) app.state.actions?.setBetterCups?.(seed.betterCups);
+      if (seed.fasterDrinks !== undefined) app.state.actions?.setFasterDrinks?.(seed.fasterDrinks);
+      if (seed.criticalClicks !== undefined)
+        app.state.actions?.setCriticalClicks?.(seed.criticalClicks);
+      if (seed.criticalClickChance !== undefined)
+        app.state.actions?.setCriticalClickChance?.(seed.criticalClickChance);
+      if (seed.criticalClickMultiplier !== undefined)
+        app.state.actions?.setCriticalClickMultiplier?.(seed.criticalClickMultiplier);
+      if (seed.suctionClickBonus !== undefined)
+        app.state.actions?.setSuctionClickBonus?.(seed.suctionClickBonus);
+      if (seed.fasterDrinksUpCounter !== undefined)
+        app.state.actions?.setFasterDrinksUpCounter?.(seed.fasterDrinksUpCounter);
+      if (seed.criticalClickUpCounter !== undefined)
+        app.state.actions?.setCriticalClickUpCounter?.(seed.criticalClickUpCounter);
+      if (seed.sps !== undefined) app.state.actions?.setSPS?.(seed.sps);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }

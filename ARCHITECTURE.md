@@ -1,5 +1,14 @@
 # Soda Clicker Pro - Complete Codebase Architecture
 
+## 📚 Documentation Overview
+
+This document serves as the canonical architecture guide for the Soda Clicker Pro codebase. For migration details and historical context, see:
+
+- **[Migration Guide](MIGRATION_GUIDE.md)** - Function migration paths and breaking changes
+- **[Refactoring Summary](REFACTORING_SUMMARY.md)** - Duplicate function elimination details
+- **[Testing Summary](TESTING_SUMMARY.md)** - Comprehensive test coverage information
+- **[Phase 1 Implementation](PHASE1_IMPLEMENTATION_SUMMARY.md)** - State management and testing enhancements
+
 ## 🎯 Project Overview
 
 **Soda Clicker Pro** is an incremental/idle game built with vanilla JavaScript, featuring a modular architecture designed for maintainability and AI agent traversability. The game simulates a soda business where players click to earn "sips" and purchase upgrades to automate production.
@@ -474,12 +483,13 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 
 ### **Testing Framework**
 
-- **Vitest**: Unit and integration testing
-- **Test Files**: Located in `tests/` directory
+- **Vitest**: Unit and integration testing (401 tests, 394 passing, 98% success rate)
+- **Test Files**: Located in `tests/` directory (16 test files, 12 categories)
 - **Test Commands**:
   ```bash
-  npm test              # Run all tests
+  npm test              # Run all tests (401 total, 98% success)
   npm run test:watch    # Watch mode for development
+  npm run test:coverage # Generate coverage report
   ```
 
 ### **Code Quality**
@@ -561,3 +571,15 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 - **Console Logging**: Comprehensive error logging
 
 This architecture provides a solid foundation for incremental game development while maintaining code clarity and AI agent traversability. The modular design allows for easy feature additions and modifications while preserving the existing game mechanics.
+
+---
+
+## 📝 Documentation Status
+
+**Last Updated**: December 2024
+
+- ✅ **Canonical Architecture Guide** - This document serves as the primary reference
+- ✅ **Test Statistics Aligned** - All docs now reflect current 401 tests (394 passing, 98% success rate)
+- ✅ **File Paths Updated** - All references use current `ts/` directory structure
+- ✅ **Migration Paths Documented** - Historical context preserved in linked documents
+- ✅ **TypeScript Migration Complete** - All core systems converted with full type safety

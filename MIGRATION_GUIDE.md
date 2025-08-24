@@ -38,21 +38,21 @@ This guide covers two migrations:
 ### Changes
 
 - Removed all inline `onclick` from `index.html`
-- Introduced `data-action` attributes and centralized dispatcher in `js/ui/buttons.ts`
+- Introduced `data-action` attributes and centralized dispatcher in `ts/ui/buttons.ts`
 - UI reads exclusively from `App.state`; eliminated `window.*` reads in UI
-- Centralized `EVENT_NAMES` export and attachment via `js/index.ts`
+- Centralized `EVENT_NAMES` export and attachment via `ts/index.ts`
 
 ### How to Add a New Button
 
 1. Add an element with `data-action="myAction"`
-2. In `js/ui/buttons.ts`, handle `myAction` in the dispatcher
+2. In `ts/ui/buttons.ts`, handle `myAction` in the dispatcher
 3. Call into `App.systems` or `App.ui` rather than globals
 
 ---
 
 ## Config Access
 
-- Use `js/core/systems/config-accessor.ts` to read upgrade/config data
+- Use `ts/core/systems/config-accessor.ts` to read upgrade/config data
 - It prefers `App.data.upgrades` and falls back to `GAME_CONFIG.BALANCE`
 
 ---
@@ -65,26 +65,26 @@ This guide covers two migrations:
 
 | Old Function Call                         | New Function Call                                | Module Location          |
 | ----------------------------------------- | ------------------------------------------------ | ------------------------ |
-| `checkUpgradeAffordability()`             | `App.ui.checkUpgradeAffordability()`             | `js/ui/affordability.js` |
-| `updateButtonState(id, affordable, cost)` | `App.ui.updateButtonState(id, affordable, cost)` | `js/ui/utils.js`         |
-| `updateCostDisplay(id, cost, affordable)` | `App.ui.updateCostDisplay(id, cost, affordable)` | `js/ui/utils.js`         |
-| `updateAllStats()`                        | `App.ui.updateAllStats()`                        | `js/ui/stats.js`         |
-| `updatePlayTime()`                        | `App.ui.updatePlayTime()`                        | `js/ui/stats.js`         |
-| `updateLastSaveTime()`                    | `App.ui.updateLastSaveTime()`                    | `js/ui/stats.js`         |
-| `updateClickStats()`                      | `App.ui.updateClickStats()`                      | `js/ui/stats.js`         |
-| `updateTopSipsPerDrink()`                 | `App.ui.updateTopSipsPerDrink()`                 | `js/ui/displays.js`      |
-| `updateTopSipsPerSecond()`                | `App.ui.updateTopSipsPerSecond()`                | `js/ui/displays.js`      |
-| `updateDrinkProgress()`                   | `App.ui.updateDrinkProgress()`                   | `js/ui/displays.js`      |
-| `updateCriticalClickDisplay()`            | `App.ui.updateCriticalClickDisplay()`            | `js/ui/displays.js`      |
-| `updateAutosaveStatus()`                  | `App.ui.updateAutosaveStatus()`                  | `js/ui/displays.js`      |
+| `checkUpgradeAffordability()`             | `App.ui.checkUpgradeAffordability()`             | `ts/ui/affordability.ts` |
+| `updateButtonState(id, affordable, cost)` | `App.ui.updateButtonState(id, affordable, cost)` | `ts/ui/utils.ts`         |
+| `updateCostDisplay(id, cost, affordable)` | `App.ui.updateCostDisplay(id, cost, affordable)` | `ts/ui/utils.ts`         |
+| `updateAllStats()`                        | `App.ui.updateAllStats()`                        | `ts/ui/stats.ts`         |
+| `updatePlayTime()`                        | `App.ui.updatePlayTime()`                        | `ts/ui/stats.ts`         |
+| `updateLastSaveTime()`                    | `App.ui.updateLastSaveTime()`                    | `ts/ui/stats.ts`         |
+| `updateClickStats()`                      | `App.ui.updateClickStats()`                      | `ts/ui/stats.ts`         |
+| `updateTopSipsPerDrink()`                 | `App.ui.updateTopSipsPerDrink()`                 | `ts/ui/displays.ts`      |
+| `updateTopSipsPerSecond()`                | `App.ui.updateTopSipsPerSecond()`                | `ts/ui/displays.ts`      |
+| `updateDrinkProgress()`                   | `App.ui.updateDrinkProgress()`                   | `ts/ui/displays.ts`      |
+| `updateCriticalClickDisplay()`            | `App.ui.updateCriticalClickDisplay()`            | `ts/ui/displays.ts`      |
+| `updateAutosaveStatus()`                  | `App.ui.updateAutosaveStatus()`                  | `ts/ui/displays.ts`      |
 
 ### **Core System Functions** (`main.js` → `App.systems.*`)
 
 | Old Function Call      | New Function Call                           | Module Location                     |
 | ---------------------- | ------------------------------------------- | ----------------------------------- |
-| `save()`               | `App.systems.save.performSaveSnapshot()`    | `js/core/systems/save-system.ts`    |
-| `saveOptions(options)` | `App.systems.options.saveOptions(options)`  | `js/core/systems/options-system.js` |
-| `loadOptions()`        | `App.systems.options.loadOptions(defaults)` | `js/core/systems/options-system.js` |
+| `save()`               | `App.systems.save.performSaveSnapshot()`    | `ts/core/systems/save-system.ts`    |
+| `saveOptions(options)` | `App.systems.options.saveOptions(options)`  | `ts/core/systems/options-system.ts` |
+| `loadOptions()`        | `App.systems.options.loadOptions(defaults)` | `ts/core/systems/options-system.ts` |
 
 ### **Functions Completely Removed**
 
@@ -151,12 +151,12 @@ App.systems.options.saveOptions({ autosaveEnabled: true });
 
 | Function Type      | Location                 | Access Pattern                          |
 | ------------------ | ------------------------ | --------------------------------------- |
-| Display Updates    | `js/ui/displays.js`      | `App.ui.functionName()`                 |
-| Stats Management   | `js/ui/stats.js`         | `App.ui.functionName()`                 |
-| Button Logic       | `js/ui/utils.js`         | `App.ui.functionName()`                 |
-| Game Mechanics     | `js/core/rules/`         | `App.rules.functionName()`              |
-| Storage Operations | `js/services/storage.ts` | `App.storage.functionName()`            |
-| System Operations  | `js/core/systems/`       | `App.systems.systemName.functionName()` |
+| Display Updates    | `ts/ui/displays.ts`      | `App.ui.functionName()`                 |
+| Stats Management   | `ts/ui/stats.ts`         | `App.ui.functionName()`                 |
+| Button Logic       | `ts/ui/utils.ts`         | `App.ui.functionName()`                 |
+| Game Mechanics     | `ts/core/rules/`         | `App.rules.functionName()`              |
+| Storage Operations | `ts/services/storage.ts` | `App.storage.functionName()`            |
+| System Operations  | `ts/core/systems/`       | `App.systems.systemName.functionName()` |
 
 ### **Testing Considerations**
 
