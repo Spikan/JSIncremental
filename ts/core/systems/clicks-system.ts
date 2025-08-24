@@ -1,4 +1,7 @@
-// Clicks system: centralizes click tracking and streak logic (TypeScript)
+// Clicks system: centralizes click tracking and streak logic with LargeNumber support (TypeScript)
+
+import { LargeNumber } from '../numbers/large-number';
+import { toLargeNumber } from '../numbers/migration-utils';
 
 export function trackClick() {
   try {
@@ -60,69 +63,65 @@ export function handleSodaClick(multiplier: number = 1) {
     }
 
     const state = w.App?.state?.getState?.() || {};
-    const suctionValue = Number(
+
+    // Calculate click value with LargeNumber support
+    const suctionValue = toLargeNumber(
       state.suctions ?? w.suctions?.toNumber?.() ?? Number(w.suctions) ?? 0
     );
-    const totalClickValueNum = (1 + suctionValue * 0.3) * Number(multiplier || 1);
+    const multiplierValue = toLargeNumber(multiplier || 1);
 
-    // Add to sips and mirror to state (use Decimal if available, numerically safe)
+    // Base click value (1 sip) + suction bonus (0.3 per suction level)
+    const baseClick = new LargeNumber(1);
+    const suctionBonus = suctionValue.multiply(new LargeNumber(0.3));
+    const totalClickValue = baseClick.add(suctionBonus).multiply(multiplierValue);
+
+    // Add to sips with LargeNumber arithmetic
+    const currentSips = toLargeNumber(w.sips || 0);
+    w.sips = currentSips.add(totalClickValue);
+
+    // Update state keeping LargeNumber
     try {
-      const toNum = (v: any) =>
-        v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
-      const current = toNum(w.sips);
-      const next = current + totalClickValueNum;
-      w.sips = w.Decimal ? new w.Decimal(next) : next;
-      w.App?.state?.setState?.({ sips: next });
-    } catch {
-      w.sips = Number(w.sips || 0) + totalClickValueNum;
-      try {
-        w.App?.state?.setState?.({ sips: Number(w.sips) });
-      } catch (error) {
-        console.warn('Failed to set sips in state after fallback:', error);
-      }
-    }
-    try {
-      const toNum = (v: any) =>
-        v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
-      w.App?.state?.setState?.({ sips: toNum(w.sips) });
+      w.App?.state?.actions?.setSips?.(w.sips);
     } catch (error) {
-      console.warn('Failed to set sips in state with toNum conversion:', error);
+      console.warn('Failed to set sips in state:', error);
     }
 
-    // Critical check using state-first
+    // Critical check using state-first with LargeNumber support
     const criticalChance = Number(state.criticalClickChance ?? w.criticalClickChance ?? 0);
     if (Math.random() < criticalChance) {
-      const criticalMultiplier = Number(
+      const criticalMultiplier = toLargeNumber(
         state.criticalClickMultiplier ?? w.criticalClickMultiplier ?? 5
       );
-      const criticalBonusNum = totalClickValueNum * (criticalMultiplier - 1);
+
+      // Calculate critical bonus: totalClickValue * (criticalMultiplier - 1)
+      const criticalBonus = totalClickValue.multiply(
+        criticalMultiplier.subtract(new LargeNumber(1))
+      );
+
+      // Add critical bonus to sips
+      const currentSips = toLargeNumber(w.sips || 0);
+      w.sips = currentSips.add(criticalBonus);
+
+      // Update state keeping LargeNumber
       try {
-        const toNum = (v: any) =>
-          v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
-        const current = toNum(w.sips);
-        const next = current + criticalBonusNum;
-        w.sips = w.Decimal ? new w.Decimal(next) : next;
-        w.App?.state?.setState?.({ sips: next });
-      } catch {
-        w.sips = Number(w.sips || 0) + criticalBonusNum;
-        try {
-          w.App?.state?.setState?.({ sips: Number(w.sips) });
-        } catch (error) {
-          console.warn('Failed to set sips in state after critical fallback:', error);
-        }
+        w.App?.state?.actions?.setSips?.(w.sips);
+      } catch (error) {
+        console.warn('Failed to set sips in state after critical click:', error);
       }
       try {
-        w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, { bonus: criticalBonusNum });
+        w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, {
+          bonus: criticalBonus.toNumber()
+        });
       } catch (error) {
         console.warn('Failed to emit critical click event:', error);
       }
     }
 
-    // Emit soda click and sync totals
+    // Emit soda click and sync totals with LargeNumber support
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, {
-        value: totalClickValueNum,
-        gained: totalClickValueNum,
+        value: totalClickValue.toNumber(),
+        gained: totalClickValue.toNumber(),
       });
     } catch (error) {
       console.warn('Failed to emit soda click event:', error);
@@ -130,8 +129,9 @@ export function handleSodaClick(multiplier: number = 1) {
     try {
       w.App?.stateBridge?.autoSync?.();
       const st = w.App?.state?.getState?.() || {};
-      const prevTotal = Number(st.totalSipsEarned || 0);
-      w.App?.state?.setState?.({ totalSipsEarned: prevTotal + totalClickValueNum });
+      const prevTotal = toLargeNumber(st.totalSipsEarned || 0);
+      const newTotal = prevTotal.add(totalClickValue);
+      w.App?.state?.actions?.setTotalSipsEarned?.(newTotal);
     } catch (error) {
       console.warn('Failed to sync state and update total sips earned:', error);
     }

@@ -5,6 +5,8 @@ import {
   computeTotalSipsPerDrink,
 } from '../rules/economy.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
+import { LargeNumber } from '../numbers/large-number';
+import { toLargeNumber } from '../numbers/migration-utils';
 
 function getConfig(): { upgrades: any; config: any } {
   return getUpgradesAndConfig();
@@ -18,34 +20,57 @@ export function recalcProduction({
   base = {},
   multipliers = {},
 }: {
-  straws: number;
-  cups: number;
-  widerStraws: number;
-  betterCups: number;
-  base?: { strawBaseSPD?: number; cupBaseSPD?: number; baseSipsPerDrink?: number };
-  multipliers?: { widerStrawsPerLevel?: number; betterCupsPerLevel?: number };
-}): { strawSPD: number; cupSPD: number; sipsPerDrink: number } {
+  straws: number | LargeNumber;
+  cups: number | LargeNumber;
+  widerStraws: number | LargeNumber;
+  betterCups: number | LargeNumber;
+  base?: {
+    strawBaseSPD?: number | LargeNumber;
+    cupBaseSPD?: number | LargeNumber;
+    baseSipsPerDrink?: number | LargeNumber
+  };
+  multipliers?: {
+    widerStrawsPerLevel?: number | LargeNumber;
+    betterCupsPerLevel?: number | LargeNumber
+  };
+}): { strawSPD: LargeNumber; cupSPD: LargeNumber; sipsPerDrink: LargeNumber } {
   const { upgrades, config } = getConfig();
 
-  const strawBaseSPD =
-    base.strawBaseSPD ?? upgrades?.straws?.baseSPD ?? config.STRAW_BASE_SPD ?? 0.6;
-  const cupBaseSPD = base.cupBaseSPD ?? upgrades?.cups?.baseSPD ?? config.CUP_BASE_SPD ?? 1.2;
-  const baseSipsPerDrink = base.baseSipsPerDrink ?? config.BASE_SIPS_PER_DRINK ?? 1;
+  // Convert all values to LargeNumber for consistent calculations
+  const strawBaseSPD = toLargeNumber(
+    base.strawBaseSPD ?? upgrades?.straws?.baseSPD ?? config.STRAW_BASE_SPD ?? 0.6
+  );
+  const cupBaseSPD = toLargeNumber(
+    base.cupBaseSPD ?? upgrades?.cups?.baseSPD ?? config.CUP_BASE_SPD ?? 1.2
+  );
+  const baseSipsPerDrink = toLargeNumber(
+    base.baseSipsPerDrink ?? config.BASE_SIPS_PER_DRINK ?? 1
+  );
 
-  const widerStrawsPerLevel =
+  const widerStrawsPerLevel = toLargeNumber(
     multipliers.widerStrawsPerLevel ??
     upgrades?.widerStraws?.multiplierPerLevel ??
     config.WIDER_STRAWS_MULTIPLIER ??
-    0.5;
-  const betterCupsPerLevel =
+    0.5
+  );
+  const betterCupsPerLevel = toLargeNumber(
     multipliers.betterCupsPerLevel ??
     upgrades?.betterCups?.multiplierPerLevel ??
     config.BETTER_CUPS_MULTIPLIER ??
-    0.4;
+    0.4
+  );
 
-  const strawSPD = computeStrawSPD(straws, strawBaseSPD, widerStraws, widerStrawsPerLevel);
-  const cupSPD = computeCupSPD(cups, cupBaseSPD, betterCups, betterCupsPerLevel);
-  const totalSPD = computeTotalSPD(straws, strawSPD, cups, cupSPD);
+  // Use LargeNumber versions of all inputs
+  const strawsLarge = toLargeNumber(straws);
+  const cupsLarge = toLargeNumber(cups);
+  const widerStrawsLarge = toLargeNumber(widerStraws);
+  const betterCupsLarge = toLargeNumber(betterCups);
+
+  // Calculate production values with LargeNumber support
+  const strawSPD = computeStrawSPD(strawsLarge, strawBaseSPD, widerStrawsLarge, widerStrawsPerLevel);
+  const cupSPD = computeCupSPD(cupsLarge, cupBaseSPD, betterCupsLarge, betterCupsPerLevel);
+  const totalSPD = computeTotalSPD(strawsLarge, strawSPD, cupsLarge, cupSPD);
   const sipsPerDrink = computeTotalSipsPerDrink(baseSipsPerDrink, totalSPD);
+
   return { strawSPD, cupSPD, sipsPerDrink };
 }

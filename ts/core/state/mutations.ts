@@ -1,83 +1,101 @@
-// Pure mutation helpers for Decimal-like values (TypeScript)
+// Pure mutation helpers for LargeNumber values (TypeScript)
+// Enhanced for unlimited scaling with break_infinity support
 
-// Type definitions for Decimal compatibility
-interface DecimalLike {
-  _v?: number;
-  plus?(x: DecimalValue): DecimalLike;
-  minus?(x: DecimalValue): DecimalLike;
-  times?(x: DecimalValue): DecimalLike;
-  gte?(x: DecimalValue): boolean;
-  toString(): string;
+import { LargeNumber } from '../numbers/large-number';
+import { toLargeNumber, add, subtract, multiply } from '../numbers/migration-utils';
+
+// Type for values that can be LargeNumber or converted to LargeNumber
+export type NumericValue = number | string | LargeNumber | any;
+
+/**
+ * Add sips to current amount - returns LargeNumber for unlimited scaling
+ */
+export function addSips(currentSips: NumericValue, amount: NumericValue): LargeNumber {
+  return add(currentSips, amount);
 }
 
-type DecimalValue = number | string | DecimalLike;
-
-interface DecimalConstructor {
-  new (value: DecimalValue): DecimalLike & {
-    plus(x: DecimalValue): DecimalLike;
-    minus(x: DecimalValue): DecimalLike;
-    times(x: DecimalValue): DecimalLike;
-    gte(x: DecimalValue): boolean;
-  };
+/**
+ * Subtract sips from current amount - returns LargeNumber for unlimited scaling
+ */
+export function subtractSips(currentSips: NumericValue, amount: NumericValue): LargeNumber {
+  return subtract(currentSips, amount);
 }
 
-function toDecimal(value: DecimalValue): DecimalLike {
-  // Check if Decimal.js is available
-  const DecimalCtor =
-    typeof window !== 'undefined' && ((window as any).Decimal as DecimalConstructor);
-  if (DecimalCtor) {
-    try {
-      return new DecimalCtor(value);
-    } catch {
-      // Fall back to plain object if Decimal constructor fails
-    }
-  }
-
-  // Fallback implementation
-  const numericValue = Number(
-    typeof value === 'object' && value._v !== undefined ? value._v : value
-  );
-
-  return {
-    _v: numericValue,
-    plus(x: DecimalValue) {
-      const otherValue = Number(typeof x === 'object' && x._v !== undefined ? x._v : x);
-      return toDecimal(this._v! + otherValue);
-    },
-    minus(x: DecimalValue) {
-      const otherValue = Number(typeof x === 'object' && x._v !== undefined ? x._v : x);
-      return toDecimal(this._v! - otherValue);
-    },
-    times(x: DecimalValue) {
-      const otherValue = Number(typeof x === 'object' && x._v !== undefined ? x._v : x);
-      return toDecimal(this._v! * otherValue);
-    },
-    gte(x: DecimalValue) {
-      const otherValue = Number(typeof x === 'object' && x._v !== undefined ? x._v : x);
-      return this._v! >= otherValue;
-    },
-    toString() {
-      return String(this._v!);
-    },
-  };
+/**
+ * Increment a count by specified amount - returns LargeNumber for unlimited scaling
+ */
+export function incrementCount(currentCount: NumericValue, by: number = 1): LargeNumber {
+  return add(currentCount, by);
 }
 
-export function addSips(currentSips: DecimalValue, amount: DecimalValue): string {
-  const dec = toDecimal(currentSips);
-  const res = dec.plus ? dec.plus(amount) : toDecimal(Number(currentSips) + Number(amount));
-  return res.toString();
+/**
+ * Multiply a value by specified factor - returns LargeNumber for unlimited scaling
+ */
+export function multiplyValue(value: NumericValue, factor: NumericValue): LargeNumber {
+  return multiply(value, factor);
 }
 
-export function subtractSips(currentSips: DecimalValue, amount: DecimalValue): string {
-  const dec = toDecimal(currentSips);
-  const res = dec.minus ? dec.minus(amount) : toDecimal(Number(currentSips) - Number(amount));
-  return res.toString();
+/**
+ * Check if one value is greater than or equal to another
+ */
+export function isGreaterOrEqual(value1: NumericValue, value2: NumericValue): boolean {
+  const ln1 = toLargeNumber(value1);
+  const ln2 = toLargeNumber(value2);
+  return ln1.gte(ln2);
 }
 
-export function incrementCount(currentCount: DecimalValue, by: number = 1): string {
-  const dec = toDecimal(currentCount);
-  const res = dec.plus ? dec.plus(by) : toDecimal(Number(currentCount) + by);
-  return res.toString();
+/**
+ * Check if one value is greater than another
+ */
+export function isGreater(value1: NumericValue, value2: NumericValue): boolean {
+  const ln1 = toLargeNumber(value1);
+  const ln2 = toLargeNumber(value2);
+  return ln1.gt(ln2);
+}
+
+/**
+ * Check if one value is less than or equal to another
+ */
+export function isLessOrEqual(value1: NumericValue, value2: NumericValue): boolean {
+  const ln1 = toLargeNumber(value1);
+  const ln2 = toLargeNumber(value2);
+  return ln1.lte(ln2);
+}
+
+/**
+ * Check if one value is less than another
+ */
+export function isLess(value1: NumericValue, value2: NumericValue): boolean {
+  const ln1 = toLargeNumber(value1);
+  const ln2 = toLargeNumber(value2);
+  return ln1.lt(ln2);
+}
+
+/**
+ * Check if two values are equal
+ */
+export function areEqual(value1: NumericValue, value2: NumericValue): boolean {
+  const ln1 = toLargeNumber(value1);
+  const ln2 = toLargeNumber(value2);
+  return ln1.eq(ln2);
+}
+
+/**
+ * Get the maximum of two values
+ */
+export function max(value1: NumericValue, value2: NumericValue): LargeNumber {
+  const ln1 = toLargeNumber(value1);
+  const ln2 = toLargeNumber(value2);
+  return ln1.gte(ln2) ? ln1 : ln2;
+}
+
+/**
+ * Get the minimum of two values
+ */
+export function min(value1: NumericValue, value2: NumericValue): LargeNumber {
+  const ln1 = toLargeNumber(value1);
+  const ln2 = toLargeNumber(value2);
+  return ln1.lte(ln2) ? ln1 : ln2;
 }
 
 export {};

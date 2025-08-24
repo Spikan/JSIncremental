@@ -165,13 +165,13 @@ export function updateShopStats(): void {
     | HTMLElement
     | undefined;
   if (strawsPurchasedElement) {
-    const v = Number((window as any).App?.state?.getState?.()?.straws || 0);
+    const v = (window as any).App?.state?.getState?.()?.straws || 0;
     strawsPurchasedElement.textContent = formatNumber(v);
   }
   // Cups purchased
   const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
   if (cupsPurchasedElement) {
-    const v = Number((window as any).App?.state?.getState?.()?.cups || 0);
+    const v = (window as any).App?.state?.getState?.()?.cups || 0;
     cupsPurchasedElement.textContent = formatNumber(v);
   }
   // Suctions purchased
@@ -179,7 +179,7 @@ export function updateShopStats(): void {
     | HTMLElement
     | undefined;
   if (suctionsPurchasedElement) {
-    const v = Number((window as any).App?.state?.getState?.()?.suctions || 0);
+    const v = (window as any).App?.state?.getState?.()?.suctions || 0;
     suctionsPurchasedElement.textContent = formatNumber(v);
   }
   // Critical clicks purchased
@@ -187,7 +187,7 @@ export function updateShopStats(): void {
     | HTMLElement
     | undefined;
   if (criticalClicksPurchasedElement) {
-    const v = Number((window as any).App?.state?.getState?.()?.criticalClicks || 0);
+    const v = (window as any).App?.state?.getState?.()?.criticalClicks || 0;
     criticalClicksPurchasedElement.textContent = formatNumber(v);
   }
 }
@@ -197,18 +197,18 @@ export function updateAchievementStats(): void {
   // Current level
   const currentLevelElement = (window as any).DOM_CACHE?.currentLevel as HTMLElement | undefined;
   if (currentLevelElement) {
-    const level = Number((window as any).App?.state?.getState?.()?.level || 1);
-    currentLevelElement.textContent = String(level);
+    const level = (window as any).App?.state?.getState?.()?.level || 1;
+    currentLevelElement.textContent = formatNumber(level);
   }
   // Total upgrades (sum of all upgrade counters)
   const totalUpgradesElement = (window as any).DOM_CACHE?.totalUpgrades as HTMLElement | undefined;
   if (totalUpgradesElement) {
     const st = (window as any).App?.state?.getState?.() || {};
-    const widerStraws = Number((st as any).widerStraws || 0);
-    const betterCups = Number((st as any).betterCups || 0);
-    const suctionUpCounter = Number((st as any).suctionUpCounter || 0);
-    const fasterDrinksUpCounter = Number((st as any).fasterDrinksUpCounter || 0);
-    const criticalClickUpCounter = Number((st as any).criticalClickUpCounter || 0);
+    const widerStraws = (st as any).widerStraws || 0;
+    const betterCups = (st as any).betterCups || 0;
+    const suctionUpCounter = (st as any).suctionUpCounter || 0;
+    const fasterDrinksUpCounter = (st as any).fasterDrinksUpCounter || 0;
+    const criticalClickUpCounter = (st as any).criticalClickUpCounter || 0;
     const totalUpgrades =
       widerStraws + betterCups + suctionUpCounter + fasterDrinksUpCounter + criticalClickUpCounter;
     totalUpgradesElement.textContent = formatNumber(totalUpgrades);
@@ -218,7 +218,7 @@ export function updateAchievementStats(): void {
     | HTMLElement
     | undefined;
   if (fasterDrinksOwnedElement) {
-    const owned = Number((window as any).App?.state?.getState?.()?.fasterDrinks || 0);
+    const owned = (window as any).App?.state?.getState?.()?.fasterDrinks || 0;
     fasterDrinksOwnedElement.textContent = formatNumber(owned);
   }
 }

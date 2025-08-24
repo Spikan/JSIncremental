@@ -210,10 +210,10 @@ function initGame() {
     if ((window as any).App?.systems?.resources?.recalcProduction) {
       const up = (window as any).App?.data?.upgrades || {};
       const result = (window as any).App.systems.resources.recalcProduction({
-        straws: straws.toNumber(),
-        cups: cups.toNumber(),
-        widerStraws: widerStraws.toNumber(),
-        betterCups: betterCups.toNumber(),
+        straws: straws,
+        cups: cups,
+        widerStraws: widerStraws,
+        betterCups: betterCups,
         base: {
           strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
           cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,
@@ -225,9 +225,15 @@ function initGame() {
           betterCupsPerLevel: up?.betterCups?.multiplierPerLevel ?? config.BETTER_CUPS_MULTIPLIER,
         },
       });
-      strawSPD = new Decimal(result.strawSPD);
-      cupSPD = new Decimal(result.cupSPD);
-      spd = new Decimal(result.sipsPerDrink);
+
+      // Handle LargeNumber results properly - convert to numbers for Decimal compatibility
+      const strawSPDValue = result.strawSPD.toNumber ? result.strawSPD.toNumber() : Number(result.strawSPD);
+      const cupSPDValue = result.cupSPD.toNumber ? result.cupSPD.toNumber() : Number(result.cupSPD);
+      const spdValue = result.sipsPerDrink.toNumber ? result.sipsPerDrink.toNumber() : Number(result.sipsPerDrink);
+
+      strawSPD = new Decimal(strawSPDValue);
+      cupSPD = new Decimal(cupSPDValue);
+      spd = new Decimal(spdValue);
     } else {
       strawSPD = new Decimal(config.STRAW_BASE_SPD);
       cupSPD = new Decimal(config.CUP_BASE_SPD);

@@ -59,6 +59,23 @@ try {
   console.warn('Failed to expose EVENT_NAMES globally:', error);
 }
 
+// Convenience: expose live actions getter at App.actions for console/dev usage
+try {
+  Object.defineProperty((window as any).App, 'actions', {
+    configurable: true,
+    enumerable: false,
+    get() {
+      try {
+        return (window as any).App.state?.getState?.()?.actions;
+      } catch {
+        return undefined;
+      }
+    },
+  });
+} catch (error) {
+  console.warn('Failed to expose App.actions getter:', error);
+}
+
 try {
   const bridge =
     typeof (window as any).createStateBridge === 'function'

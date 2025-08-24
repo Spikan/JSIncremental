@@ -1,29 +1,32 @@
 // Typed legacy state bridge that mirrors globals into App.state
+// Enhanced for LargeNumber support with unlimited scaling
 
 import type { GameState } from './shape';
+import { LargeNumber } from '../numbers/large-number';
+import { toLargeNumber } from '../numbers/migration-utils';
 
-// Type for actions available in the Zustand store
+// Type for actions available in the Zustand store (enhanced for LargeNumber)
 interface StateActions {
   setDrinkRate?: (value: number) => void;
   setDrinkProgress?: (value: number) => void;
   setLastDrinkTime?: (value: number) => void;
   setLevel?: (value: number) => void;
-  setSips?: (value: number) => void;
-  setStraws?: (value: number) => void;
-  setCups?: (value: number) => void;
-  setSuctions?: (value: number) => void;
-  setWiderStraws?: (value: number) => void;
-  setBetterCups?: (value: number) => void;
-  setFasterDrinks?: (value: number) => void;
-  setCriticalClicks?: (value: number) => void;
+  setSips?: (value: number | LargeNumber) => void;
+  setStraws?: (value: number | LargeNumber) => void;
+  setCups?: (value: number | LargeNumber) => void;
+  setSuctions?: (value: number | LargeNumber) => void;
+  setWiderStraws?: (value: number | LargeNumber) => void;
+  setBetterCups?: (value: number | LargeNumber) => void;
+  setFasterDrinks?: (value: number | LargeNumber) => void;
+  setCriticalClicks?: (value: number | LargeNumber) => void;
   setCriticalClickChance?: (value: number) => void;
-  setCriticalClickMultiplier?: (value: number) => void;
-  setSuctionClickBonus?: (value: number) => void;
-  setSPD?: (value: number) => void;
-  setStrawSPD?: (value: number) => void;
-  setCupSPD?: (value: number) => void;
-  setFasterDrinksUpCounter?: (value: number) => void;
-  setCriticalClickUpCounter?: (value: number) => void;
+  setCriticalClickMultiplier?: (value: number | LargeNumber) => void;
+  setSuctionClickBonus?: (value: number | LargeNumber) => void;
+  setSPD?: (value: number | LargeNumber) => void;
+  setStrawSPD?: (value: number | LargeNumber) => void;
+  setCupSPD?: (value: number | LargeNumber) => void;
+  setFasterDrinksUpCounter?: (value: number | LargeNumber) => void;
+  setCriticalClickUpCounter?: (value: number | LargeNumber) => void;
 }
 
 type AppLike = {
@@ -34,43 +37,39 @@ type AppLike = {
   };
 };
 
-// Type for values that can be Decimal-like or primitive
-type DecimalValue = number | string | { toNumber(): number } | { _v: number };
+// Type for values that can be LargeNumber or primitive (enhanced for unlimited scaling)
+type NumericValue = number | string | LargeNumber | { toNumber(): number } | { _v: number };
 
 export function createStateBridge(app: AppLike) {
-  function setDrinkRate(value: DecimalValue) {
+  function setDrinkRate(value: NumericValue) {
     try {
-      const numericValue =
-        typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 0;
+      const numericValue = toLargeNumber(value).toNumber();
       app.state.actions?.setDrinkRate?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function setDrinkProgress(value: DecimalValue) {
+  function setDrinkProgress(value: NumericValue) {
     try {
-      const numericValue =
-        typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 0;
+      const numericValue = toLargeNumber(value).toNumber();
       app.state.actions?.setDrinkProgress?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function setLastDrinkTime(value: DecimalValue) {
+  function setLastDrinkTime(value: NumericValue) {
     try {
-      const numericValue =
-        typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 0;
+      const numericValue = toLargeNumber(value).toNumber();
       app.state.actions?.setLastDrinkTime?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function setLevel(value: DecimalValue) {
-    const numeric =
-      typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 1;
+  function setLevel(value: NumericValue) {
+    const numeric = toLargeNumber(value).toNumber();
     try {
       app.state.actions?.setLevel?.(numeric);
     } catch (error) {
@@ -78,116 +77,145 @@ export function createStateBridge(app: AppLike) {
     }
   }
 
-  function toNum(value: DecimalValue): number {
-    return typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 0;
+  function toLargeNumberValue(value: NumericValue): LargeNumber {
+    return toLargeNumber(value);
   }
 
-  function syncSips(value: DecimalValue) {
+  function syncSips(value: NumericValue) {
     try {
-      app.state.actions?.setSips?.(toNum(value));
-    } catch (error) {
-      console.warn('State bridge operation failed:', error);
-    }
-  }
-  function syncStraws(value: DecimalValue) {
-    try {
-      app.state.actions?.setStraws?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setSips?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncCups(value: DecimalValue) {
+  function syncStraws(value: NumericValue) {
     try {
-      app.state.actions?.setCups?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setStraws?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncSuctions(value: DecimalValue) {
+  function syncCups(value: NumericValue) {
     try {
-      app.state.actions?.setSuctions?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setCups?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncWiderStraws(value: DecimalValue) {
+  function syncSuctions(value: NumericValue) {
     try {
-      app.state.actions?.setWiderStraws?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setSuctions?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncBetterCups(value: DecimalValue) {
+  function syncWiderStraws(value: NumericValue) {
     try {
-      app.state.actions?.setBetterCups?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setWiderStraws?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncFasterDrinks(value: DecimalValue) {
+  function syncBetterCups(value: NumericValue) {
     try {
-      app.state.actions?.setFasterDrinks?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setBetterCups?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncCriticalClicks(value: DecimalValue) {
+  function syncFasterDrinks(value: NumericValue) {
     try {
-      app.state.actions?.setCriticalClicks?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setFasterDrinks?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncCriticalClickChance(value: DecimalValue) {
+  function syncCriticalClicks(value: NumericValue) {
     try {
-      app.state.actions?.setCriticalClickChance?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setCriticalClicks?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncCriticalClickMultiplier(value: DecimalValue) {
+  function syncCriticalClickChance(value: NumericValue) {
     try {
-      app.state.actions?.setCriticalClickMultiplier?.(toNum(value));
+      app.state.actions?.setCriticalClickChance?.(toLargeNumberValue(value).toNumber());
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncSuctionClickBonus(value: DecimalValue) {
+  function syncCriticalClickMultiplier(value: NumericValue) {
     try {
-      app.state.actions?.setSuctionClickBonus?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setCriticalClickMultiplier?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncSpd(value: DecimalValue) {
+  function syncSuctionClickBonus(value: NumericValue) {
     try {
-      app.state.actions?.setSPD?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      app.state.actions?.setSuctionClickBonus?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncStrawSPD(value: DecimalValue) {
+  function syncSpd(value: NumericValue) {
     try {
-      app.state.actions?.setStrawSPD?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      // For compatibility, convert to number if it's reasonable size
+      if (largeNumberValue.toNumber() < Number.MAX_SAFE_INTEGER) {
+        app.state.actions?.setSPD?.(largeNumberValue.toNumber());
+      } else {
+        app.state.actions?.setSPD?.(largeNumberValue);
+      }
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
-  function syncCupSPD(value: DecimalValue) {
+  function syncStrawSPD(value: NumericValue) {
     try {
-      app.state.actions?.setCupSPD?.(toNum(value));
+      const largeNumberValue = toLargeNumberValue(value);
+      // For compatibility, convert to number if it's reasonable size
+      if (largeNumberValue.toNumber() < Number.MAX_SAFE_INTEGER) {
+        app.state.actions?.setStrawSPD?.(largeNumberValue.toNumber());
+      } else {
+        app.state.actions?.setStrawSPD?.(largeNumberValue);
+      }
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
+  }
+
+  function syncCupSPD(value: NumericValue) {
+    try {
+      const largeNumberValue = toLargeNumberValue(value);
+      // For compatibility, convert to number if it's reasonable size
+      if (largeNumberValue.toNumber() < Number.MAX_SAFE_INTEGER) {
+        app.state.actions?.setCupSPD?.(largeNumberValue.toNumber());
+      } else {
+        app.state.actions?.setCupSPD?.(largeNumberValue);
+      }
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -199,7 +227,7 @@ export function createStateBridge(app: AppLike) {
       const w = typeof window !== 'undefined' ? (window as any) : {};
 
       // Helper function to safely get window properties
-      const getWindowValue = (key: string): DecimalValue | undefined => {
+      const getWindowValue = (key: string): NumericValue | undefined => {
         return w[key];
       };
 
@@ -211,14 +239,18 @@ export function createStateBridge(app: AppLike) {
             typeof seedKey === 'string' &&
             (seedKey === 'drinkRate' || seedKey === 'drinkProgress' || seedKey === 'lastDrinkTime')
           ) {
-            (seed as any)[seedKey] = Number(value) || 0;
+            (seed as any)[seedKey] = toLargeNumberValue(value).toNumber();
           } else if (seedKey === 'level') {
-            (seed as any)[seedKey] =
-              typeof value === 'object' && 'toNumber' in value
-                ? value.toNumber()
-                : Number(value) || 1;
+            (seed as any)[seedKey] = toLargeNumberValue(value);
+          } else if (
+            typeof seedKey === 'string' &&
+            (seedKey === 'criticalClickChance' || seedKey === 'currentClickStreak' || seedKey === 'bestClickStreak')
+          ) {
+            // These remain as numbers
+            (seed as any)[seedKey] = toLargeNumberValue(value).toNumber();
           } else {
-            (seed as any)[seedKey] = toNum(value);
+            // All other values become LargeNumber
+            (seed as any)[seedKey] = toLargeNumberValue(value);
           }
         }
       };

@@ -3487,6 +3487,31 @@ button:focus {
   color: var(--neutral-white);
 }
 
+/* Large Number Test Button Styles */
+.dev-btn.large-number-test {
+  border-color: var(--warning-orange);
+  background-color: rgba(255, 142, 83, 0.1);
+  color: var(--warning-orange);
+}
+
+.dev-btn.large-number-test:hover {
+  background-color: var(--warning-orange);
+  color: var(--neutral-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 142, 83, 0.3);
+}
+
+.dev-btn.large-number-test.reset {
+  border-color: var(--danger-red);
+  background-color: rgba(255, 61, 2, 0.1);
+  color: var(--danger-red);
+}
+
+.dev-btn.large-number-test.reset:hover {
+  background-color: var(--danger-red);
+  color: var(--neutral-white);
+}
+
 /* Chat Send Button */
 .chat-send-btn {
   padding: var(--btn-padding-sm);

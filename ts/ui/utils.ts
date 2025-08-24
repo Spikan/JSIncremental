@@ -5,7 +5,17 @@ export type DecimalLike = {
   toString?: () => string;
 };
 
+import { formatLargeNumber } from '../core/numbers/migration-utils';
+
 export function formatNumber(value: any): string {
+  try {
+    // Try using the new LargeNumber formatting first
+    return formatLargeNumber(value);
+  } catch (error) {
+    console.warn('Failed to format with LargeNumber, falling back:', error);
+  }
+
+  // Legacy formatting for backward compatibility
   try {
     if (typeof (window as any)?.prettify === 'function') {
       try {
@@ -17,7 +27,9 @@ export function formatNumber(value: any): string {
   } catch (error) {
     console.warn('Failed to format value:', error);
   }
+
   if (value == null) return '0';
+
   if (value && typeof (value as DecimalLike).toNumber === 'function') {
     try {
       value = (value as DecimalLike).toNumber!();
@@ -25,9 +37,15 @@ export function formatNumber(value: any): string {
       console.warn('Failed to convert decimal to number:', error);
     }
   }
+
   if (typeof value === 'number' && Number.isFinite(value)) {
+    // Handle very large numbers with scientific notation
+    if (Math.abs(value) >= 1e6) {
+      return value.toExponential(2);
+    }
     return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
+
   if (typeof value === 'string') return value;
   if (value && typeof value.toString === 'function') return value.toString();
   return String(value);
@@ -103,8 +121,8 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
   let currentSips = '0';
   try {
     const st = (window as any).App?.state?.getState?.();
-    const sipsNum = Number(st?.sips || 0);
-    currentSips = formatNumber(sipsNum);
+    // Use sips directly - formatNumber will handle LargeNumber properly
+    currentSips = formatNumber(st?.sips || 0);
   } catch (error) {
     console.warn('Failed to get current sips for button title:', error);
   }
@@ -157,17 +175,39 @@ export const GameState = {
   get sips(): number {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
-    return st && typeof st.sips !== 'undefined' ? st.sips : (window as any).sips;
+    const sipsValue = st && typeof st.sips !== 'undefined' ? st.sips : (window as any).sips;
+    // Convert LargeNumber to number safely
+    if (sipsValue && typeof sipsValue.toNumber === 'function') {
+      try {
+        const numValue = sipsValue.toNumber();
+        return Number.isFinite(numValue) ? numValue : 0;
+      } catch (error) {
+        console.warn('Failed to convert sips to number:', error);
+        return 0;
+      }
+    }
+    return Number(sipsValue || 0);
   },
   get level(): number {
     if (typeof window === 'undefined') return 1;
     const st = (window as any).App?.state?.getState?.();
-    return st && typeof st.level !== 'undefined' ? st.level : (window as any).level;
+    return st && typeof st.level !== 'undefined' ? Number(st.level || 1) : Number((window as any).level || 1);
   },
   get spd(): number {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
-    return st && typeof st.spd !== 'undefined' ? st.spd : (window as any).spd;
+    const spdValue = st && typeof st.spd !== 'undefined' ? st.spd : (window as any).spd;
+    // Convert LargeNumber to number safely
+    if (spdValue && typeof spdValue.toNumber === 'function') {
+      try {
+        const numValue = spdValue.toNumber();
+        return Number.isFinite(numValue) ? numValue : 0;
+      } catch (error) {
+        console.warn('Failed to convert spd to number:', error);
+        return 0;
+      }
+    }
+    return Number(spdValue || 0);
   },
   get drinkRate(): number {
     if (typeof window === 'undefined') return 0;

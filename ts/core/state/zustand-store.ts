@@ -3,35 +3,37 @@ import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
+import { LargeNumber } from '../numbers/large-number';
+import { add, toLargeNumber } from '../numbers/migration-utils';
 
 // Extended state interface with actions
 interface GameStore extends GameState {
   // Actions
   actions: {
-    // Resource management
-    addSips: (_amount: number) => void;
-    setSips: (_amount: number) => void;
-    addStraws: (_amount: number) => void;
-    setStraws: (_amount: number) => void;
-    addCups: (_amount: number) => void;
-    setCups: (_amount: number) => void;
-    addSuctions: (_amount: number) => void;
-    setSuctions: (_amount: number) => void;
+    // Resource management (support LargeNumber for unlimited scaling)
+    addSips: (_amount: any) => void;
+    setSips: (_amount: any) => void;
+    addStraws: (_amount: any) => void;
+    setStraws: (_amount: any) => void;
+    addCups: (_amount: any) => void;
+    setCups: (_amount: any) => void;
+    addSuctions: (_amount: any) => void;
+    setSuctions: (_amount: any) => void;
 
     // Upgrade management
-    addWiderStraws: (_amount: number) => void;
-    setWiderStraws: (_amount: number) => void;
-    addBetterCups: (_amount: number) => void;
-    setBetterCups: (_amount: number) => void;
-    addFasterDrinks: (_amount: number) => void;
-    setFasterDrinks: (_amount: number) => void;
-    addCriticalClicks: (_amount: number) => void;
-    setCriticalClicks: (_amount: number) => void;
+    addWiderStraws: (_amount: any) => void;
+    setWiderStraws: (_amount: any) => void;
+    addBetterCups: (_amount: any) => void;
+    setBetterCups: (_amount: any) => void;
+    addFasterDrinks: (_amount: any) => void;
+    setFasterDrinks: (_amount: any) => void;
+    addCriticalClicks: (_amount: any) => void;
+    setCriticalClicks: (_amount: any) => void;
 
-    // Production stats
-    setStrawSPD: (_spd: number) => void;
-    setCupSPD: (_spd: number) => void;
-    setSPD: (_spd: number) => void;
+    // Production stats (support LargeNumber for high production rates)
+    setStrawSPD: (_spd: any) => void;
+    setCupSPD: (_spd: any) => void;
+    setSPD: (_spd: any) => void;
 
     // Drink system
     setDrinkRate: (_rate: number) => void;
@@ -142,32 +144,32 @@ export const useGameStore = create<GameStore>()(
           // Resource management
           addSips: amount =>
             set(state => ({
-              sips: state.sips + amount,
-              totalSipsEarned: state.totalSipsEarned + amount,
+              sips: add(state.sips, amount),
+              totalSipsEarned: add(state.totalSipsEarned, amount),
             })),
-          setSips: amount => set({ sips: amount }),
-          addStraws: amount => set(state => ({ straws: state.straws + amount })),
-          setStraws: amount => set({ straws: amount }),
-          addCups: amount => set(state => ({ cups: state.cups + amount })),
-          setCups: amount => set({ cups: amount }),
-          addSuctions: amount => set(state => ({ suctions: state.suctions + amount })),
-          setSuctions: amount => set({ suctions: amount }),
+          setSips: amount => set({ sips: toLargeNumber(amount) }),
+          addStraws: amount => set(state => ({ straws: add(state.straws, amount) })),
+          setStraws: amount => set({ straws: toLargeNumber(amount) }),
+          addCups: amount => set(state => ({ cups: add(state.cups, amount) })),
+          setCups: amount => set({ cups: toLargeNumber(amount) }),
+          addSuctions: amount => set(state => ({ suctions: add(state.suctions, amount) })),
+          setSuctions: amount => set({ suctions: toLargeNumber(amount) }),
 
           // Upgrade management
-          addWiderStraws: amount => set(state => ({ widerStraws: state.widerStraws + amount })),
-          setWiderStraws: amount => set({ widerStraws: amount }),
-          addBetterCups: amount => set(state => ({ betterCups: state.betterCups + amount })),
-          setBetterCups: amount => set({ betterCups: amount }),
-          addFasterDrinks: amount => set(state => ({ fasterDrinks: state.fasterDrinks + amount })),
-          setFasterDrinks: amount => set({ fasterDrinks: amount }),
+          addWiderStraws: amount => set(state => ({ widerStraws: add(state.widerStraws, amount) })),
+          setWiderStraws: amount => set({ widerStraws: toLargeNumber(amount) }),
+          addBetterCups: amount => set(state => ({ betterCups: add(state.betterCups, amount) })),
+          setBetterCups: amount => set({ betterCups: toLargeNumber(amount) }),
+          addFasterDrinks: amount => set(state => ({ fasterDrinks: add(state.fasterDrinks, amount) })),
+          setFasterDrinks: amount => set({ fasterDrinks: toLargeNumber(amount) }),
           addCriticalClicks: amount =>
-            set(state => ({ criticalClicks: state.criticalClicks + amount })),
-          setCriticalClicks: amount => set({ criticalClicks: amount }),
+            set(state => ({ criticalClicks: add(state.criticalClicks, amount) })),
+          setCriticalClicks: amount => set({ criticalClicks: toLargeNumber(amount) }),
 
           // Production stats
-          setStrawSPD: spd => set({ strawSPD: spd }),
-          setCupSPD: spd => set({ cupSPD: spd }),
-          setSPD: (spd: number) => set({ spd }),
+          setStrawSPD: spd => set({ strawSPD: toLargeNumber(spd) }),
+          setCupSPD: spd => set({ cupSPD: toLargeNumber(spd) }),
+          setSPD: spd => set({ spd: toLargeNumber(spd) }),
 
           // Drink system
           setDrinkRate: rate => set({ drinkRate: rate }),
@@ -180,11 +182,11 @@ export const useGameStore = create<GameStore>()(
           addTotalPlayTime: time => set(state => ({ totalPlayTime: state.totalPlayTime + time })),
           setTotalPlayTime: time => set({ totalPlayTime: time }),
           addTotalSipsEarned: amount =>
-            set(state => ({ totalSipsEarned: state.totalSipsEarned + amount })),
-          setTotalSipsEarned: amount => set({ totalSipsEarned: amount }),
-          addTotalClicks: amount => set(state => ({ totalClicks: state.totalClicks + amount })),
-          setTotalClicks: amount => set({ totalClicks: amount }),
-          setHighestSipsPerSecond: sps => set({ highestSipsPerSecond: sps }),
+            set(state => ({ totalSipsEarned: add(state.totalSipsEarned, amount) })),
+          setTotalSipsEarned: amount => set({ totalSipsEarned: toLargeNumber(amount) }),
+          addTotalClicks: amount => set(state => ({ totalClicks: add(state.totalClicks, amount) })),
+          setTotalClicks: amount => set({ totalClicks: toLargeNumber(amount) }),
+          setHighestSipsPerSecond: sps => set({ highestSipsPerSecond: toLargeNumber(sps) }),
           setCurrentClickStreak: streak => set({ currentClickStreak: streak }),
           setBestClickStreak: streak =>
             set(state => ({
@@ -193,16 +195,16 @@ export const useGameStore = create<GameStore>()(
 
           // Click/crit systems
           setCriticalClickChance: (_chance: number) => set({ criticalClickChance: _chance }),
-          setCriticalClickMultiplier: (_multiplier: number) =>
-            set({ criticalClickMultiplier: _multiplier }),
-          setSuctionClickBonus: (_bonus: number) => set({ suctionClickBonus: _bonus }),
+          setCriticalClickMultiplier: (_multiplier: any) =>
+            set({ criticalClickMultiplier: toLargeNumber(_multiplier) }),
+          setSuctionClickBonus: (_bonus: any) => set({ suctionClickBonus: toLargeNumber(_bonus) }),
 
           // Upgrade counters
-          setFasterDrinksUpCounter: (_count: number) => set({ fasterDrinksUpCounter: _count }),
-          setCriticalClickUpCounter: (_count: number) => set({ criticalClickUpCounter: _count }),
+          setFasterDrinksUpCounter: (_count: any) => set({ fasterDrinksUpCounter: toLargeNumber(_count) }),
+          setCriticalClickUpCounter: (_count: any) => set({ criticalClickUpCounter: toLargeNumber(_count) }),
 
           // Level management
-          setLevel: (_level: number) => set({ level: _level }),
+          setLevel: (_level: any) => set({ level: toLargeNumber(_level) }),
           addLevel: (_amount: number) => set(state => ({ level: state.level + _amount })),
 
           // Options management
@@ -256,6 +258,33 @@ export const useGameStore = create<GameStore>()(
           criticalClickUpCounter: state.criticalClickUpCounter,
           options: state.options,
         }),
+        // @ts-expect-error: custom persist options supported by our setup
+        serialize: (state: any) => {
+          // Custom serialize to handle LargeNumber objects
+          const serialized = JSON.stringify(state, (key, value) => {
+            if (value && typeof value === 'object' && 'toString' in value && 'toNumber' in value) {
+              // This looks like a LargeNumber object
+              return {
+                __largeNumber: true,
+                value: value.toString()
+              };
+            }
+            return value;
+          });
+          return serialized;
+        },
+        // Note: custom deserialize to revive LargeNumber
+        deserialize: (str: any) => {
+          // Custom deserialize to restore LargeNumber objects
+          const parsed = JSON.parse(str, (key, value) => {
+            if (value && typeof value === 'object' && value.__largeNumber) {
+              // Restore LargeNumber from string representation
+              return new LargeNumber(value.value);
+            }
+            return value;
+          });
+          return parsed;
+        }
       }
     ),
     {

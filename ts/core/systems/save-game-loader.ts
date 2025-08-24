@@ -75,27 +75,24 @@ export class SaveGameLoader {
   private loadBasicResources(savegame: SaveGameData): void {
     try {
       if (typeof savegame.sips !== 'undefined') {
-        const sipsValue = this.parseDecimalValue(savegame.sips);
-        storeActions.setSips(sipsValue);
-        (window as any).sips = new (window as any).Decimal(sipsValue);
+        // Pass through raw to let store convert to LargeNumber safely
+        storeActions.setSips(savegame.sips as any);
+        (window as any).sips = new (window as any).Decimal(String(savegame.sips));
       }
 
       if (typeof savegame.straws !== 'undefined') {
-        const strawsValue = this.parseDecimalValue(savegame.straws);
-        storeActions.setStraws(strawsValue);
-        (window as any).straws = new (window as any).Decimal(strawsValue);
+        storeActions.setStraws(savegame.straws as any);
+        (window as any).straws = new (window as any).Decimal(String(savegame.straws));
       }
 
       if (typeof savegame.cups !== 'undefined') {
-        const cupsValue = this.parseDecimalValue(savegame.cups);
-        storeActions.setCups(cupsValue);
-        (window as any).cups = new (window as any).Decimal(cupsValue);
+        storeActions.setCups(savegame.cups as any);
+        (window as any).cups = new (window as any).Decimal(String(savegame.cups));
       }
 
       if (typeof savegame.suctions !== 'undefined') {
-        const suctionsValue = this.parseDecimalValue(savegame.suctions);
-        storeActions.setSuctions(suctionsValue);
-        (window as any).suctions = new (window as any).Decimal(suctionsValue);
+        storeActions.setSuctions(savegame.suctions as any);
+        (window as any).suctions = new (window as any).Decimal(String(savegame.suctions));
       }
     } catch (error) {
       console.warn('Failed to load basic resources:', error);
@@ -108,21 +105,18 @@ export class SaveGameLoader {
   private loadUpgradeLevels(savegame: SaveGameData): void {
     try {
       if (typeof savegame.fasterDrinks !== 'undefined') {
-        const fasterDrinksValue = this.parseDecimalValue(savegame.fasterDrinks);
-        storeActions.setFasterDrinks(fasterDrinksValue);
-        (window as any).fasterDrinks = new (window as any).Decimal(fasterDrinksValue);
+        storeActions.setFasterDrinks(savegame.fasterDrinks as any);
+        (window as any).fasterDrinks = new (window as any).Decimal(String(savegame.fasterDrinks));
       }
 
       if (typeof savegame.widerStraws !== 'undefined') {
-        const widerStrawsValue = this.parseDecimalValue(savegame.widerStraws);
-        storeActions.setWiderStraws(widerStrawsValue);
-        (window as any).widerStraws = new (window as any).Decimal(widerStrawsValue);
+        storeActions.setWiderStraws(savegame.widerStraws as any);
+        (window as any).widerStraws = new (window as any).Decimal(String(savegame.widerStraws));
       }
 
       if (typeof savegame.betterCups !== 'undefined') {
-        const betterCupsValue = this.parseDecimalValue(savegame.betterCups);
-        storeActions.setBetterCups(betterCupsValue);
-        (window as any).betterCups = new (window as any).Decimal(betterCupsValue);
+        storeActions.setBetterCups(savegame.betterCups as any);
+        (window as any).betterCups = new (window as any).Decimal(String(savegame.betterCups));
       }
     } catch (error) {
       console.warn('Failed to load upgrade levels:', error);
@@ -212,7 +206,7 @@ export class SaveGameLoader {
   }
 
   /**
-   * Parse decimal value with fallback
+   * Parse decimal value with fallback - handles LargeNumber and Decimal objects
    */
   private parseDecimalValue(value: any, defaultValue: number = 0): number {
     if (value === null || value === undefined) return defaultValue;
@@ -220,9 +214,28 @@ export class SaveGameLoader {
     if (typeof value === 'number') return value;
     if (typeof value === 'string') return parseFloat(value) || defaultValue;
 
-    // Handle Decimal objects
+    // Handle objects with toNumber method (Decimal.js, LargeNumber)
     if (value && typeof value.toNumber === 'function') {
-      return value.toNumber();
+      try {
+        return value.toNumber();
+      } catch (error) {
+        console.warn('Failed to get number from object:', error);
+      }
+    }
+
+    // Handle serialized LargeNumber objects (might have _value property)
+    if (value && typeof value._value !== 'undefined') {
+      return Number(value._value) || defaultValue;
+    }
+
+    // Handle objects with value property (alternative serialization format)
+    if (value && typeof value.value !== 'undefined') {
+      return Number(value.value) || defaultValue;
+    }
+
+    // Handle arrays (some serialization might convert to arrays)
+    if (Array.isArray(value) && value.length > 0) {
+      return Number(value[0]) || defaultValue;
     }
 
     return defaultValue;

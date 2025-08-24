@@ -1,4 +1,6 @@
-// Drink system: centralizes drink processing and related state/UI updates
+// Drink system: centralizes drink processing and related state/UI updates with LargeNumber support
+
+import { toLargeNumber } from '../numbers/migration-utils';
 
 export type ProcessDrinkArgs = {
   getNow?: () => number;
@@ -18,22 +20,27 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       const now = getNow();
       if (now - lastDrinkTime < drinkRate) return;
 
-      // Add full sips-per-drink (base + production)
-      const spdVal = Number(
+      // Add full sips-per-drink (base + production) with LargeNumber support
+      const spdVal = toLargeNumber(
         state.spd ?? w.sipsPerDrink?.toNumber?.() ?? w.sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
       );
-      if (typeof w.sips?.plus === 'function') {
-        w.sips = w.sips.plus(spdVal);
-      } else {
-        w.sips = Number(w.sips || 0) + spdVal;
-      }
 
-      // Mirror totals
-      const prevTotal = Number(w.App?.state?.getState?.()?.totalSipsEarned || 0);
-      const prevHigh = Number(w.App?.state?.getState?.()?.highestSipsPerSecond || 0);
-      const spdNum = Number(state.spd ?? 0);
-      const currentSipsPerSecond = (drinkRate ? 1000 / drinkRate : 0) * spdNum;
-      const highest = Math.max(prevHigh, currentSipsPerSecond);
+      // Handle sips accumulation with LargeNumber arithmetic
+      const currentSips = toLargeNumber(w.sips || 0);
+      w.sips = currentSips.add(spdVal);
+
+      // Mirror totals with LargeNumber support
+      const prevTotal = toLargeNumber(w.App?.state?.getState?.()?.totalSipsEarned || 0);
+      const prevHigh = toLargeNumber(w.App?.state?.getState?.()?.highestSipsPerSecond || 0);
+      const spdNum = toLargeNumber(state.spd ?? 0);
+
+      // Calculate current sips per second (convert to number for rate calculation)
+      const rateInSeconds = drinkRate / 1000;
+      const currentSipsPerSecond = rateInSeconds > 0 ? spdNum.toNumber() / rateInSeconds : 0;
+      const highest = Math.max(prevHigh.toNumber(), currentSipsPerSecond);
+
+      // Update total sips earned
+      const newTotalEarned = prevTotal.add(spdVal);
 
       // Reset progress and last drink time
       const nextLast = now;
@@ -51,11 +58,10 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       }
 
       try {
-        const toNum = (v: any) =>
-          v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
+        // Keep LargeNumber in state for sips and totalSipsEarned to avoid Infinity in UI formatting
         w.App?.state?.setState?.({
-          sips: toNum(w.sips),
-          totalSipsEarned: prevTotal + spdVal,
+          sips: w.sips,
+          totalSipsEarned: newTotalEarned,
           highestSipsPerSecond: highest,
           lastDrinkTime: nextLast,
           drinkProgress: nextProgress,

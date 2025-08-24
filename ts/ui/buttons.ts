@@ -168,6 +168,35 @@ const BUTTON_CONFIG: {
       type: 'dev-btn',
       label: 'Export Save',
     },
+    // Large Number Testing Actions
+    largeNumberTest: {
+      func: (action?: string) => {
+        switch (action) {
+          case 'addMassiveSips':
+            (window as any).addMassiveSips?.();
+            break;
+          case 'addHugeStraws':
+            (window as any).addHugeStraws?.();
+            break;
+          case 'addMassiveCups':
+            (window as any).addMassiveCups?.();
+            break;
+          case 'addExtremeResources':
+            (window as any).addExtremeResources?.();
+            break;
+          case 'testScientificNotation':
+            (window as any).testScientificNotation?.();
+            break;
+          case 'resetAllResources':
+            (window as any).resetAllResources?.();
+            break;
+          default:
+            console.warn('Unknown large number test action:', action);
+        }
+      },
+      type: 'dev-btn',
+      label: 'Large Number Test',
+    },
     devImportSave: {
       func: () => (window as any).App?.systems?.dev?.openImportDialog?.(),
       type: 'dev-btn',

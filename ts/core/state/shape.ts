@@ -1,4 +1,8 @@
 // Centralized default state shape for the game (TypeScript)
+// Enhanced for LargeNumber support
+
+import { LargeNumber } from '../numbers/large-number';
+import { NumericValue } from '../numbers/migration-utils';
 
 export type GameOptions = {
   autosaveEnabled: boolean;
@@ -12,92 +16,92 @@ export type GameOptions = {
 };
 
 export type GameState = {
-  // Core resources
-  sips: number;
-  straws: number;
-  cups: number;
-  suctions: number;
-  widerStraws: number;
-  betterCups: number;
-  fasterDrinks: number;
-  criticalClicks: number;
-  level: number;
+  // Core resources (now support LargeNumber for unlimited scaling)
+  sips: NumericValue;
+  straws: NumericValue;
+  cups: NumericValue;
+  suctions: NumericValue;
+  widerStraws: NumericValue;
+  betterCups: NumericValue;
+  fasterDrinks: NumericValue;
+  criticalClicks: NumericValue;
+  level: NumericValue;
 
-  // Production stats
-  spd: number; // sips per drink (effective) - renamed from sps for clarity
-  strawSPD: number;
-  cupSPD: number;
+  // Production stats (support LargeNumber for high production rates)
+  spd: NumericValue; // sips per drink (effective) - renamed from sps for clarity
+  strawSPD: NumericValue;
+  cupSPD: NumericValue;
 
-  // Drink system
+  // Drink system (time-based values remain as numbers)
   drinkRate: number;
   drinkProgress: number;
   lastDrinkTime: number;
 
-  // Session and persistence
+  // Session and persistence (time-based values remain as numbers)
   lastSaveTime: number;
   lastClickTime: number;
   sessionStartTime: number;
   totalPlayTime: number;
-  totalSipsEarned: number;
-  totalClicks: number;
-  highestSipsPerSecond: number;
+  totalSipsEarned: NumericValue;
+  totalClicks: NumericValue;
+  highestSipsPerSecond: NumericValue;
   currentClickStreak: number;
   bestClickStreak: number;
 
   // Click/crit systems (migrate from globals)
   criticalClickChance: number;
-  criticalClickMultiplier: number;
-  suctionClickBonus: number;
+  criticalClickMultiplier: NumericValue;
+  suctionClickBonus: NumericValue;
 
   // Upgrade counters
-  fasterDrinksUpCounter: number;
-  criticalClickUpCounter: number;
+  fasterDrinksUpCounter: NumericValue;
+  criticalClickUpCounter: NumericValue;
 
   // Options
   options: GameOptions;
 };
 
 export const defaultState: GameState = {
-  // Core resources
-  sips: 0,
-  straws: 0,
-  cups: 0,
-  suctions: 0,
-  widerStraws: 0,
-  betterCups: 0,
-  fasterDrinks: 0,
-  criticalClicks: 0,
-  level: 1,
+  // Core resources (using LargeNumber for unlimited scaling)
+  sips: new LargeNumber(0),
+  straws: new LargeNumber(0),
+  cups: new LargeNumber(0),
+  suctions: new LargeNumber(0),
+  widerStraws: new LargeNumber(0),
+  betterCups: new LargeNumber(0),
+  fasterDrinks: new LargeNumber(0),
+  criticalClicks: new LargeNumber(0),
+  level: new LargeNumber(1),
 
-  // Production stats
-  spd: 0, // sips per drink (renamed from sps for clarity)
-  strawSPD: 0,
-  cupSPD: 0,
+  // Production stats (using LargeNumber for high production rates)
+  spd: new LargeNumber(0), // sips per drink (renamed from sps for clarity)
+  strawSPD: new LargeNumber(0),
+  cupSPD: new LargeNumber(0),
 
-  // Drink system
+  // Drink system (time-based values remain as numbers)
   drinkRate: 0,
   drinkProgress: 0,
   lastDrinkTime: 0,
 
-  // Session and persistence
+  // Session and persistence (time-based values remain as numbers)
   lastSaveTime: 0,
   lastClickTime: 0,
   sessionStartTime: 0,
   totalPlayTime: 0,
-  totalSipsEarned: 0,
-  totalClicks: 0,
-  highestSipsPerSecond: 0,
+  totalSipsEarned: new LargeNumber(0),
+  totalClicks: new LargeNumber(0),
+  highestSipsPerSecond: new LargeNumber(0),
   currentClickStreak: 0,
   bestClickStreak: 0,
 
   // Click/crit systems
   criticalClickChance: 0,
-  criticalClickMultiplier: 0,
-  suctionClickBonus: 0,
+  criticalClickMultiplier: new LargeNumber(0),
+  suctionClickBonus: new LargeNumber(0),
 
   // Upgrade counters
-  fasterDrinksUpCounter: 0,
-  criticalClickUpCounter: 0,
+  fasterDrinksUpCounter: new LargeNumber(0),
+  criticalClickUpCounter: new LargeNumber(0),
 
   // Options
   options: {
