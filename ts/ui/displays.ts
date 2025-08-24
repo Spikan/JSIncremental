@@ -128,9 +128,9 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
     const clampedProgress = Math.min(Math.max(currentProgress, 0), 100);
     (progressFill as HTMLElement).style.width = `${clampedProgress}%`;
     if (clampedProgress >= 100) {
-      (progressFill as HTMLElement).classList.add('progress-complete');
+      (progressFill as HTMLElement).classList?.add?.('progress-complete');
     } else {
-      (progressFill as HTMLElement).classList.remove('progress-complete');
+      (progressFill as HTMLElement).classList?.remove?.('progress-complete');
     }
   }
   if (countdown && currentDrinkRate && typeof currentProgress === 'number') {

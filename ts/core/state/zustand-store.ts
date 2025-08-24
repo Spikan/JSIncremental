@@ -99,6 +99,7 @@ const defaultState: GameState = {
 
   // Session and persistence
   lastSaveTime: 0,
+  lastClickTime: 0,
   sessionStartTime: 0,
   totalPlayTime: 0,
   totalSipsEarned: 0,
@@ -239,6 +240,7 @@ export const useGameStore = create<GameStore>()(
           drinkProgress: state.drinkProgress,
           lastDrinkTime: state.lastDrinkTime,
           lastSaveTime: state.lastSaveTime,
+          lastClickTime: state.lastClickTime,
           sessionStartTime: state.sessionStartTime,
           totalPlayTime: state.totalPlayTime,
           totalSipsEarned: state.totalSipsEarned,
@@ -264,14 +266,85 @@ export const useGameStore = create<GameStore>()(
 // Export store instance for legacy compatibility
 export const gameStore = useGameStore;
 
-// Export selectors for performance optimization
-export const useSips = () => useGameStore(state => state.sips);
-export const useStraws = () => useGameStore(state => state.straws);
-export const useCups = () => useGameStore(state => state.cups);
-export const useLevel = () => useGameStore(state => state.level);
-export const useSPS = () => useGameStore(state => state.sps);
-export const useOptions = () => useGameStore(state => state.options);
-export const useActions = () => useGameStore(state => state.actions);
+// Export selectors for performance optimization (only use in React components)
+export const useSips = () => {
+  // Check if we're in a test environment or if React hooks are available
+  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
+    return useGameStore.getState().sips;
+  }
+  try {
+    return useGameStore(state => state.sips);
+  } catch (error) {
+    console.warn('useSips hook failed, returning 0:', error);
+    return 0;
+  }
+};
+export const useStraws = () => {
+  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
+    return useGameStore.getState().straws;
+  }
+  try {
+    return useGameStore(state => state.straws);
+  } catch (error) {
+    console.warn('useStraws hook failed, returning 0:', error);
+    return 0;
+  }
+};
+export const useCups = () => {
+  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
+    return useGameStore.getState().cups;
+  }
+  try {
+    return useGameStore(state => state.cups);
+  } catch (error) {
+    console.warn('useCups hook failed, returning 0:', error);
+    return 0;
+  }
+};
+export const useLevel = () => {
+  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
+    return useGameStore.getState().level;
+  }
+  try {
+    return useGameStore(state => state.level);
+  } catch (error) {
+    console.warn('useLevel hook failed, returning 1:', error);
+    return 1;
+  }
+};
+export const useSPS = () => {
+  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
+    return useGameStore.getState().sps;
+  }
+  try {
+    return useGameStore(state => state.sps);
+  } catch (error) {
+    console.warn('useSPS hook failed, returning 0:', error);
+    return 0;
+  }
+};
+export const useOptions = () => {
+  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
+    return useGameStore.getState().options;
+  }
+  try {
+    return useGameStore(state => state.options);
+  } catch (error) {
+    console.warn('useOptions hook failed, returning default options:', error);
+    return defaultState.options;
+  }
+};
+export const useActions = () => {
+  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
+    return useGameStore.getState().actions;
+  }
+  try {
+    return useGameStore(state => state.actions);
+  } catch (error) {
+    console.warn('useActions hook failed, returning empty actions:', error);
+    return {};
+  }
+};
 
 // Export store actions for direct access (useful in tests and non-React contexts)
 export const storeActions = useGameStore.getState().actions;

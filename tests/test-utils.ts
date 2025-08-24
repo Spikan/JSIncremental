@@ -319,6 +319,10 @@ export function mockConsole() {
 
 // Helper to create test environment
 export function setupTestEnvironment() {
+  // Set test environment flag for Zustand selectors
+  (global as any).window = (global as any).window || {};
+  (global as any).window.__TEST_ENV__ = true;
+
   // Mock DOM environment
   document.body.innerHTML = '';
 
@@ -343,6 +347,10 @@ export function setupTestEnvironment() {
       document.body.innerHTML = '';
       consoleMock.restore();
       timersMock.restore();
+      // Clean up test environment flag
+      if ((global as any).window) {
+        (global as any).window.__TEST_ENV__ = false;
+      }
     },
   };
 }

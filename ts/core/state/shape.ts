@@ -35,6 +35,7 @@ export type GameState = {
 
   // Session and persistence
   lastSaveTime: number;
+  lastClickTime: number;
   sessionStartTime: number;
   totalPlayTime: number;
   totalSipsEarned: number;
@@ -80,6 +81,7 @@ export const defaultState: GameState = {
 
   // Session and persistence
   lastSaveTime: 0,
+  lastClickTime: 0,
   sessionStartTime: 0,
   totalPlayTime: 0,
   totalSipsEarned: 0,
