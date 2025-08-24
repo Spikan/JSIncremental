@@ -78,7 +78,7 @@ function generateBibleWords(): string {
     return words.join('\n');
 }
 
-export function getDivineResponse(userMessage: string): string {
+export function getDivineResponse(_userMessage: string): string {
     if (!bibleWordBank || bibleWordBank.length === 0) {
         console.warn('Word bank not loaded yet, attempting to load...');
         loadWordBank().then(() => {

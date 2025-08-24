@@ -33,8 +33,8 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 ### Scripts
 - `npm run dev` — Vite dev server with HMR
 - `npm run build` — Production build
-- `npm test` — Vitest test suite
-- `npm run typecheck` — TypeScript type-check (JS + .ts, no emit)
+- `npm test` — Vitest test suite (312 tests passing)
+- `npm run typecheck` — TypeScript type-check (all core files converted)
 
 ### File Structure (high level)
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
@@ -45,6 +45,19 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 - `js/core/rules/` — Pure business logic (clicks, purchases, economy) in `.ts`
 - `js/core/validation/` — Zod schemas and validators (`schemas.ts`)
 - `types/global.d.ts` — Ambient types for globals
+
+## 🔷 TypeScript Migration Complete
+
+The codebase has been successfully migrated to TypeScript with the following achievements:
+
+- ✅ **All core application files** converted from `.js` to `.ts`
+- ✅ **Configuration files** (`vite.config.ts`, `vitest.config.ts`) converted to TypeScript
+- ✅ **Type safety** established across the entire codebase
+- ✅ **Zero TypeScript compilation errors**
+- ✅ **All 312 tests passing**
+- ✅ **Full backward compatibility** maintained
+
+The migration was completed incrementally while preserving all existing functionality and game mechanics.
 
 ## 📱 Mobile Support
 

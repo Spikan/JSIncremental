@@ -57,8 +57,7 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
     if (!action) return;
     const buttonType = BUTTON_CONFIG.types[action.type];
     if (!buttonType) return;
-    const clickX = event.clientX;
-    const clickY = event.clientY;
+
     try {
         const audio = (window as any).App?.systems?.audio?.button;
         if (audio) {
@@ -71,7 +70,7 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
     try { button.classList.add('button-clicked'); setTimeout(() => { try { button.classList.remove('button-clicked'); } catch {} }, 150); } catch {}
     try {
         if (action.func && typeof action.func === 'function') {
-            const result = action.func();
+            action.func();
             if (buttonType.feedback === 'levelup') {
                 try { (window as any).App?.ui?.showLevelUpFeedback?.(0); } catch {}
             }

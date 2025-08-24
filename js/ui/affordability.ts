@@ -1,12 +1,12 @@
 // UI Affordability System (TypeScript)
 // Handles checking and updating button states based on resource availability
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
-import { updateButtonState, updateCostDisplay, formatNumber } from './utils';
+import { updateButtonState, updateCostDisplay } from './utils';
 
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability(): void {
     if (typeof window === 'undefined') return;
-    const { upgrades: dataUp, config } = getUpgradesAndConfig();
+    getUpgradesAndConfig();
 
     const currentSips = Number((window as any).App?.state?.getState?.()?.sips || 0);
     if (currentSips === 0) {

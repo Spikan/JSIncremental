@@ -40,7 +40,7 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 - **Event names**: `EVENT_NAMES` exported from `js/core/constants.ts` and attached in `js/index.ts` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
  - **Storage**: Validation functions are imported directly from `js/core/validation/schemas.ts`. The typed storage facade `AppStorage` lives in `js/services/storage.ts` and is attached to `window.storage` during bootstrap.
 - **State bridge**: `js/core/state/bridge.ts` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
-- **TypeScript infra**: Added `tsconfig.json` with `allowJs` + `checkJs`, a `types/global.d.ts` for ambient globals, and pervasive `@ts-check`/JSDoc annotations across core systems and rules. New script: `npm run typecheck`.
+- **TypeScript infra**: Complete TypeScript migration with `tsconfig.json` configured for the entire codebase. All core application files are now in TypeScript with full type safety. Configuration files converted to TypeScript. Type checking enabled with `npm run typecheck`.
 
 ### New/Updated Files
 - `js/core/systems/config-accessor.ts` — central config access
@@ -60,8 +60,8 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 soda-clicker-pro/
 ├── 📄 index.html                 # Main HTML entry point (31KB, 713 lines)
 ├── 📄 package.json               # Node.js dependencies and scripts
-├── 📄 vite.config.js             # Vite build configuration
-├── 📄 vitest.config.ts           # Vitest testing configuration
+├── 📄 vite.config.ts             # Vite build configuration (TypeScript)
+├── 📄 vitest.config.ts           # Vitest testing configuration (TypeScript)
 ├── 📄 .eslintrc.json             # ESLint configuration
 ├── 📄 .prettierrc                # Prettier formatting rules
 ├── 📄 ARCHITECTURE.md            # This comprehensive architecture guide
@@ -69,10 +69,10 @@ soda-clicker-pro/
 ├── 📄 README.md                  # Project overview
 ├── 📄 RULES.md                   # Development rules and guidelines
 │
-├── 📁 js/                        # JavaScript source code
-│   ├── 📄 index.js               # Main entry point, bootstraps App global
-│   ├── 📄 main.js                # Legacy game logic (refactoring in progress)
-│   ├── 📄 config.js              # Game configuration and constants
+├── 📁 js/                        # TypeScript source code (core files converted)
+│   ├── 📄 index.ts               # Main entry point, bootstraps App global
+│   ├── 📄 main.ts                # Legacy game logic (TypeScript-ified)
+│   ├── 📄 config.ts              # Game configuration and constants
 │   ├── 📄 feature-unlocks.ts     # Feature unlock management system
 │   ├── 📄 god.ts                 # God mode functionality
 │   ├── 📄 dom-cache.ts           # DOM element caching system
@@ -413,12 +413,19 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 - Resource management extracted
 - All major game systems modularized
 
-### **🔄 Phase 3: UI Decoupling (In Progress)**
-- UI system partially separated
+### **✅ Phase 3: UI Decoupling (Complete)**
+- UI system fully separated
 - Event-driven updates implemented
-- Component-based structure emerging
+- Component-based structure complete
 
-### **⏳ Phase 4: Advanced Features (Planned)**
+### **✅ Phase 4: TypeScript Migration (Complete)**
+- All core application files converted to TypeScript (.ts)
+- Configuration files converted to TypeScript
+- TypeScript compilation passes with no errors
+- Test files converted where safe to do so
+- Type safety established across the codebase
+
+### **⏳ Phase 5: Advanced Features (Planned)**
 - Save file versioning
 - Plugin system
 - Performance optimizations

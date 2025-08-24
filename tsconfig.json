@@ -21,9 +21,10 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "js/core/**/*.ts",
-    "js/core/**/*.js",
-    "types/**/*.d.ts"
+    "js/**/*.ts",
+    "js/**/*.js",
+    "types/**/*.d.ts",
+    "*.config.ts"
   ],
   "exclude": [
     "node_modules",

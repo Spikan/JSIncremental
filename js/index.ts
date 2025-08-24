@@ -26,7 +26,7 @@ console.log('🔧 index.ts starting App initialization...');
 try { (window as any).EVENT_NAMES = (window as any).App.EVENT_NAMES; } catch {}
 
 try {
-  const bridge = (typeof (window as any).createStateBridge === 'function') ? (window as any).createStateBridge : ((app: any) => ({
+  const bridge = (typeof (window as any).createStateBridge === 'function') ? (window as any).createStateBridge : ((_app: any) => ({
     init: () => {}, setDrinkRate: () => {}, setDrinkProgress: () => {}, setLastDrinkTime: () => {}, setLevel: () => {}, autoSync: () => {}
   }));
   const bridgeInstance = bridge((window as any).App);

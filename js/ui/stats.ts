@@ -174,13 +174,7 @@ export function updateShopStats(): void {
 
 // Update achievement-related statistics
 export function updateAchievementStats(): void {
-    // Helper function to safely get number value
-    const safeToNumber = (value: any): number => {
-        if (!value) return 0;
-        if (typeof (value as any).toNumber === 'function') return (value as any).toNumber();
-        if (typeof value === 'number') return value;
-        return Number(value) || 0;
-    };
+
     // Current level
     const currentLevelElement = (window as any).DOM_CACHE?.currentLevel as HTMLElement | undefined;
     if (currentLevelElement) {

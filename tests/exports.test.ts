@@ -8,6 +8,28 @@ import * as Economy from '../js/core/rules/economy';
 import * as Resources from '../js/core/systems/resources';
 import * as EventBus from '../js/services/event-bus.ts';
 
+
+
+declare global {
+  var window: {
+    App?: any;
+    Decimal?: any;
+    localStorage?: Storage;
+    fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+  };
+  var document: {
+    getElementById?: (id: string) => HTMLElement | null;
+    querySelector?: (selectors: string) => Element | null;
+    addEventListener?: (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => void;
+  };
+  var console: {
+    log?: (...data: any[]) => void;
+    warn?: (...data: any[]) => void;
+    error?: (...data: any[]) => void;
+  };
+}
+
+
 describe('Module exports sanity', () => {
   it('constants exports EVENT_NAMES', () => {
     expect(typeof Constants.EVENT_NAMES).toBe('object');

@@ -1,6 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../js/core/rules/economy';
 
+
+
+declare global {
+  var window: {
+    App?: any;
+    Decimal?: any;
+    localStorage?: Storage;
+    fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+  };
+  var document: {
+    getElementById?: (id: string) => HTMLElement | null;
+    querySelector?: (selectors: string) => Element | null;
+    addEventListener?: (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => void;
+  };
+  var console: {
+    log?: (...data: any[]) => void;
+    warn?: (...data: any[]) => void;
+    error?: (...data: any[]) => void;
+  };
+}
+
+
 describe('economy rules', () => {
   it('computes SPD with multipliers', () => {
     expect(computeStrawSPD(10, 0.6, 2, 0.2)).toBeCloseTo(0.6 * (1 + 0.4), 6);

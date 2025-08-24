@@ -32,7 +32,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.js'],
     
     // Test patterns
-    include: ['tests/**/*.test.js', 'tests/**/*.spec.js'],
+    include: ['tests/**/*.test.{js,ts}', 'tests/**/*.spec.{js,ts}'],
     
     // Test timeout
     testTimeout: 10000,

@@ -10,8 +10,7 @@
 // Ported inline from js/main.js (TS-ified minimal changes)
 
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
-const DOM_CACHE: any = (typeof window !== 'undefined' && (window as any).DOM_CACHE);
-const Decimal: any = (typeof window !== 'undefined' && (window as any).Decimal);
+// DOM_CACHE and Decimal are declared in global types
 
 const BAL = (GC && GC.BALANCE) || {};
 const TIMING = (GC && GC.TIMING) || {};
@@ -78,7 +77,7 @@ function initGame() {
         let criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER); (window as any).criticalClickMultiplier = criticalClickMultiplier;
         let criticalClicks = new Decimal(0);
         let criticalClickUpCounter = new Decimal(1);
-        let suctionUpCounter = new Decimal(1);
+
 
         try { (window as any).App?.ui?.updateAutosaveStatus?.(); } catch {}
         let gameStartTime = Date.now();
@@ -88,8 +87,7 @@ function initGame() {
         }
         try { (window as any).App?.state?.setState?.({ sessionStartTime: gameStartTime, totalPlayTime: 0 }); } catch {}
 
-        let totalSipsEarned = new Decimal(0); try { (window as any).App?.state?.setState?.({ totalSipsEarned: 0 }); } catch {}
-        let highestSipsPerSecond = new Decimal(0); try { (window as any).App?.state?.setState?.({ highestSipsPerSecond: 0 }); } catch {}
+
         let gameStartDate = Date.now(); try { (window as any).App?.state?.setState?.({ sessionStartTime: Number(gameStartDate) }); } catch {}
         try { (window as any).App?.state?.setState?.({ lastClickTime: 0 }); } catch {}
 
@@ -123,7 +121,7 @@ function initGame() {
             suctionClickBonus = new Decimal(savegame.suctionClickBonus || 0);
             level = new Decimal(typeof savegame.level === 'number' ? savegame.level : (savegame.level || 1)); (window as any).level = level;
             try { (window as any).App?.stateBridge?.setLevel(level); } catch {}
-            totalSipsEarned = new Decimal(savegame.totalSipsEarned || 0);
+
             try { (window as any).App?.state?.setState?.({ totalClicks: Number(savegame.totalClicks || 0) }); } catch {}
             gameStartDate = savegame.gameStartDate || Date.now();
             try { (window as any).App?.state?.setState?.({ lastClickTime: Number(savegame.lastClickTime || 0) }); } catch {}
@@ -144,8 +142,8 @@ function initGame() {
             strawSPD = new Decimal(result.strawSPD); cupSPD = new Decimal(result.cupSPD); sps = new Decimal(result.sipsPerDrink);
         } else {
             strawSPD = new Decimal(config.STRAW_BASE_SPD); cupSPD = new Decimal(config.CUP_BASE_SPD);
-            if (widerStraws.gt(0)) { const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER)); strawSPD = strawSPD.times(upgradeMultiplier); }
-            if (betterCups.gt(0)) { const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER)); cupSPD = cupSPD.times(upgradeMultiplier); }
+            if (widerStraws && typeof widerStraws.gt === 'function' && widerStraws.gt(0)) { const upgradeMultiplier = new Decimal(1 + (widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER)); strawSPD = strawSPD.times(upgradeMultiplier); }
+            if (betterCups && typeof betterCups.gt === 'function' && betterCups.gt(0)) { const upgradeMultiplier = new Decimal(1 + (betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER)); cupSPD = cupSPD.times(upgradeMultiplier); }
             const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
             const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
             sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
