@@ -1,25 +1,7 @@
 // Main Game Logic - Legacy game logic being refactored into modular architecture
 // This file contains the core game loop and legacy functions that are being gradually moved to modules
 
-// Safety checks - ensure dependencies are available
-(function() {
-    // Check if Decimal is available
-    if (typeof Decimal === 'undefined') {
-        console.error('❌ Decimal library not available! Game cannot start.');
-        return;
-    }
-    
-    // Check if App object is available
-    if (!window.App || !window.App.ui) {
-        console.error('❌ App object not available! Game cannot start.');
-        return;
-    }
-    
-    console.log('✅ Dependencies ready, main.js loaded successfully');
-    
-    // Don't call initGame here - it will be called after the DOM is ready
-    // and all functions are properly defined
-})();
+// Safety checks moved to dependency waiter below; avoid early abort/log noise here
 
 // Cache top-level config groups for non-init helpers
 const GC = (typeof window !== 'undefined' && window.GAME_CONFIG) || {};
