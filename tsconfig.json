@@ -26,16 +26,6 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false
   },
-  "include": [
-    "ts/**/*.ts",
-    "ts/**/*.js",
-    "types/**/*.d.ts",
-    "*.config.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["ts/**/*.ts", "ts/**/*.js", "types/**/*.d.ts", "*.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }
-
-

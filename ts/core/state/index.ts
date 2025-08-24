@@ -26,11 +26,11 @@ export {
 
 // Legacy type exports for backward compatibility
 export type Unsubscribe = () => void;
-export type Listener<T> = (state: T) => void;
+export type Listener<T> = (_state: T) => void;
 export interface Store<T extends object> {
   getState: () => T;
-  setState: (partial: Partial<T>) => void;
-  subscribe: (listener: Listener<T>) => Unsubscribe;
+  setState: (_partial: Partial<T>) => void;
+  subscribe: (_listener: Listener<T>) => Unsubscribe;
 }
 
 // Legacy createStore function now creates a Zustand-compatible wrapper
@@ -40,7 +40,7 @@ export function createStore<T extends object>(initialState: T): Store<T> {
   // For now, return a basic store implementation
   // The real Zustand store is available via useGameStore
   let state: T = { ...(initialState as any) };
-  const listeners = new Set<(state: T) => void>();
+  const listeners = new Set<(_state: T) => void>();
 
   function getState(): T {
     return state;

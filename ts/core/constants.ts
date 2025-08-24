@@ -37,4 +37,6 @@ export const EVENT_NAMES = {
 
 try {
   (window as any).EVENT_NAMES = EVENT_NAMES;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose EVENT_NAMES globally:', error);
+}

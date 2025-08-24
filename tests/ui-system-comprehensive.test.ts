@@ -38,65 +38,65 @@ declare global {
     currentClickStreak?: number;
     bestClickStreak?: number;
   }
-  var performance: any;
+  let performance: any;
 }
 
 describe('UI System - Comprehensive Testing', () => {
   let mockApp: any;
   let mockGameConfig: any;
   let mockDecimal: any;
-  
+
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
-    
+
     // Mock Decimal library
     mockDecimal = class Decimal {
       value: any;
-      
+
       constructor(value: any) {
         this.value = value;
       }
-      
+
       plus(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value + otherValue);
       }
-      
+
       minus(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value - otherValue);
       }
-      
+
       times(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value * otherValue);
       }
-      
+
       div(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value / otherValue);
       }
-      
+
       gte(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return this.value >= otherValue;
       }
-      
+
       lte(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value <= otherValue);
       }
-      
+
       toNumber() {
         return this.value;
       }
-      
+
       toString() {
         return this.value.toString();
       }
     };
-    
+
     // Mock game configuration
     mockGameConfig = {
       BALANCE: {
@@ -116,10 +116,10 @@ describe('UI System - Comprehensive Testing', () => {
         BETTER_CUPS_BASE_COST: 2500,
         BETTER_CUPS_SCALING: 1.45,
         LEVEL_UP_BASE_COST: 10000,
-        LEVEL_UP_SCALING: 1.5
-      }
+        LEVEL_UP_SCALING: 1.5,
+      },
     };
-    
+
     // Mock App object with comprehensive UI system
     mockApp = {
       ui: {
@@ -149,26 +149,26 @@ describe('UI System - Comprehensive Testing', () => {
         updateAchievementStats: vi.fn(),
         performBatchUIUpdate: vi.fn(),
         initializeUI: vi.fn(),
-        updateAllDisplays: vi.fn()
+        updateAllDisplays: vi.fn(),
       },
       systems: {
         save: {
-          performSaveSnapshot: vi.fn()
+          performSaveSnapshot: vi.fn(),
         },
         options: {
           saveOptions: vi.fn(),
-          loadOptions: vi.fn()
-        }
+          loadOptions: vi.fn(),
+        },
       },
       storage: {
         getBoolean: vi.fn(() => true),
-        setBoolean: vi.fn()
+        setBoolean: vi.fn(),
       },
       events: {
-        emit: vi.fn()
-      }
+        emit: vi.fn(),
+      },
     };
-    
+
     // Setup global mocks
     (global as any).window = {
       ...(global as any).window,
@@ -202,9 +202,9 @@ describe('UI System - Comprehensive Testing', () => {
       drinkProgress: 0,
       sps: new mockDecimal(10),
       currentClickStreak: 0,
-      bestClickStreak: 0
+      bestClickStreak: 0,
     };
-    
+
     // Mock comprehensive DOM elements
     (global as any).document.body.innerHTML = `
       <div id="splashScreen" style="display: block;">
@@ -267,17 +267,15 @@ describe('UI System - Comprehensive Testing', () => {
       </div>
     `;
   });
-  
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   describe('UI System Initialization', () => {
     it('should initialize all UI modules correctly', () => {
-      const requiredModules = [
-        'displays', 'stats', 'utils', 'affordability', 'labels', 'feedback'
-      ];
-      
+      const requiredModules = ['displays', 'stats', 'utils', 'affordability', 'labels', 'feedback'];
+
       // Test that all required modules are available
       requiredModules.forEach(moduleName => {
         expect(mockApp.ui).toBeDefined();
@@ -302,7 +300,7 @@ describe('UI System - Comprehensive Testing', () => {
     it('should check upgrade affordability correctly', () => {
       // Test that affordability checking works
       expect(mockApp.ui.checkUpgradeAffordability).toBeDefined();
-      
+
       // Mock the function to test its behavior
       mockApp.ui.checkUpgradeAffordability.mockImplementation(() => {
         // Simulate affordability checking
@@ -314,24 +312,24 @@ describe('UI System - Comprehensive Testing', () => {
           criticalClick: 500,
           widerStraws: 1000,
           betterCups: 2500,
-          levelUp: 10000
+          levelUp: 10000,
         };
-        
+
         // Check if player can afford upgrades
         const canAffordStraw = (global as any).window.sips.gte(costs.straw);
         const canAffordCup = (global as any).window.sips.gte(costs.cup);
-        
+
         return { straw: canAffordStraw, cup: canAffordCup };
       });
-      
+
       const result = mockApp.ui.checkUpgradeAffordability();
       expect(result.straw).toBe(true); // 1000 >= 10
-      expect(result.cup).toBe(true);   // 1000 >= 50
+      expect(result.cup).toBe(true); // 1000 >= 50
     });
 
     it('should update button states based on affordability', () => {
       expect(mockApp.ui.updateButtonState).toBeDefined();
-      
+
       // Test button state updates
       mockApp.ui.updateButtonState('buyStraw', true, 10);
       expect(mockApp.ui.updateButtonState).toHaveBeenCalledWith('buyStraw', true, 10);
@@ -339,7 +337,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update cost displays with affordability indicators', () => {
       expect(mockApp.ui.updateCostDisplay).toBeDefined();
-      
+
       // Test cost display updates
       mockApp.ui.updateCostDisplay('strawCost', 10, true);
       expect(mockApp.ui.updateCostDisplay).toHaveBeenCalledWith('strawCost', 10, true);
@@ -349,7 +347,7 @@ describe('UI System - Comprehensive Testing', () => {
   describe('Statistics System', () => {
     it('should update all statistics correctly', () => {
       expect(mockApp.ui.updateAllStats).toBeDefined();
-      
+
       // Test comprehensive stats update
       mockApp.ui.updateAllStats();
       expect(mockApp.ui.updateAllStats).toHaveBeenCalled();
@@ -363,7 +361,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update click statistics', () => {
       expect(mockApp.ui.updateClickStats).toBeDefined();
-      
+
       // Test click stats update
       mockApp.ui.updateClickStats();
       expect(mockApp.ui.updateClickStats).toHaveBeenCalled();
@@ -385,7 +383,7 @@ describe('UI System - Comprehensive Testing', () => {
   describe('Display System', () => {
     it('should update drink progress display', () => {
       expect(mockApp.ui.updateDrinkProgress).toBeDefined();
-      
+
       // Test drink progress update
       mockApp.ui.updateDrinkProgress(0.5, 1000);
       expect(mockApp.ui.updateDrinkProgress).toHaveBeenCalledWith(0.5, 1000);
@@ -394,51 +392,51 @@ describe('UI System - Comprehensive Testing', () => {
     it('should handle drink progress edge cases correctly', () => {
       // Test drink progress edge cases with mocked functionality
       const mockUpdateDrinkProgress = vi.fn();
-      
+
       // Mock DOM elements
       const mockProgressFill = { style: { width: '' } };
       const mockCountdown = { textContent: '', classList: { add: vi.fn(), remove: vi.fn() } };
-      
+
       // Mock DOM_CACHE
       (global as any).window = {
         DOM_CACHE: {
           progressFill: mockProgressFill,
-          countdown: mockCountdown
-        }
+          countdown: mockCountdown,
+        },
       };
-      
+
       // Test progress clamping (0-100%)
       mockUpdateDrinkProgress(-10, 5000);
       // Note: In real implementation, this would clamp to 0%
-      
+
       mockUpdateDrinkProgress(150, 5000);
       // Note: In real implementation, this would clamp to 100%
-      
+
       // Test normal progress
       mockUpdateDrinkProgress(50, 5000);
-      
+
       // Test countdown calculation
       mockUpdateDrinkProgress(50, 5000);
       // Note: In real implementation, this would show 2.5s remaining
-      
+
       // Test progress completion visual feedback
       mockUpdateDrinkProgress(100, 5000);
       // Note: In real implementation, this would add countdown-warning class
-      
+
       // Test countdown warning for last second
       mockUpdateDrinkProgress(90, 5000);
       // Note: In real implementation, this would remove countdown-warning class
-      
+
       // Verify the function was called with expected parameters
       expect(mockUpdateDrinkProgress).toHaveBeenCalledTimes(6);
-      
+
       // Cleanup
       delete (global as any).window;
     });
 
     it('should update top sips per drink display', () => {
       expect(mockApp.ui.updateTopSipsPerDrink).toBeDefined();
-      
+
       // Test top sips per drink update
       mockApp.ui.updateTopSipsPerDrink();
       expect(mockApp.ui.updateTopSipsPerDrink).toHaveBeenCalled();
@@ -446,7 +444,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update top sips per second display', () => {
       expect(mockApp.ui.updateTopSipsPerSecond).toBeDefined();
-      
+
       // Test top sips per second update
       mockApp.ui.updateTopSipsPerSecond();
       expect(mockApp.ui.updateTopSipsPerSecond).toHaveBeenCalled();
@@ -454,7 +452,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update top sip counter display', () => {
       expect(mockApp.ui.updateTopSipCounter).toBeDefined();
-      
+
       // Test top sip counter update
       mockApp.ui.updateTopSipCounter();
       expect(mockApp.ui.updateTopSipCounter).toHaveBeenCalled();
@@ -462,7 +460,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update critical click display', () => {
       expect(mockApp.ui.updateCriticalClickDisplay).toBeDefined();
-      
+
       // Test critical click display update
       mockApp.ui.updateCriticalClickDisplay();
       expect(mockApp.ui.updateCriticalClickDisplay).toHaveBeenCalled();
@@ -470,7 +468,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update drink speed display', () => {
       expect(mockApp.ui.updateDrinkSpeedDisplay).toBeDefined();
-      
+
       // Test drink speed display update
       mockApp.ui.updateDrinkSpeedDisplay();
       expect(mockApp.ui.updateDrinkSpeedDisplay).toHaveBeenCalled();
@@ -478,7 +476,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update compact drink speed displays', () => {
       expect(mockApp.ui.updateCompactDrinkSpeedDisplays).toBeDefined();
-      
+
       // Test compact drink speed displays update
       mockApp.ui.updateCompactDrinkSpeedDisplays();
       expect(mockApp.ui.updateCompactDrinkSpeedDisplays).toHaveBeenCalled();
@@ -487,7 +485,7 @@ describe('UI System - Comprehensive Testing', () => {
     it('should update level displays', () => {
       expect(mockApp.ui.updateLevelNumber).toBeDefined();
       expect(mockApp.ui.updateLevelText).toBeDefined();
-      
+
       // Test level display updates
       mockApp.ui.updateLevelNumber();
       mockApp.ui.updateLevelText('Level 2');
@@ -500,7 +498,7 @@ describe('UI System - Comprehensive Testing', () => {
     it('should format numbers correctly', () => {
       // Test number formatting utility
       const testNumbers = [0, 1, 10, 100, 1000, 1000000];
-      
+
       testNumbers.forEach(num => {
         expect(typeof num.toString()).toBe('string');
       });
@@ -508,19 +506,19 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should handle button state updates correctly', () => {
       expect(mockApp.ui.updateButtonState).toBeDefined();
-      
+
       // Test various button states
       const testCases = [
         { id: 'buyStraw', affordable: true, cost: 10 },
         { id: 'buyCup', affordable: false, cost: 50 },
-        { id: 'buySuction', affordable: true, cost: 100 }
+        { id: 'buySuction', affordable: true, cost: 100 },
       ];
-      
+
       testCases.forEach(testCase => {
         mockApp.ui.updateButtonState(testCase.id, testCase.affordable, testCase.cost);
         expect(mockApp.ui.updateButtonState).toHaveBeenCalledWith(
-          testCase.id, 
-          testCase.affordable, 
+          testCase.id,
+          testCase.affordable,
           testCase.cost
         );
       });
@@ -528,19 +526,19 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should handle cost display updates correctly', () => {
       expect(mockApp.ui.updateCostDisplay).toBeDefined();
-      
+
       // Test various cost display scenarios
       const testCases = [
         { id: 'strawCost', cost: 10, affordable: true },
         { id: 'cupCost', cost: 50, affordable: false },
-        { id: 'suctionCost', cost: 100, affordable: true }
+        { id: 'suctionCost', cost: 100, affordable: true },
       ];
-      
+
       testCases.forEach(testCase => {
         mockApp.ui.updateCostDisplay(testCase.id, testCase.cost, testCase.affordable);
         expect(mockApp.ui.updateCostDisplay).toHaveBeenCalledWith(
-          testCase.id, 
-          testCase.cost, 
+          testCase.id,
+          testCase.cost,
           testCase.affordable
         );
       });
@@ -550,7 +548,7 @@ describe('UI System - Comprehensive Testing', () => {
   describe('Label Management', () => {
     it('should update click sounds toggle text', () => {
       expect(mockApp.ui.updateClickSoundsToggleText).toBeDefined();
-      
+
       // Test toggle text updates
       mockApp.ui.updateClickSoundsToggleText(true);
       mockApp.ui.updateClickSoundsToggleText(false);
@@ -560,7 +558,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update countdown text', () => {
       expect(mockApp.ui.updateCountdownText).toBeDefined();
-      
+
       // Test countdown text updates
       mockApp.ui.updateCountdownText(30);
       mockApp.ui.updateCountdownText(15);
@@ -572,7 +570,7 @@ describe('UI System - Comprehensive Testing', () => {
   describe('Batch UI Updates', () => {
     it('should perform batch UI updates efficiently', () => {
       expect(mockApp.ui.performBatchUIUpdate).toBeDefined();
-      
+
       // Test batch update functionality
       mockApp.ui.performBatchUIUpdate();
       expect(mockApp.ui.performBatchUIUpdate).toHaveBeenCalled();
@@ -580,7 +578,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should update all displays in batch', () => {
       expect(mockApp.ui.updateAllDisplays).toBeDefined();
-      
+
       // Test comprehensive display update
       mockApp.ui.updateAllDisplays();
       expect(mockApp.ui.updateAllDisplays).toHaveBeenCalled();
@@ -594,9 +592,9 @@ describe('UI System - Comprehensive Testing', () => {
         'updateAllStats',
         'updatePlayTime',
         'updateLastSaveTime',
-        'updateClickStats'
+        'updateClickStats',
       ];
-      
+
       testFunctions.forEach(funcName => {
         expect(() => {
           mockApp.ui[funcName]?.();
@@ -608,11 +606,11 @@ describe('UI System - Comprehensive Testing', () => {
       // Test that UI functions handle missing game state
       const originalSips = (global as any).window.sips;
       delete (global as any).window.sips;
-      
+
       expect(() => {
         mockApp.ui.checkUpgradeAffordability?.();
       }).not.toThrow();
-      
+
       // Restore
       (global as any).window.sips = originalSips;
     });
@@ -632,33 +630,35 @@ describe('UI System - Comprehensive Testing', () => {
   describe('Performance and Memory Management', () => {
     it('should not create excessive DOM elements', () => {
       const initialElementCount = (global as any).document.body.children.length;
-      
+
       // Simulate intensive UI operations
       for (let i = 0; i < 50; i++) {
         const div = (global as any).document.createElement('div');
         div.textContent = `Performance test ${i}`;
         (global as any).document.body.appendChild(div);
       }
-      
+
       // Clean up
-      const testElements = (global as any).document.querySelectorAll('div[textContent*="Performance test"]');
+      const testElements = (global as any).document.querySelectorAll(
+        'div[textContent*="Performance test"]'
+      );
       testElements.forEach((el: any) => el.remove());
-      
+
       // Should have cleaned up most test elements (DOM cleanup in tests can be imperfect)
       expect((global as any).document.body.children.length).toBeLessThan(100); // Just ensure we're not creating excessive elements
     });
 
     it('should handle rapid updates efficiently', () => {
       const startTime = (global as any).performance?.now?.() || Date.now();
-      
+
       // Simulate rapid UI updates
       for (let i = 0; i < 1000; i++) {
         mockApp.ui.updateAllStats?.();
       }
-      
+
       const endTime = (global as any).performance?.now?.() || Date.now();
       const duration = endTime - startTime;
-      
+
       // Should complete within reasonable time (less than 500ms)
       expect(duration).toBeLessThan(500);
       expect(mockApp.ui.updateAllStats).toHaveBeenCalledTimes(1000);
@@ -666,18 +666,18 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should not leak memory during updates', () => {
       const initialMemory = (global as any).performance?.memory?.usedJSHeapSize || 0;
-      
+
       // Simulate extended UI operations
       for (let i = 0; i < 100; i++) {
         mockApp.ui.updateAllStats?.();
         mockApp.ui.updateClickStats?.();
         mockApp.ui.updatePlayTime?.();
       }
-      
+
       // Memory usage should remain reasonable
       const finalMemory = (global as any).performance?.memory?.usedJSHeapSize || 0;
       const memoryIncrease = finalMemory - initialMemory;
-      
+
       // Memory increase should be minimal (less than 1MB)
       expect(memoryIncrease).toBeLessThan(1024 * 1024);
     });
@@ -686,7 +686,7 @@ describe('UI System - Comprehensive Testing', () => {
   describe('Integration and System Interaction', () => {
     it('should integrate with save system correctly', () => {
       expect(mockApp.systems.save.performSaveSnapshot).toBeDefined();
-      
+
       // Test save system integration
       mockApp.systems.save.performSaveSnapshot();
       expect(mockApp.systems.save.performSaveSnapshot).toHaveBeenCalled();
@@ -695,7 +695,7 @@ describe('UI System - Comprehensive Testing', () => {
     it('should integrate with options system correctly', () => {
       expect(mockApp.systems.options.saveOptions).toBeDefined();
       expect(mockApp.systems.options.loadOptions).toBeDefined();
-      
+
       // Test options system integration
       mockApp.systems.options.saveOptions({ autosaveEnabled: true });
       expect(mockApp.systems.options.saveOptions).toHaveBeenCalledWith({ autosaveEnabled: true });
@@ -704,7 +704,7 @@ describe('UI System - Comprehensive Testing', () => {
     it('should integrate with storage system correctly', () => {
       expect(mockApp.storage.getBoolean).toBeDefined();
       expect(mockApp.storage.setBoolean).toBeDefined();
-      
+
       // Test storage system integration
       mockApp.storage.getBoolean('clickSoundsEnabled');
       mockApp.storage.setBoolean('clickSoundsEnabled', true);
@@ -714,7 +714,7 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should integrate with event system correctly', () => {
       expect(mockApp.events.emit).toBeDefined();
-      
+
       // Test event system integration
       mockApp.events.emit('ui:updated', { module: 'stats' });
       expect(mockApp.events.emit).toHaveBeenCalledWith('ui:updated', { module: 'stats' });
@@ -732,9 +732,9 @@ describe('UI System - Comprehensive Testing', () => {
       // Test that UI can adapt to configuration changes
       const originalCost = mockGameConfig.BALANCE.STRAW_BASE_COST;
       mockGameConfig.BALANCE.STRAW_BASE_COST = 20;
-      
+
       expect(mockGameConfig.BALANCE.STRAW_BASE_COST).toBe(20);
-      
+
       // Restore
       mockGameConfig.BALANCE.STRAW_BASE_COST = originalCost;
     });

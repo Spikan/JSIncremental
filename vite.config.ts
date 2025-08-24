@@ -3,7 +3,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
   // Set this to your repo name (e.g., '/your-repo-name/') for GitHub Pages
-  base: process.env.VITE_BASE_PATH || '/',
+  base: (process.env as any).VITE_BASE_PATH || '/',
   build: {
     target: 'esnext',
     rollupOptions: {

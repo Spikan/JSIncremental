@@ -5,6 +5,7 @@ This document outlines the enhanced developer experience features added to the S
 ## 🛠️ Code Quality Tools
 
 ### ESLint
+
 - **Configuration**: `.eslintrc.js`
 - **Purpose**: Advanced code linting with TypeScript support
 - **Features**:
@@ -14,6 +15,7 @@ This document outlines the enhanced developer experience features added to the S
   - Consistent code style enforcement
 
 ### Prettier
+
 - **Configuration**: `.prettierrc`
 - **Purpose**: Automatic code formatting
 - **Features**:
@@ -23,6 +25,7 @@ This document outlines the enhanced developer experience features added to the S
   - 100 character line width
 
 ### TypeScript Configuration
+
 - **File**: `tsconfig.json`
 - **Enhancements**:
   - ES2022 target
@@ -33,6 +36,7 @@ This document outlines the enhanced developer experience features added to the S
 ## 🔧 Available Scripts
 
 ### Code Quality
+
 ```bash
 # Run all quality checks
 npm run quality
@@ -57,6 +61,7 @@ npm run fix
 ```
 
 ### Development
+
 ```bash
 # Start development server
 npm run dev
@@ -77,6 +82,7 @@ npm run test:ui
 ## 🪝 Git Hooks (Husky)
 
 ### Pre-commit Hook
+
 - **File**: `.husky/pre-commit`
 - **Actions**:
   - ESLint validation
@@ -84,11 +90,13 @@ npm run test:ui
   - TypeScript type checking
 
 ### Commit Message Hook
+
 - **File**: `.husky/commit-msg`
 - **Purpose**: Enforce conventional commit messages
 - **Format**: `type(scope): description`
 
 ### Conventional Commit Types
+
 - `feat`: New features
 - `fix`: Bug fixes
 - `docs`: Documentation changes
@@ -110,6 +118,7 @@ npm run test:ui
 ## 🎯 Code Quality Rules
 
 ### ESLint Rules
+
 - **Complexity**: Max 10 cyclomatic complexity
 - **Depth**: Max 4 nesting levels
 - **Lines**: Max 300 lines per file, 50 per function
@@ -117,6 +126,7 @@ npm run test:ui
 - **Callbacks**: Max 3 nested callbacks
 
 ### TypeScript Rules
+
 - **Strict mode**: Enabled
 - **No implicit returns**: Required
 - **No unchecked indexed access**: Required
@@ -126,12 +136,14 @@ npm run test:ui
 ## 🔍 IDE Integration
 
 ### VS Code Extensions (Recommended)
+
 - ESLint
 - Prettier
 - TypeScript Importer
 - Error Lens
 
 ### VS Code Settings
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -146,6 +158,7 @@ npm run test:ui
 ## 🚨 Common Issues & Solutions
 
 ### ESLint Errors
+
 ```bash
 # Auto-fix all issues
 npm run lint:fix
@@ -155,6 +168,7 @@ npx eslint ts/core/state/zustand-store.ts
 ```
 
 ### Prettier Issues
+
 ```bash
 # Format specific file
 npx prettier --write ts/core/state/zustand-store.ts
@@ -164,6 +178,7 @@ npm run format:check
 ```
 
 ### TypeScript Errors
+
 ```bash
 # Check types
 npm run type-check
@@ -175,16 +190,19 @@ npx tsc --noEmit ts/core/state/zustand-store.ts
 ## 📊 Quality Metrics
 
 ### Code Coverage
+
 - **Target**: >80% coverage
 - **Command**: `npm run test:coverage`
 - **Report**: Generated in `coverage/` directory
 
 ### Bundle Analysis
+
 - **Command**: `npm run build:analyze`
 - **Output**: `dist/stats.html`
 - **Purpose**: Identify bundle size issues
 
 ### Performance Monitoring
+
 - **Available**: Via `App.performance` global
 - **Metrics**: Web Vitals, memory usage, FPS
 - **Command**: `npm run performance`
@@ -192,6 +210,7 @@ npx tsc --noEmit ts/core/state/zustand-store.ts
 ## 🔄 Workflow Integration
 
 ### Pre-commit Process
+
 1. Stage your changes: `git add .`
 2. Commit: `git commit -m "feat: add new feature"`
 3. Hooks automatically run:
@@ -202,6 +221,7 @@ npx tsc --noEmit ts/core/state/zustand-store.ts
 5. If any fail, fix issues and try again
 
 ### Continuous Integration
+
 - All quality checks run on PR
 - Coverage reports generated
 - Bundle analysis performed
@@ -210,18 +230,21 @@ npx tsc --noEmit ts/core/state/zustand-store.ts
 ## 📚 Best Practices
 
 ### Code Organization
+
 - Use consistent import sorting
 - Group imports by type (external, internal, relative)
 - Maintain single responsibility principle
 - Keep functions under 50 lines
 
 ### Type Safety
+
 - Avoid `any` types
 - Use strict TypeScript settings
 - Define proper interfaces
 - Handle null/undefined explicitly
 
 ### Performance
+
 - Monitor bundle size
 - Track performance metrics
 - Use lazy loading where appropriate
@@ -230,6 +253,7 @@ npx tsc --noEmit ts/core/state/zustand-store.ts
 ## 🆘 Getting Help
 
 ### Debugging
+
 ```bash
 # Verbose test output
 npm run test:debug
@@ -242,6 +266,7 @@ npm run dev
 ```
 
 ### Documentation
+
 - [ESLint Rules](https://eslint.org/docs/rules/)
 - [Prettier Options](https://prettier.io/docs/en/options.html)
 - [TypeScript Config](https://www.typescriptlang.org/tsconfig)

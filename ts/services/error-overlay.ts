@@ -55,7 +55,9 @@ declare global {
         : '';
       const msg = (e as ErrorEvent).message || (e as any).error?.message || 'Unknown error';
       show(`Error: ${msg}${src}`);
-    } catch {}
+    } catch (error) {
+      console.warn('Error overlay failed to handle error event:', error);
+    }
   });
 
   window.addEventListener('unhandledrejection', e => {
@@ -63,7 +65,9 @@ declare global {
       const reason: any = (e as PromiseRejectionEvent).reason;
       const msg = typeof reason === 'string' ? reason : reason?.message || JSON.stringify(reason);
       show(`Unhandled Promise rejection: ${msg}`);
-    } catch {}
+    } catch (error) {
+      console.warn('Error overlay failed to handle unhandled rejection:', error);
+    }
   });
 
   overlay.addEventListener('click', () => {

@@ -17,15 +17,18 @@
 ## 🔄 Recent Refactoring (Duplicate Function Elimination)
 
 ### **Problem Solved**
+
 The codebase had significant duplicate functions across `main.js`, UI modules, and core systems. This created maintenance issues and code bloat.
 
 ### **Solution Implemented**
+
 - **Removed 15+ duplicate functions** from `main.js` (~2,500+ lines of duplicate code)
 - **Updated 20+ function calls** to use modular versions
 - **Consolidated functionality** into proper UI and core system modules
 - **Maintained backward compatibility** through proper App object structure
 
 -### **Functions Moved**
+
 - **UI Functions**: `checkUpgradeAffordability`, `updateButtonState`, `updateCostDisplay`, `updateAllStats`, etc. → `App.ui.*`
 - **Core Systems**: `saveOptions`, `loadOptions`, `performSaveSnapshot` → `App.systems.*`
 - **Display Functions**: `updateTopSipsPerDrink`, `updateDrinkProgress`, etc. → `App.ui.*`
@@ -38,11 +41,12 @@ Recent work completed a full UI decoupling and established TypeScript infrastruc
 - **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `ts/ui/buttons.ts`.
 - **Configuration access**: Added `ts/core/systems/config-accessor.ts` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
 - **Event names**: `EVENT_NAMES` exported from `ts/core/constants.ts` and attached in `ts/index.ts` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
- - **Storage**: Validation functions are imported directly from `ts/core/validation/schemas.ts`. The typed storage facade `AppStorage` lives in `ts/services/storage.ts` and is attached to `window.storage` during bootstrap.
+- **Storage**: Validation functions are imported directly from `ts/core/validation/schemas.ts`. The typed storage facade `AppStorage` lives in `ts/services/storage.ts` and is attached to `window.storage` during bootstrap.
 - **State bridge**: `ts/core/state/bridge.ts` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
 - **TypeScript infra**: Complete TypeScript migration with `tsconfig.json` configured for the entire codebase. All core application files are now in TypeScript with full type safety. Configuration files converted to TypeScript. Source code moved from `js/` to `ts/` directory. Type checking enabled with `npm run typecheck`.
 
 ### New/Updated Files
+
 - `ts/core/systems/config-accessor.ts` — central config access
 - `ts/ui/buttons.ts` — event delegation via `data-action`
 - `types/global.d.ts` — ambient global types (`App`, `GameState`, etc.)
@@ -139,11 +143,13 @@ soda-clicker-pro/
 **Purpose**: Centralized state container with subscription support
 
 **Key Components**:
+
 - `createStore()`: Factory function for creating observable stores
 - `defaultState`: Centralized state shape definition
 - `selectors`: Lightweight helper functions for state access
 
 **State Structure**:
+
 ```javascript
 {
   // Core resources
@@ -156,17 +162,17 @@ soda-clicker-pro/
   fasterDrinks: 0,            // Speed upgrade
   criticalClicks: 0,          // Critical hit system
   level: 1,                   // Player level
-  
+
   // Production stats
   sps: 0,                     // Sips per second
   strawSPD: 0,                // Straws per drink
   cupSPD: 0,                  // Cups per drink
-  
+
   // Drink system
   drinkRate: 0,                // Time between drinks
   drinkProgress: 0,            // Current drink progress
   lastDrinkTime: 0,           // Timestamp of last drink
-  
+
   // Options
   options: {
     autosaveEnabled: true,
@@ -179,6 +185,7 @@ soda-clicker-pro/
 ```
 
 **Usage**:
+
 ```javascript
 const store = App.state;
 store.subscribe((newState, oldState) => {
@@ -193,6 +200,7 @@ const currentState = store.getState();
 **Purpose**: Decoupled communication between systems via pub/sub pattern
 
 **Event Categories**:
+
 ```javascript
 EVENT_NAMES = {
   GAME: ['LOADED', 'SAVED', 'DELETED', 'TICK'],
@@ -201,21 +209,22 @@ EVENT_NAMES = {
   FEATURE: ['UNLOCKED'],
   UI: ['TAB_SWITCHED', 'UPDATE_DISPLAY'],
   MUSIC: ['PLAY', 'PAUSE', 'MUTE', 'UNMUTE', 'STREAM_CHANGED'],
-  OPTIONS: ['AUTOSAVE_TOGGLED', 'AUTOSAVE_INTERVAL_CHANGED', 'CLICK_SOUNDS_TOGGLED']
-}
+  OPTIONS: ['AUTOSAVE_TOGGLED', 'AUTOSAVE_INTERVAL_CHANGED', 'CLICK_SOUNDS_TOGGLED'],
+};
 ```
 
 **Usage**:
+
 ```javascript
 // Subscribe to events
-App.events.on(App.EVENT_NAMES.CLICK.SODA, (data) => {
+App.events.on(App.EVENT_NAMES.CLICK.SODA, data => {
   // Handle soda click
 });
 
 // Emit events
 App.events.emit(App.EVENT_NAMES.ECONOMY.PURCHASE, {
   item: 'straw',
-  cost: 5
+  cost: 5,
 });
 ```
 
@@ -224,17 +233,19 @@ App.events.emit(App.EVENT_NAMES.ECONOMY.PURCHASE, {
 **Purpose**: Abstracted localStorage with validation and namespacing
 
 **Features**:
-- Namespaced keys (all prefixed with 'game_')
+
+- Namespaced keys (all prefixed with 'game\_')
 - JSON serialization/deserialization
 - Boolean storage helpers
 - Save game validation
 - Error handling and fallbacks
 
 **Key Methods**:
+
 ```javascript
-App.storage.saveGame(gameState);           // Save with validation
-App.storage.loadGame();                    // Load with validation
-App.storage.setJSON('options', options);   // Store JSON data
+App.storage.saveGame(gameState); // Save with validation
+App.storage.loadGame(); // Load with validation
+App.storage.setJSON('options', options); // Store JSON data
 App.storage.getBoolean('clickSounds', true); // Get boolean with default
 ```
 
@@ -243,12 +254,14 @@ App.storage.getBoolean('clickSounds', true); // Get boolean with default
 **Purpose**: Runtime data validation using Zod schemas
 
 **Schemas**:
+
 - `UnlocksSchema`: Feature unlock conditions
 - `UpgradesSchema`: Upgrade definitions and costs
 - `GameSaveSchema`: Save file validation
 - `GameOptionsSchema`: Options validation
 
 **Usage**:
+
 ```javascript
 const validatedUnlocks = validateUnlocks(unlocksData);
 if (validatedUnlocks) {
@@ -263,19 +276,22 @@ if (validatedUnlocks) {
 **Purpose**: Pure functions for game calculations
 
 **Economy Rules** (`economy.ts`):
+
 ```javascript
-computeStrawSPD(straws, baseSPD, widerStrawsCount, multiplier)
-computeCupSPD(cups, baseSPD, betterCupsCount, multiplier)
-computeTotalSPD(straws, strawSPD, cups, cupSPD)
-computeTotalSipsPerDrink(baseSips, totalSPD)
+computeStrawSPD(straws, baseSPD, widerStrawsCount, multiplier);
+computeCupSPD(cups, baseSPD, betterCupsCount, multiplier);
+computeTotalSPD(straws, strawSPD, cups, cupSPD);
+computeTotalSipsPerDrink(baseSips, totalSPD);
 ```
 
 **Click Rules** (`clicks.ts`):
+
 - Click value calculations
 - Critical hit mechanics
 - Click streak tracking
 
 **Purchase Rules** (`purchases.ts`):
+
 - Cost scaling formulas
 - Affordability checking
 - Purchase validation
@@ -283,41 +299,49 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 ### 6. **Game Systems** (`ts/core/systems/`)
 
 **Resources System** (`resources.ts`):
+
 - Centralized production recalculation
 - Configuration fallbacks (JSON → config.js → defaults)
 - Pure calculation functions
 
 **Purchases System** (`purchases-system.ts`):
+
 - Upgrade purchase logic
 - Cost calculations
 - Purchase validation
 
 **Clicks System** (`clicks-system.ts`):
+
 - Click handling and feedback
 - Critical hit system
 - Click statistics
 
 **Drink System** (`drink-system.ts`):
+
 - Centralized drink processing
 - Syncs `lastDrinkTime`, `drinkProgress`, and `sips`
 - Integrated with loop system when available
 
 **Save System** (`save-system.ts`):
+
 - Game state persistence
 - Save validation
 - Auto-save functionality
 
 **Options System** (`options-system.js`):
+
 - Game preferences management
 - Option persistence
 - Default value handling
 
 **Loop System** (`loop-system.ts`):
+
 - Game loop management
 - Performance optimization
 - Frame rate control
 
 **Audio System** (`button-audio.ts`):
+
 - Sound effect management
 - Audio preferences
 - Volume control
@@ -327,6 +351,7 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 **Purpose**: Coordinated UI updates and user interaction
 
 **Components**:
+
 - **Displays** (`displays.js`): Update game statistics and counters
 - **Stats** (`stats.js`): Statistics panel management
 - **Feedback** (`feedback.js`): Visual feedback for actions
@@ -335,6 +360,7 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 - **Utils** (`utils.js`): Common UI operations
 
 **Event-Driven Updates**:
+
 ```javascript
 // UI automatically updates based on game events
 App.events.on(App.EVENT_NAMES.CLICK.SODA, () => {
@@ -347,6 +373,7 @@ App.events.on(App.EVENT_NAMES.CLICK.SODA, () => {
 
 **Duplicate Function Elimination**:
 All duplicate functions have been removed from `main.js` and consolidated into the modular UI and core systems. Functions are now accessed via:
+
 - **UI Functions**: `App.ui.functionName()`
 - **Core Systems**: `App.systems.systemName.functionName()`
 - **Storage**: `App.storage.functionName()`
@@ -354,11 +381,13 @@ All duplicate functions have been removed from `main.js` and consolidated into t
 ## 📊 Data Flow Architecture
 
 ### 1. **Game Initialization Flow**
+
 ```
 index.html → index.js → loadDataFiles() → validateData() → initializeUI() → gameInit.initOnDomReady()
 ```
 
 ### 2. **Click Processing Flow**
+
 ```
 User Click → main.js → App.events.emit(CLICK.SODA) → UI System → Update Displays
                 ↓
@@ -366,6 +395,7 @@ User Click → main.js → App.events.emit(CLICK.SODA) → UI System → Update 
 ```
 
 ### 3. **Purchase Flow**
+
 ```
 User Purchase → main.js → App.events.emit(ECONOMY.PURCHASE) → UI System → Update Affordability
                    ↓
@@ -373,6 +403,7 @@ User Purchase → main.js → App.events.emit(ECONOMY.PURCHASE) → UI System �
 ```
 
 ### 4. **Save/Load Flow**
+
 ```
 Auto-save Timer → save-system.ts → validateGameSave() → storage.saveGame() → App.events.emit(GAME.SAVED)
 Load Game → storage.loadGame() → validateGameSave() → App.state.setState() → App.events.emit(GAME.LOADED)
@@ -381,6 +412,7 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 ## 🎮 Game Mechanics
 
 ### **Core Resources**
+
 - **Sips**: Primary currency earned by clicking
 - **Straws**: Basic production unit (0.6 sips per drink)
 - **Cups**: Advanced production unit (1.2 sips per drink)
@@ -388,12 +420,14 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 - **Critical Clicks**: Random bonus clicks (5x multiplier)
 
 ### **Upgrade System**
+
 - **Wider Straws**: Increase straw efficiency (+50% per level)
 - **Better Cups**: Increase cup efficiency (+40% per level)
 - **Faster Drinks**: Reduce time between drinks (-1% per level)
 - **Critical Click Upgrades**: Increase chance and multiplier
 
 ### **Progression System**
+
 - **Levels**: Unlock new features and increase earnings
 - **Feature Unlocks**: Progressive feature availability
 - **Offline Progress**: Calculate earnings while away
@@ -401,6 +435,7 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 ## 🔄 Migration Status
 
 ### **✅ Phase 1: Core Infrastructure (Complete)**
+
 - State store implementation
 - Event bus system
 - Storage abstraction
@@ -408,17 +443,20 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 - Data file loading
 
 ### **✅ Phase 2: Game Logic Extraction (Complete)**
+
 - Business logic moved to pure functions
 - Upgrade logic centralized
 - Resource management extracted
 - All major game systems modularized
 
 ### **✅ Phase 3: UI Decoupling (Complete)**
+
 - UI system fully separated
 - Event-driven updates implemented
 - Component-based structure complete
 
 ### **✅ Phase 4: TypeScript Migration (Complete)**
+
 - All core application files converted to TypeScript (.ts)
 - Configuration files converted to TypeScript
 - TypeScript compilation passes with no errors
@@ -426,6 +464,7 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 - Type safety established across the codebase
 
 ### **⏳ Phase 5: Advanced Features (Planned)**
+
 - Save file versioning
 - Plugin system
 - Performance optimizations
@@ -434,6 +473,7 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 ## 🧪 Testing & Development
 
 ### **Testing Framework**
+
 - **Vitest**: Unit and integration testing
 - **Test Files**: Located in `tests/` directory
 - **Test Commands**:
@@ -443,6 +483,7 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
   ```
 
 ### **Code Quality**
+
 - **ESLint**: Code linting and style enforcement
 - **Prettier**: Code formatting
 - **Commands**:
@@ -452,37 +493,44 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
   ```
 
 ### **Development Server**
+
 - **Vite**: Fast development server with HMR
 - **Command**: `npm run dev`
 
 ## 🚀 Agent Navigation Guide
 
 ### **For Understanding Game Logic**
+
 1. Start with `ts/core/rules/` - Pure business logic
 2. Examine `ts/core/systems/` - Game system implementations
 3. Check `ts/config.ts` - Game balance and constants
 
 ### **For Understanding State Management**
+
 1. Review `ts/core/state/shape.ts` - State structure
 2. Examine `ts/core/state/index.ts` - Store implementation
 3. Check `ts/index.ts` - App bootstrap and state initialization
 
 ### **For Understanding UI Updates**
+
 1. Start with `ts/ui/index.ts` - UI system coordinator
 2. Examine individual UI modules in `ts/ui/`
 3. Check event listeners and update functions
 
 ### **For Understanding Data Flow**
+
 1. Review `ts/core/constants.ts` - Event definitions
 2. Examine `ts/services/event-bus.ts` - Event system
 3. Check how systems emit and listen to events
 
 ### **For Understanding Game Configuration**
+
 1. Check `data/upgrades.json` - Upgrade definitions
 2. Check `data/unlocks.json` - Feature unlock conditions
 3. Review `ts/config.ts` - Game constants and balance
 
 ### **For Understanding Legacy Code**
+
 1. Examine `ts/main.ts` - Legacy game logic (TypeScript-ified)
 2. Check `ts/feature-unlocks.ts` - Feature unlock system
 3. Review `ts/dom-cache.ts` - DOM element management
@@ -513,5 +561,3 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 - **Console Logging**: Comprehensive error logging
 
 This architecture provides a solid foundation for incremental game development while maintaining code clarity and AI agent traversability. The modular design allows for easy feature additions and modifications while preserving the existing game mechanics.
-
-

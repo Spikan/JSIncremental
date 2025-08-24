@@ -21,28 +21,40 @@ export function start({
 }: StartArgs) {
   try {
     stop();
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to stop previous loop:', error);
+  }
   let lastStatsUpdate = 0;
 
   function tick() {
     try {
-      updateDrinkProgress && updateDrinkProgress();
-    } catch {}
+      if (updateDrinkProgress) updateDrinkProgress();
+    } catch (error) {
+      console.warn('Failed to update drink progress in loop:', error);
+    }
     try {
-      processDrink && processDrink();
-    } catch {}
+      if (processDrink) processDrink();
+    } catch (error) {
+      console.warn('Failed to process drink in loop:', error);
+    }
     const now = getNow();
     if (now - lastStatsUpdate >= 1000) {
       lastStatsUpdate = now;
       try {
-        updateStats && updateStats();
-      } catch {}
+        if (updateStats) updateStats();
+      } catch (error) {
+        console.warn('Failed to update stats in loop:', error);
+      }
       try {
-        updatePlayTime && updatePlayTime();
-      } catch {}
+        if (updatePlayTime) updatePlayTime();
+      } catch (error) {
+        console.warn('Failed to update play time in loop:', error);
+      }
       try {
-        updateLastSaveTime && updateLastSaveTime();
-      } catch {}
+        if (updateLastSaveTime) updateLastSaveTime();
+      } catch (error) {
+        console.warn('Failed to update last save time in loop:', error);
+      }
       // Maintain authoritative totalPlayTime in App.state
       try {
         const st = (window as any).App?.state?.getState?.();
@@ -50,17 +62,19 @@ export function start({
           const prev = Number(st.totalPlayTime || 0);
           (window as any).App?.state?.setState?.({ totalPlayTime: prev + 1000 });
         }
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to update total play time in loop:', error);
+      }
     }
     rafId = requestAnimationFrame(tick) as unknown as number;
   }
 
-  runOnceSafely(updateDrinkProgress);
-  runOnceSafely(processDrink);
+  if (updateDrinkProgress) runOnceSafely(updateDrinkProgress);
+  if (processDrink) runOnceSafely(processDrink);
   lastStatsUpdate = getNow();
-  runOnceSafely(updateStats);
-  runOnceSafely(updatePlayTime);
-  runOnceSafely(updateLastSaveTime);
+  if (updateStats) runOnceSafely(updateStats);
+  if (updatePlayTime) runOnceSafely(updatePlayTime);
+  if (updateLastSaveTime) runOnceSafely(updateLastSaveTime);
   rafId = requestAnimationFrame(tick) as unknown as number;
 }
 
@@ -73,6 +87,8 @@ export function stop() {
 
 function runOnceSafely(fn: (() => void) | undefined) {
   try {
-    fn && fn();
-  } catch {}
+    if (fn) fn();
+  } catch (error) {
+    console.warn('Failed to run function safely:', error);
+  }
 }

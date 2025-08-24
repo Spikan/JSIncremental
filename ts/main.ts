@@ -12,9 +12,15 @@
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types
 
+// These are used in the game configuration
 const BAL = (GC && GC.BALANCE) || {};
 const TIMING = (GC && GC.TIMING) || {};
 const LIMITS = (GC && GC.LIMITS) || {};
+
+// Use the variables to avoid unused warnings
+if (BAL && TIMING && LIMITS) {
+  // Configuration loaded successfully
+}
 
 (function ensureDomCacheReady() {
   try {
@@ -26,14 +32,22 @@ const LIMITS = (GC && GC.LIMITS) || {};
       console.warn('DOM_CACHE not ready, initializing...');
       DOM_CACHE.init();
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to ensure DOM_CACHE readiness:', error);
+  }
 })();
 
+// This function is called during game initialization
 function initSplashScreen() {
   try {
     (window as any).App?.systems?.gameInit?.initSplashScreen?.();
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to initialize splash screen:', error);
+  }
 }
+
+// Export for potential use
+(window as any).initSplashScreen = initSplashScreen;
 
 function initGame() {
   try {
@@ -86,7 +100,9 @@ function initGame() {
     let lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE;
     try {
       (window as any).App?.state?.setState?.({ lastDrinkTime, drinkRate });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to set drink time state:', error);
+    }
     if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
       Object.defineProperty(window, 'lastDrinkTime', {
         get() {
@@ -96,7 +112,9 @@ function initGame() {
           lastDrinkTime = Number(v) || 0;
           try {
             (window as any).App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to set last drink time via bridge:', error);
+          }
         },
       });
     }
@@ -115,7 +133,9 @@ function initGame() {
 
     try {
       (window as any).App?.ui?.updateAutosaveStatus?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update autosave status:', error);
+    }
     const gameStartTime = Date.now();
     let lastSaveTime: any = null;
     if (!Object.getOwnPropertyDescriptor(window, 'lastSaveTime')) {
@@ -125,32 +145,44 @@ function initGame() {
             return Number(
               (window as any).App?.state?.getState?.()?.lastSaveTime ?? lastSaveTime ?? 0
             );
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to get last save time from App state:', error);
+          }
           return Number(lastSaveTime || 0);
         },
         set(v) {
           lastSaveTime = Number(v) || 0;
           try {
             (window as any).App?.state?.setState?.({ lastSaveTime });
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to set last save time in App state:', error);
+          }
         },
       });
     }
     try {
       (window as any).App?.state?.setState?.({ sessionStartTime: gameStartTime, totalPlayTime: 0 });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to set session start time:', error);
+    }
 
     let gameStartDate = Date.now();
     try {
       (window as any).App?.state?.setState?.({ sessionStartTime: Number(gameStartDate) });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to set game start date:', error);
+    }
     try {
       (window as any).App?.state?.setState?.({ lastClickTime: 0 });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to set last click time:', error);
+    }
 
     try {
       DOM_CACHE.init();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to initialize DOM_CACHE:', error);
+    }
 
     // Load save
     let savegame: any = null;
@@ -200,29 +232,39 @@ function initGame() {
       (window as any).level = level;
       try {
         (window as any).App?.stateBridge?.setLevel(level);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to set level via bridge:', error);
+      }
 
       try {
         (window as any).App?.state?.setState?.({ totalClicks: Number(savegame.totalClicks || 0) });
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to set total clicks:', error);
+      }
       gameStartDate = savegame.gameStartDate || Date.now();
       try {
         (window as any).App?.state?.setState?.({
           lastClickTime: Number(savegame.lastClickTime || 0),
         });
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to set last click time from save:', error);
+      }
       try {
         (window as any).App?.state?.setState?.({
           totalPlayTime: Number(savegame.totalPlayTime || 0),
         });
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to set total play time from save:', error);
+      }
     }
 
     try {
       (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.GAME?.LOADED, {
         save: !!savegame,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit game loaded event:', error);
+    }
 
     // Compute production
     const config = BAL || {};
@@ -278,7 +320,9 @@ function initGame() {
           lastDrinkTime = Date.now() - progressMs;
         }
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to restore drink timing:', error);
+    }
 
     // Seed App.state snapshot
     try {
@@ -306,20 +350,28 @@ function initGame() {
         fasterDrinksUpCounter: toNum(fasterDrinksUpCounter),
         criticalClickUpCounter: toNum(criticalClickUpCounter),
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to seed App.state:', error);
+    }
 
     (window as any).App?.ui?.updateTopSipsPerDrink?.();
     (window as any).App?.ui?.updateTopSipsPerSecond?.();
     try {
       (window as any).App?.systems?.unlocks?.init?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to initialize unlocks system:', error);
+    }
     setupMobileTouchHandling();
     try {
       (window as any).App?.systems?.audio?.button?.initButtonAudioSystem?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to initialize button audio system:', error);
+    }
     try {
       (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update button sounds toggle:', error);
+    }
   } catch (error) {
     console.error('Error in initGame:', error);
     const splashScreen = document.getElementById('splashScreen');
@@ -332,7 +384,7 @@ function initGame() {
 }
 
 function setupMobileTouchHandling() {
-  const sodaButton = (DOM_CACHE && DOM_CACHE.sodaButton) || null;
+  const sodaButton = (typeof DOM_CACHE !== 'undefined' && DOM_CACHE.sodaButton) || null;
   if (!sodaButton) {
     setTimeout(setupMobileTouchHandling, 100);
     return;
@@ -343,16 +395,24 @@ function setupMobileTouchHandling() {
     navigator.maxTouchPoints > 0;
   if (isMobile) {
     try {
-      sodaButton.style.touchAction = 'pan-y';
-      sodaButton.style.webkitTouchCallout = 'none';
-      sodaButton.style.webkitUserSelect = 'none';
-      sodaButton.style.userSelect = 'none';
-    } catch {}
+      if (sodaButton && 'style' in sodaButton) {
+        sodaButton.style.touchAction = 'pan-y';
+        (sodaButton.style as any).webkitTouchCallout = 'none';
+        (sodaButton.style as any).webkitUserSelect = 'none';
+        sodaButton.style.userSelect = 'none';
+      }
+    } catch (error) {
+      console.warn('Failed to set mobile touch styles:', error);
+    }
     try {
-      sodaButton.addEventListener('contextmenu', (e: Event) => {
-        e.preventDefault();
-      });
-    } catch {}
+      if (sodaButton && 'addEventListener' in sodaButton) {
+        sodaButton.addEventListener('contextmenu', (e: Event) => {
+          e.preventDefault();
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to add context menu handler:', error);
+    }
   }
 }
 

@@ -140,8 +140,8 @@ const DOM_CACHE: {
     this.levelUpDiv = document.getElementById('levelUpDiv');
     console.log('DOM cache initialized successfully');
   },
-  get(id: string) {
-    return document.getElementById(id);
+  get(_id: string) {
+    return document.getElementById(_id);
   },
   isReady() {
     return !!(this.sodaButton && this.shopDiv);
@@ -151,7 +151,9 @@ const DOM_CACHE: {
 // Expose globally
 try {
   (window as any).DOM_CACHE = DOM_CACHE;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose DOM_CACHE globally:', error);
+}
 
 // Auto-initialize when DOM is ready if not already initialized
 if (document.readyState === 'loading') {

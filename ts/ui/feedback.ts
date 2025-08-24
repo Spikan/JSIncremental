@@ -12,7 +12,8 @@ function isMobileDevice(): boolean {
       'ontouchstart' in window ||
       (navigator as any).maxTouchPoints > 0
     );
-  } catch {
+  } catch (error) {
+    console.warn('Failed to detect mobile device:', error);
     return false;
   }
 }
@@ -99,7 +100,8 @@ function showFeedbackAtCoordinates(
     if (progress < 1) {
       try {
         requestAnimationFrame(animate);
-      } catch {
+      } catch (error) {
+        console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
         setTimeout(animate, 16);
       }
     }
@@ -167,14 +169,16 @@ function showFeedbackWithContainer(
     if (progress < 1) {
       try {
         requestAnimationFrame(animate);
-      } catch {
+      } catch (error) {
+        console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
         setTimeout(animate, 16);
       }
     }
   };
   try {
     requestAnimationFrame(animate);
-  } catch {
+  } catch (error) {
+    console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
     setTimeout(animate, 16);
   }
   setTimeout(
@@ -270,14 +274,16 @@ export function showPurchaseFeedback(
     if (progress < 1) {
       try {
         requestAnimationFrame(animate);
-      } catch {
+      } catch (error) {
+        console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
         setTimeout(animate, 16);
       }
     }
   };
   try {
     requestAnimationFrame(animate);
-  } catch {
+  } catch (error) {
+    console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
     setTimeout(animate, 16);
   }
   const config = (window as any).GAME_CONFIG?.TIMING || {};

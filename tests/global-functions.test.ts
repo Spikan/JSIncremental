@@ -44,9 +44,9 @@ declare global {
     quickUnlock?: Function;
     testProperty?: any;
   }
-  var Decimal: any;
-  var FEATURE_UNLOCKS: any;
-  var DOM_CACHE: any;
+  let Decimal: any;
+  let FEATURE_UNLOCKS: any;
+  let DOM_CACHE: any;
 }
 
 describe('Global Functions and Dependencies Integration', () => {
@@ -55,38 +55,38 @@ describe('Global Functions and Dependencies Integration', () => {
   let mockDecimal: any;
   let mockFeatureUnlocks: any;
   let mockDomCache: any;
-  
+
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
-    
+
     // Mock Decimal library
     mockDecimal = class Decimal {
       private _value: number;
-      
+
       constructor(value: any) {
         this._value = Number(value) || 0;
       }
-      
+
       plus(other: any) {
         const otherValue = other instanceof Decimal ? other._value : Number(other);
         return new Decimal(this._value + otherValue);
       }
-      
+
       minus(other: any) {
         const otherValue = other instanceof Decimal ? other._value : Number(other);
         return new Decimal(this._value - otherValue);
       }
-      
+
       toNumber() {
         return this._value;
       }
-      
+
       toString() {
         return String(this._value);
       }
     };
-    
+
     // Mock unlocks system
     mockFeatureUnlocks = {
       init: vi.fn(),
@@ -97,10 +97,10 @@ describe('Global Functions and Dependencies Integration', () => {
       unlockConditions: {
         shop: { sips: 100 },
         stats: { totalClicks: 50 },
-        dev: { level: 5 }
-      }
+        dev: { level: 5 },
+      },
     };
-    
+
     // Mock DOM_CACHE
     mockDomCache = {
       init: vi.fn(),
@@ -110,27 +110,27 @@ describe('Global Functions and Dependencies Integration', () => {
         if (id === 'drinkProgressFill') return mockDomCache.progressFill;
         if (id === 'drinkCountdown') return mockDomCache.countdown;
         return null;
-      })
+      }),
     };
-    
+
     // Mock game configuration
     mockGameConfig = {
       BALANCE: {
         BASE_SIPS_PER_DRINK: 1,
         STRAW_BASE_COST: 10,
-        STRAW_SCALING: 1.15
+        STRAW_SCALING: 1.15,
       },
       TIMING: {
-        CLICK_STREAK_WINDOW: 1000
-      }
+        CLICK_STREAK_WINDOW: 1000,
+      },
     };
-    
+
     // Mock App object
     mockApp = {
       ui: {
         updateAllStats: vi.fn(),
         updateDrinkProgress: vi.fn(),
-        checkUpgradeAffordability: vi.fn()
+        checkUpgradeAffordability: vi.fn(),
       },
       systems: {
         purchases: {
@@ -142,23 +142,23 @@ describe('Global Functions and Dependencies Integration', () => {
           purchaseWiderStraws: vi.fn(),
           purchaseBetterCups: vi.fn(),
           upgradeFasterDrinks: vi.fn(),
-          levelUp: vi.fn()
+          levelUp: vi.fn(),
         },
         save: {
           performSaveSnapshot: vi.fn(),
-          deleteSave: vi.fn()
+          deleteSave: vi.fn(),
         },
         audio: {
           button: {
-            toggleButtonSounds: vi.fn()
-          }
-        }
+            toggleButtonSounds: vi.fn(),
+          },
+        },
       },
       events: {
-        emit: vi.fn()
-      }
+        emit: vi.fn(),
+      },
     };
-    
+
     // Setup global mocks
     (global as any).window = {
       App: { ...mockApp, systems: { ...mockApp.systems, unlocks: mockFeatureUnlocks } },
@@ -168,14 +168,14 @@ describe('Global Functions and Dependencies Integration', () => {
       sips: new mockDecimal(1000),
       straws: new mockDecimal(5),
       cups: new mockDecimal(3),
-      level: 1
+      level: 1,
     };
-    
+
     (global as any).Decimal = mockDecimal;
     (global as any).FEATURE_UNLOCKS = mockFeatureUnlocks; // retained only for legacy references in code under test
     (global as any).DOM_CACHE = mockDomCache;
   });
-  
+
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -184,16 +184,23 @@ describe('Global Functions and Dependencies Integration', () => {
     it('should have all core purchase functions defined globally', () => {
       // Mock the global functions that should be available
       const coreFunctions = [
-        'buyStraw', 'buyCup', 'buySuction', 'buyCriticalClick',
-        'buyFasterDrinks', 'buyWiderStraws', 'buyBetterCups',
-        'upgradeFasterDrinks', 'sodaClick', 'levelUp'
+        'buyStraw',
+        'buyCup',
+        'buySuction',
+        'buyCriticalClick',
+        'buyFasterDrinks',
+        'buyWiderStraws',
+        'buyBetterCups',
+        'upgradeFasterDrinks',
+        'sodaClick',
+        'levelUp',
       ];
-      
+
       // Mock these functions on window
       coreFunctions.forEach(funcName => {
         (global as any).window[funcName] = vi.fn();
       });
-      
+
       coreFunctions.forEach(funcName => {
         expect(typeof (global as any).window[funcName]).toBe('function');
         expect((global as any).window[funcName]).toBeDefined();
@@ -202,15 +209,18 @@ describe('Global Functions and Dependencies Integration', () => {
 
     it('should have all game management functions defined globally', () => {
       const managementFunctions = [
-        'save', 'toggleButtonSounds', 
-        'sendMessage', 'startGame', 'switchTab'
+        'save',
+        'toggleButtonSounds',
+        'sendMessage',
+        'startGame',
+        'switchTab',
       ];
-      
+
       // Mock these functions on window
       managementFunctions.forEach(funcName => {
         (global as any).window[funcName] = vi.fn();
       });
-      
+
       managementFunctions.forEach(funcName => {
         expect(typeof (global as any).window[funcName]).toBe('function');
         expect((global as any).window[funcName]).toBeDefined();
@@ -219,16 +229,25 @@ describe('Global Functions and Dependencies Integration', () => {
 
     it('should have all dev functions defined globally', () => {
       const devFunctions = [
-        'devUnlockAll', 'devUnlockShop', 'devUnlockUpgrades', 'devResetUnlocks',
-        'devAddTime', 'devAddSips', 'devToggleDevMode', 'devToggleGodMode',
-        'devShowDebugInfo', 'devExportSave', 'devImportSave', 'quickUnlock'
+        'devUnlockAll',
+        'devUnlockShop',
+        'devUnlockUpgrades',
+        'devResetUnlocks',
+        'devAddTime',
+        'devAddSips',
+        'devToggleDevMode',
+        'devToggleGodMode',
+        'devShowDebugInfo',
+        'devExportSave',
+        'devImportSave',
+        'quickUnlock',
       ];
-      
+
       // Mock these functions on window
       devFunctions.forEach(funcName => {
         (global as any).window[funcName] = vi.fn();
       });
-      
+
       devFunctions.forEach(funcName => {
         expect(typeof (global as any).window[funcName]).toBe('function');
         expect((global as any).window[funcName]).toBeDefined();
@@ -243,11 +262,11 @@ describe('Global Functions and Dependencies Integration', () => {
         get: () => new mockDecimal(10),
         set: (v: any) => {},
         configurable: true,
-        enumerable: true
+        enumerable: true,
       });
-      
+
       const spsDescriptor = Object.getOwnPropertyDescriptor((global as any).window, 'sps');
-      
+
       expect(spsDescriptor).toBeDefined();
       expect(spsDescriptor?.configurable).toBe(true);
       expect(typeof (global as any).window.sps).toBeDefined();
@@ -259,11 +278,14 @@ describe('Global Functions and Dependencies Integration', () => {
         get: () => 5000,
         set: (v: any) => {},
         configurable: true,
-        enumerable: true
+        enumerable: true,
       });
-      
-      const drinkRateDescriptor = Object.getOwnPropertyDescriptor((global as any).window, 'drinkRate');
-      
+
+      const drinkRateDescriptor = Object.getOwnPropertyDescriptor(
+        (global as any).window,
+        'drinkRate'
+      );
+
       expect(drinkRateDescriptor).toBeDefined();
       expect(drinkRateDescriptor?.configurable).toBe(true);
       expect(typeof (global as any).window.drinkRate).toBeDefined();
@@ -274,12 +296,12 @@ describe('Global Functions and Dependencies Integration', () => {
         Object.defineProperty((global as any).window, 'testProperty', {
           get: () => 'test',
           set: (v: any) => {},
-          configurable: true
+          configurable: true,
         });
       }).not.toThrow();
-      
+
       expect((global as any).window.testProperty).toBe('test');
-      
+
       // Cleanup
       delete (global as any).window.testProperty;
     });
@@ -288,12 +310,12 @@ describe('Global Functions and Dependencies Integration', () => {
       // Mock properties
       (global as any).window.sps = new mockDecimal(10);
       (global as any).window.drinkRate = 5000;
-      
+
       expect(() => {
         const spsValue = (global as any).window.sps;
         const drinkRateValue = (global as any).window.drinkRate;
       }).not.toThrow();
-      
+
       expect((global as any).window.sps).toBeDefined();
       expect((global as any).window.drinkRate).toBeDefined();
     });
@@ -306,9 +328,9 @@ describe('Global Functions and Dependencies Integration', () => {
         { name: 'DOM_CACHE', obj: (global as any).DOM_CACHE },
         { name: 'GAME_CONFIG', obj: (global as any).window.GAME_CONFIG },
         { name: 'Decimal', obj: (global as any).Decimal },
-        { name: 'App', obj: (global as any).window.App }
+        { name: 'App', obj: (global as any).window.App },
       ];
-      
+
       dependencies.forEach(({ name, obj }) => {
         expect(obj).toBeDefined();
         // Decimal is a constructor function, others are objects
@@ -325,7 +347,7 @@ describe('Global Functions and Dependencies Integration', () => {
       expect((global as any).window.App.systems.unlocks.checkAllUnlocks).toBeDefined();
       expect((global as any).window.App.systems.unlocks.updateUnlocksTab).toBeDefined();
       expect((global as any).window.App.systems.unlocks.updateFeatureVisibility).toBeDefined();
-      
+
       expect(typeof (global as any).FEATURE_UNLOCKS.init).toBe('function');
       expect(typeof (global as any).FEATURE_UNLOCKS.checkAllUnlocks).toBe('function');
     });
@@ -333,7 +355,7 @@ describe('Global Functions and Dependencies Integration', () => {
     it('should have DOM_CACHE methods available', () => {
       expect((global as any).DOM_CACHE.init).toBeDefined();
       expect((global as any).DOM_CACHE.get).toBeDefined();
-      
+
       expect(typeof (global as any).DOM_CACHE.init).toBe('function');
       expect(typeof (global as any).DOM_CACHE.get).toBe('function');
     });
@@ -345,7 +367,7 @@ describe('Global Functions and Dependencies Integration', () => {
         (global as any).DOM_CACHE.init();
         (global as any).DOM_CACHE.get('testElement');
       }).not.toThrow();
-      
+
       expect((global as any).FEATURE_UNLOCKS.init).toHaveBeenCalled();
       expect((global as any).FEATURE_UNLOCKS.checkAllUnlocks).toHaveBeenCalled();
       expect((global as any).DOM_CACHE.init).toHaveBeenCalled();
@@ -359,12 +381,12 @@ describe('Global Functions and Dependencies Integration', () => {
       expect((global as any).window.App.ui).toBeDefined();
       expect((global as any).window.App.systems).toBeDefined();
       expect((global as any).window.App.events).toBeDefined();
-      
+
       // Test UI subsystem
       expect((global as any).window.App.ui.updateAllStats).toBeDefined();
       expect((global as any).window.App.ui.updateDrinkProgress).toBeDefined();
       expect((global as any).window.App.ui.checkUpgradeAffordability).toBeDefined();
-      
+
       // Test systems subsystem
       expect((global as any).window.App.systems.purchases).toBeDefined();
       expect((global as any).window.App.systems.save).toBeDefined();
@@ -378,7 +400,7 @@ describe('Global Functions and Dependencies Integration', () => {
         (global as any).window.App.systems.save.performSaveSnapshot();
         (global as any).window.App.events.emit('test-event', {});
       }).not.toThrow();
-      
+
       expect((global as any).window.App.ui.updateAllStats).toHaveBeenCalled();
       expect((global as any).window.App.ui.updateDrinkProgress).toHaveBeenCalledWith(50, 5000);
       expect((global as any).window.App.systems.save.performSaveSnapshot).toHaveBeenCalled();
@@ -390,7 +412,7 @@ describe('Global Functions and Dependencies Integration', () => {
       expect((global as any).window.straws).toBeDefined();
       expect((global as any).window.cups).toBeDefined();
       expect((global as any).window.level).toBeDefined();
-      
+
       expect((global as any).window.sips.toNumber()).toBe(1000);
       expect((global as any).window.straws.toNumber()).toBe(5);
       expect((global as any).window.cups.toNumber()).toBe(3);
@@ -403,19 +425,19 @@ describe('Global Functions and Dependencies Integration', () => {
       // Temporarily remove dependencies
       const originalFeatureUnlocks = (global as any).FEATURE_UNLOCKS;
       const originalDomCache = (global as any).DOM_CACHE;
-      
+
       (global as any).FEATURE_UNLOCKS = undefined;
       (global as any).DOM_CACHE = undefined;
-      
+
       expect(() => {
         // These should not throw even with missing dependencies
         const hasFeatureUnlocks = typeof (global as any).FEATURE_UNLOCKS !== 'undefined';
         const hasDomCache = typeof (global as any).DOM_CACHE !== 'undefined';
-        
+
         expect(hasFeatureUnlocks).toBe(false);
         expect(hasDomCache).toBe(false);
       }).not.toThrow();
-      
+
       // Restore dependencies
       (global as any).FEATURE_UNLOCKS = originalFeatureUnlocks;
       (global as any).DOM_CACHE = originalDomCache;
@@ -426,7 +448,7 @@ describe('Global Functions and Dependencies Integration', () => {
         // Test accessing potentially undefined properties
         const spsValue = (global as any).window.sps || new mockDecimal(0);
         const drinkRateValue = (global as any).window.drinkRate || 5000;
-        
+
         expect(spsValue).toBeDefined();
         expect(drinkRateValue).toBeDefined();
       }).not.toThrow();

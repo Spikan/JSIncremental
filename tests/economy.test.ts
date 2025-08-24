@@ -1,27 +1,33 @@
 import { describe, it, expect } from 'vitest';
-import { computeStrawSPD, computeCupSPD, computeTotalSPD, computeTotalSipsPerDrink } from '../ts/core/rules/economy';
-
-
+import {
+  computeStrawSPD,
+  computeCupSPD,
+  computeTotalSPD,
+  computeTotalSipsPerDrink,
+} from '../ts/core/rules/economy';
 
 declare global {
-  var window: {
+  interface Window {
     App?: any;
     Decimal?: any;
     localStorage?: Storage;
     fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
-  };
-  var document: {
+  }
+  interface Document {
     getElementById?: (id: string) => HTMLElement | null;
     querySelector?: (selectors: string) => Element | null;
-    addEventListener?: (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => void;
-  };
-  var console: {
+    addEventListener?: (
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions
+    ) => void;
+  }
+  interface Console {
     log?: (...data: any[]) => void;
     warn?: (...data: any[]) => void;
     error?: (...data: any[]) => void;
-  };
+  }
 }
-
 
 describe('economy rules', () => {
   it('computes SPD with multipliers', () => {
@@ -35,5 +41,3 @@ describe('economy rules', () => {
     expect(computeTotalSipsPerDrink(1, totalSPD)).toBe(1 + totalSPD);
   });
 });
-
-

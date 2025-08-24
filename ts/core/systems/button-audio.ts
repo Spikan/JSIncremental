@@ -6,7 +6,9 @@ let buttonSoundsEnabled = true;
 function ensureContext() {
   try {
     (audioContext as any)?.resume?.();
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to resume audio context:', error);
+  }
 }
 
 function randBetween(min: number, max: number) {
@@ -45,7 +47,9 @@ function playTone({
   try {
     osc.start(now);
     osc.stop(end);
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to play sound:', error);
+  }
 }
 
 function initButtonAudioContext() {
@@ -67,7 +71,7 @@ export function initButtonAudioSystem() {
   try {
     const stored = localStorage.getItem('buttonSoundsEnabled');
     buttonSoundsEnabled = stored !== null ? stored === 'true' : true;
-  } catch (error) {
+  } catch (_error) {
     buttonSoundsEnabled = true;
   }
   updateButtonSoundsToggleButton();
@@ -78,7 +82,9 @@ export function toggleButtonSounds() {
   buttonSoundsEnabled = !buttonSoundsEnabled;
   try {
     localStorage.setItem('buttonSoundsEnabled', buttonSoundsEnabled.toString());
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to save button sounds enabled state:', error);
+  }
   updateButtonSoundsToggleButton();
   console.log('Button sounds:', buttonSoundsEnabled ? 'ON' : 'OFF');
 }
@@ -91,7 +97,9 @@ export function updateButtonSoundsToggleButton() {
       : '🔇 Button Sounds OFF';
     try {
       buttonSoundsToggle.classList.toggle('sounds-off', !buttonSoundsEnabled);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to toggle button sounds class:', error);
+    }
   }
 }
 
@@ -180,7 +188,9 @@ export function playSodaClickSound() {
       gain: 0.18,
       when: 0.03,
     });
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to play soda click sound:', error);
+  }
 }
 
 export function playLevelUpSound() {
@@ -206,7 +216,9 @@ export function playLevelUpSound() {
       gain: 0.2,
       when: 0.18,
     });
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to play level up sound:', error);
+  }
 }
 
 export function playTabSwitchSound() {
@@ -224,5 +236,7 @@ export function playTabSwitchSound() {
       gain: 0.08,
       when: 0.04,
     });
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to play tab switch sound:', error);
+  }
 }

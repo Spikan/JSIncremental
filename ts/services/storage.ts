@@ -12,13 +12,13 @@ export type AnyRecord = Record<string, unknown>;
 
 export type StorageAPI = {
   loadGame: () => AnyRecord | null;
-  saveGame: (data: AnyRecord) => boolean;
+  saveGame: (_data: AnyRecord) => boolean;
   deleteSave: () => boolean;
-  setJSON: (key: string, value: unknown) => boolean;
-  getJSON: (key: string, defaultValue?: unknown) => unknown;
-  setBoolean: (key: string, value: boolean) => boolean;
-  getBoolean: (key: string, defaultValue?: boolean) => boolean;
-  remove: (key: string) => boolean;
+  setJSON: (_key: string, _value: unknown) => boolean;
+  getJSON: (_key: string, _defaultValue?: unknown) => unknown;
+  setBoolean: (_key: string, _value: boolean) => boolean;
+  getBoolean: (_key: string, _defaultValue?: boolean) => boolean;
+  remove: (_key: string) => boolean;
 };
 
 export const AppStorage: StorageAPI = {
@@ -120,4 +120,6 @@ export const AppStorage: StorageAPI = {
 // Expose globally for legacy access
 try {
   (window as any).storage = AppStorage;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose storage globally:', error);
+}

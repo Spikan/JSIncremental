@@ -13,13 +13,17 @@ const eventBus = createEventBus();
 try {
   (window as any).eventBus = eventBus;
   (window as any).bus = eventBus;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose event bus globally:', error);
+}
 
 let EVENT_NAMES: any = (typeof window !== 'undefined' && (window as any).EVENT_NAMES) || {};
 try {
   if (typeof window !== 'undefined' && (window as any).EVENT_NAMES)
     EVENT_NAMES = (window as any).EVENT_NAMES;
-} catch {}
+} catch (error) {
+  console.warn('Failed to get EVENT_NAMES from window:', error);
+}
 
 console.log('🔧 index.ts starting App initialization...');
 
@@ -53,19 +57,33 @@ const zustandStore = useGameStore;
 
 try {
   (window as any).EVENT_NAMES = (window as any).App.EVENT_NAMES;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose EVENT_NAMES globally:', error);
+}
 
 try {
   const bridge =
     typeof (window as any).createStateBridge === 'function'
       ? (window as any).createStateBridge
       : (_app: any) => ({
-          init: () => {},
-          setDrinkRate: () => {},
-          setDrinkProgress: () => {},
-          setLastDrinkTime: () => {},
-          setLevel: () => {},
-          autoSync: () => {},
+          init: () => {
+            // No-op for compatibility
+          },
+          setDrinkRate: () => {
+            // No-op for compatibility
+          },
+          setDrinkProgress: () => {
+            // No-op for compatibility
+          },
+          setLastDrinkTime: () => {
+            // No-op for compatibility
+          },
+          setLevel: () => {
+            // No-op for compatibility
+          },
+          autoSync: () => {
+            // No-op for compatibility
+          },
         });
   const bridgeInstance = bridge((window as any).App);
   bridgeInstance.init();
@@ -97,7 +115,9 @@ try {
   storage = (st as any).AppStorage ? (st as any).AppStorage : storage;
   try {
     (window as any).storage = storage;
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to expose storage globally:', error);
+  }
 } catch (e) {
   console.warn('⚠️ storage service load failed:', e);
 }
@@ -172,7 +192,9 @@ try {
         window as any
       ).App.systems.gameInit.startGameCore;
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to initialize game init system:', error);
+  }
 } catch (e) {
   console.warn('⚠️ game-init system load failed:', e);
 }

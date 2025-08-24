@@ -8,8 +8,6 @@ import * as Economy from '../ts/core/rules/economy';
 import * as Resources from '../ts/core/systems/resources';
 import * as EventBus from '../ts/services/event-bus.ts';
 
-
-
 // Extend existing global types
 declare global {
   interface Window {
@@ -19,7 +17,6 @@ declare global {
     FEATURE_UNLOCKS?: any;
   }
 }
-
 
 describe('Module exports sanity', () => {
   it('constants exports EVENT_NAMES', () => {

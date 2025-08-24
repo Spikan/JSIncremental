@@ -1,37 +1,38 @@
 // Enhanced test utilities for better testing experience
-import { screen, fireEvent, waitFor } from '@testing-library/dom'
-import userEvent from '@testing-library/user-event'
-import { vi, beforeEach, afterEach, afterAll } from 'vitest'
+import { screen, fireEvent, waitFor } from '@testing-library/dom';
+import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 
 // MSW setup (only if available)
-let server: any = null
+let server: any = null;
 
 try {
-  const msw = require('msw/node')
-  server = msw.setupServer()
-} catch (e) {
+  // Dynamic import for MSW
+  const msw = await import('msw/node');
+  server = msw.setupServer();
+} catch (_e) {
   // MSW not available, create mock server
   server = {
     listen: () => {},
     resetHandlers: () => {},
-    close: () => {}
-  }
+    close: () => {},
+  };
 }
 
 // MSW server for API mocking
-export { server }
+export { server };
 
 // Enhanced render function with common setup
 export function renderGame(ui: string | Element, options = {}) {
-  const container = document.createElement('div')
-  document.body.appendChild(container)
-  
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+
   if (typeof ui === 'string') {
-    container.innerHTML = ui
+    container.innerHTML = ui;
   } else {
-    container.appendChild(ui)
+    container.appendChild(ui);
   }
-  
+
   return {
     container,
     ...screen,
@@ -45,20 +46,21 @@ export function renderGame(ui: string | Element, options = {}) {
     // Helper to wait for element to appear
     waitForElement: (selector: string) => waitFor(() => screen.getByText(selector)),
     // Helper to wait for element to disappear
-    waitForElementToDisappear: (selector: string) => waitFor(() => {
-      if (screen.queryByText(selector)) {
-        throw new Error(`Element ${selector} still present`)
-      }
-    }),
+    waitForElementToDisappear: (selector: string) =>
+      waitFor(() => {
+        if (screen.queryByText(selector)) {
+          throw new Error(`Element ${selector} still present`);
+        }
+      }),
     // Helper to click element
     click: (element: Element) => fireEvent.click(element),
     // Helper to type text
     type: (element: Element, text: string) => fireEvent.input(element, { target: { value: text } }),
     // Helper to submit form
-    submit: (form: HTMLFormElement) => fireEvent.submit(form),
+    submit: (form: Element) => fireEvent.submit(form as HTMLFormElement),
     // Helper to change select value
     selectOption: (select: HTMLSelectElement, value: string) => {
-      fireEvent.change(select, { target: { value } })
+      fireEvent.change(select, { target: { value } });
     },
     // Helper to check checkbox
     check: (checkbox: HTMLInputElement) => fireEvent.click(checkbox),
@@ -86,10 +88,10 @@ export function renderGame(ui: string | Element, options = {}) {
     mouseLeave: (element: Element) => fireEvent.mouseLeave(element),
     // Helper to drag and drop
     dragAndDrop: (source: Element, target: Element) => {
-      fireEvent.dragStart(source)
-      fireEvent.drop(target)
-    }
-  }
+      fireEvent.dragStart(source);
+      fireEvent.drop(target);
+    },
+  };
 }
 
 // Mock game state for testing
@@ -129,10 +131,10 @@ export const mockGameState = {
     musicEnabled: true,
     musicStreamPreferences: {
       preferred: 'local',
-      fallbacks: ['local']
-    }
-  }
-}
+      fallbacks: ['local'],
+    },
+  },
+};
 
 // Mock game configuration
 export const mockGameConfig = {
@@ -144,8 +146,8 @@ export const mockGameConfig = {
   BASE_DRINK_RATE: 1000,
   CRITICAL_CLICK_BASE_CHANCE: 0.05,
   CRITICAL_CLICK_BASE_MULTIPLIER: 2.0,
-  SUCTION_CLICK_BASE_BONUS: 0.3
-}
+  SUCTION_CLICK_BASE_BONUS: 0.3,
+};
 
 // Mock upgrades data
 export const mockUpgrades = {
@@ -155,8 +157,8 @@ export const mockUpgrades = {
   betterCups: { baseCost: 200, scaling: 1.25, upgradeBaseCost: 200 },
   suction: { baseCost: 15, scaling: 1.1, upgradeBaseCost: 15 },
   fasterDrinks: { baseCost: 100, scaling: 1.3, upgradeBaseCost: 100 },
-  criticalClick: { baseCost: 75, scaling: 1.2, upgradeBaseCost: 75 }
-}
+  criticalClick: { baseCost: 75, scaling: 1.2, upgradeBaseCost: 75 },
+};
 
 // Mock unlocks data
 export const mockUnlocks = {
@@ -171,100 +173,119 @@ export const mockUnlocks = {
   shop: { sips: 0, clicks: 0 },
   stats: { sips: 0, clicks: 0 },
   god: { sips: 1000, clicks: 100 },
-  unlocks: { sips: 0, clicks: 0 }
-}
+  unlocks: { sips: 0, clicks: 0 },
+};
 
 // Helper to create mock DOM elements
-export function createMockElement(tag: string, attributes: Record<string, string> = {}): HTMLElement {
-  const element = document.createElement(tag)
+export function createMockElement(
+  tag: string,
+  attributes: Record<string, string> = {}
+): HTMLElement {
+  const element = document.createElement(tag);
   Object.entries(attributes).forEach(([key, value]) => {
-    element.setAttribute(key, value)
-  })
-  return element
+    element.setAttribute(key, value);
+  });
+  return element;
 }
 
 // Helper to create mock button
 export function createMockButton(text: string, action?: string): HTMLButtonElement {
-  const button = document.createElement('button')
-  button.textContent = text
+  const button = document.createElement('button');
+  button.textContent = text;
   if (action) {
-    button.setAttribute('data-action', action)
+    button.setAttribute('data-action', action);
   }
-  return button
+  return button;
 }
 
 // Helper to create mock input
 export function createMockInput(type: string, value: string = ''): HTMLInputElement {
-  const input = document.createElement('input')
-  input.type = type
-  input.value = value
-  return input
+  const input = document.createElement('input');
+  input.type = type;
+  input.value = value;
+  return input;
 }
 
 // Helper to create mock select
 export function createMockSelect(options: string[]): HTMLSelectElement {
-  const select = document.createElement('select')
+  const select = document.createElement('select');
   options.forEach(option => {
-    const optionElement = document.createElement('option')
-    optionElement.value = option
-    optionElement.textContent = option
-    select.appendChild(optionElement)
-  })
-  return select
+    const optionElement = document.createElement('option');
+    optionElement.value = option;
+    optionElement.textContent = option;
+    select.appendChild(optionElement);
+  });
+  return select;
 }
 
 // Helper to wait for async operations
 export function waitForAsync(ms: number = 100): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Helper to mock timers
 export function mockTimers() {
-  vi.useFakeTimers()
+  vi.useFakeTimers();
   return {
     advanceTimersByTime: (ms: number) => vi.advanceTimersByTime(ms),
     runOnlyPendingTimers: () => vi.runOnlyPendingTimers(),
     runAllTimers: () => vi.runAllTimers(),
-    restore: () => vi.useRealTimers()
-  }
+    restore: () => vi.useRealTimers(),
+  };
 }
 
 // Helper to mock localStorage
 export function mockLocalStorage() {
-  const store: Record<string, string> = {}
-  
+  const store: Record<string, string> = {};
+
   Object.defineProperty(window, 'localStorage', {
     value: {
       getItem: (key: string) => store[key] || null,
-      setItem: (key: string, value: string) => { store[key] = value },
-      removeItem: (key: string) => { delete store[key] },
-      clear: () => { Object.keys(store).forEach(key => delete store[key]) },
+      setItem: (key: string, value: string) => {
+        store[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete store[key];
+      },
+      clear: () => {
+        Object.keys(store).forEach(key => delete store[key]);
+      },
       key: (index: number) => Object.keys(store)[index] || null,
-      get length() { return Object.keys(store).length }
+      get length() {
+        return Object.keys(store).length;
+      },
     },
-    writable: true
-  })
-  
-  return store
+    writable: true,
+  });
+
+  return store;
 }
 
 // Helper to mock sessionStorage
 export function mockSessionStorage() {
-  const store: Record<string, string> = {}
-  
+  const store: Record<string, string> = {};
+
   Object.defineProperty(window, 'sessionStorage', {
     value: {
       getItem: (key: string) => store[key] || null,
-      setItem: (key: string, value: string) => { store[key] = value },
-      removeItem: (key: string) => { delete store[key] },
-      clear: () => { Object.keys(store).forEach(key => delete store[key]) },
+      setItem: (key: string, value: string) => {
+        store[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete store[key];
+      },
+      clear: () => {
+        Object.keys(store).forEach(key => delete store[key]);
+      },
       key: (index: number) => Object.keys(store)[index] || null,
-      get length() { return Object.keys(store).length }
+      get length() {
+        return Object.keys(store).length;
+      },
     },
-    writable: true
-  })
-  
-  return store
+    writable: true,
+  });
+
+  return store;
 }
 
 // Helper to mock fetch
@@ -273,59 +294,59 @@ export function mockFetch(response: any, status: number = 200) {
     ok: status >= 200 && status < 300,
     status,
     json: () => Promise.resolve(response),
-    text: () => Promise.resolve(JSON.stringify(response))
-  })
+    text: () => Promise.resolve(JSON.stringify(response)),
+  });
 }
 
 // Helper to mock console methods
 export function mockConsole() {
-  const originalConsole = { ...console }
+  const originalConsole = { ...console };
   const mockConsole = {
     log: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
     info: vi.fn(),
-    debug: vi.fn()
-  }
-  
-  Object.assign(console, mockConsole)
-  
+    debug: vi.fn(),
+  };
+
+  Object.assign(console, mockConsole);
+
   return {
     ...mockConsole,
-    restore: () => Object.assign(console, originalConsole)
-  }
+    restore: () => Object.assign(console, originalConsole),
+  };
 }
 
 // Helper to create test environment
 export function setupTestEnvironment() {
   // Mock DOM environment
-  document.body.innerHTML = ''
-  
+  document.body.innerHTML = '';
+
   // Mock localStorage
-  const localStorageMock = mockLocalStorage()
-  
+  const localStorageMock = mockLocalStorage();
+
   // Mock sessionStorage
-  const sessionStorageMock = mockSessionStorage()
-  
+  const sessionStorageMock = mockSessionStorage();
+
   // Mock console
-  const consoleMock = mockConsole()
-  
+  const consoleMock = mockConsole();
+
   // Mock timers
-  const timersMock = mockTimers()
-  
+  const timersMock = mockTimers();
+
   return {
     localStorageMock,
     sessionStorageMock,
     consoleMock,
     timersMock,
     cleanup: () => {
-      document.body.innerHTML = ''
-      consoleMock.restore()
-      timersMock.restore()
-    }
-  }
+      document.body.innerHTML = '';
+      consoleMock.restore();
+      timersMock.restore();
+    },
+  };
 }
 
 // Export everything for easy importing
-export * from '@testing-library/dom'
-export { userEvent } from '@testing-library/user-event'
+export * from '@testing-library/dom';
+export { userEvent } from '@testing-library/user-event';

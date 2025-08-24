@@ -41,10 +41,14 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
 
       try {
         w.App?.stateBridge?.setLastDrinkTime?.(nextLast);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to set last drink time via bridge:', error);
+      }
       try {
         w.App?.stateBridge?.setDrinkProgress?.(nextProgress);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to set drink progress via bridge:', error);
+      }
 
       try {
         const toNum = (v: any) =>
@@ -56,21 +60,31 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
           lastDrinkTime: nextLast,
           drinkProgress: nextProgress,
         });
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to update drink state:', error);
+      }
 
       try {
         w.App?.ui?.updateDrinkProgress?.(nextProgress, drinkRate);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to update drink progress UI:', error);
+      }
       // Update top counters immediately after awarding sips
       try {
         w.App?.ui?.updateTopSipsPerDrink?.();
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to update top sips per drink display:', error);
+      }
       try {
         w.App?.ui?.updateTopSipsPerSecond?.();
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to update top sips per second display:', error);
+      }
       try {
         w.App?.ui?.updateTopSipCounter?.();
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to update top sip counter display:', error);
+      }
       // Autosave handled by wall-clock timer below
       // Wall-clock autosave: also trigger by elapsed real time regardless of drink cadence
       try {
@@ -85,14 +99,22 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
           } else if (nowMs - last >= intervalMs) {
             try {
               w.App?.systems?.save?.performSaveSnapshot?.();
-            } catch {}
+            } catch (error) {
+              console.warn('Failed to perform autosave snapshot:', error);
+            }
             w.__lastAutosaveClockMs = nowMs;
           }
         }
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to handle wall-clock autosave:', error);
+      }
       try {
         w.App?.ui?.checkUpgradeAffordability?.();
-      } catch {}
-    } catch {}
+      } catch (error) {
+        console.warn('Failed to check upgrade affordability:', error);
+      }
+    } catch (error) {
+      console.warn('Failed to process drink:', error);
+    }
   };
 }

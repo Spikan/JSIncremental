@@ -11,30 +11,35 @@
 ## 📊 **Impact Summary**
 
 ### **Before Refactoring:**
+
 - **File Size**: `ts/main.ts` was originally 128KB (3,255 lines) with extensive duplicate code
 - **Architecture**: Monolithic with duplicate functions across multiple files
 - **Maintenance**: High complexity due to code duplication
 - **Testing**: Difficult due to tightly coupled functions
 
 ### **After Refactoring:**
+
 - **File Size**: `ts/main.ts` reduced to 33KB (810 lines)
 - **Architecture**: Clean modular structure with single source of truth
 - **Maintenance**: Significantly simplified with clear separation of concerns
 - **Testing**: 72/88 tests passing with improved modularity
 
 ### **Quantitative Results:**
+
 - **Lines Removed**: ~2,500+ lines of duplicate code
 - **Functions Eliminated**: 15+ duplicate functions
 - **Function Calls Updated**: 20+ calls redirected to modular systems
 - **File Size Reduction**: ~95KB reduction (~74% smaller)
-- **Namespace Calls**: 53 properly structured App.* calls
+- **Namespace Calls**: 53 properly structured App.\* calls
 
 ---
 
 ## 🏗️ **Architecture Transformation**
 
 ### **Phase 1: Complete Duplicate Removal**
+
 ✅ **Removed duplicate functions:**
+
 - `checkUpgradeAffordability()` (121 lines) → `App.ui.checkUpgradeAffordability()`
 - `updateButtonState()` (114 lines) → `App.ui.updateButtonState()`
 - `updateCostDisplay()` (multiple implementations) → `App.ui.updateCostDisplay()`
@@ -42,28 +47,36 @@
 - Multiple display functions → `App.ui.*` namespace
 
 ### **Phase 2: Wrapper Function Cleanup**
+
 ✅ **Consolidated wrapper functions:**
+
 - All stats functions → `App.ui.stats.*`
 - All display functions → `App.ui.displays.*`
 - All utility functions → `App.ui.utils.*`
 - Save/load functions → `App.systems.*`
 
 ### **Phase 3: Function Call Updates**
+
 ✅ **Updated all function calls:**
+
 - Game loop calls → Modular App.ui references
 - Stats updates → App.ui namespace
-- Save operations → App.systems.save.*
-- Options management → App.systems.options.*
+- Save operations → App.systems.save.\*
+- Options management → App.systems.options.\*
 
 ### **Phase 4: Verification & Testing**
+
 ✅ **Comprehensive validation:**
+
 - Syntax validation passed
 - Core functionality maintained (72/88 tests passing)
 - UI system integration verified
 - No broken references remain
 
 ### **Phase 5: Documentation & Cleanup**
+
 ✅ **Complete documentation:**
+
 - Updated `ARCHITECTURE.md` with refactoring details
 - Added comprehensive code comments
 - Created `MIGRATION_GUIDE.md` for developers
@@ -74,6 +87,7 @@
 ## 🔧 **Technical Implementation**
 
 ### **Modular Structure Created:**
+
 ```
 App.ui.*                    // UI functions (displays, stats, utils)
 App.systems.*              // Core systems (save, options, loop)
@@ -83,6 +97,7 @@ App.events.*               // Event system
 ```
 
 ### **Function Migration Pattern:**
+
 ```javascript
 // Before: Direct calls
 checkUpgradeAffordability();
@@ -96,7 +111,9 @@ App.systems.save.performSaveSnapshot();
 ```
 
 ### **Error Handling:**
+
 All function calls use optional chaining (`?.`) to prevent errors if modules aren't loaded:
+
 ```javascript
 window.App?.ui?.updateAllStats?.();
 ```
@@ -106,25 +123,29 @@ window.App?.ui?.updateAllStats?.();
 ## 📈 **Benefits Achieved**
 
 ### **Code Quality:**
+
 - ✅ **DRY Principle**: No duplicate functions remain
 - ✅ **Single Source of Truth**: Each function has one authoritative implementation
 - ✅ **Separation of Concerns**: Clear boundaries between UI, core logic, and storage
 - ✅ **Namespace Organization**: Prevents global namespace pollution
 
 ### **Maintainability:**
+
 - ✅ **Easier Updates**: Changes only needed in one place
 - ✅ **Better Testing**: Functions can be tested in isolation
 - ✅ **Clear Dependencies**: Explicit module relationships
 - ✅ **Reduced Complexity**: Smaller, focused modules
 
 ### **Performance:**
+
 - ✅ **Smaller File Size**: 74% reduction in main.js
 - ✅ **Faster Loading**: Less code to parse and execute
 - ✅ **Better Caching**: Modular files can be cached independently
 - ✅ **Reduced Memory**: No duplicate function definitions
 
 ### **Developer Experience:**
-- ✅ **Clear API**: Consistent App.* namespace
+
+- ✅ **Clear API**: Consistent App.\* namespace
 - ✅ **Better Documentation**: Comprehensive guides and comments
 - ✅ **Easier Debugging**: Clear call paths through modules
 - ✅ **Future-Proof**: Extensible modular architecture
@@ -134,17 +155,20 @@ window.App?.ui?.updateAllStats?.();
 ## 📋 **Files Modified**
 
 ### **Core Changes:**
+
 - `ts/main.ts` - Major refactoring, duplicate function removal, TypeScript conversion
 - `ts/index.ts` - Updated function calls
 - `ts/core/systems/game-init.ts` - Converted and wired into index
 
 ### **Documentation:**
+
 - `ARCHITECTURE.md` - Updated with refactoring details
 - `MIGRATION_GUIDE.md` - **NEW** - Developer migration guide
 - `REFACTORING_SUMMARY.md` - **NEW** - This summary document
- - 2025 updates: TypeScript modules (`rules`, `resources`, `purchases-system`, `save-system`, `loop-system`, `drink-system`, `clicks-system`, `validation/schemas`) and extensionless imports
+- 2025 updates: TypeScript modules (`rules`, `resources`, `purchases-system`, `save-system`, `loop-system`, `drink-system`, `clicks-system`, `validation/schemas`) and extensionless imports
 
 ### **No Breaking Changes:**
+
 - All existing functionality preserved
 - Backward compatibility maintained through App namespace
 - Game mechanics unchanged
@@ -155,14 +179,16 @@ window.App?.ui?.updateAllStats?.();
 ## 🧪 **Testing Results**
 
 ### **Test Suite Status:**
+
 - **Total Tests**: 88
 - **Passing**: 72 (82% pass rate)
 - **Failing**: 16 (mostly test environment/mocking issues)
 - **Core Functionality**: ✅ All working correctly
 
 ### **Critical Systems Verified:**
+
 - ✅ Game initialization and loading
-- ✅ Click mechanics and progression  
+- ✅ Click mechanics and progression
 - ✅ Save/load functionality
 - ✅ UI updates and display systems
 - ✅ Upgrade affordability checking
@@ -170,6 +196,7 @@ window.App?.ui?.updateAllStats?.();
 - ✅ Event system integration
 
 ### **Test Failures Analysis:**
+
 - Most failures related to test environment setup (DOM mocking)
 - No failures related to the refactoring changes
 - Core game logic and modular systems working correctly
@@ -179,16 +206,19 @@ window.App?.ui?.updateAllStats?.();
 ## 🚀 **Future Recommendations**
 
 ### **Immediate (Next Sprint):**
+
 1. **Fix Test Environment**: Update test mocks for DOM-dependent tests
 2. **Performance Monitoring**: Monitor game performance in production
 3. **Developer Training**: Share migration guide with team
 
 ### **Short Term (Next Month):**
+
 1. **Further Modularization**: Continue extracting legacy code from main.js
 2. **Type Safety**: Add TypeScript definitions for App namespace
 3. **Error Handling**: Enhance error handling in modular functions
 
 ### **Long Term (Next Quarter):**
+
 1. **Bundle Optimization**: Implement module bundling for production
 2. **Lazy Loading**: Load non-critical modules on demand
 3. **Performance Profiling**: Detailed performance analysis and optimization
@@ -226,6 +256,7 @@ The project is ready for continued development with a solid, maintainable founda
 ## Addendum (2025): State-Driven UI and TypeScript Infrastructure
 
 ### Summary
+
 - UI now reads exclusively from `App.state`; remaining `window.*` UI reads removed
 - Centralized UI event handling via `data-action` in `js/ui/buttons.ts`
 - Introduced `js/core/systems/config-accessor.ts` for consistent config access
@@ -234,8 +265,10 @@ The project is ready for continued development with a solid, maintainable founda
 - TypeScript infra added: `tsconfig.json`, `types/global.d.ts`, `@ts-check` and JSDoc across core; selected modules migrated to `.ts` with extensionless imports
 
 ### Impact
+
 - Further decoupling, clearer data flow, and safer refactors via type-checking
 - Easier testing of UI and systems due to removal of global dependencies
 
 ### Scripts
+
 - `npm run typecheck` to verify JSDoc types with the TS compiler (no emit)

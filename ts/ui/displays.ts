@@ -10,7 +10,9 @@ export function updateTopSipsPerDrink(): void {
       const sps = Number(state.sps || 0);
       topSipsPerDrinkElement.innerHTML = formatNumber(sps);
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update top sips per drink:', error);
+  }
 }
 
 export function updateTopSipsPerSecond(): void {
@@ -25,7 +27,9 @@ export function updateTopSipsPerSecond(): void {
       const sipsPerSecond = sipsPerDrink / drinkRateSeconds;
       topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update top sips per second:', error);
+  }
 }
 
 export function updateCriticalClickDisplay(): void {
@@ -37,7 +41,9 @@ export function updateCriticalClickDisplay(): void {
       if (!Number.isNaN(chance)) {
         criticalClickChanceCompact.textContent = `${(chance * 100).toFixed(1)}%`;
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update critical click display:', error);
+    }
   }
 }
 
@@ -57,7 +63,9 @@ export function updateDrinkSpeedDisplay(): void {
       const bonusPct = Math.max(0, (1 - currMs / baseMs) * 100);
       drinkSpeedBonusCompact.textContent = `${Math.round(bonusPct)}%`;
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update display:', error);
+  }
 }
 
 export function updateAutosaveStatus(): void {
@@ -78,16 +86,22 @@ export function updateAutosaveStatus(): void {
       if (checkbox) {
         try {
           checkbox.checked = !!opts.autosaveEnabled;
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to update display:', error);
+        }
       }
       if (select) {
         try {
           const val = String(opts.autosaveInterval ?? '10');
           if (select.value !== val) select.value = val;
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to update display:', error);
+        }
       }
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update display:', error);
+  }
 }
 
 export function updateDrinkProgress(progress?: number, drinkRate?: number): void {
@@ -100,7 +114,9 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
       if (currentProgress == null) currentProgress = Number(state.drinkProgress || 0);
       if (currentDrinkRate == null) currentDrinkRate = Number(state.drinkRate || 0);
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update display:', error);
+  }
   const progressFill =
     (window as any).DOM_CACHE?.progressFill || document.getElementById('drinkProgressFill');
   const countdown =
@@ -138,7 +154,9 @@ export function updateTopSipCounter(): void {
     try {
       const sipsNum = Number((window as any).App?.state?.getState?.()?.sips || 0);
       (topSipElement as HTMLElement).textContent = formatNumber(sipsNum);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update display:', error);
+    }
   }
 }
 
@@ -149,7 +167,9 @@ export function updateLevelNumber(): void {
     try {
       const level = Number((window as any).App?.state?.getState?.()?.level || 1);
       levelEl.innerHTML = String(level);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update display:', error);
+    }
   }
 }
 
@@ -161,7 +181,9 @@ export function updateLevelText(): void {
       const level = Number((window as any).App?.state?.getState?.()?.level || 1);
       const levelText = getLevelText(level);
       levelTextEl.innerHTML = levelText;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update display:', error);
+    }
   }
 }
 
@@ -174,7 +196,9 @@ export function updateDrinkRate(): void {
       const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
       drinkRateElement.textContent = `${drinkRateSeconds.toFixed(2)}s`;
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update display:', error);
+  }
 }
 
 export function updateCompactDrinkSpeedDisplays(): void {
@@ -193,7 +217,9 @@ export function updateCompactDrinkSpeedDisplays(): void {
       const bonusPct = Math.max(0, (1 - currMs / baseMs) * 100);
       drinkSpeedBonusCompact.textContent = `${Math.round(bonusPct)}%`;
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update display:', error);
+  }
   const compactDisplays = document.querySelectorAll('[id*="Compact"]');
   compactDisplays.forEach(display => {
     try {
@@ -202,7 +228,9 @@ export function updateCompactDrinkSpeedDisplays(): void {
         const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
         (display as HTMLElement).textContent = `${drinkRateSeconds.toFixed(2)}s`;
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update display:', error);
+    }
   });
 }
 
@@ -220,7 +248,7 @@ function getLevelText(level: number): string {
     'Ultimate Soda Master',
   ];
   const index = Math.min(Math.floor(level - 1), levelTexts.length - 1);
-  return levelTexts[index] || levelTexts[levelTexts.length - 1];
+  return levelTexts[index] || levelTexts[levelTexts.length - 1] || 'Unknown Level';
 }
 
 export { updateCostDisplay, updateButtonState };

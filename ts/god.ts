@@ -38,7 +38,11 @@ export async function loadWordBank(): Promise<string[] | null> {
       let url: { href: string };
       try {
         url = new URL('../word_bank.json', import.meta.url);
-      } catch {
+      } catch (error) {
+        console.warn(
+          'Failed to create URL from import.meta.url, falling back to base path:',
+          error
+        );
         const base = (typeof window !== 'undefined' && (window as any).__BASE_PATH__) || '';
         url = { href: base ? `${base}word_bank.json` : 'word_bank.json' };
       }
@@ -64,7 +68,7 @@ function getRandomBibleWord(): string {
     return 'word';
   }
   const randomIndex = lcgRandomInt(0, bibleWordBank.length - 1);
-  return bibleWordBank[randomIndex];
+  return bibleWordBank[randomIndex] || 'word';
 }
 
 export function isWordBankReady(): boolean {
@@ -131,7 +135,7 @@ function escapeHtml(text: string): string {
   return div.innerHTML;
 }
 
-export async function getGodResponse(userMessage: string): Promise<void> {
+export function getGodResponse(userMessage: string): void {
   try {
     if (userMessage.toLowerCase().includes('geodude')) {
       triggerGeodudeVideo();
@@ -149,7 +153,9 @@ export async function getGodResponse(userMessage: string): Promise<void> {
       'The holy servers are overloaded. Please wait and try again!',
       'My sacred connection is acting up. Give it a moment and try again!',
     ];
-    const randomError = errorMessages[lcgRandomInt(0, errorMessages.length - 1)];
+    const randomError =
+      errorMessages[lcgRandomInt(0, errorMessages.length - 1)] ||
+      'The divine connection is experiencing technical difficulties. Please try again later!';
     addGodMessage(randomError);
   }
 }
@@ -159,7 +165,10 @@ export function triggerGeodudeVideo(): void {
     'https://www.youtube.com/embed/Mhvl7X_as8I?autoplay=1&mute=0',
     'https://www.youtube.com/embed/ok7fOwdk2gc?autoplay=1&mute=0',
   ];
-  const randomVideo = geodudeVideos[lcgRandomInt(0, geodudeVideos.length - 1)];
+  const randomVideo =
+    geodudeVideos[lcgRandomInt(0, geodudeVideos.length - 1)] ||
+    geodudeVideos[0] ||
+    'https://www.youtube.com/embed/Mhvl7X_as8I?autoplay=1&mute=0';
   let videoModal = document.getElementById('geodudeVideoModal') as HTMLElement | null;
   if (!videoModal) {
     videoModal = document.createElement('div');
@@ -235,7 +244,9 @@ try {
     if (chatInput) chatInput.value = '';
     try {
       (window as any).getGodResponse?.(message);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to handle god response:', error);
+    }
   };
   (window as any).addUserMessage = function addUserMessage(message: string): void {
     const chatMessages = document.getElementById('chatMessages');
@@ -252,9 +263,13 @@ try {
     chatMessages.appendChild(messageDiv);
     try {
       (window as any).scrollToBottom?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to handle god response:', error);
+    }
   };
-} catch {}
+} catch (error) {
+  console.warn('Failed to initialize god chat system:', error);
+}
 
 // Initialize word bank on module load
 loadWordBank();

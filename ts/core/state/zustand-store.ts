@@ -8,69 +8,69 @@ interface GameStore extends GameState {
   // Actions
   actions: {
     // Resource management
-    addSips: (amount: number) => void;
-    setSips: (amount: number) => void;
-    addStraws: (amount: number) => void;
-    setStraws: (amount: number) => void;
-    addCups: (amount: number) => void;
-    setCups: (amount: number) => void;
-    addSuctions: (amount: number) => void;
-    setSuctions: (amount: number) => void;
+    addSips: (_amount: number) => void;
+    setSips: (_amount: number) => void;
+    addStraws: (_amount: number) => void;
+    setStraws: (_amount: number) => void;
+    addCups: (_amount: number) => void;
+    setCups: (_amount: number) => void;
+    addSuctions: (_amount: number) => void;
+    setSuctions: (_amount: number) => void;
 
     // Upgrade management
-    addWiderStraws: (amount: number) => void;
-    setWiderStraws: (amount: number) => void;
-    addBetterCups: (amount: number) => void;
-    setBetterCups: (amount: number) => void;
-    addFasterDrinks: (amount: number) => void;
-    setFasterDrinks: (amount: number) => void;
-    addCriticalClicks: (amount: number) => void;
-    setCriticalClicks: (amount: number) => void;
+    addWiderStraws: (_amount: number) => void;
+    setWiderStraws: (_amount: number) => void;
+    addBetterCups: (_amount: number) => void;
+    setBetterCups: (_amount: number) => void;
+    addFasterDrinks: (_amount: number) => void;
+    setFasterDrinks: (_amount: number) => void;
+    addCriticalClicks: (_amount: number) => void;
+    setCriticalClicks: (_amount: number) => void;
 
     // Production stats
-    setStrawSPD: (spd: number) => void;
-    setCupSPD: (spd: number) => void;
-    setSPS: (sps: number) => void;
+    setStrawSPD: (_spd: number) => void;
+    setCupSPD: (_spd: number) => void;
+    setSPS: (_sps: number) => void;
 
     // Drink system
-    setDrinkRate: (rate: number) => void;
-    setDrinkProgress: (progress: number) => void;
-    setLastDrinkTime: (time: number) => void;
+    setDrinkRate: (_rate: number) => void;
+    setDrinkProgress: (_progress: number) => void;
+    setLastDrinkTime: (_time: number) => void;
 
     // Session and persistence
-    setLastSaveTime: (time: number) => void;
-    setSessionStartTime: (time: number) => void;
-    addTotalPlayTime: (time: number) => void;
-    setTotalPlayTime: (time: number) => void;
-    addTotalSipsEarned: (amount: number) => void;
-    setTotalSipsEarned: (amount: number) => void;
-    addTotalClicks: (amount: number) => void;
-    setTotalClicks: (amount: number) => void;
-    setHighestSipsPerSecond: (sps: number) => void;
-    setCurrentClickStreak: (streak: number) => void;
-    setBestClickStreak: (streak: number) => void;
+    setLastSaveTime: (_time: number) => void;
+    setSessionStartTime: (_time: number) => void;
+    addTotalPlayTime: (_time: number) => void;
+    setTotalPlayTime: (_time: number) => void;
+    addTotalSipsEarned: (_amount: number) => void;
+    setTotalSipsEarned: (_amount: number) => void;
+    addTotalClicks: (_amount: number) => void;
+    setTotalClicks: (_amount: number) => void;
+    setHighestSipsPerSecond: (_sps: number) => void;
+    setCurrentClickStreak: (_streak: number) => void;
+    setBestClickStreak: (_streak: number) => void;
 
     // Click/crit systems
-    setCriticalClickChance: (chance: number) => void;
-    setCriticalClickMultiplier: (multiplier: number) => void;
-    setSuctionClickBonus: (bonus: number) => void;
+    setCriticalClickChance: (_chance: number) => void;
+    setCriticalClickMultiplier: (_multiplier: number) => void;
+    setSuctionClickBonus: (_bonus: number) => void;
 
     // Upgrade counters
-    setFasterDrinksUpCounter: (count: number) => void;
-    setCriticalClickUpCounter: (count: number) => void;
+    setFasterDrinksUpCounter: (_count: number) => void;
+    setCriticalClickUpCounter: (_count: number) => void;
 
     // Level management
-    setLevel: (level: number) => void;
-    addLevel: (amount: number) => void;
+    setLevel: (_level: number) => void;
+    addLevel: (_amount: number) => void;
 
     // Options management
-    updateOptions: (options: Partial<GameOptions>) => void;
-    setOption: <K extends keyof GameOptions>(key: K, value: GameOptions[K]) => void;
+    updateOptions: (_options: Partial<GameOptions>) => void;
+    setOption: <K extends keyof GameOptions>(_key: K, _value: GameOptions[K]) => void;
 
     // Bulk operations
-    setState: (partial: Partial<GameState>) => void;
+    setState: (_partial: Partial<GameState>) => void;
     resetState: () => void;
-    loadState: (state: Partial<GameState>) => void;
+    loadState: (_state: Partial<GameState>) => void;
   };
 }
 
@@ -190,32 +190,33 @@ export const useGameStore = create<GameStore>()(
             })),
 
           // Click/crit systems
-          setCriticalClickChance: chance => set({ criticalClickChance: chance }),
-          setCriticalClickMultiplier: multiplier => set({ criticalClickMultiplier: multiplier }),
-          setSuctionClickBonus: bonus => set({ suctionClickBonus: bonus }),
+          setCriticalClickChance: (_chance: number) => set({ criticalClickChance: _chance }),
+          setCriticalClickMultiplier: (_multiplier: number) =>
+            set({ criticalClickMultiplier: _multiplier }),
+          setSuctionClickBonus: (_bonus: number) => set({ suctionClickBonus: _bonus }),
 
           // Upgrade counters
-          setFasterDrinksUpCounter: count => set({ fasterDrinksUpCounter: count }),
-          setCriticalClickUpCounter: count => set({ criticalClickUpCounter: count }),
+          setFasterDrinksUpCounter: (_count: number) => set({ fasterDrinksUpCounter: _count }),
+          setCriticalClickUpCounter: (_count: number) => set({ criticalClickUpCounter: _count }),
 
           // Level management
-          setLevel: level => set({ level }),
-          addLevel: amount => set(state => ({ level: state.level + amount })),
+          setLevel: (_level: number) => set({ level: _level }),
+          addLevel: (_amount: number) => set(state => ({ level: state.level + _amount })),
 
           // Options management
-          updateOptions: options =>
+          updateOptions: (_options: Partial<GameOptions>) =>
             set(state => ({
-              options: { ...state.options, ...options },
+              options: { ...state.options, ..._options },
             })),
-          setOption: (key, value) =>
+          setOption: (_key: keyof GameOptions, _value: any) =>
             set(state => ({
-              options: { ...state.options, [key]: value },
+              options: { ...state.options, [_key]: _value },
             })),
 
           // Bulk operations
-          setState: partial => set(state => ({ ...state, ...partial })),
+          setState: (_partial: Partial<GameState>) => set(state => ({ ...state, ..._partial })),
           resetState: () => set(defaultState),
-          loadState: state => set(current => ({ ...current, ...state })),
+          loadState: (_state: Partial<GameState>) => set(current => ({ ...current, ..._state })),
         },
       })),
       {
@@ -279,4 +280,6 @@ export const storeActions = useGameStore.getState().actions;
 try {
   (window as any).useGameStore = useGameStore;
   (window as any).gameStore = gameStore;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose Zustand store globally:', error);
+}

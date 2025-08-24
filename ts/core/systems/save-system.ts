@@ -4,7 +4,7 @@ type QueueArgs = {
   now: number;
   lastOp: number;
   minIntervalMs: number;
-  schedule: (ms: number) => void;
+  schedule: (_ms: number) => void;
   perform: () => void;
 };
 
@@ -52,7 +52,9 @@ export function performSaveSnapshot(): any {
     w.App?.storage?.saveGame?.(payload);
     try {
       w.App?.state?.setState?.({ lastSaveTime: payload.lastSaveTime });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update last save time in state:', error);
+    }
     w.App?.events?.emit?.(w.App?.EVENT_NAMES?.GAME?.SAVED, payload);
     return payload;
   } catch (e) {
@@ -66,7 +68,9 @@ export function deleteSave() {
     (window as any).App?.storage?.deleteSave?.();
     try {
       (window as any).App?.systems?.unlocks?.reset?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to reset unlocks after save deletion:', error);
+    }
     (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.GAME?.DELETED, {});
     return true;
   } catch (e) {

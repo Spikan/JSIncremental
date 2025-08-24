@@ -6,8 +6,8 @@ import { useGameStore } from './zustand-store';
 // Legacy store interface compatibility
 export interface LegacyStore<T extends object> {
   getState: () => T;
-  setState: (partial: Partial<T>) => void;
-  subscribe: (listener: (state: T) => void) => () => void;
+  setState: (_partial: Partial<T>) => void;
+  subscribe: (_listener: (_state: T) => void) => () => void;
 }
 
 // Create a legacy-compatible wrapper around Zustand store
@@ -20,16 +20,16 @@ export function createLegacyStore<T extends object>(initialState: T): LegacyStor
 
   return {
     getState: () => useGameStore.getState() as T,
-    setState: (partial: Partial<T>) => {
+    setState: (_partial: Partial<T>) => {
       const currentStore = useGameStore.getState();
       if (currentStore.actions && currentStore.actions.setState) {
-        currentStore.actions.setState(partial as any);
+        currentStore.actions.setState(_partial as any);
       }
     },
-    subscribe: (listener: (state: T) => void) => {
+    subscribe: (_listener: (_state: T) => void) => {
       // Subscribe to Zustand store changes
-      const unsubscribe = useGameStore.subscribe(state => {
-        listener(state as T);
+      const unsubscribe = useGameStore.subscribe(_state => {
+        _listener(_state as T);
       });
 
       // Return unsubscribe function
@@ -43,11 +43,11 @@ export const appStore = createLegacyStore<any>({ version: 1 });
 
 // Legacy selectors for backward compatibility
 export const selectors = {
-  sips: (s: any) => s.sips,
-  level: (s: any) => s.level,
-  drinkProgress: (s: any) => s.drinkProgress,
-  drinkRate: (s: any) => s.drinkRate,
-  options: (s: any) => s.options || {},
+  sips: (_s: any) => _s.sips,
+  level: (_s: any) => _s.level,
+  drinkProgress: (_s: any) => _s.drinkProgress,
+  drinkRate: (_s: any) => _s.drinkRate,
+  options: (_s: any) => _s.options || {},
 };
 
 // Migration helper functions
@@ -88,4 +88,6 @@ try {
   (window as any).migrateToZustand = migrateToZustand;
   (window as any).getZustandStore = getZustandStore;
   (window as any).getZustandActions = getZustandActions;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose Zustand bridge functions globally:', error);
+}

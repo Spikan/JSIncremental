@@ -24,7 +24,9 @@ export function updatePlayTime(): void {
         playTimeElement.textContent = `${seconds}s`;
       }
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update stats display:', error);
+  }
 }
 
 // Update last save time display
@@ -48,7 +50,9 @@ export function updateLastSaveTime(): void {
         lastSaveElement.textContent = `${hours}h ago`;
       }
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update stats display:', error);
+  }
 }
 
 // Update all statistics (main coordinator function)

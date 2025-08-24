@@ -7,58 +7,58 @@ describe('Game Core - Main Game Logic', () => {
   let mockApp: any;
   let mockGameConfig: any;
   let mockDecimal: any;
-  
+
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
-    
+
     // Mock Decimal library
     mockDecimal = class Decimal {
       value: number;
-      
+
       constructor(value: number) {
         this.value = value;
       }
-      
+
       plus(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value + otherValue);
       }
-      
+
       minus(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value - otherValue);
       }
-      
+
       times(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value * otherValue);
       }
-      
+
       div(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value / otherValue);
       }
-      
+
       gte(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return this.value >= otherValue;
       }
-      
+
       lte(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return this.value <= otherValue;
       }
-      
+
       toNumber() {
         return this.value;
       }
-      
+
       toString() {
         return this.value.toString();
       }
     };
-    
+
     // Mock game configuration
     mockGameConfig = {
       BALANCE: {
@@ -78,20 +78,20 @@ describe('Game Core - Main Game Logic', () => {
         BETTER_CUPS_BASE_COST: 2500,
         BETTER_CUPS_SCALING: 1.45,
         LEVEL_UP_BASE_COST: 10000,
-        LEVEL_UP_SCALING: 1.5
+        LEVEL_UP_SCALING: 1.5,
       },
       TIMING: {
         CLICK_STREAK_WINDOW: 1000,
-        DOM_READY_DELAY: 100
+        DOM_READY_DELAY: 100,
       },
       LIMITS: {
         TARGET_FPS: 60,
         STATS_UPDATE_INTERVAL: 1000,
         AFFORDABILITY_CHECK_INTERVAL: 500,
-        MAX_CLICK_TIMES: 100
-      }
+        MAX_CLICK_TIMES: 100,
+      },
     };
-    
+
     // Mock App object
     mockApp = {
       ui: {
@@ -103,54 +103,54 @@ describe('Game Core - Main Game Logic', () => {
         updateTopSipsPerDrink: vi.fn(),
         updateTopSipsPerSecond: vi.fn(),
         updateClickStats: vi.fn(),
-        updateAutosaveStatus: vi.fn()
+        updateAutosaveStatus: vi.fn(),
       },
       systems: {
         loop: {
-          start: vi.fn()
+          start: vi.fn(),
         },
         save: {
-          performSaveSnapshot: vi.fn()
+          performSaveSnapshot: vi.fn(),
         },
         options: {
           saveOptions: vi.fn(),
-          loadOptions: vi.fn()
+          loadOptions: vi.fn(),
         },
         autosave: {
-          computeAutosaveCounter: vi.fn(() => ({ nextCounter: 1, shouldSave: false }))
+          computeAutosaveCounter: vi.fn(() => ({ nextCounter: 1, shouldSave: false })),
         },
         audio: {
           button: {
             initButtonAudioSystem: vi.fn(),
             updateButtonSoundsToggleButton: vi.fn(),
-            playButtonClickSound: vi.fn()
-          }
-        }
+            playButtonClickSound: vi.fn(),
+          },
+        },
       },
       storage: {
         loadGame: vi.fn(() => null),
         saveGame: vi.fn(),
         setBoolean: vi.fn(),
-        getBoolean: vi.fn(() => true)
+        getBoolean: vi.fn(() => true),
       },
       events: {
-        emit: vi.fn()
+        emit: vi.fn(),
       },
       stateBridge: {
         setLevel: vi.fn(),
         setLastDrinkTime: vi.fn(),
         setDrinkProgress: vi.fn(),
-        setDrinkRate: vi.fn()
+        setDrinkRate: vi.fn(),
       },
       data: {
         upgrades: {
           straws: { baseCost: 10, scaling: 1.15 },
           cups: { baseCost: 50, scaling: 1.2 },
-          fasterDrinks: { baseCost: 200, scaling: 1.3 }
-        }
-      }
+          fasterDrinks: { baseCost: 200, scaling: 1.3 },
+        },
+      },
     };
-    
+
     // Setup global mocks
     (global as any).window = {
       ...(global as any).window,
@@ -185,9 +185,8 @@ describe('Game Core - Main Game Logic', () => {
       sps: new mockDecimal(0),
       currentClickStreak: 0,
       bestClickStreak: 0,
-      lastClickTime: 0
     };
-    
+
     // Mock DOM elements
     document.body.innerHTML = `
       <div id="splashScreen" style="display: block;">
@@ -210,7 +209,7 @@ describe('Game Core - Main Game Logic', () => {
       </div>
     `;
   });
-  
+
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -236,9 +235,9 @@ describe('Game Core - Main Game Logic', () => {
         totalClicks: 150,
         gameStartDate: Date.now() - 86400000, // 1 day ago
         lastClickTime: Date.now() - 5000,
-        clickTimes: [Date.now() - 1000, Date.now() - 500]
+        clickTimes: [Date.now() - 1000, Date.now() - 500],
       });
-      
+
       // Call initGame (we'll need to import it or mock it)
       expect((window as any).sips.value).toBe(0); // Initial state
       expect((window as any).straws.value).toBe(0);
@@ -247,7 +246,7 @@ describe('Game Core - Main Game Logic', () => {
 
     it('should handle missing save data gracefully', () => {
       mockApp.storage.loadGame.mockReturnValue(null);
-      
+
       // Should initialize with default values
       expect((window as any).sips.value).toBe(0);
       expect((window as any).straws.value).toBe(0);
@@ -259,7 +258,7 @@ describe('Game Core - Main Game Logic', () => {
       mockApp.storage.loadGame.mockImplementation(() => {
         throw new Error('Corrupted save data');
       });
-      
+
       // Should not crash and use defaults
       expect((window as any).sips.value).toBe(0);
       expect((window as any).straws.value).toBe(0);
@@ -286,10 +285,10 @@ describe('Game Core - Main Game Logic', () => {
     it('should process drinks at correct intervals', () => {
       const initialSips = (window as any).sips.value;
       const initialTime = (window as any).lastDrinkTime;
-      
+
       // Mock time progression
       // testUtils.mockTime(initialTime + 1000); // 1 second later
-      
+
       // Process drink should add base sips
       const baseSipsPerDrink = mockGameConfig.BALANCE.BASE_SIPS_PER_DRINK;
       expect(baseSipsPerDrink).toBe(1);
@@ -307,12 +306,12 @@ describe('Game Core - Main Game Logic', () => {
       // Temporarily remove a UI function
       const originalFunction = mockApp.ui.updateAllStats;
       delete mockApp.ui.updateAllStats;
-      
+
       // Should not crash
       expect(() => {
         (window as any).App?.ui?.updateAllStats?.();
       }).not.toThrow();
-      
+
       // Restore
       mockApp.ui.updateAllStats = originalFunction;
     });
@@ -321,14 +320,14 @@ describe('Game Core - Main Game Logic', () => {
   describe('Performance and Memory', () => {
     it('should not create excessive DOM elements', () => {
       const initialElementCount = document.body.children.length;
-      
+
       // Simulate some operations
       for (let i = 0; i < 10; i++) {
         const div = document.createElement('div');
         div.textContent = `Test element ${i}`;
         document.body.appendChild(div);
       }
-      
+
       // Clean up
       const testElements = document.querySelectorAll('div');
       testElements.forEach(el => {
@@ -336,22 +335,22 @@ describe('Game Core - Main Game Logic', () => {
           el.remove();
         }
       });
-      
+
       // Should have cleaned up most test elements
       expect(document.body.children.length).toBeLessThanOrEqual(initialElementCount + 2);
     });
 
     it('should handle rapid function calls efficiently', () => {
       const startTime = performance.now();
-      
+
       // Simulate rapid UI updates
       for (let i = 0; i < 100; i++) {
         mockApp.ui.updateAllStats();
       }
-      
+
       const endTime = performance.now();
       const duration = endTime - startTime;
-      
+
       // Should complete within reasonable time (less than 100ms)
       expect(duration).toBeLessThan(100);
       expect(mockApp.ui.updateAllStats).toHaveBeenCalledTimes(100);
@@ -363,7 +362,7 @@ describe('Game Core - Main Game Logic', () => {
       expect(mockGameConfig.BALANCE).toBeDefined();
       expect(mockGameConfig.TIMING).toBeDefined();
       expect(mockGameConfig.LIMITS).toBeDefined();
-      
+
       // Check balance values are positive
       Object.values(mockGameConfig.BALANCE).forEach((value: any) => {
         if (typeof value === 'number') {
@@ -399,12 +398,12 @@ describe('Game Core - Main Game Logic', () => {
         sips: (window as any).sips.value,
         straws: (window as any).straws.value,
         cups: (window as any).cups.value,
-        level: (window as any).level.value
+        level: (window as any).level.value,
       };
-      
+
       // Simulate some operations
       (window as any).sips = new mockDecimal(initialState.sips + 10);
-      
+
       expect((window as any).sips.value).toBe(initialState.sips + 10);
       expect((window as any).straws.value).toBe(initialState.straws);
       expect((window as any).cups.value).toBe(initialState.cups);

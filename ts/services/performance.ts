@@ -281,6 +281,6 @@ class PerformanceMonitor {
 export const performanceMonitor = new PerformanceMonitor();
 
 // Export for legacy window access
-try {
+if (typeof window !== 'undefined') {
   (window as any).performanceMonitor = performanceMonitor;
-} catch {}
+}

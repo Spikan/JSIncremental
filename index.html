@@ -1,750 +1,789 @@
 <!doctype html>
 
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Soda Clicker Pro</title>
-    <meta name="description" content="Soda Clicker Pro">
-    <meta name="author" content="Spikan">
-    <link rel="stylesheet" type="text/css" href="css/style.css"/>
-    <link rel="icon" type="image/png" href="images/regSoda.png">
-    
+    <meta name="description" content="Soda Clicker Pro" />
+    <meta name="author" content="Spikan" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="icon" type="image/png" href="images/regSoda.png" />
+
     <!-- Eruda Mobile Debug Tool -->
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
     <script>
-        // Safety check to ensure functions are available - moved to after main.js loads
-        window.addEventListener('load', function() {
-            // Wait for modules to load and APIs to be available
-            function checkFunctionsLoaded() {
-                var hasSwitchTab = !!(window.App && window.App.ui && typeof window.App.ui.switchTab === 'function');
-                if (!hasSwitchTab) {
-                    console.log('⏳ Waiting for App.ui.switchTab...');
-                    setTimeout(checkFunctionsLoaded, 200);
-                    return;
-                }
-                console.log('✅ App.ui.switchTab is available');
-            }
-
-            // Start checking after a brief initial delay
-            setTimeout(checkFunctionsLoaded, 1000);
-        });
+      eruda.init();
     </script>
-</head>
+    <script>
+      // Safety check to ensure functions are available - moved to after main.js loads
+      window.addEventListener('load', function () {
+        // Wait for modules to load and APIs to be available
+        function checkFunctionsLoaded() {
+          var hasSwitchTab = !!(
+            window.App &&
+            window.App.ui &&
+            typeof window.App.ui.switchTab === 'function'
+          );
+          if (!hasSwitchTab) {
+            console.log('⏳ Waiting for App.ui.switchTab...');
+            setTimeout(checkFunctionsLoaded, 200);
+            return;
+          }
+          console.log('✅ App.ui.switchTab is available');
+        }
 
-<body>
+        // Start checking after a brief initial delay
+        setTimeout(checkFunctionsLoaded, 1000);
+      });
+    </script>
+  </head>
 
-<!-- Splash Screen -->
-<div id="splashScreen" class="splash-overlay">
-    <div class="splash-content">
+  <body>
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-overlay">
+      <div class="splash-content">
         <div class="splash-title">
-            <h1 class="splash-main-title">SODA CLICKER</h1>
-            <h2 class="splash-subtitle">PRO</h2>
+          <h1 class="splash-main-title">SODA CLICKER</h1>
+          <h2 class="splash-subtitle">PRO</h2>
         </div>
         <div class="splash-subtitle-text">
-            <p>THE ULTIMATE SODA DRINKING EXPERIENCE</p>
+          <p>THE ULTIMATE SODA DRINKING EXPERIENCE</p>
         </div>
         <div class="splash-instruction">
-            <p>CLICK TO START</p>
+          <p>CLICK TO START</p>
         </div>
         <div class="splash-warning">
-            ⚠️ This game is under active development. Things WILL stop working randomly.
+          ⚠️ This game is under active development. Things WILL stop working randomly.
         </div>
         <div class="splash-buttons">
-            <button class="splash-start-btn" data-action="startGame">START</button>
+          <button class="splash-start-btn" data-action="startGame">START</button>
         </div>
         <div class="splash-version">
-            <p>v1.0 - Inspired by Soda Drinker Pro</p>
+          <p>v1.0 - Inspired by Soda Drinker Pro</p>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- Main Game Content -->
-<div id="gameContent" class="game-content" style="display: none;">
-
-<div id="topDiv" class="center">
-    <div id="levelDiv">
-        <h2>
-            Level <span id="levelNumber">1</span>
-        </h2>
-        <h3>
+    <!-- Main Game Content -->
+    <div id="gameContent" class="game-content" style="display: none">
+      <div id="topDiv" class="center">
+        <div id="levelDiv">
+          <h2>Level <span id="levelNumber">1</span></h2>
+          <h3>
             Clicking Soda
-            <br/>
+            <br />
             <span id="levelText">On a Blue Background</span>
-        </h3>
-    </div>
-    <div id="topSipCounter" class="top-sip-counter">
-        <span class="top-sip-label">Total Sips:</span>
-        <span id="topSipValue" class="top-sip-value">0</span>
-        <span class="top-sip-separator">|</span>
-        <span class="top-sip-label">per drink:</span>
-        <span id="topSipsPerDrink" class="top-sip-value">1</span>
-        <span class="top-sip-separator">|</span>
-        <span class="top-sip-label">per second:</span>
-        <span id="topSipsPerSecond" class="top-sip-value">1</span>
-    </div>
-    <h1>
-        Soda Clicker
-        <br/>
-        PRO!
-    </h1>
-</div>
+          </h3>
+        </div>
+        <div id="topSipCounter" class="top-sip-counter">
+          <span class="top-sip-label">Total Sips:</span>
+          <span id="topSipValue" class="top-sip-value">0</span>
+          <span class="top-sip-separator">|</span>
+          <span class="top-sip-label">per drink:</span>
+          <span id="topSipsPerDrink" class="top-sip-value">1</span>
+          <span class="top-sip-separator">|</span>
+          <span class="top-sip-label">per second:</span>
+          <span id="topSipsPerSecond" class="top-sip-value">1</span>
+        </div>
+        <h1>
+          Soda Clicker
+          <br />
+          PRO!
+        </h1>
+      </div>
 
-<!-- Tab Navigation -->
-<div class="tab-navigation">
-            <button class="tab-btn active" data-action="switchTab:soda">🥤 Soda Clicking</button>
-    <button class="tab-btn" data-action="switchTab:unlocks">🔓 Unlocks</button>
-    <button class="tab-btn" data-action="switchTab:shop">🛒 Shop & Upgrades</button>
-    <button class="tab-btn" data-action="switchTab:stats">📊 Statistics</button>
-            <button class="tab-btn" data-action="switchTab:god">🙏 Talk to God</button>
-    <button class="tab-btn" data-action="switchTab:options">⚙️ Options</button>
-    <button class="tab-btn" data-action="switchTab:dev">🔧 Dev Tools</button>
-</div>
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button class="tab-btn active" data-action="switchTab:soda">🥤 Soda Clicking</button>
+        <button class="tab-btn" data-action="switchTab:unlocks">🔓 Unlocks</button>
+        <button class="tab-btn" data-action="switchTab:shop">🛒 Shop & Upgrades</button>
+        <button class="tab-btn" data-action="switchTab:stats">📊 Statistics</button>
+        <button class="tab-btn" data-action="switchTab:god">🙏 Talk to God</button>
+        <button class="tab-btn" data-action="switchTab:options">⚙️ Options</button>
+        <button class="tab-btn" data-action="switchTab:dev">🔧 Dev Tools</button>
+      </div>
 
-    <!-- Drink Progress Bar - Moved to Header -->
-    <div class="drink-progress-container">
+      <!-- Drink Progress Bar - Moved to Header -->
+      <div class="drink-progress-container">
         <div class="drink-info">
-            <span class="drink-label">Next Drink:</span>
-            <span class="drink-countdown" id="drinkCountdown">5.0s</span>
+          <span class="drink-label">Next Drink:</span>
+          <span class="drink-countdown" id="drinkCountdown">5.0s</span>
         </div>
         <div class="drink-progress-bar">
-            <div class="drink-progress-fill" id="drinkProgressFill"></div>
+          <div class="drink-progress-fill" id="drinkProgressFill"></div>
         </div>
         <!-- Drink Speed Upgrade Button - Compact layout below progress bar -->
         <div class="drink-speed-upgrade-container">
-            <button class="drink-speed-upgrade-btn" data-action="buyFasterDrinks">
-                <div class="drink-speed-upgrade-icon">⚡</div>
-                <div class="drink-speed-upgrade-info">
-                    <div class="drink-speed-upgrade-name">Faster Drinks</div>
-                    <div class="drink-speed-upgrade-cost"><span id="fasterDrinksCostCompact">80</span> Sips</div>
-                </div>
-            </button>
-            <div class="drink-speed-upgrade-stats">
-                <span class="drink-speed-stat">Speed: <span id="currentDrinkSpeedCompact">5.00s</span></span>
-                <span class="drink-speed-stat">Bonus: <span id="drinkSpeedBonusCompact">0%</span></span>
+          <button class="drink-speed-upgrade-btn" data-action="buyFasterDrinks">
+            <div class="drink-speed-upgrade-icon">⚡</div>
+            <div class="drink-speed-upgrade-info">
+              <div class="drink-speed-upgrade-name">Faster Drinks</div>
+              <div class="drink-speed-upgrade-cost">
+                <span id="fasterDrinksCostCompact">80</span> Sips
+              </div>
             </div>
-            <button class="drink-speed-upgrade-btn upgrade" data-action="upgradeFasterDrinks">
-                <div class="drink-speed-upgrade-icon">🔧</div>
-                <div class="drink-speed-upgrade-info">
-                    <div class="drink-speed-upgrade-name">Upgrade Faster Drinks</div>
-                    <div class="drink-speed-upgrade-cost"><span id="fasterDrinksUpCostCompact">1500</span> Sips</div>
-                </div>
-            </button>
+          </button>
+          <div class="drink-speed-upgrade-stats">
+            <span class="drink-speed-stat"
+              >Speed: <span id="currentDrinkSpeedCompact">5.00s</span></span
+            >
+            <span class="drink-speed-stat">Bonus: <span id="drinkSpeedBonusCompact">0%</span></span>
+          </div>
+          <button class="drink-speed-upgrade-btn upgrade" data-action="upgradeFasterDrinks">
+            <div class="drink-speed-upgrade-icon">🔧</div>
+            <div class="drink-speed-upgrade-info">
+              <div class="drink-speed-upgrade-name">Upgrade Faster Drinks</div>
+              <div class="drink-speed-upgrade-cost">
+                <span id="fasterDrinksUpCostCompact">1500</span> Sips
+              </div>
+            </div>
+          </button>
         </div>
-    </div>
+      </div>
 
-<!-- Soda Clicking Tab -->
-<div id="sodaTab" class="tab-content active">
-    <div id="sodaDiv" class="center">
-        <div class="soda-container">
-            <img src="images/regSoda.png" id="sodaButton" data-action="sodaClick" data-args="1"
-                 alt="a picture of soda for you to click"/>
-        </div>
+      <!-- Soda Clicking Tab -->
+      <div id="sodaTab" class="tab-content active">
+        <div id="sodaDiv" class="center">
+          <div class="soda-container">
+            <img
+              src="images/regSoda.png"
+              id="sodaButton"
+              data-action="sodaClick"
+              data-args="1"
+              alt="a picture of soda for you to click"
+            />
+          </div>
 
-        <!-- Clicking Upgrades Section - Compact layout next to soda button -->
-        <div class="clicking-upgrades-container">
+          <!-- Clicking Upgrades Section - Compact layout next to soda button -->
+          <div class="clicking-upgrades-container">
             <div class="clicking-upgrade-item">
-                <button class="clicking-upgrade-btn" data-action="buySuction">
-                    <div class="clicking-upgrade-icon">💨</div>
-                    <div class="clicking-upgrade-info">
-                        <div class="clicking-upgrade-name">Suction</div>
-                        <div class="clicking-upgrade-cost"><span id="suctionCostCompact">40</span> Sips</div>
-                    </div>
-                </button>
-                <div class="clicking-upgrade-stats">
-                    <span class="clicking-stat">+<span id="suctionClickBonusCompact">0.3</span> Sips/click</span>
+              <button class="clicking-upgrade-btn" data-action="buySuction">
+                <div class="clicking-upgrade-icon">💨</div>
+                <div class="clicking-upgrade-info">
+                  <div class="clicking-upgrade-name">Suction</div>
+                  <div class="clicking-upgrade-cost">
+                    <span id="suctionCostCompact">40</span> Sips
+                  </div>
                 </div>
+              </button>
+              <div class="clicking-upgrade-stats">
+                <span class="clicking-stat"
+                  >+<span id="suctionClickBonusCompact">0.3</span> Sips/click</span
+                >
+              </div>
             </div>
-            
+
             <div class="clicking-upgrade-item">
-                <button class="clicking-upgrade-btn" data-action="buyCriticalClick">
-                    <div class="clicking-upgrade-icon">⚡</div>
-                    <div class="clicking-upgrade-info">
-                        <div class="clicking-upgrade-name">Critical Click</div>
-                        <div class="clicking-upgrade-cost"><span id="criticalClickCostCompact">60</span> Sips</div>
-                    </div>
-                </button>
-                <div class="clicking-upgrade-stats">
-                    <span class="clicking-stat"><span id="criticalClickChanceCompact">0.1</span>% chance</span>
+              <button class="clicking-upgrade-btn" data-action="buyCriticalClick">
+                <div class="clicking-upgrade-icon">⚡</div>
+                <div class="clicking-upgrade-info">
+                  <div class="clicking-upgrade-name">Critical Click</div>
+                  <div class="clicking-upgrade-cost">
+                    <span id="criticalClickCostCompact">60</span> Sips
+                  </div>
                 </div>
+              </button>
+              <div class="clicking-upgrade-stats">
+                <span class="clicking-stat"
+                  ><span id="criticalClickChanceCompact">0.1</span>% chance</span
+                >
+              </div>
             </div>
+          </div>
         </div>
 
-
-    </div>
-
-    <div id="levelUpDiv" class="center">
-        <button class="level-up-btn disabled" data-action="levelUp">
+        <div id="levelUpDiv" class="center">
+          <button class="level-up-btn disabled" data-action="levelUp">
             <div class="cost-line">
-                <span id="levelCost" class="cost-number">3000</span>
-                <span class="cost-text">Sips</span>
+              <span id="levelCost" class="cost-number">3000</span>
+              <span class="cost-text">Sips</span>
             </div>
-            Level Up <br/>
+            Level Up <br />
             (+ 150% per drink)
-        </button>
-    </div>
-</div>
+          </button>
+        </div>
+      </div>
 
-<!-- Unlocks Tab -->
-<div id="unlocksTab" class="tab-content">
-    <div class="unlocks-container">
-        <div class="unlocks-header">
+      <!-- Unlocks Tab -->
+      <div id="unlocksTab" class="tab-content">
+        <div class="unlocks-container">
+          <div class="unlocks-header">
             <h2>🔓 Feature Unlocks</h2>
             <p class="unlocks-subtitle">Discover new features as you progress!</p>
-        </div>
-        
-        <div class="unlocks-grid" id="unlocksGrid">
+          </div>
+
+          <div class="unlocks-grid" id="unlocksGrid">
             <!-- Unlock items will be populated by JavaScript -->
-        </div>
-        
-        <div class="unlocks-progress">
+          </div>
+
+          <div class="unlocks-progress">
             <div class="progress-info">
-                <span class="progress-label">Progress:</span>
-                <span class="progress-value" id="unlocksProgress">0/12</span>
+              <span class="progress-label">Progress:</span>
+              <span class="progress-value" id="unlocksProgress">0/12</span>
             </div>
             <div class="progress-bar">
-                <div class="progress-fill" id="unlocksProgressFill"></div>
+              <div class="progress-fill" id="unlocksProgressFill"></div>
             </div>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
 
-<!-- Shop & Upgrades Tab -->
-<div id="shopTab" class="tab-content">
-    <div id="shopDiv" class="center">
-        <div class="shop-container">
-                        <div class="shop-item">
-                <div class="shop-header">
-                                         <button class="shop-btn" data-action="buyStraw">
-                         <div class="cost-line">
-                             <span id="strawCost" class="cost-number">5</span>
-                             <span class="cost-text">Sips</span>
-                         </div>
-                         Extra Straw
-                     </button>
+      <!-- Shop & Upgrades Tab -->
+      <div id="shopTab" class="tab-content">
+        <div id="shopDiv" class="center">
+          <div class="shop-container">
+            <div class="shop-item">
+              <div class="shop-header">
+                <button class="shop-btn" data-action="buyStraw">
+                  <div class="cost-line">
+                    <span id="strawCost" class="cost-number">5</span>
+                    <span class="cost-text">Sips</span>
+                  </div>
+                  Extra Straw
+                </button>
+              </div>
+              <div class="shop-stats">
+                <div class="shop-stat">
+                  <span class="stat-label">Owned:</span>
+                  <span id="straws" class="stat-value">0</span>
                 </div>
-                <div class="shop-stats">
-                    <div class="shop-stat">
-                        <span class="stat-label">Owned:</span>
-                        <span id="straws" class="stat-value">0</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">+ per drink:</span>
-                                                 <span id="strawSPD" class="stat-value">0.6</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">Total production:</span>
-                        <span id="totalStrawSPD" class="stat-value">0</span> per drink
-                    </div>
+                <div class="shop-stat">
+                  <span class="stat-label">+ per drink:</span>
+                  <span id="strawSPD" class="stat-value">0.6</span>
                 </div>
+                <div class="shop-stat">
+                  <span class="stat-label">Total production:</span>
+                  <span id="totalStrawSPD" class="stat-value">0</span> per drink
+                </div>
+              </div>
             </div>
 
             <div class="shop-item">
-                <div class="shop-header">
-                                         <button class="shop-btn" data-action="buyWiderStraws">
-                         <div class="cost-line">
-                             <span id="widerStrawsCost" class="cost-number">150</span>
-                             <span class="cost-text">Sips</span>
-                         </div>
-                         Wider Straws Upgrade<br/>
-                         <small style="color: #FF8E53; font-size: 0.7rem;">Increases straw production</small>
-                     </button>
+              <div class="shop-header">
+                <button class="shop-btn" data-action="buyWiderStraws">
+                  <div class="cost-line">
+                    <span id="widerStrawsCost" class="cost-number">150</span>
+                    <span class="cost-text">Sips</span>
+                  </div>
+                  Wider Straws Upgrade<br />
+                  <small style="color: #ff8e53; font-size: 0.7rem"
+                    >Increases straw production</small
+                  >
+                </button>
+              </div>
+              <div class="shop-stats">
+                <div class="shop-stat">
+                  <span class="stat-label">Owned:</span>
+                  <span id="widerStraws" class="stat-value">0</span>
                 </div>
-                <div class="shop-stats">
-                    <div class="shop-stat">
-                        <span class="stat-label">Owned:</span>
-                        <span id="widerStraws" class="stat-value">0</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">+ per drink:</span>
-                                                 <span id="widerStrawsSPD" class="stat-value">0.6</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">Total production:</span>
-                        <span id="totalWiderStrawsSPD" class="stat-value">0</span> per drink
-                    </div>
+                <div class="shop-stat">
+                  <span class="stat-label">+ per drink:</span>
+                  <span id="widerStrawsSPD" class="stat-value">0.6</span>
                 </div>
-            </div>
-
-                        <div class="shop-item">
-                <div class="shop-header">
-                                         <button class="shop-btn" data-action="buyCup">
-                         <div class="cost-line">
-                             <span id="cupCost" class="cost-number">15</span>
-                             <span class="cost-text">Sips</span>
-                         </div>
-                         Bigger Cup
-                     </button>
+                <div class="shop-stat">
+                  <span class="stat-label">Total production:</span>
+                  <span id="totalWiderStrawsSPD" class="stat-value">0</span> per drink
                 </div>
-                <div class="shop-stats">
-                    <div class="shop-stat">
-                        <span class="stat-label">Owned:</span>
-                        <span id="cups" class="stat-value">0</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">+ per drink:</span>
-                                                 <span id="cupSPD" class="stat-value">1.2</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">Total production:</span>
-                        <span id="totalCupSPD" class="stat-value">0</span> per drink
-                    </div>
-                </div>
+              </div>
             </div>
 
             <div class="shop-item">
-                <div class="shop-header">
-                                         <button class="shop-btn" data-action="buyBetterCups">
-                         <div class="cost-line">
-                             <span id="betterCupsCost" class="cost-number">400</span>
-                             <span class="cost-text">Sips</span>
-                         </div>
-                         Better Cups Upgrade<br/>
-                         <small style="color: #FF8E53; font-size: 0.7rem;">Increases cup production</small>
-                     </button>
+              <div class="shop-header">
+                <button class="shop-btn" data-action="buyCup">
+                  <div class="cost-line">
+                    <span id="cupCost" class="cost-number">15</span>
+                    <span class="cost-text">Sips</span>
+                  </div>
+                  Bigger Cup
+                </button>
+              </div>
+              <div class="shop-stats">
+                <div class="shop-stat">
+                  <span class="stat-label">Owned:</span>
+                  <span id="cups" class="stat-value">0</span>
                 </div>
-                <div class="shop-stats">
-                    <div class="shop-stat">
-                        <span class="stat-label">Owned:</span>
-                        <span id="betterCups" class="stat-value">0</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">+ per drink:</span>
-                                                 <span id="betterCupsSPD" class="stat-value">1.2</span>
-                    </div>
-                    <div class="shop-stat">
-                        <span class="stat-label">Total production:</span>
-                                         <span id="totalBetterCupsSPD" class="stat-value">0</span> per drink
-                    </div>
+                <div class="shop-stat">
+                  <span class="stat-label">+ per drink:</span>
+                  <span id="cupSPD" class="stat-value">1.2</span>
                 </div>
+                <div class="shop-stat">
+                  <span class="stat-label">Total production:</span>
+                  <span id="totalCupSPD" class="stat-value">0</span> per drink
+                </div>
+              </div>
             </div>
 
-            
-
-            
-
-            
+            <div class="shop-item">
+              <div class="shop-header">
+                <button class="shop-btn" data-action="buyBetterCups">
+                  <div class="cost-line">
+                    <span id="betterCupsCost" class="cost-number">400</span>
+                    <span class="cost-text">Sips</span>
+                  </div>
+                  Better Cups Upgrade<br />
+                  <small style="color: #ff8e53; font-size: 0.7rem">Increases cup production</small>
+                </button>
+              </div>
+              <div class="shop-stats">
+                <div class="shop-stat">
+                  <span class="stat-label">Owned:</span>
+                  <span id="betterCups" class="stat-value">0</span>
+                </div>
+                <div class="shop-stat">
+                  <span class="stat-label">+ per drink:</span>
+                  <span id="betterCupsSPD" class="stat-value">1.2</span>
+                </div>
+                <div class="shop-stat">
+                  <span class="stat-label">Total production:</span>
+                  <span id="totalBetterCupsSPD" class="stat-value">0</span> per drink
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
 
-<!-- Options Tab -->
-<div id="optionsTab" class="tab-content">
-    <div class="options-container">
-        <div class="options-section">
+      <!-- Options Tab -->
+      <div id="optionsTab" class="tab-content">
+        <div class="options-container">
+          <div class="options-section">
             <h3>🔊 Button Audio</h3>
             <div class="sound-controls">
-                <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="sound-toggle-btn">
-                    🔊 Button Sounds ON
-                </button>
-                <p class="sound-description">Enable or disable button click sound effects</p>
+              <button
+                id="buttonSoundsToggle"
+                data-action="toggleButtonSounds"
+                class="sound-toggle-btn"
+              >
+                🔊 Button Sounds ON
+              </button>
+              <p class="sound-description">Enable or disable button click sound effects</p>
             </div>
-        </div>
-        
-        <div class="options-section">
+          </div>
+
+          <div class="options-section">
             <h3>💾 Save & Load</h3>
             <div class="save-controls">
-                <button data-action="save" class="save-btn">Save Game</button>
-                <button data-action="delete_save" class="save-btn">Delete Save</button>
+              <button data-action="save" class="save-btn">Save Game</button>
+              <button data-action="delete_save" class="save-btn">Delete Save</button>
             </div>
-        </div>
-        
-        <div class="options-section">
+          </div>
+
+          <div class="options-section">
             <h3>⏰ Auto-Save Settings</h3>
             <div class="autosave-controls">
-                <label class="autosave-toggle">
-                    <input type="checkbox" id="autosaveToggle" data-action="toggleAutosave">
-                    <span class="toggle-slider"></span>
-                    Enable Auto-Save
-                </label>
-                <div class="autosave-interval">
-                    <label for="autosaveInterval">Auto-Save Interval:</label>
-                    <select id="autosaveInterval" data-action="changeAutosaveInterval">
-                        <option value="5">5 seconds</option>
-                        <option value="10" selected>10 seconds</option>
-                        <option value="15">15 seconds</option>
-                        <option value="30">30 seconds</option>
-                        <option value="60">1 minute</option>
-                        <option value="300">5 minutes</option>
-                    </select>
-                </div>
-                <div class="autosave-status">
-                    <span id="autosaveStatus">Auto-save enabled (10s)</span>
-                </div>
+              <label class="autosave-toggle">
+                <input type="checkbox" id="autosaveToggle" data-action="toggleAutosave" />
+                <span class="toggle-slider"></span>
+                Enable Auto-Save
+              </label>
+              <div class="autosave-interval">
+                <label for="autosaveInterval">Auto-Save Interval:</label>
+                <select id="autosaveInterval" data-action="changeAutosaveInterval">
+                  <option value="5">5 seconds</option>
+                  <option value="10" selected>10 seconds</option>
+                  <option value="15">15 seconds</option>
+                  <option value="30">30 seconds</option>
+                  <option value="60">1 minute</option>
+                  <option value="300">5 minutes</option>
+                </select>
+              </div>
+              <div class="autosave-status">
+                <span id="autosaveStatus">Auto-save enabled (10s)</span>
+              </div>
             </div>
-        </div>
-        
-        
-        
-        <div class="options-section">
+          </div>
+
+          <div class="options-section">
             <h3>🎮 Game Information</h3>
             <div class="game-info">
-                <div class="info-item">
-                    <span class="info-label">Version:</span>
-                    <span class="info-value">1.0.0</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Last Save:</span>
-                    <span class="info-value" id="lastSaveTime">Never</span>
-                    </div>
-                <div class="info-item">
-                    <span class="info-label">Play Time:</span>
-                    <span class="info-value" id="playTime">0:00:00</span>
-                </div>
+              <div class="info-item">
+                <span class="info-label">Version:</span>
+                <span class="info-value">1.0.0</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Last Save:</span>
+                <span class="info-value" id="lastSaveTime">Never</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Play Time:</span>
+                <span class="info-value" id="playTime">0:00:00</span>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
 
-<!-- Stats Tab -->
-<div id="statsTab" class="tab-content">
-    <div class="stats-container">
-        <div class="stats-section">
+      <!-- Stats Tab -->
+      <div id="statsTab" class="tab-content">
+        <div class="stats-container">
+          <div class="stats-section">
             <h3>⏱️ Time & Progress</h3>
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">⏰</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Total Play Time</div>
-                        <div class="stat-value" id="totalPlayTime">0:00:00</div>
-                    </div>
+              <div class="stat-card">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-content">
+                  <div class="stat-label">Total Play Time</div>
+                  <div class="stat-value" id="totalPlayTime">0:00:00</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🎯</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Current Session</div>
-                        <div class="stat-value" id="sessionTime">0:00:00</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-content">
+                  <div class="stat-label">Current Session</div>
+                  <div class="stat-value" id="sessionTime">0:00:00</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📅</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Days Since Start</div>
-                        <div class="stat-value" id="daysSinceStart">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-content">
+                  <div class="stat-label">Days Since Start</div>
+                  <div class="stat-value" id="daysSinceStart">0</div>
                 </div>
+              </div>
             </div>
-        </div>
-        
-        <div class="stats-section">
+          </div>
+
+          <div class="stats-section">
             <h3>🖱️ Clicking Statistics</h3>
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">👆</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Total Clicks</div>
-                        <div class="stat-value" id="totalClicks">0</div>
-                    </div>
+              <div class="stat-card">
+                <div class="stat-icon">👆</div>
+                <div class="stat-content">
+                  <div class="stat-label">Total Clicks</div>
+                  <div class="stat-value" id="totalClicks">0</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⚡</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Clicks Per Second</div>
-                        <div class="stat-value" id="clicksPerSecond">0.00</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-content">
+                  <div class="stat-label">Clicks Per Second</div>
+                  <div class="stat-value" id="clicksPerSecond">0.00</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🏆</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Best Click Streak</div>
-                        <div class="stat-value" id="bestClickStreak">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-content">
+                  <div class="stat-label">Best Click Streak</div>
+                  <div class="stat-value" id="bestClickStreak">0</div>
                 </div>
+              </div>
             </div>
-        </div>
-        
-        <div class="stats-section">
+          </div>
+
+          <div class="stats-section">
             <h3>💰 Economy & Progress</h3>
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">💧</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Total Sips Earned</div>
-                        <div class="stat-value" id="totalSipsEarned">0</div>
-                    </div>
+              <div class="stat-card">
+                <div class="stat-icon">💧</div>
+                <div class="stat-content">
+                  <div class="stat-label">Total Sips Earned</div>
+                  <div class="stat-value" id="totalSipsEarned">0</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📈</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Current Sips/Second</div>
-                        <div class="stat-value" id="currentSipsPerSecond">0.00</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-content">
+                  <div class="stat-label">Current Sips/Second</div>
+                  <div class="stat-value" id="currentSipsPerSecond">0.00</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🚀</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Highest Sips/Second</div>
-                        <div class="stat-value" id="highestSipsPerSecond">0.00</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-content">
+                  <div class="stat-label">Highest Sips/Second</div>
+                  <div class="stat-value" id="highestSipsPerSecond">0.00</div>
                 </div>
+              </div>
             </div>
-        </div>
-        
-        <div class="stats-section">
+          </div>
+
+          <div class="stats-section">
             <h3>🛒 Shop & Upgrades</h3>
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">🥤</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Straws Purchased</div>
-                        <div class="stat-value" id="strawsPurchased">0</div>
-                    </div>
+              <div class="stat-card">
+                <div class="stat-icon">🥤</div>
+                <div class="stat-content">
+                  <div class="stat-label">Straws Purchased</div>
+                  <div class="stat-value" id="strawsPurchased">0</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">☕</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Cups Purchased</div>
-                        <div class="stat-value" id="cupsPurchased">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">☕</div>
+                <div class="stat-content">
+                  <div class="stat-label">Cups Purchased</div>
+                  <div class="stat-value" id="cupsPurchased">0</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🥤</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Wider Straw Upgrades</div>
-                        <div class="stat-value" id="widerStrawsPurchased">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🥤</div>
+                <div class="stat-content">
+                  <div class="stat-label">Wider Straw Upgrades</div>
+                  <div class="stat-value" id="widerStrawsPurchased">0</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">☕</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Better Cup Upgrades</div>
-                        <div class="stat-value" id="betterCupsPurchased">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">☕</div>
+                <div class="stat-content">
+                  <div class="stat-label">Better Cup Upgrades</div>
+                  <div class="stat-value" id="betterCupsPurchased">0</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💨</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Suctions Purchased</div>
-                        <div class="stat-value" id="suctionsPurchased">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">💨</div>
+                <div class="stat-content">
+                  <div class="stat-label">Suctions Purchased</div>
+                  <div class="stat-value" id="suctionsPurchased">0</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💥</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Critical Clicks</div>
-                        <div class="stat-value" id="criticalClicksPurchased">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">💥</div>
+                <div class="stat-content">
+                  <div class="stat-label">Critical Clicks</div>
+                  <div class="stat-value" id="criticalClicksPurchased">0</div>
                 </div>
+              </div>
             </div>
-        </div>
-        
-        <div class="stats-section">
+          </div>
+
+          <div class="stats-section">
             <h3>🎉 Achievements & Milestones</h3>
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">⭐</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Current Level</div>
-                        <div class="stat-value" id="currentLevel">1</div>
-                    </div>
+              <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                  <div class="stat-label">Current Level</div>
+                  <div class="stat-value" id="currentLevel">1</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🔧</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Total Upgrades</div>
-                        <div class="stat-value" id="totalUpgrades">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">🔧</div>
+                <div class="stat-content">
+                  <div class="stat-label">Total Upgrades</div>
+                  <div class="stat-value" id="totalUpgrades">0</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💎</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Faster Drinks Owned</div>
-                        <div class="stat-value" id="fasterDrinksOwned">0</div>
-                    </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">💎</div>
+                <div class="stat-content">
+                  <div class="stat-label">Faster Drinks Owned</div>
+                  <div class="stat-value" id="fasterDrinksOwned">0</div>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
 
-<!-- TempleOS God Tab -->
-<div id="godTab" class="tab-content">
-    <div class="god-container">
-        <div class="god-header">
+      <!-- TempleOS God Tab -->
+      <div id="godTab" class="tab-content">
+        <div class="god-container">
+          <div class="god-header">
             <h2>🙏 Talk to God</h2>
             <p class="god-subtitle">Seek divine wisdom and guidance</p>
-        </div>
-        
-        <div class="chat-container">
-                    <div class="chat-messages" id="chatMessages">
-            <div class="message god-message">
+          </div>
+
+          <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+              <div class="message god-message">
                 <div class="message-avatar">
-                    <img src="images/TempleOS.jpg" alt="God" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+                  <img
+                    src="images/TempleOS.jpg"
+                    alt="God"
+                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px"
+                  />
                 </div>
                 <div class="message-content">
-                    <div class="message-sender">God</div>
-                    <div class="message-text">Greetings, mortal! I am listening to your prayers. What would you like to discuss?</div>
+                  <div class="message-sender">God</div>
+                  <div class="message-text">
+                    Greetings, mortal! I am listening to your prayers. What would you like to
+                    discuss?
+                  </div>
                 </div>
+              </div>
             </div>
-        </div>
-            
-            <div class="chat-input-container">
-                <input type="text" id="chatInput" class="chat-input" placeholder="Type your message to God..." maxlength="100">
-                <button data-action="sendMessage" class="chat-send-btn">🙏 Send</button>
-            </div>
-        </div>
-        
-        <div class="god-info">
-            <p>💡 <strong>Tip:</strong> God responds with divine wisdom and guidance. Type anything to receive spiritual insight!</p>
-            <p style="margin-top: 1rem; font-size: 0.9em; color: #FF8E53; font-style: italic;">
-                <strong>Divine Inspiration:</strong> This sacred oracle draws wisdom from ancient sacred texts, providing guidance through carefully selected words of divine origin.<br/>
-                <em>The divine word generator uses mystical wisdom to offer meaningful insights and inspiration for your journey.</em>
-            </p>
-            <p style="margin-top: 0.5rem; font-size: 0.8em; color: #888; font-style: italic;">
-                <em>⚡ If you know, you know... this oracle runs on 64-bit divine wisdom ✨</em>
-            </p>
-        </div>
-    </div>
-</div>
 
-<!-- Dev Tools Tab -->
-<div id="devTab" class="tab-content">
-    <div class="dev-container">
-        <div class="dev-header">
+            <div class="chat-input-container">
+              <input
+                type="text"
+                id="chatInput"
+                class="chat-input"
+                placeholder="Type your message to God..."
+                maxlength="100"
+              />
+              <button data-action="sendMessage" class="chat-send-btn">🙏 Send</button>
+            </div>
+          </div>
+
+          <div class="god-info">
+            <p>
+              💡 <strong>Tip:</strong> God responds with divine wisdom and guidance. Type anything
+              to receive spiritual insight!
+            </p>
+            <p style="margin-top: 1rem; font-size: 0.9em; color: #ff8e53; font-style: italic">
+              <strong>Divine Inspiration:</strong> This sacred oracle draws wisdom from ancient
+              sacred texts, providing guidance through carefully selected words of divine origin.<br />
+              <em
+                >The divine word generator uses mystical wisdom to offer meaningful insights and
+                inspiration for your journey.</em
+              >
+            </p>
+            <p style="margin-top: 0.5rem; font-size: 0.8em; color: #888; font-style: italic">
+              <em>⚡ If you know, you know... this oracle runs on 64-bit divine wisdom ✨</em>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dev Tools Tab -->
+      <div id="devTab" class="tab-content">
+        <div class="dev-container">
+          <div class="dev-header">
             <h2>🔧 Development Tools</h2>
             <p class="dev-subtitle">Testing and development utilities</p>
             <div class="dev-status" id="devStatus">
-                <span class="dev-status-label">Dev Mode:</span>
-                <span class="dev-status-value" id="devModeStatus">Disabled</span>
+              <span class="dev-status-label">Dev Mode:</span>
+              <span class="dev-status-value" id="devModeStatus">Disabled</span>
             </div>
-        </div>
-        
-        <div class="dev-section">
+          </div>
+
+          <div class="dev-section">
             <h3>🚀 Feature Unlocks</h3>
             <div class="dev-grid">
-                <button data-action="devUnlockAll" class="dev-btn unlock-all">
-                    <div class="dev-btn-icon">🔓</div>
-                    <div class="dev-btn-text">Unlock All Features</div>
-                </button>
-                <button data-action="devUnlockShop" class="dev-btn unlock-shop">
-                    <div class="dev-btn-icon">🛒</div>
-                    <div class="dev-btn-text">Unlock Shop</div>
-                </button>
-                <button data-action="devUnlockUpgrades" class="dev-btn unlock-upgrades">
-                    <div class="dev-btn-icon">⚡</div>
-                    <div class="dev-btn-text">Unlock All Upgrades</div>
-                </button>
-                <button data-action="devResetUnlocks" class="dev-btn reset">
-                    <div class="dev-btn-icon">🔄</div>
-                    <div class="dev-btn-text">Reset Unlocks</div>
-                </button>
+              <button data-action="devUnlockAll" class="dev-btn unlock-all">
+                <div class="dev-btn-icon">🔓</div>
+                <div class="dev-btn-text">Unlock All Features</div>
+              </button>
+              <button data-action="devUnlockShop" class="dev-btn unlock-shop">
+                <div class="dev-btn-icon">🛒</div>
+                <div class="dev-btn-text">Unlock Shop</div>
+              </button>
+              <button data-action="devUnlockUpgrades" class="dev-btn unlock-upgrades">
+                <div class="dev-btn-icon">⚡</div>
+                <div class="dev-btn-text">Unlock All Upgrades</div>
+              </button>
+              <button data-action="devResetUnlocks" class="dev-btn reset">
+                <div class="dev-btn-icon">🔄</div>
+                <div class="dev-btn-text">Reset Unlocks</div>
+              </button>
             </div>
-        </div>
-        
-        <div class="dev-section">
+          </div>
+
+          <div class="dev-section">
             <h3>⏰ Time Travel</h3>
             <div class="dev-grid">
-                <button data-action="devAddTime:3600000" class="dev-btn time-travel">
-                    <div class="dev-btn-icon">⏰</div>
-                    <div class="dev-btn-text">+1 Hour</div>
-                </button>
-                <button data-action="devAddTime:86400000" class="dev-btn time-travel">
-                    <div class="dev-btn-icon">📅</div>
-                    <div class="dev-btn-text">+1 Day</div>
-                </button>
-                <button data-action="devAddTime:604800000" class="dev-btn time-travel">
-                    <div class="dev-btn-icon">📆</div>
-                    <div class="dev-btn-text">+1 Week</div>
-                </button>
-                <button data-action="devAddTime:2592000000" class="dev-btn time-travel">
-                    <div class="dev-btn-icon">🗓️</div>
-                    <div class="dev-btn-text">+1 Month</div>
-                </button>
+              <button data-action="devAddTime:3600000" class="dev-btn time-travel">
+                <div class="dev-btn-icon">⏰</div>
+                <div class="dev-btn-text">+1 Hour</div>
+              </button>
+              <button data-action="devAddTime:86400000" class="dev-btn time-travel">
+                <div class="dev-btn-icon">📅</div>
+                <div class="dev-btn-text">+1 Day</div>
+              </button>
+              <button data-action="devAddTime:604800000" class="dev-btn time-travel">
+                <div class="dev-btn-icon">📆</div>
+                <div class="dev-btn-text">+1 Week</div>
+              </button>
+              <button data-action="devAddTime:2592000000" class="dev-btn time-travel">
+                <div class="dev-btn-icon">🗓️</div>
+                <div class="dev-btn-text">+1 Month</div>
+              </button>
             </div>
-        </div>
-        
-        <div class="dev-section">
+          </div>
+
+          <div class="dev-section">
             <h3>💰 Resource Management</h3>
             <div class="dev-grid">
-                <button data-action="devAddSips:1000" class="dev-btn resources">
-                    <div class="dev-btn-icon">🥤</div>
-                    <div class="dev-btn-text">+1000 Sips</div>
-                </button>
-                <button data-action="devAddSips:10000" class="dev-btn resources">
-                    <div class="dev-btn-icon">🥤</div>
-                    <div class="dev-btn-text">+10K Sips</div>
-                </button>
-                <button data-action="devAddSips:100000" class="dev-btn resources">
-                    <div class="dev-btn-icon">🥤</div>
-                    <div class="dev-btn-text">+100K Sips</div>
-                </button>
-                <button data-action="devAddSips:1000000" class="dev-btn resources">
-                    <div class="dev-btn-icon">🥤</div>
-                    <div class="dev-btn-text">+1M Sips</div>
-                </button>
+              <button data-action="devAddSips:1000" class="dev-btn resources">
+                <div class="dev-btn-icon">🥤</div>
+                <div class="dev-btn-text">+1000 Sips</div>
+              </button>
+              <button data-action="devAddSips:10000" class="dev-btn resources">
+                <div class="dev-btn-icon">🥤</div>
+                <div class="dev-btn-text">+10K Sips</div>
+              </button>
+              <button data-action="devAddSips:100000" class="dev-btn resources">
+                <div class="dev-btn-icon">🥤</div>
+                <div class="dev-btn-text">+100K Sips</div>
+              </button>
+              <button data-action="devAddSips:1000000" class="dev-btn resources">
+                <div class="dev-btn-icon">🥤</div>
+                <div class="dev-btn-text">+1M Sips</div>
+              </button>
             </div>
-        </div>
-        
-        <div class="dev-section">
+          </div>
+
+          <div class="dev-section">
             <h3>🎯 Testing Tools</h3>
             <div class="dev-grid">
-                <button data-action="devToggleDevMode" class="dev-btn testing">
-                    <div class="dev-btn-icon">🔧</div>
-                    <div class="dev-btn-text">Toggle Dev Mode</div>
-                </button>
-                <button data-action="devToggleGodMode" class="dev-btn testing">
-                    <div class="dev-btn-icon">👑</div>
-                    <div class="dev-btn-text">Toggle God Mode</div>
-                </button>
-                <button data-action="devShowDebugInfo" class="dev-btn testing">
-                    <div class="dev-btn-icon">🐛</div>
-                    <div class="dev-btn-text">Show Debug Info</div>
-                </button>
-                <button data-action="devExportSave" class="dev-btn testing">
-                    <div class="dev-btn-icon">💾</div>
-                    <div class="dev-btn-text">Export Save</div>
-                </button>
+              <button data-action="devToggleDevMode" class="dev-btn testing">
+                <div class="dev-btn-icon">🔧</div>
+                <div class="dev-btn-text">Toggle Dev Mode</div>
+              </button>
+              <button data-action="devToggleGodMode" class="dev-btn testing">
+                <div class="dev-btn-icon">👑</div>
+                <div class="dev-btn-text">Toggle God Mode</div>
+              </button>
+              <button data-action="devShowDebugInfo" class="dev-btn testing">
+                <div class="dev-btn-icon">🐛</div>
+                <div class="dev-btn-text">Show Debug Info</div>
+              </button>
+              <button data-action="devExportSave" class="dev-btn testing">
+                <div class="dev-btn-icon">💾</div>
+                <div class="dev-btn-text">Export Save</div>
+              </button>
             </div>
-        </div>
-        
-        <div class="dev-section">
+          </div>
+
+          <div class="dev-section">
             <h3>📁 Save Management</h3>
             <div class="dev-grid">
-                <button data-action="devImportSave" class="dev-btn testing">
-                    <div class="dev-btn-icon">📥</div>
-                    <div class="dev-btn-text">Import Save</div>
-                </button>
-                <button data-action="quickUnlock" class="dev-btn unlock-all">
-                    <div class="dev-btn-icon">⚡</div>
-                    <div class="dev-btn-text">Quick Unlock</div>
-                </button>
+              <button data-action="devImportSave" class="dev-btn testing">
+                <div class="dev-btn-icon">📥</div>
+                <div class="dev-btn-text">Import Save</div>
+              </button>
+              <button data-action="quickUnlock" class="dev-btn unlock-all">
+                <div class="dev-btn-icon">⚡</div>
+                <div class="dev-btn-text">Quick Unlock</div>
+              </button>
             </div>
+          </div>
+
+          <div class="dev-info">
+            <p>
+              ⚠️ <strong>Warning:</strong> These tools are for development and testing purposes
+              only!
+            </p>
+            <p>
+              💡 <strong>Tip:</strong> Use these tools to test game balance, debug issues, or
+              experiment with different game states.
+            </p>
+          </div>
         </div>
-        
-        <div class="dev-info">
-            <p>⚠️ <strong>Warning:</strong> These tools are for development and testing purposes only!</p>
-            <p>💡 <strong>Tip:</strong> Use these tools to test game balance, debug issues, or experiment with different game states.</p>
-        </div>
+      </div>
     </div>
-</div>
 
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2.0.0/dist/break_infinity.min.js"></script>
+    <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
+    <script type="module" src="ts/config.ts"></script>
+    <script type="module" src="ts/core/constants.ts"></script>
+    <!-- event-bus.ts is loaded dynamically in ts/index.ts -->
+    <!-- schemas.ts is imported where needed; no global include required -->
+    <!-- storage.ts is loaded dynamically in ts/index.ts -->
+    <script type="module" src="ts/dom-cache.ts"></script>
+    <script type="module" src="ts/index.ts"></script>
+    <script type="module" src="ts/god.ts"></script>
+    <script type="module" src="ts/main.ts"></script>
+    <script>
+      // Ensure Decimal is available globally before loading main.js
+      if (typeof Decimal === 'undefined') {
+        console.error('❌ Decimal library not loaded! Game will not work properly.');
+      } else {
+        console.log('✅ Decimal library loaded successfully');
+      }
 
-<script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2.0.0/dist/break_infinity.min.js"></script>
-<script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
-<script type="module" src="ts/config.ts"></script>
-<script type="module" src="ts/core/constants.ts"></script>
-<!-- event-bus.ts is loaded dynamically in ts/index.ts -->
-<!-- schemas.ts is imported where needed; no global include required -->
-<!-- storage.ts is loaded dynamically in ts/index.ts -->
-<script type="module" src="ts/dom-cache.ts"></script>
-<script type="module" src="ts/index.ts"></script>
-<script type="module" src="ts/god.ts"></script>
-<script type="module" src="ts/main.ts"></script>
-<script>
-// Ensure Decimal is available globally before loading main.js
-if (typeof Decimal === 'undefined') {
-    console.error('❌ Decimal library not loaded! Game will not work properly.');
-} else {
-    console.log('✅ Decimal library loaded successfully');
-}
-
-// Let main.js handle the script loading since the modular files are now working
-console.log('🔧 Core scripts loaded, main.js will handle the rest...');
-</script>
-</body>
-</html>
-</html>
+      // Let main.js handle the script loading since the modular files are now working
+      console.log('🔧 Core scripts loaded, main.js will handle the rest...');
+    </script>
+  </body>
 </html>

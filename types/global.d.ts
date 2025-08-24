@@ -4,26 +4,26 @@
 interface DecimalLike {
   toNumber(): number;
   toString(): string;
-  plus(value: number | string | DecimalLike): DecimalLike;
-  minus?(value: number | string | DecimalLike): DecimalLike;
-  times(value: number | string | DecimalLike): DecimalLike;
-  div?(value: number | string | DecimalLike): DecimalLike;
-  gte?(value: number | string | DecimalLike): boolean;
-  gt?(value: number | string | DecimalLike): boolean;
-  lte?(value: number | string | DecimalLike): boolean;
-  lt?(value: number | string | DecimalLike): boolean;
+  plus(_value: number | string | DecimalLike): DecimalLike;
+  minus?(_value: number | string | DecimalLike): DecimalLike;
+  times(_value: number | string | DecimalLike): DecimalLike;
+  div?(_value: number | string | DecimalLike): DecimalLike;
+  gte?(_value: number | string | DecimalLike): boolean;
+  gt?(_value: number | string | DecimalLike): boolean;
+  lte?(_value: number | string | DecimalLike): boolean;
+  lt?(_value: number | string | DecimalLike): boolean;
 }
 
 interface DecimalCtor {
-  new (value: number | string | DecimalLike): DecimalLike;
+  new (_value: number | string | DecimalLike): DecimalLike;
 }
 
-type EventHandler<T = any> = (payload: T) => void;
+type EventHandler<T = unknown> = (_payload: T) => void;
 
 interface EventBusGeneric {
-  on(event: string, handler: EventHandler): () => void;
-  off(event: string, handler: EventHandler): void;
-  emit(event: string, payload?: any): void;
+  on(_event: string, _handler: EventHandler<unknown>): () => void;
+  off(_event: string, _handler: EventHandler<unknown>): void;
+  emit(_event: string, _payload?: unknown): void;
 }
 
 interface GameOptions {
@@ -67,8 +67,15 @@ interface GameState {
 
 interface Store<T> {
   getState(): T;
-  setState(partial: Partial<T>): void;
-  subscribe(listener: (state: T) => void): () => void;
+  setState(_partial: Partial<T>): void;
+  subscribe(_listener: (_state: T) => void): () => void;
+}
+
+// Type for store actions (exported for future use)
+export interface StoreActions<T> {
+  setState: (_partial: Partial<T>) => void;
+  resetState: () => void;
+  loadState: (_state: Partial<T>) => void;
 }
 
 type ButtonAudioAPI = {
@@ -85,28 +92,28 @@ type ButtonAudioAPI = {
 };
 
 type SystemsAPI = {
-  resources?: Record<string, any>;
-  purchases?: Record<string, any>;
-  clicks?: Record<string, any>;
-  autosave?: Record<string, any>;
-  save?: Record<string, any>;
-  options?: Record<string, any>;
-  loop?: Record<string, any>;
+  resources?: Record<string, unknown>;
+  purchases?: Record<string, unknown>;
+  clicks?: Record<string, unknown>;
+  autosave?: Record<string, unknown>;
+  save?: Record<string, unknown>;
+  options?: Record<string, unknown>;
+  loop?: Record<string, unknown>;
   audio?: { button?: ButtonAudioAPI };
-  gameInit?: Record<string, any>;
-  drink?: Record<string, any>;
+  gameInit?: Record<string, unknown>;
+  drink?: Record<string, unknown>;
 };
 
 interface AppNamespace {
   state: Store<GameState>;
-  storage: any;
+  storage: unknown;
   events: EventBusGeneric;
-  EVENT_NAMES: any;
-  rules: Record<string, any>;
+  EVENT_NAMES: Record<string, unknown>;
+  rules: Record<string, unknown>;
   systems: SystemsAPI;
-  ui: Record<string, any>;
-  data: Record<string, any>;
-  stateBridge?: Record<string, any>;
+  ui: Record<string, unknown>;
+  data: Record<string, unknown>;
+  stateBridge?: Record<string, unknown>;
 }
 
 interface GameConfig {
@@ -121,16 +128,110 @@ interface GameConfig {
 }
 
 declare global {
-  var Decimal: DecimalCtor;
-  var DOM_CACHE: any;
+  const Decimal: DecimalCtor;
+  const DOM_CACHE: {
+    levelNumber: HTMLElement | null;
+    levelText: HTMLElement | null;
+    sodaButton: HTMLElement | null;
+    topSipValue: HTMLElement | null;
+    topSipsPerDrink: HTMLElement | null;
+    topSipsPerSecond: HTMLElement | null;
+    musicPlayer: HTMLElement | null;
+    musicToggleBtn: HTMLElement | null;
+    musicMuteBtn: HTMLElement | null;
+    musicStatus: HTMLElement | null;
+    musicStreamSelect: HTMLElement | null;
+    currentStreamInfo: HTMLElement | null;
+    shopDiv: HTMLElement | null;
+    widerStraws: HTMLElement | null;
+    betterCups: HTMLElement | null;
+    widerStrawsSPD: HTMLElement | null;
+    betterCupsSPD: HTMLElement | null;
+    totalWiderStrawsSPD: HTMLElement | null;
+    totalBetterCupsSPD: HTMLElement | null;
+    statsTab: HTMLElement | null;
+    progressFill: HTMLElement | null;
+    countdown: HTMLElement | null;
+    playTime: HTMLElement | null;
+    lastSaveTime: HTMLElement | null;
+    totalPlayTime: HTMLElement | null;
+    sessionTime: HTMLElement | null;
+    daysSinceStart: HTMLElement | null;
+    totalClicks: HTMLElement | null;
+    clicksPerSecond: HTMLElement | null;
+    bestClickStreak: HTMLElement | null;
+    totalSipsEarned: HTMLElement | null;
+    currentSipsPerSecond: HTMLElement | null;
+    highestSipsPerSecond: HTMLElement | null;
+    strawsPurchased: HTMLElement | null;
+    cupsPurchased: HTMLElement | null;
+    widerStrawsPurchased: HTMLElement | null;
+    betterCupsPurchased: HTMLElement | null;
+    suctionsPurchased: HTMLElement | null;
+    criticalClicksPurchased: HTMLElement | null;
+    currentLevel: HTMLElement | null;
+    totalUpgrades: HTMLElement | null;
+    fasterDrinksOwned: HTMLElement | null;
+    levelUpDiv: HTMLElement | null;
+    init: () => void;
+    get: (_id: string) => HTMLElement | null;
+    isReady: () => boolean;
+  };
   interface Window {
     App: AppNamespace;
     GAME_CONFIG: GameConfig;
     Decimal: DecimalCtor;
-    DOM_CACHE: any;
-    FEATURE_UNLOCKS: any;
-    validateGameSave?: (data: any) => any;
-    validateGameOptions?: (data: any) => any;
+    DOM_CACHE: {
+      levelNumber: HTMLElement | null;
+      levelText: HTMLElement | null;
+      sodaButton: HTMLElement | null;
+      topSipValue: HTMLElement | null;
+      topSipsPerDrink: HTMLElement | null;
+      topSipsPerSecond: HTMLElement | null;
+      musicPlayer: HTMLElement | null;
+      musicToggleBtn: HTMLElement | null;
+      musicMuteBtn: HTMLElement | null;
+      musicStatus: HTMLElement | null;
+      musicStreamSelect: HTMLElement | null;
+      currentStreamInfo: HTMLElement | null;
+      shopDiv: HTMLElement | null;
+      widerStraws: HTMLElement | null;
+      betterCups: HTMLElement | null;
+      widerStrawsSPD: HTMLElement | null;
+      betterCupsSPD: HTMLElement | null;
+      totalWiderStrawsSPD: HTMLElement | null;
+      totalBetterCupsSPD: HTMLElement | null;
+      statsTab: HTMLElement | null;
+      progressFill: HTMLElement | null;
+      countdown: HTMLElement | null;
+      playTime: HTMLElement | null;
+      lastSaveTime: HTMLElement | null;
+      totalPlayTime: HTMLElement | null;
+      sessionTime: HTMLElement | null;
+      daysSinceStart: HTMLElement | null;
+      totalClicks: HTMLElement | null;
+      clicksPerSecond: HTMLElement | null;
+      bestClickStreak: HTMLElement | null;
+      totalSipsEarned: HTMLElement | null;
+      currentSipsPerSecond: HTMLElement | null;
+      highestSipsPerSecond: HTMLElement | null;
+      strawsPurchased: HTMLElement | null;
+      cupsPurchased: HTMLElement | null;
+      widerStrawsPurchased: HTMLElement | null;
+      betterCupsPurchased: HTMLElement | null;
+      suctionsPurchased: HTMLElement | null;
+      criticalClicksPurchased: HTMLElement | null;
+      currentLevel: HTMLElement | null;
+      totalUpgrades: HTMLElement | null;
+      fasterDrinksOwned: HTMLElement | null;
+      levelUpDiv: HTMLElement | null;
+      init: () => void;
+      get: (_id: string) => HTMLElement | null;
+      isReady: () => boolean;
+    };
+    FEATURE_UNLOCKS: Record<string, unknown>;
+    validateGameSave?: (_data: unknown) => unknown;
+    validateGameOptions?: (_data: unknown) => unknown;
   }
 }
 

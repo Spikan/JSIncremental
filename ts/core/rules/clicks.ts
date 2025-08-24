@@ -1,6 +1,6 @@
 // Pure helpers for click outcomes (TypeScript)
 
-type DecimalLike = { toString(): string; plus(x: any): any; times(x: any): any };
+type DecimalLike = { toString(): string; plus(_x: any): any; times(_x: any): any };
 
 export function computeClick({
   baseClick,
@@ -13,22 +13,22 @@ export function computeClick({
   criticalChance: number;
   criticalMultiplier: number | string;
 }): { gained: string; critical: boolean } {
-  const DecimalCtor: new (v: any) => DecimalLike =
+  const DecimalCtor: new (_v: any) => DecimalLike =
     (globalThis as any).Decimal ||
     (function () {
       return class LocalDecimal {
         private _v: number;
-        constructor(v: any) {
-          this._v = Number(v) || 0;
+        constructor(_v: any) {
+          this._v = Number(_v) || 0;
         }
         toString() {
           return String(this._v);
         }
-        plus(x: any) {
-          return new LocalDecimal(this._v + Number(x && x.toString ? x.toString() : x));
+        plus(_x: any) {
+          return new LocalDecimal(this._v + Number(_x && _x.toString ? _x.toString() : _x));
         }
-        times(x: any) {
-          return new LocalDecimal(this._v * Number(x && x.toString ? x.toString() : x));
+        times(_x: any) {
+          return new LocalDecimal(this._v * Number(_x && _x.toString ? _x.toString() : _x));
         }
       } as any;
     })();

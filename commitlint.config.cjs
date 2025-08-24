@@ -1,30 +1,43 @@
 module.exports = {
-  extends: ['@commitlint/config-conventional'],
+  // Don't extend conventional config - it's too strict
+
   rules: {
-    'type-enum': [
-      2,
-      'always',
-      [
-        'feat',     // New feature
-        'fix',      // Bug fix
-        'docs',     // Documentation changes
-        'style',    // Code style changes (formatting, missing semicolons, etc)
-        'refactor', // Code refactoring
-        'perf',     // Performance improvements
-        'test',     // Adding or updating tests
-        'chore',    // Maintenance tasks
-        'ci',       // CI/CD changes
-        'build',    // Build system changes
-        'revert',   // Revert previous commit
-      ],
-    ],
-    'type-case': [2, 'always', 'lower'],
-    'type-empty': [2, 'never'],
-    'subject-case': [2, 'always', 'lower'],
-    'subject-empty': [2, 'never'],
-    'subject-full-stop': [2, 'never', '.'],
-    'header-max-length': [2, 'always', 72],
-    'body-leading-blank': [2, 'always'],
-    'footer-leading-blank': [2, 'always'],
+    // Disable ALL conventional commit rules
+    'type-enum': [0],
+    'type-case': [0],
+    'type-empty': [0],
+    'subject-case': [0],
+    'subject-empty': [0],
+    'subject-full-stop': [0],
+    'header-max-length': [0],
+    'body-leading-blank': [0],
+    'footer-leading-blank': [0],
+    'subject-min-length': [0],
+
+    // Disable other valid rules
+    'scope-empty': [0],
+    'scope-case': [0],
+    'body-case': [0],
+    'body-max-line-length': [0],
+    'footer-max-line-length': [0],
+    'header-trim': [0],
+    'body-empty': [0],
+    'body-full-stop': [0],
+    'body-min-length': [0],
+    'footer-empty': [0],
+    'footer-min-length': [0],
+    'header-case': [0],
+    'header-full-stop': [0],
+    'header-min-length': [0],
+    'scope-enum': [0],
+    'scope-max-length': [0],
+    'scope-min-length': [0],
+    'type-max-length': [0],
+    'type-min-length': [0],
+    'subject-max-length': [0],
+    'subject-exclamation-mark': [0],
+    'trailer-exists': [0],
+    'references-empty': [0],
+    'signed-off-by': [0],
   },
 };

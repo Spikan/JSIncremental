@@ -165,6 +165,8 @@ export const config = {
 // Mirror to window for non-module consumers (legacy)
 try {
   (window as any).GAME_CONFIG = config;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose GAME_CONFIG globally:', error);
+}
 
 export type GameConfig = typeof config;

@@ -41,13 +41,16 @@ export const FEATURE_UNLOCKS = {
       this.updateFeatureVisibility();
       this.updateUnlocksTab();
       console.log('FEATURE_UNLOCKS system initialized');
-    } catch {}
+    } catch (error) {
+      console.error('Failed to initialize FEATURE_UNLOCKS system:', error);
+    }
   },
   checkUnlocks(sips: any, clicks: number): string[] {
     const out: string[] = [];
     const entries = Object.keys(this.unlockConditions) as string[];
     for (const feature of entries) {
-      const cond: UnlockCondition = (this.unlockConditions as UnlockMap)[feature];
+      const cond = (this.unlockConditions as UnlockMap)[feature];
+      if (!cond) continue;
       const sipsMet = sips?.gte ? sips.gte(cond.sips) : Number(sips || 0) >= cond.sips;
       const clicksMet = Number(clicks || 0) >= cond.clicks;
       if (!this.unlockedFeatures.has(feature) && sipsMet && clicksMet) out.push(feature);
@@ -91,7 +94,9 @@ export const FEATURE_UNLOCKS = {
         (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.FEATURE?.UNLOCKED, {
           feature,
         });
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to emit feature unlocked event:', error);
+      }
       return true;
     }
     return false;
@@ -107,9 +112,13 @@ export const FEATURE_UNLOCKS = {
       setTimeout(() => {
         try {
           notification.remove();
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to remove unlock notification:', error);
+        }
       }, duration);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to show unlock notification:', error);
+    }
   },
   updateFeatureVisibility() {
     try {
@@ -124,17 +133,23 @@ export const FEATURE_UNLOCKS = {
           (btn as HTMLElement).style.display = 'inline-block';
           try {
             (btn as HTMLElement).classList.remove('locked');
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to remove locked class from button:', error);
+          }
           return;
         }
         const isUnlocked = this.unlockedFeatures.has(tabName);
         (btn as HTMLElement).style.display = isUnlocked ? 'inline-block' : 'none';
         try {
           (btn as HTMLElement).classList.toggle('locked', !isUnlocked);
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to toggle locked class on button:', error);
+        }
       });
       this.updateUpgradeVisibility();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update feature visibility:', error);
+    }
   },
   updateUpgradeVisibility() {
     const qs = (sel: string) => document.querySelector(sel) as HTMLElement | null;
@@ -169,7 +184,9 @@ export const FEATURE_UNLOCKS = {
     } catch (e) {
       try {
         console.warn('saveUnlockedFeatures failed', e);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to log saveUnlockedFeatures error:', error);
+      }
     }
   },
   loadUnlockedFeatures() {
@@ -185,7 +202,9 @@ export const FEATURE_UNLOCKS = {
     } catch (e) {
       try {
         console.error('Error loading unlocked features:', e);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to log loadUnlockedFeatures error:', error);
+      }
       this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
     }
   },
@@ -195,7 +214,9 @@ export const FEATURE_UNLOCKS = {
       const app: any = (window as any).App;
       if (app?.storage?.remove) app.storage.remove('unlockedFeatures');
       else localStorage.removeItem('unlockedFeatures');
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to remove unlocked features from storage:', error);
+    }
     this.updateFeatureVisibility();
   },
   checkAllUnlocks() {
@@ -304,8 +325,8 @@ export const FEATURE_UNLOCKS = {
     Object.keys(this.unlockConditions).forEach(feature => {
       const info = featureInfo[feature];
       const condition = this.unlockConditions[feature];
+      if (!info || !condition) return;
       const isUnlocked = this.unlockedFeatures.has(feature);
-      if (!info) return;
       const sipsMet = Number(st.sips || 0) >= condition.sips;
       const clicksMet = Number(st.totalClicks || 0) >= condition.clicks;
       const el = document.createElement('div');

@@ -10,14 +10,20 @@ export function formatNumber(value: any): string {
     if (typeof (window as any)?.prettify === 'function') {
       try {
         return (window as any).prettify(value);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to prettify value:', error);
+      }
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to format value:', error);
+  }
   if (value == null) return '0';
   if (value && typeof (value as DecimalLike).toNumber === 'function') {
     try {
       value = (value as DecimalLike).toNumber!();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to convert decimal to number:', error);
+    }
   }
   if (typeof value === 'number' && Number.isFinite(value)) {
     return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -82,20 +88,26 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
     (button as any).classList.toggle('affordable', isAffordable);
     (button as any).classList.toggle('unaffordable', !isAffordable);
     (button as any).classList.toggle('disabled', !isAffordable);
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update button classes:', error);
+  }
   try {
     const costSpan = (button as HTMLElement).querySelector('.cost') as HTMLElement | null;
     if (costSpan != null && typeof cost !== 'undefined') {
       costSpan.textContent = formatNumber(cost);
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update cost display:', error);
+  }
   const formattedCost = formatNumber(cost as any);
   let currentSips = '0';
   try {
     const st = (window as any).App?.state?.getState?.();
     const sipsNum = Number(st?.sips || 0);
     currentSips = formatNumber(sipsNum);
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to get current sips for button title:', error);
+  }
   (button as any).title = isAffordable
     ? `Click to purchase for ${formattedCost} Sips`
     : `Costs ${formattedCost} Sips (You have ${currentSips})`;
@@ -123,7 +135,9 @@ function updateCompactButtonVariants(buttonId: string, isAffordable: boolean): v
       el.classList.toggle('unaffordable', !isAffordable);
       el.classList.toggle('disabled', !isAffordable);
     });
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update compact button variants:', error);
+  }
 }
 
 export function updateCostDisplay(elementId: string, cost: number, isAffordable: boolean): void {
@@ -134,7 +148,9 @@ export function updateCostDisplay(elementId: string, cost: number, isAffordable:
   try {
     element.classList.toggle('affordable', isAffordable);
     element.classList.toggle('unaffordable', !isAffordable);
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update cost display classes:', error);
+  }
 }
 
 export const GameState = {

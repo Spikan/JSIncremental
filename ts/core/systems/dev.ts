@@ -28,7 +28,8 @@ export function unlockAll(): boolean {
     fu.updateFeatureVisibility?.();
     fu.updateUnlocksTab?.();
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -41,7 +42,8 @@ export function unlockShop(): boolean {
     fu.unlockedFeatures.add('shop');
     fu.updateFeatureVisibility?.();
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -56,7 +58,8 @@ export function unlockUpgrades(): boolean {
     );
     fu.updateFeatureVisibility?.();
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -73,7 +76,8 @@ export function resetUnlocks(): boolean {
     fu.updateFeatureVisibility?.();
     fu.updateUnlocksTab?.();
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -115,7 +119,8 @@ export function addTime(milliseconds: number): boolean {
     w.App?.state?.setState?.({ lastSaveTime: nextSave });
     w.App?.ui?.updateLastSaveTime?.();
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -129,7 +134,8 @@ export function addSips(amount: number): boolean {
     w.App?.ui?.updateTopSipCounter?.();
     w.App?.ui?.checkUpgradeAffordability?.();
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -138,7 +144,8 @@ export function toggleDevMode(): boolean {
   try {
     (window as Win).App?.systems?.unlocks?.toggleDevMode?.();
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -146,7 +153,8 @@ export function toggleDevMode(): boolean {
 export function toggleGodMode(): boolean {
   try {
     /* hook here if needed */ return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -158,7 +166,8 @@ export function showDebugInfo(): boolean {
     const st = w.App?.state?.getState?.();
     console.log('State snapshot:', st);
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -183,7 +192,8 @@ export function exportSave(): boolean {
     link.click();
     URL.revokeObjectURL(url);
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }
@@ -218,13 +228,16 @@ export function openImportDialog(): boolean {
           });
           w.App?.ui?.updateAllStats?.();
           w.App?.ui?.checkUpgradeAffordability?.();
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to import save data:', error);
+        }
       };
       reader.readAsText(file);
     };
     input.click();
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('Dev function failed:', error);
     return false;
   }
 }

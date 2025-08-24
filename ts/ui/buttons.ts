@@ -99,7 +99,9 @@ const BUTTON_CONFIG: {
           audio.toggleButtonSounds();
           try {
             (window as any).App?.ui?.updateAutosaveStatus?.();
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to update autosave status in sound toggle:', error);
+          }
         }
       },
       type: 'sound-toggle-btn',
@@ -191,13 +193,16 @@ const POINTER_SUPPRESS_MS = 500;
 function markPointerHandled(element: any): void {
   try {
     element.__lastPointerTs = Date.now();
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to mark pointer as handled:', error);
+  }
 }
 function shouldSuppressClick(element: any): boolean {
   try {
     const last = Number((element && element.__lastPointerTs) || 0);
     return Date.now() - last < POINTER_SUPPRESS_MS;
-  } catch {
+  } catch (error) {
+    console.warn('Failed to check pointer suppression:', error);
     return false;
   }
 }
@@ -216,11 +221,15 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
       if (buttonType.audio === 'purchase') {
         try {
           audio.playButtonPurchaseSound();
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to handle button interaction:', error);
+        }
       } else {
         try {
           audio.playButtonClickSound();
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to play button click sound:', error);
+        }
       }
     } else if ((window as any).playButtonPurchaseSound && (window as any).playButtonClickSound) {
       if (buttonType.audio === 'purchase') {
@@ -229,22 +238,30 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
         (window as any).playButtonClickSound();
       }
     }
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to play button audio:', error);
+  }
   try {
     button.classList.add('button-clicked');
     setTimeout(() => {
       try {
         button.classList.remove('button-clicked');
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to remove button clicked class:', error);
+      }
     }, 150);
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to add button clicked visual feedback:', error);
+  }
   try {
     if (action.func && typeof action.func === 'function') {
       action.func();
       if (buttonType.feedback === 'levelup') {
         try {
           (window as any).App?.ui?.showLevelUpFeedback?.(0);
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to handle button interaction:', error);
+        }
       }
     }
   } catch (error) {
@@ -289,7 +306,9 @@ function setupUnifiedButtonSystem(): void {
           if (action.type) {
             try {
               button.classList.add(action.type);
-            } catch {}
+            } catch (error) {
+              console.warn('Failed to handle button interaction:', error);
+            }
           }
           console.log(`🔧 Successfully configured button: ${actionName} (${action.type})`);
         }
@@ -310,7 +329,9 @@ function setupSpecialButtonHandlers(): void {
         const tabName = action.split(':')[1];
         try {
           (window as any).App?.ui?.switchTab?.(tabName, e);
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to handle button interaction:', error);
+        }
       }
     });
   });
@@ -351,12 +372,18 @@ function setupSpecialButtonHandlers(): void {
             setTimeout(() => {
               try {
                 (sodaButton as any).classList.remove('soda-clicked');
-              } catch {}
+              } catch (error) {
+                console.warn('Failed to handle button interaction:', error);
+              }
             }, 140);
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to handle button interaction:', error);
+          }
           try {
             (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e);
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to handle button interaction:', error);
+          }
         }
         reset();
       });
@@ -403,12 +430,18 @@ function setupSpecialButtonHandlers(): void {
             setTimeout(() => {
               try {
                 (sodaButton as any).classList.remove('soda-clicked');
-              } catch {}
+              } catch (error) {
+                console.warn('Failed to handle button interaction:', error);
+              }
             }, 140);
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to handle button interaction:', error);
+          }
           try {
             (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e);
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to handle button interaction:', error);
+          }
         }
         reset();
       });
@@ -421,12 +454,18 @@ function setupSpecialButtonHandlers(): void {
         setTimeout(() => {
           try {
             (sodaButton as any).classList.remove('soda-clicked');
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to handle button interaction:', error);
+          }
         }, 140);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to handle button interaction:', error);
+      }
       try {
         (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e);
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to handle button interaction:', error);
+      }
     });
   }
   const chatInput = document.getElementById('chatInput') as any;
@@ -450,7 +489,9 @@ function setupSpecialButtonHandlers(): void {
         e.stopPropagation();
         try {
           (window as any).startGame?.();
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to handle button interaction:', error);
+        }
       });
     } else if ('ontouchstart' in window) {
       (splashStartBtn as any).addEventListener(
@@ -461,7 +502,9 @@ function setupSpecialButtonHandlers(): void {
           e.stopPropagation();
           try {
             (window as any).startGame?.();
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to handle button interaction:', error);
+          }
         },
         { passive: true }
       );
@@ -472,7 +515,9 @@ function setupSpecialButtonHandlers(): void {
       e.stopPropagation();
       try {
         (window as any).startGame?.();
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to handle button interaction:', error);
+      }
     });
   }
   if (document && (document as any).body && (document as any).body.addEventListener) {
@@ -488,7 +533,7 @@ function setupSpecialButtonHandlers(): void {
           const action = el.getAttribute('data-action');
           if (!action) return;
           const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
-          if (fnName === 'sodaClick') return;
+          if (!fnName || fnName === 'sodaClick') return;
           const argsAttr = el.getAttribute('data-args') || argStr;
           let args: any[] = [];
           if (argsAttr) {
@@ -527,7 +572,9 @@ function setupSpecialButtonHandlers(): void {
             e.stopPropagation();
             try {
               (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.();
-            } catch {}
+            } catch (error) {
+              console.warn('Failed to handle button interaction:', error);
+            }
             (window as any).App?.ui?.switchTab?.(args[0], e);
             return;
           }
@@ -543,7 +590,9 @@ function setupSpecialButtonHandlers(): void {
                   if (fnName === 'toggleButtonSounds') {
                     (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
                   }
-                } catch {}
+                } catch (error) {
+                  console.warn('Failed to handle button interaction:', error);
+                }
                 try {
                   const btnType = meta.type;
                   const audio = (window as any).App?.systems?.audio?.button;
@@ -559,7 +608,9 @@ function setupSpecialButtonHandlers(): void {
                       audio.playButtonClickSound?.();
                     }
                   }
-                } catch {}
+                } catch (error) {
+                  console.warn('Failed to handle button interaction:', error);
+                }
               } else {
                 if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) {
                   success = !!(window as any).App.systems.purchases.execute[fnName]();
@@ -580,7 +631,9 @@ function setupSpecialButtonHandlers(): void {
                       (window as any).App.systems.audio.button.playButtonClickSound?.();
                     }
                   }
-                } catch {}
+                } catch (error) {
+                  console.warn('Failed to handle button interaction:', error);
+                }
               }
               if (
                 isPurchase &&
@@ -596,7 +649,9 @@ function setupSpecialButtonHandlers(): void {
                     const match = (el.textContent || '').replace(/[,]/g, '').match(/\d+(?:\.\d+)?/);
                     costValue = match ? Number(match[0]) : undefined;
                   }
-                } catch {}
+                } catch (error) {
+                  console.warn('Failed to handle button interaction:', error);
+                }
                 const rect = el.getBoundingClientRect();
                 const cx = typeof e.clientX === 'number' ? e.clientX : rect.left + rect.width / 2;
                 const cy = typeof e.clientY === 'number' ? e.clientY : rect.top + rect.height / 2;
@@ -625,6 +680,7 @@ function setupSpecialButtonHandlers(): void {
         const action = el.getAttribute('data-action');
         if (!action) return;
         const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
+        if (!fnName) return;
         const argsAttr = el.getAttribute('data-args') || argStr;
         let args: any[] = [];
         if (argsAttr) {
@@ -658,7 +714,9 @@ function setupSpecialButtonHandlers(): void {
           e.stopPropagation();
           try {
             (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.();
-          } catch {}
+          } catch (error) {
+            console.warn('Failed to handle button interaction:', error);
+          }
           (window as any).App?.ui?.switchTab?.(args[0], e);
           return;
         }
@@ -674,7 +732,9 @@ function setupSpecialButtonHandlers(): void {
                 if (fnName === 'toggleButtonSounds') {
                   (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
                 }
-              } catch {}
+              } catch (error) {
+                console.warn('Failed to handle button interaction:', error);
+              }
               try {
                 const btnType = meta.type;
                 const audio = (window as any).App?.systems?.audio?.button;
@@ -690,7 +750,9 @@ function setupSpecialButtonHandlers(): void {
                     audio.playButtonClickSound?.();
                   }
                 }
-              } catch {}
+              } catch (error) {
+                console.warn('Failed to handle button interaction:', error);
+              }
             } else {
               if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) {
                 success = !!(window as any).App.systems.purchases.execute[fnName]();
@@ -711,7 +773,9 @@ function setupSpecialButtonHandlers(): void {
                     (window as any).App.systems.audio.button.playButtonClickSound?.();
                   }
                 }
-              } catch {}
+              } catch (error) {
+                console.warn('Failed to handle button interaction:', error);
+              }
             }
             if (
               isPurchase &&
@@ -727,7 +791,9 @@ function setupSpecialButtonHandlers(): void {
                   const match = (el.textContent || '').replace(/[,]/g, '').match(/\d+(?:\.\d+)?/);
                   costValue = match ? Number(match[0]) : undefined;
                 }
-              } catch {}
+              } catch (error) {
+                console.warn('Failed to handle button interaction:', error);
+              }
               const cx =
                 typeof e.clientX === 'number'
                   ? e.clientX

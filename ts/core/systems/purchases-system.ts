@@ -240,14 +240,17 @@ export function levelUp({
 function getAppState(): any {
   try {
     return (window as any).App?.state?.getState?.() || {};
-  } catch {
+  } catch (error) {
+    console.warn('Failed to get app state, returning empty object:', error);
     return {};
   }
 }
 function setAppState(patch: any): void {
   try {
     (window as any).App?.state?.setState?.(patch);
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to set app state:', error);
+  }
 }
 function toNum(v: any): number {
   return v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
@@ -267,10 +270,14 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       w.sips = w.sips && w.sips.minus ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after straw purchase:', error);
+    }
     try {
       w.straws = new (w.Decimal || Number)(result.straws);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update straws after straw purchase:', error);
+    }
     setAppState({
       sips: toNum(w.sips),
       straws: result.straws,
@@ -280,16 +287,22 @@ export const execute = {
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after straw purchase:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after straw purchase:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'straw',
         cost: result.spent,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit purchase event for straw:', error);
+    }
     return true;
   },
   buyCup(): boolean {
@@ -305,10 +318,14 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       w.sips = w.sips && w.sips.minus ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after cup purchase:', error);
+    }
     try {
       w.cups = new (w.Decimal || Number)(result.cups);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update cups after cup purchase:', error);
+    }
     setAppState({
       sips: toNum(w.sips),
       cups: result.cups,
@@ -318,16 +335,22 @@ export const execute = {
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after cup purchase:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after cup purchase:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'cup',
         cost: result.spent,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit purchase event for cup:', error);
+    }
     return true;
   },
   buyWiderStraws(): boolean {
@@ -343,10 +366,14 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       w.sips = w.sips && w.sips.minus ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after wider straws purchase:', error);
+    }
     try {
       w.widerStraws = new (w.Decimal || Number)(result.widerStraws);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update wider straws after purchase:', error);
+    }
     setAppState({
       sips: toNum(w.sips),
       widerStraws: result.widerStraws,
@@ -356,16 +383,22 @@ export const execute = {
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after wider straws purchase:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after wider straws purchase:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'widerStraws',
         cost: result.spent,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit purchase event for wider straws:', error);
+    }
     return true;
   },
   buyBetterCups(): boolean {
@@ -381,10 +414,14 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       w.sips = w.sips && w.sips.minus ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after better cups purchase:', error);
+    }
     try {
       w.betterCups = new (w.Decimal || Number)(result.betterCups);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update better cups after purchase:', error);
+    }
     setAppState({
       sips: toNum(w.sips),
       betterCups: result.betterCups,
@@ -394,16 +431,22 @@ export const execute = {
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after better cups purchase:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after better cups purchase:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'betterCups',
         cost: result.spent,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit purchase event for better cups:', error);
+    }
     return true;
   },
   buySuction(): boolean {
@@ -416,10 +459,14 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       w.sips = w.sips && w.sips.minus ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after suction purchase:', error);
+    }
     try {
       w.suctions = new (w.Decimal || Number)(result.suctions);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update suctions after purchase:', error);
+    }
     setAppState({
       sips: toNum(w.sips),
       suctions: result.suctions,
@@ -427,16 +474,22 @@ export const execute = {
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after suction purchase:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after suction purchase:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'suction',
         cost: result.spent,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit purchase event for suction:', error);
+    }
     return true;
   },
   buyFasterDrinks(): boolean {
@@ -449,10 +502,14 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       w.sips = w.sips && w.sips.minus ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after faster drinks purchase:', error);
+    }
     try {
       w.fasterDrinks = new (w.Decimal || Number)(result.fasterDrinks);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update faster drinks after purchase:', error);
+    }
     // Compute next drink rate based on config and new fasterDrinks count
     const { config } = getTypedConfig();
     const baseMs = Number(w.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE ?? 5000);
@@ -468,22 +525,35 @@ export const execute = {
     setAppState({ sips: toNum(w.sips), fasterDrinks: result.fasterDrinks, drinkRate: nextRate });
     try {
       w.App?.stateBridge?.setDrinkRate?.(nextRate);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to set drink rate via bridge after faster drinks purchase:', error);
+    }
     try {
       w.App?.ui?.updateCompactDrinkSpeedDisplays?.();
-    } catch {}
+    } catch (error) {
+      console.warn(
+        'Failed to update compact drink speed displays after faster drinks purchase:',
+        error
+      );
+    }
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after faster drinks purchase:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after faster drinks purchase:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'fasterDrinks',
         cost: result.spent,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit purchase event for faster drinks:', error);
+    }
     return true;
   },
   buyCriticalClick(): boolean {
@@ -497,13 +567,19 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       w.sips = w.sips && w.sips.minus ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after critical click purchase:', error);
+    }
     try {
       w.criticalClicks = new (w.Decimal || Number)(result.criticalClicks);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update critical clicks after purchase:', error);
+    }
     try {
       w.criticalClickChance = new (w.Decimal || Number)(result.criticalClickChance);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update critical click chance after purchase:', error);
+    }
     setAppState({
       sips: toNum(w.sips),
       criticalClicks: result.criticalClicks,
@@ -511,16 +587,22 @@ export const execute = {
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after critical click purchase:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after critical click purchase:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'criticalClick',
         cost: result.spent,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit purchase event for critical click:', error);
+    }
     return true;
   },
   upgradeFasterDrinks(): boolean {
@@ -533,7 +615,9 @@ export const execute = {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       w.sips = w.sips && w.sips.minus ? w.sips.minus(result.spent) : toNum(st.sips) - result.spent;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after faster drinks upgrade:', error);
+    }
     // Recalculate drinkRate factoring in upgrades (if any modifiers apply, integrate here)
     const { config } = getTypedConfig();
     const baseMs = Number(w.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE ?? 5000);
@@ -552,22 +636,35 @@ export const execute = {
     });
     try {
       w.App?.stateBridge?.setDrinkRate?.(nextRate);
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to set drink rate via bridge after faster drinks upgrade:', error);
+    }
     try {
       w.App?.ui?.updateCompactDrinkSpeedDisplays?.();
-    } catch {}
+    } catch (error) {
+      console.warn(
+        'Failed to update compact drink speed displays after faster drinks upgrade:',
+        error
+      );
+    }
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after faster drinks upgrade:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after faster drinks upgrade:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.UPGRADE_PURCHASED, {
         item: 'fasterDrinksUp',
         cost: result.spent,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit upgrade purchased event for faster drinks upgrade:', error);
+    }
     return true;
   },
   levelUp(): boolean {
@@ -582,21 +679,29 @@ export const execute = {
     const nextSips = toNum(st.sips) - result.spent + result.sipsGained;
     try {
       w.sips = w.Decimal ? new w.Decimal(nextSips) : nextSips;
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update sips after level up:', error);
+    }
     setAppState({ sips: nextSips, level: result.level });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to check upgrade affordability after level up:', error);
+    }
     try {
       w.App?.ui?.updateAllStats?.();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update all stats after level up:', error);
+    }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'levelUp',
         cost: result.spent,
         gained: result.sipsGained,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit purchase event for level up:', error);
+    }
     return true;
   },
 };

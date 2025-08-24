@@ -57,10 +57,14 @@ export function initializeUI(): void {
   // Sync options UI on init
   try {
     updateAutosaveStatus();
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update autosave status on init:', error);
+  }
   try {
     (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to update button sounds toggle on init:', error);
+  }
   if ((window as any).App?.events) {
     (window as any).App.events.on((window as any).App.EVENT_NAMES?.CLICK?.SODA, (data: any) => {
       updateTopSipsPerDrink();
@@ -129,17 +133,23 @@ export function switchTab(tabName: string, event: any): void {
   const clickedButton = event?.target as any;
   try {
     clickedButton?.classList?.add('active');
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to activate tab button:', error);
+  }
   if (tabName === 'stats') {
     try {
       updateAllStats();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update stats tab:', error);
+    }
   }
   if (tabName === 'unlocks') {
     try {
       const sys = (window as any).App?.systems?.unlocks;
       if (sys?.updateUnlocksTab) sys.updateUnlocksTab();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to update unlocks tab:', error);
+    }
   }
 }
 

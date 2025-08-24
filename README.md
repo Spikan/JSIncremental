@@ -9,7 +9,7 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 - **Statistics**: Track your progress and achievements
 - **Options**: Configurable auto-save and game settings
 - **Divine Oracle**: Sacred guidance through biblical wisdom and spiritual insight 🏛️<br/>
-  *(If you know, you know... runs on 64-bit divine processing power ⚡)*
+  _(If you know, you know... runs on 64-bit divine processing power ⚡)_
 
 ## 🎮 How to Play
 
@@ -22,21 +22,25 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 ## 🛠️ Development
 
 ### Prerequisites
+
 - Modern web browser with ES6 module support
 
 ### Running Locally
+
 1. Clone the repository
 2. Install dependencies: `npm install`
 3. Start dev server: `npm run dev`
 4. Open the provided local URL (e.g., `http://localhost:5173`)
 
 ### Scripts
+
 - `npm run dev` — Vite dev server with HMR
 - `npm run build` — Production build
 - `npm test` — Vitest test suite (312 tests passing)
 - `npm run typecheck` — TypeScript type-check (all core files converted)
 
 ### File Structure (high level)
+
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
 - `ts/index.ts` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
 - `ts/core/state/` — Central `App.state` store (`index.ts`, `shape.ts`) and bridge
@@ -60,6 +64,7 @@ The codebase has been successfully migrated to TypeScript with the following ach
 The migration was completed incrementally while preserving all existing functionality and game mechanics.
 
 **Directory Structure Update:**
+
 - The `js/` directory has been renamed to `ts/` to better reflect the TypeScript nature of the codebase
 - All import statements have been updated to reference the new `ts/` directory
 - Configuration files and documentation have been updated accordingly
@@ -67,6 +72,7 @@ The migration was completed incrementally while preserving all existing function
 ## 📱 Mobile Support
 
 The game is fully responsive and works great on:
+
 - Desktop computers
 - Tablets
 - Mobile phones
@@ -75,6 +81,7 @@ The game is fully responsive and works great on:
 ## 🎨 Customization
 
 You can customize various aspects of the game:
+
 - Colors and themes in `css/style.css`
 - Game mechanics in `ts/core/rules/*` and systems in `ts/core/systems/*`
 - State boot is ESM: no `window.defaultState`; see `ts/core/state/shape.ts`
@@ -83,6 +90,7 @@ You can customize various aspects of the game:
 ## 🤝 Contributing
 
 Feel free to contribute improvements! Just remember to:
+
 - Test your changes thoroughly
 - Follow the existing code style
 

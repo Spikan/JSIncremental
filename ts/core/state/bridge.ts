@@ -1,29 +1,37 @@
 // Typed legacy state bridge that mirrors globals into App.state
 
-type AppLike = { state: { setState?: (partial: any) => void; getState?: () => any } };
+type AppLike = { state: { setState?: (_partial: any) => void; getState?: () => any } };
 
 export function createStateBridge(app: AppLike) {
   function setDrinkRate(value: any) {
     try {
       app.state.setState?.({ drinkRate: Number(value) || 0 });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function setDrinkProgress(value: any) {
     try {
       app.state.setState?.({ drinkProgress: Number(value) || 0 });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function setLastDrinkTime(value: any) {
     try {
       app.state.setState?.({ lastDrinkTime: Number(value) || 0 });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function setLevel(value: any) {
     const numeric =
       value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 1;
     try {
       app.state.setState?.({ level: numeric });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
 
   function toNum(value: any): number {
@@ -33,72 +41,100 @@ export function createStateBridge(app: AppLike) {
   function syncSips(value: any) {
     try {
       app.state.setState?.({ sips: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncStraws(value: any) {
     try {
       app.state.setState?.({ straws: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncCups(value: any) {
     try {
       app.state.setState?.({ cups: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncSuctions(value: any) {
     try {
       app.state.setState?.({ suctions: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncWiderStraws(value: any) {
     try {
       app.state.setState?.({ widerStraws: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncBetterCups(value: any) {
     try {
       app.state.setState?.({ betterCups: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncFasterDrinks(value: any) {
     try {
       app.state.setState?.({ fasterDrinks: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncCriticalClicks(value: any) {
     try {
       app.state.setState?.({ criticalClicks: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncCriticalClickChance(value: any) {
     try {
       app.state.setState?.({ criticalClickChance: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncCriticalClickMultiplier(value: any) {
     try {
       app.state.setState?.({ criticalClickMultiplier: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncSuctionClickBonus(value: any) {
     try {
       app.state.setState?.({ suctionClickBonus: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncSps(value: any) {
     try {
       app.state.setState?.({ sps: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncStrawSPD(value: any) {
     try {
       app.state.setState?.({ strawSPD: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
   function syncCupSPD(value: any) {
     try {
       app.state.setState?.({ cupSPD: toNum(value) });
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
 
   function init() {
@@ -131,7 +167,9 @@ export function createStateBridge(app: AppLike) {
         seed.criticalClickUpCounter = toNum(w.criticalClickUpCounter);
       if (typeof w.sps !== 'undefined') seed.sps = toNum(w.sps);
       if (Object.keys(seed).length) app.state.setState?.(seed);
-    } catch {}
+    } catch (error) {
+      console.warn('State bridge operation failed:', error);
+    }
   }
 
   function autoSync() {
@@ -156,9 +194,7 @@ export function createStateBridge(app: AppLike) {
       if (typeof w.lastDrinkTime !== 'undefined') setLastDrinkTime(w.lastDrinkTime);
       if (typeof w.level !== 'undefined') setLevel(w.level);
     } catch (error) {
-      try {
-        console.warn('State bridge auto-sync failed:', error);
-      } catch {}
+      console.warn('State bridge auto-sync failed:', error);
     }
   }
 
@@ -186,4 +222,6 @@ export function createStateBridge(app: AppLike) {
 // Expose globally for legacy bootstrap
 try {
   (window as any).createStateBridge = createStateBridge;
-} catch {}
+} catch (error) {
+  console.warn('Failed to expose state bridge globally:', error);
+}

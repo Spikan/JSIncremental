@@ -3,40 +3,44 @@
 ## Rule: No Fallback Systems Without Root Cause Analysis
 
 **What this means:**
+
 - Do NOT add "hacky" fallback code to work around errors
 - Do NOT implement multiple fallback calculations without understanding why the primary system failed
 - Do NOT add try-catch blocks that silently fail and fall back to hardcoded values
 
 **What to do instead:**
+
 1. **Investigate the root cause** - Why is the primary system failing?
 2. **Check dependencies** - Are required objects/functions loaded in the right order?
 3. **Verify initialization** - Is the system properly initialized before use?
 4. **Fix the actual problem** - Don't work around it, fix it at the source
 
 **Examples of what NOT to do:**
+
 ```javascript
 // ❌ BAD: Multiple fallback calculations without understanding why
 function calculateSomething() {
-    if (window.primarySystem?.calculate) {
-        return window.primarySystem.calculate();
-    } else if (window.fallbackSystem?.calculate) {
-        return window.fallbackSystem.calculate();
-    } else {
-        // Hardcoded fallback - this is a hack!
-        return 100;
-    }
+  if (window.primarySystem?.calculate) {
+    return window.primarySystem.calculate();
+  } else if (window.fallbackSystem?.calculate) {
+    return window.fallbackSystem.calculate();
+  } else {
+    // Hardcoded fallback - this is a hack!
+    return 100;
+  }
 }
 
 // ❌ BAD: Silent fallbacks that hide real problems
 try {
-    return window.App.systems.purchases.buy();
+  return window.App.systems.purchases.buy();
 } catch {
-    // Silently fall back to manual logic - this hides the real issue!
-    return manualPurchaseLogic();
+  // Silently fall back to manual logic - this hides the real issue!
+  return manualPurchaseLogic();
 }
 ```
 
 **Examples of what TO do:**
+
 ```javascript
 // ✅ GOOD: Check if system is properly initialized
 if (!window.App?.systems?.purchases) {
@@ -52,6 +56,7 @@ return window.App.systems.purchases.buy();
 ```
 
 **Why this matters:**
+
 - Fallback systems create technical debt
 - They hide real problems that will resurface later
 - They confuse future developers (including AI agents)
@@ -59,6 +64,7 @@ return window.App.systems.purchases.buy();
 - They often don't actually solve the underlying issue
 
 **When fallbacks ARE acceptable:**
+
 - After thorough root cause analysis
 - When the fallback is a legitimate alternative (not a workaround)
 - When documented clearly with the reason for the fallback
@@ -71,10 +77,12 @@ return window.App.systems.purchases.buy();
 ## Rule: No Global Reads in UI (Use App.state)
 
 **What this means:**
+
 - UI modules must read from `App.state` exclusively
 - Do not read or write `window.*` in UI code
 
 **Do this:**
+
 ```javascript
 // ✅ GOOD
 const state = App.state.getState();
@@ -82,6 +90,7 @@ elements.totalClicks.textContent = String(state.totalClicks);
 ```
 
 **Not this:**
+
 ```javascript
 // ❌ BAD
 elements.totalClicks.textContent = String(window.totalClicks);
@@ -92,17 +101,19 @@ elements.totalClicks.textContent = String(window.totalClicks);
 ## Rule: No Inline Handlers (Use data-action + Central Dispatcher)
 
 **What this means:**
+
 - Remove `onclick`/inline handlers from HTML
 - Use `data-action` attributes and dispatch in `ts/ui/buttons.ts`
 
 **Pattern:**
+
 ```html
 <button data-action="buy-straw"></button>
 ```
 
 ```javascript
 // in ts/ui/buttons.ts
-document.body.addEventListener('click', (e) => {
+document.body.addEventListener('click', e => {
   const action = e.target?.closest('[data-action]')?.dataset?.action;
   if (!action) return;
   // route to App.systems / App.ui implementations
@@ -121,6 +132,7 @@ Avoid duplicating logic or reading config directly in multiple places.
 ## Rule: Imports and Extensions
 
 **What this means:**
+
 - Prefer extensionless imports during authoring to keep paths stable across JS→TS.
 - When importing `.ts` files directly in the browser (dynamic imports from JS), we allow `.ts` extensions via tsconfig. Keep consistency within the repo:
   - TS→TS: extensionless is preferred.

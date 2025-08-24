@@ -34,13 +34,19 @@ export function trackClick() {
       w.clickTimes = w.clickTimes || [];
       w.clickTimes.push(now);
       if (w.clickTimes.length > maxClickTimes) w.clickTimes.shift();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to maintain legacy click times array:', error);
+    }
 
     // Play audio if available
     try {
       w.App?.systems?.audio?.button?.playButtonClickSound?.();
-    } catch {}
-  } catch {}
+    } catch (error) {
+      console.warn('Failed to play button click sound:', error);
+    }
+  } catch (error) {
+    console.warn('Failed to track click:', error);
+  }
 }
 
 export function handleSodaClick(multiplier: number = 1) {
@@ -49,7 +55,9 @@ export function handleSodaClick(multiplier: number = 1) {
     // Track click via system
     try {
       trackClick();
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to track click in soda click handler:', error);
+    }
 
     const state = w.App?.state?.getState?.() || {};
     const suctionValue = Number(
@@ -69,13 +77,17 @@ export function handleSodaClick(multiplier: number = 1) {
       w.sips = Number(w.sips || 0) + totalClickValueNum;
       try {
         w.App?.state?.setState?.({ sips: Number(w.sips) });
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to set sips in state after fallback:', error);
+      }
     }
     try {
       const toNum = (v: any) =>
         v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
       w.App?.state?.setState?.({ sips: toNum(w.sips) });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to set sips in state with toNum conversion:', error);
+    }
 
     // Critical check using state-first
     const criticalChance = Number(state.criticalClickChance ?? w.criticalClickChance ?? 0);
@@ -95,11 +107,15 @@ export function handleSodaClick(multiplier: number = 1) {
         w.sips = Number(w.sips || 0) + criticalBonusNum;
         try {
           w.App?.state?.setState?.({ sips: Number(w.sips) });
-        } catch {}
+        } catch (error) {
+          console.warn('Failed to set sips in state after critical fallback:', error);
+        }
       }
       try {
         w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, { bonus: criticalBonusNum });
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to emit critical click event:', error);
+      }
     }
 
     // Emit soda click and sync totals
@@ -108,12 +124,18 @@ export function handleSodaClick(multiplier: number = 1) {
         value: totalClickValueNum,
         gained: totalClickValueNum,
       });
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to emit soda click event:', error);
+    }
     try {
       w.App?.stateBridge?.autoSync?.();
       const st = w.App?.state?.getState?.() || {};
       const prevTotal = Number(st.totalSipsEarned || 0);
       w.App?.state?.setState?.({ totalSipsEarned: prevTotal + totalClickValueNum });
-    } catch {}
-  } catch {}
+    } catch (error) {
+      console.warn('Failed to sync state and update total sips earned:', error);
+    }
+  } catch (error) {
+    console.warn('Failed to handle soda click:', error);
+  }
 }
