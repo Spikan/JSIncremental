@@ -3,10 +3,47 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
+declare global {
+  interface Window {
+    App?: any;
+    GAME_CONFIG?: any;
+    Decimal?: any;
+    sips?: any;
+    straws?: any;
+    cups?: any;
+    suctions?: any;
+    fasterDrinks?: any;
+    widerStraws?: any;
+    betterCups?: any;
+    criticalClickChance?: any;
+    criticalClickMultiplier?: any;
+    criticalClicks?: any;
+    criticalClickUpCounter?: any;
+    suctionClickBonus?: any;
+    level?: any;
+    totalSipsEarned?: any;
+    totalClicks?: number;
+    gameStartDate?: number;
+    lastClickTime?: number;
+    clickTimes?: number[];
+    clickSoundsEnabled?: boolean;
+    autosaveEnabled?: boolean;
+    autosaveInterval?: number;
+    autosaveCounter?: number;
+    lastDrinkTime?: number;
+    drinkRate?: number;
+    drinkProgress?: number;
+    sps?: any;
+    currentClickStreak?: number;
+    bestClickStreak?: number;
+  }
+  var performance: any;
+}
+
 describe('Main.js Integration - Refactored Functionality', () => {
-  let mockApp;
-  let mockGameConfig;
-  let mockDecimal;
+  let mockApp: any;
+  let mockGameConfig: any;
+  let mockDecimal: any;
   
   beforeEach(() => {
     // Reset mocks
@@ -14,36 +51,38 @@ describe('Main.js Integration - Refactored Functionality', () => {
     
     // Mock Decimal library
     mockDecimal = class Decimal {
-      constructor(value) {
+      value: any;
+      
+      constructor(value: any) {
         this.value = value;
       }
       
-      plus(other) {
+      plus(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value + otherValue);
       }
       
-      minus(other) {
+      minus(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value - otherValue);
       }
       
-      times(other) {
+      times(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value * otherValue);
       }
       
-      div(other) {
+      div(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value / otherValue);
       }
       
-      gte(other) {
+      gte(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return this.value >= otherValue;
       }
       
-      lte(other) {
+      lte(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value <= otherValue);
       }
@@ -160,7 +199,7 @@ describe('Main.js Integration - Refactored Functionality', () => {
           }))
         },
         autosave: {
-          computeAutosaveCounter: vi.fn(({ enabled, counter, intervalSec, drinkRateMs }) => {
+          computeAutosaveCounter: vi.fn(({ enabled, counter, intervalSec, drinkRateMs }: any) => {
             if (!enabled) return { nextCounter: 0, shouldSave: false };
             
             const drinksPerSecond = 1000 / drinkRateMs;
@@ -180,21 +219,21 @@ describe('Main.js Integration - Refactored Functionality', () => {
           }))
         },
         purchases: {
-          canAfford: vi.fn((cost) => window.sips.gte(cost)),
-          purchase: vi.fn((item, cost) => {
-            if (window.sips.gte(cost)) {
-              window.sips = window.sips.minus(cost);
+          canAfford: vi.fn((cost: any) => (global as any).window.sips.gte(cost)),
+          purchase: vi.fn((item: any, cost: any) => {
+            if ((global as any).window.sips.gte(cost)) {
+              (global as any).window.sips = (global as any).window.sips.minus(cost);
               return true;
             }
             return false;
           })
         },
         clicks: {
-          processClick: vi.fn((multiplier = 1) => {
+          processClick: vi.fn((multiplier: number = 1) => {
             const baseSips = 1;
             const totalSips = baseSips * multiplier;
-            window.sips = window.sips.plus(totalSips);
-            window.totalClicks++;
+            (global as any).window.sips = (global as any).window.sips.plus(totalSips);
+            (global as any).window.totalClicks++;
             return totalSips;
           })
         },
@@ -263,21 +302,21 @@ describe('Main.js Integration - Refactored Functionality', () => {
         economy: {
           computeStrawSPD: vi.fn(() => 2),
           computeCupSPD: vi.fn(() => 3),
-          computeStrawCost: vi.fn((count) => 10 * Math.pow(1.15, count)),
-          computeCupCost: vi.fn((count) => 50 * Math.pow(1.2, count))
+          computeStrawCost: vi.fn((count: number) => 10 * Math.pow(1.15, count)),
+          computeCupCost: vi.fn((count: number) => 50 * Math.pow(1.2, count))
         },
         clicks: {
-          processClick: vi.fn((baseSips = 1, multiplier = 1) => baseSips * multiplier)
+          processClick: vi.fn((baseSips: number = 1, multiplier: number = 1) => baseSips * multiplier)
         },
         purchases: {
-          canAfford: vi.fn((cost) => window.sips.gte(cost))
+          canAfford: vi.fn((cost: any) => (global as any).window.sips.gte(cost))
         }
       }
     };
     
     // Setup global mocks
-    global.window = {
-      ...global.window,
+    (global as any).window = {
+      ...(global as any).window,
       App: mockApp,
       GAME_CONFIG: mockGameConfig,
       Decimal: mockDecimal,
@@ -312,7 +351,7 @@ describe('Main.js Integration - Refactored Functionality', () => {
     };
     
     // Mock DOM elements
-    document.body.innerHTML = `
+    (global as any).document.body.innerHTML = `
       <div id="splashScreen" style="display: block;">
         <div class="splash-content">
           <h1 class="splash-title">Soda Clicker Pro</h1>
@@ -372,7 +411,7 @@ describe('Main.js Integration - Refactored Functionality', () => {
       
       systemFunctions.forEach(funcPath => {
         const parts = funcPath.split('.');
-        let obj = mockApp.systems;
+        let obj: any = mockApp.systems;
         parts.forEach(part => {
           expect(obj[part]).toBeDefined();
           obj = obj[part];
@@ -384,9 +423,9 @@ describe('Main.js Integration - Refactored Functionality', () => {
       // Test that function calls use optional chaining
       expect(() => {
         // These should not throw even if functions are missing
-        window.App?.ui?.updateAllStats?.();
-        window.App?.systems?.save?.performSaveSnapshot?.();
-        window.App?.systems?.options?.saveOptions?.();
+        (global as any).window.App?.ui?.updateAllStats?.();
+        (global as any).window.App?.systems?.save?.performSaveSnapshot?.();
+        (global as any).window.App?.systems?.options?.saveOptions?.();
       }).not.toThrow();
     });
   });
@@ -560,17 +599,17 @@ describe('Main.js Integration - Refactored Functionality', () => {
   describe('Error Handling and Graceful Degradation', () => {
     it('should handle missing App object gracefully', () => {
       // Test that missing App object doesn't crash
-      const originalApp = window.App;
-      delete window.App;
+      const originalApp = (global as any).window.App;
+      delete (global as any).window.App;
       
       expect(() => {
         // Should not crash
-        window.App?.ui?.updateAllStats?.();
-        window.App?.systems?.save?.performSaveSnapshot?.();
+        (global as any).window.App?.ui?.updateAllStats?.();
+        (global as any).window.App?.systems?.save?.performSaveSnapshot?.();
       }).not.toThrow();
       
       // Restore
-      window.App = originalApp;
+      (global as any).window.App = originalApp;
     });
 
     it('should handle missing UI functions gracefully', () => {
@@ -580,7 +619,7 @@ describe('Main.js Integration - Refactored Functionality', () => {
       
       expect(() => {
         // Should not crash
-        window.App?.ui?.updateAllStats?.();
+        (global as any).window.App?.ui?.updateAllStats?.();
       }).not.toThrow();
       
       // Restore
@@ -594,7 +633,7 @@ describe('Main.js Integration - Refactored Functionality', () => {
       
       expect(() => {
         // Should not crash
-        window.App?.systems?.save?.performSaveSnapshot?.();
+        (global as any).window.App?.systems?.save?.performSaveSnapshot?.();
       }).not.toThrow();
       
       // Restore
@@ -604,15 +643,15 @@ describe('Main.js Integration - Refactored Functionality', () => {
 
   describe('Performance and Memory Management', () => {
     it('should handle rapid function calls efficiently', () => {
-      const startTime = performance.now();
+      const startTime = (global as any).performance?.now?.() || Date.now();
       
       // Simulate rapid function calls
       for (let i = 0; i < 1000; i++) {
-        window.App?.ui?.updateAllStats?.();
-        window.App?.systems?.save?.performSaveSnapshot?.();
+        (global as any).window.App?.ui?.updateAllStats?.();
+        (global as any).window.App?.systems?.save?.performSaveSnapshot?.();
       }
       
-      const endTime = performance.now();
+      const endTime = (global as any).performance?.now?.() || Date.now();
       const duration = endTime - startTime;
       
       // Should complete within reasonable time (less than 1000ms)
@@ -620,17 +659,17 @@ describe('Main.js Integration - Refactored Functionality', () => {
     });
 
     it('should not create excessive objects during operations', () => {
-      const initialMemory = performance.memory?.usedJSHeapSize || 0;
+      const initialMemory = (global as any).performance?.memory?.usedJSHeapSize || 0;
       
       // Simulate extended operations
       for (let i = 0; i < 100; i++) {
-        window.App?.ui?.updateAllStats?.();
-        window.App?.systems?.save?.performSaveSnapshot?.();
-        window.App?.systems?.options?.loadOptions?.();
+        (global as any).window.App?.ui?.updateAllStats?.();
+        (global as any).window.App?.systems?.save?.performSaveSnapshot?.();
+        (global as any).window.App?.systems?.options?.loadOptions?.();
       }
       
       // Memory usage should remain reasonable
-      const finalMemory = performance.memory?.usedJSHeapSize || 0;
+      const finalMemory = (global as any).performance?.memory?.usedJSHeapSize || 0;
       const memoryIncrease = finalMemory - initialMemory;
       
       // Memory increase should be minimal (less than 1MB)
@@ -672,18 +711,18 @@ describe('Main.js Integration - Refactored Functionality', () => {
   describe('Backward Compatibility', () => {
     it('should maintain existing game functionality', () => {
       // Test that core game mechanics still work
-      expect(window.sips.value).toBe(1000);
-      expect(window.straws.value).toBe(5);
-      expect(window.cups.value).toBe(3);
-      expect(window.level.value).toBe(1);
+      expect((global as any).window.sips.value).toBe(1000);
+      expect((global as any).window.straws.value).toBe(5);
+      expect((global as any).window.cups.value).toBe(3);
+      expect((global as any).window.level.value).toBe(1);
     });
 
     it('should maintain existing game state', () => {
       // Test that game state is preserved
-      expect(window.totalClicks).toBe(150);
-      expect(window.gameStartDate).toBeDefined();
-      expect(window.lastClickTime).toBeDefined();
-      expect(window.clickTimes).toBeDefined();
+      expect((global as any).window.totalClicks).toBe(150);
+      expect((global as any).window.gameStartDate).toBeDefined();
+      expect((global as any).window.lastClickTime).toBeDefined();
+      expect((global as any).window.clickTimes).toBeDefined();
     });
 
     it('should maintain existing configuration', () => {

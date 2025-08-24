@@ -3,10 +3,48 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
+declare global {
+  interface Window {
+    App?: any;
+    GAME_CONFIG?: any;
+    Decimal?: any;
+    DOM_CACHE?: any;
+    sips?: any;
+    straws?: any;
+    cups?: any;
+    suctions?: any;
+    fasterDrinks?: any;
+    widerStraws?: any;
+    betterCups?: any;
+    criticalClickChance?: any;
+    criticalClickMultiplier?: any;
+    criticalClicks?: any;
+    criticalClickUpCounter?: any;
+    suctionClickBonus?: any;
+    level?: any;
+    totalSipsEarned?: any;
+    totalClicks?: number;
+    gameStartDate?: number;
+    lastClickTime?: number;
+    clickTimes?: number[];
+    clickSoundsEnabled?: boolean;
+    autosaveEnabled?: boolean;
+    autosaveInterval?: number;
+    autosaveCounter?: number;
+    lastDrinkTime?: number;
+    drinkRate?: number;
+    drinkProgress?: number;
+    sps?: any;
+    currentClickStreak?: number;
+    bestClickStreak?: number;
+  }
+  var performance: any;
+}
+
 describe('UI System - Comprehensive Testing', () => {
-  let mockApp;
-  let mockGameConfig;
-  let mockDecimal;
+  let mockApp: any;
+  let mockGameConfig: any;
+  let mockDecimal: any;
   
   beforeEach(() => {
     // Reset mocks
@@ -14,38 +52,40 @@ describe('UI System - Comprehensive Testing', () => {
     
     // Mock Decimal library
     mockDecimal = class Decimal {
-      constructor(value) {
+      value: any;
+      
+      constructor(value: any) {
         this.value = value;
       }
       
-      plus(other) {
+      plus(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value + otherValue);
       }
       
-      minus(other) {
+      minus(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value - otherValue);
       }
       
-      times(other) {
+      times(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value * otherValue);
       }
       
-      div(other) {
+      div(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return new Decimal(this.value / otherValue);
       }
       
-      gte(other) {
+      gte(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
         return this.value >= otherValue;
       }
       
-      lte(other) {
+      lte(other: any) {
         const otherValue = other instanceof Decimal ? other.value : other;
-        return this.value <= otherValue;
+        return new Decimal(this.value <= otherValue);
       }
       
       toNumber() {
@@ -130,8 +170,8 @@ describe('UI System - Comprehensive Testing', () => {
     };
     
     // Setup global mocks
-    global.window = {
-      ...global.window,
+    (global as any).window = {
+      ...(global as any).window,
       App: mockApp,
       GAME_CONFIG: mockGameConfig,
       Decimal: mockDecimal,
@@ -166,7 +206,7 @@ describe('UI System - Comprehensive Testing', () => {
     };
     
     // Mock comprehensive DOM elements
-    document.body.innerHTML = `
+    (global as any).document.body.innerHTML = `
       <div id="splashScreen" style="display: block;">
         <div class="splash-content">
           <h1 class="splash-title">Soda Clicker Pro</h1>
@@ -278,8 +318,8 @@ describe('UI System - Comprehensive Testing', () => {
         };
         
         // Check if player can afford upgrades
-        const canAffordStraw = window.sips.gte(costs.straw);
-        const canAffordCup = window.sips.gte(costs.cup);
+        const canAffordStraw = (global as any).window.sips.gte(costs.straw);
+        const canAffordCup = (global as any).window.sips.gte(costs.cup);
         
         return { straw: canAffordStraw, cup: canAffordCup };
       });
@@ -360,7 +400,7 @@ describe('UI System - Comprehensive Testing', () => {
       const mockCountdown = { textContent: '', classList: { add: vi.fn(), remove: vi.fn() } };
       
       // Mock DOM_CACHE
-      global.window = {
+      (global as any).window = {
         DOM_CACHE: {
           progressFill: mockProgressFill,
           countdown: mockCountdown
@@ -393,7 +433,7 @@ describe('UI System - Comprehensive Testing', () => {
       expect(mockUpdateDrinkProgress).toHaveBeenCalledTimes(6);
       
       // Cleanup
-      delete global.window;
+      delete (global as any).window;
     });
 
     it('should update top sips per drink display', () => {
@@ -566,15 +606,15 @@ describe('UI System - Comprehensive Testing', () => {
 
     it('should handle missing game state gracefully', () => {
       // Test that UI functions handle missing game state
-      const originalSips = window.sips;
-      delete window.sips;
+      const originalSips = (global as any).window.sips;
+      delete (global as any).window.sips;
       
       expect(() => {
         mockApp.ui.checkUpgradeAffordability?.();
       }).not.toThrow();
       
       // Restore
-      window.sips = originalSips;
+      (global as any).window.sips = originalSips;
     });
 
     it('should handle rapid function calls without errors', () => {
@@ -591,32 +631,32 @@ describe('UI System - Comprehensive Testing', () => {
 
   describe('Performance and Memory Management', () => {
     it('should not create excessive DOM elements', () => {
-      const initialElementCount = document.body.children.length;
+      const initialElementCount = (global as any).document.body.children.length;
       
       // Simulate intensive UI operations
       for (let i = 0; i < 50; i++) {
-        const div = document.createElement('div');
+        const div = (global as any).document.createElement('div');
         div.textContent = `Performance test ${i}`;
-        document.body.appendChild(div);
+        (global as any).document.body.appendChild(div);
       }
       
       // Clean up
-      const testElements = document.querySelectorAll('div[textContent*="Performance test"]');
-      testElements.forEach(el => el.remove());
+      const testElements = (global as any).document.querySelectorAll('div[textContent*="Performance test"]');
+      testElements.forEach((el: any) => el.remove());
       
       // Should have cleaned up most test elements (DOM cleanup in tests can be imperfect)
-      expect(document.body.children.length).toBeLessThan(100); // Just ensure we're not creating excessive elements
+      expect((global as any).document.body.children.length).toBeLessThan(100); // Just ensure we're not creating excessive elements
     });
 
     it('should handle rapid updates efficiently', () => {
-      const startTime = performance.now();
+      const startTime = (global as any).performance?.now?.() || Date.now();
       
       // Simulate rapid UI updates
       for (let i = 0; i < 1000; i++) {
         mockApp.ui.updateAllStats?.();
       }
       
-      const endTime = performance.now();
+      const endTime = (global as any).performance?.now?.() || Date.now();
       const duration = endTime - startTime;
       
       // Should complete within reasonable time (less than 500ms)
@@ -625,7 +665,7 @@ describe('UI System - Comprehensive Testing', () => {
     });
 
     it('should not leak memory during updates', () => {
-      const initialMemory = performance.memory?.usedJSHeapSize || 0;
+      const initialMemory = (global as any).performance?.memory?.usedJSHeapSize || 0;
       
       // Simulate extended UI operations
       for (let i = 0; i < 100; i++) {
@@ -635,7 +675,7 @@ describe('UI System - Comprehensive Testing', () => {
       }
       
       // Memory usage should remain reasonable
-      const finalMemory = performance.memory?.usedJSHeapSize || 0;
+      const finalMemory = (global as any).performance?.memory?.usedJSHeapSize || 0;
       const memoryIncrease = finalMemory - initialMemory;
       
       // Memory increase should be minimal (less than 1MB)

@@ -1,7 +1,60 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
+declare global {
+  interface Window {
+    DOM_CACHE?: {
+      sodaButton?: { parentNode?: { getBoundingClientRect?: () => { left: number; top: number; width: number; height: number } } };
+      shopDiv?: { getBoundingClientRect?: () => { left: number; top: number; width: number; height: number } };
+      levelUpDiv?: { getBoundingClientRect?: () => { left: number; top: number; width: number; height: number } };
+    };
+    GAME_CONFIG?: {
+      LIMITS?: {
+        CLICK_FEEDBACK_RANGE_X?: number;
+        CLICK_FEEDBACK_RANGE_Y?: number;
+      };
+      TIMING?: {
+        CLICK_FEEDBACK_DURATION?: number;
+        CRITICAL_FEEDBACK_DURATION?: number;
+      };
+    };
+    App?: {
+      systems?: {
+        audio?: {
+          button?: {
+            playButtonClickSound?: () => void;
+            playButtonPurchaseSound?: () => void;
+          };
+        };
+        save?: {
+          saveGame?: (data: any) => void;
+          loadGame?: () => any;
+        };
+        options?: {
+          saveOptions?: (options: any) => void;
+          loadOptions?: () => any;
+        };
+      };
+      events?: {
+        emit?: (event: string, data?: any) => void;
+        on?: (event: string, handler: Function) => void;
+      };
+    };
+    localStorage?: Storage;
+    sessionStorage?: Storage;
+    addEventListener?: (event: string, handler: Function) => void;
+    removeEventListener?: (event: string, handler: Function) => void;
+    requestAnimationFrame?: (callback: FrameRequestCallback) => number;
+    cancelAnimationFrame?: (handle: number) => void;
+    setTimeout?: (callback: Function, delay: number) => number;
+    clearTimeout?: (id: number) => void;
+    setInterval?: (callback: Function, delay: number) => number;
+    clearInterval?: (id: number) => void;
+    console?: Console;
+  }
+}
+
 // Mock DOM and browser APIs
-global.document = {
+(global as any).document = {
     getElementById: vi.fn(() => ({
         textContent: '',
         innerHTML: '',
@@ -26,7 +79,7 @@ global.document = {
     querySelectorAll: vi.fn(() => [])
 };
 
-global.window = {
+(global as any).window = {
     DOM_CACHE: {
         sodaButton: { parentNode: { getBoundingClientRect: vi.fn(() => ({ left: 100, top: 200, width: 150, height: 150 })) } },
         shopDiv: { getBoundingClientRect: vi.fn(() => ({ left: 300, top: 100, width: 200, height: 150 })) },
@@ -78,11 +131,11 @@ global.window = {
     },
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
-    requestAnimationFrame: vi.fn((cb) => setTimeout(cb, 16)),
+    requestAnimationFrame: vi.fn((cb: Function) => setTimeout(cb, 16)),
     cancelAnimationFrame: vi.fn(),
-    setTimeout: vi.fn((cb, delay) => {
+    setTimeout: vi.fn((cb: Function, delay: number) => {
         const id = Math.random();
-        setTimeout.mock.calls.push([cb, delay]);
+        (setTimeout as any).mock.calls.push([cb, delay]);
         return id;
     }),
     clearTimeout: vi.fn(),
@@ -95,7 +148,7 @@ global.window = {
     }
 };
 
-global.console = {
+(global as any).console = {
     log: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
@@ -103,20 +156,20 @@ global.console = {
     debug: vi.fn()
 };
 
-global.setTimeout = vi.fn((cb, delay) => {
+(global as any).setTimeout = vi.fn((cb: Function, delay: number) => {
     const id = Math.random();
-    setTimeout.mock.calls.push([cb, delay]);
+    (setTimeout as any).mock.calls.push([cb, delay]);
     return id;
 });
 
-global.clearTimeout = vi.fn();
-global.setInterval = vi.fn();
-global.clearInterval = vi.fn();
+(global as any).clearTimeout = vi.fn();
+(global as any).setInterval = vi.fn();
+(global as any).clearInterval = vi.fn();
 
 describe('Game Runtime Safety Tests', () => {
     
     describe('UI System Runtime Safety', () => {
-        let ui;
+        let ui: any;
 
         beforeEach(async () => {
             vi.clearAllMocks();
@@ -216,7 +269,7 @@ describe('Game Runtime Safety Tests', () => {
     });
 
     describe('Feedback System Runtime Safety', () => {
-        let feedback;
+        let feedback: any;
 
         beforeEach(async () => {
             vi.clearAllMocks();
@@ -226,73 +279,73 @@ describe('Game Runtime Safety Tests', () => {
         it('should handle missing soda button gracefully in showClickFeedback', () => {
             expect(() => {
                 // Remove soda button temporarily
-                const originalSodaButton = window.DOM_CACHE.sodaButton;
-                delete window.DOM_CACHE.sodaButton;
+                const originalSodaButton = (global as any).window.DOM_CACHE.sodaButton;
+                delete (global as any).window.DOM_CACHE.sodaButton;
                 
                 feedback.showClickFeedback(100, false);
                 
                 // Restore
-                window.DOM_CACHE.sodaButton = originalSodaButton;
+                (global as any).window.DOM_CACHE.sodaButton = originalSodaButton;
             }).not.toThrow();
         });
 
         it('should handle missing shop div gracefully in showPurchaseFeedback', () => {
             expect(() => {
                 // Remove shop div temporarily
-                const originalShopDiv = window.DOM_CACHE.shopDiv;
-                delete window.DOM_CACHE.shopDiv;
+                const originalShopDiv = (global as any).window.DOM_CACHE.shopDiv;
+                delete (global as any).window.DOM_CACHE.shopDiv;
                 
                 feedback.showPurchaseFeedback('Test Item', 50);
                 
                 // Restore
-                window.DOM_CACHE.shopDiv = originalShopDiv;
+                (global as any).window.DOM_CACHE.shopDiv = originalShopDiv;
             }).not.toThrow();
         });
 
         it('should handle missing level up div gracefully in showLevelUpFeedback', () => {
             expect(() => {
                 // Remove level up div temporarily
-                const originalLevelUpDiv = window.DOM_CACHE.levelUpDiv;
-                delete window.DOM_CACHE.levelUpDiv;
+                const originalLevelUpDiv = (global as any).window.DOM_CACHE.levelUpDiv;
+                delete (global as any).window.DOM_CACHE.levelUpDiv;
                 
                 feedback.showLevelUpFeedback(500);
                 
                 // Restore
-                window.DOM_CACHE.levelUpDiv = originalLevelUpDiv;
+                (global as any).window.DOM_CACHE.levelUpDiv = originalLevelUpDiv;
             }).not.toThrow();
         });
 
         it('should handle missing GAME_CONFIG gracefully in feedback functions', () => {
             expect(() => {
                 // Remove GAME_CONFIG temporarily
-                const originalConfig = window.GAME_CONFIG;
-                delete window.GAME_CONFIG;
+                const originalConfig = (global as any).window.GAME_CONFIG;
+                delete (global as any).window.GAME_CONFIG;
                 
                 feedback.showClickFeedback(100, false);
                 feedback.showPurchaseFeedback('Test', 50);
                 
                 // Restore
-                window.GAME_CONFIG = originalConfig;
+                (global as any).window.GAME_CONFIG = originalConfig;
             }).not.toThrow();
         });
 
         it('should handle missing prettify function gracefully', () => {
             expect(() => {
                 // Remove prettify temporarily
-                const originalPrettify = global.prettify;
-                delete global.prettify;
+                const originalPrettify = (global as any).prettify;
+                delete (global as any).prettify;
                 
                 feedback.showClickFeedback(100, false);
                 feedback.showPurchaseFeedback('Test', 50);
                 
                 // Restore
-                global.prettify = originalPrettify;
+                (global as any).prettify = originalPrettify;
             }).not.toThrow();
         });
     });
 
     describe('Button System Runtime Safety', () => {
-        let buttonSystem;
+        let buttonSystem: any;
 
         beforeEach(async () => {
             vi.clearAllMocks();
@@ -302,8 +355,8 @@ describe('Game Runtime Safety Tests', () => {
         it('should handle missing audio system gracefully', () => {
             expect(() => {
                 // Remove audio system temporarily
-                const originalAudio = window.App.systems.audio;
-                delete window.App.systems.audio;
+                const originalAudio = (global as any).window.App.systems.audio;
+                delete (global as any).window.App.systems.audio;
                 
                 // Test button click handling
                 const mockEvent = {
@@ -319,7 +372,7 @@ describe('Game Runtime Safety Tests', () => {
                 buttonSystem.handleButtonClick(mockEvent, mockButton, 'buyStraw');
                 
                 // Restore
-                window.App.systems.audio = originalAudio;
+                (global as any).window.App.systems.audio = originalAudio;
             }).not.toThrow();
         });
 
@@ -360,7 +413,7 @@ describe('Game Runtime Safety Tests', () => {
     });
 
     describe('Core Systems Runtime Safety', () => {
-        let coreSystems;
+        let coreSystems: any;
 
         beforeEach(async () => {
             vi.clearAllMocks();
@@ -375,8 +428,8 @@ describe('Game Runtime Safety Tests', () => {
         it('should handle missing localStorage gracefully in save system', () => {
             expect(() => {
                 // Remove localStorage temporarily
-                const originalLocalStorage = window.localStorage;
-                delete window.localStorage;
+                const originalLocalStorage = (global as any).window.localStorage;
+                delete (global as any).window.localStorage;
                 
                 // Test save functions
                 if (coreSystems.save.saveGame) {
@@ -384,15 +437,15 @@ describe('Game Runtime Safety Tests', () => {
                 }
                 
                 // Restore
-                window.localStorage = originalLocalStorage;
+                (global as any).window.localStorage = originalLocalStorage;
             }).not.toThrow();
         });
 
         it('should handle missing sessionStorage gracefully in options system', () => {
             expect(() => {
                 // Remove sessionStorage temporarily
-                const originalSessionStorage = window.sessionStorage;
-                delete window.sessionStorage;
+                const originalSessionStorage = (global as any).window.sessionStorage;
+                delete (global as any).window.sessionStorage;
                 
                 // Test options functions
                 if (coreSystems.options.saveOptions) {
@@ -400,15 +453,15 @@ describe('Game Runtime Safety Tests', () => {
                 }
                 
                 // Restore
-                window.sessionStorage = originalSessionStorage;
+                (global as any).window.sessionStorage = originalSessionStorage;
             }).not.toThrow();
         });
 
         it('should handle missing App.systems gracefully in autosave system', () => {
             expect(() => {
                 // Remove App.systems temporarily
-                const originalAppSystems = window.App.systems;
-                delete window.App.systems;
+                const originalAppSystems = (global as any).window.App.systems;
+                delete (global as any).window.App.systems;
                 
                 // Test autosave functions
                 if (coreSystems.autosave.computeAutosaveCounter) {
@@ -421,41 +474,43 @@ describe('Game Runtime Safety Tests', () => {
                 }
                 
                 // Restore
-                window.App.systems = originalAppSystems;
+                (global as any).window.App.systems = originalAppSystems;
             }).not.toThrow();
         });
     });
 
     describe('Main Integration Runtime Safety', () => {
         beforeEach(() => {
-            // Mock the main.js module to prevent import errors
-            vi.doMock('../ts/main.js', () => ({
+            // Mock the main.ts module to prevent import errors
+            vi.doMock('../ts/main.ts', () => ({
                 default: {},
                 // Mock any exports if needed
             }));
             
             // Ensure Decimal is available globally
-            global.Decimal = global.Decimal || class Decimal {
-                constructor(value) {
+            (global as any).Decimal = (global as any).Decimal || class Decimal {
+                private _value: number;
+                
+                constructor(value: any) {
                     this._value = Number(value) || 0;
                 }
                 toNumber() { return this._value; }
                 toString() { return String(this._value); }
-                plus(other) { return new Decimal(this._value + Number(other)); }
-                minus(other) { return new Decimal(this._value - Number(other)); }
-                times(other) { return new Decimal(this._value * Number(other)); }
-                div(other) { return new Decimal(this._value / Number(other)); }
-                gte(other) { return this._value >= Number(other); }
-                lte(other) { return this._value <= Number(other); }
-                gt(other) { return this._value > Number(other); }
-                lt(other) { return this._value < Number(other); }
-                eq(other) { return this._value === Number(other); }
+                plus(other: any) { return new Decimal(this._value + Number(other)); }
+                minus(other: any) { return new Decimal(this._value - Number(other)); }
+                times(other: any) { return new Decimal(this._value * Number(other)); }
+                div(other: any) { return new Decimal(this._value / Number(other)); }
+                gte(other: any) { return this._value >= Number(other); }
+                lte(other: any) { return this._value <= Number(other); }
+                gt(other: any) { return this._value > Number(other); }
+                lt(other: any) { return this._value < Number(other); }
+                eq(other: any) { return this._value === Number(other); }
             };
             
             // Mock window.App structure with proper UI functions
-            global.window = global.window || {};
-            global.window.App = global.window.App || {};
-            global.window.App.ui = global.window.App.ui || {
+            (global as any).window = (global as any).window || {};
+            (global as any).window.App = (global as any).window.App || {};
+            (global as any).window.App.ui = (global as any).window.App.ui || {
                 updateCostDisplay: vi.fn(),
                 updateButtonState: vi.fn(),
                 updateTopSipsPerDrink: vi.fn(),
@@ -478,7 +533,7 @@ describe('Game Runtime Safety Tests', () => {
                 updateCountdownText: vi.fn(),
                 setMusicStatusText: vi.fn()
             };
-            global.window.App.systems = global.window.App.systems || {
+            (global as any).window.App.systems = (global as any).window.App.systems || {
                 save: { performSaveSnapshot: vi.fn() },
                 options: { loadOptions: vi.fn() },
                 autosave: { computeAutosaveCounter: vi.fn() },
@@ -489,39 +544,39 @@ describe('Game Runtime Safety Tests', () => {
                 audio: { button: { playButtonClickSound: vi.fn() } },
                 gameInit: { initOnDomReady: vi.fn() }
             };
-            global.window.App.rules = global.window.App.rules || {
+            (global as any).window.App.rules = (global as any).window.App.rules || {
                 economy: { computeStrawSPD: vi.fn() },
                 clicks: { computeClickValue: vi.fn() },
                 purchases: { nextStrawCost: vi.fn() }
             };
         });
 
-        it('should handle missing App.ui gracefully in main.js', () => {
-            // Test that main.js can handle missing App.ui gracefully
+        it('should handle missing App.ui gracefully in main.ts', () => {
+            // Test that main.ts can handle missing App.ui gracefully
             expect(() => {
-                // Simulate main.js trying to access App.ui
-                if (global.window.App?.ui) {
-                    global.window.App.ui.updateCostDisplay('test', 100, true);
+                // Simulate main.ts trying to access App.ui
+                if ((global as any).window.App?.ui) {
+                    (global as any).window.App.ui.updateCostDisplay('test', 100, true);
                 }
             }).not.toThrow();
         });
 
-        it('should handle missing App.systems gracefully in main.js', () => {
-            // Test that main.js can handle missing App.systems gracefully
+        it('should handle missing App.systems gracefully in main.ts', () => {
+            // Test that main.ts can handle missing App.systems gracefully
             expect(() => {
-                // Simulate main.js trying to access App.systems
-                if (global.window.App?.systems) {
-                    global.window.App.systems.save?.performSaveSnapshot?.();
+                // Simulate main.ts trying to access App.systems
+                if ((global as any).window.App?.systems) {
+                    (global as any).window.App.systems.save?.performSaveSnapshot?.();
                 }
             }).not.toThrow();
         });
 
-        it('should handle missing App.rules gracefully in main.js', () => {
-            // Test that main.js can handle missing App.rules gracefully
+        it('should handle missing App.rules gracefully in main.ts', () => {
+            // Test that main.ts can handle missing App.rules gracefully
             expect(() => {
-                // Simulate main.js trying to access App.rules
-                if (global.window.App?.rules) {
-                    global.window.App.rules.economy?.computeStrawSPD?.(1, 1, 0, 1);
+                // Simulate main.ts trying to access App.rules
+                if ((global as any).window.App?.rules) {
+                    (global as any).window.App.rules.economy?.computeStrawSPD?.(1, 1, 0, 1);
                 }
             }).not.toThrow();
         });
@@ -531,8 +586,8 @@ describe('Game Runtime Safety Tests', () => {
         it('should handle missing event listeners gracefully', () => {
             expect(() => {
                 // Test event emission with missing listeners
-                if (window.App?.events?.emit) {
-                    window.App.events.emit('TEST_EVENT', { data: 'test' });
+                if ((global as any).window.App?.events?.emit) {
+                    (global as any).window.App.events.emit('TEST_EVENT', { data: 'test' });
                 }
             }).not.toThrow();
         });
@@ -540,8 +595,8 @@ describe('Game Runtime Safety Tests', () => {
         it('should handle missing event names gracefully', () => {
             expect(() => {
                 // Test event emission with undefined event name
-                if (window.App?.events?.emit) {
-                    window.App.events.emit(undefined, { data: 'test' });
+                if ((global as any).window.App?.events?.emit) {
+                    (global as any).window.App.events.emit(undefined, { data: 'test' });
                 }
             }).not.toThrow();
         });
@@ -551,38 +606,38 @@ describe('Game Runtime Safety Tests', () => {
         it('should handle storage quota exceeded gracefully', () => {
             expect(() => {
                 // Mock localStorage to throw quota exceeded error
-                const originalSetItem = window.localStorage.setItem;
-                window.localStorage.setItem = vi.fn(() => {
+                const originalSetItem = (global as any).window.localStorage.setItem;
+                (global as any).window.localStorage.setItem = vi.fn(() => {
                     throw new Error('QuotaExceededError');
                 });
                 
                 try {
-                    window.localStorage.setItem('test', 'data');
-                } catch (error) {
+                    (global as any).window.localStorage.setItem('test', 'data');
+                } catch (error: any) {
                     expect(error.message).toBe('QuotaExceededError');
                 }
                 
                 // Restore
-                window.localStorage.setItem = originalSetItem;
+                (global as any).window.localStorage.setItem = originalSetItem;
             }).not.toThrow();
         });
 
         it('should handle storage access denied gracefully', () => {
             expect(() => {
                 // Mock localStorage to throw access denied error
-                const originalGetItem = window.localStorage.getItem;
-                window.localStorage.getItem = vi.fn(() => {
+                const originalGetItem = (global as any).window.localStorage.getItem;
+                (global as any).window.localStorage.getItem = vi.fn(() => {
                     throw new Error('AccessDeniedError');
                 });
                 
                 try {
-                    window.localStorage.getItem('test');
-                } catch (error) {
+                    (global as any).window.localStorage.getItem('test');
+                } catch (error: any) {
                     expect(error.message).toBe('AccessDeniedError');
                 }
                 
                 // Restore
-                window.localStorage.getItem = originalGetItem;
+                (global as any).window.localStorage.getItem = originalGetItem;
             }).not.toThrow();
         });
     });
@@ -591,33 +646,33 @@ describe('Game Runtime Safety Tests', () => {
         it('should handle missing performance API gracefully', () => {
             expect(() => {
                 // Remove performance API temporarily
-                const originalPerformance = global.performance;
-                delete global.performance;
+                const originalPerformance = (global as any).performance;
+                delete (global as any).performance;
                 
                 // Test functions that might use performance
                 const timestamp = Date.now();
                 expect(typeof timestamp).toBe('number');
                 
                 // Restore
-                global.performance = originalPerformance;
+                (global as any).performance = originalPerformance;
             }).not.toThrow();
         });
 
         it('should handle missing requestAnimationFrame gracefully', () => {
             expect(() => {
                 // Remove requestAnimationFrame temporarily
-                const originalRAF = window.requestAnimationFrame;
-                delete window.requestAnimationFrame;
+                const originalRAF = (global as any).window.requestAnimationFrame;
+                delete (global as any).window.requestAnimationFrame;
                 
                 // Test functions that might use requestAnimationFrame
                 const callback = () => {};
-                if (window.setTimeout) {
-                    const id = window.setTimeout(callback, 16);
-                    window.clearTimeout(id);
+                if ((global as any).window.setTimeout) {
+                    const id = (global as any).window.setTimeout(callback, 16);
+                    (global as any).window.clearTimeout(id);
                 }
                 
                 // Restore
-                window.requestAnimationFrame = originalRAF;
+                (global as any).window.requestAnimationFrame = originalRAF;
             }).not.toThrow();
         });
     });

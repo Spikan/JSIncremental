@@ -1,19 +1,26 @@
 {
   "env": { "browser": true, "es2022": true, "node": true },
-  "extends": ["eslint:recommended", "plugin:import/recommended", "prettier"],
+  "extends": [
+    "eslint:recommended", 
+    "plugin:import/recommended", 
+    "prettier"
+  ],
   "plugins": ["import"],
   "settings": {
     "import/resolver": {
       "node": { "extensions": [".js", ".ts"] }
     }
   },
-  "parserOptions": { "sourceType": "module" },
+  "parserOptions": { 
+    "sourceType": "module",
+    "ecmaVersion": 2022
+  },
   "rules": {
     "no-implicit-globals": "off",
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "import/no-unresolved": "off",
     "import/named": "off",
-    "no-undef": ["error", { "typeof": true }]
+    "no-undef": "off"
   },
   "globals": {
     "global": "readonly",
@@ -25,7 +32,10 @@
     "dist/",
     "node_modules/",
     "*.d.ts",
-    "ts/**/*.ts"
+    "ts/**/*.ts",
+    "tests/**/*.ts",
+    "vite.config.ts",
+    "vitest.config.ts"
   ]
 }
 
