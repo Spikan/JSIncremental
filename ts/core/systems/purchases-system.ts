@@ -283,7 +283,7 @@ export const execute = {
       straws: result.straws,
       strawSPD: result.strawSPD ?? 0,
       cupSPD: result.cupSPD ?? 0,
-      sps: result.sipsPerDrink ?? 0,
+      spd: result.sipsPerDrink ?? 0,
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
@@ -331,7 +331,7 @@ export const execute = {
       cups: result.cups,
       strawSPD: result.strawSPD ?? 0,
       cupSPD: result.cupSPD ?? 0,
-      sps: result.sipsPerDrink ?? 0,
+      spd: result.sipsPerDrink ?? 0,
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
@@ -379,7 +379,7 @@ export const execute = {
       widerStraws: result.widerStraws,
       strawSPD: result.strawSPD ?? 0,
       cupSPD: result.cupSPD ?? 0,
-      sps: result.sipsPerDrink ?? 0,
+      spd: result.sipsPerDrink ?? 0,
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
@@ -427,7 +427,7 @@ export const execute = {
       betterCups: result.betterCups,
       strawSPD: result.strawSPD ?? 0,
       cupSPD: result.cupSPD ?? 0,
-      sps: result.sipsPerDrink ?? 0,
+      spd: result.sipsPerDrink ?? 0,
     });
     try {
       w.App?.ui?.checkUpgradeAffordability?.();
@@ -672,7 +672,7 @@ export const execute = {
     const result = levelUp({
       sips: Number(st.sips || 0),
       level: Number(st.level || 0),
-      sipsPerDrink: Number(st.sps || 0),
+      sipsPerDrink: Number(st.spd || 0),
     });
     if (!result) return false;
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;

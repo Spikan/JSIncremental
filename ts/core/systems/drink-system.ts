@@ -19,20 +19,20 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       if (now - lastDrinkTime < drinkRate) return;
 
       // Add full sips-per-drink (base + production)
-      const spsVal = Number(
-        state.sps ?? w.sipsPerDrink?.toNumber?.() ?? w.sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
+      const spdVal = Number(
+        state.spd ?? w.sipsPerDrink?.toNumber?.() ?? w.sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
       );
       if (typeof w.sips?.plus === 'function') {
-        w.sips = w.sips.plus(spsVal);
+        w.sips = w.sips.plus(spdVal);
       } else {
-        w.sips = Number(w.sips || 0) + spsVal;
+        w.sips = Number(w.sips || 0) + spdVal;
       }
 
       // Mirror totals
       const prevTotal = Number(w.App?.state?.getState?.()?.totalSipsEarned || 0);
       const prevHigh = Number(w.App?.state?.getState?.()?.highestSipsPerSecond || 0);
-      const spsNum = Number(state.sps ?? 0);
-      const currentSipsPerSecond = (drinkRate ? 1000 / drinkRate : 0) * spsNum;
+      const spdNum = Number(state.spd ?? 0);
+      const currentSipsPerSecond = (drinkRate ? 1000 / drinkRate : 0) * spdNum;
       const highest = Math.max(prevHigh, currentSipsPerSecond);
 
       // Reset progress and last drink time
@@ -55,7 +55,7 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
           v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
         w.App?.state?.setState?.({
           sips: toNum(w.sips),
-          totalSipsEarned: prevTotal + spsVal,
+          totalSipsEarned: prevTotal + spdVal,
           highestSipsPerSecond: highest,
           lastDrinkTime: nextLast,
           drinkProgress: nextProgress,

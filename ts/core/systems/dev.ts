@@ -95,11 +95,11 @@ export function addTime(milliseconds: number): boolean {
     const remainder = totalElapsed % Math.max(rate, 1);
     if (drinks > 0) {
       const config = w.GAME_CONFIG?.BALANCE || {};
-      const spsVal =
-        st && typeof st.sps !== 'undefined'
-          ? Number(st.sps)
+      const spdVal =
+        st && typeof st.spd !== 'undefined'
+          ? Number(st.spd)
           : Number(config.BASE_SIPS_PER_DRINK || 1);
-      const gain = spsVal * drinks;
+      const gain = spdVal * drinks;
       const currentSips = toNum(w.sips);
       const nextSips = currentSips + gain;
       w.sips = w.Decimal ? new w.Decimal(nextSips) : nextSips;

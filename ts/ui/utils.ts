@@ -164,10 +164,10 @@ export const GameState = {
     const st = (window as any).App?.state?.getState?.();
     return st && typeof st.level !== 'undefined' ? st.level : (window as any).level;
   },
-  get sps(): number {
+  get spd(): number {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
-    return st && typeof st.sps !== 'undefined' ? st.sps : (window as any).sps;
+    return st && typeof st.spd !== 'undefined' ? st.spd : (window as any).spd;
   },
   get drinkRate(): number {
     if (typeof window === 'undefined') return 0;
