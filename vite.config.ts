@@ -17,7 +17,7 @@ export default defineConfig({
       compress: {
         drop_console: true, // Remove console.log in production
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+        pure_funcs: ['console.log', 'console.info', 'console.debug'] as string[],
       },
     },
 
@@ -31,7 +31,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Split vendor libraries for better caching
-        manualChunks: (id) => {
+        manualChunks: (id: string) => {
           // Vendor libraries
           if (id.includes('node_modules')) {
             if (id.includes('zustand')) return 'vendor-zustand';
@@ -50,15 +50,20 @@ export default defineConfig({
           }
 
           // Game systems
-          if (id.includes('/core/systems/') ||
-              id.includes('feature-unlocks') ||
-              id.includes('god.ts')) {
+          if (
+            id.includes('/core/systems/') ||
+            id.includes('feature-unlocks') ||
+            id.includes('god.ts')
+          ) {
             return 'game-systems';
           }
+
+          // Default chunk
+          return 'index';
         },
 
         // Optimize asset naming
-        assetFileNames: (assetInfo) => {
+        assetFileNames: assetInfo => {
           const info = assetInfo.name?.split('.') ?? [];
           const ext = info[info.length - 1];
           if (/\.(css)$/.test(assetInfo.name ?? '')) {
@@ -75,16 +80,16 @@ export default defineConfig({
 
         chunkFileNames: 'assets/[name]-[hash].js',
       },
-    },
 
-    plugins: [
-      visualizer({
-        filename: 'dist/stats.html',
-        open: true,
-        gzipSize: true,
-        brotliSize: true,
-      }),
-    ],
+      plugins: [
+        visualizer({
+          filename: 'dist/stats.html',
+          open: true,
+          gzipSize: true,
+          brotliSize: true,
+        }),
+      ] as any[],
+    },
   },
 
   server: {
@@ -93,15 +98,15 @@ export default defineConfig({
     // Enable compression for better development performance
     fs: {
       // Allow serving files from one level up to find word_bank.json
-      allow: ['..']
-    }
+      allow: ['..'] as string[],
+    },
   },
 
   // Optimize dependencies
   optimizeDeps: {
-    include: ['zustand', 'zod'],
+    include: ['zustand', 'zod'] as string[],
 
     // Exclude large dependencies that should be bundled
-    exclude: []
+    exclude: [] as string[],
   },
 } as const);
