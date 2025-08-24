@@ -52,88 +52,112 @@ export const setMusicStatusText = labels.setMusicStatusText;
 
 // Initialize UI event listeners
 export function initializeUI(): void {
-    console.log('UI system initialized');
-    buttons.initButtonSystem();
-    // Sync options UI on init
-    try { updateAutosaveStatus(); } catch {}
-    try { (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.(); } catch {}
-    if ((window as any).App?.events) {
-        (window as any).App.events.on((window as any).App.EVENT_NAMES?.CLICK?.SODA, (data: any) => {
-            updateTopSipsPerDrink();
-            updateTopSipsPerSecond();
-            updateTopSipCounter();
-            checkUpgradeAffordability();
-            if (data && typeof data.gained === 'number') {
-                showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
-            }
-        });
-        (window as any).App.events.on((window as any).App.EVENT_NAMES?.ECONOMY?.PURCHASE, (data: any) => {
-            updateTopSipsPerDrink();
-            updateTopSipsPerSecond();
-            updateTopSipCounter();
-            checkUpgradeAffordability();
-            updateCriticalClickDisplay();
-            if (data && data.item && data.cost && typeof data.clickX === 'number' && typeof data.clickY === 'number') {
-                showPurchaseFeedback(data.item, data.cost, data.clickX, data.clickY);
-            }
-        });
-        (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.SAVED, () => {
-            updateLastSaveTime();
-        });
-        (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.LOADED, () => {
-            setTimeout(() => {
-                updateAllDisplays();
-                checkUpgradeAffordability();
-            }, 100);
-        });
-    }
+  console.log('UI system initialized');
+  buttons.initButtonSystem();
+  // Sync options UI on init
+  try {
+    updateAutosaveStatus();
+  } catch {}
+  try {
+    (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+  } catch {}
+  if ((window as any).App?.events) {
+    (window as any).App.events.on((window as any).App.EVENT_NAMES?.CLICK?.SODA, (data: any) => {
+      updateTopSipsPerDrink();
+      updateTopSipsPerSecond();
+      updateTopSipCounter();
+      checkUpgradeAffordability();
+      if (data && typeof data.gained === 'number') {
+        showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
+      }
+    });
+    (window as any).App.events.on(
+      (window as any).App.EVENT_NAMES?.ECONOMY?.PURCHASE,
+      (data: any) => {
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
+        updateTopSipCounter();
+        checkUpgradeAffordability();
+        updateCriticalClickDisplay();
+        if (
+          data &&
+          data.item &&
+          data.cost &&
+          typeof data.clickX === 'number' &&
+          typeof data.clickY === 'number'
+        ) {
+          showPurchaseFeedback(data.item, data.cost, data.clickX, data.clickY);
+        }
+      }
+    );
+    (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.SAVED, () => {
+      updateLastSaveTime();
+    });
+    (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.LOADED, () => {
+      setTimeout(() => {
+        updateAllDisplays();
+        checkUpgradeAffordability();
+      }, 100);
+    });
+  }
 }
 
 // Update all UI displays (useful for initialization and major state changes)
 export function updateAllDisplays(): void {
-    updateTopSipsPerDrink();
-    updateTopSipsPerSecond();
-    updateTopSipCounter();
-    updateCriticalClickDisplay();
-    updateDrinkSpeedDisplay();
-    updateAutosaveStatus();
-    updatePlayTime();
-    updateLastSaveTime();
-    updateAllStats();
-    checkUpgradeAffordability();
+  updateTopSipsPerDrink();
+  updateTopSipsPerSecond();
+  updateTopSipCounter();
+  updateCriticalClickDisplay();
+  updateDrinkSpeedDisplay();
+  updateAutosaveStatus();
+  updatePlayTime();
+  updateLastSaveTime();
+  updateAllStats();
+  checkUpgradeAffordability();
 }
 
 // Move switchTab into UI to eliminate window.switchTab
 export function switchTab(tabName: string, event: any): void {
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach((tab: any) => tab.classList.remove('active'));
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach((btn: any) => btn.classList.remove('active'));
-    const selectedTab = document.getElementById(tabName + 'Tab');
-    if (selectedTab) { selectedTab.classList.add('active'); }
-    const clickedButton = event?.target as any;
-    try { clickedButton?.classList?.add('active'); } catch {}
-    if (tabName === 'stats') { try { updateAllStats(); } catch {} }
-    if (tabName === 'unlocks') {
-        try {
-            const sys = (window as any).App?.systems?.unlocks;
-            if (sys?.updateUnlocksTab) sys.updateUnlocksTab();
-        } catch {}
-    }
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabContents.forEach((tab: any) => tab.classList.remove('active'));
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  tabButtons.forEach((btn: any) => btn.classList.remove('active'));
+  const selectedTab = document.getElementById(`${tabName}Tab`);
+  if (selectedTab) {
+    selectedTab.classList.add('active');
+  }
+  const clickedButton = event?.target as any;
+  try {
+    clickedButton?.classList?.add('active');
+  } catch {}
+  if (tabName === 'stats') {
+    try {
+      updateAllStats();
+    } catch {}
+  }
+  if (tabName === 'unlocks') {
+    try {
+      const sys = (window as any).App?.systems?.unlocks;
+      if (sys?.updateUnlocksTab) sys.updateUnlocksTab();
+    } catch {}
+  }
 }
 
 // Batch UI updates for performance (use in game loop)
 export function performBatchUIUpdate(): void {
-    requestAnimationFrame(() => {
-        updateTopSipsPerDrink();
-        updateTopSipsPerSecond();
-        updateTopSipCounter();
-        updatePlayTime();
-        if (typeof window !== 'undefined' && (window as any).DOM_CACHE?.statsTab?.classList?.contains('active')) {
-            updateAllStats();
-        }
-        if (Math.random() < 0.1) {
-            checkUpgradeAffordability();
-        }
-    });
+  requestAnimationFrame(() => {
+    updateTopSipsPerDrink();
+    updateTopSipsPerSecond();
+    updateTopSipCounter();
+    updatePlayTime();
+    if (
+      typeof window !== 'undefined' &&
+      (window as any).DOM_CACHE?.statsTab?.classList?.contains('active')
+    ) {
+      updateAllStats();
+    }
+    if (Math.random() < 0.1) {
+      checkUpgradeAffordability();
+    }
+  });
 }

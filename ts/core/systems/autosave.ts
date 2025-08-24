@@ -1,11 +1,26 @@
 // Autosave counter progression helper (TypeScript)
 
-export type AutosaveArgs = { enabled: boolean; counter: number; intervalSec: number; drinkRateMs: number };
+export type AutosaveArgs = {
+  enabled: boolean;
+  counter: number;
+  intervalSec: number;
+  drinkRateMs: number;
+};
 export type AutosaveResult = { nextCounter: number; shouldSave: boolean };
-export type AutosaveClockArgs = { enabled: boolean; lastSavedMs: number; nowMs: number; intervalSec: number };
+export type AutosaveClockArgs = {
+  enabled: boolean;
+  lastSavedMs: number;
+  nowMs: number;
+  intervalSec: number;
+};
 export type AutosaveClockResult = { nextLastSavedMs: number; shouldSave: boolean };
 
-export function computeAutosaveCounter({ enabled, counter, intervalSec, drinkRateMs }: AutosaveArgs): AutosaveResult {
+export function computeAutosaveCounter({
+  enabled,
+  counter,
+  intervalSec,
+  drinkRateMs,
+}: AutosaveArgs): AutosaveResult {
   if (!enabled) return { nextCounter: 0, shouldSave: false };
   const drinksPerSecond = 1000 / Number(drinkRateMs || 1000);
   const drinksForAutosave = Math.ceil(Number(intervalSec || 10) * drinksPerSecond);
@@ -15,7 +30,12 @@ export function computeAutosaveCounter({ enabled, counter, intervalSec, drinkRat
 }
 
 // Wall-clock autosave helper: triggers based on elapsed real time, independent of drink timing
-export function shouldAutosaveClock({ enabled, lastSavedMs, nowMs, intervalSec }: AutosaveClockArgs): AutosaveClockResult {
+export function shouldAutosaveClock({
+  enabled,
+  lastSavedMs,
+  nowMs,
+  intervalSec,
+}: AutosaveClockArgs): AutosaveClockResult {
   if (!enabled) return { nextLastSavedMs: Number(lastSavedMs || 0), shouldSave: false };
   const now = Number(nowMs || Date.now());
   const last = Number(lastSavedMs || 0);
@@ -24,5 +44,3 @@ export function shouldAutosaveClock({ enabled, lastSavedMs, nowMs, intervalSec }
   if (now - last >= intervalMs) return { nextLastSavedMs: now, shouldSave: true };
   return { nextLastSavedMs: last, shouldSave: false };
 }
-
-

@@ -37,5 +37,3 @@ export function computeTotalSipsPerDrink(
 ): number {
   return Number(baseSipsPerDrink) + Number(totalSPD);
 }
-
-

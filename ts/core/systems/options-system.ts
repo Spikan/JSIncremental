@@ -35,5 +35,3 @@ export function saveOptions(options: GameOptions): boolean {
     }
   }
 }
-
-

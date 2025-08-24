@@ -1,7 +1,9 @@
 // Error overlay utility (TypeScript)
 
 declare global {
-  interface Window { __ERROR_OVERLAY_ATTACHED__?: boolean }
+  interface Window {
+    __ERROR_OVERLAY_ATTACHED__?: boolean;
+  }
 }
 
 (function attachErrorOverlay(): void {
@@ -46,18 +48,20 @@ declare global {
     list.appendChild(item);
   }
 
-  window.addEventListener('error', (e) => {
+  window.addEventListener('error', e => {
     try {
-      const src = (e as ErrorEvent).filename ? `\n@ ${(e as ErrorEvent).filename}:${(e as ErrorEvent).lineno}:${(e as ErrorEvent).colno}` : '';
-      const msg = (e as ErrorEvent).message || ((e as any).error?.message) || 'Unknown error';
+      const src = (e as ErrorEvent).filename
+        ? `\n@ ${(e as ErrorEvent).filename}:${(e as ErrorEvent).lineno}:${(e as ErrorEvent).colno}`
+        : '';
+      const msg = (e as ErrorEvent).message || (e as any).error?.message || 'Unknown error';
       show(`Error: ${msg}${src}`);
     } catch {}
   });
 
-  window.addEventListener('unhandledrejection', (e) => {
+  window.addEventListener('unhandledrejection', e => {
     try {
       const reason: any = (e as PromiseRejectionEvent).reason;
-      const msg = typeof reason === 'string' ? reason : (reason?.message || JSON.stringify(reason));
+      const msg = typeof reason === 'string' ? reason : reason?.message || JSON.stringify(reason);
       show(`Unhandled Promise rejection: ${msg}`);
     } catch {}
   });
@@ -69,5 +73,3 @@ declare global {
 })();
 
 export {};
-
-

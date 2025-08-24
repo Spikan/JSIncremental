@@ -2,27 +2,27 @@
 // The old createStore implementation has been replaced with Zustand for better performance
 
 // Export the new Zustand store and related utilities
-export { 
-  useGameStore, 
-  gameStore, 
-  useSips, 
-  useStraws, 
-  useCups, 
-  useLevel, 
-  useSPS, 
-  useOptions, 
-  useActions 
-} from './zustand-store'
+export {
+  useGameStore,
+  gameStore,
+  useSips,
+  useStraws,
+  useCups,
+  useLevel,
+  useSPS,
+  useOptions,
+  useActions,
+} from './zustand-store';
 
 // Export legacy compatibility layer
-export { 
-  createLegacyStore, 
-  appStore, 
-  selectors, 
-  migrateToZustand, 
-  getZustandStore, 
-  getZustandActions 
-} from './zustand-bridge'
+export {
+  createLegacyStore,
+  appStore,
+  selectors,
+  migrateToZustand,
+  getZustandStore,
+  getZustandActions,
+} from './zustand-bridge';
 
 // Legacy type exports for backward compatibility
 export type Unsubscribe = () => void;
@@ -36,7 +36,7 @@ export interface Store<T extends object> {
 // Legacy createStore function now creates a Zustand-compatible wrapper
 export function createStore<T extends object>(initialState: T): Store<T> {
   console.warn('⚠️ createStore is deprecated. Use useGameStore or gameStore directly.');
-  
+
   // For now, return a basic store implementation
   // The real Zustand store is available via useGameStore
   let state: T = { ...(initialState as any) };
@@ -59,5 +59,3 @@ export function createStore<T extends object>(initialState: T): Store<T> {
 
   return { getState, setState, subscribe };
 }
-
-

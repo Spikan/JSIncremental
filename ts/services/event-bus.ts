@@ -26,7 +26,11 @@ export function createEventBus<E extends EventMap = Record<string, unknown>>(): 
     const set = listeners.get(event);
     if (!set) return;
     for (const handler of Array.from(set)) {
-      try { (handler as any)(payload); } catch (e) { console.warn('bus handler error', e); }
+      try {
+        (handler as any)(payload);
+      } catch (e) {
+        console.warn('bus handler error', e);
+      }
     }
   }
 
@@ -35,8 +39,12 @@ export function createEventBus<E extends EventMap = Record<string, unknown>>(): 
 
 export const bus = createEventBus();
 
-try { (window as any).createEventBus = createEventBus; } catch {}
-try { (window as any).eventBus = bus; } catch {}
-try { (window as any).bus = bus; } catch {}
-
-
+try {
+  (window as any).createEventBus = createEventBus;
+} catch {}
+try {
+  (window as any).eventBus = bus;
+} catch {}
+try {
+  (window as any).bus = bus;
+} catch {}

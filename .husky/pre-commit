@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+echo "🔍 Running pre-commit checks..."
+
+# Run ESLint
+echo "📝 Checking code quality with ESLint..."
+npm run lint
+
+# Run Prettier check
+echo "🎨 Checking code formatting with Prettier..."
+npm run format:check
+
+# Run TypeScript type checking
+echo "🔧 Checking TypeScript types..."
+npm run type-check
+
+echo "✅ Pre-commit checks passed!"

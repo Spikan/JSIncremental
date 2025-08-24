@@ -14,7 +14,9 @@ type Win = typeof window & {
   lastSaveTime?: any;
 };
 
-function toNum(v: any): number { return (v && typeof v.toNumber === 'function') ? v.toNumber() : Number(v || 0); }
+function toNum(v: any): number {
+  return v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
+}
 
 export function unlockAll(): boolean {
   try {
@@ -22,11 +24,13 @@ export function unlockAll(): boolean {
     const fu = w.App?.systems?.unlocks;
     if (!fu) return false;
     const allFeatures = Object.keys(fu.unlockConditions || {});
-    allFeatures.forEach((f) => fu.unlockedFeatures.add(f));
+    allFeatures.forEach(f => fu.unlockedFeatures.add(f));
     fu.updateFeatureVisibility?.();
     fu.updateUnlocksTab?.();
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function unlockShop(): boolean {
@@ -37,7 +41,9 @@ export function unlockShop(): boolean {
     fu.unlockedFeatures.add('shop');
     fu.updateFeatureVisibility?.();
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function unlockUpgrades(): boolean {
@@ -45,10 +51,14 @@ export function unlockUpgrades(): boolean {
     const w = window as Win;
     const fu = w.App?.systems?.unlocks;
     if (!fu) return false;
-    ['widerStraws','betterCups','fasterDrinks','criticalClick','suction'].forEach((f)=> fu.unlockedFeatures.add(f));
+    ['widerStraws', 'betterCups', 'fasterDrinks', 'criticalClick', 'suction'].forEach(f =>
+      fu.unlockedFeatures.add(f)
+    );
     fu.updateFeatureVisibility?.();
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function resetUnlocks(): boolean {
@@ -63,13 +73,16 @@ export function resetUnlocks(): boolean {
     fu.updateFeatureVisibility?.();
     fu.updateUnlocksTab?.();
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function addTime(milliseconds: number): boolean {
   try {
     const w = window as Win;
-    const ms = Number(milliseconds) || 0; if (!ms) return false;
+    const ms = Number(milliseconds) || 0;
+    if (!ms) return false;
     const st = w.App?.state?.getState?.() || {};
     const rate = Number(st.drinkRate || w.drinkRate || 1000);
     const now = Date.now();
@@ -78,7 +91,10 @@ export function addTime(milliseconds: number): boolean {
     const remainder = totalElapsed % Math.max(rate, 1);
     if (drinks > 0) {
       const config = w.GAME_CONFIG?.BALANCE || {};
-      const spsVal = (st && typeof st.sps !== 'undefined') ? Number(st.sps) : Number((config.BASE_SIPS_PER_DRINK) || 1);
+      const spsVal =
+        st && typeof st.sps !== 'undefined'
+          ? Number(st.sps)
+          : Number(config.BASE_SIPS_PER_DRINK || 1);
       const gain = spsVal * drinks;
       const currentSips = toNum(w.sips);
       const nextSips = currentSips + gain;
@@ -99,7 +115,9 @@ export function addTime(milliseconds: number): boolean {
     w.App?.state?.setState?.({ lastSaveTime: nextSave });
     w.App?.ui?.updateLastSaveTime?.();
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function addSips(amount: number): boolean {
@@ -111,15 +129,26 @@ export function addSips(amount: number): boolean {
     w.App?.ui?.updateTopSipCounter?.();
     w.App?.ui?.checkUpgradeAffordability?.();
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function toggleDevMode(): boolean {
-  try { (window as Win).App?.systems?.unlocks?.toggleDevMode?.(); return true; } catch { return false; }
+  try {
+    (window as Win).App?.systems?.unlocks?.toggleDevMode?.();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function toggleGodMode(): boolean {
-  try { /* hook here if needed */ return true; } catch { return false; }
+  try {
+    /* hook here if needed */ return true;
+  } catch {
+    return false;
+  }
 }
 
 export function showDebugInfo(): boolean {
@@ -129,7 +158,9 @@ export function showDebugInfo(): boolean {
     const st = w.App?.state?.getState?.();
     console.log('State snapshot:', st);
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function exportSave(): boolean {
@@ -137,10 +168,10 @@ export function exportSave(): boolean {
     const w = window as Win;
     const st = w.App?.state?.getState?.() || {};
     const saveData: any = {
-      sips: String(st.sips ?? (w.sips?.toString?.() ?? 0)),
-      straws: String(st.straws ?? (w.straws?.toString?.() ?? 0)),
-      cups: String(st.cups ?? (w.cups?.toString?.() ?? 0)),
-      level: String(st.level ?? (w.level?.toString?.() ?? 1)),
+      sips: String(st.sips ?? w.sips?.toString?.() ?? 0),
+      straws: String(st.straws ?? w.straws?.toString?.() ?? 0),
+      cups: String(st.cups ?? w.cups?.toString?.() ?? 0),
+      level: String(st.level ?? w.level?.toString?.() ?? 1),
       timestamp: Date.now(),
     };
     const dataStr = JSON.stringify(saveData, null, 2);
@@ -152,7 +183,9 @@ export function exportSave(): boolean {
     link.click();
     URL.revokeObjectURL(url);
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export function openImportDialog(): boolean {
@@ -168,10 +201,14 @@ export function openImportDialog(): boolean {
       reader.onload = function (ev: any) {
         try {
           const saveData = JSON.parse(ev?.target?.result || '{}');
-          if (saveData.sips != null) w.sips = w.Decimal ? new w.Decimal(saveData.sips) : Number(saveData.sips);
-          if (saveData.straws != null) w.straws = w.Decimal ? new w.Decimal(saveData.straws) : Number(saveData.straws);
-          if (saveData.cups != null) w.cups = w.Decimal ? new w.Decimal(saveData.cups) : Number(saveData.cups);
-          if (saveData.level != null) w.level = w.Decimal ? new w.Decimal(saveData.level) : Number(saveData.level);
+          if (saveData.sips != null)
+            w.sips = w.Decimal ? new w.Decimal(saveData.sips) : Number(saveData.sips);
+          if (saveData.straws != null)
+            w.straws = w.Decimal ? new w.Decimal(saveData.straws) : Number(saveData.straws);
+          if (saveData.cups != null)
+            w.cups = w.Decimal ? new w.Decimal(saveData.cups) : Number(saveData.cups);
+          if (saveData.level != null)
+            w.level = w.Decimal ? new w.Decimal(saveData.level) : Number(saveData.level);
           // Mirror to App.state minimally
           w.App?.state?.setState?.({
             sips: toNum(w.sips),
@@ -187,7 +224,7 @@ export function openImportDialog(): boolean {
     };
     input.click();
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
-
-

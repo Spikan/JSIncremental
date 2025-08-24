@@ -15,5 +15,3 @@ export function nextCupCost(
 ): number {
   return Math.floor(Number(baseCost) * Math.pow(Number(scaling), Number(cupCount)));
 }
-
-

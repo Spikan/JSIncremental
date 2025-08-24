@@ -6,7 +6,7 @@ export function computeClick({
   baseClick,
   suctionBonus,
   criticalChance,
-  criticalMultiplier
+  criticalMultiplier,
 }: {
   baseClick: number | string;
   suctionBonus: number | string;
@@ -18,10 +18,18 @@ export function computeClick({
     (function () {
       return class LocalDecimal {
         private _v: number;
-        constructor(v: any) { this._v = Number(v) || 0; }
-        toString() { return String(this._v); }
-        plus(x: any) { return new LocalDecimal(this._v + Number((x && x.toString) ? x.toString() : x)); }
-        times(x: any) { return new LocalDecimal(this._v * Number((x && x.toString) ? x.toString() : x)); }
+        constructor(v: any) {
+          this._v = Number(v) || 0;
+        }
+        toString() {
+          return String(this._v);
+        }
+        plus(x: any) {
+          return new LocalDecimal(this._v + Number(x && x.toString ? x.toString() : x));
+        }
+        times(x: any) {
+          return new LocalDecimal(this._v * Number(x && x.toString ? x.toString() : x));
+        }
       } as any;
     })();
 
@@ -32,5 +40,3 @@ export function computeClick({
   const gained = (base as any).plus(bonus).times(isCritical ? mult : new DecimalCtor(1));
   return { gained: (gained as any).toString(), critical: isCritical };
 }
-
-

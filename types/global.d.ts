@@ -2,138 +2,136 @@
 
 // Minimal Decimal-like interface compatible with production and test stubs
 interface DecimalLike {
-	toNumber(): number;
-	toString(): string;
-	plus(value: number | string | DecimalLike): DecimalLike;
-	minus?(value: number | string | DecimalLike): DecimalLike;
-	times(value: number | string | DecimalLike): DecimalLike;
-	div?(value: number | string | DecimalLike): DecimalLike;
-	gte?(value: number | string | DecimalLike): boolean;
-	gt?(value: number | string | DecimalLike): boolean;
-	lte?(value: number | string | DecimalLike): boolean;
-	lt?(value: number | string | DecimalLike): boolean;
+  toNumber(): number;
+  toString(): string;
+  plus(value: number | string | DecimalLike): DecimalLike;
+  minus?(value: number | string | DecimalLike): DecimalLike;
+  times(value: number | string | DecimalLike): DecimalLike;
+  div?(value: number | string | DecimalLike): DecimalLike;
+  gte?(value: number | string | DecimalLike): boolean;
+  gt?(value: number | string | DecimalLike): boolean;
+  lte?(value: number | string | DecimalLike): boolean;
+  lt?(value: number | string | DecimalLike): boolean;
 }
 
 interface DecimalCtor {
-	new (value: number | string | DecimalLike): DecimalLike;
+  new (value: number | string | DecimalLike): DecimalLike;
 }
 
 type EventHandler<T = any> = (payload: T) => void;
 
 interface EventBusGeneric {
-	on(event: string, handler: EventHandler): () => void;
-	off(event: string, handler: EventHandler): void;
-	emit(event: string, payload?: any): void;
+  on(event: string, handler: EventHandler): () => void;
+  off(event: string, handler: EventHandler): void;
+  emit(event: string, payload?: any): void;
 }
 
 interface GameOptions {
-	autosaveEnabled: boolean;
-	autosaveInterval: number; // seconds
-	clickSoundsEnabled: boolean;
-	musicEnabled: boolean;
-	musicStreamPreferences?: Record<string, boolean> | { preferred?: string; fallbacks?: string[] };
+  autosaveEnabled: boolean;
+  autosaveInterval: number; // seconds
+  clickSoundsEnabled: boolean;
+  musicEnabled: boolean;
+  musicStreamPreferences?: Record<string, boolean> | { preferred?: string; fallbacks?: string[] };
 }
 
 interface GameState {
-	sips: number;
-	straws: number;
-	cups: number;
-	suctions: number;
-	widerStraws: number;
-	betterCups: number;
-	fasterDrinks: number;
-	criticalClicks: number;
-	level: number;
-	sps: number;
-	strawSPD: number;
-	cupSPD: number;
-	drinkRate: number;
-	drinkProgress: number;
-	lastDrinkTime: number;
-	// newly centralized
-	criticalClickChance: number;
-	criticalClickMultiplier: number;
-	suctionClickBonus: number;
-	fasterDrinksUpCounter: number;
-	criticalClickUpCounter: number;
-	lastSaveTime: number;
-	sessionStartTime: number;
-	totalSipsEarned: number;
-	totalClicks: number;
-	highestSipsPerSecond: number;
-	totalPlayTime: number;
-	options: GameOptions;
+  sips: number;
+  straws: number;
+  cups: number;
+  suctions: number;
+  widerStraws: number;
+  betterCups: number;
+  fasterDrinks: number;
+  criticalClicks: number;
+  level: number;
+  sps: number;
+  strawSPD: number;
+  cupSPD: number;
+  drinkRate: number;
+  drinkProgress: number;
+  lastDrinkTime: number;
+  // newly centralized
+  criticalClickChance: number;
+  criticalClickMultiplier: number;
+  suctionClickBonus: number;
+  fasterDrinksUpCounter: number;
+  criticalClickUpCounter: number;
+  lastSaveTime: number;
+  sessionStartTime: number;
+  totalSipsEarned: number;
+  totalClicks: number;
+  highestSipsPerSecond: number;
+  totalPlayTime: number;
+  options: GameOptions;
 }
 
 interface Store<T> {
-	getState(): T;
-	setState(partial: Partial<T>): void;
-	subscribe(listener: (state: T) => void): () => void;
+  getState(): T;
+  setState(partial: Partial<T>): void;
+  subscribe(listener: (state: T) => void): () => void;
 }
 
 type ButtonAudioAPI = {
-	initButtonAudioSystem?: () => void;
-	toggleButtonSounds?: () => void;
-	updateButtonSoundsToggleButton?: () => void;
-	playButtonClickSound?: () => void;
-	playButtonPurchaseSound?: () => void;
-	playButtonCriticalClickSound?: () => void;
-	playSodaClickSound?: () => void;
-	playLevelUpSound?: () => void;
-	playTabSwitchSound?: () => void;
-	getButtonSoundsEnabled?: () => boolean;
+  initButtonAudioSystem?: () => void;
+  toggleButtonSounds?: () => void;
+  updateButtonSoundsToggleButton?: () => void;
+  playButtonClickSound?: () => void;
+  playButtonPurchaseSound?: () => void;
+  playButtonCriticalClickSound?: () => void;
+  playSodaClickSound?: () => void;
+  playLevelUpSound?: () => void;
+  playTabSwitchSound?: () => void;
+  getButtonSoundsEnabled?: () => boolean;
 };
 
 type SystemsAPI = {
-	resources?: Record<string, any>;
-	purchases?: Record<string, any>;
-	clicks?: Record<string, any>;
-	autosave?: Record<string, any>;
-	save?: Record<string, any>;
-	options?: Record<string, any>;
-	loop?: Record<string, any>;
-	audio?: { button?: ButtonAudioAPI };
-	gameInit?: Record<string, any>;
-	drink?: Record<string, any>;
+  resources?: Record<string, any>;
+  purchases?: Record<string, any>;
+  clicks?: Record<string, any>;
+  autosave?: Record<string, any>;
+  save?: Record<string, any>;
+  options?: Record<string, any>;
+  loop?: Record<string, any>;
+  audio?: { button?: ButtonAudioAPI };
+  gameInit?: Record<string, any>;
+  drink?: Record<string, any>;
 };
 
 interface AppNamespace {
-	state: Store<GameState>;
-	storage: any;
-	events: EventBusGeneric;
-	EVENT_NAMES: any;
-	rules: Record<string, any>;
-	systems: SystemsAPI;
-	ui: Record<string, any>;
-	data: Record<string, any>;
-	stateBridge?: Record<string, any>;
+  state: Store<GameState>;
+  storage: any;
+  events: EventBusGeneric;
+  EVENT_NAMES: any;
+  rules: Record<string, any>;
+  systems: SystemsAPI;
+  ui: Record<string, any>;
+  data: Record<string, any>;
+  stateBridge?: Record<string, any>;
 }
 
 interface GameConfig {
-	BALANCE: Record<string, number> & {
-		STRAW_BASE_SPD: number;
-		CUP_BASE_SPD: number;
-		BASE_SIPS_PER_DRINK: number;
-		SUCTION_CLICK_BONUS: number;
-	};
-	TIMING: Record<string, number>;
-	LIMITS: Record<string, number>;
+  BALANCE: Record<string, number> & {
+    STRAW_BASE_SPD: number;
+    CUP_BASE_SPD: number;
+    BASE_SIPS_PER_DRINK: number;
+    SUCTION_CLICK_BONUS: number;
+  };
+  TIMING: Record<string, number>;
+  LIMITS: Record<string, number>;
 }
 
 declare global {
-    var Decimal: DecimalCtor;
-    var DOM_CACHE: any;
-	interface Window {
-		App: AppNamespace;
-		GAME_CONFIG: GameConfig;
-		Decimal: DecimalCtor;
-		DOM_CACHE: any;
-		FEATURE_UNLOCKS: any;
-		validateGameSave?: (data: any) => any;
-		validateGameOptions?: (data: any) => any;
-	}
+  var Decimal: DecimalCtor;
+  var DOM_CACHE: any;
+  interface Window {
+    App: AppNamespace;
+    GAME_CONFIG: GameConfig;
+    Decimal: DecimalCtor;
+    DOM_CACHE: any;
+    FEATURE_UNLOCKS: any;
+    validateGameSave?: (data: any) => any;
+    validateGameOptions?: (data: any) => any;
+  }
 }
 
 export {};
-
-
