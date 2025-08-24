@@ -47,8 +47,8 @@ return window.App.systems.purchases.buy();
 
 // ✅ GOOD: Fix the root cause (e.g., script loading order)
 // In index.html: Ensure dependencies load before main.js
-<script type="module" src="js/index.ts"></script>  <!-- Initialize App -->
-<script src="js/main.js"></script>                 <!-- Use App -->
+<script type="module" src="ts/index.ts"></script>  <!-- Initialize App -->
+<script type="module" src="ts/main.ts"></script>   <!-- Use App -->
 ```
 
 **Why this matters:**
@@ -93,7 +93,7 @@ elements.totalClicks.textContent = String(window.totalClicks);
 
 **What this means:**
 - Remove `onclick`/inline handlers from HTML
-- Use `data-action` attributes and dispatch in `js/ui/buttons.js`
+- Use `data-action` attributes and dispatch in `ts/ui/buttons.ts`
 
 **Pattern:**
 ```html
@@ -101,7 +101,7 @@ elements.totalClicks.textContent = String(window.totalClicks);
 ```
 
 ```javascript
-// in js/ui/buttons.js
+// in ts/ui/buttons.ts
 document.body.addEventListener('click', (e) => {
   const action = e.target?.closest('[data-action]')?.dataset?.action;
   if (!action) return;
@@ -113,7 +113,7 @@ document.body.addEventListener('click', (e) => {
 
 ## Rule: Configuration via Accessor
 
-**Use** `js/core/systems/config-accessor.ts` to read upgrades and balance.
+**Use** `ts/core/systems/config-accessor.ts` to read upgrades and balance.
 Avoid duplicating logic or reading config directly in multiple places.
 
 ---

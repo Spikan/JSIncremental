@@ -238,6 +238,6 @@ export const FEATURE_UNLOCKS = {
   },
 };
 
-// No global attach; loaded into App.systems.unlocks by js/index.js
+// No global attach; loaded into App.systems.unlocks by ts/index.ts
 
 

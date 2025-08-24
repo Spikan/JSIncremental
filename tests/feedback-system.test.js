@@ -96,7 +96,7 @@ describe('Feedback System', () => {
 
     beforeEach(async () => {
         vi.clearAllMocks();
-        feedback = await import('../js/ui/feedback.ts');
+        feedback = await import('../ts/ui/feedback.ts');
     });
 
     afterEach(() => {

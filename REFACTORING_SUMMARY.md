@@ -11,13 +11,13 @@
 ## 📊 **Impact Summary**
 
 ### **Before Refactoring:**
-- **File Size**: `js/main.js` was 128KB (3,255 lines) with extensive duplicate code
+- **File Size**: `ts/main.ts` was originally 128KB (3,255 lines) with extensive duplicate code
 - **Architecture**: Monolithic with duplicate functions across multiple files
 - **Maintenance**: High complexity due to code duplication
 - **Testing**: Difficult due to tightly coupled functions
 
 ### **After Refactoring:**
-- **File Size**: `js/main.js` reduced to 33KB (810 lines)
+- **File Size**: `ts/main.ts` reduced to 33KB (810 lines)
 - **Architecture**: Clean modular structure with single source of truth
 - **Maintenance**: Significantly simplified with clear separation of concerns
 - **Testing**: 72/88 tests passing with improved modularity
@@ -134,9 +134,9 @@ window.App?.ui?.updateAllStats?.();
 ## 📋 **Files Modified**
 
 ### **Core Changes:**
-- `js/main.js` - Major refactoring, duplicate function removal
-- `js/index.ts` - Updated function calls
-- `js/core/systems/game-init.ts` - Converted and wired into index
+- `ts/main.ts` - Major refactoring, duplicate function removal, TypeScript conversion
+- `ts/index.ts` - Updated function calls
+- `ts/core/systems/game-init.ts` - Converted and wired into index
 
 ### **Documentation:**
 - `ARCHITECTURE.md` - Updated with refactoring details

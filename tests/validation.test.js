@@ -6,7 +6,7 @@ let validateUnlocks, validateUpgrades, validateGameSave, validateGameOptions;
 beforeAll(async () => {
     // Ensure schemas module picks up real Zod
     globalThis.Zod = realZ;
-    const mod = await import('../js/core/validation/schemas');
+    const mod = await import('../ts/core/validation/schemas');
     validateUnlocks = mod.validateUnlocks;
     validateUpgrades = mod.validateUpgrades;
     validateGameSave = mod.validateGameSave;

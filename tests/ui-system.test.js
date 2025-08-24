@@ -82,7 +82,7 @@ describe('UI System', () => {
 
     beforeEach(async () => {
         vi.clearAllMocks();
-        ui = await import('../js/ui/index.ts');
+        ui = await import('../ts/ui/index.ts');
     });
 
     describe('Displays Module', () => {

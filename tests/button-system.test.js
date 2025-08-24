@@ -99,7 +99,7 @@ describe('Button System', () => {
         mockWindow.startGame = vi.fn();
         
         // Import the button system
-        buttonSystem = await import('../js/ui/buttons.ts');
+        buttonSystem = await import('../ts/ui/buttons.ts');
     });
 
     afterEach(() => {

@@ -35,24 +35,24 @@ The codebase had significant duplicate functions across `main.js`, UI modules, a
 Recent work completed a full UI decoupling and established TypeScript infrastructure while keeping the codebase in JavaScript via JSDoc typing.
 
 - **Single source of truth**: All UI modules read from `App.state` only. Legacy `window.*` UI reads have been eliminated.
-- **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `js/ui/buttons.ts`.
-- **Configuration access**: Added `js/core/systems/config-accessor.ts` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
-- **Event names**: `EVENT_NAMES` exported from `js/core/constants.ts` and attached in `js/index.ts` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
- - **Storage**: Validation functions are imported directly from `js/core/validation/schemas.ts`. The typed storage facade `AppStorage` lives in `js/services/storage.ts` and is attached to `window.storage` during bootstrap.
-- **State bridge**: `js/core/state/bridge.ts` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
-- **TypeScript infra**: Complete TypeScript migration with `tsconfig.json` configured for the entire codebase. All core application files are now in TypeScript with full type safety. Configuration files converted to TypeScript. Type checking enabled with `npm run typecheck`.
+- **Centralized UI events**: Inline `onclick` handlers were removed from `index.html`. Buttons now use `data-action` attributes with a centralized dispatcher in `ts/ui/buttons.ts`.
+- **Configuration access**: Added `ts/core/systems/config-accessor.ts` to consistently read upgrades and balance data (`App.data.upgrades` → `GAME_CONFIG.BALANCE`).
+- **Event names**: `EVENT_NAMES` exported from `ts/core/constants.ts` and attached in `ts/index.ts` to `App.EVENT_NAMES` (and mirrored to `window.EVENT_NAMES`).
+ - **Storage**: Validation functions are imported directly from `ts/core/validation/schemas.ts`. The typed storage facade `AppStorage` lives in `ts/services/storage.ts` and is attached to `window.storage` during bootstrap.
+- **State bridge**: `ts/core/state/bridge.ts` seeds and syncs legacy globals into `App.state` during initialization while we complete migration.
+- **TypeScript infra**: Complete TypeScript migration with `tsconfig.json` configured for the entire codebase. All core application files are now in TypeScript with full type safety. Configuration files converted to TypeScript. Source code moved from `js/` to `ts/` directory. Type checking enabled with `npm run typecheck`.
 
 ### New/Updated Files
-- `js/core/systems/config-accessor.ts` — central config access
-- `js/ui/buttons.ts` — event delegation via `data-action`
+- `ts/core/systems/config-accessor.ts` — central config access
+- `ts/ui/buttons.ts` — event delegation via `data-action`
 - `types/global.d.ts` — ambient global types (`App`, `GameState`, etc.)
 - `tsconfig.json` — JS-with-types configuration
 - TypeScript conversions with extensionless imports:
-  - `js/core/rules/*.ts` (`clicks`, `economy`, `purchases`)
-  - `js/core/systems/resources.ts`, `purchases-system.ts`, `save-system.ts`, `loop-system.ts`, `drink-system.ts`, `clicks-system.ts`, `options-system.ts`, `autosave.ts`, `button-audio.ts`, `game-init.ts`
-  - `js/core/validation/schemas.ts`
-  - `js/services/event-bus.ts`, `js/services/storage.ts`
-  - `js/feature-unlocks.ts`
+  - `ts/core/rules/*.ts` (`clicks`, `economy`, `purchases`)
+  - `ts/core/systems/resources.ts`, `purchases-system.ts`, `save-system.ts`, `loop-system.ts`, `drink-system.ts`, `clicks-system.ts`, `options-system.ts`, `autosave.ts`, `button-audio.ts`, `game-init.ts`
+  - `ts/core/validation/schemas.ts`
+  - `ts/services/event-bus.ts`, `ts/services/storage.ts`
+  - `ts/feature-unlocks.ts`
 
 ## 📁 Complete File Structure
 
@@ -69,7 +69,7 @@ soda-clicker-pro/
 ├── 📄 README.md                  # Project overview
 ├── 📄 RULES.md                   # Development rules and guidelines
 │
-├── 📁 js/                        # TypeScript source code (core files converted)
+├── 📁 ts/                        # TypeScript source code
 │   ├── 📄 index.ts               # Main entry point, bootstraps App global
 │   ├── 📄 main.ts                # Legacy game logic (TypeScript-ified)
 │   ├── 📄 config.ts              # Game configuration and constants
@@ -134,7 +134,7 @@ soda-clicker-pro/
 
 ## 🔧 Core Systems Deep Dive
 
-### 1. **State Management System** (`js/core/state/`)
+### 1. **State Management System** (`ts/core/state/`)
 
 **Purpose**: Centralized state container with subscription support
 
@@ -188,7 +188,7 @@ store.setState({ sips: newValue });
 const currentState = store.getState();
 ```
 
-### 2. **Event System** (`js/services/event-bus.ts`)
+### 2. **Event System** (`ts/services/event-bus.ts`)
 
 **Purpose**: Decoupled communication between systems via pub/sub pattern
 
@@ -219,7 +219,7 @@ App.events.emit(App.EVENT_NAMES.ECONOMY.PURCHASE, {
 });
 ```
 
-### 3. **Storage System** (`js/services/storage.ts`)
+### 3. **Storage System** (`ts/services/storage.ts`)
 
 **Purpose**: Abstracted localStorage with validation and namespacing
 
@@ -238,7 +238,7 @@ App.storage.setJSON('options', options);   // Store JSON data
 App.storage.getBoolean('clickSounds', true); // Get boolean with default
 ```
 
-### 4. **Validation System** (`js/core/validation/schemas.ts`)
+### 4. **Validation System** (`ts/core/validation/schemas.ts`)
 
 **Purpose**: Runtime data validation using Zod schemas
 
@@ -258,7 +258,7 @@ if (validatedUnlocks) {
 }
 ```
 
-### 5. **Business Logic Rules** (`js/core/rules/`)
+### 5. **Business Logic Rules** (`ts/core/rules/`)
 
 **Purpose**: Pure functions for game calculations
 
@@ -280,7 +280,7 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 - Affordability checking
 - Purchase validation
 
-### 6. **Game Systems** (`js/core/systems/`)
+### 6. **Game Systems** (`ts/core/systems/`)
 
 **Resources System** (`resources.ts`):
 - Centralized production recalculation
@@ -322,7 +322,7 @@ computeTotalSipsPerDrink(baseSips, totalSPD)
 - Audio preferences
 - Volume control
 
-### 7. **UI System** (`js/ui/`)
+### 7. **UI System** (`ts/ui/`)
 
 **Purpose**: Coordinated UI updates and user interaction
 
@@ -458,34 +458,34 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 ## 🚀 Agent Navigation Guide
 
 ### **For Understanding Game Logic**
-1. Start with `js/core/rules/` - Pure business logic
-2. Examine `js/core/systems/` - Game system implementations
-3. Check `js/config.js` - Game balance and constants
+1. Start with `ts/core/rules/` - Pure business logic
+2. Examine `ts/core/systems/` - Game system implementations
+3. Check `ts/config.ts` - Game balance and constants
 
 ### **For Understanding State Management**
-1. Review `js/core/state/shape.ts` - State structure
-2. Examine `js/core/state/index.ts` - Store implementation
-3. Check `js/index.ts` - App bootstrap and state initialization
+1. Review `ts/core/state/shape.ts` - State structure
+2. Examine `ts/core/state/index.ts` - Store implementation
+3. Check `ts/index.ts` - App bootstrap and state initialization
 
 ### **For Understanding UI Updates**
-1. Start with `js/ui/index.ts` - UI system coordinator
-2. Examine individual UI modules in `js/ui/`
+1. Start with `ts/ui/index.ts` - UI system coordinator
+2. Examine individual UI modules in `ts/ui/`
 3. Check event listeners and update functions
 
 ### **For Understanding Data Flow**
-1. Review `js/core/constants.ts` - Event definitions
-2. Examine `js/services/event-bus.ts` - Event system
+1. Review `ts/core/constants.ts` - Event definitions
+2. Examine `ts/services/event-bus.ts` - Event system
 3. Check how systems emit and listen to events
 
 ### **For Understanding Game Configuration**
 1. Check `data/upgrades.json` - Upgrade definitions
 2. Check `data/unlocks.json` - Feature unlock conditions
-3. Review `js/config.js` - Game constants and balance
+3. Review `ts/config.ts` - Game constants and balance
 
 ### **For Understanding Legacy Code**
-1. Examine `js/main.js` - Legacy game logic (being refactored)
-2. Check `js/feature-unlocks.js` - Feature unlock system
-3. Review `js/dom-cache.ts` - DOM element management
+1. Examine `ts/main.ts` - Legacy game logic (TypeScript-ified)
+2. Check `ts/feature-unlocks.ts` - Feature unlock system
+3. Review `ts/dom-cache.ts` - DOM element management
 
 ## 🔍 Key Design Patterns
 

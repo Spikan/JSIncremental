@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { computeClick } from '../js/core/rules/clicks';
+import { computeClick } from '../ts/core/rules/clicks';
 
 declare global {
   var window: {

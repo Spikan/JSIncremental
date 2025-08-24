@@ -120,7 +120,7 @@ describe('Game Runtime Safety Tests', () => {
 
         beforeEach(async () => {
             vi.clearAllMocks();
-            ui = await import('../js/ui/index.ts');
+            ui = await import('../ts/ui/index.ts');
         });
 
         it('should handle missing DOM elements gracefully in updateCostDisplay', () => {
@@ -220,7 +220,7 @@ describe('Game Runtime Safety Tests', () => {
 
         beforeEach(async () => {
             vi.clearAllMocks();
-            feedback = await import('../js/ui/feedback.ts');
+            feedback = await import('../ts/ui/feedback.ts');
         });
 
         it('should handle missing soda button gracefully in showClickFeedback', () => {
@@ -296,7 +296,7 @@ describe('Game Runtime Safety Tests', () => {
 
         beforeEach(async () => {
             vi.clearAllMocks();
-            buttonSystem = await import('../js/ui/buttons.ts');
+            buttonSystem = await import('../ts/ui/buttons.ts');
         });
 
         it('should handle missing audio system gracefully', () => {
@@ -366,9 +366,9 @@ describe('Game Runtime Safety Tests', () => {
             vi.clearAllMocks();
             // Import core systems
             coreSystems = {
-                save: await import('../js/core/systems/save-system'),
-                options: await import('../js/core/systems/options-system'),
-                autosave: await import('../js/core/systems/autosave')
+                save: await import('../ts/core/systems/save-system'),
+                options: await import('../ts/core/systems/options-system'),
+                autosave: await import('../ts/core/systems/autosave')
             };
         });
 
@@ -429,7 +429,7 @@ describe('Game Runtime Safety Tests', () => {
     describe('Main Integration Runtime Safety', () => {
         beforeEach(() => {
             // Mock the main.js module to prevent import errors
-            vi.doMock('../js/main.js', () => ({
+            vi.doMock('../ts/main.js', () => ({
                 default: {},
                 // Mock any exports if needed
             }));

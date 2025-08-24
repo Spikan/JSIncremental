@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 
 // Import public modules to assert they load and have expected exports
-import * as Constants from '../js/core/constants.ts';
-import * as Clicks from '../js/core/rules/clicks';
-import * as Purchases from '../js/core/rules/purchases';
-import * as Economy from '../js/core/rules/economy';
-import * as Resources from '../js/core/systems/resources';
-import * as EventBus from '../js/services/event-bus.ts';
+import * as Constants from '../ts/core/constants.ts';
+import * as Clicks from '../ts/core/rules/clicks';
+import * as Purchases from '../ts/core/rules/purchases';
+import * as Economy from '../ts/core/rules/economy';
+import * as Resources from '../ts/core/systems/resources';
+import * as EventBus from '../ts/services/event-bus.ts';
 
 
 

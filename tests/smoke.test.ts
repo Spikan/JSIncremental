@@ -47,7 +47,7 @@ describe('Game Smoke Test', () => {
     });
 
     it('should have App global object', () => {
-        // This would normally be set by js/index.js
+        // This would normally be set by ts/index.ts
         expect(typeof window.App).toBe('undefined');
     });
 

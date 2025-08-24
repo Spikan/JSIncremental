@@ -21,8 +21,8 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "js/**/*.ts",
-    "js/**/*.js",
+    "ts/**/*.ts",
+    "ts/**/*.js",
     "types/**/*.d.ts",
     "*.config.ts"
   ],

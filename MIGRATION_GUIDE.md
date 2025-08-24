@@ -22,10 +22,10 @@ This guide covers two migrations:
 - For complex legacy modules, temporarily use `// @ts-nocheck` while migrating
 
 ### Priorities
-1. Pure rules in `js/core/rules/*.js` → converted to `.ts` (clicks, economy, purchases)
-2. Core systems in `js/core/systems/*.js` → converted to `.ts` (resources, purchases-system, save-system, loop-system, drink-system, clicks-system)
-3. UI modules in `js/ui/*.js` → converted to `.ts` (index.ts, buttons.ts, displays.ts, stats.ts, feedback.ts, affordability.ts, labels.ts, utils.ts)
-4. Remaining legacy modules (`main.js`) use `// @ts-nocheck`
+1. Pure rules in `ts/core/rules/*.ts` → fully converted (clicks, economy, purchases)
+2. Core systems in `ts/core/systems/*.ts` → fully converted (resources, purchases-system, save-system, loop-system, drink-system, clicks-system)
+3. UI modules in `ts/ui/*.ts` → fully converted (index.ts, buttons.ts, displays.ts, stats.ts, feedback.ts, affordability.ts, labels.ts, utils.ts)
+4. All modules now fully converted to TypeScript (`main.ts` with proper typing)
 
 ---
 

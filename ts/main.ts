@@ -5,9 +5,9 @@
 
 // Bring over the JS file contents verbatim with minimal edits for TS compatibility
 // We import the existing JS via a triple-slash reference to keep order under Vite
-// but here we inline the logic from js/main.js, adapted for TS types.
+// but here we inline the logic from original main.js, adapted for TS types.
 
-// Ported inline from js/main.js (TS-ified minimal changes)
+// Ported inline from original main.js (TS-ified minimal changes)
 
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types

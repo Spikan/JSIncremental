@@ -38,12 +38,12 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 
 ### File Structure (high level)
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
-- `js/index.ts` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
-- `js/core/state/` — Central `App.state` store (`index.ts`, `shape.ts`) and bridge
-- `js/ui/` — Displays, stats, buttons (event delegation), utils (TypeScript)
-- `js/core/systems/` — Save, loop, options, purchases, resources, audio, game-init (TypeScript)
-- `js/core/rules/` — Pure business logic (clicks, purchases, economy) in `.ts`
-- `js/core/validation/` — Zod schemas and validators (`schemas.ts`)
+- `ts/index.ts` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
+- `ts/core/state/` — Central `App.state` store (`index.ts`, `shape.ts`) and bridge
+- `ts/ui/` — Displays, stats, buttons (event delegation), utils (TypeScript)
+- `ts/core/systems/` — Save, loop, options, purchases, resources, audio, game-init (TypeScript)
+- `ts/core/rules/` — Pure business logic (clicks, purchases, economy) in `.ts`
+- `ts/core/validation/` — Zod schemas and validators (`schemas.ts`)
 - `types/global.d.ts` — Ambient types for globals
 
 ## 🔷 TypeScript Migration Complete
@@ -59,6 +59,11 @@ The codebase has been successfully migrated to TypeScript with the following ach
 
 The migration was completed incrementally while preserving all existing functionality and game mechanics.
 
+**Directory Structure Update:**
+- The `js/` directory has been renamed to `ts/` to better reflect the TypeScript nature of the codebase
+- All import statements have been updated to reference the new `ts/` directory
+- Configuration files and documentation have been updated accordingly
+
 ## 📱 Mobile Support
 
 The game is fully responsive and works great on:
@@ -71,9 +76,9 @@ The game is fully responsive and works great on:
 
 You can customize various aspects of the game:
 - Colors and themes in `css/style.css`
-- Game mechanics in `js/core/rules/*` and systems in `js/core/systems/*`
-- State boot is ESM: no `window.defaultState`; see `js/core/state/shape.ts`
-- Configuration options via `data/upgrades.json` and `js/config.js` (access with `config-accessor.ts`)
+- Game mechanics in `ts/core/rules/*` and systems in `ts/core/systems/*`
+- State boot is ESM: no `window.defaultState`; see `ts/core/state/shape.ts`
+- Configuration options via `data/upgrades.json` and `ts/config.ts` (access with `config-accessor.ts`)
 
 ## 🤝 Contributing
 

@@ -444,8 +444,7 @@ function createMockElement(tagName = 'div') {
       fontWeight: '',
       animation: '',
       setProperty: vi.fn(),
-      getPropertyValue: vi.fn(() => ''),
-      cssText: ''
+      getPropertyValue: vi.fn(() => '')
     },
     classList: {
       add: vi.fn(),
@@ -567,7 +566,7 @@ global.document = {
     element.id = selector.replace(/[.#]/, '');
     return element;
   }),
-  querySelectorAll: vi.fn((selector) => []),
+  querySelectorAll: vi.fn((_selector) => []),
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
   dispatchEvent: vi.fn(),
@@ -606,10 +605,7 @@ global.document = {
   },
   readyState: 'complete',
   hidden: false,
-  visibilityState: 'visible',
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  dispatchEvent: vi.fn()
+  visibilityState: 'visible'
 };
 
 // Setup test utilities
