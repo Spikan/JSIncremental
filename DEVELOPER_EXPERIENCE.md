@@ -203,9 +203,9 @@ npx tsc --noEmit ts/core/state/zustand-store.ts
 
 ### Performance Monitoring
 
-- **Available**: Via `App.performance` global
+- **Available**: Via `performanceMonitor` global
 - **Metrics**: Web Vitals, memory usage, FPS
-- **Command**: `npm run performance`
+- **Command**: Access via global `performanceMonitor` in browser console
 
 ## 🔄 Workflow Integration
 

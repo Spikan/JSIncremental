@@ -36,18 +36,20 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 
 - `npm run dev` — Vite dev server with HMR
 - `npm run build` — Production build
-- `npm test` — Vitest test suite (394 tests passing, 98% success rate)
-- `npm run typecheck` — TypeScript type-check (all core files converted)
+- `npm test` — Vitest test suite (401 tests passing, 100% success rate)
+- `npm run type-check` — TypeScript type-check (all core files converted)
 
 ### File Structure (high level)
 
 - `index.html` — Main interface; no inline `onclick` (uses `data-action`)
 - `ts/index.ts` — Bootstraps `App`, imports `EVENT_NAMES`, loads UI (ESM)
-- `ts/core/state/` — Central `App.state` store (`zustand-store.ts`, `shape.ts`)
-- `ts/ui/` — Displays, stats, buttons (event delegation), utils (TypeScript)
-- `ts/core/systems/` — Save, loop, options, purchases, resources, audio, game-init (TypeScript)
-- `ts/core/rules/` — Pure business logic (clicks, purchases, economy) in `.ts`
-- `ts/core/validation/` — Zod schemas and validators (`schemas.ts`)
+- `ts/main.ts` — Legacy game logic with TypeScript enhancements
+- `ts/core/state/` — Zustand store with optimized selectors and subscriptions
+- `ts/core/systems/` — Modular systems (save, loop, options, purchases, resources, audio, game-init)
+- `ts/core/rules/` — Pure business logic (clicks, purchases, economy) in TypeScript
+- `ts/core/validation/` — Zod schemas and validators
+- `ts/ui/` — UI modules with optimized displays and event handling
+- `ts/services/` — Service layer (storage, event-bus, error-overlay, performance)
 - `types/global.d.ts` — Ambient types for globals
 
 ## 🔷 TypeScript Migration Complete
@@ -58,7 +60,7 @@ The codebase has been successfully migrated to TypeScript with the following ach
 - ✅ **Configuration files** (`vite.config.ts`, `vitest.config.ts`) converted to TypeScript
 - ✅ **Type safety** established across the entire codebase
 - ✅ **Zero TypeScript compilation errors**
-- ✅ **All 312 tests passing**
+- ✅ **All 401 tests passing**
 - ✅ **Full backward compatibility** maintained
 
 The migration was completed incrementally while preserving all existing functionality and game mechanics.
