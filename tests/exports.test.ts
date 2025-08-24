@@ -10,23 +10,14 @@ import * as EventBus from '../ts/services/event-bus.ts';
 
 
 
+// Extend existing global types
 declare global {
-  var window: {
+  interface Window {
     App?: any;
-    Decimal?: any;
-    localStorage?: Storage;
-    fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
-  };
-  var document: {
-    getElementById?: (id: string) => HTMLElement | null;
-    querySelector?: (selectors: string) => Element | null;
-    addEventListener?: (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => void;
-  };
-  var console: {
-    log?: (...data: any[]) => void;
-    warn?: (...data: any[]) => void;
-    error?: (...data: any[]) => void;
-  };
+    GAME_CONFIG?: any;
+    DOM_CACHE?: any;
+    FEATURE_UNLOCKS?: any;
+  }
 }
 
 

@@ -1,48 +1,163 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 
+// Extend existing global types
 declare global {
-  var window: {
+  interface Window {
     App?: any;
-    localStorage: Storage;
-    fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
-  };
-  var document: {
-    getElementById: (id: string) => HTMLElement | null;
-    querySelector: (selectors: string) => Element | null;
-    addEventListener: (type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => void;
-  };
-  var console: {
-    log: (...data: any[]) => void;
-    warn: (...data: any[]) => void;
-    error: (...data: any[]) => void;
-  };
+    GAME_CONFIG?: any;
+    DOM_CACHE?: any;
+    FEATURE_UNLOCKS?: any;
+  }
 }
 
 describe('Game Smoke Test', () => {
     beforeAll(() => {
         // Mock browser environment
-        global.window = {
+        (global as any).window = {
             localStorage: {
                 getItem: () => null,
                 setItem: () => {},
-                removeItem: () => {}
+                removeItem: () => {},
+                length: 0,
+                clear: () => {},
+                key: () => null
             },
             fetch: () => Promise.resolve({
                 ok: true,
-                json: () => Promise.resolve({})
-            })
+                json: () => Promise.resolve({}),
+                headers: new Headers(),
+                redirected: false,
+                status: 200,
+                statusText: 'OK',
+                type: 'basic',
+                url: '',
+                clone: () => ({} as Response),
+                text: () => Promise.resolve(''),
+                blob: () => Promise.resolve(new Blob()),
+                arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+                formData: () => Promise.resolve(new FormData())
+            } as Response)
         };
-        
-        global.document = {
+
+        (global as any).document = {
             getElementById: () => null,
             querySelector: () => null,
-            addEventListener: () => {}
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            dispatchEvent: () => false,
+            createElement: () => null as any,
+            readyState: 'complete',
+            body: null,
+            head: null,
+            documentElement: null,
+            title: '',
+            cookie: '',
+            referrer: '',
+            domain: '',
+            URL: '',
+            location: null as any,
+            defaultView: null,
+            compatMode: '',
+            contentType: '',
+            characterSet: '',
+            charset: '',
+            inputEncoding: '',
+            lastModified: '',
+            links: [],
+            forms: [],
+            images: [],
+            embeds: [],
+            plugins: [],
+            scripts: [],
+            styleSheets: [],
+            all: [],
+            anchors: [],
+            applets: [],
+            children: [],
+            childElementCount: 0,
+            dir: '',
+            designMode: '',
+            fullscreenElement: null,
+            fullscreenEnabled: false,
+            hidden: false,
+            pointerLockElement: null,
+            scrollingElement: null,
+            visibilityState: 'visible',
+            xmlEncoding: '',
+            xmlStandalone: false,
+            xmlVersion: '',
+            createAttribute: () => null as any,
+            createComment: () => null as any,
+            createDocumentFragment: () => null as any,
+            createEvent: () => null as any,
+            createTextNode: () => null as any,
+            getElementsByClassName: () => [],
+            getElementsByName: () => [],
+            getElementsByTagName: () => [],
+            getElementsByTagNameNS: () => [],
+            getRootNode: () => null as any,
+            getSelection: () => null,
+            hasFocus: () => false,
+            importNode: () => null as any,
+            open: () => null as any,
+            querySelectorAll: () => [],
+            write: () => {},
+            writeln: () => {},
+            adoptNode: () => null as any,
+            captureEvents: () => {},
+            caretRangeFromPoint: () => null as any,
+            clear: () => {},
+            close: () => {},
+            createAttributeNS: () => null as any,
+            createCDATASection: () => null as any,
+            createElementNS: () => null as any,
+            createExpression: () => null as any,
+            createNSResolver: () => null as any,
+            createNodeIterator: () => null as any,
+            createProcessingInstruction: () => null as any,
+            createRange: () => null as any,
+            createTreeWalker: () => null as any,
+            elementFromPoint: () => null,
+            elementsFromPoint: () => [],
+            evaluate: () => null as any,
+            execCommand: () => false,
+            exitFullscreen: () => Promise.resolve(),
+            exitPointerLock: () => {},
+            getAnimations: () => [],
+            onfullscreenchange: null,
+            onfullscreenerror: null,
+            onpointerlockchange: null,
+            onpointerlockerror: null,
+            onreadystatechange: null,
+            onvisibilitychange: null,
+            ownerDocument: null,
+            doctype: null,
+            implementation: null as any
         };
-        
-        global.console = {
+
+        (global as any).console = {
             log: () => {},
             warn: () => {},
-            error: () => {}
+            error: () => {},
+            assert: () => {},
+            clear: () => {},
+            count: () => {},
+            countReset: () => {},
+            debug: () => {},
+            dir: () => {},
+            dirxml: () => {},
+            group: () => {},
+            groupCollapsed: () => {},
+            groupEnd: () => {},
+            info: () => {},
+            table: () => {},
+            time: () => {},
+            timeEnd: () => {},
+            timeLog: () => {},
+            trace: () => {},
+            profile: () => {},
+            profileEnd: () => {},
+            timeStamp: () => {}
         };
     });
 
