@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock DOM elements and globals
-global.document = {
+(global as any).document = {
     getElementById: vi.fn(() => ({
         textContent: '',
         innerHTML: '',
@@ -33,7 +33,7 @@ global.document = {
     querySelectorAll: vi.fn(() => [])
 };
 
-global.window = {
+(global as any).window = {
     DOM_CACHE: {
         topSipValue: { innerHTML: '' },
         topSipsPerDrink: { innerHTML: '' },
@@ -74,11 +74,11 @@ global.window = {
     }
 };
 
-global.prettify = vi.fn((value) => value.toString());
-global.requestAnimationFrame = vi.fn((cb) => setTimeout(cb, 16));
+(global as any).prettify = vi.fn((value: any) => value.toString());
+(global as any).requestAnimationFrame = vi.fn((cb: Function) => setTimeout(cb, 16));
 
 describe('UI System', () => {
-    let ui;
+    let ui: any;
 
     beforeEach(async () => {
         vi.clearAllMocks();
@@ -102,11 +102,11 @@ describe('UI System', () => {
             ui.updateTopSipsPerDrink();
             
             // Should access DOM_CACHE.topSipsPerDrink
-            expect(window.DOM_CACHE.topSipsPerDrink).toBeDefined();
+            expect((window as any).DOM_CACHE.topSipsPerDrink).toBeDefined();
         });
 
         it('should update critical click display', () => {
-            window.criticalClickChance = { times: vi.fn(() => ({ toFixed: () => '5.0' })) };
+            (window as any).criticalClickChance = { times: vi.fn(() => ({ toFixed: () => '5.0' })) };
             
             ui.updateCriticalClickDisplay();
             
@@ -116,20 +116,20 @@ describe('UI System', () => {
 
     describe('Stats Module', () => {
         it('should update play time display', () => {
-            window.totalPlayTime = 65000; // 65 seconds
+            (window as any).totalPlayTime = 65000; // 65 seconds
             
             ui.updatePlayTime();
             
             // Should format time correctly
-            expect(window.DOM_CACHE).toBeDefined();
+            expect((window as any).DOM_CACHE).toBeDefined();
         });
 
         it('should update all stats when stats tab is active', () => {
-            window.DOM_CACHE.statsTab.classList.contains.mockReturnValue(true);
+            (window as any).DOM_CACHE.statsTab.classList.contains.mockReturnValue(true);
             
             ui.updateAllStats();
             
-            expect(window.DOM_CACHE.statsTab.classList.contains).toHaveBeenCalledWith('active');
+            expect((window as any).DOM_CACHE.statsTab.classList.contains).toHaveBeenCalledWith('active');
         });
     });
 
@@ -158,9 +158,9 @@ describe('UI System', () => {
 
     describe('Affordability Module', () => {
         it('should check upgrade affordability', () => {
-            window.straws = { toNumber: () => 5 };
-            window.cups = { toNumber: () => 3 };
-            window.suctions = { toNumber: () => 1 };
+            (window as any).straws = { toNumber: () => 5 };
+            (window as any).cups = { toNumber: () => 3 };
+            (window as any).suctions = { toNumber: () => 1 };
             
             expect(() => ui.checkUpgradeAffordability()).not.toThrow();
         });
@@ -174,8 +174,8 @@ describe('UI System', () => {
         it('should set up event listeners during initialization', () => {
             ui.initializeUI();
             
-            expect(window.App.events.on).toHaveBeenCalledWith('CLICK.SODA', expect.any(Function));
-            expect(window.App.events.on).toHaveBeenCalledWith('ECONOMY.PURCHASE', expect.any(Function));
+            expect((window as any).App.events.on).toHaveBeenCalledWith('CLICK.SODA', expect.any(Function));
+            expect((window as any).App.events.on).toHaveBeenCalledWith('ECONOMY.PURCHASE', expect.any(Function));
         });
 
         it('should update all displays', () => {

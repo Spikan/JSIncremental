@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock DOM elements and globals
-const createMockButton = (onclick = null, className = '') => ({
+const createMockButton = (onclick: string | null = null, className: string = '') => ({
     getAttribute: vi.fn(() => onclick),
     removeAttribute: vi.fn(),
     addEventListener: vi.fn(),
@@ -15,7 +15,7 @@ const createMockButton = (onclick = null, className = '') => ({
 const mockDocument = {
     querySelectorAll: vi.fn(),
     getElementById: vi.fn(),
-    readyState: 'complete',
+    readyState: 'complete' as DocumentReadyState,
     addEventListener: vi.fn()
 };
 
@@ -52,9 +52,9 @@ const mockWindow = {
 };
 
 // Mock global objects
-global.document = mockDocument;
-global.window = mockWindow;
-global.console = {
+(global as any).document = mockDocument;
+(global as any).window = mockWindow;
+(global as any).console = {
     log: vi.fn(),
     warn: vi.fn(),
     error: vi.fn()
@@ -77,7 +77,7 @@ mockWindow.levelUp = vi.fn();
 mockWindow.toggleButtonSounds = vi.fn();
 
 describe('Button System', () => {
-    let buttonSystem;
+    let buttonSystem: any;
 
     beforeEach(async () => {
         vi.clearAllMocks();
@@ -149,7 +149,7 @@ describe('Button System', () => {
     });
 
     describe('handleButtonClick', () => {
-                    it('should handle button click with correct audio and feedback', () => {
+        it('should handle button click with correct audio and feedback', () => {
             const { handleButtonClick } = buttonSystem;
             const mockEvent = {
                 preventDefault: vi.fn(),
@@ -168,37 +168,37 @@ describe('Button System', () => {
             expect(mockWindow.App.systems.purchases.execute.buyStraw).toHaveBeenCalled();
         });
 
-            it('should play purchase sound for shop buttons', () => {
-        const { handleButtonClick } = buttonSystem;
-        const mockEvent = {
-            preventDefault: vi.fn(),
-            stopPropagation: vi.fn(),
-            clientX: 100,
-            clientY: 200
-        };
-        const mockButtonElement = createMockButton();
-        const actionName = 'buyStraw';
+        it('should play purchase sound for shop buttons', () => {
+            const { handleButtonClick } = buttonSystem;
+            const mockEvent = {
+                preventDefault: vi.fn(),
+                stopPropagation: vi.fn(),
+                clientX: 100,
+                clientY: 200
+            };
+            const mockButtonElement = createMockButton();
+            const actionName = 'buyStraw';
 
-        handleButtonClick(mockEvent, mockButtonElement, actionName);
-
-        expect(mockWindow.App.systems.audio.button.playButtonPurchaseSound).toHaveBeenCalled();
-    });
-
-            it('should handle unknown button actions gracefully', () => {
-        const { handleButtonClick } = buttonSystem;
-        const mockEvent = {
-            preventDefault: vi.fn(),
-            stopPropagation: vi.fn(),
-            clientX: 100,
-            clientY: 200
-        };
-        const mockButtonElement = createMockButton();
-        const actionName = 'unknownAction';
-
-        expect(() => {
             handleButtonClick(mockEvent, mockButtonElement, actionName);
-        }).not.toThrow();
-    });
+
+            expect(mockWindow.App.systems.audio.button.playButtonPurchaseSound).toHaveBeenCalled();
+        });
+
+        it('should handle unknown button actions gracefully', () => {
+            const { handleButtonClick } = buttonSystem;
+            const mockEvent = {
+                preventDefault: vi.fn(),
+                stopPropagation: vi.fn(),
+                clientX: 100,
+                clientY: 200
+            };
+            const mockButtonElement = createMockButton();
+            const actionName = 'unknownAction';
+
+            expect(() => {
+                handleButtonClick(mockEvent, mockButtonElement, actionName);
+            }).not.toThrow();
+        });
     });
 
     describe('setupUnifiedButtonSystem', () => {
@@ -237,10 +237,6 @@ describe('Button System', () => {
 
             // Buttons without onclick should not have onclick removed
             expect(mockButtons[0].removeAttribute).not.toHaveBeenCalled();
-            
-            // Note: setupSpecialButtonHandlers will still be called and may add listeners
-            // to special buttons like tab buttons, which is expected behavior
-            // We're only testing that the onclick-specific logic is skipped
         });
 
         it('should handle malformed onclick attributes gracefully', () => {
@@ -309,41 +305,41 @@ describe('Button System', () => {
             vi.useFakeTimers();
             
             // Ensure all essential window functions are mocked on the global window
-            global.window = global.window || {};
-            global.window.buyStraw = vi.fn();
-            global.window.buyCup = vi.fn();
-            global.window.levelUp = vi.fn();
-            global.window.save = vi.fn();
-            global.window.buySuction = vi.fn();
-            global.window.buyFasterDrinks = vi.fn();
-            global.window.buyCriticalClick = vi.fn();
-            global.window.buyWiderStraws = vi.fn();
-            global.window.buyBetterCups = vi.fn();
-            global.window.upgradeFasterDrinks = vi.fn();
-            global.window.upgradeCriticalClick = vi.fn();
-            global.window.toggleClickSounds = vi.fn();
-            global.window.switchTab = vi.fn();
-            global.window.devUnlockAll = vi.fn();
-            global.window.devAddTime = vi.fn();
-            global.window.devAddSips = vi.fn();
-            global.window.devToggleDevMode = vi.fn();
-            global.window.devToggleGodMode = vi.fn();
-            global.window.devShowDebugInfo = vi.fn();
-            global.window.devExportSave = vi.fn();
-            global.window.devImportSave = vi.fn();
-            global.window.quickUnlock = vi.fn();
-            global.window.startGame = vi.fn();
-            global.window.reload = vi.fn();
-            global.window.spsClick = vi.fn();
-            global.window.sodaClick = vi.fn();
+            (global as any).window = (global as any).window || {};
+            (global as any).window.buyStraw = vi.fn();
+            (global as any).window.buyCup = vi.fn();
+            (global as any).window.levelUp = vi.fn();
+            (global as any).window.save = vi.fn();
+            (global as any).window.buySuction = vi.fn();
+            (global as any).window.buyFasterDrinks = vi.fn();
+            (global as any).window.buyCriticalClick = vi.fn();
+            (global as any).window.buyWiderStraws = vi.fn();
+            (global as any).window.buyBetterCups = vi.fn();
+            (global as any).window.upgradeFasterDrinks = vi.fn();
+            (global as any).window.upgradeCriticalClick = vi.fn();
+            (global as any).window.toggleClickSounds = vi.fn();
+            (global as any).window.switchTab = vi.fn();
+            (global as any).window.devUnlockAll = vi.fn();
+            (global as any).window.devAddTime = vi.fn();
+            (global as any).window.devAddSips = vi.fn();
+            (global as any).window.devToggleDevMode = vi.fn();
+            (global as any).window.devToggleGodMode = vi.fn();
+            (global as any).window.devShowDebugInfo = vi.fn();
+            (global as any).window.devExportSave = vi.fn();
+            (global as any).window.devImportSave = vi.fn();
+            (global as any).window.quickUnlock = vi.fn();
+            (global as any).window.startGame = vi.fn();
+            (global as any).window.reload = vi.fn();
+            (global as any).window.spsClick = vi.fn();
+            (global as any).window.sodaClick = vi.fn();
             
             // Add missing functions that initButtonSystem checks for
-            global.window.toggleButtonSounds = vi.fn();
-            global.window.sendMessage = vi.fn();
+            (global as any).window.toggleButtonSounds = vi.fn();
+            (global as any).window.sendMessage = vi.fn();
             
             // Mock setTimeout to execute immediately for testing
-            const originalSetTimeout = global.setTimeout;
-            global.setTimeout = (callback, delay) => {
+            const originalSetTimeout = (global as any).setTimeout;
+            (global as any).setTimeout = (callback: Function, delay?: number) => {
               if (delay === 0 || delay === undefined) {
                 callback();
                 return 1; // Return a mock ID
@@ -389,8 +385,8 @@ describe('Button System', () => {
 
             // Mock setTimeout to execute once and then stop
             let setTimeoutCallCount = 0;
-            const originalSetTimeout = global.setTimeout;
-            global.setTimeout = (fn) => {
+            const originalSetTimeout = (global as any).setTimeout;
+            (global as any).setTimeout = (fn: Function) => {
                 if (setTimeoutCallCount === 0) {
                     setTimeoutCallCount++;
                     // Don't call fn() to avoid infinite recursion
@@ -402,7 +398,7 @@ describe('Button System', () => {
             expect(setupSpy).not.toHaveBeenCalled();
 
             // Restore setTimeout
-            global.setTimeout = originalSetTimeout;
+            (global as any).setTimeout = originalSetTimeout;
         });
     });
 
@@ -412,41 +408,41 @@ describe('Button System', () => {
             vi.useFakeTimers();
             
             // Ensure all essential window functions are mocked on the global window
-            global.window = global.window || {};
-            global.window.buyStraw = vi.fn();
-            global.window.buyCup = vi.fn();
-            global.window.levelUp = vi.fn();
-            global.window.save = vi.fn();
-            global.window.buySuction = vi.fn();
-            global.window.buyFasterDrinks = vi.fn();
-            global.window.buyCriticalClick = vi.fn();
-            global.window.buyWiderStraws = vi.fn();
-            global.window.buyBetterCups = vi.fn();
-            global.window.upgradeFasterDrinks = vi.fn();
-            global.window.upgradeCriticalClick = vi.fn();
-            global.window.toggleClickSounds = vi.fn();
-            global.window.switchTab = vi.fn();
-            global.window.devUnlockAll = vi.fn();
-            global.window.devAddTime = vi.fn();
-            global.window.devAddSips = vi.fn();
-            global.window.devToggleDevMode = vi.fn();
-            global.window.devToggleGodMode = vi.fn();
-            global.window.devShowDebugInfo = vi.fn();
-            global.window.devExportSave = vi.fn();
-            global.window.devImportSave = vi.fn();
-            global.window.quickUnlock = vi.fn();
-            global.window.startGame = vi.fn();
-            global.window.reload = vi.fn();
-            global.window.spsClick = vi.fn();
-            global.window.sodaClick = vi.fn();
+            (global as any).window = (global as any).window || {};
+            (global as any).window.buyStraw = vi.fn();
+            (global as any).window.buyCup = vi.fn();
+            (global as any).window.levelUp = vi.fn();
+            (global as any).window.save = vi.fn();
+            (global as any).window.buySuction = vi.fn();
+            (global as any).window.buyFasterDrinks = vi.fn();
+            (global as any).window.buyCriticalClick = vi.fn();
+            (global as any).window.buyWiderStraws = vi.fn();
+            (global as any).window.buyBetterCups = vi.fn();
+            (global as any).window.upgradeFasterDrinks = vi.fn();
+            (global as any).window.upgradeCriticalClick = vi.fn();
+            (global as any).window.toggleClickSounds = vi.fn();
+            (global as any).window.switchTab = vi.fn();
+            (global as any).window.devUnlockAll = vi.fn();
+            (global as any).window.devAddTime = vi.fn();
+            (global as any).window.devAddSips = vi.fn();
+            (global as any).window.devToggleDevMode = vi.fn();
+            (global as any).window.devToggleGodMode = vi.fn();
+            (global as any).window.devShowDebugInfo = vi.fn();
+            (global as any).window.devExportSave = vi.fn();
+            (global as any).window.devImportSave = vi.fn();
+            (global as any).window.quickUnlock = vi.fn();
+            (global as any).window.startGame = vi.fn();
+            (global as any).window.reload = vi.fn();
+            (global as any).window.spsClick = vi.fn();
+            (global as any).window.sodaClick = vi.fn();
             
             // Add missing functions that initButtonSystem checks for
-            global.window.toggleButtonSounds = vi.fn();
-            global.window.sendMessage = vi.fn();
+            (global as any).window.toggleButtonSounds = vi.fn();
+            (global as any).window.sendMessage = vi.fn();
             
             // Mock setTimeout to execute immediately for testing
-            const originalSetTimeout = global.setTimeout;
-            global.setTimeout = (callback, delay) => {
+            const originalSetTimeout = (global as any).setTimeout;
+            (global as any).setTimeout = (callback: Function, delay?: number) => {
               if (delay === 0 || delay === undefined) {
                 callback();
                 return 1; // Return a mock ID
