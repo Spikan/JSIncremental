@@ -63,72 +63,221 @@ export function performSaveSnapshot(): any {
   }
 }
 
-// Function to reset game state to default values
+// Function to reset game state to exactly match first load initialization
 export function resetGameState() {
   try {
     const w: any = window as any;
-    const defaultState = {
-      sips: 0,
-      straws: 0,
-      cups: 0,
-      suctions: 0,
-      widerStraws: 0,
-      betterCups: 0,
-      fasterDrinks: 0,
-      criticalClicks: 0,
-      level: 1,
-      sps: 0,
-      strawSPD: 0,
-      cupSPD: 0,
-      drinkRate: 1000,
-      drinkProgress: 0,
-      lastDrinkTime: 0,
-      lastSaveTime: 0,
-      lastClickTime: 0,
-      sessionStartTime: Date.now(),
-      totalPlayTime: 0,
-      totalSipsEarned: 0,
-      totalClicks: 0,
-      highestSipsPerSecond: 0,
-      currentClickStreak: 0,
-      bestClickStreak: 0,
-      criticalClickChance: 0,
-      criticalClickMultiplier: 0,
-      suctionClickBonus: 0,
-      fasterDrinksUpCounter: 0,
-      criticalClickUpCounter: 0,
-    };
+    const GC: any = w.GAME_CONFIG || {};
+    const BAL = GC.BALANCE || {};
+    const TIMING = GC.TIMING || {};
 
-    // Reset global state
-    w.sips = 0;
-    w.straws = 0;
-    w.cups = 0;
-    w.suctions = 0;
-    w.widerStraws = 0;
-    w.betterCups = 0;
-    w.fasterDrinks = 0;
-    w.criticalClicks = 0;
-    w.level = 1;
-    w.drinkRate = 1000;
-    w.drinkProgress = 0;
-    w.lastDrinkTime = 0;
-    w.lastSaveTime = 0;
-    w.lastClickTime = 0;
-    w.sessionStartTime = Date.now();
-    w.totalPlayTime = 0;
-    w.totalSipsEarned = 0;
-    w.totalClicks = 0;
-    w.highestSipsPerSecond = 0;
+    // Initialize Decimal objects exactly like initGame does
+    w.sips = new Decimal(0);
+    const straws = new Decimal(0);
+    const cups = new Decimal(0);
+    w.straws = straws;
+    w.cups = cups;
+    const suctions = new Decimal(0);
+    w.suctions = suctions;
 
-    // Reset Zustand store
-    w.App?.state?.setState?.(defaultState);
+    const sps = new Decimal(0);
+    const strawSPD = new Decimal(0);
+    const cupSPD = new Decimal(0);
+    const suctionClickBonus = new Decimal(0);
+    const widerStraws = new Decimal(0);
+    w.widerStraws = widerStraws;
+    const betterCups = new Decimal(0);
+    w.betterCups = betterCups;
+    const level = new Decimal(1);
+    w.level = level;
 
-    // Update all displays
-    w.App?.ui?.updateAllDisplays?.();
-    w.App?.ui?.updateTopSipCounter?.();
+    // Set up drink timing exactly like initGame
+    const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE || 1000;
+    const drinkRate = DEFAULT_DRINK_RATE;
+    const drinkProgress = 0;
+    const lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE;
+
+    // Set up drink timing state
+    try {
+      w.App?.state?.setState?.({ lastDrinkTime, drinkRate });
+    } catch (error) {
+      console.warn('Failed to set drink time state:', error);
+    }
+
+    // Set up global drink timing property
+    if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
+      Object.defineProperty(window, 'lastDrinkTime', {
+        get() {
+          return lastDrinkTime;
+        },
+        set(v) {
+          const newTime = Number(v) || 0;
+          try {
+            w.App?.stateBridge?.setLastDrinkTime(newTime);
+          } catch (error) {
+            console.warn('Failed to set last drink time via bridge:', error);
+          }
+        },
+      });
+    }
+
+    // Initialize upgrade variables exactly like initGame
+    const fasterDrinks = new Decimal(0);
+    w.fasterDrinks = fasterDrinks;
+    const fasterDrinksUpCounter = new Decimal(1);
+    w.fasterDrinksUpCounter = fasterDrinksUpCounter;
+
+    const criticalClickChance = new Decimal(BAL.CRITICAL_CLICK_BASE_CHANCE || 0.01);
+    w.criticalClickChance = criticalClickChance;
+    const criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER || 5);
+    w.criticalClickMultiplier = criticalClickMultiplier;
+    const criticalClicks = new Decimal(0);
+    const criticalClickUpCounter = new Decimal(1);
+
+    // Set up session timing exactly like initGame
+    const gameStartTime = Date.now();
+    let lastSaveTime: any = null;
+
+    // Set up lastSaveTime property
+    if (!Object.getOwnPropertyDescriptor(window, 'lastSaveTime')) {
+      Object.defineProperty(window, 'lastSaveTime', {
+        get() {
+          try {
+            return Number(w.App?.state?.getState?.()?.lastSaveTime ?? lastSaveTime ?? 0);
+          } catch (error) {
+            console.warn('Failed to get last save time from App state:', error);
+          }
+          return Number(lastSaveTime || 0);
+        },
+        set(v) {
+          lastSaveTime = Number(v) || 0;
+          try {
+            w.App?.state?.setState?.({ lastSaveTime });
+          } catch (error) {
+            console.warn('Failed to set last save time in App state:', error);
+          }
+        },
+      });
+    }
+
+    // Set session state exactly like initGame
+    try {
+      w.App?.state?.setState?.({
+        sessionStartTime: gameStartTime,
+        totalPlayTime: 0,
+        lastClickTime: 0,
+      });
+    } catch (error) {
+      console.warn('Failed to set session state:', error);
+    }
+
+    // Initialize DOM_CACHE exactly like initGame
+    try {
+      if (typeof DOM_CACHE !== 'undefined' && !DOM_CACHE.isReady()) {
+        DOM_CACHE.init();
+      }
+    } catch (error) {
+      console.warn('Failed to initialize DOM_CACHE:', error);
+    }
+
+    // Compute production exactly like initGame
+    const config = BAL || {};
+    if (w.App?.systems?.resources?.recalcProduction) {
+      const up = w.App?.data?.upgrades || {};
+      w.App.systems.resources.recalcProduction({
+        straws: straws.toNumber(),
+        cups: cups.toNumber(),
+        widerStraws: widerStraws.toNumber(),
+        betterCups: betterCups.toNumber(),
+        base: {
+          strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
+          cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,
+          baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
+        },
+        multipliers: {
+          widerStrawsPerLevel:
+            up?.widerStraws?.multiplierPerLevel ?? config.WIDER_STRAWS_MULTIPLIER,
+          betterCupsPerLevel: up?.betterCups?.multiplierPerLevel ?? config.BETTER_CUPS_MULTIPLIER,
+        },
+      });
+      // Production calculation completed (results are 0 since all resources are 0)
+    }
+
+    // Seed App.state snapshot exactly like initGame
+    try {
+      const toNum = (v: any) =>
+        v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
+      w.App?.state?.setState?.({
+        sips: toNum(w.sips),
+        straws: toNum(straws),
+        cups: toNum(cups),
+        suctions: toNum(suctions),
+        widerStraws: toNum(widerStraws),
+        betterCups: toNum(betterCups),
+        fasterDrinks: toNum(fasterDrinks),
+        criticalClicks: toNum(criticalClicks),
+        level: toNum(level),
+        sps: toNum(sps),
+        strawSPD: toNum(strawSPD),
+        cupSPD: toNum(cupSPD),
+        drinkRate: Number(drinkRate || 0),
+        drinkProgress: Number(drinkProgress || 0),
+        lastDrinkTime: Number(lastDrinkTime || 0),
+        lastSaveTime: 0,
+        sessionStartTime: gameStartTime,
+        totalPlayTime: 0,
+        totalSipsEarned: 0,
+        totalClicks: 0,
+        highestSipsPerSecond: 0,
+        currentClickStreak: 0,
+        bestClickStreak: 0,
+        criticalClickChance: toNum(criticalClickChance),
+        criticalClickMultiplier: toNum(criticalClickMultiplier),
+        suctionClickBonus: toNum(suctionClickBonus),
+        fasterDrinksUpCounter: toNum(fasterDrinksUpCounter),
+        criticalClickUpCounter: toNum(criticalClickUpCounter),
+      });
+    } catch (error) {
+      console.warn('Failed to seed App.state:', error);
+    }
+
+    // Update displays exactly like initGame
     w.App?.ui?.updateTopSipsPerDrink?.();
     w.App?.ui?.updateTopSipsPerSecond?.();
-    w.App?.ui?.updateAllStats?.();
+
+    // Initialize systems exactly like initGame
+    try {
+      w.App?.systems?.unlocks?.init?.();
+    } catch (error) {
+      console.warn('Failed to initialize unlocks system:', error);
+    }
+
+    // Initialize mobile input
+    try {
+      w.App?.ui?.mobileInput?.initialize?.();
+    } catch (error) {
+      console.warn('Failed to initialize mobile input:', error);
+    }
+
+    // Initialize audio systems
+    try {
+      w.App?.systems?.audio?.button?.initButtonAudioSystem?.();
+    } catch (error) {
+      console.warn('Failed to initialize button audio system:', error);
+    }
+
+    try {
+      w.App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+    } catch (error) {
+      console.warn('Failed to update button sounds toggle:', error);
+    }
+
+    // Update autosave status
+    try {
+      w.App?.ui?.updateAutosaveStatus?.();
+    } catch (error) {
+      console.warn('Failed to update autosave status:', error);
+    }
 
     return true;
   } catch (e) {
