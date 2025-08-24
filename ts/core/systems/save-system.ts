@@ -80,9 +80,15 @@ export function resetGameState() {
     const suctions = new Decimal(0);
     w.suctions = suctions;
 
-    const sps = new Decimal(0);
+    // Initialize production variables
     const strawSPD = new Decimal(0);
     const cupSPD = new Decimal(0);
+
+    // Calculate sps (sips per second) - base amount since all resources are 0
+    const baseSipsPerDrink = new Decimal(BAL.BASE_SIPS_PER_DRINK || 1);
+    const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
+    const sps = baseSipsPerDrink.plus(passiveSipsPerDrink); // Will be baseSipsPerDrink since resources are 0
+
     const suctionClickBonus = new Decimal(0);
     const widerStraws = new Decimal(0);
     w.widerStraws = widerStraws;
