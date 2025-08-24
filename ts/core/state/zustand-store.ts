@@ -31,7 +31,7 @@ interface GameStore extends GameState {
     // Production stats
     setStrawSPD: (_spd: number) => void;
     setCupSPD: (_spd: number) => void;
-    setSPS: (_sps: number) => void;
+    setSPD: (_spd: number) => void;
 
     // Drink system
     setDrinkRate: (_rate: number) => void;
@@ -89,7 +89,7 @@ const defaultState: GameState = {
   level: 1,
 
   // Production stats
-  sps: 0, // sips per drink (confusingly named, should be "spd")
+  spd: 0, // sips per drink (renamed from sps for clarity)
   strawSPD: 0,
   cupSPD: 0,
 
@@ -167,7 +167,7 @@ export const useGameStore = create<GameStore>()(
           // Production stats
           setStrawSPD: spd => set({ strawSPD: spd }),
           setCupSPD: spd => set({ cupSPD: spd }),
-          setSPS: sps => set({ sps }),
+          setSPD: (spd: number) => set({ spd }),
 
           // Drink system
           setDrinkRate: rate => set({ drinkRate: rate }),
@@ -234,7 +234,7 @@ export const useGameStore = create<GameStore>()(
           fasterDrinks: state.fasterDrinks,
           criticalClicks: state.criticalClicks,
           level: state.level,
-          sps: state.sps,
+          spd: state.spd,
           strawSPD: state.strawSPD,
           cupSPD: state.cupSPD,
           drinkRate: state.drinkRate,
@@ -310,7 +310,7 @@ export const useCriticalClicks = createSelector(state => state.criticalClicks, 0
 export const useLevel = createSelector(state => state.level, 1, 'level');
 
 // Production and performance selectors
-export const useSPS = createSelector(state => state.sps, 0, 'sps');
+export const useSPD = createSelector(state => state.spd, 0, 'spd');
 
 export const useStrawSPD = createSelector(state => state.strawSPD, 0, 'strawSPD');
 
@@ -403,18 +403,18 @@ export const useTotalResources = () => {
 };
 
 export const useProductionStats = () => {
-  const sps = useSPS();
+  const spd = useSPD();
   const strawSPD = useStrawSPD();
   const cupSPD = useCupSPD();
 
   return useMemo(
     () => ({
-      sps,
+      spd,
       strawSPD,
       cupSPD,
       totalSPD: strawSPD + cupSPD,
     }),
-    [sps, strawSPD, cupSPD]
+    [spd, strawSPD, cupSPD]
   );
 };
 
@@ -445,8 +445,8 @@ export const useSubscribeToLevel = (callback: (level: number) => void) => {
   return useGameStore.subscribe(state => state.level, callback, { fireImmediately: false });
 };
 
-export const useSubscribeToSPS = (callback: (sps: number) => void) => {
-  return useGameStore.subscribe(state => state.sps, callback, { fireImmediately: false });
+export const useSubscribeToSPD = (callback: (spd: number) => void) => {
+  return useGameStore.subscribe(state => state.spd, callback, { fireImmediately: false });
 };
 
 // Export store actions for direct access (useful in tests and non-React contexts)

@@ -12,7 +12,7 @@ export function updateTopSipsPerDrink(): void {
   try {
     // Subscribe to SPS changes only
     useGameStore.subscribe(
-      state => state.sps,
+      state => state.spd,
       sps => {
         if (topSipsPerDrinkElement) {
           topSipsPerDrinkElement.innerHTML = formatNumber(Number(sps || 0));
@@ -25,8 +25,8 @@ export function updateTopSipsPerDrink(): void {
     // Fallback: update once
     const state = useGameStore.getState();
     if (topSipsPerDrinkElement && state) {
-      const sps = Number(state.sps || 0);
-      topSipsPerDrinkElement.innerHTML = formatNumber(sps);
+      const spd = Number(state.spd || 0);
+      topSipsPerDrinkElement.innerHTML = formatNumber(spd);
     }
   }
 }
@@ -40,10 +40,10 @@ export function updateTopSipsPerSecond(): void {
   try {
     // Subscribe to both SPS and drink rate changes
     useGameStore.subscribe(
-      state => ({ sps: state.sps, drinkRate: state.drinkRate }),
-      ({ sps, drinkRate }) => {
+      state => ({ spd: state.spd, drinkRate: state.drinkRate }),
+      ({ spd, drinkRate }) => {
         if (topSipsPerSecondElement) {
-          const sipsPerDrink = Number(sps || 0);
+          const sipsPerDrink = Number(spd || 0);
           const drinkRateMs = Number(drinkRate || 0) || 1000;
           const drinkRateSeconds = drinkRateMs / 1000;
           const sipsPerSecond = sipsPerDrink / drinkRateSeconds;
@@ -57,7 +57,7 @@ export function updateTopSipsPerSecond(): void {
     // Fallback: update once
     const state = useGameStore.getState();
     if (topSipsPerSecondElement && state) {
-      const sipsPerDrink = Number(state.sps || 0);
+      const sipsPerDrink = Number(state.spd || 0);
       const drinkRateMs = Number(state.drinkRate || 0) || 1000;
       const drinkRateSeconds = drinkRateMs / 1000;
       const sipsPerSecond = sipsPerDrink / drinkRateSeconds;

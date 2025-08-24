@@ -24,12 +24,7 @@ export type GameState = {
   level: number;
 
   // Production stats
-  sps: number; // sips per drink (effective) - NOTE: variable name is confusing, should be "spd" for sips per drink
-
-  // TODO: Future refactoring - rename sps to spd for clarity:
-  // sps -> spd; // sips per drink (clearer naming)
-  // This would affect 22+ files including core systems, UI, tests, and types
-  // See REFACTORING_SPS_GUIDE.md for detailed implementation plan
+  spd: number; // sips per drink (effective) - renamed from sps for clarity
   strawSPD: number;
   cupSPD: number;
 
@@ -75,7 +70,7 @@ export const defaultState: GameState = {
   level: 1,
 
   // Production stats
-  sps: 0, // sips per drink (confusingly named, should be "spd")
+  spd: 0, // sips per drink (renamed from sps for clarity)
   strawSPD: 0,
   cupSPD: 0,
 

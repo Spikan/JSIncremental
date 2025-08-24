@@ -19,7 +19,7 @@ interface StateActions {
   setCriticalClickChance?: (value: number) => void;
   setCriticalClickMultiplier?: (value: number) => void;
   setSuctionClickBonus?: (value: number) => void;
-  setSPS?: (value: number) => void;
+  setSPD?: (value: number) => void;
   setStrawSPD?: (value: number) => void;
   setCupSPD?: (value: number) => void;
   setFasterDrinksUpCounter?: (value: number) => void;
@@ -169,9 +169,9 @@ export function createStateBridge(app: AppLike) {
     }
   }
 
-  function syncSps(value: DecimalValue) {
+  function syncSpd(value: DecimalValue) {
     try {
-      app.state.actions?.setSPS?.(toNum(value));
+      app.state.actions?.setSPD?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -240,7 +240,7 @@ export function createStateBridge(app: AppLike) {
       setSeedIfExists('suctionClickBonus', 'suctionClickBonus');
       setSeedIfExists('fasterDrinksUpCounter', 'fasterDrinksUpCounter');
       setSeedIfExists('criticalClickUpCounter', 'criticalClickUpCounter');
-      setSeedIfExists('sps', 'sps');
+      setSeedIfExists('spd', 'spd');
       // Apply seed values using individual actions
       if (seed.drinkRate !== undefined) app.state.actions?.setDrinkRate?.(seed.drinkRate);
       if (seed.drinkProgress !== undefined)
@@ -267,7 +267,7 @@ export function createStateBridge(app: AppLike) {
         app.state.actions?.setFasterDrinksUpCounter?.(seed.fasterDrinksUpCounter);
       if (seed.criticalClickUpCounter !== undefined)
         app.state.actions?.setCriticalClickUpCounter?.(seed.criticalClickUpCounter);
-      if (seed.sps !== undefined) app.state.actions?.setSPS?.(seed.sps);
+      if (seed.spd !== undefined) app.state.actions?.setSPD?.(seed.spd);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -289,7 +289,7 @@ export function createStateBridge(app: AppLike) {
       if (typeof w.criticalClickMultiplier !== 'undefined')
         syncCriticalClickMultiplier(w.criticalClickMultiplier);
       if (typeof w.suctionClickBonus !== 'undefined') syncSuctionClickBonus(w.suctionClickBonus);
-      if (typeof w.sps !== 'undefined') syncSps(w.sps);
+      if (typeof w.spd !== 'undefined') syncSpd(w.spd);
       if (typeof w.drinkRate !== 'undefined') setDrinkRate(w.drinkRate);
       if (typeof w.drinkProgress !== 'undefined') setDrinkProgress(w.drinkProgress);
       if (typeof w.lastDrinkTime !== 'undefined') setLastDrinkTime(w.lastDrinkTime);
@@ -313,7 +313,7 @@ export function createStateBridge(app: AppLike) {
     syncBetterCups,
     syncFasterDrinks,
     syncCriticalClicks,
-    syncSps,
+    syncSpd,
     syncStrawSPD,
     syncCupSPD,
     autoSync,
