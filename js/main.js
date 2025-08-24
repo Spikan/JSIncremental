@@ -138,25 +138,7 @@ if (typeof DOM_CACHE === 'undefined') {
 // Splash init handled by App.systems.gameInit; keep a passthrough for legacy calls
 function initSplashScreen() { try { window.App?.systems?.gameInit?.initSplashScreen?.(); } catch {} }
 
-// Tab switching moved to UI module (App.ui.switchTab)
-
-// Note: Button system lives at js/ui/buttons.ts as part of the UI system
-
-// ============================================================================
-// DUPLICATE FUNCTIONS REMOVED - NOW USING MODULAR ARCHITECTURE
-// ============================================================================
-// The following functions were duplicated between main.js and modular systems.
-// They have been removed from main.js and consolidated into the appropriate modules.
-// All calls now use the App namespace for better organization and maintainability.
-
-// Check if upgrades are affordable and update UI accordingly
-// MOVED TO: js/ui/affordability.ts - use App.ui.checkUpgradeAffordability()
-
-// Update button state based on affordability  
-// MOVED TO: js/ui/utils.ts - use App.ui.updateButtonState()
-
-// Update cost display with affordability indicators
-// MOVED TO: js/ui/utils.ts - use App.ui.updateCostDisplay()
+// Tab switching and UI helpers live in js/ui/*.ts (App.ui.*)
 
 function initGame() {
     try {
@@ -690,21 +672,7 @@ function setupMobileTouchHandling() {
     }
 }
 
-// Use App.ui.updateDrinkProgress() in js/ui/displays.ts
-
-// setDrinkRate legacy helper removed; owned by systems
-
-// Use App.ui.updateDrinkRate() in js/ui/displays.ts
-
-// getDrinkRateSeconds legacy helper removed
-
-// Use App.ui.updateTopSipsPerDrink() in js/ui/displays.ts
-
-// Use App.ui.updateTopSipsPerSecond() in js/ui/displays.ts
-
-// Use App.ui.updateCompactDrinkSpeedDisplays() in js/ui/displays.ts
-
-// Click tracking handled by App.systems.clicks
+// UI update helpers and click tracking live in App.ui and App.systems.clicks
 
 // ============================================================================
 // DEV FUNCTIONS FOR DEVELOPMENT AND TESTING
