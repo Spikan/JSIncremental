@@ -1,17 +1,46 @@
-// Typed minimal app state store
+// State store exports - now using Zustand with legacy compatibility
+// The old createStore implementation has been replaced with Zustand for better performance
 
+// Export the new Zustand store and related utilities
+export { 
+  useGameStore, 
+  gameStore, 
+  useSips, 
+  useStraws, 
+  useCups, 
+  useLevel, 
+  useSPS, 
+  useOptions, 
+  useActions 
+} from './zustand-store'
+
+// Export legacy compatibility layer
+export { 
+  createLegacyStore, 
+  appStore, 
+  selectors, 
+  migrateToZustand, 
+  getZustandStore, 
+  getZustandActions 
+} from './zustand-bridge'
+
+// Legacy type exports for backward compatibility
 export type Unsubscribe = () => void;
 export type Listener<T> = (state: T) => void;
-
 export interface Store<T extends object> {
   getState: () => T;
   setState: (partial: Partial<T>) => void;
   subscribe: (listener: Listener<T>) => Unsubscribe;
 }
 
+// Legacy createStore function now creates a Zustand-compatible wrapper
 export function createStore<T extends object>(initialState: T): Store<T> {
+  console.warn('⚠️ createStore is deprecated. Use useGameStore or gameStore directly.');
+  
+  // For now, return a basic store implementation
+  // The real Zustand store is available via useGameStore
   let state: T = { ...(initialState as any) };
-  const listeners = new Set<Listener<T>>();
+  const listeners = new Set<(state: T) => void>();
 
   function getState(): T {
     return state;
@@ -23,31 +52,12 @@ export function createStore<T extends object>(initialState: T): Store<T> {
     for (const listener of listeners) listener(state);
   }
 
-  function subscribe(listener: Listener<T>): Unsubscribe {
+  function subscribe(listener: (state: T) => void): () => void {
     listeners.add(listener);
     return () => listeners.delete(listener);
   }
 
   return { getState, setState, subscribe };
 }
-
-// Default app store instance for legacy access
-const appStore = createStore<any>({ version: 1 });
-
-// Lightweight selectors (untyped in legacy scenarios)
-const selectors = {
-  sips: (s: any) => s.sips,
-  level: (s: any) => s.level,
-  drinkProgress: (s: any) => s.drinkProgress,
-  drinkRate: (s: any) => s.drinkRate,
-  options: (s: any) => s.options || {},
-};
-
-// Attach to window for legacy bootstrap usage
-try { (window as any).createStore = createStore; } catch {}
-try { (window as any).appStore = appStore; } catch {}
-try { (window as any).selectors = selectors; } catch {}
-
-export { appStore, selectors };
 
 

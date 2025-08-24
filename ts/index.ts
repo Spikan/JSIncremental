@@ -1,8 +1,9 @@
 // Entry module providing a small public API surface and environment checks (TypeScript)
 
-import { createStore } from './core/state/index.ts';
+import { createStore, useGameStore } from './core/state/index.ts';
 import { defaultState } from './core/state/shape.ts';
 import { createEventBus } from './services/event-bus.ts';
+import { performanceMonitor } from './services/performance.ts';
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || { loadGame: () => null, saveGame: () => {} };
 const eventBus = createEventBus();
@@ -12,8 +13,14 @@ let EVENT_NAMES: any = (typeof window !== 'undefined' && (window as any).EVENT_N
 try { if (typeof window !== 'undefined' && (window as any).EVENT_NAMES) EVENT_NAMES = (window as any).EVENT_NAMES; } catch {}
 
 console.log('🔧 index.ts starting App initialization...');
+
+// Initialize Zustand store
+console.log('🔧 Initializing Zustand store...');
+const zustandStore = useGameStore;
+
 (window as any).App = {
   state: createStore(defaultState),
+  zustand: zustandStore, // New Zustand store
   storage,
   events: eventBus,
   EVENT_NAMES,
@@ -21,6 +28,7 @@ console.log('🔧 index.ts starting App initialization...');
   systems: { resources: {}, purchases: {}, clicks: {}, autosave: {}, save: {}, options: {}, loop: {}, audio: { button: {} }, gameInit: {}, drink: {} },
   ui: {},
   data: {},
+  performance: performanceMonitor, // Performance monitoring
 };
 
 try { (window as any).EVENT_NAMES = (window as any).App.EVENT_NAMES; } catch {}
