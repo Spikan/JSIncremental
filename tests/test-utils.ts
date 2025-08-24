@@ -49,7 +49,11 @@ export function setupTestEnvironment() {
     (global as any).window = {
       addEventListener: () => {},
       removeEventListener: () => {},
+      __TEST_ENV__: true, // Enable test environment bypass in selectors
     } as any;
+  } else {
+    // Set the test environment flag on existing window
+    (window as any).__TEST_ENV__ = true;
   }
 
   if (typeof document === 'undefined') {
@@ -61,7 +65,10 @@ export function setupTestEnvironment() {
 
   return {
     cleanup: () => {
-      // Cleanup function
+      // Cleanup function - remove test environment flag
+      if (typeof window !== 'undefined') {
+        delete (window as any).__TEST_ENV__;
+      }
     }
   };
 }

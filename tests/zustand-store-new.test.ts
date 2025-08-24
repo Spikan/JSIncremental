@@ -7,7 +7,7 @@ import {
   useStraws,
   useCups,
   useLevel,
-  useSPS,
+  useHighestSipsPerSecond,
   useOptions,
   useActions,
 } from '../ts/core/state/zustand-store';
@@ -17,7 +17,7 @@ import {
   selectors,
   migrateToZustand,
 } from '../ts/core/state/zustand-bridge';
-import { setupTestEnvironment } from './test-utils';
+import { setupTestEnvironment, expectLargeNumberToEqual } from './test-utils';
 
 describe('Zustand Store - Core Functionality', () => {
   let cleanup: () => void;
@@ -62,67 +62,67 @@ describe('Zustand Store - Core Functionality', () => {
   describe('Resource Management', () => {
     it('should add sips correctly', () => {
       storeActions.addSips(100);
-      expect(useGameStore.getState().sips).toBe(100);
-      expect(useGameStore.getState().totalSipsEarned).toBe(100);
+      expectLargeNumberToEqual(useGameStore.getState().sips, 100);
+      expectLargeNumberToEqual(useGameStore.getState().totalSipsEarned, 100);
     });
 
     it('should set sips correctly', () => {
       storeActions.setSips(500);
-      expect(useGameStore.getState().sips).toBe(500);
+      expectLargeNumberToEqual(useGameStore.getState().sips, 500);
     });
 
     it('should add straws correctly', () => {
       storeActions.addStraws(3);
-      expect(useGameStore.getState().straws).toBe(3);
+      expectLargeNumberToEqual(useGameStore.getState().straws, 3);
     });
 
     it('should add cups correctly', () => {
       storeActions.addCups(2);
-      expect(useGameStore.getState().cups).toBe(2);
+      expectLargeNumberToEqual(useGameStore.getState().cups, 2);
     });
 
     it('should add suctions correctly', () => {
       storeActions.addSuctions(1);
-      expect(useGameStore.getState().suctions).toBe(1);
+      expectLargeNumberToEqual(useGameStore.getState().suctions, 1);
     });
   });
 
   describe('Upgrade Management', () => {
     it('should add wider straws correctly', () => {
       storeActions.addWiderStraws(2);
-      expect(useGameStore.getState().widerStraws).toBe(2);
+      expectLargeNumberToEqual(useGameStore.getState().widerStraws, 2);
     });
 
     it('should add better cups correctly', () => {
       storeActions.addBetterCups(1);
-      expect(useGameStore.getState().betterCups).toBe(1);
+      expectLargeNumberToEqual(useGameStore.getState().betterCups, 1);
     });
 
     it('should add faster drinks correctly', () => {
       storeActions.addFasterDrinks(3);
-      expect(useGameStore.getState().fasterDrinks).toBe(3);
+      expectLargeNumberToEqual(useGameStore.getState().fasterDrinks, 3);
     });
 
     it('should add critical clicks correctly', () => {
       storeActions.addCriticalClicks(2);
-      expect(useGameStore.getState().criticalClicks).toBe(2);
+      expectLargeNumberToEqual(useGameStore.getState().criticalClicks, 2);
     });
   });
 
   describe('Production Stats', () => {
     it('should set straw SPD correctly', () => {
       storeActions.setStrawSPD(1.5);
-      expect(useGameStore.getState().strawSPD).toBe(1.5);
+      expectLargeNumberToEqual(useGameStore.getState().strawSPD, 1.5);
     });
 
     it('should set cup SPD correctly', () => {
       storeActions.setCupSPD(2.8);
-      expect(useGameStore.getState().cupSPD).toBe(2.8);
+      expectLargeNumberToEqual(useGameStore.getState().cupSPD, 2.8);
     });
 
     it('should set SPS correctly', () => {
-      storeActions.setSPS(25.5);
-      expect(useGameStore.getState().sps).toBe(25.5);
+      storeActions.setHighestSipsPerSecond(25.5);
+      expectLargeNumberToEqual(useGameStore.getState().highestSipsPerSecond, 25.5);
     });
   });
 
@@ -161,23 +161,23 @@ describe('Zustand Store - Core Functionality', () => {
 
     it('should add total sips earned correctly', () => {
       storeActions.addTotalSipsEarned(1000);
-      expect(useGameStore.getState().totalSipsEarned).toBe(1000);
+      expectLargeNumberToEqual(useGameStore.getState().totalSipsEarned, 1000);
 
       storeActions.addTotalSipsEarned(500);
-      expect(useGameStore.getState().totalSipsEarned).toBe(1500);
+      expectLargeNumberToEqual(useGameStore.getState().totalSipsEarned, 1500);
     });
 
     it('should add total clicks correctly', () => {
       storeActions.addTotalClicks(50);
-      expect(useGameStore.getState().totalClicks).toBe(50);
+      expectLargeNumberToEqual(useGameStore.getState().totalClicks, 50);
 
       storeActions.addTotalClicks(25);
-      expect(useGameStore.getState().totalClicks).toBe(75);
+      expectLargeNumberToEqual(useGameStore.getState().totalClicks, 75);
     });
 
     it('should set highest SPS correctly', () => {
       storeActions.setHighestSipsPerSecond(30.5);
-      expect(useGameStore.getState().highestSipsPerSecond).toBe(30.5);
+      expectLargeNumberToEqual(useGameStore.getState().highestSipsPerSecond, 30.5);
     });
 
     it('should set click streaks correctly', () => {
@@ -202,37 +202,37 @@ describe('Zustand Store - Core Functionality', () => {
 
     it('should set critical click multiplier correctly', () => {
       storeActions.setCriticalClickMultiplier(3.0);
-      expect(useGameStore.getState().criticalClickMultiplier).toBe(3.0);
+      expectLargeNumberToEqual(useGameStore.getState().criticalClickMultiplier, 3.0);
     });
 
     it('should set suction click bonus correctly', () => {
       storeActions.setSuctionClickBonus(0.5);
-      expect(useGameStore.getState().suctionClickBonus).toBe(0.5);
+      expectLargeNumberToEqual(useGameStore.getState().suctionClickBonus, 0.5);
     });
   });
 
   describe('Upgrade Counters', () => {
     it('should set faster drinks up counter correctly', () => {
       storeActions.setFasterDrinksUpCounter(5);
-      expect(useGameStore.getState().fasterDrinksUpCounter).toBe(5);
+      expectLargeNumberToEqual(useGameStore.getState().fasterDrinksUpCounter, 5);
     });
 
     it('should set critical click up counter correctly', () => {
       storeActions.setCriticalClickUpCounter(3);
-      expect(useGameStore.getState().criticalClickUpCounter).toBe(3);
+      expectLargeNumberToEqual(useGameStore.getState().criticalClickUpCounter, 3);
     });
   });
 
   describe('Level Management', () => {
     it('should set level correctly', () => {
       storeActions.setLevel(5);
-      expect(useGameStore.getState().level).toBe(5);
+      expectLargeNumberToEqual(useGameStore.getState().level, 5);
     });
 
     it('should add level correctly', () => {
       storeActions.setLevel(3);
       storeActions.addLevel(2);
-      expect(useGameStore.getState().level).toBe(5);
+      expectLargeNumberToEqual(useGameStore.getState().level, 5);
     });
   });
 
@@ -322,7 +322,7 @@ describe('Zustand Store - Core Functionality', () => {
       storeActions.addSips(100);
 
       expect(notifiedCount).toBeGreaterThan(0);
-      expect(lastState.sips).toBe(100);
+      expectLargeNumberToEqual(lastState.sips, 100);
 
       unsubscribe();
     });
@@ -391,7 +391,7 @@ describe('Zustand Store - Selectors', () => {
     it('should select SPS correctly', () => {
       storeActions.setHighestSipsPerSecond(45.5);
       const sps = useHighestSipsPerSecond();
-      expect(sps.toNumber()).toBe(45.5);
+      expectLargeNumberToEqual(sps, 45.5);
     });
 
     it('should select options correctly', () => {
@@ -543,7 +543,7 @@ describe('Zustand Store - Performance', () => {
 
     // Should complete in reasonable time (less than 100ms)
     expect(duration).toBeLessThan(100);
-    expect(useGameStore.getState().sips).toBe(1000);
+    expectLargeNumberToEqual(useGameStore.getState().sips, 1000);
   });
 
   it('should handle multiple subscribers efficiently', () => {

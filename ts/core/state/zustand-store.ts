@@ -307,7 +307,13 @@ const createSelector = <T>(
   return () => {
     // Test environment bypass for performance
     if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
-      return (useGameStore.getState()[selectorName as keyof GameStore] as T) || defaultValue;
+      try {
+        const state = useGameStore.getState();
+        return selector(state);
+      } catch (error) {
+        console.warn(`${selectorName} selector failed in test environment, returning default:`, error);
+        return defaultValue;
+      }
     }
 
     try {
@@ -319,31 +325,31 @@ const createSelector = <T>(
   };
 };
 
-// Basic resource selectors
-export const useSips = createSelector(state => state.sips, 0, 'sips');
+// Basic resource selectors - convert LargeNumber to numbers for UI display
+export const useSips = createSelector(state => state.sips.toNumber(), 0, 'sips');
 
-export const useStraws = createSelector(state => state.straws, 0, 'straws');
+export const useStraws = createSelector(state => state.straws.toNumber(), 0, 'straws');
 
-export const useCups = createSelector(state => state.cups, 0, 'cups');
+export const useCups = createSelector(state => state.cups.toNumber(), 0, 'cups');
 
-export const useSuctions = createSelector(state => state.suctions, 0, 'suctions');
+export const useSuctions = createSelector(state => state.suctions.toNumber(), 0, 'suctions');
 
-export const useWiderStraws = createSelector(state => state.widerStraws, 0, 'widerStraws');
+export const useWiderStraws = createSelector(state => state.widerStraws.toNumber(), 0, 'widerStraws');
 
-export const useBetterCups = createSelector(state => state.betterCups, 0, 'betterCups');
+export const useBetterCups = createSelector(state => state.betterCups.toNumber(), 0, 'betterCups');
 
-export const useFasterDrinks = createSelector(state => state.fasterDrinks, 0, 'fasterDrinks');
+export const useFasterDrinks = createSelector(state => state.fasterDrinks.toNumber(), 0, 'fasterDrinks');
 
-export const useCriticalClicks = createSelector(state => state.criticalClicks, 0, 'criticalClicks');
+export const useCriticalClicks = createSelector(state => state.criticalClicks.toNumber(), 0, 'criticalClicks');
 
-export const useLevel = createSelector(state => state.level, 1, 'level');
+export const useLevel = createSelector(state => state.level.toNumber(), 1, 'level');
 
-// Production and performance selectors
-export const useSPD = createSelector(state => state.spd, 0, 'spd');
+// Production and performance selectors - convert LargeNumber to numbers for UI display
+export const useSPD = createSelector(state => state.spd.toNumber(), 0, 'spd');
 
-export const useStrawSPD = createSelector(state => state.strawSPD, 0, 'strawSPD');
+export const useStrawSPD = createSelector(state => state.strawSPD.toNumber(), 0, 'strawSPD');
 
-export const useCupSPD = createSelector(state => state.cupSPD, 0, 'cupSPD');
+export const useCupSPD = createSelector(state => state.cupSPD.toNumber(), 0, 'cupSPD');
 
 // Drink system selectors
 export const useDrinkRate = createSelector(state => state.drinkRate, 0, 'drinkRate');
@@ -352,30 +358,30 @@ export const useDrinkProgress = createSelector(state => state.drinkProgress, 0, 
 
 export const useLastDrinkTime = createSelector(state => state.lastDrinkTime, 0, 'lastDrinkTime');
 
-// Click system selectors
+// Click system selectors - convert LargeNumber to numbers for UI display
 export const useCriticalClickChance = createSelector(
-  state => state.criticalClickChance,
+  state => state.criticalClickChance.toNumber(),
   0,
   'criticalClickChance'
 );
 
 export const useCriticalClickMultiplier = createSelector(
-  state => state.criticalClickMultiplier,
+  state => state.criticalClickMultiplier.toNumber(),
   0,
   'criticalClickMultiplier'
 );
 
 export const useSuctionClickBonus = createSelector(
-  state => state.suctionClickBonus,
+  state => state.suctionClickBonus.toNumber(),
   0,
   'suctionClickBonus'
 );
 
-// Session and statistics selectors
-export const useTotalClicks = createSelector(state => state.totalClicks, 0, 'totalClicks');
+// Session and statistics selectors - convert LargeNumber to numbers for UI display
+export const useTotalClicks = createSelector(state => state.totalClicks.toNumber(), 0, 'totalClicks');
 
 export const useTotalSipsEarned = createSelector(
-  state => state.totalSipsEarned,
+  state => state.totalSipsEarned.toNumber(),
   0,
   'totalSipsEarned'
 );
@@ -383,7 +389,7 @@ export const useTotalSipsEarned = createSelector(
 export const useTotalPlayTime = createSelector(state => state.totalPlayTime, 0, 'totalPlayTime');
 
 export const useHighestSipsPerSecond = createSelector(
-  state => state.highestSipsPerSecond,
+  state => state.highestSipsPerSecond.toNumber(),
   0,
   'highestSipsPerSecond'
 );
