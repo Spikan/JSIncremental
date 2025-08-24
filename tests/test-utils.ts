@@ -15,7 +15,10 @@ export function expectLargeNumberToEqual(received: LargeNumber | any, expected: 
 /**
  * Test helper to compare LargeNumber objects with expected strings
  */
-export function expectLargeNumberToEqualString(received: LargeNumber | any, expected: string): void {
+export function expectLargeNumberToEqualString(
+  received: LargeNumber | any,
+  expected: string
+): void {
   if (received instanceof LargeNumber) {
     expect(received.toString()).toBe(expected);
   } else {
@@ -69,6 +72,6 @@ export function setupTestEnvironment() {
       if (typeof window !== 'undefined') {
         delete (window as any).__TEST_ENV__;
       }
-    }
+    },
   };
 }

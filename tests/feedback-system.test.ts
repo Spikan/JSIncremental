@@ -310,7 +310,7 @@ describe('Feedback System', () => {
 
       const element = (document.createElement as any).mock.results[0].value;
       expect(element.innerHTML).toContain('LEVEL UP!');
-      expect(element.innerHTML).toContain('+1000 sips bonus!');
+      expect(element.innerHTML).toContain('+1,000 sips bonus!');
     });
 
     it('should set level up feedback accessibility attributes', () => {
@@ -380,7 +380,7 @@ describe('Feedback System', () => {
       const element = (document.createElement as any).mock.results[0].value;
       expect(element.innerHTML).toContain('Welcome Back!');
       expect(element.innerHTML).toContain('1 hour 0 minutes');
-      expect(element.innerHTML).toContain('+1800');
+      expect(element.innerHTML).toContain('+1,800');
     });
 
     it('should set modal accessibility attributes', () => {

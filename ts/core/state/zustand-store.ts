@@ -160,7 +160,8 @@ export const useGameStore = create<GameStore>()(
           setWiderStraws: amount => set({ widerStraws: toLargeNumber(amount) }),
           addBetterCups: amount => set(state => ({ betterCups: add(state.betterCups, amount) })),
           setBetterCups: amount => set({ betterCups: toLargeNumber(amount) }),
-          addFasterDrinks: amount => set(state => ({ fasterDrinks: add(state.fasterDrinks, amount) })),
+          addFasterDrinks: amount =>
+            set(state => ({ fasterDrinks: add(state.fasterDrinks, amount) })),
           setFasterDrinks: amount => set({ fasterDrinks: toLargeNumber(amount) }),
           addCriticalClicks: amount =>
             set(state => ({ criticalClicks: add(state.criticalClicks, amount) })),
@@ -200,12 +201,15 @@ export const useGameStore = create<GameStore>()(
           setSuctionClickBonus: (_bonus: any) => set({ suctionClickBonus: toLargeNumber(_bonus) }),
 
           // Upgrade counters
-          setFasterDrinksUpCounter: (_count: any) => set({ fasterDrinksUpCounter: toLargeNumber(_count) }),
-          setCriticalClickUpCounter: (_count: any) => set({ criticalClickUpCounter: toLargeNumber(_count) }),
+          setFasterDrinksUpCounter: (_count: any) =>
+            set({ fasterDrinksUpCounter: toLargeNumber(_count) }),
+          setCriticalClickUpCounter: (_count: any) =>
+            set({ criticalClickUpCounter: toLargeNumber(_count) }),
 
           // Level management
           setLevel: (_level: any) => set({ level: toLargeNumber(_level) }),
-          addLevel: (_amount: number) => set(state => ({ level: state.level.add(toLargeNumber(_amount)) })),
+          addLevel: (_amount: number) =>
+            set(state => ({ level: state.level.add(toLargeNumber(_amount)) })),
 
           // Options management
           updateOptions: (_options: Partial<GameOptions>) =>
@@ -261,12 +265,12 @@ export const useGameStore = create<GameStore>()(
         // @ts-expect-error: custom persist options supported by our setup
         serialize: (state: any) => {
           // Custom serialize to handle LargeNumber objects
-          const serialized = JSON.stringify(state, (key, value) => {
+          const serialized = JSON.stringify(state, (_key, value) => {
             if (value && typeof value === 'object' && 'toString' in value && 'toNumber' in value) {
               // This looks like a LargeNumber object
               return {
                 __largeNumber: true,
-                value: value.toString()
+                value: value.toString(),
               };
             }
             return value;
@@ -276,7 +280,7 @@ export const useGameStore = create<GameStore>()(
         // Note: custom deserialize to revive LargeNumber
         deserialize: (str: any) => {
           // Custom deserialize to restore LargeNumber objects
-          const parsed = JSON.parse(str, (key, value) => {
+          const parsed = JSON.parse(str, (_key, value) => {
             if (value && typeof value === 'object' && value.__largeNumber) {
               // Restore LargeNumber from string representation
               return new LargeNumber(value.value);
@@ -284,7 +288,7 @@ export const useGameStore = create<GameStore>()(
             return value;
           });
           return parsed;
-        }
+        },
       }
     ),
     {
@@ -311,7 +315,10 @@ const createSelector = <T>(
         const state = useGameStore.getState();
         return selector(state);
       } catch (error) {
-        console.warn(`${selectorName} selector failed in test environment, returning default:`, error);
+        console.warn(
+          `${selectorName} selector failed in test environment, returning default:`,
+          error
+        );
         return defaultValue;
       }
     }
@@ -334,13 +341,25 @@ export const useCups = createSelector(state => state.cups.toNumber(), 0, 'cups')
 
 export const useSuctions = createSelector(state => state.suctions.toNumber(), 0, 'suctions');
 
-export const useWiderStraws = createSelector(state => state.widerStraws.toNumber(), 0, 'widerStraws');
+export const useWiderStraws = createSelector(
+  state => state.widerStraws.toNumber(),
+  0,
+  'widerStraws'
+);
 
 export const useBetterCups = createSelector(state => state.betterCups.toNumber(), 0, 'betterCups');
 
-export const useFasterDrinks = createSelector(state => state.fasterDrinks.toNumber(), 0, 'fasterDrinks');
+export const useFasterDrinks = createSelector(
+  state => state.fasterDrinks.toNumber(),
+  0,
+  'fasterDrinks'
+);
 
-export const useCriticalClicks = createSelector(state => state.criticalClicks.toNumber(), 0, 'criticalClicks');
+export const useCriticalClicks = createSelector(
+  state => state.criticalClicks.toNumber(),
+  0,
+  'criticalClicks'
+);
 
 export const useLevel = createSelector(state => state.level.toNumber(), 1, 'level');
 
@@ -360,7 +379,7 @@ export const useLastDrinkTime = createSelector(state => state.lastDrinkTime, 0, 
 
 // Click system selectors - convert LargeNumber to numbers for UI display
 export const useCriticalClickChance = createSelector(
-  state => state.criticalClickChance.toNumber(),
+  state => state.criticalClickChance,
   0,
   'criticalClickChance'
 );
@@ -378,7 +397,11 @@ export const useSuctionClickBonus = createSelector(
 );
 
 // Session and statistics selectors - convert LargeNumber to numbers for UI display
-export const useTotalClicks = createSelector(state => state.totalClicks.toNumber(), 0, 'totalClicks');
+export const useTotalClicks = createSelector(
+  state => state.totalClicks.toNumber(),
+  0,
+  'totalClicks'
+);
 
 export const useTotalSipsEarned = createSelector(
   state => state.totalSipsEarned.toNumber(),

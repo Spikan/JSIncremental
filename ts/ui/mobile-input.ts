@@ -98,7 +98,7 @@ export class MobileInputHandler {
       return document.getElementById('sodaButton');
     }
 
-    return DOM_CACHE.sodaButton || document.getElementById('sodaButton');
+    return DOM_CACHE['sodaButton'] || document.getElementById('sodaButton');
   }
 
   /**

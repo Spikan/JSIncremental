@@ -12,52 +12,34 @@ import {
   computeEfficiencyBonus,
   computeBreakthroughMultiplier,
   computeInflationRate,
-  computeInterestRate
+  computeInterestRate,
 } from '../ts/core/rules/economy';
 
 describe('Enhanced Economy Functions', () => {
   describe('Very Large Number Handling', () => {
     it('should handle extremely large straw SPD values', () => {
-      const result = computeStrawSPD(
-        '1e100',
-        '1e50',
-        10,
-        0.1
-      );
+      const result = computeStrawSPD('1e100', '1e50', 10, 0.1);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1e50);
     });
 
     it('should handle extremely large cup SPD values', () => {
-      const result = computeCupSPD(
-        '1e100',
-        '1e50',
-        10,
-        0.1
-      );
+      const result = computeCupSPD('1e100', '1e50', 10, 0.1);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1e50);
     });
 
     it('should handle very large total SPD with synergy', () => {
-      const result = computeTotalSPD(
-        '1e100',
-        '1e50',
-        '1e100',
-        '1e50'
-      );
+      const result = computeTotalSPD('1e100', '1e50', '1e100', '1e50');
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1e100);
     });
 
     it('should handle very large sips per drink with diminishing returns', () => {
-      const result = computeTotalSipsPerDrink(
-        1,
-        '1e100'
-      );
+      const result = computeTotalSipsPerDrink(1, '1e100');
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1);
@@ -66,60 +48,42 @@ describe('Enhanced Economy Functions', () => {
 
   describe('Advanced Economy Mechanics', () => {
     it('should calculate prestige bonus for very large sip counts', () => {
-      const result = computePrestigeBonus(
-        '1e100',
-        10
-      );
+      const result = computePrestigeBonus('1e100', 10);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1);
     });
 
     it('should calculate golden straw multiplier for large straw counts', () => {
-      const result = computeGoldenStrawMultiplier(
-        '1e30',
-        100
-      );
+      const result = computeGoldenStrawMultiplier('1e30', 100);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1);
     });
 
     it('should calculate efficiency bonus for high SPD', () => {
-      const result = computeEfficiencyBonus(
-        '1e50',
-        50
-      );
+      const result = computeEfficiencyBonus('1e50', 50);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1);
     });
 
     it('should calculate breakthrough multiplier', () => {
-      const result = computeBreakthroughMultiplier(
-        '1e200',
-        20
-      );
+      const result = computeBreakthroughMultiplier('1e200', 20);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1);
     });
 
     it('should calculate inflation rate for large economies', () => {
-      const result = computeInflationRate(
-        '1e50',
-        5000
-      );
+      const result = computeInflationRate('1e50', 5000);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(0);
     });
 
     it('should calculate interest rate for large bank deposits', () => {
-      const result = computeInterestRate(
-        '1e20',
-        25
-      );
+      const result = computeInterestRate('1e20', 25);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(0);
@@ -170,10 +134,10 @@ describe('Enhanced Economy Functions', () => {
   describe('Mixed Type Support', () => {
     it('should work with mixed number and LargeNumber inputs', () => {
       const result = computeTotalSPD(
-        1000,           // number
+        1000, // number
         new LargeNumber('1.5'), // LargeNumber
-        '500',          // string
-        2.0             // number
+        '500', // string
+        2.0 // number
       );
 
       expect(result).toBeInstanceOf(LargeNumber);
@@ -181,12 +145,7 @@ describe('Enhanced Economy Functions', () => {
     });
 
     it('should handle string representations of large numbers', () => {
-      const result = computeStrawSPD(
-        '1e50',
-        '1e25',
-        5,
-        0.2
-      );
+      const result = computeStrawSPD('1e50', '1e25', 5, 0.2);
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1e25);
@@ -207,12 +166,7 @@ describe('Enhanced Economy Functions', () => {
 
       // Perform multiple calculations with very large numbers
       for (let i = 0; i < 100; i++) {
-        computeTotalSPD(
-          `1e${100 + i}`,
-          `1e${50 + i}`,
-          `1e${100 + i}`,
-          `1e${50 + i}`
-        );
+        computeTotalSPD(`1e${100 + i}`, `1e${50 + i}`, `1e${100 + i}`, `1e${50 + i}`);
       }
 
       const endTime = performance.now();

@@ -431,16 +431,16 @@ function getAppState(): any {
     return {};
   }
 }
-function setAppState(patch: any): void {
-  try {
-    (window as any).App?.state?.setState?.(patch);
-  } catch (error) {
-    console.warn('Failed to set app state:', error);
-  }
-}
-function toNum(v: any): number {
-  return v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
-}
+// function _setAppState(patch: any): void {
+//   try {
+//     (window as any).App?.state?.setState?.(patch);
+//   } catch (error) {
+//     console.warn('Failed to set app state:', error);
+//   }
+// }
+// function _toNum(v: any): number {
+//   return v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
+// }
 
 function subtractFromWallet(spent: number | LargeNumber): any {
   const w: any = (typeof window !== 'undefined' ? window : {}) as any;
@@ -622,7 +622,9 @@ export const execute = {
       console.warn('Failed to update sips after wider straws purchase:', error);
     }
     try {
-      w.widerStraws = new (w.Decimal || Number)((result.widerStraws as any).toNumber?.() ?? Number(result.widerStraws));
+      w.widerStraws = new (w.Decimal || Number)(
+        (result.widerStraws as any).toNumber?.() ?? Number(result.widerStraws)
+      );
     } catch (error) {
       console.warn('Failed to update wider straws after purchase:', error);
     }
@@ -695,7 +697,9 @@ export const execute = {
       console.warn('Failed to update sips after better cups purchase:', error);
     }
     try {
-      w.betterCups = new (w.Decimal || Number)((result.betterCups as any).toNumber?.() ?? Number(result.betterCups));
+      w.betterCups = new (w.Decimal || Number)(
+        (result.betterCups as any).toNumber?.() ?? Number(result.betterCups)
+      );
     } catch (error) {
       console.warn('Failed to update better cups after purchase:', error);
     }
@@ -765,7 +769,9 @@ export const execute = {
       console.warn('Failed to update sips after suction purchase:', error);
     }
     try {
-      w.suctions = new (w.Decimal || Number)((result.suctions as any).toNumber?.() ?? Number(result.suctions));
+      w.suctions = new (w.Decimal || Number)(
+        (result.suctions as any).toNumber?.() ?? Number(result.suctions)
+      );
     } catch (error) {
       console.warn('Failed to update suctions after purchase:', error);
     }
@@ -831,7 +837,9 @@ export const execute = {
       console.warn('Failed to update sips after faster drinks purchase:', error);
     }
     try {
-      w.fasterDrinks = new (w.Decimal || Number)((result.fasterDrinks as any).toNumber?.() ?? Number(result.fasterDrinks));
+      w.fasterDrinks = new (w.Decimal || Number)(
+        (result.fasterDrinks as any).toNumber?.() ?? Number(result.fasterDrinks)
+      );
     } catch (error) {
       console.warn('Failed to update faster drinks after purchase:', error);
     }
@@ -924,12 +932,16 @@ export const execute = {
       console.warn('Failed to update sips after critical click purchase:', error);
     }
     try {
-      w.criticalClicks = new (w.Decimal || Number)((result.criticalClicks as any).toNumber?.() ?? Number(result.criticalClicks));
+      w.criticalClicks = new (w.Decimal || Number)(
+        (result.criticalClicks as any).toNumber?.() ?? Number(result.criticalClicks)
+      );
     } catch (error) {
       console.warn('Failed to update critical clicks after purchase:', error);
     }
     try {
-      w.criticalClickChance = new (w.Decimal || Number)((result.criticalClickChance as any).toNumber?.() ?? Number(result.criticalClickChance));
+      w.criticalClickChance = new (w.Decimal || Number)(
+        (result.criticalClickChance as any).toNumber?.() ?? Number(result.criticalClickChance)
+      );
     } catch (error) {
       console.warn('Failed to update critical click chance after purchase:', error);
     }
@@ -1079,9 +1091,10 @@ export const execute = {
       const spent = (result.spent as any).toNumber?.() ?? Number(result.spent);
       const gained = (result.sipsGained as any).toNumber?.() ?? Number(result.sipsGained);
       const curr = st.sips as any;
-      const nextLarge = curr && curr.add && curr.subtract
-        ? curr.add((result.sipsGained as any)).subtract((result.spent as any))
-        : ((curr ?? 0) + gained - spent);
+      const nextLarge =
+        curr && curr.add && curr.subtract
+          ? curr.add(result.sipsGained as any).subtract(result.spent as any)
+          : (curr ?? 0) + gained - spent;
       w.sips = nextLarge;
       const actions = w.App?.state?.actions;
       actions?.setSips?.(nextLarge);

@@ -13,7 +13,7 @@ import {
   isLess,
   areEqual,
   max,
-  min
+  min,
 } from '../ts/core/state/mutations';
 
 describe('State Mutations with LargeNumber', () => {

@@ -2,7 +2,7 @@
 // Enhanced for very large numbers with scaling and balance considerations
 
 import { LargeNumber } from '../numbers/large-number';
-import { add, multiply, pow } from '../numbers/migration-utils';
+import { pow } from '../numbers/migration-utils';
 
 // ===== Safe numeric helpers =====
 function safeExponentFromLarge(exponent: LargeNumber, max: number = 1_000_000): number {
@@ -55,7 +55,7 @@ const ECONOMY_CONFIG = {
   // Scaling factors for very large numbers
   largeNumberScaling: {
     strawMultiplier: new LargeNumber('0.95'), // Slight diminishing returns
-    cupMultiplier: new LargeNumber('0.98'),    // Even smaller diminishing returns
+    cupMultiplier: new LargeNumber('0.98'), // Even smaller diminishing returns
     exponentialBase: new LargeNumber('1.001'), // Very gentle exponential growth
   },
 
@@ -192,9 +192,7 @@ export function computeTotalSipsPerDrink(
     const excessSPD = spd.subtract(new LargeNumber('1e50'));
     const exp = safeExponentFromLarge(excessSPD);
     const diminishingFactor = pow(new LargeNumber('0.9999'), exp);
-    totalSips = base.add(new LargeNumber('1e50')).add(
-      excessSPD.multiply(diminishingFactor)
-    );
+    totalSips = base.add(new LargeNumber('1e50')).add(excessSPD.multiply(diminishingFactor));
   }
 
   return totalSips;
@@ -214,12 +212,12 @@ export function computePrestigeBonus(
 
   // Base prestige bonus scales logarithmically with total sips
   const log = safeLog10FromLarge(totalSips);
-  const baseBonus = new LargeNumber('1.1').add(log > 0 ? new LargeNumber(log / 10) : new LargeNumber(0));
+  const baseBonus = new LargeNumber('1.1').add(
+    log > 0 ? new LargeNumber(log / 10) : new LargeNumber(0)
+  );
 
   // Additional bonus from prestige level
-  const prestigeMultiplier = new LargeNumber('1').add(
-    prestige.multiply(new LargeNumber('0.5'))
-  );
+  const prestigeMultiplier = new LargeNumber('1').add(prestige.multiply(new LargeNumber('0.5')));
 
   return baseBonus.multiply(prestigeMultiplier);
 }
@@ -235,9 +233,7 @@ export function computeGoldenStrawMultiplier(
   const goldenCount = new LargeNumber(goldenStrawCount);
 
   // Base multiplier from golden straws
-  let multiplier = new LargeNumber('1').add(
-    goldenCount.multiply(new LargeNumber('0.1'))
-  );
+  let multiplier = new LargeNumber('1').add(goldenCount.multiply(new LargeNumber('0.1')));
 
   // Bonus multiplier for very large straw counts
   if (strawCount.gte(new LargeNumber('1e20'))) {

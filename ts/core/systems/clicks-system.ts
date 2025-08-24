@@ -110,7 +110,7 @@ export function handleSodaClick(multiplier: number = 1) {
       }
       try {
         w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, {
-          bonus: criticalBonus.toNumber()
+          bonus: criticalBonus.toNumber(),
         });
       } catch (error) {
         console.warn('Failed to emit critical click event:', error);

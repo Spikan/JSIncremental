@@ -191,7 +191,9 @@ export const GameState = {
   get level(): number {
     if (typeof window === 'undefined') return 1;
     const st = (window as any).App?.state?.getState?.();
-    return st && typeof st.level !== 'undefined' ? Number(st.level || 1) : Number((window as any).level || 1);
+    return st && typeof st.level !== 'undefined'
+      ? Number(st.level || 1)
+      : Number((window as any).level || 1);
   },
   get spd(): number {
     if (typeof window === 'undefined') return 0;

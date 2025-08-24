@@ -9,7 +9,7 @@ export {
   useStraws,
   useCups,
   useLevel,
-  useSPS,
+  useHighestSipsPerSecond,
   useOptions,
   useActions,
 } from './zustand-store';

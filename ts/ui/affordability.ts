@@ -28,23 +28,11 @@ export function checkUpgradeAffordability(): void {
   updateButtonState('buyStraw', canAfford(costs.straw), costs.straw);
   updateButtonState('buyCup', canAfford(costs.cup), costs.cup);
   updateButtonState('buySuction', canAfford(costs.suction), costs.suction);
-  updateButtonState(
-    'buyFasterDrinks',
-    canAfford(costs.fasterDrinks),
-    costs.fasterDrinks
-  );
-  updateButtonState(
-    'buyCriticalClick',
-    canAfford(costs.criticalClick),
-    costs.criticalClick
-  );
+  updateButtonState('buyFasterDrinks', canAfford(costs.fasterDrinks), costs.fasterDrinks);
+  updateButtonState('buyCriticalClick', canAfford(costs.criticalClick), costs.criticalClick);
   updateButtonState('buyWiderStraws', canAfford(costs.widerStraws), costs.widerStraws);
   updateButtonState('buyBetterCups', canAfford(costs.betterCups), costs.betterCups);
-  updateButtonState(
-    'upgradeFasterDrinks',
-    canAfford(costs.fasterDrinksUp),
-    costs.fasterDrinksUp
-  );
+  updateButtonState('upgradeFasterDrinks', canAfford(costs.fasterDrinksUp), costs.fasterDrinksUp);
   // Critical click upgrade button doesn't exist
   updateButtonState('levelUp', canAfford(costs.levelUp), costs.levelUp);
 
@@ -53,21 +41,9 @@ export function checkUpgradeAffordability(): void {
   updateCostDisplay('cupCost', costs.cup, canAfford(costs.cup));
   updateCostDisplay('suctionCost', costs.suction, canAfford(costs.suction));
   updateCostDisplay('suctionCostCompact', costs.suction, canAfford(costs.suction));
-  updateCostDisplay(
-    'fasterDrinksCost',
-    costs.fasterDrinks,
-    canAfford(costs.fasterDrinks)
-  );
-  updateCostDisplay(
-    'fasterDrinksCostCompact',
-    costs.fasterDrinks,
-    canAfford(costs.fasterDrinks)
-  );
-  updateCostDisplay(
-    'criticalClickCost',
-    costs.criticalClick,
-    canAfford(costs.criticalClick)
-  );
+  updateCostDisplay('fasterDrinksCost', costs.fasterDrinks, canAfford(costs.fasterDrinks));
+  updateCostDisplay('fasterDrinksCostCompact', costs.fasterDrinks, canAfford(costs.fasterDrinks));
+  updateCostDisplay('criticalClickCost', costs.criticalClick, canAfford(costs.criticalClick));
   updateCostDisplay(
     'criticalClickCostCompact',
     costs.criticalClick,
@@ -75,11 +51,7 @@ export function checkUpgradeAffordability(): void {
   );
   updateCostDisplay('widerStrawsCost', costs.widerStraws, canAfford(costs.widerStraws));
   updateCostDisplay('betterCupsCost', costs.betterCups, canAfford(costs.betterCups));
-  updateCostDisplay(
-    'fasterDrinksUpCost',
-    costs.fasterDrinksUp,
-    canAfford(costs.fasterDrinksUp)
-  );
+  updateCostDisplay('fasterDrinksUpCost', costs.fasterDrinksUp, canAfford(costs.fasterDrinksUp));
   updateCostDisplay(
     'fasterDrinksUpCostCompact',
     costs.fasterDrinksUp,
@@ -122,7 +94,9 @@ function calculateAllCosts(): any {
   costs.cup = cupBaseCost.multiply(cupScaling.pow(cupExponent));
 
   // Suction cost - use LargeNumber calculation
-  const suctionBaseCost = toLargeNumber(dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40);
+  const suctionBaseCost = toLargeNumber(
+    dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40
+  );
   const suctionScaling = toLargeNumber(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
   const suctionCount = toLargeNumber((window as any).App?.state?.getState?.()?.suctions || 0);
 
@@ -139,15 +113,15 @@ function calculateAllCosts(): any {
   const fasterDrinksScaling = toLargeNumber(
     dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.1
   );
-  const fasterDrinksCount = toLargeNumber((window as any).App?.state?.getState?.()?.fasterDrinks || 0);
+  const fasterDrinksCount = toLargeNumber(
+    (window as any).App?.state?.getState?.()?.fasterDrinks || 0
+  );
 
   // Use safe exponent conversion for pow()
   const fasterDrinksExponent = Number.isFinite((fasterDrinksCount as any).toNumber?.())
     ? (fasterDrinksCount as any).toNumber()
     : 0;
-  costs.fasterDrinks = fasterDrinksBaseCost.multiply(
-    fasterDrinksScaling.pow(fasterDrinksExponent)
-  );
+  costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksExponent));
 
   // Critical click cost - use LargeNumber calculation
   const criticalClickBaseCost = toLargeNumber(
@@ -156,7 +130,9 @@ function calculateAllCosts(): any {
   const criticalClickScaling = toLargeNumber(
     dataUp?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING ?? 1.12
   );
-  const criticalClickCount = toLargeNumber((window as any).App?.state?.getState?.()?.criticalClicks || 0);
+  const criticalClickCount = toLargeNumber(
+    (window as any).App?.state?.getState?.()?.criticalClicks || 0
+  );
 
   // Use safe exponent conversion for pow()
   const criticalClickExponent = Number.isFinite((criticalClickCount as any).toNumber?.())
@@ -170,7 +146,9 @@ function calculateAllCosts(): any {
   const widerStrawsBaseCost = toLargeNumber(
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
   );
-  const widerStrawsCount = toLargeNumber((window as any).App?.state?.getState?.()?.widerStraws || 0);
+  const widerStrawsCount = toLargeNumber(
+    (window as any).App?.state?.getState?.()?.widerStraws || 0
+  );
   costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(new LargeNumber(1)));
 
   // Better cups cost - use LargeNumber calculation

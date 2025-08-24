@@ -11,7 +11,7 @@ import {
   PerformanceMonitor,
   performanceMonitor,
   clearAllCaches,
-  getCacheStats
+  getCacheStats,
 } from '../ts/core/numbers/performance-utils';
 
 describe('Performance Optimization', () => {
@@ -181,9 +181,9 @@ describe('Performance Optimization', () => {
     it('should calculate synergy efficiently', () => {
       const result = optimizedSynergyCalculation(
         '1000', // straws
-        '500',  // cups
-        '2',    // straw SPD
-        '3'     // cup SPD
+        '500', // cups
+        '2', // straw SPD
+        '3' // cup SPD
       );
 
       expect(result).toBeInstanceOf(LargeNumber);
@@ -198,12 +198,7 @@ describe('Performance Optimization', () => {
     });
 
     it('should handle large numbers in synergy calculations', () => {
-      const result = optimizedSynergyCalculation(
-        '1e50',
-        '1e40',
-        '1e20',
-        '1e25'
-      );
+      const result = optimizedSynergyCalculation('1e50', '1e40', '1e20', '1e25');
 
       expect(result).toBeInstanceOf(LargeNumber);
       expect(isFinite(result.toNumber())).toBe(true);

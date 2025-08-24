@@ -7,7 +7,7 @@ import {
   addMassiveCups,
   addExtremeResources,
   testScientificNotation,
-  resetAllResources
+  resetAllResources,
 } from '../ts/core/systems/dev';
 
 describe('Dev Tools Large Number Functions', () => {

@@ -2,7 +2,7 @@
 // Provides caching, memoization, and efficient calculation patterns
 
 import { LargeNumber } from './large-number';
-import { pow, multiply, add } from './migration-utils';
+import { pow, multiply } from './migration-utils';
 
 // Simple LRU cache implementation
 class LRUCache<K, V> {
@@ -28,7 +28,9 @@ class LRUCache<K, V> {
     if (this.cache.size >= this.maxSize) {
       // Remove least recently used (first item)
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
     }
     this.cache.set(key, value);
   }
@@ -134,8 +136,11 @@ export function memoizedFormat(value: any): string {
     result = numValue.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 
-  formatCache.set(key, result);
-  return result;
+  if (result !== undefined) {
+    formatCache.set(key, result);
+    return result;
+  }
+  return key;
 }
 
 /**
@@ -156,7 +161,7 @@ export function batchCalculateStrawSPD(
     }
 
     // Calculate straw SPD (simplified version for batch processing)
-    const strawCount = new LargeNumber(straws);
+    // const strawCount = new LargeNumber(straws);
     const baseValue = new LargeNumber(baseSPDArray[index]);
     const upgradeMultiplier = new LargeNumber(1).add(
       new LargeNumber(widerStrawsArray[index]).multiply(
@@ -230,7 +235,10 @@ export function optimizedSynergyCalculation(
  */
 export class PerformanceMonitor {
   private static instance: PerformanceMonitor;
-  private metrics = new Map<string, { count: number; totalTime: number; maxTime: number; minTime: number }>();
+  private metrics = new Map<
+    string,
+    { count: number; totalTime: number; maxTime: number; minTime: number }
+  >();
 
   static getInstance(): PerformanceMonitor {
     if (!PerformanceMonitor.instance) {
@@ -256,7 +264,7 @@ export class PerformanceMonitor {
         count: 1,
         totalTime: duration,
         maxTime: duration,
-        minTime: duration
+        minTime: duration,
       });
     }
 
@@ -288,7 +296,7 @@ export function getCacheStats() {
   return {
     powCache: powCache.size(),
     economyCache: economyCalculationCache.size(),
-    formatCache: formatCache.size()
+    formatCache: formatCache.size(),
   };
 }
 

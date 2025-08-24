@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { expectLargeNumberToEqual } from './test-utils';
 import {
   computeStrawSPD,
   computeCupSPD,
@@ -37,7 +38,7 @@ describe('economy rules', () => {
 
   it('computes totals', () => {
     const totalSPD = computeTotalSPD(10, 1, 5, 2);
-    expect(totalSPD).toBe(10 * 1 + 5 * 2);
-    expect(computeTotalSipsPerDrink(1, totalSPD)).toBe(1 + totalSPD);
+    expectLargeNumberToEqual(totalSPD, 10 * 1 + 5 * 2);
+    expectLargeNumberToEqual(computeTotalSipsPerDrink(1, totalSPD), 1 + totalSPD.toNumber());
   });
 });

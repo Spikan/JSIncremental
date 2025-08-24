@@ -4,7 +4,11 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { LargeNumber } from '../ts/core/numbers/large-number';
 import { toLargeNumber, add, multiply, pow } from '../ts/core/numbers/migration-utils';
-import { memoizedPow, cachedExponentialGrowth, PerformanceMonitor } from '../ts/core/numbers/performance-utils';
+import {
+  memoizedPow,
+  cachedExponentialGrowth,
+  PerformanceMonitor,
+} from '../ts/core/numbers/performance-utils';
 import { addSips, subtractSips, isGreaterOrEqual } from '../ts/core/state/mutations';
 import { computeStrawSPD, computeTotalSPD } from '../ts/core/rules/economy';
 
@@ -100,7 +104,9 @@ describe('LargeNumber Performance Benchmarks', () => {
 
       // Cached call should be significantly faster
       expect(time2).toBeLessThan(time1);
-      console.log(`Caching benefit: First call ${time1.toFixed(2)}ms, Cached call ${time2.toFixed(2)}ms`);
+      console.log(
+        `Caching benefit: First call ${time1.toFixed(2)}ms, Cached call ${time2.toFixed(2)}ms`
+      );
     });
 
     it('should cache exponential growth calculations', () => {
@@ -120,7 +126,9 @@ describe('LargeNumber Performance Benchmarks', () => {
 
       expect(result1.toNumber()).toBe(result2.toNumber());
       expect(time2).toBeLessThan(time1);
-      console.log(`Exponential growth caching: First ${time1.toFixed(2)}ms, Cached ${time2.toFixed(2)}ms`);
+      console.log(
+        `Exponential growth caching: First ${time1.toFixed(2)}ms, Cached ${time2.toFixed(2)}ms`
+      );
     });
   });
 
@@ -224,7 +232,8 @@ describe('LargeNumber Performance Benchmarks', () => {
         // Perform operations on them
         for (let i = 0; i < count; i++) {
           const result = numbers[i].add(new LargeNumber(1)).multiply(new LargeNumber(2));
-          if (i < 100) { // Only convert some to avoid performance hit
+          if (i < 100) {
+            // Only convert some to avoid performance hit
             result.toNumber();
           }
         }
@@ -266,7 +275,12 @@ describe('LargeNumber Performance Benchmarks', () => {
           // Simulate economy calculations
           if (tick % 10 === 0) {
             const strawSPD = computeStrawSPD(straws, new LargeNumber(0.1), 0, 0);
-            const totalSPD = computeTotalSPD(straws, strawSPD, new LargeNumber(0), new LargeNumber(0));
+            const totalSPD = computeTotalSPD(
+              straws,
+              strawSPD,
+              new LargeNumber(0),
+              new LargeNumber(0)
+            );
             // Use results to ensure calculations aren't optimized away
             expect(strawSPD.toNumber()).toBeGreaterThan(0);
             expect(totalSPD.toNumber()).toBeGreaterThan(0);
@@ -304,7 +318,9 @@ describe('LargeNumber Performance Benchmarks', () => {
       // Log metrics for analysis
       console.log('Performance Metrics:');
       Object.entries(metrics).forEach(([operation, data]: [string, any]) => {
-        console.log(`  ${operation}: ${data.count} calls, ${data.totalTime.toFixed(2)}ms total, ${data.maxTime.toFixed(2)}ms max, ${data.minTime.toFixed(2)}ms min`);
+        console.log(
+          `  ${operation}: ${data.count} calls, ${data.totalTime.toFixed(2)}ms total, ${data.maxTime.toFixed(2)}ms max, ${data.minTime.toFixed(2)}ms min`
+        );
       });
     });
   });

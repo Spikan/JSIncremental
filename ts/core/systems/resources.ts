@@ -27,11 +27,11 @@ export function recalcProduction({
   base?: {
     strawBaseSPD?: number | LargeNumber;
     cupBaseSPD?: number | LargeNumber;
-    baseSipsPerDrink?: number | LargeNumber
+    baseSipsPerDrink?: number | LargeNumber;
   };
   multipliers?: {
     widerStrawsPerLevel?: number | LargeNumber;
-    betterCupsPerLevel?: number | LargeNumber
+    betterCupsPerLevel?: number | LargeNumber;
   };
 }): { strawSPD: LargeNumber; cupSPD: LargeNumber; sipsPerDrink: LargeNumber } {
   const { upgrades, config } = getConfig();
@@ -43,21 +43,19 @@ export function recalcProduction({
   const cupBaseSPD = toLargeNumber(
     base.cupBaseSPD ?? upgrades?.cups?.baseSPD ?? config.CUP_BASE_SPD ?? 1.2
   );
-  const baseSipsPerDrink = toLargeNumber(
-    base.baseSipsPerDrink ?? config.BASE_SIPS_PER_DRINK ?? 1
-  );
+  const baseSipsPerDrink = toLargeNumber(base.baseSipsPerDrink ?? config.BASE_SIPS_PER_DRINK ?? 1);
 
   const widerStrawsPerLevel = toLargeNumber(
     multipliers.widerStrawsPerLevel ??
-    upgrades?.widerStraws?.multiplierPerLevel ??
-    config.WIDER_STRAWS_MULTIPLIER ??
-    0.5
+      upgrades?.widerStraws?.multiplierPerLevel ??
+      config.WIDER_STRAWS_MULTIPLIER ??
+      0.5
   );
   const betterCupsPerLevel = toLargeNumber(
     multipliers.betterCupsPerLevel ??
-    upgrades?.betterCups?.multiplierPerLevel ??
-    config.BETTER_CUPS_MULTIPLIER ??
-    0.4
+      upgrades?.betterCups?.multiplierPerLevel ??
+      config.BETTER_CUPS_MULTIPLIER ??
+      0.4
   );
 
   // Use LargeNumber versions of all inputs
@@ -67,7 +65,12 @@ export function recalcProduction({
   const betterCupsLarge = toLargeNumber(betterCups);
 
   // Calculate production values with LargeNumber support
-  const strawSPD = computeStrawSPD(strawsLarge, strawBaseSPD, widerStrawsLarge, widerStrawsPerLevel);
+  const strawSPD = computeStrawSPD(
+    strawsLarge,
+    strawBaseSPD,
+    widerStrawsLarge,
+    widerStrawsPerLevel
+  );
   const cupSPD = computeCupSPD(cupsLarge, cupBaseSPD, betterCupsLarge, betterCupsPerLevel);
   const totalSPD = computeTotalSPD(strawsLarge, strawSPD, cupsLarge, cupSPD);
   const sipsPerDrink = computeTotalSipsPerDrink(baseSipsPerDrink, totalSPD);

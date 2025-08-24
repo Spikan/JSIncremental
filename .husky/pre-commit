@@ -1,17 +1,44 @@
 #!/usr/bin/env sh
 
-echo "🔍 Running pre-commit checks..."
+echo "🔍 Running pre-commit quality checks..."
+echo "========================================"
+
+# Track start time
+start_time=$(date +%s)
+
+# Function to run command with error handling
+run_check() {
+  echo ""
+  echo "$1"
+  echo "----------------------------------------"
+
+  if $2; then
+    echo "✅ PASSED"
+    return 0
+  else
+    echo "❌ FAILED"
+    echo ""
+    echo "🔧 To fix automatically:"
+    echo "   npm run $3"
+    echo ""
+    return 1
+  fi
+}
 
 # Run ESLint
-echo "📝 Checking code quality with ESLint..."
-npm run lint
+run_check "📝 Checking code quality with ESLint..." "npm run lint" "lint:fix"
 
 # Run Prettier check
-echo "🎨 Checking code formatting with Prettier..."
-npm run format:check
+run_check "🎨 Checking code formatting with Prettier..." "npm run format:check" "format"
 
 # Run TypeScript type checking
-echo "🔧 Checking TypeScript types..."
-npm run type-check
+run_check "🔧 Checking TypeScript types..." "npm run type-check" "type-check"
 
-echo "✅ Pre-commit checks passed!"
+# Calculate duration
+end_time=$(date +%s)
+duration=$((end_time - start_time))
+
+echo ""
+echo "========================================"
+echo "🎉 All pre-commit checks passed! ($duration seconds)"
+echo "========================================"

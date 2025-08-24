@@ -2,7 +2,7 @@
 // Tests complete user flows from game start to advanced progression
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { setupTestEnvironment } from './test-utils';
+import { setupTestEnvironment, expectLargeNumberToEqual } from './test-utils';
 import { computeClick } from '../ts/core/rules/clicks';
 import {
   computeStrawSPD,
@@ -117,7 +117,7 @@ describe('User Journey Testing', () => {
 
       // Production should increase
       const sps = computeStrawSPD(gameState.straws, 0.6, 0, 1);
-      expect(sps).toBe(0.6);
+      expectLargeNumberToEqual(sps, 0.6);
     });
   });
 
@@ -199,9 +199,9 @@ describe('User Journey Testing', () => {
       }
 
       // Should have made good progress
-      expect(gameState.straws).toBeGreaterThan(5);
-      expect(gameState.cups).toBeGreaterThan(2);
-      expect(gameState.suctions).toBeGreaterThan(0);
+      expect(gameState.straws.toNumber()).toBeGreaterThan(5);
+      expect(gameState.cups.toNumber()).toBeGreaterThan(2);
+      expect(gameState.suctions.toNumber()).toBeGreaterThan(0);
       expect(gameState.sips).toBeGreaterThan(1000);
       expect(gameState.totalClicks).toBeGreaterThan(3000);
     });
@@ -260,8 +260,8 @@ describe('User Journey Testing', () => {
         }
 
         // Each strategy should result in different resource distributions
-        expect(gameState.straws + gameState.cups + gameState.suctions).toBeGreaterThan(5);
-        expect(gameState.sips).toBeGreaterThan(1000);
+        expect(gameState.straws.toNumber() + gameState.cups.toNumber() + gameState.suctions.toNumber()).toBeGreaterThan(5);
+        expect(gameState.sips.toNumber()).toBeGreaterThan(1000);
       });
     });
   });
@@ -330,7 +330,7 @@ describe('User Journey Testing', () => {
 
       // Should get more critical hits with higher chance
       expect(criticalHits).toBeGreaterThan(0);
-      expect(gameState.totalSipsEarned).toBeGreaterThan(criticalHits * 5);
+      expect(gameState.totalSipsEarned.toNumber()).toBeGreaterThan(criticalHits * 5);
     });
   });
 
@@ -504,7 +504,7 @@ describe('User Journey Testing', () => {
 
       // Should complete calculations in reasonable time
       expect(duration).toBeLessThan(100); // 100ms for complex calculations
-      expect(sps).toBeGreaterThan(10000);
+      expect(typeof sps === 'string' ? parseFloat(sps) : sps).toBeGreaterThan(10000);
       expect(Number.isFinite(sps)).toBe(true);
     });
 

@@ -22,12 +22,12 @@ import {
   subtract,
   multiply,
   divide,
-  pow
+  pow,
 } from './migration-utils';
 
 // Create a default instance for global use
 export const Numbers = {
-  LargeNumber,
+  // LargeNumber,
   // Migration utilities
   toLargeNumber,
   toNumber,

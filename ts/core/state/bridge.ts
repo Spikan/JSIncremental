@@ -244,7 +244,9 @@ export function createStateBridge(app: AppLike) {
             (seed as any)[seedKey] = toLargeNumberValue(value);
           } else if (
             typeof seedKey === 'string' &&
-            (seedKey === 'criticalClickChance' || seedKey === 'currentClickStreak' || seedKey === 'bestClickStreak')
+            (seedKey === 'criticalClickChance' ||
+              seedKey === 'currentClickStreak' ||
+              seedKey === 'bestClickStreak')
           ) {
             // These remain as numbers
             (seed as any)[seedKey] = toLargeNumberValue(value).toNumber();

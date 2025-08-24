@@ -46,7 +46,7 @@ describe('computeClick', () => {
       criticalMultiplier: 1,
     });
 
-    expect(result.gained).toBe('15');
+    expect(result.gained.toString()).toBe('15');
     expect(result.critical).toBe(false);
   });
 
@@ -58,7 +58,7 @@ describe('computeClick', () => {
       criticalMultiplier: 2,
     });
 
-    expect(result.gained).toBe('30'); // (10 + 5) * 2
+    expect(result.gained.toString()).toBe('30'); // (10 + 5) * 2
     expect(result.critical).toBe(true);
   });
 });

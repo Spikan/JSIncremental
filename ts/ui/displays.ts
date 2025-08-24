@@ -46,7 +46,7 @@ export function updateTopSipsPerSecond(): void {
       ({ spd, drinkRate }) => {
         if (topSipsPerSecondElement) {
           // Keep LargeNumber for spd and do division properly
-          const sipsPerDrinkLarge = (spd && typeof spd.toNumber === 'function') ? spd : null;
+          const sipsPerDrinkLarge = spd && typeof spd.toNumber === 'function' ? spd : null;
           const drinkRateMs = Number(drinkRate || 0) || 1000;
           const drinkRateSeconds = drinkRateMs / 1000;
 
@@ -72,7 +72,8 @@ export function updateTopSipsPerSecond(): void {
     const state = useGameStore.getState();
     if (topSipsPerSecondElement && state) {
       // Handle LargeNumber for spd and do division properly
-      const sipsPerDrinkLarge = (state.spd && typeof state.spd.toNumber === 'function') ? state.spd : null;
+      const sipsPerDrinkLarge =
+        state.spd && typeof state.spd.toNumber === 'function' ? state.spd : null;
       const drinkRateMs = Number(state.drinkRate || 0) || 1000;
       const drinkRateSeconds = drinkRateMs / 1000;
 
@@ -234,10 +235,16 @@ export function updateTopSipCounter(): void {
       const state = useGameStore.getState();
       console.log('DEBUG: updateTopSipCounter - state.sips:', state.sips);
       console.log('DEBUG: updateTopSipCounter - state.sips type:', typeof state.sips);
-      console.log('DEBUG: updateTopSipCounter - state.sips has toNumber:', !!(state.sips && typeof state.sips.toNumber === 'function'));
+      console.log(
+        'DEBUG: updateTopSipCounter - state.sips has toNumber:',
+        !!(state.sips && typeof state.sips.toNumber === 'function')
+      );
       if (state.sips && typeof state.sips.toNumber === 'function') {
         console.log('DEBUG: updateTopSipCounter - state.sips.toNumber():', state.sips.toNumber());
-        console.log('DEBUG: updateTopSipCounter - isFinite:', Number.isFinite(state.sips.toNumber()));
+        console.log(
+          'DEBUG: updateTopSipCounter - isFinite:',
+          Number.isFinite(state.sips.toNumber())
+        );
       }
       // Use state.sips directly - formatNumber will handle LargeNumber properly
       const formatted = formatNumber(state.sips);

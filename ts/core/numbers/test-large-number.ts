@@ -31,7 +31,11 @@ console.log('Native number operations work:', nativeNum.add(nativeNum).toString(
 
 // Test 4: Check which library is being used
 const testNum = new LargeNumber(1);
-console.log('Using break_infinity:', !(testNum._value instanceof NativeNumber));
-console.log('Library available:', typeof (globalThis as any).BreakInfinity !== 'undefined' || typeof (globalThis as any).Decimal !== 'undefined');
+console.log('Using break_infinity:', !((testNum as any)._value instanceof NativeNumber));
+console.log(
+  'Library available:',
+  typeof (globalThis as any).BreakInfinity !== 'undefined' ||
+    typeof (globalThis as any).Decimal !== 'undefined'
+);
 
 console.log('LargeNumber tests completed successfully!');

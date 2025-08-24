@@ -9,15 +9,33 @@ const mockWindow = {
       this.value = Number(value) || 0;
     }
     value: number;
-    toNumber() { return this.value; }
-    plus(other: any) { return new (window as any).Decimal(this.value + other); }
-    minus(other: any) { return new (window as any).Decimal(this.value - other); }
-    times(other: any) { return new (window as any).Decimal(this.value * other); }
-    div(other: any) { return new (window as any).Decimal(this.value / other); }
-    gt(other: any) { return this.value > other; }
-    gte(other: any) { return this.value >= other; }
-    lt(other: any) { return this.value < other; }
-    lte(other: any) { return this.value <= other; }
+    toNumber() {
+      return this.value;
+    }
+    plus(other: any) {
+      return new (window as any).Decimal(this.value + other);
+    }
+    minus(other: any) {
+      return new (window as any).Decimal(this.value - other);
+    }
+    times(other: any) {
+      return new (window as any).Decimal(this.value * other);
+    }
+    div(other: any) {
+      return new (window as any).Decimal(this.value / other);
+    }
+    gt(other: any) {
+      return this.value > other;
+    }
+    gte(other: any) {
+      return this.value >= other;
+    }
+    lt(other: any) {
+      return this.value < other;
+    }
+    lte(other: any) {
+      return this.value <= other;
+    }
   },
   App: {
     systems: {
@@ -26,23 +44,23 @@ const mockWindow = {
           // Mock LargeNumber-like objects
           const mockLargeNumber = (value: number) => ({
             toNumber: () => value,
-            toString: () => String(value)
+            toString: () => String(value),
           });
 
           return {
             strawSPD: mockLargeNumber(params.straws * 0.6),
             cupSPD: mockLargeNumber(params.cups * 1.2),
-            sipsPerDrink: mockLargeNumber(1 + params.straws * 0.6 + params.cups * 1.2)
+            sipsPerDrink: mockLargeNumber(1 + params.straws * 0.6 + params.cups * 1.2),
           };
-        }
-      }
+        },
+      },
     },
     state: {
       setState: (state: any) => {
         console.log('Setting state:', state);
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 // Mock global window
@@ -70,12 +88,12 @@ describe('InitGame Integration', () => {
       base: {
         strawBaseSPD: 0.6,
         cupBaseSPD: 1.2,
-        baseSipsPerDrink: 1
+        baseSipsPerDrink: 1,
       },
       multipliers: {
         widerStrawsPerLevel: 0.5,
-        betterCupsPerLevel: 0.4
-      }
+        betterCupsPerLevel: 0.4,
+      },
     };
 
     // This should not throw an error
@@ -83,9 +101,13 @@ describe('InitGame Integration', () => {
       const result = mockWindow.App.systems.resources.recalcProduction(params);
 
       // Test the conversion logic from main.ts
-      const strawSPDValue = result.strawSPD.toNumber ? result.strawSPD.toNumber() : Number(result.strawSPD);
+      const strawSPDValue = result.strawSPD.toNumber
+        ? result.strawSPD.toNumber()
+        : Number(result.strawSPD);
       const cupSPDValue = result.cupSPD.toNumber ? result.cupSPD.toNumber() : Number(result.cupSPD);
-      const spdValue = result.sipsPerDrink.toNumber ? result.sipsPerDrink.toNumber() : Number(result.sipsPerDrink);
+      const spdValue = result.sipsPerDrink.toNumber
+        ? result.sipsPerDrink.toNumber()
+        : Number(result.sipsPerDrink);
 
       // Values should be valid numbers
       expect(typeof strawSPDValue).toBe('number');
@@ -96,14 +118,13 @@ describe('InitGame Integration', () => {
       expect(strawSPDValue).toBeGreaterThan(0);
       expect(cupSPDValue).toBeGreaterThan(0);
       expect(spdValue).toBeGreaterThan(1);
-
     }).not.toThrow();
   });
 
   it('should handle mixed number and LargeNumber objects', () => {
     const largeNumberLike = {
       toNumber: () => 42,
-      toString: () => '42'
+      toString: () => '42',
     };
 
     const plainNumber = 24;
@@ -115,7 +136,7 @@ describe('InitGame Integration', () => {
       { input: plainNumber, expected: 24 },
       { input: stringNumber, expected: 18 },
       { input: null, expected: 0 },
-      { input: undefined, expected: 0 }
+      { input: undefined, expected: 0 },
     ];
 
     testCases.forEach(({ input, expected }) => {
@@ -129,7 +150,7 @@ describe('InitGame Integration', () => {
       { input: { toNumber: () => 'not a number' }, expected: NaN },
       { input: { toNumber: () => Infinity }, expected: Infinity },
       { input: { toNumber: () => -Infinity }, expected: -Infinity },
-      { input: { toNumber: () => 0 }, expected: 0 }
+      { input: { toNumber: () => 0 }, expected: 0 },
     ];
 
     testCases.forEach(({ input, expected }) => {

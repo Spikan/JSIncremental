@@ -2,7 +2,7 @@
 // Tests comprehensive user journeys and edge cases
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { setupTestEnvironment } from './test-utils';
+import { setupTestEnvironment, expectLargeNumberToEqual } from './test-utils';
 import { computeClick } from '../ts/core/rules/clicks';
 import {
   computeStrawSPD,
@@ -91,7 +91,7 @@ describe('Real-World Game Scenarios', () => {
       // All results should have valid gained amounts
       results.forEach(result => {
         expect(Number(result.gained)).toBeGreaterThan(0);
-        expect(result.gained).toBe(String(Number(result.gained)));
+        expect(result.gained.toString()).toBe(String(result.gained.toNumber()));
       });
     });
 
@@ -105,7 +105,7 @@ describe('Real-World Game Scenarios', () => {
 
       // Calculate production after first straw
       const strawSPD = computeStrawSPD(1, 0.6, 0, 1); // 1 straw, no upgrades
-      expect(strawSPD).toBe(0.6);
+      expectLargeNumberToEqual(strawSPD, 0.6);
 
       // Time to earn enough for second straw: (5 - 10) / 0.6 = negative (already have enough)
       // But let's test the progression calculation

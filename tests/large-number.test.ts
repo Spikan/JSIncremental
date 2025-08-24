@@ -262,7 +262,7 @@ describe('Backward Compatibility', () => {
     };
 
     const result = toLargeNumber(decimalLike);
-    expect(result.toNumber()).toBe(100);
+    expect(result ? result.toNumber() : 0).toBe(100);
   });
 
   it('should handle mixed number types', () => {

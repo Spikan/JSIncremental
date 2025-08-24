@@ -75,6 +75,22 @@ interface Decimal {
 }
 
 // Unified interface for our LargeNumber operations
+// Legacy interface for backward compatibility
+export interface LargeNumberLike {
+  toString(): string;
+  toNumber(): number;
+  add?(other: LargeNumberLike): LargeNumberLike;
+  minus?(other: LargeNumberLike): LargeNumberLike;
+  times?(other: LargeNumberLike): LargeNumberLike;
+  div?(other: LargeNumberLike): LargeNumberLike;
+  pow?(exponent: number): LargeNumberLike;
+  gte?(other: LargeNumberLike): boolean;
+  gt?(other: LargeNumberLike): boolean;
+  lte?(other: LargeNumberLike): boolean;
+  lt?(other: LargeNumberLike): boolean;
+  eq?(other: LargeNumberLike): boolean;
+}
+
 export interface NumericOperations {
   add(other: NumericOperations): NumericOperations;
   subtract(other: NumericOperations): NumericOperations;
@@ -96,10 +112,20 @@ export interface NumericOperations {
 declare global {
   var BreakInfinity: BreakInfinityStatic;
   var Decimal: DecimalStatic;
+  var DOM_CACHE: {
+    isReady(): boolean;
+    init(): void;
+    [key: string]: any;
+  };
 
   // Make them available on window too
   interface Window {
     BreakInfinity: BreakInfinityStatic;
     Decimal: DecimalStatic;
+    DOM_CACHE: {
+      isReady(): boolean;
+      init(): void;
+      [key: string]: any;
+    };
   }
 }

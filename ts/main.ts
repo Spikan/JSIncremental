@@ -227,9 +227,13 @@ function initGame() {
       });
 
       // Handle LargeNumber results properly - convert to numbers for Decimal compatibility
-      const strawSPDValue = result.strawSPD.toNumber ? result.strawSPD.toNumber() : Number(result.strawSPD);
+      const strawSPDValue = result.strawSPD.toNumber
+        ? result.strawSPD.toNumber()
+        : Number(result.strawSPD);
       const cupSPDValue = result.cupSPD.toNumber ? result.cupSPD.toNumber() : Number(result.cupSPD);
-      const spdValue = result.sipsPerDrink.toNumber ? result.sipsPerDrink.toNumber() : Number(result.sipsPerDrink);
+      const spdValue = result.sipsPerDrink.toNumber
+        ? result.sipsPerDrink.toNumber()
+        : Number(result.sipsPerDrink);
 
       strawSPD = new Decimal(strawSPDValue);
       cupSPD = new Decimal(cupSPDValue);
@@ -237,13 +241,17 @@ function initGame() {
     } else {
       strawSPD = new Decimal(config.STRAW_BASE_SPD);
       cupSPD = new Decimal(config.CUP_BASE_SPD);
-      if (widerStraws && typeof widerStraws.gt === 'function' && widerStraws.gt(0)) {
+      if (
+        widerStraws &&
+        typeof widerStraws.greaterThan === 'function' &&
+        widerStraws.greaterThan(0)
+      ) {
         const upgradeMultiplier = new Decimal(
           1 + widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER
         );
         strawSPD = strawSPD.times(upgradeMultiplier);
       }
-      if (betterCups && typeof betterCups.gt === 'function' && betterCups.gt(0)) {
+      if (betterCups && typeof betterCups.greaterThan === 'function' && betterCups.greaterThan(0)) {
         const upgradeMultiplier = new Decimal(
           1 + betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER
         );

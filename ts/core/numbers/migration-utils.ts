@@ -56,7 +56,10 @@ export function toNumber(value: NumericValue): number {
   }
 
   // Handle Decimal.js-like objects safely
-  if (value && (typeof (value as any).toString === 'function' || typeof (value as any).toNumber === 'function')) {
+  if (
+    value &&
+    (typeof (value as any).toString === 'function' || typeof (value as any).toNumber === 'function')
+  ) {
     try {
       const str = (value as any).toString?.();
       // If string looks like scientific notation or non-finite when parsed, avoid Number()
@@ -194,10 +197,12 @@ export function isLargeNumber(value: any): value is LargeNumber {
  * Checks if a value supports Decimal.js-like operations
  */
 export function isDecimalLike(value: any): boolean {
-  return value &&
-         typeof value.toNumber === 'function' &&
-         typeof value.toString === 'function' &&
-         typeof value.plus === 'function';
+  return (
+    value &&
+    typeof value.toNumber === 'function' &&
+    typeof value.toString === 'function' &&
+    typeof value.plus === 'function'
+  );
 }
 
 /**

@@ -542,7 +542,7 @@ export function resetAllResources(): boolean {
     w.App?.state?.setState?.({
       sips: 0,
       straws: 0,
-      cups: 0
+      cups: 0,
     });
 
     w.App?.ui?.updateAllStats?.();

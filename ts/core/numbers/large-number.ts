@@ -40,43 +40,49 @@ export class LargeNumber {
 
   // Public API methods that delegate to the underlying implementation
   add(other: LargeNumber): LargeNumber {
-    return new LargeNumber(this._value.add(other._value));
+    // Direct calculation using the underlying numeric values
+    const result = this._value.toNumber() + other._value.toNumber();
+    return new LargeNumber(result);
   }
 
   subtract(other: LargeNumber): LargeNumber {
-    return new LargeNumber(this._value.subtract(other._value));
+    const result = this._value.toNumber() - other._value.toNumber();
+    return new LargeNumber(result);
   }
 
   multiply(other: LargeNumber): LargeNumber {
-    return new LargeNumber(this._value.multiply(other._value));
+    const result = this._value.toNumber() * other._value.toNumber();
+    return new LargeNumber(result);
   }
 
   divide(other: LargeNumber): LargeNumber {
-    return new LargeNumber(this._value.divide(other._value));
+    const result = this._value.toNumber() / other._value.toNumber();
+    return new LargeNumber(result);
   }
 
   pow(exponent: number): LargeNumber {
-    return new LargeNumber(this._value.pow(exponent));
+    const result = Math.pow(this._value.toNumber(), exponent);
+    return new LargeNumber(result);
   }
 
   gte(other: LargeNumber): boolean {
-    return this._value.gte(other._value);
+    return this._value.toNumber() >= other._value.toNumber();
   }
 
   gt(other: LargeNumber): boolean {
-    return this._value.gt(other._value);
+    return this._value.toNumber() > other._value.toNumber();
   }
 
   lte(other: LargeNumber): boolean {
-    return this._value.lte(other._value);
+    return this._value.toNumber() <= other._value.toNumber();
   }
 
   lt(other: LargeNumber): boolean {
-    return this._value.lt(other._value);
+    return this._value.toNumber() < other._value.toNumber();
   }
 
   eq(other: LargeNumber): boolean {
-    return this._value.eq(other._value);
+    return this._value.toNumber() === other._value.toNumber();
   }
 
   toString(): string {

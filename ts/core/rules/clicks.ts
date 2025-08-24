@@ -1,7 +1,6 @@
 // Pure helpers for click outcomes with LargeNumber support (TypeScript)
 
 import { LargeNumber } from '../numbers/large-number';
-import { add, multiply } from '../numbers/migration-utils';
 
 export function computeClick({
   baseClick,
