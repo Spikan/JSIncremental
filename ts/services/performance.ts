@@ -1,5 +1,6 @@
 // Performance monitoring service using web-vitals
 import { onCLS, onFCP, onLCP, onTTFB } from 'web-vitals';
+import { errorReporter, ErrorCategory, ErrorSeverity } from './error-overlay';
 
 export interface PerformanceMetrics {
   CLS: number | null;
@@ -56,35 +57,61 @@ class PerformanceMonitor {
   }
 
   private monitorWebVitals(): void {
-    // Cumulative Layout Shift (CLS)
-    onCLS((metric: any) => {
-      this.metrics.CLS = metric.value;
-      this.logMetric('CLS', metric.value);
-    });
+    try {
+      // Cumulative Layout Shift (CLS)
+      onCLS((metric: any) => {
+        try {
+          this.metrics.CLS = metric.value;
+          this.logMetric('CLS', metric.value);
+        } catch (error) {
+          this.handlePerformanceError('CLS monitoring', error);
+        }
+      });
+    } catch (error) {
+      this.handlePerformanceError('CLS setup', error);
+    }
 
-    // First Input Delay (FID) - Not available in web-vitals v5
-    // onFID((metric: any) => {
-    //   this.metrics.FID = metric.value
-    //   this.logMetric('FID', metric.value)
-    // })
+    try {
+      // First Contentful Paint (FCP)
+      onFCP((metric: any) => {
+        try {
+          this.metrics.FCP = metric.value;
+          this.logMetric('FCP', metric.value);
+        } catch (error) {
+          this.handlePerformanceError('FCP monitoring', error);
+        }
+      });
+    } catch (error) {
+      this.handlePerformanceError('FCP setup', error);
+    }
 
-    // First Contentful Paint (FCP)
-    onFCP((metric: any) => {
-      this.metrics.FCP = metric.value;
-      this.logMetric('FCP', metric.value);
-    });
+    try {
+      // Largest Contentful Paint (LCP)
+      onLCP((metric: any) => {
+        try {
+          this.metrics.LCP = metric.value;
+          this.logMetric('LCP', metric.value);
+        } catch (error) {
+          this.handlePerformanceError('LCP monitoring', error);
+        }
+      });
+    } catch (error) {
+      this.handlePerformanceError('LCP setup', error);
+    }
 
-    // Largest Contentful Paint (LCP)
-    onLCP((metric: any) => {
-      this.metrics.LCP = metric.value;
-      this.logMetric('LCP', metric.value);
-    });
-
-    // Time to First Byte (TTFB)
-    onTTFB((metric: any) => {
-      this.metrics.TTFB = metric.value;
-      this.logMetric('TTFB', metric.value);
-    });
+    try {
+      // Time to First Byte (TTFB)
+      onTTFB((metric: any) => {
+        try {
+          this.metrics.TTFB = metric.value;
+          this.logMetric('TTFB', metric.value);
+        } catch (error) {
+          this.handlePerformanceError('TTFB monitoring', error);
+        }
+      });
+    } catch (error) {
+      this.handlePerformanceError('TTFB setup', error);
+    }
   }
 
   private monitorGamePerformance(): void {
@@ -110,33 +137,50 @@ class PerformanceMonitor {
   }
 
   private monitorMemoryUsage(): void {
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
-      this.metrics.memoryUsage = {
-        usedJSHeapSize: memory.usedJSHeapSize,
-        totalJSHeapSize: memory.totalJSHeapSize,
-        jsHeapSizeLimit: memory.jsHeapSizeLimit,
-      };
-
-      // Log memory usage
-      this.logMetric('Memory Usage (MB)', memory.usedJSHeapSize / 1024 / 1024);
-
-      // Monitor memory usage periodically
-      setInterval(() => {
-        const currentMemory = (performance as any).memory;
+    try {
+      if ('memory' in performance) {
+        const memory = (performance as any).memory;
         this.metrics.memoryUsage = {
-          usedJSHeapSize: currentMemory.usedJSHeapSize,
-          totalJSHeapSize: currentMemory.totalJSHeapSize,
-          jsHeapSizeLimit: currentMemory.jsHeapSizeLimit,
+          usedJSHeapSize: memory.usedJSHeapSize,
+          totalJSHeapSize: memory.totalJSHeapSize,
+          jsHeapSizeLimit: memory.jsHeapSizeLimit,
         };
 
-        // Warn if memory usage is high
-        const memoryUsageMB = currentMemory.usedJSHeapSize / 1024 / 1024;
-        if (memoryUsageMB > 100) {
-          // 100MB threshold
-          console.warn(`High memory usage: ${memoryUsageMB.toFixed(2)}MB`);
-        }
-      }, 30000); // Check every 30 seconds
+        // Log memory usage
+        this.logMetric('Memory Usage (MB)', memory.usedJSHeapSize / 1024 / 1024);
+
+        // Monitor memory usage periodically
+        const memoryCheckInterval = setInterval(() => {
+          try {
+            const currentMemory = (performance as any).memory;
+            this.metrics.memoryUsage = {
+              usedJSHeapSize: currentMemory.usedJSHeapSize,
+              totalJSHeapSize: currentMemory.totalJSHeapSize,
+              jsHeapSizeLimit: currentMemory.jsHeapSizeLimit,
+            };
+
+            // Warn if memory usage is high
+            const memoryUsageMB = currentMemory.usedJSHeapSize / 1024 / 1024;
+            if (memoryUsageMB > 100) {
+              // 100MB threshold
+              console.warn(`High memory usage: ${memoryUsageMB.toFixed(2)}MB`);
+
+              // Report high memory usage as a performance error
+              if (memoryUsageMB > 200) {
+                this.handlePerformanceError(
+                  'high_memory_usage',
+                  new Error(`Memory usage exceeded 200MB: ${memoryUsageMB.toFixed(2)}MB`)
+                );
+              }
+            }
+          } catch (error) {
+            this.handlePerformanceError('memory_check_interval', error);
+            clearInterval(memoryCheckInterval);
+          }
+        }, 30000); // Check every 30 seconds
+      }
+    } catch (error) {
+      this.handlePerformanceError('memory_monitoring_setup', error);
     }
   }
 
@@ -168,15 +212,39 @@ class PerformanceMonitor {
     requestAnimationFrame(countFrames);
   }
 
-  private logMetric(name: string, value: number): void {
-    console.log(`📊 Performance: ${name} = ${value}`);
+  private handlePerformanceError(operation: string, error: any): void {
+    const errorMessage = `Performance monitoring failed: ${operation}`;
+    console.warn(errorMessage, error);
 
-    // Send to analytics if available
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'performance_metric', {
-        metric_name: name,
-        metric_value: value,
-      });
+    // Report to error handling system
+    errorReporter?.reportError({
+      id: `perf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      message: errorMessage,
+      category: ErrorCategory.PERFORMANCE,
+      severity: ErrorSeverity.MEDIUM,
+      context: {
+        component: 'performance-monitor',
+        operation: operation,
+        timestamp: Date.now(),
+        stackTrace: error?.stack,
+      },
+      originalError: error instanceof Error ? error : new Error(String(error)),
+    });
+  }
+
+  private logMetric(name: string, value: number): void {
+    try {
+      console.log(`📊 Performance: ${name} = ${value}`);
+
+      // Send to analytics if available
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'performance_metric', {
+          metric_name: name,
+          metric_value: value,
+        });
+      }
+    } catch (error) {
+      this.handlePerformanceError('logMetric', error);
     }
   }
 

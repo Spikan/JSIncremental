@@ -1,6 +1,7 @@
 // Storage service (TypeScript) with schema-backed validation
 
 import { validateGameOptions, validateGameSave } from '../core/validation/schemas.ts';
+import { errorReporter, ErrorCategory, ErrorSeverity } from './error-overlay';
 
 const STORAGE_PREFIX = 'game_';
 
@@ -30,7 +31,24 @@ export const AppStorage: StorageAPI = {
       const validated = validateGameSave(parsed as any);
       return validated || parsed;
     } catch (e) {
-      console.error('Error loading game:', e);
+      const errorMessage = 'Error loading game';
+      console.error(errorMessage, e);
+
+      // Report error with context
+      errorReporter?.reportError({
+        id: `storage_load_${Date.now()}`,
+        message: errorMessage,
+        category: ErrorCategory.STORAGE,
+        severity: ErrorSeverity.HIGH,
+        context: {
+          component: 'storage',
+          operation: 'loadGame',
+          timestamp: Date.now(),
+          stackTrace: e instanceof Error ? e.stack : undefined,
+        },
+        originalError: e instanceof Error ? e : new Error(String(e)),
+      });
+
       return null;
     }
   },
@@ -40,11 +58,43 @@ export const AppStorage: StorageAPI = {
       const validated = validateGameSave(data as any);
       if (!validated) {
         console.warn('Attempting to save invalid game data');
+
+        // Report validation error
+        errorReporter?.reportError({
+          id: `storage_save_validation_${Date.now()}`,
+          message: 'Attempting to save invalid game data',
+          category: ErrorCategory.VALIDATION,
+          severity: ErrorSeverity.MEDIUM,
+          context: {
+            component: 'storage',
+            operation: 'saveGame',
+            timestamp: Date.now(),
+            gameState: data,
+          },
+        });
       }
       localStorage.setItem(getKey('save'), JSON.stringify(data));
       return true;
     } catch (e) {
-      console.error('Error saving game:', e);
+      const errorMessage = 'Error saving game';
+      console.error(errorMessage, e);
+
+      // Report error with context
+      errorReporter?.reportError({
+        id: `storage_save_${Date.now()}`,
+        message: errorMessage,
+        category: ErrorCategory.STORAGE,
+        severity: ErrorSeverity.HIGH,
+        context: {
+          component: 'storage',
+          operation: 'saveGame',
+          timestamp: Date.now(),
+          gameState: data,
+          stackTrace: e instanceof Error ? e.stack : undefined,
+        },
+        originalError: e instanceof Error ? e : new Error(String(e)),
+      });
+
       return false;
     }
   },
@@ -54,7 +104,24 @@ export const AppStorage: StorageAPI = {
       localStorage.removeItem(getKey('save'));
       return true;
     } catch (e) {
-      console.error('Error deleting save:', e);
+      const errorMessage = 'Error deleting save';
+      console.error(errorMessage, e);
+
+      // Report error with context
+      errorReporter?.reportError({
+        id: `storage_delete_${Date.now()}`,
+        message: errorMessage,
+        category: ErrorCategory.STORAGE,
+        severity: ErrorSeverity.MEDIUM,
+        context: {
+          component: 'storage',
+          operation: 'deleteSave',
+          timestamp: Date.now(),
+          stackTrace: e instanceof Error ? e.stack : undefined,
+        },
+        originalError: e instanceof Error ? e : new Error(String(e)),
+      });
+
       return false;
     }
   },
