@@ -24,7 +24,7 @@ export type GameState = {
   level: number;
 
   // Production stats
-  sps: number; // sips per drink (effective)
+  sps: number; // sips per drink (effective) - NOTE: variable name is confusing, should be "spd" for sips per drink
   strawSPD: number;
   cupSPD: number;
 
@@ -70,7 +70,7 @@ export const defaultState: GameState = {
   level: 1,
 
   // Production stats
-  sps: 0,
+  sps: 0, // sips per drink (confusingly named, should be "spd")
   strawSPD: 0,
   cupSPD: 0,
 

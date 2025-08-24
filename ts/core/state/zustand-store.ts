@@ -89,7 +89,7 @@ const defaultState: GameState = {
   level: 1,
 
   // Production stats
-  sps: 0,
+  sps: 0, // sips per drink (confusingly named, should be "spd")
   strawSPD: 0,
   cupSPD: 0,
 

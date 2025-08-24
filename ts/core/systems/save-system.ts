@@ -84,7 +84,7 @@ export function resetGameState() {
     const strawSPD = new Decimal(0);
     const cupSPD = new Decimal(0);
 
-    // Calculate sps (sips per second) - base amount since all resources are 0
+    // Calculate sps (sips per drink - confusingly named, should be spd) - base amount since all resources are 0
     const baseSipsPerDrink = new Decimal(BAL.BASE_SIPS_PER_DRINK || 1);
     const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
     const sps = baseSipsPerDrink.plus(passiveSipsPerDrink); // Will be baseSipsPerDrink since resources are 0
