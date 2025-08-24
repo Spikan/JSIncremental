@@ -3,10 +3,46 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
+declare global {
+  interface Window {
+    App?: any;
+    GAME_CONFIG?: any;
+    Decimal?: any;
+    sips?: any;
+    straws?: any;
+    cups?: any;
+    suctions?: any;
+    fasterDrinks?: any;
+    widerStraws?: any;
+    betterCups?: any;
+    criticalClickChance?: number;
+    criticalClickMultiplier?: number;
+    criticalClicks?: any;
+    criticalClickUpCounter?: number;
+    suctionClickBonus?: number;
+    level?: number;
+    totalSipsEarned?: any;
+    totalClicks?: number;
+    gameStartDate?: number;
+    lastClickTime?: number;
+    clickTimes?: number[];
+    lastSaveTime?: number;
+    autosaveEnabled?: boolean;
+    autosaveInterval?: number;
+    autosaveCounter?: number;
+    lastDrinkTime?: number;
+    drinkRate?: number;
+    drinkProgress?: number;
+    sps?: any;
+    currentClickStreak?: number;
+    bestClickStreak?: number;
+  }
+}
+
 describe('Core Systems - Comprehensive Testing', () => {
-  let mockApp;
-  let mockGameConfig;
-  let mockDecimal;
+  let mockApp: any;
+  let mockGameConfig: any;
+  let mockDecimal: any;
   
   beforeEach(() => {
     // Reset mocks
@@ -14,47 +50,49 @@ describe('Core Systems - Comprehensive Testing', () => {
     
     // Mock Decimal library
     mockDecimal = class Decimal {
-      constructor(value) {
+      private _value: number;
+      
+      constructor(value: any) {
         this._value = Number(value) || 0;
       }
       
       // Basic arithmetic methods
-      plus(other) {
+      plus(other: any): Decimal {
         const otherValue = other instanceof Decimal ? other._value : Number(other);
         return new Decimal(this._value + otherValue);
       }
       
-      minus(other) {
+      minus(other: any): Decimal {
         const otherValue = other instanceof Decimal ? other._value : Number(other);
         return new Decimal(this._value - otherValue);
       }
       
-      times(other) {
+      times(other: any): Decimal {
         const otherValue = other instanceof Decimal ? other._value : Number(other);
         return new Decimal(this._value * otherValue);
       }
       
-      div(other) {
+      div(other: any): Decimal {
         const otherValue = other instanceof Decimal ? other._value : Number(other);
         return new Decimal(this._value / otherValue);
       }
       
       // Comparison methods
-      gte(other) {
+      gte(other: any): boolean {
         const otherValue = other instanceof Decimal ? other._value : Number(other);
         return this._value >= otherValue;
       }
       
-      lte(other) {
+      lte(other: any): Decimal {
         const otherValue = other instanceof Decimal ? other._value : Number(other);
         return new Decimal(this._value <= otherValue);
       }
       
-      toNumber() {
+      toNumber(): number {
         return this._value;
       }
       
-      toString() {
+      toString(): string {
         return String(this._value);
       }
     };
@@ -141,7 +179,7 @@ describe('Core Systems - Comprehensive Testing', () => {
           }))
         },
         autosave: {
-          computeAutosaveCounter: vi.fn(({ enabled, counter, intervalSec, drinkRateMs }) => {
+          computeAutosaveCounter: vi.fn(({ enabled, counter, intervalSec, drinkRateMs }: { enabled: boolean; counter: number; intervalSec: number; drinkRateMs: number }) => {
             if (!enabled) return { nextCounter: 0, shouldSave: false };
             
             const drinksPerSecond = 1000 / drinkRateMs;
@@ -161,21 +199,21 @@ describe('Core Systems - Comprehensive Testing', () => {
           }))
         },
         purchases: {
-          canAfford: vi.fn((cost) => window.sips.gte(cost)),
-          purchase: vi.fn((item, cost) => {
-            if (window.sips.gte(cost)) {
-              window.sips = window.sips.minus(cost);
+          canAfford: vi.fn((cost: any) => (global as any).window.sips.gte(cost)),
+          purchase: vi.fn((item: string, cost: any) => {
+            if ((global as any).window.sips.gte(cost)) {
+              (global as any).window.sips = (global as any).window.sips.minus(cost);
               return true;
             }
             return false;
           })
         },
         clicks: {
-          processClick: vi.fn((multiplier = 1) => {
+          processClick: vi.fn((multiplier: number = 1) => {
             const baseSips = 1;
             const totalSips = baseSips * multiplier;
-            window.sips = window.sips.plus(totalSips);
-            window.totalClicks++;
+            (global as any).window.sips = (global as any).window.sips.plus(totalSips);
+            (global as any).window.totalClicks++;
             return totalSips;
           })
         },
@@ -244,20 +282,20 @@ describe('Core Systems - Comprehensive Testing', () => {
         economy: {
           computeStrawSPD: vi.fn(() => 2),
           computeCupSPD: vi.fn(() => 3),
-          computeStrawCost: vi.fn((count) => 10 * Math.pow(1.15, count)),
-          computeCupCost: vi.fn((count) => 50 * Math.pow(1.2, count))
+          computeStrawCost: vi.fn((count: number) => 10 * Math.pow(1.15, count)),
+          computeCupCost: vi.fn((count: number) => 50 * Math.pow(1.2, count))
         },
         clicks: {
-          processClick: vi.fn((baseSips = 1, multiplier = 1) => baseSips * multiplier)
+          processClick: vi.fn((baseSips: number = 1, multiplier: number = 1) => baseSips * multiplier)
         },
         purchases: {
-          canAfford: vi.fn((cost) => window.sips.gte(cost))
+          canAfford: vi.fn((cost: any) => (global as any).window.sips.gte(cost))
         }
       }
     };
     
     // Mock window object with game state
-    global.window = {
+    (global as any).window = {
       App: mockApp,
       GAME_CONFIG: mockGameConfig,
       Decimal: mockDecimal,
@@ -503,17 +541,17 @@ describe('Core Systems - Comprehensive Testing', () => {
     it('should process purchases correctly', () => {
       expect(mockApp.systems.purchases.purchase).toBeDefined();
       
-      const initialSips = window.sips.toNumber();
+      const initialSips = (global as any).window.sips.toNumber();
       
       // Test successful purchase
       const success = mockApp.systems.purchases.purchase('straw', 10);
       expect(success).toBe(true);
-      expect(window.sips.toNumber()).toBe(initialSips - 10);
+      expect((global as any).window.sips.toNumber()).toBe(initialSips - 10);
       
       // Test failed purchase
       const failure = mockApp.systems.purchases.purchase('expensive', 10000);
       expect(failure).toBe(false);
-      expect(window.sips.toNumber()).toBe(initialSips - 10); // Should not change
+      expect((global as any).window.sips.toNumber()).toBe(initialSips - 10); // Should not change
     });
   });
 
@@ -521,24 +559,24 @@ describe('Core Systems - Comprehensive Testing', () => {
     it('should process clicks correctly', () => {
       expect(mockApp.systems.clicks.processClick).toBeDefined();
       
-      const initialSips = window.sips.toNumber();
-      const initialClicks = window.totalClicks;
+      const initialSips = (global as any).window.sips.toNumber();
+      const initialClicks = (global as any).window.totalClicks;
       
       const sipsEarned = mockApp.systems.clicks.processClick(1);
       
       expect(sipsEarned).toBe(1);
-      expect(window.sips.toNumber()).toBe(initialSips + 1);
-      expect(window.totalClicks).toBe(initialClicks + 1);
+      expect((global as any).window.sips.toNumber()).toBe(initialSips + 1);
+      expect((global as any).window.totalClicks).toBe(initialClicks + 1);
     });
 
     it('should handle click multipliers correctly', () => {
-      const initialSips = window.sips.toNumber();
+      const initialSips = (global as any).window.sips.toNumber();
       
       // Test with multiplier
       const sipsEarned = mockApp.systems.clicks.processClick(5);
       
       expect(sipsEarned).toBe(5);
-      expect(window.sips.toNumber()).toBe(initialSips + 5);
+      expect((global as any).window.sips.toNumber()).toBe(initialSips + 5);
     });
   });
 
@@ -779,10 +817,10 @@ describe('Core Systems - Comprehensive Testing', () => {
 
     it('should maintain state consistency across systems', () => {
       const initialState = {
-        sips: window.sips.toNumber(),
-        straws: window.straws.toNumber(),
-        cups: window.cups.toNumber(),
-        level: window.level
+        sips: (global as any).window.sips.toNumber(),
+        straws: (global as any).window.straws.toNumber(),
+        cups: (global as any).window.cups.toNumber(),
+        level: (global as any).window.level
       };
       
       // Simulate some operations
@@ -790,10 +828,10 @@ describe('Core Systems - Comprehensive Testing', () => {
       mockApp.systems.purchases.purchase('straw', 10);
       
       // Check that state is consistent
-      expect(window.sips.toNumber()).toBe(initialState.sips + 1 - 10);
-      expect(window.straws.toNumber()).toBe(initialState.straws);
-      expect(window.cups.toNumber()).toBe(initialState.cups);
-      expect(window.level).toBe(initialState.level);
+      expect((global as any).window.sips.toNumber()).toBe(initialState.sips + 1 - 10);
+      expect((global as any).window.straws.toNumber()).toBe(initialState.straws);
+      expect((global as any).window.cups.toNumber()).toBe(initialState.cups);
+      expect((global as any).window.level).toBe(initialState.level);
     });
 
     it('should handle save and load cycle correctly', () => {
@@ -801,8 +839,8 @@ describe('Core Systems - Comprehensive Testing', () => {
       const saveData = mockApp.systems.save.performSaveSnapshot();
       
       // Modify state
-      window.sips = new mockDecimal(2000);
-      window.straws = new mockDecimal(10);
+      (global as any).window.sips = new mockDecimal(2000);
+      (global as any).window.straws = new mockDecimal(10);
       
       // Load saved state
       const loadedData = mockApp.storage.loadGame();
@@ -880,7 +918,7 @@ describe('Core Systems - Comprehensive Testing', () => {
     });
 
     it('should not leak memory during operations', () => {
-      const initialMemory = performance.memory?.usedJSHeapSize || 0;
+      const initialMemory = (performance as any).memory?.usedJSHeapSize || 0;
       
       // Simulate extended system operations
       for (let i = 0; i < 100; i++) {
@@ -890,7 +928,7 @@ describe('Core Systems - Comprehensive Testing', () => {
       }
       
       // Memory usage should remain reasonable
-      const finalMemory = performance.memory?.usedJSHeapSize || 0;
+      const finalMemory = (performance as any).memory?.usedJSHeapSize || 0;
       const memoryIncrease = finalMemory - initialMemory;
       
       // Memory increase should be minimal (less than 1MB)
@@ -905,14 +943,14 @@ describe('Core Systems - Comprehensive Testing', () => {
       const mockCountdown = { textContent: '', classList: { add: vi.fn(), remove: vi.fn() } };
       
       // Mock DOM elements
-      const mockGetElementById = vi.fn((id) => {
+      const mockGetElementById = vi.fn((id: string) => {
         if (id === 'drinkProgressFill') return mockProgressFill;
         if (id === 'drinkCountdown') return mockCountdown;
         return null;
       });
       
       // Mock document
-      global.document = {
+      (global as any).document = {
         getElementById: mockGetElementById
       };
       
@@ -920,7 +958,7 @@ describe('Core Systems - Comprehensive Testing', () => {
       const mockDOMCache = {
         progressFill: mockProgressFill,
         countdown: mockCountdown,
-        get: vi.fn((id) => {
+        get: vi.fn((id: string) => {
           if (id === 'drinkProgressFill') return mockProgressFill;
           if (id === 'drinkCountdown') return mockCountdown;
           return null;
@@ -936,14 +974,14 @@ describe('Core Systems - Comprehensive Testing', () => {
       expect(mockDOMCache.get('drinkCountdown')).toBe(mockCountdown);
       
       // Cleanup
-      delete global.document;
+      delete (global as any).document;
     });
 
     it('should handle missing progress elements gracefully', () => {
       // Test graceful handling of missing elements
       const mockGetElementById = vi.fn(() => null);
       
-      global.document = {
+      (global as any).document = {
         getElementById: mockGetElementById
       };
       
@@ -964,7 +1002,7 @@ describe('Core Systems - Comprehensive Testing', () => {
       expect(mockDOMCache.countdown).toBeNull();
       
       // Cleanup
-      delete global.document;
+      delete (global as any).document;
     });
   });
 });
