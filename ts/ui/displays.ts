@@ -13,9 +13,9 @@ export function updateTopSipsPerDrink(): void {
     // Subscribe to SPS changes only
     useGameStore.subscribe(
       state => state.spd,
-      sps => {
+      spd => {
         if (topSipsPerDrinkElement) {
-          topSipsPerDrinkElement.innerHTML = formatNumber(Number(sps || 0));
+          topSipsPerDrinkElement.innerHTML = formatNumber(Number(spd || 0));
         }
       },
       { fireImmediately: true }

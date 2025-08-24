@@ -79,7 +79,7 @@ function initGame() {
     let suctions = new Decimal(0);
     (window as any).suctions = suctions;
 
-    let sps = new Decimal(0);
+    let spd = new Decimal(0);
     let strawSPD = new Decimal(0);
     let cupSPD = new Decimal(0);
     let suctionClickBonus = new Decimal(0);
@@ -227,7 +227,7 @@ function initGame() {
       });
       strawSPD = new Decimal(result.strawSPD);
       cupSPD = new Decimal(result.cupSPD);
-      sps = new Decimal(result.sipsPerDrink);
+      spd = new Decimal(result.sipsPerDrink);
     } else {
       strawSPD = new Decimal(config.STRAW_BASE_SPD);
       cupSPD = new Decimal(config.CUP_BASE_SPD);
@@ -245,7 +245,7 @@ function initGame() {
       }
       const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
       const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-      sps = baseSipsPerDrink.plus(passiveSipsPerDrink);
+      spd = baseSipsPerDrink.plus(passiveSipsPerDrink);
     }
     suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
 
@@ -277,7 +277,7 @@ function initGame() {
         fasterDrinks: toNum((window as any).fasterDrinks),
         criticalClicks: toNum(criticalClicks),
         level: toNum(level),
-        sps: toNum(sps),
+        spd: toNum(spd),
         strawSPD: toNum(strawSPD),
         cupSPD: toNum(cupSPD),
         drinkRate: Number(drinkRate || 0),

@@ -84,10 +84,10 @@ export function resetGameState() {
     const strawSPD = new Decimal(0);
     const cupSPD = new Decimal(0);
 
-    // Calculate sps (sips per drink - confusingly named, should be spd) - base amount since all resources are 0
+    // Calculate spd (sips per drink) - base amount since all resources are 0
     const baseSipsPerDrink = new Decimal(BAL.BASE_SIPS_PER_DRINK || 1);
     const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-    const sps = baseSipsPerDrink.plus(passiveSipsPerDrink); // Will be baseSipsPerDrink since resources are 0
+    const spd = baseSipsPerDrink.plus(passiveSipsPerDrink); // Will be baseSipsPerDrink since resources are 0
 
     const suctionClickBonus = new Decimal(0);
     const widerStraws = new Decimal(0);
@@ -223,7 +223,7 @@ export function resetGameState() {
         fasterDrinks: toNum(fasterDrinks),
         criticalClicks: toNum(criticalClicks),
         level: toNum(level),
-        sps: toNum(sps),
+        spd: toNum(spd),
         strawSPD: toNum(strawSPD),
         cupSPD: toNum(cupSPD),
         drinkRate: Number(drinkRate || 0),
