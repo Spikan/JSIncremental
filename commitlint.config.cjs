@@ -7,17 +7,17 @@ module.exports = {
       2,
       'always',
       [
-        'feat',      // New feature
-        'fix',       // Bug fix
-        'docs',      // Documentation
-        'style',     // Code style (formatting, etc.)
-        'refactor',  // Code restructuring
-        'test',      // Adding/updating tests
-        'chore',     // Maintenance tasks
-        'perf',      // Performance improvements
-        'revert',    // Revert changes
-        'build',     // Build system changes
-        'ci',        // CI/CD changes
+        'feat', // New feature
+        'fix', // Bug fix
+        'docs', // Documentation
+        'style', // Code style (formatting, etc.)
+        'refactor', // Code restructuring
+        'test', // Adding/updating tests
+        'chore', // Maintenance tasks
+        'perf', // Performance improvements
+        'revert', // Revert changes
+        'build', // Build system changes
+        'ci', // CI/CD changes
       ],
     ],
 
@@ -59,20 +59,20 @@ module.exports = {
       2,
       'always',
       [
-        'ui',        // User interface
-        'state',     // State management
-        'game',      // Game logic
-        'system',    // Game systems
-        'test',      // Testing
-        'build',     // Build system
-        'config',    // Configuration
-        'docs',      // Documentation
-        'lint',      // Linting/formatting
-        'perf',      // Performance
-        'refactor',  // Code refactoring
-        'mobile',    // Mobile-specific code
+        'ui', // User interface
+        'state', // State management
+        'game', // Game logic
+        'system', // Game systems
+        'test', // Testing
+        'build', // Build system
+        'config', // Configuration
+        'docs', // Documentation
+        'lint', // Linting/formatting
+        'perf', // Performance
+        'refactor', // Code refactoring
+        'mobile', // Mobile-specific code
         'bootstrap', // Initialization
-        'save',      // Save/load system
+        'save', // Save/load system
       ],
     ],
 

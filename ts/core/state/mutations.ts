@@ -1,45 +1,82 @@
 // Pure mutation helpers for Decimal-like values (TypeScript)
 
-function toDecimal(value: any): any {
-  const DecimalCtor = typeof window !== 'undefined' ? window.Decimal : undefined;
-  if (DecimalCtor) return new DecimalCtor(value);
+// Type definitions for Decimal compatibility
+interface DecimalLike {
+  _v?: number;
+  plus?(x: DecimalValue): DecimalLike;
+  minus?(x: DecimalValue): DecimalLike;
+  times?(x: DecimalValue): DecimalLike;
+  gte?(x: DecimalValue): boolean;
+  toString(): string;
+}
+
+type DecimalValue = number | string | DecimalLike;
+
+interface DecimalConstructor {
+  new (value: DecimalValue): DecimalLike & {
+    plus(x: DecimalValue): DecimalLike;
+    minus(x: DecimalValue): DecimalLike;
+    times(x: DecimalValue): DecimalLike;
+    gte(x: DecimalValue): boolean;
+  };
+}
+
+function toDecimal(value: DecimalValue): DecimalLike {
+  // Check if Decimal.js is available
+  const DecimalCtor = typeof window !== 'undefined' && (window as any).Decimal as DecimalConstructor;
+  if (DecimalCtor) {
+    try {
+      return new DecimalCtor(value);
+    } catch {
+      // Fall back to plain object if Decimal constructor fails
+    }
+  }
+
+  // Fallback implementation
+  const numericValue = Number(
+    typeof value === 'object' && value._v !== undefined ? value._v : value
+  );
+
   return {
-    _v: Number((value as any)?._v ?? value),
-    plus(x: any) {
-      return toDecimal(this._v + Number((x as any)?._v ?? x));
+    _v: numericValue,
+    plus(x: DecimalValue) {
+      const otherValue = Number(typeof x === 'object' && x._v !== undefined ? x._v : x);
+      return toDecimal(this._v! + otherValue);
     },
-    minus(x: any) {
-      return toDecimal(this._v - Number((x as any)?._v ?? x));
+    minus(x: DecimalValue) {
+      const otherValue = Number(typeof x === 'object' && x._v !== undefined ? x._v : x);
+      return toDecimal(this._v! - otherValue);
     },
-    times(x: any) {
-      return toDecimal(this._v * Number((x as any)?._v ?? x));
+    times(x: DecimalValue) {
+      const otherValue = Number(typeof x === 'object' && x._v !== undefined ? x._v : x);
+      return toDecimal(this._v! * otherValue);
     },
-    gte(x: any) {
-      return this._v >= Number((x as any)?._v ?? x);
+    gte(x: DecimalValue) {
+      const otherValue = Number(typeof x === 'object' && x._v !== undefined ? x._v : x);
+      return this._v! >= otherValue;
     },
     toString() {
-      return String(this._v);
+      return String(this._v!);
     },
   };
 }
 
-export function addSips(currentSips: any, amount: any): string {
+export function addSips(currentSips: DecimalValue, amount: DecimalValue): string {
   const dec = toDecimal(currentSips);
-  const res = dec && dec.plus ? dec.plus(amount) : toDecimal(Number(currentSips) + Number(amount));
-  return res && typeof res.toString === 'function' ? res.toString() : String(res);
+  const res = dec.plus ? dec.plus(amount) : toDecimal(Number(currentSips) + Number(amount));
+  return res.toString();
 }
 
-export function subtractSips(currentSips: any, amount: any): string {
+export function subtractSips(currentSips: DecimalValue, amount: DecimalValue): string {
   const dec = toDecimal(currentSips);
-  const res =
-    dec && dec.minus ? dec.minus(amount) : toDecimal(Number(currentSips) - Number(amount));
-  return res && typeof res.toString === 'function' ? res.toString() : String(res);
+  const res = dec.minus ? dec.minus(amount) : toDecimal(Number(currentSips) - Number(amount));
+  return res.toString();
 }
 
-export function incrementCount(currentCount: any, by: number = 1): string {
+export function incrementCount(currentCount: DecimalValue, by: number = 1): string {
   const dec = toDecimal(currentCount);
-  const res = dec && dec.plus ? dec.plus(by) : toDecimal(Number(currentCount) + Number(by));
-  return res && typeof res.toString === 'function' ? res.toString() : String(res);
+  const res = dec.plus ? dec.plus(by) : toDecimal(Number(currentCount) + by);
+  return res.toString();
 }
 
 export {};

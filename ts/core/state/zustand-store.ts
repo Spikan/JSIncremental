@@ -209,7 +209,7 @@ export const useGameStore = create<GameStore>()(
             set(state => ({
               options: { ...state.options, ..._options },
             })),
-          setOption: (_key: keyof GameOptions, _value: any) =>
+          setOption: <K extends keyof GameOptions>(_key: K, _value: GameOptions[K]) =>
             set(state => ({
               options: { ...state.options, [_key]: _value },
             })),

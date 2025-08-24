@@ -1,38 +1,80 @@
 // Typed legacy state bridge that mirrors globals into App.state
 
+import type { GameState } from './shape';
+
+// Type for actions available in the Zustand store
+interface StateActions {
+  setDrinkRate?: (value: number) => void;
+  setDrinkProgress?: (value: number) => void;
+  setLastDrinkTime?: (value: number) => void;
+  setLevel?: (value: number) => void;
+  setSips?: (value: number) => void;
+  setStraws?: (value: number) => void;
+  setCups?: (value: number) => void;
+  setSuctions?: (value: number) => void;
+  setWiderStraws?: (value: number) => void;
+  setBetterCups?: (value: number) => void;
+  setFasterDrinks?: (value: number) => void;
+  setCriticalClicks?: (value: number) => void;
+  setCriticalClickChance?: (value: number) => void;
+  setCriticalClickMultiplier?: (value: number) => void;
+  setSuctionClickBonus?: (value: number) => void;
+  setSPS?: (value: number) => void;
+  setStrawSPD?: (value: number) => void;
+  setCupSPD?: (value: number) => void;
+  setFasterDrinksUpCounter?: (value: number) => void;
+  setCriticalClickUpCounter?: (value: number) => void;
+}
+
 type AppLike = {
   state: {
-    setState?: (_partial: any) => void;
-    getState?: () => any;
-    actions?: any; // Zustand actions
+    setState?: (partial: Partial<GameState>) => void;
+    getState?: () => GameState;
+    actions?: StateActions;
   };
 };
 
+// Type for values that can be Decimal-like or primitive
+type DecimalValue = number | string | { toNumber(): number } | { _v: number };
+
 export function createStateBridge(app: AppLike) {
-  function setDrinkRate(value: any) {
+  function setDrinkRate(value: DecimalValue) {
     try {
-      app.state.actions?.setDrinkRate?.(Number(value) || 0);
+      const numericValue = typeof value === 'object' && 'toNumber' in value
+        ? value.toNumber()
+        : Number(value) || 0;
+      app.state.actions?.setDrinkRate?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function setDrinkProgress(value: any) {
+
+  function setDrinkProgress(value: DecimalValue) {
     try {
-      app.state.actions?.setDrinkProgress?.(Number(value) || 0);
+      const numericValue = typeof value === 'object' && 'toNumber' in value
+        ? value.toNumber()
+        : Number(value) || 0;
+      app.state.actions?.setDrinkProgress?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function setLastDrinkTime(value: any) {
+
+  function setLastDrinkTime(value: DecimalValue) {
     try {
-      app.state.actions?.setLastDrinkTime?.(Number(value) || 0);
+      const numericValue = typeof value === 'object' && 'toNumber' in value
+        ? value.toNumber()
+        : Number(value) || 0;
+      app.state.actions?.setLastDrinkTime?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function setLevel(value: any) {
-    const numeric =
-      value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 1;
+
+  function setLevel(value: DecimalValue) {
+    const numeric = typeof value === 'object' && 'toNumber' in value
+      ? value.toNumber()
+      : Number(value) || 1;
     try {
       app.state.actions?.setLevel?.(numeric);
     } catch (error) {
@@ -40,102 +82,116 @@ export function createStateBridge(app: AppLike) {
     }
   }
 
-  function toNum(value: any): number {
-    return value && typeof value.toNumber === 'function' ? value.toNumber() : Number(value) || 0;
+  function toNum(value: DecimalValue): number {
+    return typeof value === 'object' && 'toNumber' in value
+      ? value.toNumber()
+      : Number(value) || 0;
   }
 
-  function syncSips(value: any) {
+  function syncSips(value: DecimalValue) {
     try {
       app.state.actions?.setSips?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncStraws(value: any) {
+  function syncStraws(value: DecimalValue) {
     try {
       app.state.actions?.setStraws?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncCups(value: any) {
+
+  function syncCups(value: DecimalValue) {
     try {
       app.state.actions?.setCups?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncSuctions(value: any) {
+
+  function syncSuctions(value: DecimalValue) {
     try {
       app.state.actions?.setSuctions?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncWiderStraws(value: any) {
+
+  function syncWiderStraws(value: DecimalValue) {
     try {
       app.state.actions?.setWiderStraws?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncBetterCups(value: any) {
+
+  function syncBetterCups(value: DecimalValue) {
     try {
       app.state.actions?.setBetterCups?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncFasterDrinks(value: any) {
+
+  function syncFasterDrinks(value: DecimalValue) {
     try {
       app.state.actions?.setFasterDrinks?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncCriticalClicks(value: any) {
+
+  function syncCriticalClicks(value: DecimalValue) {
     try {
       app.state.actions?.setCriticalClicks?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncCriticalClickChance(value: any) {
+
+  function syncCriticalClickChance(value: DecimalValue) {
     try {
       app.state.actions?.setCriticalClickChance?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncCriticalClickMultiplier(value: any) {
+
+  function syncCriticalClickMultiplier(value: DecimalValue) {
     try {
       app.state.actions?.setCriticalClickMultiplier?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncSuctionClickBonus(value: any) {
+
+  function syncSuctionClickBonus(value: DecimalValue) {
     try {
       app.state.actions?.setSuctionClickBonus?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncSps(value: any) {
+
+  function syncSps(value: DecimalValue) {
     try {
       app.state.actions?.setSPS?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncStrawSPD(value: any) {
+
+  function syncStrawSPD(value: DecimalValue) {
     try {
       app.state.actions?.setStrawSPD?.(toNum(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
-  function syncCupSPD(value: any) {
+
+  function syncCupSPD(value: DecimalValue) {
     try {
       app.state.actions?.setCupSPD?.(toNum(value));
     } catch (error) {
@@ -145,33 +201,46 @@ export function createStateBridge(app: AppLike) {
 
   function init() {
     try {
-      const seed: any = {};
-      const w: any = typeof window !== 'undefined' ? window : {};
-      if (typeof w.drinkRate !== 'undefined') seed.drinkRate = Number(w.drinkRate) || 0;
-      if (typeof w.drinkProgress !== 'undefined') seed.drinkProgress = Number(w.drinkProgress) || 0;
-      if (typeof w.lastDrinkTime !== 'undefined') seed.lastDrinkTime = Number(w.lastDrinkTime) || 0;
-      if (typeof w.level !== 'undefined')
-        seed.level =
-          typeof w.level?.toNumber === 'function' ? w.level.toNumber() : Number(w.level) || 1;
-      if (typeof w.sips !== 'undefined') seed.sips = toNum(w.sips);
-      if (typeof w.straws !== 'undefined') seed.straws = toNum(w.straws);
-      if (typeof w.cups !== 'undefined') seed.cups = toNum(w.cups);
-      if (typeof w.suctions !== 'undefined') seed.suctions = toNum(w.suctions);
-      if (typeof w.widerStraws !== 'undefined') seed.widerStraws = toNum(w.widerStraws);
-      if (typeof w.betterCups !== 'undefined') seed.betterCups = toNum(w.betterCups);
-      if (typeof w.fasterDrinks !== 'undefined') seed.fasterDrinks = toNum(w.fasterDrinks);
-      if (typeof w.criticalClicks !== 'undefined') seed.criticalClicks = toNum(w.criticalClicks);
-      if (typeof w.criticalClickChance !== 'undefined')
-        seed.criticalClickChance = toNum(w.criticalClickChance);
-      if (typeof w.criticalClickMultiplier !== 'undefined')
-        seed.criticalClickMultiplier = toNum(w.criticalClickMultiplier);
-      if (typeof w.suctionClickBonus !== 'undefined')
-        seed.suctionClickBonus = toNum(w.suctionClickBonus);
-      if (typeof w.fasterDrinksUpCounter !== 'undefined')
-        seed.fasterDrinksUpCounter = toNum(w.fasterDrinksUpCounter);
-      if (typeof w.criticalClickUpCounter !== 'undefined')
-        seed.criticalClickUpCounter = toNum(w.criticalClickUpCounter);
-      if (typeof w.sps !== 'undefined') seed.sps = toNum(w.sps);
+      const seed: Partial<GameState> = {};
+      const w = typeof window !== 'undefined' ? window as any : {};
+
+      // Helper function to safely get window properties
+      const getWindowValue = (key: string): DecimalValue | undefined => {
+        return w[key];
+      };
+
+      // Helper function to set seed value if window property exists
+      const setSeedIfExists = (key: string, seedKey: keyof GameState) => {
+        const value = getWindowValue(key);
+        if (value !== undefined) {
+          if (typeof seedKey === 'string' && (seedKey === 'drinkRate' || seedKey === 'drinkProgress' || seedKey === 'lastDrinkTime')) {
+            (seed as any)[seedKey] = Number(value) || 0;
+          } else if (seedKey === 'level') {
+            (seed as any)[seedKey] = typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 1;
+          } else {
+            (seed as any)[seedKey] = toNum(value);
+          }
+        }
+      };
+
+      setSeedIfExists('drinkRate', 'drinkRate');
+      setSeedIfExists('drinkProgress', 'drinkProgress');
+      setSeedIfExists('lastDrinkTime', 'lastDrinkTime');
+      setSeedIfExists('level', 'level');
+      setSeedIfExists('sips', 'sips');
+      setSeedIfExists('straws', 'straws');
+      setSeedIfExists('cups', 'cups');
+      setSeedIfExists('suctions', 'suctions');
+      setSeedIfExists('widerStraws', 'widerStraws');
+      setSeedIfExists('betterCups', 'betterCups');
+      setSeedIfExists('fasterDrinks', 'fasterDrinks');
+      setSeedIfExists('criticalClicks', 'criticalClicks');
+      setSeedIfExists('criticalClickChance', 'criticalClickChance');
+      setSeedIfExists('criticalClickMultiplier', 'criticalClickMultiplier');
+      setSeedIfExists('suctionClickBonus', 'suctionClickBonus');
+      setSeedIfExists('fasterDrinksUpCounter', 'fasterDrinksUpCounter');
+      setSeedIfExists('criticalClickUpCounter', 'criticalClickUpCounter');
+      setSeedIfExists('sps', 'sps');
       // Apply seed values using individual actions
       if (seed.drinkRate !== undefined) app.state.actions?.setDrinkRate?.(seed.drinkRate);
       if (seed.drinkProgress !== undefined)
