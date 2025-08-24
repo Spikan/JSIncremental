@@ -205,7 +205,7 @@ export const useGameStore = create<GameStore>()(
 
           // Level management
           setLevel: (_level: any) => set({ level: toLargeNumber(_level) }),
-          addLevel: (_amount: number) => set(state => ({ level: state.level + _amount })),
+          addLevel: (_amount: number) => set(state => ({ level: state.level.add(toLargeNumber(_amount)) })),
 
           // Options management
           updateOptions: (_options: Partial<GameOptions>) =>

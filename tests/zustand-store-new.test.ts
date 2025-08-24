@@ -389,9 +389,9 @@ describe('Zustand Store - Selectors', () => {
     });
 
     it('should select SPS correctly', () => {
-      storeActions.setSPS(45.5);
-      const sps = useSPS();
-      expect(sps).toBe(45.5);
+      storeActions.setHighestSipsPerSecond(45.5);
+      const sps = useHighestSipsPerSecond();
+      expect(sps.toNumber()).toBe(45.5);
     });
 
     it('should select options correctly', () => {
