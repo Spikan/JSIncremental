@@ -40,9 +40,8 @@ type DecimalValue = number | string | { toNumber(): number } | { _v: number };
 export function createStateBridge(app: AppLike) {
   function setDrinkRate(value: DecimalValue) {
     try {
-      const numericValue = typeof value === 'object' && 'toNumber' in value
-        ? value.toNumber()
-        : Number(value) || 0;
+      const numericValue =
+        typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 0;
       app.state.actions?.setDrinkRate?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -51,9 +50,8 @@ export function createStateBridge(app: AppLike) {
 
   function setDrinkProgress(value: DecimalValue) {
     try {
-      const numericValue = typeof value === 'object' && 'toNumber' in value
-        ? value.toNumber()
-        : Number(value) || 0;
+      const numericValue =
+        typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 0;
       app.state.actions?.setDrinkProgress?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -62,9 +60,8 @@ export function createStateBridge(app: AppLike) {
 
   function setLastDrinkTime(value: DecimalValue) {
     try {
-      const numericValue = typeof value === 'object' && 'toNumber' in value
-        ? value.toNumber()
-        : Number(value) || 0;
+      const numericValue =
+        typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 0;
       app.state.actions?.setLastDrinkTime?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -72,9 +69,8 @@ export function createStateBridge(app: AppLike) {
   }
 
   function setLevel(value: DecimalValue) {
-    const numeric = typeof value === 'object' && 'toNumber' in value
-      ? value.toNumber()
-      : Number(value) || 1;
+    const numeric =
+      typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 1;
     try {
       app.state.actions?.setLevel?.(numeric);
     } catch (error) {
@@ -83,9 +79,7 @@ export function createStateBridge(app: AppLike) {
   }
 
   function toNum(value: DecimalValue): number {
-    return typeof value === 'object' && 'toNumber' in value
-      ? value.toNumber()
-      : Number(value) || 0;
+    return typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 0;
   }
 
   function syncSips(value: DecimalValue) {
@@ -202,7 +196,7 @@ export function createStateBridge(app: AppLike) {
   function init() {
     try {
       const seed: Partial<GameState> = {};
-      const w = typeof window !== 'undefined' ? window as any : {};
+      const w = typeof window !== 'undefined' ? (window as any) : {};
 
       // Helper function to safely get window properties
       const getWindowValue = (key: string): DecimalValue | undefined => {
@@ -213,10 +207,16 @@ export function createStateBridge(app: AppLike) {
       const setSeedIfExists = (key: string, seedKey: keyof GameState) => {
         const value = getWindowValue(key);
         if (value !== undefined) {
-          if (typeof seedKey === 'string' && (seedKey === 'drinkRate' || seedKey === 'drinkProgress' || seedKey === 'lastDrinkTime')) {
+          if (
+            typeof seedKey === 'string' &&
+            (seedKey === 'drinkRate' || seedKey === 'drinkProgress' || seedKey === 'lastDrinkTime')
+          ) {
             (seed as any)[seedKey] = Number(value) || 0;
           } else if (seedKey === 'level') {
-            (seed as any)[seedKey] = typeof value === 'object' && 'toNumber' in value ? value.toNumber() : Number(value) || 1;
+            (seed as any)[seedKey] =
+              typeof value === 'object' && 'toNumber' in value
+                ? value.toNumber()
+                : Number(value) || 1;
           } else {
             (seed as any)[seedKey] = toNum(value);
           }

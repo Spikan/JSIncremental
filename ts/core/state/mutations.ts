@@ -23,7 +23,8 @@ interface DecimalConstructor {
 
 function toDecimal(value: DecimalValue): DecimalLike {
   // Check if Decimal.js is available
-  const DecimalCtor = typeof window !== 'undefined' && (window as any).Decimal as DecimalConstructor;
+  const DecimalCtor =
+    typeof window !== 'undefined' && ((window as any).Decimal as DecimalConstructor);
   if (DecimalCtor) {
     try {
       return new DecimalCtor(value);
