@@ -519,6 +519,21 @@ export function levelUp({
 }
 
 // Convenience execute-style helpers that read/update App.state directly
+// Helper function to sanitize LargeNumber values
+function sanitizeLargeNumber(value: LargeNumber, fallback: LargeNumber): LargeNumber {
+  if (!value) return fallback;
+  try {
+    if (!isFinite(Number(value.toString()))) {
+      console.warn('🚫 Sanitizing extreme LargeNumber value:', value.toString());
+      return fallback;
+    }
+    return value;
+  } catch (error) {
+    console.warn('🚫 Error sanitizing LargeNumber, using fallback:', error);
+    return fallback;
+  }
+}
+
 function getAppState(): any {
   try {
     const rawState = (window as any).App?.state?.getState?.() || {};
@@ -597,20 +612,33 @@ export const execute = {
       console.warn('Failed to update sips after straw purchase:', error);
     }
     try {
-      // Handle LargeNumber straws
+      // Handle LargeNumber straws with sanitization
+      let strawsValue = result.straws;
+      if (strawsValue instanceof LargeNumber) {
+        // Sanitize extreme LargeNumber values
+        if (!isFinite(Number(strawsValue.toString()))) {
+          console.warn('🚫 Sanitizing extreme straws value in state update');
+          strawsValue = new LargeNumber('1'); // Safe fallback
+        }
+      }
       const strawsNum =
-        result.straws instanceof LargeNumber ? result.straws.toNumber() : Number(result.straws);
+        strawsValue instanceof LargeNumber ? strawsValue.toNumber() : Number(strawsValue);
       w.straws = new (w.Decimal || Number)(strawsNum);
     } catch (error) {
       console.warn('Failed to update straws after straw purchase:', error);
     }
     try {
       const actions = w.App?.state?.actions;
+      // Use sanitized values for state update
+      const sanitizedStrawSPD = sanitizeLargeNumber(result.strawSPD, new LargeNumber('0.6'));
+      const sanitizedCupSPD = sanitizeLargeNumber(result.cupSPD, new LargeNumber('1.2'));
+      const sanitizedSPD = sanitizeLargeNumber(result.sipsPerDrink, new LargeNumber('1'));
+
       actions?.setSips?.(w.sips);
-      actions?.setStraws?.(result.straws);
-      actions?.setStrawSPD?.(result.strawSPD);
-      actions?.setCupSPD?.(result.cupSPD);
-      actions?.setSPD?.(result.sipsPerDrink);
+      actions?.setStraws?.(result.straws); // Use original result, sanitization happens in window.straws
+      actions?.setStrawSPD?.(sanitizedStrawSPD);
+      actions?.setCupSPD?.(sanitizedCupSPD);
+      actions?.setSPD?.(sanitizedSPD);
     } catch (error) {
       console.warn('Failed to update App.state via actions after straw purchase:', error);
     }
@@ -618,10 +646,10 @@ export const execute = {
     try {
       w.App?.state?.setState?.({
         sips: w.sips,
-        straws: result.straws,
-        strawSPD: result.strawSPD,
-        cupSPD: result.cupSPD,
-        spd: result.sipsPerDrink,
+        straws: new LargeNumber('1'), // Safe fallback
+        strawSPD: new LargeNumber('0.6'),
+        cupSPD: new LargeNumber('1.2'),
+        spd: new LargeNumber('1'),
       });
     } catch (error) {
       console.warn('Failed to fallback setState after straw purchase:', error);
@@ -676,30 +704,42 @@ export const execute = {
       console.warn('Failed to update sips after cup purchase:', error);
     }
     try {
-      // Handle LargeNumber cups
-      const cupsNum =
-        result.cups instanceof LargeNumber ? result.cups.toNumber() : Number(result.cups);
+      // Handle LargeNumber cups with sanitization
+      let cupsValue = result.cups;
+      if (cupsValue instanceof LargeNumber) {
+        // Sanitize extreme LargeNumber values
+        if (!isFinite(Number(cupsValue.toString()))) {
+          console.warn('🚫 Sanitizing extreme cups value in state update');
+          cupsValue = new LargeNumber('1'); // Safe fallback
+        }
+      }
+      const cupsNum = cupsValue instanceof LargeNumber ? cupsValue.toNumber() : Number(cupsValue);
       w.cups = new (w.Decimal || Number)(cupsNum);
     } catch (error) {
       console.warn('Failed to update cups after cup purchase:', error);
     }
     try {
       const actions = w.App?.state?.actions;
+      // Use sanitized values for state update
+      const sanitizedStrawSPD = sanitizeLargeNumber(result.strawSPD, new LargeNumber('0.6'));
+      const sanitizedCupSPD = sanitizeLargeNumber(result.cupSPD, new LargeNumber('1.2'));
+      const sanitizedSPD = sanitizeLargeNumber(result.sipsPerDrink, new LargeNumber('1'));
+
       actions?.setSips?.(w.sips);
-      actions?.setCups?.(result.cups);
-      actions?.setStrawSPD?.(result.strawSPD);
-      actions?.setCupSPD?.(result.cupSPD);
-      actions?.setSPD?.(result.sipsPerDrink);
+      actions?.setCups?.(result.cups); // Use original result, sanitization happens in window.cups
+      actions?.setStrawSPD?.(sanitizedStrawSPD);
+      actions?.setCupSPD?.(sanitizedCupSPD);
+      actions?.setSPD?.(sanitizedSPD);
     } catch (error) {
       console.warn('Failed to update App.state via actions after cup purchase:', error);
     }
     try {
       w.App?.state?.setState?.({
         sips: w.sips,
-        cups: result.cups,
-        strawSPD: result.strawSPD,
-        cupSPD: result.cupSPD,
-        spd: result.sipsPerDrink,
+        cups: new LargeNumber('1'), // Safe fallback
+        strawSPD: new LargeNumber('0.6'),
+        cupSPD: new LargeNumber('1.2'),
+        spd: new LargeNumber('1'),
       });
     } catch (error) {
       console.warn('Failed to fallback setState after cup purchase:', error);
