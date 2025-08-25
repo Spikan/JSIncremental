@@ -161,19 +161,36 @@ export function updateEconomyStats(): void {
 
 // Update shop-related statistics
 export function updateShopStats(): void {
+  console.log('📊 updateShopStats() called');
+
+  // Debug: Log current state values
+  const state = (window as any).App?.state?.getState?.();
+  if (state) {
+    console.log('🔍 Current state values:', {
+      straws: state.straws,
+      cups: state.cups,
+      sips: state.sips
+    });
+  }
   // Straws purchased
   const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
     | HTMLElement
     | undefined;
   if (strawsPurchasedElement) {
     const v = (window as any).App?.state?.getState?.()?.straws || 0;
+    console.log('🔍 updateShopStats: Straws value =', v, 'formatted =', formatNumber(v));
     strawsPurchasedElement.textContent = formatNumber(v);
+  } else {
+    console.warn('🚫 updateShopStats: strawsPurchasedElement not found in DOM_CACHE');
   }
   // Cups purchased
   const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
   if (cupsPurchasedElement) {
     const v = (window as any).App?.state?.getState?.()?.cups || 0;
+    console.log('🔍 updateShopStats: Cups value =', v, 'formatted =', formatNumber(v));
     cupsPurchasedElement.textContent = formatNumber(v);
+  } else {
+    console.warn('🚫 updateShopStats: cupsPurchasedElement not found in DOM_CACHE');
   }
   // Suctions purchased
   const suctionsPurchasedElement = (window as any).DOM_CACHE?.suctionsPurchased as

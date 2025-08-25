@@ -136,6 +136,8 @@ const DOM_CACHE: {
     this.highestSipsPerSecond = document.getElementById('highestSipsPerSecond');
     this.strawsPurchased = document.getElementById('straws');
     this.cupsPurchased = document.getElementById('cups');
+    console.log('🔍 DOM_CACHE init: straws element =', this.strawsPurchased);
+    console.log('🔍 DOM_CACHE init: cups element =', this.cupsPurchased);
     this.widerStrawsPurchased = document.getElementById('widerStrawsPurchased');
     this.betterCupsPurchased = document.getElementById('betterCupsPurchased');
     this.suctionsPurchased = document.getElementById('suctionsPurchased');
