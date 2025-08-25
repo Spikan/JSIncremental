@@ -21,7 +21,12 @@ export class LargeNumber {
       try {
         console.log('✅ Using break_infinity library for value:', value);
         this._value = new BreakInfinityLib(value as any);
-        console.log('✅ Created break_infinity object:', this._value, 'toString():', this._value.toString());
+        console.log(
+          '✅ Created break_infinity object:',
+          this._value,
+          'toString():',
+          this._value.toString()
+        );
         return;
       } catch (error) {
         console.warn('❌ BreakInfinity failed, falling back to native numbers:', error);
@@ -46,12 +51,11 @@ export class LargeNumber {
     console.log('🔍 globalThis.BreakInfinity:', typeof (globalThis as any).BreakInfinity);
     console.log('🔍 window.BreakInfinity:', typeof (window as any)?.BreakInfinity);
 
-    const lib = (
+    const lib =
       (globalThis as any).Decimal ||
       (window as any).Decimal ||
       (globalThis as any).BreakInfinity ||
-      (window as any).BreakInfinity
-    );
+      (window as any).BreakInfinity;
 
     console.log('🔍 Selected library:', lib ? 'FOUND' : 'NOT FOUND');
     return lib;
@@ -121,6 +125,21 @@ export class LargeNumber {
 
   eq(other: LargeNumber): boolean {
     return this._value.toNumber() === other._value.toNumber();
+  }
+
+  // Debug method to check internal value type
+  getValueType(): string {
+    return this._value.constructor.name;
+  }
+
+  // Debug method to inspect internal value (for debugging only)
+  getDebugInfo(): any {
+    return {
+      type: this._value.constructor.name,
+      toString: this._value.toString(),
+      toNumber: this._value.toNumber(),
+      internal: this._value
+    };
   }
 
   toString(): string {
