@@ -250,13 +250,22 @@ export function updatePurchasedCounts(): void {
     criticalClicks: state.criticalClicks,
   });
 
+  // Check if DOM_CACHE is available
+  if (!(window as any).DOM_CACHE) {
+    console.log('❌ DOM_CACHE not available');
+    return;
+  }
+
+  console.log('🗂️ DOM_CACHE available:', Object.keys((window as any).DOM_CACHE || {}));
+
   // Update straws purchased count
   const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
     | HTMLElement
     | undefined;
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
-    const strawsValue = typeof straws === 'object' && straws.toSafeNumber ? straws.toSafeNumber() : straws;
+    const strawsValue =
+      typeof straws === 'object' && straws.toSafeNumber ? straws.toSafeNumber() : straws;
     strawsPurchasedElement.textContent = formatNumber(strawsValue);
     console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
   } else {
@@ -280,9 +289,17 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (widerStrawsPurchasedElement) {
     const widerStraws = state.widerStraws || 0;
-    const widerStrawsValue = typeof widerStraws === 'object' && widerStraws.toSafeNumber ? widerStraws.toSafeNumber() : widerStraws;
+    const widerStrawsValue =
+      typeof widerStraws === 'object' && widerStraws.toSafeNumber
+        ? widerStraws.toSafeNumber()
+        : widerStraws;
     widerStrawsPurchasedElement.textContent = formatNumber(widerStrawsValue);
-    console.log('✅ Updated widerStraws:', widerStrawsValue, 'element:', widerStrawsPurchasedElement);
+    console.log(
+      '✅ Updated widerStraws:',
+      widerStrawsValue,
+      'element:',
+      widerStrawsPurchasedElement
+    );
   } else {
     console.log('❌ widerStrawsPurchased element not found');
   }
@@ -293,7 +310,10 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (betterCupsPurchasedElement) {
     const betterCups = state.betterCups || 0;
-    const betterCupsValue = typeof betterCups === 'object' && betterCups.toSafeNumber ? betterCups.toSafeNumber() : betterCups;
+    const betterCupsValue =
+      typeof betterCups === 'object' && betterCups.toSafeNumber
+        ? betterCups.toSafeNumber()
+        : betterCups;
     betterCupsPurchasedElement.textContent = formatNumber(betterCupsValue);
     console.log('✅ Updated betterCups:', betterCupsValue, 'element:', betterCupsPurchasedElement);
   } else {
@@ -306,7 +326,8 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (suctionsPurchasedElement) {
     const suctions = state.suctions || 0;
-    const suctionsValue = typeof suctions === 'object' && suctions.toSafeNumber ? suctions.toSafeNumber() : suctions;
+    const suctionsValue =
+      typeof suctions === 'object' && suctions.toSafeNumber ? suctions.toSafeNumber() : suctions;
     suctionsPurchasedElement.textContent = formatNumber(suctionsValue);
     console.log('✅ Updated suctions:', suctionsValue, 'element:', suctionsPurchasedElement);
   } else {
@@ -319,12 +340,29 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (criticalClicksPurchasedElement) {
     const criticalClicks = state.criticalClicks || 0;
-    const criticalClicksValue = typeof criticalClicks === 'object' && criticalClicks.toSafeNumber ? criticalClicks.toSafeNumber() : criticalClicks;
+    const criticalClicksValue =
+      typeof criticalClicks === 'object' && criticalClicks.toSafeNumber
+        ? criticalClicks.toSafeNumber()
+        : criticalClicks;
     criticalClicksPurchasedElement.textContent = formatNumber(criticalClicksValue);
-    console.log('✅ Updated criticalClicks:', criticalClicksValue, 'element:', criticalClicksPurchasedElement);
+    console.log(
+      '✅ Updated criticalClicks:',
+      criticalClicksValue,
+      'element:',
+      criticalClicksPurchasedElement
+    );
   } else {
     console.log('❌ criticalClicksPurchased element not found');
   }
 
   console.log('🎉 updatePurchasedCounts completed');
+
+  // Make function available globally for testing
+  if (typeof window !== 'undefined') {
+    (window as any).testShopCounts = () => {
+      console.log('🧪 Manual test of shop counts...');
+      updatePurchasedCounts();
+    };
+    console.log('💡 Call testShopCounts() in console to manually test shop displays');
+  }
 }
