@@ -486,10 +486,12 @@ export function addExtremeResources(): boolean {
 
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
+      console.log('🔄 Dev tools UI update starting...');
       w.App?.ui?.updateAllStats?.();
       w.App?.ui?.updatePurchasedCounts?.();
       w.App?.ui?.checkUpgradeAffordability?.();
       w.App?.ui?.updateAllDisplays?.();
+      console.log('🔄 Dev tools UI update completed');
     }, 10);
 
     console.log('✅ Extreme resources added successfully!');

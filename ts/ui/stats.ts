@@ -259,18 +259,32 @@ export function updatePurchasedCounts(): void {
   }
   console.log('📊 Current state:', { straws: state.straws, cups: state.cups });
 
-  // Check if DOM_CACHE is available
-  if (!(window as any).DOM_CACHE) return;
+  // Debug: Check DOM_CACHE availability
+  if (!(window as any).DOM_CACHE) {
+    console.log('📊 DOM_CACHE not available');
+    return;
+  }
+  console.log('📊 DOM_CACHE available:', (window as any).DOM_CACHE);
 
   // Update straws purchased count
   const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
     | HTMLElement
     | undefined;
+  console.log(
+    '🔍 strawsPurchasedElement:',
+    strawsPurchasedElement,
+    'exists:',
+    !!strawsPurchasedElement
+  );
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
+    console.log('🔍 Raw straws value:', straws, 'type:', typeof straws);
     const strawsValue =
       typeof straws === 'object' && straws.toSafeNumber ? straws.toSafeNumber() : straws;
-    strawsPurchasedElement.textContent = formatNumber(strawsValue);
+    console.log('🔍 Processed straws value:', strawsValue);
+    const formattedStraws = formatNumber(strawsValue);
+    console.log('🔍 Formatted straws:', formattedStraws);
+    strawsPurchasedElement.textContent = formattedStraws;
     console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
   } else {
     console.log('❌ strawsPurchased element not found');
@@ -278,10 +292,15 @@ export function updatePurchasedCounts(): void {
 
   // Update cups purchased count
   const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
+  console.log('🔍 cupsPurchasedElement:', cupsPurchasedElement, 'exists:', !!cupsPurchasedElement);
   if (cupsPurchasedElement) {
     const cups = state.cups || 0;
+    console.log('🔍 Raw cups value:', cups, 'type:', typeof cups);
     const cupsValue = typeof cups === 'object' && cups.toSafeNumber ? cups.toSafeNumber() : cups;
-    cupsPurchasedElement.textContent = formatNumber(cupsValue);
+    console.log('🔍 Processed cups value:', cupsValue);
+    const formattedCups = formatNumber(cupsValue);
+    console.log('🔍 Formatted cups:', formattedCups);
+    cupsPurchasedElement.textContent = formattedCups;
     console.log('✅ Updated cups:', cupsValue, 'element:', cupsPurchasedElement);
   } else {
     console.log('❌ cupsPurchased element not found');
