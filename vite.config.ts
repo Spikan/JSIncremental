@@ -11,13 +11,45 @@ export default defineConfig({
     // Enable source maps for better debugging
     sourcemap: false, // Disable for production to reduce size
 
-    // Optimize minification
+    // Optimize minification - less aggressive to avoid variable conflicts
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true, // Remove console.log in production
         drop_debugger: true,
         pure_funcs: ['console.log', 'console.info', 'console.debug'] as string[],
+        // Reduce aggressive optimizations that can cause variable conflicts
+        sequences: false,
+        booleans: false,
+        collapse_vars: false,
+        reduce_vars: false,
+      },
+      mangle: {
+        // Keep longer variable names to avoid conflicts
+        keep_fnames: true,
+        reserved: [
+          'f',
+          'g',
+          'h',
+          'i',
+          'j',
+          'k',
+          'l',
+          'm',
+          'n',
+          'o',
+          'p',
+          'q',
+          'r',
+          's',
+          't',
+          'u',
+          'v',
+          'w',
+          'x',
+          'y',
+          'z',
+        ],
       },
     },
 
