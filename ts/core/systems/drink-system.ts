@@ -40,13 +40,14 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       const prevHigh = toDecimal(w.App?.state?.getState?.()?.highestSipsPerSecond || 0);
       const spdNum = toDecimal(state.spd ?? 0);
 
-      // Calculate current sips per second (convert to number for rate calculation)
+      // Calculate current sips per second (keep in Decimal space to preserve precision)
       const rateInSeconds = drinkRate / 1000;
+      const rateInSecondsDecimal = toDecimal(rateInSeconds);
       const currentSipsPerSecond =
-        // Preserve extreme values in SPS calculation
-        rateInSeconds > 0 ? spdNum.toNumber() / rateInSeconds : 0;
-      // Preserve extreme values when comparing highest SPS
-      const highest = Math.max(prevHigh.toNumber(), currentSipsPerSecond);
+        rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : toDecimal(0);
+
+      // Compare highest SPS using Decimal operations to preserve extreme values
+      const highest = prevHigh.gte(currentSipsPerSecond) ? prevHigh : currentSipsPerSecond;
 
       // Update total sips earned
       const newTotalEarned = prevTotal.add(spdVal);
@@ -68,10 +69,13 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
 
       try {
         // Keep Decimal in state for sips and totalSipsEarned to avoid Infinity in UI formatting
+        // Convert highestSipsPerSecond to number for UI compatibility while preserving precision
+        const highestForUI = highest.gte(toDecimal(1e6)) ? highest.toString() : highest.toNumber();
+
         w.App?.state?.setState?.({
           sips: w.sips,
           totalSipsEarned: newTotalEarned,
-          highestSipsPerSecond: highest,
+          highestSipsPerSecond: highestForUI,
           lastDrinkTime: nextLast,
           drinkProgress: nextProgress,
         });

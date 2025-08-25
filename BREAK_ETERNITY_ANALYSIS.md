@@ -17,7 +17,9 @@ This analysis reviews the current implementation of patashu's break_eternity.js 
 ### Critical Issues Identified ❌
 
 #### 1. **Precision Loss in Drink System**
+
 **Location**: `ts/core/systems/drink-system.ts:44-47`
+
 ```typescript
 // Calculate current sips per second (convert to number for rate calculation)
 const rateInSeconds = drinkRate / 1000;
@@ -31,7 +33,9 @@ const currentSipsPerSecond =
 **Impact**: Sips per second calculations become inaccurate for late-game progression.
 
 #### 2. **Inconsistent toNumber() Usage in Tests**
+
 **Location**: Multiple test files
+
 ```typescript
 expect(result.toNumber()).toBe(150); // ❌ Destroys precision
 ```
@@ -39,14 +43,18 @@ expect(result.toNumber()).toBe(150); // ❌ Destroys precision
 **Problem**: Tests use `.toNumber()` for assertions, which may fail with extreme values.
 
 #### 3. **Missing Extreme Value Validation**
+
 **Location**: `ts/core/numbers/decimal-utils.ts`
 **Problem**: No validation for edge cases like:
+
 - Numbers approaching break_eternity.js limits (10^^1e308)
 - Invalid string inputs
 - Performance degradation with extremely large exponents
 
 #### 4. **Incomplete Error Handling**
+
 **Location**: `ts/core/numbers/migration-utils.ts:25-30`
+
 ```typescript
 try {
   return new Decimal(value);
@@ -63,29 +71,32 @@ try {
 ### 1. **Fix Precision Loss in Drink System**
 
 **Current Implementation**:
+
 ```typescript
 const currentSipsPerSecond = rateInSeconds > 0 ? spdNum.toNumber() / rateInSeconds : 0;
 ```
 
 **Recommended Fix**:
+
 ```typescript
 // Keep calculations in Decimal space
 const rateInSecondsDecimal = new Decimal(rateInSeconds);
 const currentSipsPerSecond = rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : new Decimal(0);
 
 // For UI display only, use safe conversion
-const displaySPS = currentSipsPerSecond.gte(new Decimal(1e6)) 
-  ? currentSipsPerSecond.toString() 
+const displaySPS = currentSipsPerSecond.gte(new Decimal(1e6))
+  ? currentSipsPerSecond.toString()
   : currentSipsPerSecond.toNumber();
 ```
 
 ### 2. **Implement Safe Number Conversion Utility**
 
 **Create**: `ts/core/numbers/safe-conversion.ts`
+
 ```typescript
 export function safeToNumber(decimal: DecimalType, fallback: number = 0): number {
   if (!isDecimal(decimal)) return fallback;
-  
+
   try {
     const num = decimal.toNumber();
     if (isFinite(num) && num < 1e308) {
@@ -99,7 +110,7 @@ export function safeToNumber(decimal: DecimalType, fallback: number = 0): number
 
 export function safeToString(decimal: DecimalType): string {
   if (!isDecimal(decimal)) return '0';
-  
+
   try {
     return decimal.toString();
   } catch {
@@ -109,7 +120,7 @@ export function safeToString(decimal: DecimalType): string {
 
 export function isExtremeValue(decimal: DecimalType): boolean {
   if (!isDecimal(decimal)) return false;
-  
+
   try {
     const num = decimal.toNumber();
     return !isFinite(num) || num >= 1e308;
@@ -122,6 +133,7 @@ export function isExtremeValue(decimal: DecimalType): boolean {
 ### 3. **Enhanced Input Validation**
 
 **Update**: `ts/core/numbers/migration-utils.ts`
+
 ```typescript
 export function toDecimal(value: NumericValue): DecimalType {
   if (isDecimal(value)) {
@@ -135,15 +147,15 @@ export function toDecimal(value: NumericValue): DecimalType {
       console.warn('Invalid decimal string format:', value);
       return new Decimal(0);
     }
-    
+
     try {
       const result = new Decimal(value);
-      
+
       // Check for extreme values that might cause performance issues
       if (isExtremeValue(result)) {
         console.warn('Extreme value detected, may impact performance:', value);
       }
-      
+
       return result;
     } catch (error) {
       console.error('Failed to convert string to Decimal:', error, 'Value:', value);
@@ -167,13 +179,13 @@ export function toDecimal(value: NumericValue): DecimalType {
 function isValidDecimalString(str: string): boolean {
   // Basic validation for break_eternity.js string formats
   const validPatterns = [
-    /^-?\d+(\.\d+)?$/,           // Regular numbers
-    /^-?\d+(\.\d+)?e[+-]?\d+$/,  // Scientific notation
-    /^-?\d+(\.\d+)?e\d+e\d+$/,   // Double scientific notation
-    /^e\d+$/,                    // e notation
-    /^e\d+e\d+$/,                // Double e notation
+    /^-?\d+(\.\d+)?$/, // Regular numbers
+    /^-?\d+(\.\d+)?e[+-]?\d+$/, // Scientific notation
+    /^-?\d+(\.\d+)?e\d+e\d+$/, // Double scientific notation
+    /^e\d+$/, // e notation
+    /^e\d+e\d+$/, // Double e notation
   ];
-  
+
   return validPatterns.some(pattern => pattern.test(str));
 }
 ```
@@ -181,6 +193,7 @@ function isValidDecimalString(str: string): boolean {
 ### 4. **Performance Monitoring for Extreme Values**
 
 **Update**: `ts/core/numbers/performance-utils.ts`
+
 ```typescript
 export class ExtremeValueMonitor {
   private static instance: ExtremeValueMonitor;
@@ -201,7 +214,7 @@ export class ExtremeValueMonitor {
       const num = decimal.toNumber();
       if (!isFinite(num) || num >= 1e100) {
         this.extremeValueCount++;
-        
+
         if (this.extremeValueCount > 100) {
           const warning = `High extreme value usage detected: ${this.extremeValueCount} operations`;
           if (!this.performanceWarnings.includes(warning)) {
@@ -233,6 +246,7 @@ export class ExtremeValueMonitor {
 ### 5. **Improved Test Framework**
 
 **Update**: Test files to use safe assertions
+
 ```typescript
 // Instead of:
 expect(result.toNumber()).toBe(150);
@@ -246,11 +260,12 @@ expect(result.toString()).toMatch(/1\.5e\+2/);
 ### 6. **Enhanced Error Recovery**
 
 **Create**: `ts/core/numbers/error-recovery.ts`
+
 ```typescript
 export class DecimalErrorRecovery {
   static handleConversionError(value: any, context: string): DecimalType {
     console.error(`Decimal conversion error in ${context}:`, value);
-    
+
     // Attempt recovery strategies
     if (typeof value === 'string') {
       // Try to extract numeric part
@@ -259,7 +274,7 @@ export class DecimalErrorRecovery {
         return new Decimal(numericMatch[0]);
       }
     }
-    
+
     // Fallback to safe default
     return new Decimal(0);
   }
@@ -289,6 +304,7 @@ export class DecimalErrorRecovery {
 ### 7. **Memory Management for Extreme Values**
 
 **Update**: `ts/core/numbers/performance-utils.ts`
+
 ```typescript
 export function optimizeForExtremeValues(): void {
   // Clear caches when dealing with extreme values
@@ -307,7 +323,7 @@ class LRUCache<K, V> {
     if (isDecimal(value)) {
       ExtremeValueMonitor.getInstance().checkPerformance(value, 'cache-set');
     }
-    
+
     // ... existing set logic ...
   }
 }
@@ -316,30 +332,34 @@ class LRUCache<K, V> {
 ## Implementation Priority
 
 ### High Priority (Critical Fixes)
+
 1. **Fix drink system precision loss** - Affects core gameplay
 2. **Implement safe conversion utilities** - Prevents data corruption
 3. **Update test framework** - Ensures reliability
 
 ### Medium Priority (Performance & Reliability)
+
 4. **Enhanced input validation** - Prevents crashes
 5. **Performance monitoring** - Identifies bottlenecks
 6. **Error recovery system** - Improves stability
 
 ### Low Priority (Optimization)
+
 7. **Memory management** - Long-term performance
 8. **Advanced caching** - Future scalability
 
 ## Testing Strategy
 
 ### Extreme Value Test Cases
+
 ```typescript
 describe('Extreme Value Handling', () => {
   const testValues = [
-    '1e308',    // JavaScript limit
-    '1e500',    // Moderate extreme
-    '1e1000',   // Large extreme
-    '1e2000',   // Very large extreme
-    '1e5000',   // Extreme extreme
+    '1e308', // JavaScript limit
+    '1e500', // Moderate extreme
+    '1e1000', // Large extreme
+    '1e2000', // Very large extreme
+    '1e5000', // Extreme extreme
   ];
 
   testValues.forEach(value => {

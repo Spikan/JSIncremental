@@ -9,7 +9,7 @@ import { isDecimal, DecimalType } from './decimal-utils';
  */
 export function safeToNumber(decimal: DecimalType, fallback: number = 0): number {
   if (!isDecimal(decimal)) return fallback;
-  
+
   try {
     const num = decimal.toNumber();
     // Only return the number if it's finite and within safe range
@@ -28,7 +28,7 @@ export function safeToNumber(decimal: DecimalType, fallback: number = 0): number
  */
 export function safeToString(decimal: DecimalType): string {
   if (!isDecimal(decimal)) return '0';
-  
+
   try {
     return decimal.toString();
   } catch {
@@ -42,7 +42,7 @@ export function safeToString(decimal: DecimalType): string {
  */
 export function isExtremeValue(decimal: DecimalType): boolean {
   if (!isDecimal(decimal)) return false;
-  
+
   try {
     const num = decimal.toNumber();
     return !isFinite(num) || num >= 1e308;
@@ -57,17 +57,17 @@ export function isExtremeValue(decimal: DecimalType): boolean {
  */
 export function safeFormat(decimal: DecimalType): string {
   if (!isDecimal(decimal)) return '0';
-  
+
   try {
     if (isExtremeValue(decimal)) {
       return decimal.toString();
     }
-    
+
     const num = decimal.toNumber();
     if (Math.abs(num) >= 1e6 || Math.abs(num) <= 1e-6) {
       return decimal.toString();
     }
-    
+
     return num.toLocaleString(undefined, {
       maximumFractionDigits: 2,
       minimumFractionDigits: 0,
@@ -85,7 +85,7 @@ export function safeGte(a: any, b: any): boolean {
   if (!isDecimal(a) || !isDecimal(b)) {
     return Number(a || 0) >= Number(b || 0);
   }
-  
+
   try {
     return a.gte(b);
   } catch {
@@ -100,7 +100,7 @@ export function safeAdd(a: any, b: any): DecimalType {
   if (!isDecimal(a) || !isDecimal(b)) {
     return new (globalThis as any).Decimal(Number(a || 0) + Number(b || 0));
   }
-  
+
   try {
     return a.add(b);
   } catch {
@@ -115,7 +115,7 @@ export function safeMultiply(a: any, b: any): DecimalType {
   if (!isDecimal(a) || !isDecimal(b)) {
     return new (globalThis as any).Decimal(Number(a || 0) * Number(b || 0));
   }
-  
+
   try {
     return a.mul(b);
   } catch {
@@ -132,7 +132,7 @@ export function safeDivide(a: any, b: any): DecimalType {
     const numB = Number(b || 1);
     return new (globalThis as any).Decimal(numB !== 0 ? numA / numB : 0);
   }
-  
+
   try {
     return a.div(b);
   } catch {
@@ -145,18 +145,18 @@ export function safeDivide(a: any, b: any): DecimalType {
  */
 export function isValidDecimalString(str: string): boolean {
   if (typeof str !== 'string') return false;
-  
+
   // Basic validation for break_eternity.js string formats
   const validPatterns = [
-    /^-?\d+(\.\d+)?$/,           // Regular numbers
-    /^-?\d+(\.\d+)?e[+-]?\d+$/,  // Scientific notation
-    /^-?\d+(\.\d+)?e\d+e\d+$/,   // Double scientific notation
-    /^e\d+$/,                    // e notation
-    /^e\d+e\d+$/,                // Double e notation
-    /^-?e\d+$/,                  // Negative e notation
-    /^-?e\d+e\d+$/,              // Negative double e notation
+    /^-?\d+(\.\d+)?$/, // Regular numbers
+    /^-?\d+(\.\d+)?e[+-]?\d+$/, // Scientific notation
+    /^-?\d+(\.\d+)?e\d+e\d+$/, // Double scientific notation
+    /^e\d+$/, // e notation
+    /^e\d+e\d+$/, // Double e notation
+    /^-?e\d+$/, // Negative e notation
+    /^-?e\d+e\d+$/, // Negative double e notation
   ];
-  
+
   return validPatterns.some(pattern => pattern.test(str));
 }
 
@@ -165,7 +165,7 @@ export function isValidDecimalString(str: string): boolean {
  */
 export function getMagnitudeDescription(decimal: DecimalType): string {
   if (!isDecimal(decimal)) return 'Invalid';
-  
+
   try {
     if (isExtremeValue(decimal)) {
       const str = decimal.toString();
@@ -177,7 +177,7 @@ export function getMagnitudeDescription(decimal: DecimalType): string {
       }
       return 'Extreme';
     }
-    
+
     const num = decimal.toNumber();
     if (num >= 1e6) return 'Large';
     if (num >= 1000) return 'Medium';

@@ -15,6 +15,9 @@
 export { formatDecimal } from './decimal-utils';
 export * from './migration-utils';
 
+// Export safe conversion utilities
+export * from './safe-conversion';
+
 // Explicitly export Decimal for files that need it directly
 export { Decimal } from './migration-utils';
 
@@ -38,6 +41,20 @@ import {
   toLargeNumber,
   isLargeNumber,
 } from './migration-utils';
+
+// Import safe conversion utilities
+import {
+  safeToNumber,
+  safeToString,
+  isExtremeValue,
+  safeFormat,
+  safeGte,
+  safeAdd,
+  safeMultiply,
+  safeDivide,
+  isValidDecimalString,
+  getMagnitudeDescription,
+} from './safe-conversion';
 
 // Decimal is available from migration-utils.ts export
 
@@ -65,6 +82,18 @@ export const Numbers = {
   divide,
   pow,
 
+  // Safe conversion utilities
+  safeToNumber,
+  safeToString,
+  isExtremeValue,
+  safeFormat,
+  safeGte,
+  safeAdd,
+  safeMultiply,
+  safeDivide,
+  isValidDecimalString,
+  getMagnitudeDescription,
+
   // Legacy aliases
   toLargeNumber,
   isLargeNumber,
@@ -73,4 +102,18 @@ export const Numbers = {
 // Make available globally for backward compatibility
 if (typeof window !== 'undefined') {
   (window as any).Numbers = Numbers;
+
+  // Also export safe conversion utilities globally for easy access
+  (window as any).SafeDecimal = {
+    safeToNumber,
+    safeToString,
+    isExtremeValue,
+    safeFormat,
+    safeGte,
+    safeAdd,
+    safeMultiply,
+    safeDivide,
+    isValidDecimalString,
+    getMagnitudeDescription,
+  };
 }

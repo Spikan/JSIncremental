@@ -13,7 +13,7 @@ export class DecimalErrorRecovery {
    */
   static handleConversionError(value: any, context: string): DecimalType {
     console.error(`Decimal conversion error in ${context}:`, value);
-    
+
     // Attempt recovery strategies
     if (typeof value === 'string') {
       // Try to extract numeric part
@@ -25,7 +25,7 @@ export class DecimalErrorRecovery {
           // Continue to next recovery strategy
         }
       }
-      
+
       // Try to clean the string
       const cleaned = value.replace(/[^\d.-]/g, '');
       if (cleaned && isValidDecimalString(cleaned)) {
@@ -36,7 +36,7 @@ export class DecimalErrorRecovery {
         }
       }
     }
-    
+
     // Try to convert to number first
     if (typeof value === 'number') {
       if (isFinite(value)) {
@@ -47,7 +47,7 @@ export class DecimalErrorRecovery {
         }
       }
     }
-    
+
     // Fallback to safe default
     console.warn(`Using fallback value 0 for ${context}`);
     return new (globalThis as any).Decimal(0);
@@ -81,39 +81,34 @@ export class DecimalErrorRecovery {
    */
   static validateInputs(a: any, b: any, operation: string): boolean {
     const issues: string[] = [];
-    
+
     if (!isDecimal(a) && typeof a !== 'number' && typeof a !== 'string') {
       issues.push(`Invalid first operand: ${typeof a}`);
     }
-    
+
     if (!isDecimal(b) && typeof b !== 'number' && typeof b !== 'string') {
       issues.push(`Invalid second operand: ${typeof b}`);
     }
-    
+
     if (issues.length > 0) {
       console.warn(`Input validation failed for ${operation}:`, issues.join(', '));
       return false;
     }
-    
+
     return true;
   }
 
   /**
    * Attempts to recover from arithmetic operation errors
    */
-  static handleArithmeticError(
-    a: any, 
-    b: any, 
-    operation: string, 
-    error: any
-  ): DecimalType {
+  static handleArithmeticError(a: any, b: any, operation: string, error: any): DecimalType {
     console.error(`Arithmetic error in ${operation}:`, error);
     console.error('Operands:', { a, b });
-    
+
     // Try to convert operands to safe values
     const safeA = this.convertToSafeDecimal(a);
     const safeB = this.convertToSafeDecimal(b);
-    
+
     try {
       switch (operation) {
         case 'add':
@@ -140,14 +135,14 @@ export class DecimalErrorRecovery {
     if (isDecimal(value)) {
       return value;
     }
-    
+
     if (typeof value === 'number') {
       if (isFinite(value)) {
         return new (globalThis as any).Decimal(value);
       }
       return new (globalThis as any).Decimal(0);
     }
-    
+
     if (typeof value === 'string') {
       if (isValidDecimalString(value)) {
         try {
@@ -157,7 +152,7 @@ export class DecimalErrorRecovery {
         }
       }
     }
-    
+
     return new (globalThis as any).Decimal(0);
   }
 }
@@ -192,7 +187,7 @@ export class ExtremeValueMonitor {
       const num = decimal.toNumber();
       if (!isFinite(num) || num >= 1e100) {
         this.extremeValueCount++;
-        
+
         if (this.extremeValueCount > 100) {
           const warning = `High extreme value usage detected: ${this.extremeValueCount} operations`;
           if (!this.performanceWarnings.includes(warning)) {
@@ -245,18 +240,22 @@ export function setupGlobalErrorHandling(): void {
   const originalError = console.error;
   console.error = (...args: any[]) => {
     const message = args.join(' ');
-    
+
     // Check if this is a Decimal-related error
-    if (message.includes('Decimal') || message.includes('toNumber') || message.includes('Infinity')) {
+    if (
+      message.includes('Decimal') ||
+      message.includes('toNumber') ||
+      message.includes('Infinity')
+    ) {
       console.warn('Decimal-related error detected:', message);
-      
+
       // Log to performance monitor
       ExtremeValueMonitor.getInstance().checkPerformance(
-        new (globalThis as any).Decimal(0), 
+        new (globalThis as any).Decimal(0),
         'error-handling'
       );
     }
-    
+
     originalError.apply(console, args);
   };
 }

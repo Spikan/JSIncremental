@@ -9,6 +9,7 @@ import {
   multiply,
   gte,
 } from '../ts/core/numbers/migration-utils';
+import { safeToNumber } from '../ts/core/numbers/safe-conversion';
 import { computeClick } from '../ts/core/rules/clicks';
 import { computeTotalSipsPerDrink } from '../ts/core/rules/economy';
 import { nextStrawCost } from '../ts/core/rules/purchases';
@@ -203,34 +204,34 @@ describe('LargeNumber', () => {
     const a = new LargeNumber(10);
     const b = new LargeNumber(5);
     const result = a.add(b);
-    expect(result.toNumber()).toBe(15);
+    expect(safeToNumber(result)).toBe(15);
   });
 
   it('should perform subtraction', () => {
     const a = new LargeNumber(10);
     const b = new LargeNumber(3);
     const result = a.subtract(b);
-    expect(result.toNumber()).toBe(7);
+    expect(safeToNumber(result)).toBe(7);
   });
 
   it('should perform multiplication', () => {
     const a = new LargeNumber(6);
     const b = new LargeNumber(7);
     const result = a.multiply(b);
-    expect(result.toNumber()).toBe(42);
+    expect(safeToNumber(result)).toBe(42);
   });
 
   it('should perform division', () => {
     const a = new LargeNumber(15);
     const b = new LargeNumber(3);
     const result = a.divide(b);
-    expect(result.toNumber()).toBe(5);
+    expect(safeToNumber(result)).toBe(5);
   });
 
   it('should perform exponentiation', () => {
     const a = new LargeNumber(2);
     const result = a.pow(3);
-    expect(result.toNumber()).toBe(8);
+    expect(safeToNumber(result)).toBe(8);
   });
 
   it('should handle comparison operations', () => {
@@ -247,17 +248,17 @@ describe('LargeNumber', () => {
 
 describe('Migration Utilities', () => {
   it('should convert various types to LargeNumber', () => {
-    expect(toLargeNumber(100).toNumber()).toBe(100);
-    expect(toLargeNumber('1000').toNumber()).toBe(1000);
-    expect(toLargeNumber(new LargeNumber(500)).toNumber()).toBe(500);
+    expect(safeToNumber(toLargeNumber(100))).toBe(100);
+    expect(safeToNumber(toLargeNumber('1000'))).toBe(1000);
+    expect(safeToNumber(toLargeNumber(new LargeNumber(500)))).toBe(500);
   });
 
   it('should perform arithmetic operations', () => {
     const result = add(10, 5);
-    expect(result.toNumber()).toBe(15);
+    expect(safeToNumber(result)).toBe(15);
 
     const product = multiply(6, 7);
-    expect(product.toNumber()).toBe(42);
+    expect(safeToNumber(product)).toBe(42);
   });
 
   it('should handle comparison operations', () => {

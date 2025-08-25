@@ -4,6 +4,7 @@
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
 import { isDecimal, DecimalType } from './decimal-utils';
+import { isValidDecimalString } from './safe-conversion';
 
 // Export Decimal for use by other modules
 export { Decimal };
@@ -19,22 +20,39 @@ export function toDecimal(value: NumericValue): DecimalType {
     return value;
   }
 
-  // Handle string representations
+  // Enhanced string validation
   if (typeof value === 'string') {
+    // Validate string format before conversion
+    if (!isValidDecimalString(value)) {
+      console.warn('Invalid decimal string format:', value);
+      return new Decimal(0);
+    }
+
     try {
-      return new Decimal(value);
+      const result = new Decimal(value);
+
+      // Check for extreme values that might cause performance issues
+      if (result.toNumber() >= 1e100) {
+        console.warn('Extreme value detected, may impact performance:', value);
+      }
+
+      return result;
     } catch (error) {
-      console.warn('Failed to convert string to Decimal:', error);
+      console.error('Failed to convert string to Decimal:', error, 'Value:', value);
       return new Decimal(0);
     }
   }
 
-  // Handle numbers
+  // Handle numbers with validation
   if (typeof value === 'number') {
+    if (!isFinite(value)) {
+      console.warn('Non-finite number provided:', value);
+      return new Decimal(0);
+    }
     return new Decimal(value);
   }
 
-  // Fallback
+  console.warn('Invalid value type for Decimal conversion:', typeof value, value);
   return new Decimal(0);
 }
 

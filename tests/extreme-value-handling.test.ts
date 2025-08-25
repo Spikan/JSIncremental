@@ -2,22 +2,22 @@
 // Demonstrates the enhanced safety and reliability features
 
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
-import { 
-  safeToNumber, 
-  safeToString, 
-  isExtremeValue, 
+import {
+  safeToNumber,
+  safeToString,
+  isExtremeValue,
   safeFormat,
   safeGte,
   safeAdd,
   safeMultiply,
   safeDivide,
   isValidDecimalString,
-  getMagnitudeDescription
+  getMagnitudeDescription,
 } from '../ts/core/numbers/safe-conversion';
 import {
   DecimalErrorRecovery,
   ExtremeValueMonitor,
-  setupGlobalErrorHandling
+  setupGlobalErrorHandling,
 } from '../ts/core/numbers/error-recovery';
 
 // Mock break_eternity.js for testing
@@ -57,7 +57,7 @@ describe('Safe Conversion Utilities', () => {
     it('should preserve precision for all values', () => {
       const normal = new Decimal(1000);
       const extreme = new Decimal('1e500');
-      
+
       expect(safeToString(normal)).toBe('1000');
       expect(safeToString(extreme)).toBe('1e+500');
     });
@@ -73,7 +73,7 @@ describe('Safe Conversion Utilities', () => {
       const normal = new Decimal(1000);
       const large = new Decimal('1e100');
       const extreme = new Decimal('1e500');
-      
+
       expect(isExtremeValue(normal)).toBe(false);
       expect(isExtremeValue(large)).toBe(false); // Still within safe range
       expect(isExtremeValue(extreme)).toBe(true);
@@ -136,7 +136,7 @@ describe('Safe Conversion Utilities', () => {
     it('should compare values correctly', () => {
       const a = new Decimal('1e100');
       const b = new Decimal('5e99');
-      
+
       expect(safeGte(a, b)).toBe(true);
       expect(safeGte(b, a)).toBe(false);
       expect(safeGte(a, a)).toBe(true);
@@ -204,7 +204,7 @@ describe('Error Recovery', () => {
     it('should validate calculation results', () => {
       const valid = new Decimal(1000);
       const extreme = new Decimal('1e500');
-      
+
       expect(DecimalErrorRecovery.validateCalculation(valid, 'test')).toBe(true);
       expect(DecimalErrorRecovery.validateCalculation(extreme, 'test')).toBe(true);
     });
@@ -222,14 +222,14 @@ describe('Performance Monitoring', () => {
     it('should track extreme value usage', () => {
       const monitor = ExtremeValueMonitor.getInstance();
       monitor.reset();
-      
+
       const extreme = new Decimal('1e500');
-      
+
       // Simulate multiple operations
       for (let i = 0; i < 10; i++) {
         monitor.checkPerformance(extreme, 'test-operation');
       }
-      
+
       const stats = monitor.getStats();
       expect(stats.extremeValueCount).toBe(10);
       expect(stats.operationCounts['test-operation']).toBe(10);
@@ -238,14 +238,14 @@ describe('Performance Monitoring', () => {
     it('should warn about high usage', () => {
       const monitor = ExtremeValueMonitor.getInstance();
       monitor.reset();
-      
+
       const extreme = new Decimal('1e500');
-      
+
       // Simulate high usage
       for (let i = 0; i < 150; i++) {
         monitor.checkPerformance(extreme, 'high-usage');
       }
-      
+
       const stats = monitor.getStats();
       expect(stats.warnings).toBeGreaterThan(0);
     });
@@ -253,14 +253,14 @@ describe('Performance Monitoring', () => {
     it('should detect when optimization is needed', () => {
       const monitor = ExtremeValueMonitor.getInstance();
       monitor.reset();
-      
+
       const extreme = new Decimal('1e500');
-      
+
       // Simulate moderate usage
       for (let i = 0; i < 60; i++) {
         monitor.checkPerformance(extreme, 'moderate-usage');
       }
-      
+
       expect(monitor.needsOptimization()).toBe(true);
     });
   });
@@ -272,15 +272,15 @@ describe('Integration Tests', () => {
     const baseSPD = new Decimal('1e100');
     const multiplier = new Decimal('1e50');
     const time = 1000;
-    
+
     // Calculate production over time
     const production = safeMultiply(baseSPD, multiplier);
     const totalProduction = safeMultiply(production, time);
-    
+
     // Verify calculations maintain precision
     expect(isExtremeValue(totalProduction)).toBe(true);
     expect(safeToString(totalProduction)).toMatch(/e\+/);
-    
+
     // Verify performance monitoring
     const monitor = ExtremeValueMonitor.getInstance();
     const stats = monitor.getStats();
@@ -292,17 +292,17 @@ describe('Integration Tests', () => {
     const baseCost = new Decimal('1e200');
     const scaling = new Decimal('1.15');
     const level = 100;
-    
+
     // Calculate cost with exponential scaling
     let cost = baseCost;
     for (let i = 0; i < level; i++) {
       cost = safeMultiply(cost, scaling);
     }
-    
+
     // Verify cost is extreme but calculable
     expect(isExtremeValue(cost)).toBe(true);
     expect(safeToString(cost)).toMatch(/e\+/);
-    
+
     // Verify affordability check works
     const playerSips = new Decimal('1e300');
     expect(safeGte(playerSips, cost)).toBe(true);
@@ -310,11 +310,11 @@ describe('Integration Tests', () => {
 
   it('should handle save/load with extreme values', () => {
     const extremeValue = new Decimal('1e500');
-    
+
     // Simulate save
     const savedString = safeToString(extremeValue);
     expect(savedString).toBe('1e+500');
-    
+
     // Simulate load
     const loadedValue = new Decimal(savedString);
     expect(loadedValue.toString()).toBe('1e+500');
@@ -326,14 +326,14 @@ describe('Edge Cases', () => {
   it('should handle values at JavaScript limits', () => {
     const atLimit = new Decimal('1e308');
     const overLimit = new Decimal('1e309');
-    
+
     expect(isExtremeValue(atLimit)).toBe(false); // At limit but still safe
     expect(isExtremeValue(overLimit)).toBe(true); // Over limit
   });
 
   it('should handle negative extreme values', () => {
     const negativeExtreme = new Decimal('-1e500');
-    
+
     expect(isExtremeValue(negativeExtreme)).toBe(true);
     expect(safeToString(negativeExtreme)).toBe('-1e+500');
   });
@@ -341,7 +341,7 @@ describe('Edge Cases', () => {
   it('should handle zero and very small values', () => {
     const zero = new Decimal(0);
     const tiny = new Decimal('1e-100');
-    
+
     expect(isExtremeValue(zero)).toBe(false);
     expect(isExtremeValue(tiny)).toBe(false);
     expect(safeToNumber(zero)).toBe(0);
