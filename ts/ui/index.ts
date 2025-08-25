@@ -27,6 +27,7 @@ export const updateLevelNumber = displays.updateLevelNumber;
 export const updateLevelText = displays.updateLevelText;
 export const updateDrinkRate = displays.updateDrinkRate;
 export const updateCompactDrinkSpeedDisplays = displays.updateCompactDrinkSpeedDisplays;
+export const updatePurchasedCounts = stats.updatePurchasedCounts;
 
 export const updatePlayTime = stats.updatePlayTime;
 export const updateLastSaveTime = stats.updateLastSaveTime;

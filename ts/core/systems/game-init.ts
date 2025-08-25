@@ -39,6 +39,7 @@ export function initSplashScreen(): void {
               w.App?.ui?.updatePlayTime?.();
               w.App?.ui?.updateLastSaveTime?.();
               w.App?.ui?.updateAllStats?.();
+              w.App?.ui?.updatePurchasedCounts?.();
               w.App?.ui?.checkUpgradeAffordability?.();
               w.App?.systems?.unlocks?.checkAllUnlocks?.();
             } catch {}

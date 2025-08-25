@@ -221,4 +221,57 @@ export function updateAchievementStats(): void {
     const owned = (window as any).App?.state?.getState?.()?.fasterDrinks || 0;
     fasterDrinksOwnedElement.textContent = formatNumber(owned);
   }
+
+  // Update purchased item counts in shop displays
+  updatePurchasedCounts();
+}
+
+// Update purchased item counts in shop displays
+export function updatePurchasedCounts(): void {
+  if (typeof window === 'undefined') return;
+
+  const state = (window as any).App?.state?.getState?.();
+  if (!state) return;
+
+  // Update straws purchased count
+  const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as HTMLElement | undefined;
+  if (strawsPurchasedElement) {
+    const straws = state.straws || 0;
+    strawsPurchasedElement.textContent = formatNumber(straws);
+  }
+
+  // Update cups purchased count
+  const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
+  if (cupsPurchasedElement) {
+    const cups = state.cups || 0;
+    cupsPurchasedElement.textContent = formatNumber(cups);
+  }
+
+  // Update wider straws purchased count
+  const widerStrawsPurchasedElement = (window as any).DOM_CACHE?.widerStrawsPurchased as HTMLElement | undefined;
+  if (widerStrawsPurchasedElement) {
+    const widerStraws = state.widerStraws || 0;
+    widerStrawsPurchasedElement.textContent = formatNumber(widerStraws);
+  }
+
+  // Update better cups purchased count
+  const betterCupsPurchasedElement = (window as any).DOM_CACHE?.betterCupsPurchased as HTMLElement | undefined;
+  if (betterCupsPurchasedElement) {
+    const betterCups = state.betterCups || 0;
+    betterCupsPurchasedElement.textContent = formatNumber(betterCups);
+  }
+
+  // Update suctions purchased count
+  const suctionsPurchasedElement = (window as any).DOM_CACHE?.suctionsPurchased as HTMLElement | undefined;
+  if (suctionsPurchasedElement) {
+    const suctions = state.suctions || 0;
+    suctionsPurchasedElement.textContent = formatNumber(suctions);
+  }
+
+  // Update critical clicks purchased count
+  const criticalClicksPurchasedElement = (window as any).DOM_CACHE?.criticalClicksPurchased as HTMLElement | undefined;
+  if (criticalClicksPurchasedElement) {
+    const criticalClicks = state.criticalClicks || 0;
+    criticalClicksPurchasedElement.textContent = formatNumber(criticalClicks);
+  }
 }
