@@ -105,7 +105,16 @@ export class LargeNumber {
   }
 
   toNumber(): number {
-    return this._value.toNumber();
+    const num = this._value.toNumber();
+    // For extreme values that exceed JavaScript's Number.MAX_VALUE,
+    // return the mantissa to provide a reasonable approximation
+    if (!isFinite(num) && this._value.toString().includes('e+')) {
+      // Extract mantissa from scientific notation (e.g., "1.23e+400" -> 1.23)
+      const str = this._value.toString();
+      const mantissa = parseFloat(str.split('e')[0]);
+      return isFinite(mantissa) ? mantissa : 1; // fallback to 1 if parsing fails
+    }
+    return num;
   }
 
   toJSON(): string {

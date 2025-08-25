@@ -18,13 +18,21 @@ function runExtremeValueTests() {
   console.log('1e2000:', extreme1.toString());
   console.log('1e2000 toNumber():', extreme1.toNumber());
   console.log('1e2000 type:', extreme1.getValueType());
-  console.log('1e2000 raw object:', extreme1.getDebugInfo());
 
   // Test smaller values that should work
   const medium = new LargeNumber('1e100');
   console.log('1e100:', medium.toString());
   console.log('1e100 toNumber():', medium.toNumber());
   console.log('1e100 type:', medium.getValueType());
+
+  // Test various extreme values
+  const extreme2 = new LargeNumber('1.5e3000');
+  console.log('1.5e3000:', extreme2.toString());
+  console.log('1.5e3000 toNumber():', extreme2.toNumber());
+
+  const extreme3 = new LargeNumber('2.5e4000');
+  console.log('2.5e4000:', extreme3.toString());
+  console.log('2.5e4000 toNumber():', extreme3.toNumber());
 
   // Test break_infinity directly
   if (typeof (globalThis as any).Decimal !== 'undefined') {
