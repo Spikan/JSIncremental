@@ -17,25 +17,25 @@ function runExtremeValueTests() {
   const extreme1 = new Decimal('1e2000');
   console.log('1e2000:', extreme1.toString());
   console.log('1e2000 toNumber():', DecimalOps.toSafeNumber(extreme1));
-  console.log('1e2000 toSafeNumber():', extreme1.toSafeNumber());
-  console.log('1e2000 type:', extreme1.getValueType());
+  console.log('1e2000 toSafeNumber():', DecimalOps.toSafeNumber(extreme1));
+  console.log('1e2000 type:', typeof extreme1);
 
   // Test smaller values that should work
   const medium = new Decimal('1e100');
   console.log('1e100:', medium.toString());
   console.log('1e100 toNumber():', DecimalOps.toSafeNumber(medium));
-  console.log('1e100 type:', medium.getValueType());
+  console.log('1e100 type:', typeof medium);
 
   // Test various extreme values
   const extreme2 = new Decimal('1.5e3000');
   console.log('1.5e3000:', extreme2.toString());
   console.log('1.5e3000 toNumber():', DecimalOps.toSafeNumber(extreme2));
-  console.log('1.5e3000 toSafeNumber():', extreme2.toSafeNumber());
+  console.log('1.5e3000 toSafeNumber():', DecimalOps.toSafeNumber(extreme2));
 
   const extreme3 = new Decimal('2.5e4000');
   console.log('2.5e4000:', extreme3.toString());
   console.log('2.5e4000 toNumber():', DecimalOps.toSafeNumber(extreme3));
-  console.log('2.5e4000 toSafeNumber():', extreme3.toSafeNumber());
+  console.log('2.5e4000 toSafeNumber():', DecimalOps.toSafeNumber(extreme3));
 
   // Test break_eternity.js directly
   if (typeof (globalThis as any).Decimal !== 'undefined') {
