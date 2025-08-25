@@ -247,7 +247,7 @@ export function updatePurchasedCounts(): void {
     widerStraws: state.widerStraws,
     betterCups: state.betterCups,
     suctions: state.suctions,
-    criticalClicks: state.criticalClicks
+    criticalClicks: state.criticalClicks,
   });
 
   // Update straws purchased count
@@ -256,8 +256,9 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
-    strawsPurchasedElement.textContent = formatNumber(straws);
-    console.log('✅ Updated straws:', straws, 'element:', strawsPurchasedElement);
+    const strawsValue = typeof straws === 'object' && straws.toSafeNumber ? straws.toSafeNumber() : straws;
+    strawsPurchasedElement.textContent = formatNumber(strawsValue);
+    console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
   } else {
     console.log('❌ strawsPurchased element not found');
   }
@@ -266,8 +267,9 @@ export function updatePurchasedCounts(): void {
   const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
   if (cupsPurchasedElement) {
     const cups = state.cups || 0;
-    cupsPurchasedElement.textContent = formatNumber(cups);
-    console.log('✅ Updated cups:', cups, 'element:', cupsPurchasedElement);
+    const cupsValue = typeof cups === 'object' && cups.toSafeNumber ? cups.toSafeNumber() : cups;
+    cupsPurchasedElement.textContent = formatNumber(cupsValue);
+    console.log('✅ Updated cups:', cupsValue, 'element:', cupsPurchasedElement);
   } else {
     console.log('❌ cupsPurchased element not found');
   }
@@ -278,8 +280,9 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (widerStrawsPurchasedElement) {
     const widerStraws = state.widerStraws || 0;
-    widerStrawsPurchasedElement.textContent = formatNumber(widerStraws);
-    console.log('✅ Updated widerStraws:', widerStraws, 'element:', widerStrawsPurchasedElement);
+    const widerStrawsValue = typeof widerStraws === 'object' && widerStraws.toSafeNumber ? widerStraws.toSafeNumber() : widerStraws;
+    widerStrawsPurchasedElement.textContent = formatNumber(widerStrawsValue);
+    console.log('✅ Updated widerStraws:', widerStrawsValue, 'element:', widerStrawsPurchasedElement);
   } else {
     console.log('❌ widerStrawsPurchased element not found');
   }
@@ -290,8 +293,9 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (betterCupsPurchasedElement) {
     const betterCups = state.betterCups || 0;
-    betterCupsPurchasedElement.textContent = formatNumber(betterCups);
-    console.log('✅ Updated betterCups:', betterCups, 'element:', betterCupsPurchasedElement);
+    const betterCupsValue = typeof betterCups === 'object' && betterCups.toSafeNumber ? betterCups.toSafeNumber() : betterCups;
+    betterCupsPurchasedElement.textContent = formatNumber(betterCupsValue);
+    console.log('✅ Updated betterCups:', betterCupsValue, 'element:', betterCupsPurchasedElement);
   } else {
     console.log('❌ betterCupsPurchased element not found');
   }
@@ -302,8 +306,9 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (suctionsPurchasedElement) {
     const suctions = state.suctions || 0;
-    suctionsPurchasedElement.textContent = formatNumber(suctions);
-    console.log('✅ Updated suctions:', suctions, 'element:', suctionsPurchasedElement);
+    const suctionsValue = typeof suctions === 'object' && suctions.toSafeNumber ? suctions.toSafeNumber() : suctions;
+    suctionsPurchasedElement.textContent = formatNumber(suctionsValue);
+    console.log('✅ Updated suctions:', suctionsValue, 'element:', suctionsPurchasedElement);
   } else {
     console.log('❌ suctionsPurchased element not found');
   }
@@ -314,8 +319,9 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (criticalClicksPurchasedElement) {
     const criticalClicks = state.criticalClicks || 0;
-    criticalClicksPurchasedElement.textContent = formatNumber(criticalClicks);
-    console.log('✅ Updated criticalClicks:', criticalClicks, 'element:', criticalClicksPurchasedElement);
+    const criticalClicksValue = typeof criticalClicks === 'object' && criticalClicks.toSafeNumber ? criticalClicks.toSafeNumber() : criticalClicks;
+    criticalClicksPurchasedElement.textContent = formatNumber(criticalClicksValue);
+    console.log('✅ Updated criticalClicks:', criticalClicksValue, 'element:', criticalClicksPurchasedElement);
   } else {
     console.log('❌ criticalClicksPurchased element not found');
   }
