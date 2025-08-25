@@ -15,19 +15,12 @@ export function checkUpgradeAffordability(): void {
   // Debug logging for extreme value diagnosis
   console.log('🔍 checkUpgradeAffordability: Current sips =', rawSipsLarge.toString());
 
-  // Determine effective sips value with fallbacks for extreme cases
-  let currentSipsLarge: LargeNumber;
+  // Use sips value as-is for affordability calculations (preserve extreme values)
+  const currentSipsLarge = rawSipsLarge;
+
+  // Log extreme values for monitoring (don't sanitize)
   if (!isFinite(Number(rawSipsLarge.toString()))) {
-    console.warn('🚫 checkUpgradeAffordability: Sips is corrupted (NaN/Infinity), using fallback');
-    // Use a much larger fallback sips value for extreme cases
-    currentSipsLarge = new LargeNumber('1000000'); // 1M fallback for extreme cases
-    console.log('🔄 Using extreme fallback sips:', currentSipsLarge.toString());
-  } else if (rawSipsLarge.lte(new LargeNumber(0))) {
-    console.warn('🚫 checkUpgradeAffordability: Sips is zero or negative, using fallback');
-    currentSipsLarge = new LargeNumber('1000000'); // 1M fallback for zero/negative cases
-    console.log('🔄 Using fallback sips for zero/negative:', currentSipsLarge.toString());
-  } else {
-    currentSipsLarge = rawSipsLarge;
+    console.log('🔥 checkUpgradeAffordability: Extreme sips detected:', rawSipsLarge.toString());
   }
 
   // Function to check affordability using LargeNumber comparison
@@ -35,19 +28,16 @@ export function checkUpgradeAffordability(): void {
     try {
       const costLarge = toLargeNumber(cost);
 
-      // Use the already-validated currentSipsLarge (which may have been set to fallback)
+      // Use sips as-is for comparison (no arbitrary cost limits)
       const effectiveSips = currentSipsLarge;
 
-      // Handle extreme costs - if cost is astronomically high, consider it unaffordable
-      // but still allow reasonable purchases
-      let result = false;
-      if (costLarge.lt(new LargeNumber('1000000000'))) {
-        // Cost is reasonable (< 1B), do normal comparison
-        result = gte(effectiveSips, costLarge);
-      } else {
-        // Cost is astronomical, mark as unaffordable but don't disable permanently
-        console.log('🚫 Extreme cost detected:', costLarge.toString());
-        result = false;
+      // Always do proper LargeNumber comparison regardless of magnitude
+      // Extreme values should be handled properly by the LargeNumber library
+      const result = gte(effectiveSips, costLarge);
+
+      // Log extreme costs for monitoring
+      if (!isFinite(Number(costLarge.toString()))) {
+        console.log('🔥 Extreme cost detected:', costLarge.toString());
       }
 
       console.log(
