@@ -154,7 +154,10 @@ export function formatDecimal(value: NumericValue): string {
     if (value >= 1e6 || value <= -1e6) {
       return (value as number).toExponential(2);
     }
-    return (value as number).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+    return (value as number).toLocaleString(undefined, {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 0,
+    });
   }
 
   return String(value || 0);

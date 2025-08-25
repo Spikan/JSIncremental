@@ -10,7 +10,7 @@ if (fs.existsSync(displaysFile)) {
   let originalContent = content;
 
   // Add import for formatNumber if not present
-  if (!content.includes("import { formatNumber }")) {
+  if (!content.includes('import { formatNumber }')) {
     content = content.replace(
       /import \{ DecimalOps, Decimal \} from '\.\.\/core\/numbers';/,
       "import { DecimalOps, Decimal } from '../core/numbers';\nimport { formatNumber } from './utils';"
@@ -18,16 +18,10 @@ if (fs.existsSync(displaysFile)) {
   }
 
   // Replace drink rate toFixed calls with formatNumber
-  content = content.replace(
-    /drinkRateSeconds\.toFixed\(2\)/g,
-    'formatNumber(drinkRateSeconds)'
-  );
+  content = content.replace(/drinkRateSeconds\.toFixed\(2\)/g, 'formatNumber(drinkRateSeconds)');
 
   // Replace countdown toFixed(1) with formatNumber for consistency
-  content = content.replace(
-    /seconds\.toFixed\(1\)/g,
-    'formatNumber(seconds)'
-  );
+  content = content.replace(/seconds\.toFixed\(1\)/g, 'formatNumber(seconds)');
 
   // Replace remainingTime toFixed(1) with formatNumber
   content = content.replace(
@@ -42,10 +36,7 @@ if (fs.existsSync(displaysFile)) {
     '(numericChance * 100).toFixed(1)'
   );
 
-  content = content.replace(
-    /\(chance \* 100\)\.toFixed\(1\)/g,
-    '(chance * 100).toFixed(1)'
-  );
+  content = content.replace(/\(chance \* 100\)\.toFixed\(1\)/g, '(chance * 100).toFixed(1)');
 
   if (content !== originalContent) {
     fs.writeFileSync(displaysFile, content, 'utf8');
@@ -60,7 +51,7 @@ if (fs.existsSync(labelsFile)) {
   let originalContent = content;
 
   // Add import for formatNumber
-  if (!content.includes("import { formatNumber }")) {
+  if (!content.includes('import { formatNumber }')) {
     content = content.replace(
       /import \{ DecimalOps, Decimal \} from '\.\.\/core\/numbers';/,
       "import { DecimalOps, Decimal } from '../core/numbers';\nimport { formatNumber } from './utils';"
@@ -68,10 +59,7 @@ if (fs.existsSync(labelsFile)) {
   }
 
   // Replace toFixed(1) with formatNumber
-  content = content.replace(
-    /seconds\.toFixed\(1\)/g,
-    'formatNumber(seconds)'
-  );
+  content = content.replace(/seconds\.toFixed\(1\)/g, 'formatNumber(seconds)');
 
   if (content !== originalContent) {
     fs.writeFileSync(labelsFile, content, 'utf8');
