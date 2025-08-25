@@ -20,12 +20,11 @@ export const checkIsDecimal = (value: any): value is DecimalType => {
   }
 };
 
-// Alias for backward compatibility
-export const isDecimal = checkIsDecimal;
+
 
 // Minimal formatting utility for UI display
 export const formatDecimal = (value: any): string => {
-  if (!isDecimal(value)) {
+  if (!checkIsDecimal(value)) {
     if (typeof value === 'number') {
       return !isFinite(value)
         ? String(value)

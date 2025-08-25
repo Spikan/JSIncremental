@@ -13,7 +13,7 @@ function getDecimal() {
     return undefined;
   }
 }
-import { isDecimal, DecimalType } from './decimal-utils';
+import { checkIsDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
 
 // Export type for use by other modules
@@ -32,7 +32,7 @@ export function toDecimal(value: NumericValue): DecimalType {
     return value as any;
   }
 
-  if (isDecimal(value)) {
+  if (checkIsDecimal(value)) {
     return value;
   }
 
@@ -76,7 +76,7 @@ export function toDecimal(value: NumericValue): DecimalType {
  * Converts to string representation suitable for display
  */
 export function toString(value: NumericValue): string {
-  if (isDecimal(value)) {
+  if (checkIsDecimal(value)) {
     return value.toString();
   }
 
@@ -164,7 +164,7 @@ export function eq(a: NumericValue, b: NumericValue): boolean {
  * Formats a number for display, handling very large numbers
  */
 export function formatDecimal(value: NumericValue): string {
-  if (isDecimal(value)) {
+  if (checkIsDecimal(value)) {
     return value.toString();
   }
 
@@ -184,7 +184,7 @@ export function formatDecimal(value: NumericValue): string {
 
 // Legacy function names for backward compatibility during migration
 export const toLargeNumber = toDecimal;
-export const isLargeNumber = isDecimal;
+export const isLargeNumber = checkIsDecimal;
 
 // Export for global use
 if (typeof window !== 'undefined') {
@@ -201,7 +201,7 @@ if (typeof window !== 'undefined') {
     lte,
     lt,
     eq,
-    isDecimal,
+    isDecimal: checkIsDecimal,
     formatDecimal,
     // Legacy aliases
     toLargeNumber,

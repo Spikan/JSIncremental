@@ -33,7 +33,7 @@ export * from './performance-tuning';
 // Decimal is accessed via lazy loading in migration-utils
 
 // Import isDecimal separately since it's used in the Numbers object
-import { isDecimal } from './decimal-utils';
+import { checkIsDecimal } from './decimal-utils';
 
 // Import required functions
 import {
@@ -114,7 +114,7 @@ import {
 // Create a unified interface for global use
 export const Numbers = {
   // Decimal operations via lazy loading
-  isDecimal,
+  isDecimal: checkIsDecimal,
 
   // Migration utilities (with legacy aliases)
   toDecimal,
