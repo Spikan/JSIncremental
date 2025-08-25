@@ -18,6 +18,18 @@ export * from './migration-utils';
 // Export safe conversion utilities
 export * from './safe-conversion';
 
+// Export error recovery utilities
+export * from './error-recovery';
+
+// Export memory optimization utilities
+export * from './memory-optimization';
+
+// Export advanced caching utilities
+export * from './advanced-caching';
+
+// Export performance tuning utilities
+export * from './performance-tuning';
+
 // Explicitly export Decimal for files that need it directly
 export { Decimal } from './migration-utils';
 
@@ -55,6 +67,48 @@ import {
   isValidDecimalString,
   getMagnitudeDescription,
 } from './safe-conversion';
+
+// Import error recovery utilities
+import {
+  DecimalErrorRecovery,
+  ExtremeValueMonitor,
+  setupGlobalErrorHandling,
+} from './error-recovery';
+
+// Import memory optimization utilities
+import {
+  MemoryOptimizer,
+  MemoryAwareCache,
+  PerformanceOptimizer,
+  setupMemoryOptimization,
+  memoryOptimizer,
+  performanceOptimizer,
+  decimalMemoryPool,
+} from './memory-optimization';
+
+// Import advanced caching utilities
+import {
+  PredictiveCache,
+  AdaptiveCache,
+  DecimalOperationCache,
+  BatchOptimizer,
+  CacheManager,
+  predictiveCache,
+  decimalOperationCache,
+  batchOptimizer,
+  cacheManager,
+} from './advanced-caching';
+
+// Import performance tuning utilities
+import {
+  PerformanceTuner,
+  OptimizedOperations,
+  PerformanceDashboard,
+  setupPerformanceOptimization,
+  performanceTuner,
+  optimizedOperations,
+  performanceDashboard,
+} from './performance-tuning';
 
 // Decimal is available from migration-utils.ts export
 
@@ -94,6 +148,40 @@ export const Numbers = {
   isValidDecimalString,
   getMagnitudeDescription,
 
+  // Error recovery utilities
+  DecimalErrorRecovery,
+  ExtremeValueMonitor,
+  setupGlobalErrorHandling,
+
+  // Memory optimization utilities
+  MemoryOptimizer,
+  MemoryAwareCache,
+  PerformanceOptimizer,
+  setupMemoryOptimization,
+  memoryOptimizer,
+  performanceOptimizer,
+  decimalMemoryPool,
+
+  // Advanced caching utilities
+  PredictiveCache,
+  AdaptiveCache,
+  DecimalOperationCache,
+  BatchOptimizer,
+  CacheManager,
+  predictiveCache,
+  decimalOperationCache,
+  batchOptimizer,
+  cacheManager,
+
+  // Performance tuning utilities
+  PerformanceTuner,
+  OptimizedOperations,
+  PerformanceDashboard,
+  setupPerformanceOptimization,
+  performanceTuner,
+  optimizedOperations,
+  performanceDashboard,
+
   // Legacy aliases
   toLargeNumber,
   isLargeNumber,
@@ -115,5 +203,29 @@ if (typeof window !== 'undefined') {
     safeDivide,
     isValidDecimalString,
     getMagnitudeDescription,
+  };
+
+  // Export optimization utilities globally
+  (window as any).DecimalOptimizer = {
+    // Memory optimization
+    memoryOptimizer,
+    performanceOptimizer,
+    decimalMemoryPool,
+
+    // Advanced caching
+    predictiveCache,
+    decimalOperationCache,
+    batchOptimizer,
+    cacheManager,
+
+    // Performance tuning
+    performanceTuner,
+    optimizedOperations,
+    performanceDashboard,
+
+    // Setup functions
+    setupMemoryOptimization,
+    setupPerformanceOptimization,
+    setupGlobalErrorHandling,
   };
 }
