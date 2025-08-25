@@ -56,106 +56,6 @@ const zustandStore = useGameStore;
   performance: performanceMonitor, // Performance monitoring
 };
 
-// Install lazy-loading proxies for critical systems so callers don't block on module load
-try {
-  // Loop system: provide a lazy start() that imports the real module on first call
-  if (typeof (window as any).App.systems.loop.start !== 'function') {
-    (window as any).App.systems.loop.start = (args: any) => {
-      try {
-        return import('./core/systems/loop-system.ts')
-          .then(mod => {
-            Object.assign((window as any).App.systems.loop, mod);
-            return (mod as any).start?.(args);
-          })
-          .catch((error: any) => {
-            console.warn('Lazy import of loop-system failed:', error);
-            return undefined;
-          });
-      } catch (error) {
-        console.warn('Lazy start loop failed:', error);
-        return undefined;
-      }
-    };
-  }
-} catch (error) {
-  console.warn('Failed to install lazy loop proxy:', error);
-}
-
-try {
-  // UI system: provide lazy wrappers for initializeUI and switchTab
-  const ensureUiLoaded = () =>
-    import('./ui/index.ts')
-      .then(mod => {
-        Object.assign((window as any).App.ui, mod);
-        return (window as any).App.ui;
-      })
-      .catch((error: any) => {
-        console.warn('Lazy import of UI module failed:', error);
-        return (window as any).App.ui;
-      });
-  if (typeof (window as any).App.ui.initializeUI !== 'function') {
-    (window as any).App.ui.initializeUI = () => {
-      return ensureUiLoaded().then((ui: any) => ui.initializeUI?.());
-    };
-  }
-  if (typeof (window as any).App.ui.switchTab !== 'function') {
-    (window as any).App.ui.switchTab = (tabName: string, event?: any) => {
-      return ensureUiLoaded().then((ui: any) => ui.switchTab?.(tabName, event));
-    };
-  }
-} catch (error) {
-  console.warn('Failed to install lazy UI proxies:', error);
-}
-
-// Provide a resilient startGame shim early so UI can call it immediately
-try {
-  // Ensure initGame is available without importing main.ts to avoid circular init
-  if (typeof (window as any).initGame !== 'function') {
-    (window as any).initGame = function initGameShim() {
-      try {
-        const tryCall = (retries = 50) => {
-          const real = (window as any).initGame;
-          if (typeof real === 'function' && real !== initGameShim) {
-            return real();
-          }
-          if (retries <= 0) return undefined;
-          setTimeout(() => tryCall(retries - 1), 50);
-          return undefined;
-        };
-        return tryCall();
-      } catch (error) {
-        console.warn('initGame shim error:', error);
-        return undefined;
-      }
-    };
-  }
-  if (typeof (window as any).startGame !== 'function') {
-    (window as any).startGame = function startGameShim() {
-      try {
-        const gi = (window as any).App?.systems?.gameInit;
-        const impl = gi?.startGame || gi?.startGameCore;
-        if (typeof impl === 'function') {
-          return impl();
-        }
-        // Retry shortly until game-init module finishes loading
-        setTimeout(() => {
-          try {
-            const gi2 = (window as any).App?.systems?.gameInit;
-            const impl2 = gi2?.startGame || gi2?.startGameCore;
-            if (typeof impl2 === 'function') impl2();
-          } catch (error) {
-            console.warn('Deferred startGame call failed:', error);
-          }
-        }, 100);
-      } catch (error) {
-        console.warn('startGame shim error:', error);
-      }
-    };
-  }
-} catch (error) {
-  console.warn('Failed to install startGame shim:', error);
-}
-
 try {
   (window as any).EVENT_NAMES = (window as any).App.EVENT_NAMES;
 } catch (error) {
@@ -321,15 +221,8 @@ console.log('✅ App object created and ready');
 console.log('🔧 index.ts finished loading, App object created:', !!(window as any).App);
 
 try {
-  console.log('🔍 index.ts: Checking for initOnDomReady...');
-  console.log('🔍 initOnDomReady exists:', typeof (window as any).initOnDomReady);
-  console.log('🔍 App object exists:', !!(window as any).App);
-
   if ((window as any).initOnDomReady) {
-    console.log('✅ Calling initOnDomReady...');
     (window as any).initOnDomReady();
-  } else {
-    console.log('❌ initOnDomReady not available');
   }
 } catch (error) {
   console.warn('⚠️ DOM-ready initialization failed:', error);

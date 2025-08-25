@@ -1,7 +1,7 @@
 // Error recovery utilities for break_eternity.js Decimal operations
 // Provides robust error handling and recovery strategies
 
-import { checkIsDecimal, DecimalType } from './decimal-utils';
+import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
 
 /**
@@ -57,7 +57,7 @@ export class DecimalErrorRecovery {
    * Validates calculation results
    */
   static validateCalculation(result: DecimalType, operation: string): boolean {
-    if (!checkIsDecimal(result)) {
+    if (!isDecimal(result)) {
       console.error(`Invalid result from ${operation}:`, result);
       return false;
     }
@@ -82,11 +82,11 @@ export class DecimalErrorRecovery {
   static validateInputs(a: any, b: any, operation: string): boolean {
     const issues: string[] = [];
 
-    if (!checkIsDecimal(a) && typeof a !== 'number' && typeof a !== 'string') {
+    if (!isDecimal(a) && typeof a !== 'number' && typeof a !== 'string') {
       issues.push(`Invalid first operand: ${typeof a}`);
     }
 
-    if (!checkIsDecimal(b) && typeof b !== 'number' && typeof b !== 'string') {
+    if (!isDecimal(b) && typeof b !== 'number' && typeof b !== 'string') {
       issues.push(`Invalid second operand: ${typeof b}`);
     }
 
@@ -132,7 +132,7 @@ export class DecimalErrorRecovery {
    * Converts any value to a safe Decimal
    */
   private static convertToSafeDecimal(value: any): DecimalType {
-    if (checkIsDecimal(value)) {
+    if (isDecimal(value)) {
       return value;
     }
 
@@ -177,7 +177,7 @@ export class ExtremeValueMonitor {
    * Checks if a Decimal operation might impact performance
    */
   checkPerformance(decimal: DecimalType, operation: string): void {
-    if (!checkIsDecimal(decimal)) return;
+    if (!isDecimal(decimal)) return;
 
     // Track operation counts
     const currentCount = this.operationCounts.get(operation) || 0;

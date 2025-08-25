@@ -1,24 +1,13 @@
 // Direct break_eternity.js utilities
 // No wrapper - direct Decimal operations for maximum performance
 
-// Import checkIsDecimal first to avoid temporal dead zone
-import { checkIsDecimal, DecimalType } from './decimal-utils';
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
+import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
 
-// Direct break_eternity.js access - function-based to avoid initialization issues
-function getDecimal() {
-  try {
-    return (
-      (globalThis as any).Decimal ||
-      (typeof window !== 'undefined' ? (window as any).Decimal : undefined)
-    );
-  } catch (error) {
-    console.warn('Decimal library not available:', error);
-    return undefined;
-  }
-}
-
-// Export type for use by other modules
+// Export Decimal for use by other modules
+export { Decimal };
 export type { DecimalType };
 
 export type NumericValue = number | string | DecimalType | any;
@@ -27,14 +16,7 @@ export type NumericValue = number | string | DecimalType | any;
  * Safely converts any value to Decimal (direct break_eternity.js)
  */
 export function toDecimal(value: NumericValue): DecimalType {
-  // Check if Decimal is available
-  const Decimal = getDecimal();
-  if (!Decimal) {
-    console.warn('Decimal library not available, returning fallback value');
-    return value as any;
-  }
-
-  if (checkIsDecimal(value)) {
+  if (isDecimal(value)) {
     return value;
   }
 
@@ -43,11 +25,11 @@ export function toDecimal(value: NumericValue): DecimalType {
     // Validate string format before conversion
     if (!isValidDecimalString(value)) {
       console.warn('Invalid decimal string format:', value);
-      return new (getDecimal())(0);
+      return new Decimal(0);
     }
 
     try {
-      const result = new (getDecimal())(value);
+      const result = new Decimal(value);
 
       // Check for extreme values that might cause performance issues
       if (result.toNumber() >= 1e100) {
@@ -57,7 +39,7 @@ export function toDecimal(value: NumericValue): DecimalType {
       return result;
     } catch (error) {
       console.error('Failed to convert string to Decimal:', error, 'Value:', value);
-      return new (getDecimal())(0);
+      return new Decimal(0);
     }
   }
 
@@ -65,20 +47,20 @@ export function toDecimal(value: NumericValue): DecimalType {
   if (typeof value === 'number') {
     if (!isFinite(value)) {
       console.warn('Non-finite number provided:', value);
-      return new (getDecimal())(0);
+      return new Decimal(0);
     }
-    return new (getDecimal())(value);
+    return new Decimal(value);
   }
 
   console.warn('Invalid value type for Decimal conversion:', typeof value, value);
-  return new (getDecimal())(0);
+  return new Decimal(0);
 }
 
 /**
  * Converts to string representation suitable for display
  */
 export function toString(value: NumericValue): string {
-  if (checkIsDecimal(value)) {
+  if (isDecimal(value)) {
     return value.toString();
   }
 
@@ -166,7 +148,7 @@ export function eq(a: NumericValue, b: NumericValue): boolean {
  * Formats a number for display, handling very large numbers
  */
 export function formatDecimal(value: NumericValue): string {
-  if (checkIsDecimal(value)) {
+  if (isDecimal(value)) {
     return value.toString();
   }
 
@@ -186,7 +168,7 @@ export function formatDecimal(value: NumericValue): string {
 
 // Legacy function names for backward compatibility during migration
 export const toLargeNumber = toDecimal;
-export const isLargeNumber = checkIsDecimal;
+export const isLargeNumber = isDecimal;
 
 // Export for global use
 if (typeof window !== 'undefined') {
@@ -203,7 +185,7 @@ if (typeof window !== 'undefined') {
     lte,
     lt,
     eq,
-    isDecimal: checkIsDecimal,
+    isDecimal,
     formatDecimal,
     // Legacy aliases
     toLargeNumber,

@@ -530,21 +530,22 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update critical clicks purchased count
-  const criticalClicksPurchasedDisplayElement = (window as any).DOM_CACHE
-    ?.criticalClicksPurchased as HTMLElement | undefined;
-  if (criticalClicksPurchasedDisplayElement) {
+  const criticalClicksPurchasedElement = (window as any).DOM_CACHE?.criticalClicksPurchased as
+    | HTMLElement
+    | undefined;
+  if (criticalClicksPurchasedElement) {
     const criticalClicks = state.criticalClicks || 0;
     const criticalClicksValue =
       typeof criticalClicks === 'object' && criticalClicks.toString
         ? criticalClicks.toString()
         : criticalClicks;
-    criticalClicksPurchasedDisplayElement.textContent = formatNumber(criticalClicksValue);
+    criticalClicksPurchasedElement.textContent = formatNumber(criticalClicksValue);
     if (shouldLog)
       console.log(
         '✅ Updated criticalClicks:',
         criticalClicksValue,
         'element:',
-        criticalClicksPurchasedDisplayElement
+        criticalClicksPurchasedElement
       );
   } else {
     if (shouldLog) console.log('❌ criticalClicksPurchased element not found');

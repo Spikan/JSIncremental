@@ -39,11 +39,6 @@ body {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  /* Debug: ensure visibility */
-  visibility: visible;
-  opacity: 1;
-  /* Temporary debug border */
-  border: 5px solid red;
 }
 
 .splash-overlay:hover {

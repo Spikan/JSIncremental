@@ -9,6 +9,9 @@ import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { updateButtonState, updateCostDisplay } from './utils';
 import { toDecimal, gte } from '../core/numbers/migration-utils';
 
+// Direct break_eternity.js Decimal access
+const Decimal = (globalThis as any).Decimal;
+
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability(): void {
   if (typeof window === 'undefined') return;
@@ -115,13 +118,13 @@ function calculateAllCosts(): any {
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
   );
   const widerStrawsCount = toDecimal((window as any).App?.state?.getState?.()?.widerStraws || 0);
-  costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(toDecimal(1)));
+  costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(new Decimal(1)));
 
   const betterCupsBaseCost = toDecimal(
     dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400
   );
   const betterCupsCount = toDecimal((window as any).App?.state?.getState?.()?.betterCups || 0);
-  costs.betterCups = betterCupsBaseCost.multiply(betterCupsCount.add(toDecimal(1)));
+  costs.betterCups = betterCupsBaseCost.multiply(betterCupsCount.add(new Decimal(1)));
 
   const fasterDrinksUpBaseCost = toDecimal(
     dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 1500

@@ -30,10 +30,11 @@ export * from './advanced-caching';
 // Export performance tuning utilities
 export * from './performance-tuning';
 
-// Decimal is accessed via lazy loading in migration-utils
+// Explicitly export Decimal for files that need it directly
+export { Decimal } from './migration-utils';
 
 // Import isDecimal separately since it's used in the Numbers object
-import { checkIsDecimal } from './decimal-utils';
+import { isDecimal } from './decimal-utils';
 
 // Import required functions
 import {
@@ -113,8 +114,9 @@ import {
 
 // Create a unified interface for global use
 export const Numbers = {
-  // Decimal operations via lazy loading
-  isDecimal: checkIsDecimal,
+  // Direct Decimal operations - Decimal available from migration-utils.ts
+  Decimal,
+  isDecimal,
 
   // Migration utilities (with legacy aliases)
   toDecimal,

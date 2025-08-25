@@ -117,11 +117,6 @@ const BUTTON_CONFIG: {
       type: 'splash-start-btn',
       label: 'Start Game',
     },
-    forceStartGame: {
-      func: () => (window as any).forceStartGame?.(),
-      type: 'splash-start-btn',
-      label: 'Force Start Game',
-    },
     // Dev actions
     devUnlockAll: {
       func: () => (window as any).App?.systems?.dev?.unlockAll?.(),
@@ -669,25 +664,11 @@ function setupSpecialButtonHandlers(): void {
       }
     });
   }
-  // Setup splash screen handlers with proper timing
-  function setupSplashHandlers() {
-    const splashStartBtn =
-      typeof document !== 'undefined' && (document as any).querySelector
-        ? (document as any).querySelector('.splash-start-btn[data-action="startGame"]')
-        : null;
-
-    if (!splashStartBtn || !(splashStartBtn as any).addEventListener) {
-      console.log('⏳ Splash button not ready or addEventListener not available');
-      return false;
-    }
-
-    // Check if startGame is available
-    if (typeof (window as any).startGame !== 'function') {
-      console.log('⏳ startGame function not available yet, retrying...');
-      return false;
-    }
-
-    console.log('✅ Setting up splash screen event handlers...');
+  const splashStartBtn =
+    typeof document !== 'undefined' && (document as any).querySelector
+      ? (document as any).querySelector('.splash-start-btn')
+      : null;
+  if (splashStartBtn && (splashStartBtn as any).addEventListener) {
     if ((window as any).PointerEvent) {
       (splashStartBtn as any).addEventListener('pointerdown', (e: any) => {
         if (e && e.pointerType && e.pointerType === 'mouse') return;
@@ -726,27 +707,6 @@ function setupSpecialButtonHandlers(): void {
         console.warn('Failed to handle button interaction:', error);
       }
     });
-
-    return true; // Successfully set up handlers
-  }
-
-  // Try to setup splash handlers immediately
-  if (!setupSplashHandlers()) {
-    // If not ready, retry with increasing delays
-    let retryCount = 0;
-    const maxRetries = 50; // Max 5 seconds (50 * 100ms)
-    const retryInterval = () => {
-      retryCount++;
-      if (retryCount >= maxRetries) {
-        console.warn('⚠️ Failed to setup splash handlers after max retries');
-        return;
-      }
-
-      if (!setupSplashHandlers()) {
-        setTimeout(retryInterval, 100);
-      }
-    };
-    setTimeout(retryInterval, 100);
   }
   if (document && (document as any).body && (document as any).body.addEventListener) {
     if ((window as any).PointerEvent) {
@@ -1053,9 +1013,6 @@ function setupSpecialButtonHandlers(): void {
             '.splash-start-btn'
           ) as HTMLElement | null;
           if (!startEl) return;
-          // Only handle the real Start button, not the Force Start button
-          const actionAttr = startEl.getAttribute('data-action');
-          if (actionAttr !== 'startGame') return;
           if (e && e.pointerType && e.pointerType === 'mouse') return;
           markPointerHandled(startEl);
           e.preventDefault();
@@ -1076,9 +1033,6 @@ function setupSpecialButtonHandlers(): void {
         if (!(target instanceof HTMLElement)) return;
         const startEl = (target as HTMLElement).closest('.splash-start-btn') as HTMLElement | null;
         if (!startEl) return;
-        // Only handle the real Start button, not the Force Start button
-        const actionAttr = startEl.getAttribute('data-action');
-        if (actionAttr !== 'startGame') return;
         if (shouldSuppressClick(startEl)) return;
         e.preventDefault();
         e.stopPropagation();

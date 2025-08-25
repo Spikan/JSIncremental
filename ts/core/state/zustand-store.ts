@@ -8,7 +8,8 @@ import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
-// Import toDecimal for lazy loading
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
 import { toDecimal, add } from '../numbers/migration-utils';
 
 // Extended state interface with actions
@@ -16,69 +17,69 @@ interface GameStore extends GameState {
   // Actions
   actions: {
     // Resource management (support Decimal for unlimited scaling)
-    addSips: (amount: any) => void;
-    setSips: (amount: any) => void;
-    addStraws: (amount: any) => void;
-    setStraws: (amount: any) => void;
-    addCups: (amount: any) => void;
-    setCups: (amount: any) => void;
-    addSuctions: (amount: any) => void;
-    setSuctions: (amount: any) => void;
+    addSips: (_amount: any) => void;
+    setSips: (_amount: any) => void;
+    addStraws: (_amount: any) => void;
+    setStraws: (_amount: any) => void;
+    addCups: (_amount: any) => void;
+    setCups: (_amount: any) => void;
+    addSuctions: (_amount: any) => void;
+    setSuctions: (_amount: any) => void;
 
     // Upgrade management
-    addWiderStraws: (amount: any) => void;
-    setWiderStraws: (amount: any) => void;
-    addBetterCups: (amount: any) => void;
-    setBetterCups: (amount: any) => void;
-    addFasterDrinks: (amount: any) => void;
-    setFasterDrinks: (amount: any) => void;
-    addCriticalClicks: (amount: any) => void;
-    setCriticalClicks: (amount: any) => void;
+    addWiderStraws: (_amount: any) => void;
+    setWiderStraws: (_amount: any) => void;
+    addBetterCups: (_amount: any) => void;
+    setBetterCups: (_amount: any) => void;
+    addFasterDrinks: (_amount: any) => void;
+    setFasterDrinks: (_amount: any) => void;
+    addCriticalClicks: (_amount: any) => void;
+    setCriticalClicks: (_amount: any) => void;
 
     // Production stats (support Decimal for high production rates)
-    setStrawSPD: (spd: any) => void;
-    setCupSPD: (spd: any) => void;
-    setSPD: (spd: any) => void;
+    setStrawSPD: (_spd: any) => void;
+    setCupSPD: (_spd: any) => void;
+    setSPD: (_spd: any) => void;
 
     // Drink system
-    setDrinkRate: (rate: number) => void;
-    setDrinkProgress: (progress: number) => void;
-    setLastDrinkTime: (time: number) => void;
+    setDrinkRate: (_rate: number) => void;
+    setDrinkProgress: (_progress: number) => void;
+    setLastDrinkTime: (_time: number) => void;
 
     // Session and persistence
-    setLastSaveTime: (time: number) => void;
-    setSessionStartTime: (time: number) => void;
-    addTotalPlayTime: (time: number) => void;
-    setTotalPlayTime: (time: number) => void;
-    addTotalSipsEarned: (amount: number) => void;
-    setTotalSipsEarned: (amount: number) => void;
-    addTotalClicks: (amount: number) => void;
-    setTotalClicks: (amount: number) => void;
-    setHighestSipsPerSecond: (sps: number) => void;
-    setCurrentClickStreak: (streak: number) => void;
-    setBestClickStreak: (streak: number) => void;
+    setLastSaveTime: (_time: number) => void;
+    setSessionStartTime: (_time: number) => void;
+    addTotalPlayTime: (_time: number) => void;
+    setTotalPlayTime: (_time: number) => void;
+    addTotalSipsEarned: (_amount: number) => void;
+    setTotalSipsEarned: (_amount: number) => void;
+    addTotalClicks: (_amount: number) => void;
+    setTotalClicks: (_amount: number) => void;
+    setHighestSipsPerSecond: (_sps: number) => void;
+    setCurrentClickStreak: (_streak: number) => void;
+    setBestClickStreak: (_streak: number) => void;
 
     // Click/crit systems
-    setCriticalClickChance: (chance: number) => void;
-    setCriticalClickMultiplier: (multiplier: number) => void;
-    setSuctionClickBonus: (bonus: number) => void;
+    setCriticalClickChance: (_chance: number) => void;
+    setCriticalClickMultiplier: (_multiplier: number) => void;
+    setSuctionClickBonus: (_bonus: number) => void;
 
     // Upgrade counters
-    setFasterDrinksUpCounter: (count: number) => void;
-    setCriticalClickUpCounter: (count: number) => void;
+    setFasterDrinksUpCounter: (_count: number) => void;
+    setCriticalClickUpCounter: (_count: number) => void;
 
     // Level management
-    setLevel: (level: number) => void;
-    addLevel: (amount: number) => void;
+    setLevel: (_level: number) => void;
+    addLevel: (_amount: number) => void;
 
     // Options management
-    updateOptions: (options: Partial<GameOptions>) => void;
-    setOption: <K extends keyof GameOptions>(key: K, value: GameOptions[K]) => void;
+    updateOptions: (_options: Partial<GameOptions>) => void;
+    setOption: <K extends keyof GameOptions>(_key: K, _value: GameOptions[K]) => void;
 
     // Bulk operations
-    setState: (partial: Partial<GameState>) => void;
+    setState: (_partial: Partial<GameState>) => void;
     resetState: () => void;
-    loadState: (state: Partial<GameState>) => void;
+    loadState: (_state: Partial<GameState>) => void;
   };
 }
 
@@ -200,36 +201,36 @@ export const useGameStore = create<GameStore>()(
             })),
 
           // Click/crit systems
-          setCriticalClickChance: (chance: number) => set({ criticalClickChance: chance }),
-          setCriticalClickMultiplier: (multiplier: any) =>
-            set({ criticalClickMultiplier: toDecimal(multiplier) }),
-          setSuctionClickBonus: (bonus: any) => set({ suctionClickBonus: toDecimal(bonus) }),
+          setCriticalClickChance: (_chance: number) => set({ criticalClickChance: _chance }),
+          setCriticalClickMultiplier: (_multiplier: any) =>
+            set({ criticalClickMultiplier: toDecimal(_multiplier) }),
+          setSuctionClickBonus: (_bonus: any) => set({ suctionClickBonus: toDecimal(_bonus) }),
 
           // Upgrade counters
-          setFasterDrinksUpCounter: (count: any) =>
-            set({ fasterDrinksUpCounter: toDecimal(count) }),
-          setCriticalClickUpCounter: (count: any) =>
-            set({ criticalClickUpCounter: toDecimal(count) }),
+          setFasterDrinksUpCounter: (_count: any) =>
+            set({ fasterDrinksUpCounter: toDecimal(_count) }),
+          setCriticalClickUpCounter: (_count: any) =>
+            set({ criticalClickUpCounter: toDecimal(_count) }),
 
           // Level management
-          setLevel: (level: any) => set({ level: toDecimal(level) }),
-          addLevel: (amount: number) =>
-            set(state => ({ level: state.level.add(toDecimal(amount)) })),
+          setLevel: (_level: any) => set({ level: toDecimal(_level) }),
+          addLevel: (_amount: number) =>
+            set(state => ({ level: state.level.add(toDecimal(_amount)) })),
 
           // Options management
-          updateOptions: (options: Partial<GameOptions>) =>
+          updateOptions: (_options: Partial<GameOptions>) =>
             set(state => ({
-              options: { ...state.options, ...options },
+              options: { ...state.options, ..._options },
             })),
-          setOption: <K extends keyof GameOptions>(key: K, value: GameOptions[K]) =>
+          setOption: <K extends keyof GameOptions>(_key: K, _value: GameOptions[K]) =>
             set(state => ({
-              options: { ...state.options, [key]: value },
+              options: { ...state.options, [_key]: _value },
             })),
 
           // Bulk operations
-          setState: (partial: Partial<GameState>) => set(state => ({ ...state, ...partial })),
+          setState: (_partial: Partial<GameState>) => set(state => ({ ...state, ..._partial })),
           resetState: () => set(defaultState),
-          loadState: (state: Partial<GameState>) => set(current => ({ ...current, ...state })),
+          loadState: (_state: Partial<GameState>) => set(current => ({ ...current, ..._state })),
         },
       })),
       {
@@ -288,7 +289,7 @@ export const useGameStore = create<GameStore>()(
           const parsed = JSON.parse(str, (_key, value) => {
             if (value && typeof value === 'object' && value.__largeNumber) {
               // Restore Decimal from string representation
-              return toDecimal(value.value);
+              return new Decimal(value.value);
             }
             return value;
           });
@@ -474,9 +475,9 @@ export const useTotalResources = () => {
       suctions,
       total: (state: GameStore) =>
         state.sips
-          ?.add(state.straws || toDecimal(0))
-          .add(state.cups || toDecimal(0))
-          .add(state.suctions || toDecimal(0))
+          ?.add(state.straws || new Decimal(0))
+          .add(state.cups || new Decimal(0))
+          .add(state.suctions || new Decimal(0))
           .toString() || '0',
     }),
     [sips, straws, cups, suctions]
@@ -494,7 +495,7 @@ export const useProductionStats = () => {
       strawSPD,
       cupSPD,
       totalSPD: (state: GameStore) =>
-        state.strawSPD?.add(state.cupSPD || toDecimal(0)).toString() || '0',
+        state.strawSPD?.add(state.cupSPD || new Decimal(0)).toString() || '0',
     }),
     [spd, strawSPD, cupSPD]
   );
@@ -513,7 +514,7 @@ export const useClickStats = () => {
       criticalClickMultiplier,
       suctionClickBonus,
       effectiveMultiplier: (state: GameStore) =>
-        state.criticalClickMultiplier?.add(state.suctionClickBonus || toDecimal(0)).toString() ||
+        state.criticalClickMultiplier?.add(state.suctionClickBonus || new Decimal(0)).toString() ||
         '0',
     }),
     [totalClicks, criticalClickChance, criticalClickMultiplier, suctionClickBonus]

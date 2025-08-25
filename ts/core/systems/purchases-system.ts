@@ -10,7 +10,8 @@
 import { nextCupCost, nextStrawCost } from '../rules/purchases.ts';
 import { recalcProduction } from './resources.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
-// Import toDecimal for lazy loading
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
 import { toDecimal, gte } from '../numbers/migration-utils';
 import { DecimalType } from '../numbers/decimal-utils';
 
@@ -59,7 +60,7 @@ export function purchaseStraw({
     cost = nextStrawCost(strawsLarge, baseCost, scaling);
 
     // Validate cost calculation
-    if (!cost || !cost.isFinite() || cost.lte(toDecimal(0))) {
+    if (!cost || !cost.isFinite() || cost.lte(new Decimal(0))) {
       console.warn('🚫 purchaseStraw: Invalid cost calculation:', cost.toString());
       return null;
     }
@@ -75,7 +76,7 @@ export function purchaseStraw({
       return null;
     }
 
-    newStraws = strawsLarge.add(toDecimal(1));
+    newStraws = strawsLarge.add(new Decimal(1));
 
     // Recalculate production with error handling
     const productionResult = recalcProduction({
@@ -153,7 +154,7 @@ export function purchaseCup({
     cost = nextCupCost(cupsLarge, baseCost, scaling);
 
     // Validate cost calculation
-    if (!cost || !isFinite(Number(cost.toString())) || cost.lte(toDecimal(0))) {
+    if (!cost || !isFinite(Number(cost.toString())) || cost.lte(new Decimal(0))) {
       console.warn('🚫 purchaseCup: Invalid cost calculation:', cost?.toString());
       return null;
     }
@@ -169,7 +170,7 @@ export function purchaseCup({
       return null;
     }
 
-    newCups = cupsLarge.add(toDecimal(1));
+    newCups = cupsLarge.add(new Decimal(1));
 
     // Recalculate production with error handling
     const productionResult = recalcProduction({
@@ -230,8 +231,8 @@ export function purchaseWiderStraws({
   const widerStrawsLarge = toDecimal(widerStraws);
   const betterCupsLarge = toDecimal(betterCups);
 
-  const baseCostLarge = toDecimal(baseCost);
-  const newWiderStrawsLarge = widerStrawsLarge.add(toDecimal(1));
+  const baseCostLarge = new Decimal(baseCost);
+  const newWiderStrawsLarge = widerStrawsLarge.add(new Decimal(1));
   const cost = baseCostLarge.multiply(newWiderStrawsLarge);
 
   // Check affordability using Decimal comparison
@@ -276,8 +277,8 @@ export function purchaseBetterCups({
   const widerStrawsLarge = toDecimal(widerStraws);
   const betterCupsLarge = toDecimal(betterCups);
 
-  const baseCostLarge = toDecimal(baseCost);
-  const newBetterCupsLarge = betterCupsLarge.add(toDecimal(1));
+  const baseCostLarge = new Decimal(baseCost);
+  const newBetterCupsLarge = betterCupsLarge.add(new Decimal(1));
   const cost = baseCostLarge.multiply(newBetterCupsLarge);
 
   // Check affordability using Decimal comparison
@@ -314,16 +315,16 @@ export function purchaseSuction({
   const sipsLarge = toDecimal(sips);
   const suctionsLarge = toDecimal(suctions);
 
-  const baseCostLarge = toDecimal(baseCost);
-  const scalingLarge = toDecimal(scaling);
+  const baseCostLarge = new Decimal(baseCost);
+  const scalingLarge = new Decimal(scaling);
   // Use direct Decimal pow for extreme values instead of toSafeNumber
   const cost = baseCostLarge.multiply(scalingLarge.pow(suctionsLarge));
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newSuctions = suctionsLarge.add(toDecimal(1));
-  const suctionClickBonus = toDecimal(config.SUCTION_CLICK_BONUS ?? 0).multiply(newSuctions);
+  const newSuctions = suctionsLarge.add(new Decimal(1));
+  const suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS ?? 0).multiply(newSuctions);
 
   return {
     spent: cost,
@@ -345,14 +346,14 @@ export function upgradeSuction({
   const sipsLarge = toDecimal(sips);
   const counterLarge = toDecimal(suctionUpCounter);
 
-  const baseCostLarge = toDecimal(config.SUCTION_UPGRADE_BASE_COST ?? 0);
+  const baseCostLarge = new Decimal(config.SUCTION_UPGRADE_BASE_COST ?? 0);
   const cost = baseCostLarge.multiply(counterLarge);
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newCounter = counterLarge.add(toDecimal(1));
-  const suctionClickBonus = toDecimal(config.SUCTION_CLICK_BONUS ?? 0).multiply(newCounter);
+  const newCounter = counterLarge.add(new Decimal(1));
+  const suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS ?? 0).multiply(newCounter);
 
   return {
     spent: cost,
@@ -376,15 +377,15 @@ export function purchaseFasterDrinks({
   const sipsLarge = toDecimal(sips);
   const fasterDrinksLarge = toDecimal(fasterDrinks);
 
-  const baseCostLarge = toDecimal(baseCost);
-  const scalingLarge = toDecimal(scaling);
+  const baseCostLarge = new Decimal(baseCost);
+  const scalingLarge = new Decimal(scaling);
   // Use direct Decimal pow for extreme values instead of toSafeNumber
   const cost = baseCostLarge.multiply(scalingLarge.pow(fasterDrinksLarge));
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newFasterDrinks = fasterDrinksLarge.add(toDecimal(1));
+  const newFasterDrinks = fasterDrinksLarge.add(new Decimal(1));
 
   return {
     spent: cost,
@@ -406,13 +407,13 @@ export function upgradeFasterDrinks({
   const sipsLarge = toDecimal(sips);
   const counterLarge = toDecimal(fasterDrinksUpCounter);
 
-  const baseLarge = toDecimal(base);
+  const baseLarge = new Decimal(base);
   const cost = baseLarge.multiply(counterLarge);
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newCounter = counterLarge.add(toDecimal(1));
+  const newCounter = counterLarge.add(new Decimal(1));
 
   return {
     spent: cost,
@@ -438,8 +439,8 @@ export function purchaseCriticalClick({
   const criticalClicksLarge = toDecimal(criticalClicks);
   const criticalClickChanceLarge = toDecimal(criticalClickChance);
 
-  const baseCostLarge = toDecimal(baseCost);
-  const scalingLarge = toDecimal(scaling);
+  const baseCostLarge = new Decimal(baseCost);
+  const scalingLarge = new Decimal(scaling);
   const cost = baseCostLarge.multiply(
     // Use direct Decimal pow for extreme values
     scalingLarge.pow(criticalClicksLarge)
@@ -448,9 +449,9 @@ export function purchaseCriticalClick({
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newCriticalClicks = criticalClicksLarge.add(toDecimal(1));
+  const newCriticalClicks = criticalClicksLarge.add(new Decimal(1));
   const newChance = criticalClickChanceLarge.add(
-    toDecimal(config.CRITICAL_CLICK_CHANCE_INCREMENT ?? 0)
+    new Decimal(config.CRITICAL_CLICK_CHANCE_INCREMENT ?? 0)
   );
 
   return {
@@ -476,15 +477,15 @@ export function upgradeCriticalClick({
   const counterLarge = toDecimal(criticalClickUpCounter);
   const multiplierLarge = toDecimal(criticalClickMultiplier);
 
-  const baseCostLarge = toDecimal(config.CRITICAL_CLICK_UPGRADE_BASE_COST ?? 0);
+  const baseCostLarge = new Decimal(config.CRITICAL_CLICK_UPGRADE_BASE_COST ?? 0);
   const cost = baseCostLarge.multiply(counterLarge);
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newCounter = counterLarge.add(toDecimal(1));
+  const newCounter = counterLarge.add(new Decimal(1));
   const newMultiplier = multiplierLarge.add(
-    toDecimal(config.CRITICAL_CLICK_MULTIPLIER_INCREMENT ?? 0)
+    new Decimal(config.CRITICAL_CLICK_MULTIPLIER_INCREMENT ?? 0)
   );
 
   return {
@@ -512,16 +513,16 @@ export function levelUp({
   const levelLarge = toDecimal(level);
   const sipsPerDrinkLarge = toDecimal(sipsPerDrink);
 
-  const baseLarge = toDecimal(base);
-  const scalingLarge = toDecimal(scaling);
+  const baseLarge = new Decimal(base);
+  const scalingLarge = new Decimal(scaling);
   // Use direct Decimal pow for extreme values instead of toSafeNumber
   const cost = baseLarge.multiply(scalingLarge.pow(levelLarge));
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newLevel = levelLarge.add(toDecimal(1));
-  const sipsGained = toDecimal(config.LEVEL_UP_SIPS_MULTIPLIER ?? 1).multiply(sipsPerDrinkLarge);
+  const newLevel = levelLarge.add(new Decimal(1));
+  const sipsGained = new Decimal(config.LEVEL_UP_SIPS_MULTIPLIER ?? 1).multiply(sipsPerDrinkLarge);
   const sipsDelta = sipsGained.subtract(cost);
 
   return {
@@ -637,7 +638,7 @@ function subtractFromWallet(spent: number | DecimalType): any {
     next = current.subtract(spent);
   } else {
     // For regular numbers, convert to Decimal
-    next = current.subtract(toDecimal(spent || 0));
+    next = current.subtract(new Decimal(spent || 0));
   }
 
   w.sips = next;
@@ -680,9 +681,9 @@ export const execute = {
     try {
       const actions = w.App?.state?.actions;
       // Use sanitized values for state update
-      const sanitizedStrawSPD = sanitizeDecimal(result.strawSPD, toDecimal('0.6'));
-      const sanitizedCupSPD = sanitizeDecimal(result.cupSPD, toDecimal('1.2'));
-      const sanitizedSPD = sanitizeDecimal(result.sipsPerDrink, toDecimal('1'));
+      const sanitizedStrawSPD = sanitizeDecimal(result.strawSPD, new Decimal('0.6'));
+      const sanitizedCupSPD = sanitizeDecimal(result.cupSPD, new Decimal('1.2'));
+      const sanitizedSPD = sanitizeDecimal(result.sipsPerDrink, new Decimal('1'));
 
       actions?.setSips?.(w.sips);
       actions?.setStraws?.(result.straws); // Use original result, sanitization happens in window.straws

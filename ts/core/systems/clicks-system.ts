@@ -1,6 +1,7 @@
 // Clicks system: centralizes click tracking and streak logic with Decimal support (TypeScript)
 
-// Import toDecimal for lazy loading
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
 import { toDecimal } from '../numbers/migration-utils';
 
 export function trackClick() {
@@ -72,8 +73,8 @@ export async function handleSodaClick(multiplier: number = 1) {
     const multiplierValue = toDecimal(multiplier || 1);
 
     // Base click value (1 sip) + suction bonus (0.3 per suction level)
-    const baseClick = toDecimal(1);
-    const suctionBonus = suctionValue.multiply(toDecimal(0.3));
+    const baseClick = new Decimal(1);
+    const suctionBonus = suctionValue.multiply(new Decimal(0.3));
     const totalClickValue = baseClick.add(suctionBonus).multiply(multiplierValue);
 
     // Add to sips with Decimal arithmetic
@@ -125,7 +126,7 @@ export async function handleSodaClick(multiplier: number = 1) {
       );
 
       // Calculate critical bonus: totalClickValue * (criticalMultiplier - 1)
-      const criticalBonus = totalClickValue.multiply(criticalMultiplier.subtract(toDecimal(1)));
+      const criticalBonus = totalClickValue.multiply(criticalMultiplier.subtract(new Decimal(1)));
 
       // Add critical bonus to sips
       const currentSips = toDecimal(w.sips || 0);

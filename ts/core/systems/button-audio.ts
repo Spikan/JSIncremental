@@ -32,18 +32,18 @@ function playTone({
 }) {
   if (!audioContext) return;
   const osc = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
+  const g = audioContext.createGain();
   osc.type = type as OscillatorType;
-  osc.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+  osc.connect(g);
+  g.connect(audioContext.destination);
   const now = audioContext.currentTime + when;
   const end = now + duration;
   osc.frequency.setValueAtTime(freqStart, now);
   if (typeof freqEnd === 'number' && freqEnd >= 0) {
     osc.frequency.exponentialRampToValueAtTime(Math.max(1, freqEnd), end);
   }
-  gainNode.gain.setValueAtTime(gain, now);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, end);
+  g.gain.setValueAtTime(gain, now);
+  g.gain.exponentialRampToValueAtTime(0.001, end);
   try {
     osc.start(now);
     osc.stop(end);

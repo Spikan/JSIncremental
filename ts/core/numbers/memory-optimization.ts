@@ -1,7 +1,7 @@
 // Memory optimization utilities for break_eternity.js extreme value operations
 // Provides intelligent memory management and performance optimization
 
-import { checkIsDecimal, DecimalType } from './decimal-utils';
+import { isDecimal, DecimalType } from './decimal-utils';
 import { isExtremeValue } from './safe-conversion';
 import { ExtremeValueMonitor } from './error-recovery';
 
@@ -43,7 +43,7 @@ class DecimalMemoryPool {
    * Return a Decimal to the pool for reuse
    */
   return(decimal: DecimalType): void {
-    if (!checkIsDecimal(decimal)) return;
+    if (!isDecimal(decimal)) return;
 
     const key = decimal.toString();
     if (!this.pool.has(key)) {
@@ -232,7 +232,7 @@ export class MemoryAwareCache<K, V> {
   }
 
   private estimateMemoryUsage(value: V): number {
-    if (checkIsDecimal(value)) {
+    if (isDecimal(value)) {
       // Estimate based on string representation length
       return (value as any).toString().length * 2; // Rough estimate
     }

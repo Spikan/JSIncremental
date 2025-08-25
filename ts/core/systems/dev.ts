@@ -6,7 +6,8 @@
 // MEMORY: PRESERVE FULL DECIMAL PRECISION IN ALL DEV OPERATIONS
 // MEMORY: EXTREME VALUE TESTING IS A CORE FEATURE - DO NOT SANITIZE
 
-// Import toDecimal for lazy loading
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
 import { toDecimal, add } from '../numbers/migration-utils';
 
 type Win = typeof window & {
@@ -275,7 +276,7 @@ export function addMassiveSips(): boolean {
     if (!w.sips) return false;
 
     // Create a Decimal with 1e500 sips (way beyond JavaScript limits)
-    const massiveAmount = toDecimal('1e500');
+    const massiveAmount = new Decimal('1e500');
     console.log(`Adding ${massiveAmount.toString()} sips`);
 
     // Add to current sips using Decimal system
@@ -316,7 +317,7 @@ export function addHugeStraws(): boolean {
     if (typeof w.straws === 'undefined' || w.straws === null) return false;
 
     // Create a Decimal with 1e750 straws (demonstrating break_eternity.js)
-    const hugeAmount = toDecimal('1e750');
+    const hugeAmount = new Decimal('1e750');
     console.log(`Adding ${hugeAmount.toString()} straws`);
 
     // Add to current straws using Decimal system
@@ -363,7 +364,7 @@ export function addMassiveCups(): boolean {
     if (typeof w.cups === 'undefined' || w.cups === null) return false;
 
     // Create a Decimal with 1e1000 cups (extreme break_eternity.js test)
-    const massiveAmount = toDecimal('1e1000');
+    const massiveAmount = new Decimal('1e1000');
     console.log(`Adding ${massiveAmount.toString()} cups`);
 
     // Add to current cups using Decimal system
@@ -407,7 +408,7 @@ export function addExtremeResources(): boolean {
     const w = window as Win;
     console.log('🚀 Adding extreme resources (1e2000 each)...');
 
-    const extremeAmount = toDecimal('1e2000');
+    const extremeAmount = new Decimal('1e2000');
 
     // Add sips
     if (typeof w.sips !== 'undefined') {
@@ -510,7 +511,7 @@ export function testScientificNotation(): boolean {
     testAmounts.forEach((amount, index) => {
       setTimeout(() => {
         if (w.sips) {
-          const largeAmount = toDecimal(amount);
+          const largeAmount = new Decimal(amount);
           const currentSips = toDecimal(w.sips);
           const newSips = add(currentSips, largeAmount);
 
@@ -547,9 +548,9 @@ export function resetAllResources(): boolean {
 
     // Always update Zustand state first (this is what UI reads from)
     w.App?.state?.setState?.({
-      sips: toDecimal(0),
-      straws: toDecimal(0),
-      cups: toDecimal(0),
+      sips: new Decimal(0),
+      straws: new Decimal(0),
+      cups: new Decimal(0),
     });
 
     // Also update window properties for compatibility
