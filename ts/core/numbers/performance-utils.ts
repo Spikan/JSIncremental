@@ -170,14 +170,7 @@ export function batchCalculateStrawSPD(
 
     result = baseValue.multiply(upgradeMultiplier);
 
-    // Apply basic scaling for very large numbers
-    if (result.gte(new Decimal('1e100'))) {
-      const excess = result.subtract(new Decimal('1e100'));
-      const scaledExcess = memoizedPow(new Decimal('1.001'), excess.toNumber());
-      result = new Decimal('1e100').add(
-        excess.multiply(new Decimal('0.95')).multiply(scaledExcess)
-      );
-    }
+    // No artificial caps - break_eternity.js handles all scaling
 
     economyCalculationCache.set(key, result);
     return result;
@@ -209,18 +202,8 @@ export function optimizedSynergyCalculation(
   const strawContribution = sSPD.multiply(straws);
   const cupContribution = cSPD.multiply(cups);
 
-  // Optimized synergy calculation
-  let synergyMultiplier = new Decimal(1);
-  if (straws.gte(new Decimal('100')) && cups.gte(new Decimal('100'))) {
-    const strawRatio = straws.divide(new Decimal('100'));
-    const cupRatio = cups.divide(new Decimal('100'));
-    const synergyRatio = strawRatio.multiply(cupRatio);
-
-    // Use more efficient calculation for synergy
-    synergyMultiplier = synergyMultiplier.add(
-      new Decimal('1.1').multiply(memoizedPow(new Decimal('0.999'), synergyRatio.toNumber()))
-    );
-  }
+  // NO artificial synergy calculations - break_eternity.js handles all scaling naturally
+  const synergyMultiplier = new Decimal(1);
 
   result = strawContribution.add(cupContribution).multiply(synergyMultiplier);
   economyCalculationCache.set(key, result);

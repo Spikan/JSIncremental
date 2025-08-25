@@ -43,16 +43,16 @@ export function nextStrawCostLegacy(
   strawCount: number | string,
   baseCost: number | string,
   scaling: number | string
-): number {
-  // Preserve extreme values - direct toNumber
-  return Math.floor(nextStrawCost(strawCount, baseCost, scaling).toNumber());
+): DecimalType {
+  // Return Decimal directly - no JavaScript number conversion
+  return nextStrawCost(strawCount, baseCost, scaling);
 }
 
 export function nextCupCostLegacy(
   cupCount: number | string,
   baseCost: number | string,
   scaling: number | string
-): number {
-  // Preserve extreme values - direct toNumber
-  return Math.floor(nextCupCost(cupCount, baseCost, scaling).toNumber());
+): DecimalType {
+  // Return Decimal directly - no JavaScript number conversion
+  return nextCupCost(cupCount, baseCost, scaling);
 }

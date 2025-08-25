@@ -208,24 +208,14 @@ export const GameState = {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
     const sipsValue = st && typeof st.sips !== 'undefined' ? st.sips : (window as any).sips;
-    // Preserve extreme values - return the actual value if extreme
+    // Direct Decimal to number conversion - no safety nets
     if (sipsValue && typeof sipsValue.toNumber === 'function') {
-      try {
-        // For extreme values, check if toNumber() would lose precision
-        if (!sipsValue.isFinite()) {
-          // Return 0 for non-finite values, but preserve the magnitude check
-          return 0;
-        }
-        const rawNumber = sipsValue.toNumber();
-        if (Number.isFinite(rawNumber)) {
-          return rawNumber;
-        } else {
-          // For extreme values, return the maximum representable number
-          return sipsValue.isPositive() ? Number.MAX_VALUE : -Number.MAX_VALUE;
-        }
-      } catch (error) {
-        console.warn('Failed to convert sips to number:', error);
-        return 0;
+      const rawNumber = sipsValue.toNumber();
+      if (Number.isFinite(rawNumber)) {
+        return rawNumber;
+      } else {
+        // For extreme values, return the maximum representable number
+        return sipsValue.isPositive() ? Number.MAX_VALUE : -Number.MAX_VALUE;
       }
     }
     return Number(sipsValue || 0);
@@ -241,19 +231,10 @@ export const GameState = {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
     const spdValue = st && typeof st.spd !== 'undefined' ? st.spd : (window as any).spd;
-    // Convert Decimal to number safely
+    // Direct Decimal to number conversion
     if (spdValue && typeof spdValue.toNumber === 'function') {
-      try {
-        // For extreme values, use direct calculation
-        const numValue =
-          spdValue && typeof spdValue.toNumber === 'function'
-            ? spdValue.toNumber()
-            : Number(spdValue || 0);
-        return Number.isFinite(numValue) ? numValue : 0;
-      } catch (error) {
-        console.warn('Failed to convert spd to number:', error);
-        return 0;
-      }
+      const numValue = spdValue.toNumber();
+      return Number.isFinite(numValue) ? numValue : Number.MAX_VALUE;
     }
     return Number(spdValue || 0);
   },
