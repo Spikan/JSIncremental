@@ -410,6 +410,7 @@ export function updatePurchasedCounts(): void {
   if (totalStrawSPDElement) {
     const straws = state.straws || 0;
     const strawSPD = state.strawSPD || 0;
+
     // Use toDecimal helper for better memory efficiency
     const strawsLarge = toDecimal(straws);
     const strawSPDLarge = toDecimal(strawSPD);
@@ -447,6 +448,7 @@ export function updatePurchasedCounts(): void {
   if (totalCupSPDElement) {
     const cups = state.cups || 0;
     const cupSPD = state.cupSPD || 0;
+
     // Use toDecimal helper for better memory efficiency
     const cupsLarge = toDecimal(cups);
     const cupSPDLarge = toDecimal(cupSPD);
