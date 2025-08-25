@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Test script to verify drink system fix works with extreme values
 // This should be run in a browser environment where break_eternity.js is loaded
 
@@ -74,8 +75,7 @@ function toDecimal(value) {
 // Test the fixed drink system logic
 function testDrinkSystemFix() {
   console.log('\n🔧 Testing Fixed Drink System Logic');
-
-  const now = Date.now();
+  
   const drinkRate = 1000;
   const rateInSeconds = drinkRate / 1000;
 
