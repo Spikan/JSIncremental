@@ -71,42 +71,63 @@ function calculateAllCosts(): any {
   const { upgrades: dataUp, config } = getUpgradesAndConfig();
   const costs: any = {};
 
-  // Straw cost - use LargeNumber calculation
+  // Straw cost - use LargeNumber calculation with extreme value protection
   const strawBaseCost = toLargeNumber(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
   const strawScaling = toLargeNumber(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
   const strawCount = toLargeNumber((window as any).App?.state?.getState?.()?.straws || 0);
 
-  // Use safe exponent conversion for pow()
-  const strawExponent = Number.isFinite((strawCount as any).toNumber?.())
-    ? (strawCount as any).toNumber()
-    : 0;
+  // Use safe exponent conversion with cap for extreme values
+  let strawExponent = 0;
+  try {
+    const rawExponent = (strawCount as any).toNumber?.();
+    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
+      // Cap exponent to prevent astronomical costs from extreme values
+      strawExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    }
+  } catch (error) {
+    console.warn('🚫 calculateAllCosts: Error calculating straw exponent:', error);
+  }
   costs.straw = strawBaseCost.multiply(strawScaling.pow(strawExponent));
 
-  // Cup cost - use LargeNumber calculation
+  // Cup cost - use LargeNumber calculation with extreme value protection
   const cupBaseCost = toLargeNumber(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
   const cupScaling = toLargeNumber(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
   const cupCount = toLargeNumber((window as any).App?.state?.getState?.()?.cups || 0);
 
-  // Use safe exponent conversion for pow()
-  const cupExponent = Number.isFinite((cupCount as any).toNumber?.())
-    ? (cupCount as any).toNumber()
-    : 0;
+  // Use safe exponent conversion with cap for extreme values
+  let cupExponent = 0;
+  try {
+    const rawExponent = (cupCount as any).toNumber?.();
+    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
+      // Cap exponent to prevent astronomical costs from extreme values
+      cupExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    }
+  } catch (error) {
+    console.warn('🚫 calculateAllCosts: Error calculating cup exponent:', error);
+  }
   costs.cup = cupBaseCost.multiply(cupScaling.pow(cupExponent));
 
-  // Suction cost - use LargeNumber calculation
+  // Suction cost - use LargeNumber calculation with extreme value protection
   const suctionBaseCost = toLargeNumber(
     dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40
   );
   const suctionScaling = toLargeNumber(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
   const suctionCount = toLargeNumber((window as any).App?.state?.getState?.()?.suctions || 0);
 
-  // Use safe exponent conversion for pow()
-  const suctionExponent = Number.isFinite((suctionCount as any).toNumber?.())
-    ? (suctionCount as any).toNumber()
-    : 0;
+  // Use safe exponent conversion with cap for extreme values
+  let suctionExponent = 0;
+  try {
+    const rawExponent = (suctionCount as any).toNumber?.();
+    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
+      // Cap exponent to prevent astronomical costs from extreme values
+      suctionExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    }
+  } catch (error) {
+    console.warn('🚫 calculateAllCosts: Error calculating suction exponent:', error);
+  }
   costs.suction = suctionBaseCost.multiply(suctionScaling.pow(suctionExponent));
 
-  // Faster drinks cost - use LargeNumber calculation
+  // Faster drinks cost - use LargeNumber calculation with extreme value protection
   const fasterDrinksBaseCost = toLargeNumber(
     dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST ?? 80
   );
@@ -117,13 +138,20 @@ function calculateAllCosts(): any {
     (window as any).App?.state?.getState?.()?.fasterDrinks || 0
   );
 
-  // Use safe exponent conversion for pow()
-  const fasterDrinksExponent = Number.isFinite((fasterDrinksCount as any).toNumber?.())
-    ? (fasterDrinksCount as any).toNumber()
-    : 0;
+  // Use safe exponent conversion with cap for extreme values
+  let fasterDrinksExponent = 0;
+  try {
+    const rawExponent = (fasterDrinksCount as any).toNumber?.();
+    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
+      // Cap exponent to prevent astronomical costs from extreme values
+      fasterDrinksExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    }
+  } catch (error) {
+    console.warn('🚫 calculateAllCosts: Error calculating fasterDrinks exponent:', error);
+  }
   costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksExponent));
 
-  // Critical click cost - use LargeNumber calculation
+  // Critical click cost - use LargeNumber calculation with extreme value protection
   const criticalClickBaseCost = toLargeNumber(
     dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST ?? 60
   );
@@ -134,10 +162,17 @@ function calculateAllCosts(): any {
     (window as any).App?.state?.getState?.()?.criticalClicks || 0
   );
 
-  // Use safe exponent conversion for pow()
-  const criticalClickExponent = Number.isFinite((criticalClickCount as any).toNumber?.())
-    ? (criticalClickCount as any).toNumber()
-    : 0;
+  // Use safe exponent conversion with cap for extreme values
+  let criticalClickExponent = 0;
+  try {
+    const rawExponent = (criticalClickCount as any).toNumber?.();
+    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
+      // Cap exponent to prevent astronomical costs from extreme values
+      criticalClickExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    }
+  } catch (error) {
+    console.warn('🚫 calculateAllCosts: Error calculating criticalClick exponent:', error);
+  }
   costs.criticalClick = criticalClickBaseCost.multiply(
     criticalClickScaling.pow(criticalClickExponent)
   );
