@@ -228,10 +228,27 @@ export function updateAchievementStats(): void {
 
 // Update purchased item counts in shop displays
 export function updatePurchasedCounts(): void {
-  if (typeof window === 'undefined') return;
+  console.log('🔄 updatePurchasedCounts called');
+
+  if (typeof window === 'undefined') {
+    console.log('❌ window is undefined');
+    return;
+  }
 
   const state = (window as any).App?.state?.getState?.();
-  if (!state) return;
+  if (!state) {
+    console.log('❌ no state found');
+    return;
+  }
+
+  console.log('📊 Current state:', {
+    straws: state.straws,
+    cups: state.cups,
+    widerStraws: state.widerStraws,
+    betterCups: state.betterCups,
+    suctions: state.suctions,
+    criticalClicks: state.criticalClicks
+  });
 
   // Update straws purchased count
   const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
@@ -240,6 +257,9 @@ export function updatePurchasedCounts(): void {
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
     strawsPurchasedElement.textContent = formatNumber(straws);
+    console.log('✅ Updated straws:', straws, 'element:', strawsPurchasedElement);
+  } else {
+    console.log('❌ strawsPurchased element not found');
   }
 
   // Update cups purchased count
@@ -247,6 +267,9 @@ export function updatePurchasedCounts(): void {
   if (cupsPurchasedElement) {
     const cups = state.cups || 0;
     cupsPurchasedElement.textContent = formatNumber(cups);
+    console.log('✅ Updated cups:', cups, 'element:', cupsPurchasedElement);
+  } else {
+    console.log('❌ cupsPurchased element not found');
   }
 
   // Update wider straws purchased count
@@ -256,6 +279,9 @@ export function updatePurchasedCounts(): void {
   if (widerStrawsPurchasedElement) {
     const widerStraws = state.widerStraws || 0;
     widerStrawsPurchasedElement.textContent = formatNumber(widerStraws);
+    console.log('✅ Updated widerStraws:', widerStraws, 'element:', widerStrawsPurchasedElement);
+  } else {
+    console.log('❌ widerStrawsPurchased element not found');
   }
 
   // Update better cups purchased count
@@ -265,6 +291,9 @@ export function updatePurchasedCounts(): void {
   if (betterCupsPurchasedElement) {
     const betterCups = state.betterCups || 0;
     betterCupsPurchasedElement.textContent = formatNumber(betterCups);
+    console.log('✅ Updated betterCups:', betterCups, 'element:', betterCupsPurchasedElement);
+  } else {
+    console.log('❌ betterCupsPurchased element not found');
   }
 
   // Update suctions purchased count
@@ -274,6 +303,9 @@ export function updatePurchasedCounts(): void {
   if (suctionsPurchasedElement) {
     const suctions = state.suctions || 0;
     suctionsPurchasedElement.textContent = formatNumber(suctions);
+    console.log('✅ Updated suctions:', suctions, 'element:', suctionsPurchasedElement);
+  } else {
+    console.log('❌ suctionsPurchased element not found');
   }
 
   // Update critical clicks purchased count
@@ -283,5 +315,10 @@ export function updatePurchasedCounts(): void {
   if (criticalClicksPurchasedElement) {
     const criticalClicks = state.criticalClicks || 0;
     criticalClicksPurchasedElement.textContent = formatNumber(criticalClicks);
+    console.log('✅ Updated criticalClicks:', criticalClicks, 'element:', criticalClicksPurchasedElement);
+  } else {
+    console.log('❌ criticalClicksPurchased element not found');
   }
+
+  console.log('🎉 updatePurchasedCounts completed');
 }
