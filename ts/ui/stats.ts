@@ -169,7 +169,7 @@ export function updateShopStats(): void {
     console.log('🔍 Current state values:', {
       straws: state.straws,
       cups: state.cups,
-      sips: state.sips
+      sips: state.sips,
     });
   }
   // Straws purchased
