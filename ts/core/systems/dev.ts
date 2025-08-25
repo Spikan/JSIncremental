@@ -318,25 +318,28 @@ export function addHugeStraws(): boolean {
     const currentStraws = toLargeNumber(w.straws);
     const newStraws = add(currentStraws, hugeAmount);
 
-    // Update the straws value - keep as LargeNumber for proper handling
-    if (w.Decimal) {
-      // For very large numbers, use LargeNumber directly, fallback to Decimal for smaller values
-      if (Number.isFinite(newStraws.toNumber())) {
+    // Always update Zustand state first (this is what UI reads from)
+    w.App?.state?.actions?.setStraws?.(newStraws);
+
+    // Also update window property for compatibility
+    try {
+      if (w.Decimal && Number.isFinite(newStraws.toNumber())) {
         w.straws = new w.Decimal(newStraws.toNumber());
       } else {
-        // For extremely large numbers, store the LargeNumber directly
         w.straws = newStraws;
       }
-    } else {
-      // For extremely large numbers, store the LargeNumber directly
+    } catch (error) {
+      // Fallback: just set the LargeNumber directly
       w.straws = newStraws;
+      console.warn('Failed to set window.straws, using LargeNumber directly:', error);
     }
 
-    // Update state with LargeNumber value
-    w.App?.state?.actions?.setStraws?.(newStraws);
-    w.App?.ui?.updateAllStats?.();
-    w.App?.ui?.checkUpgradeAffordability?.();
-    w.App?.ui?.updateAllDisplays?.();
+    // Update UI with a small delay to ensure state is settled
+    setTimeout(() => {
+      w.App?.ui?.updateAllStats?.();
+      w.App?.ui?.checkUpgradeAffordability?.();
+      w.App?.ui?.updateAllDisplays?.();
+    }, 10);
 
     console.log(`✅ New straws total: ${newStraws.toString()}`);
     return true;
@@ -364,25 +367,28 @@ export function addMassiveCups(): boolean {
     const currentCups = toLargeNumber(w.cups);
     const newCups = add(currentCups, massiveAmount);
 
-    // Update the cups value - keep as LargeNumber for proper handling
-    if (w.Decimal) {
-      // For very large numbers, use LargeNumber directly, fallback to Decimal for smaller values
-      if (Number.isFinite(newCups.toNumber())) {
+    // Always update Zustand state first (this is what UI reads from)
+    w.App?.state?.actions?.setCups?.(newCups);
+
+    // Also update window property for compatibility
+    try {
+      if (w.Decimal && Number.isFinite(newCups.toNumber())) {
         w.cups = new w.Decimal(newCups.toNumber());
       } else {
-        // For extremely large numbers, store the LargeNumber directly
         w.cups = newCups;
       }
-    } else {
-      // For extremely large numbers, store the LargeNumber directly
+    } catch (error) {
+      // Fallback: just set the LargeNumber directly
       w.cups = newCups;
+      console.warn('Failed to set window.cups, using LargeNumber directly:', error);
     }
 
-    // Update state with LargeNumber value
-    w.App?.state?.actions?.setCups?.(newCups);
-    w.App?.ui?.updateAllStats?.();
-    w.App?.ui?.checkUpgradeAffordability?.();
-    w.App?.ui?.updateAllDisplays?.();
+    // Update UI with a small delay to ensure state is settled
+    setTimeout(() => {
+      w.App?.ui?.updateAllStats?.();
+      w.App?.ui?.checkUpgradeAffordability?.();
+      w.App?.ui?.updateAllDisplays?.();
+    }, 10);
 
     console.log(`✅ New cups total: ${newCups.toString()}`);
     return true;
@@ -423,16 +429,23 @@ export function addExtremeResources(): boolean {
     if (typeof w.straws !== 'undefined') {
       const currentStraws = toLargeNumber(w.straws);
       const newStraws = add(currentStraws, extremeAmount);
-      if (w.Decimal) {
-        if (Number.isFinite(newStraws.toNumber())) {
+
+      // Always update Zustand state first (this is what UI reads from)
+      w.App?.state?.actions?.setStraws?.(newStraws);
+
+      // Also update window property for compatibility
+      try {
+        if (w.Decimal && Number.isFinite(newStraws.toNumber())) {
           w.straws = new w.Decimal(newStraws.toNumber());
         } else {
           w.straws = newStraws;
         }
-      } else {
+      } catch (error) {
+        // Fallback: just set the LargeNumber directly
         w.straws = newStraws;
+        console.warn('Failed to set window.straws, using LargeNumber directly:', error);
       }
-      w.App?.state?.actions?.setStraws?.(newStraws);
+
       console.log(`✅ Straws: ${newStraws.toString()}`);
     }
 
@@ -440,16 +453,23 @@ export function addExtremeResources(): boolean {
     if (typeof w.cups !== 'undefined') {
       const currentCups = toLargeNumber(w.cups);
       const newCups = add(currentCups, extremeAmount);
-      if (w.Decimal) {
-        if (Number.isFinite(newCups.toNumber())) {
+
+      // Always update Zustand state first (this is what UI reads from)
+      w.App?.state?.actions?.setCups?.(newCups);
+
+      // Also update window property for compatibility
+      try {
+        if (w.Decimal && Number.isFinite(newCups.toNumber())) {
           w.cups = new w.Decimal(newCups.toNumber());
         } else {
           w.cups = newCups;
         }
-      } else {
+      } catch (error) {
+        // Fallback: just set the LargeNumber directly
         w.cups = newCups;
+        console.warn('Failed to set window.cups, using LargeNumber directly:', error);
       }
-      w.App?.state?.actions?.setCups?.(newCups);
+
       console.log(`✅ Cups: ${newCups.toString()}`);
     }
 
@@ -462,10 +482,12 @@ export function addExtremeResources(): boolean {
         console.warn('Failed to validate extreme values:', error);
       });
 
-    // Update UI
-    w.App?.ui?.updateAllStats?.();
-    w.App?.ui?.checkUpgradeAffordability?.();
-    w.App?.ui?.updateAllDisplays?.();
+    // Update UI with a small delay to ensure state is settled
+    setTimeout(() => {
+      w.App?.ui?.updateAllStats?.();
+      w.App?.ui?.checkUpgradeAffordability?.();
+      w.App?.ui?.updateAllDisplays?.();
+    }, 10);
 
     console.log('✅ Extreme resources added successfully!');
     return true;
@@ -526,33 +548,23 @@ export function resetAllResources(): boolean {
     const w = window as Win;
     console.log('🔄 Resetting all resources to zero...');
 
-    // Reset sips
+    // Always update Zustand state first (this is what UI reads from)
+    w.App?.state?.setState?.({
+      sips: new LargeNumber(0),
+      straws: new LargeNumber(0),
+      cups: new LargeNumber(0),
+    });
+
+    // Also update window properties for compatibility
     if (w.Decimal) {
       w.sips = new w.Decimal(0);
-    } else {
-      w.sips = 0;
-    }
-
-    // Reset straws
-    if (w.Decimal) {
       w.straws = new w.Decimal(0);
-    } else {
-      w.straws = 0;
-    }
-
-    // Reset cups
-    if (w.Decimal) {
       w.cups = new w.Decimal(0);
     } else {
+      w.sips = 0;
+      w.straws = 0;
       w.cups = 0;
     }
-
-    // Update state and UI
-    w.App?.state?.setState?.({
-      sips: 0,
-      straws: 0,
-      cups: 0,
-    });
 
     w.App?.ui?.updateAllStats?.();
     w.App?.ui?.checkUpgradeAffordability?.();
