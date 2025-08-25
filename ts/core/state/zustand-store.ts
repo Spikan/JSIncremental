@@ -513,9 +513,8 @@ export const useClickStats = () => {
       criticalClickMultiplier,
       suctionClickBonus,
       effectiveMultiplier: (state: GameStore) =>
-        state.criticalClickMultiplier
-          ?.add(state.suctionClickBonus || toDecimal(0))
-          .toString() || '0',
+        state.criticalClickMultiplier?.add(state.suctionClickBonus || toDecimal(0)).toString() ||
+        '0',
     }),
     [totalClicks, criticalClickChance, criticalClickMultiplier, suctionClickBonus]
   );
