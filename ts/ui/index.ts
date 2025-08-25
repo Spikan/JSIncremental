@@ -85,11 +85,13 @@ export function initializeUI(): void {
     (window as any).App.events.on(
       (window as any).App.EVENT_NAMES?.ECONOMY?.PURCHASE,
       (data: any) => {
+        console.log('🔧 PURCHASE EVENT RECEIVED:', data);
         updateTopSipsPerDrink();
         updateTopSipsPerSecond();
         updateTopSipCounter();
         checkUpgradeAffordability();
         updateCriticalClickDisplay();
+        console.log('🔧 CALLING updatePurchasedCounts()');
         updatePurchasedCounts(); // Update shop owned counters
         if (
           data &&

@@ -520,10 +520,12 @@ export const execute = {
       console.warn('Failed to update shop displays after straw purchase:', error);
     }
     try {
+      console.log('🛒 EMITTING PURCHASE EVENT for straw:', { item: 'straw', cost: result.spent });
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'straw',
         cost: result.spent,
       });
+      console.log('🛒 PURCHASE EVENT EMITTED for straw');
     } catch (error) {
       console.warn('Failed to emit purchase event for straw:', error);
     }
