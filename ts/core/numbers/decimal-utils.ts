@@ -5,7 +5,7 @@
 export type DecimalType = any;
 
 // Type guard for break_eternity.js Decimal objects
-export const checkIsDecimal = (value: any): value is DecimalType => {
+export function checkIsDecimal(value: any): value is DecimalType {
   if (!value) return false;
   try {
     return (
@@ -18,7 +18,7 @@ export const checkIsDecimal = (value: any): value is DecimalType => {
   } catch {
     return false;
   }
-};
+}
 
 // Minimal formatting utility for UI display
 export const formatDecimal = (value: any): string => {
