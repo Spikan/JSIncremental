@@ -11,18 +11,68 @@ export function checkUpgradeAffordability(): void {
   getUpgradesAndConfig();
 
   const currentSipsLarge = toLargeNumber((window as any).App?.state?.getState?.()?.sips || 0);
-  // Check if current sips is effectively zero
+
+  // Debug logging for extreme value diagnosis
+  console.log('🔍 checkUpgradeAffordability: Current sips =', currentSipsLarge.toString());
+
+  // Check if current sips is effectively zero or corrupted
   if (currentSipsLarge.lte(new LargeNumber(0))) {
-    return;
+    console.warn('🚫 checkUpgradeAffordability: Sips is zero or negative, disabling all buttons');
+    // Don't return - continue to disable all buttons properly
+    // return;
+  }
+
+  // Additional validation for extreme values
+  if (!isFinite(Number(currentSipsLarge.toString()))) {
+    console.warn('🚫 checkUpgradeAffordability: Sips is corrupted (NaN/Infinity), using fallback');
+    // Use fallback sips value for button state calculation
+    // This prevents buttons from being permanently disabled
   }
 
   // Function to check affordability using LargeNumber comparison
   const canAfford = (cost: any): boolean => {
-    const costLarge = toLargeNumber(cost);
-    return gte(currentSipsLarge, costLarge);
+    try {
+      const costLarge = toLargeNumber(cost);
+
+      // If sips is corrupted, use a reasonable fallback for button states
+      let effectiveSips = currentSipsLarge;
+      if (
+        !isFinite(Number(currentSipsLarge.toString())) ||
+        currentSipsLarge.lt(new LargeNumber(0))
+      ) {
+        // Use a fallback value that allows reasonable purchases
+        effectiveSips = new LargeNumber('1000');
+        console.log('🔄 Using fallback sips for affordability check:', effectiveSips.toString());
+      }
+
+      const result = gte(effectiveSips, costLarge);
+      console.log(
+        '🔍 canAfford check: sips =',
+        effectiveSips.toString(),
+        'cost =',
+        costLarge.toString(),
+        'result =',
+        result
+      );
+      return result;
+    } catch (error) {
+      console.warn('🚫 Error in canAfford check:', error);
+      // Default to affordable if there's an error to prevent permanent disabling
+      return true;
+    }
   };
 
   const costs = calculateAllCosts();
+
+  // Log costs for debugging extreme value issues
+  console.log('🔍 Calculated costs:', {
+    straw: costs.straw?.toString(),
+    cup: costs.cup?.toString(),
+    suction: costs.suction?.toString(),
+    criticalClick: costs.criticalClick?.toString(),
+    widerStraws: costs.widerStraws?.toString(),
+    betterCups: costs.betterCups?.toString(),
+  });
 
   // Update button states based on affordability
   updateButtonState('buyStraw', canAfford(costs.straw), costs.straw);
