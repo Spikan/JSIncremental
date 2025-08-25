@@ -52,7 +52,8 @@ export function trackClick() {
   }
 }
 
-export function handleSodaClick(multiplier: number = 1) {
+export async function handleSodaClick(multiplier: number = 1) {
+  console.log('🍹 handleSodaClick called with multiplier:', multiplier);
   try {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     // Track click via system
@@ -80,8 +81,38 @@ export function handleSodaClick(multiplier: number = 1) {
     w.sips = currentSips.add(totalClickValue);
 
     // Update state keeping LargeNumber
+    console.log(
+      '🍹 Before state update - sips:',
+      w.sips,
+      'state sips:',
+      w.App?.state?.getState?.()?.sips
+    );
     try {
-      w.App?.state?.actions?.setSips?.(w.sips);
+      if (w.App?.state?.actions?.setSips) {
+        console.log('🍹 Calling setSips with:', w.sips);
+        w.App.state.actions.setSips(w.sips);
+        console.log('🍹 After state update - state sips:', w.App?.state?.getState?.()?.sips);
+      } else {
+        console.warn(
+          '🍹 setSips action not available via App.state.actions, trying direct store access...'
+        );
+        // Try direct store access as fallback
+        try {
+          const { storeActions } = await import('../state/zustand-store.ts');
+          if (storeActions?.setSips) {
+            console.log('🍹 Calling setSips via storeActions with:', w.sips);
+            storeActions.setSips(w.sips);
+            console.log(
+              '🍹 After state update via storeActions - state sips:',
+              w.App?.state?.getState?.()?.sips
+            );
+          } else {
+            console.warn('🍹 setSips action not available via storeActions either!');
+          }
+        } catch (storeError) {
+          console.warn('🍹 Failed to import storeActions:', storeError);
+        }
+      }
     } catch (error) {
       console.warn('Failed to set sips in state:', error);
     }
@@ -119,10 +150,18 @@ export function handleSodaClick(multiplier: number = 1) {
 
     // Emit soda click and sync totals with LargeNumber support
     try {
+      console.log('DEBUG: Emitting CLICK.SODA event with data:', {
+        value: totalClickValue.toNumber(),
+        gained: totalClickValue.toNumber(),
+        eventName: w.App?.EVENT_NAMES?.CLICK?.SODA,
+        hasEventSystem: !!w.App?.events,
+        hasEmit: typeof w.App?.events?.emit === 'function',
+      });
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, {
         value: totalClickValue.toNumber(),
         gained: totalClickValue.toNumber(),
       });
+      console.log('🍹 CLICK.SODA event emitted successfully');
     } catch (error) {
       console.warn('Failed to emit soda click event:', error);
     }

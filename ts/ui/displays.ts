@@ -3,47 +3,112 @@ import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
 import { useGameStore } from '../core/state/zustand-store';
 import { LargeNumber } from '../core/numbers/large-number';
 
+// Store subscription references to avoid multiple subscriptions
+let topSipsPerDrinkSubscription: (() => void) | null = null;
+let topSipsPerSecondSubscription: (() => void) | null = null;
+
 // Optimized display update functions using subscribeWithSelector
 export function updateTopSipsPerDrink(): void {
+  console.log('🔧 UPDATE TOP SIPS PER DRINK: Function called');
   if (typeof window === 'undefined') return;
-  const topSipsPerDrinkElement: any = (window as any).DOM_CACHE?.topSipsPerDrink;
 
-  if (!topSipsPerDrinkElement) return;
+  // Check if DOM_CACHE is ready
+  const domCache = (window as any).DOM_CACHE;
+  if (!domCache || !domCache.isReady || !domCache.isReady()) {
+    console.log('DEBUG: updateTopSipsPerDrink - DOM_CACHE not ready, skipping update');
+    return;
+  }
+
+  const topSipsPerDrinkElement: any =
+    domCache.topSipsPerDrink || document.getElementById('topSipsPerDrink');
+
+  console.log('🔧 UPDATE TOP SIPS PER DRINK: Element found =', !!topSipsPerDrinkElement);
+
+  // Silent updates unless there's an issue
+
+  if (!topSipsPerDrinkElement) {
+    console.error('DEBUG: updateTopSipsPerDrink - element not found!');
+    return;
+  }
+
+  // Clean up existing subscription if any
+  if (topSipsPerDrinkSubscription) {
+    console.log('🔧 UPDATE TOP SIPS PER DRINK: Cleaning up existing subscription');
+    // Clean up existing subscription
+    topSipsPerDrinkSubscription();
+    topSipsPerDrinkSubscription = null;
+  }
 
   try {
+    console.log('🔧 UPDATE TOP SIPS PER DRINK: Setting up subscription');
+    // Set up subscription
     // Subscribe to SPS changes only
-    useGameStore.subscribe(
+    topSipsPerDrinkSubscription = useGameStore.subscribe(
       state => state.spd,
       spd => {
+        // Subscription fired - silent update
         if (topSipsPerDrinkElement) {
           // Use spd directly - formatNumber will handle LargeNumber properly
-          topSipsPerDrinkElement.innerHTML = formatNumber(spd);
+          const formatted = formatNumber(spd);
+          // Silent update - no visual feedback needed
+          topSipsPerDrinkElement.innerHTML = formatted;
         }
       },
       { fireImmediately: true }
     );
+    console.log('🔧 UPDATE TOP SIPS PER DRINK: Subscription setup complete');
   } catch (error) {
     console.warn('Failed to update top sips per drink:', error);
     // Fallback: update once
     const state = useGameStore.getState();
     if (topSipsPerDrinkElement && state) {
       // Use state.spd directly - formatNumber will handle LargeNumber properly
-      topSipsPerDrinkElement.innerHTML = formatNumber(state.spd);
+      const formatted = formatNumber(state.spd);
+      console.log('DEBUG: topSipsPerDrink fallback update:', formatted);
+      topSipsPerDrinkElement.innerHTML = formatted;
     }
   }
 }
 
 export function updateTopSipsPerSecond(): void {
+  console.log('🔧 UPDATE TOP SIPS PER SECOND: Function called');
   if (typeof window === 'undefined') return;
-  const topSipsPerSecondElement: any = (window as any).DOM_CACHE?.topSipsPerSecond;
 
-  if (!topSipsPerSecondElement) return;
+  // Check if DOM_CACHE is ready
+  const domCache = (window as any).DOM_CACHE;
+  if (!domCache || !domCache.isReady()) {
+    console.log('DEBUG: updateTopSipsPerSecond - DOM_CACHE not ready, skipping update');
+    return;
+  }
+
+  const topSipsPerSecondElement: any =
+    domCache.topSipsPerSecond || document.getElementById('topSipsPerSecond');
+
+  console.log('🔧 UPDATE TOP SIPS PER SECOND: Element found =', !!topSipsPerSecondElement);
+
+  // Silent updates unless there's an issue
+
+  if (!topSipsPerSecondElement) {
+    console.error('DEBUG: updateTopSipsPerSecond - element not found!');
+    return;
+  }
+
+  // Clean up existing subscription if any
+  if (topSipsPerSecondSubscription) {
+    console.log('🔧 UPDATE TOP SIPS PER SECOND: Cleaning up existing subscription');
+    // Clean up existing subscription
+    topSipsPerSecondSubscription();
+    topSipsPerSecondSubscription = null;
+  }
 
   try {
+    console.log('🔧 UPDATE TOP SIPS PER SECOND: Setting up subscription');
+    // Set up subscription
     // Subscribe to both SPS and drink rate changes
-    useGameStore.subscribe(
+    topSipsPerSecondSubscription = useGameStore.subscribe(
       state => ({ spd: state.spd, drinkRate: state.drinkRate }),
       ({ spd, drinkRate }) => {
+        // Subscription fired - silent update
         if (topSipsPerSecondElement) {
           // Keep LargeNumber for spd and do division properly
           const sipsPerDrinkLarge = spd && typeof spd.toNumber === 'function' ? spd : null;
@@ -61,11 +126,14 @@ export function updateTopSipsPerSecond(): void {
             sipsPerSecond = sipsPerDrink / drinkRateSeconds;
           }
 
-          topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
+          const formatted = formatNumber(sipsPerSecond);
+          // Silent update - no visual feedback needed
+          topSipsPerSecondElement.innerHTML = formatted;
         }
       },
       { fireImmediately: true }
     );
+    console.log('🔧 UPDATE TOP SIPS PER SECOND: Subscription setup complete');
   } catch (error) {
     console.warn('Failed to update top sips per second:', error);
     // Fallback: update once
@@ -88,7 +156,9 @@ export function updateTopSipsPerSecond(): void {
         sipsPerSecond = sipsPerDrink / drinkRateSeconds;
       }
 
-      topSipsPerSecondElement.innerHTML = formatNumber(sipsPerSecond);
+      const formatted = formatNumber(sipsPerSecond);
+      console.log('DEBUG: topSipsPerSecond fallback update:', formatted);
+      topSipsPerSecondElement.innerHTML = formatted;
     }
   }
 }
@@ -227,32 +297,32 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
 }
 
 export function updateTopSipCounter(): void {
+  console.log('🔧 UPDATE TOP SIP COUNTER: Function called');
   if (typeof window === 'undefined') return;
-  const topSipElement =
-    (window as any).DOM_CACHE?.topSipValue || document.getElementById('topSipValue');
+
+  // Check if DOM_CACHE is ready
+  const domCache = (window as any).DOM_CACHE;
+  if (!domCache || !domCache.isReady()) {
+    console.log('DEBUG: updateTopSipCounter - DOM_CACHE not ready, skipping update');
+    return;
+  }
+
+  const topSipElement = domCache.topSipValue || document.getElementById('topSipValue');
+
+  // Silent updates unless there's an issue
+
   if (topSipElement) {
     try {
       const state = useGameStore.getState();
-      console.log('DEBUG: updateTopSipCounter - state.sips:', state.sips);
-      console.log('DEBUG: updateTopSipCounter - state.sips type:', typeof state.sips);
-      console.log(
-        'DEBUG: updateTopSipCounter - state.sips has toNumber:',
-        !!(state.sips && typeof state.sips.toNumber === 'function')
-      );
-      if (state.sips && typeof state.sips.toNumber === 'function') {
-        console.log('DEBUG: updateTopSipCounter - state.sips.toNumber():', state.sips.toNumber());
-        console.log(
-          'DEBUG: updateTopSipCounter - isFinite:',
-          Number.isFinite(state.sips.toNumber())
-        );
-      }
       // Use state.sips directly - formatNumber will handle LargeNumber properly
       const formatted = formatNumber(state.sips);
-      console.log('DEBUG: updateTopSipCounter - formatted result:', formatted);
+      // Silent update - no visual feedback needed
       (topSipElement as HTMLElement).textContent = formatted;
     } catch (error) {
       console.warn('Failed to update display:', error);
     }
+  } else {
+    console.error('DEBUG: updateTopSipCounter - topSipElement not found!');
   }
 }
 
@@ -347,6 +417,220 @@ function getLevelText(level: number): string {
   ];
   const index = Math.min(Math.floor(level - 1), levelTexts.length - 1);
   return levelTexts[index] || levelTexts[levelTexts.length - 1] || 'Unknown Level';
+}
+
+// Debug function for testing top indicators
+export function debugTopIndicators(): void {
+  console.log('=== TOP INDICATORS DEBUG ===');
+  console.log('DOM_CACHE available:', !!(window as any).DOM_CACHE);
+  console.log('DOM_CACHE.isReady():', (window as any).DOM_CACHE?.isReady?.());
+
+  const elements = ['topSipValue', 'topSipsPerDrink', 'topSipsPerSecond'];
+
+  elements.forEach(id => {
+    const element = document.getElementById(id);
+    const cachedElement = (window as any).DOM_CACHE?.[id];
+    console.log(`Element ${id}:`, {
+      direct: !!element,
+      cached: !!cachedElement,
+      same: element === cachedElement,
+      content: element?.textContent || 'N/A',
+    });
+  });
+
+  // Test state access
+  try {
+    const state = useGameStore.getState();
+    console.log('Game state:', {
+      sips: state.sips,
+      spd: state.spd,
+      drinkRate: state.drinkRate,
+    });
+  } catch (error) {
+    console.error('Failed to access game state:', error);
+  }
+
+  // Test event system
+  try {
+    const events = (window as any).App?.events;
+    console.log('Event system available:', !!events);
+    if (events) {
+      console.log('Available events:', Object.keys(events));
+    }
+  } catch (error) {
+    console.error('Failed to access event system:', error);
+  }
+
+  // Test if functions are available
+  const testFunctions = ['updateTopSipCounter', 'updateTopSipsPerDrink', 'updateTopSipsPerSecond'];
+
+  testFunctions.forEach(funcName => {
+    const func = (window as any).App?.ui?.[funcName];
+    console.log(`Function ${funcName} available:`, typeof func === 'function');
+  });
+
+  console.log('=== END DEBUG ===');
+}
+
+// Debug function to manually trigger updates
+export function forceUpdateTopIndicators(): void {
+  console.log('=== FORCE UPDATE TOP INDICATORS ===');
+  try {
+    updateTopSipCounter();
+    updateTopSipsPerDrink();
+    updateTopSipsPerSecond();
+    console.log('Manual updates completed');
+  } catch (error) {
+    console.error('Failed to force update:', error);
+  }
+  console.log('=== END FORCE UPDATE ===');
+}
+
+// Debug function to test state changes and subscriptions
+export function testStateChangesAndUpdates(): void {
+  console.log('=== TESTING STATE CHANGES AND UPDATES ===');
+
+  try {
+    const state = useGameStore.getState();
+    console.log('Initial state:', {
+      sips: state.sips,
+      spd: state.spd,
+      drinkRate: state.drinkRate,
+    });
+
+    // Test adding sips
+    console.log('Testing sip addition...');
+    state.actions.addSips(10);
+
+    // Wait a bit and check state again
+    setTimeout(() => {
+      const newState = useGameStore.getState();
+      console.log('State after adding 10 sips:', {
+        sips: newState.sips,
+        spd: newState.spd,
+        drinkRate: newState.drinkRate,
+      });
+
+      // Check if elements were updated
+      const topSipElement = document.getElementById('topSipValue');
+      const topSipsPerDrinkElement = document.getElementById('topSipsPerDrink');
+      const topSipsPerSecondElement = document.getElementById('topSipsPerSecond');
+
+      console.log('Element contents after state change:', {
+        topSipValue: topSipElement?.textContent,
+        topSipsPerDrink: topSipsPerDrinkElement?.innerHTML,
+        topSipsPerSecond: topSipsPerSecondElement?.innerHTML,
+      });
+
+      // Test SPD change
+      console.log('Testing SPD change...');
+      state.actions.setSPD(5);
+
+      setTimeout(() => {
+        const finalState = useGameStore.getState();
+        console.log('Final state after SPD change:', {
+          sips: finalState.sips,
+          spd: finalState.spd,
+          drinkRate: finalState.drinkRate,
+        });
+
+        console.log('Final element contents:', {
+          topSipValue: topSipElement?.textContent,
+          topSipsPerDrink: topSipsPerDrinkElement?.innerHTML,
+          topSipsPerSecond: topSipsPerSecondElement?.innerHTML,
+        });
+
+        console.log('=== STATE CHANGE TEST COMPLETED ===');
+      }, 200);
+    }, 200);
+  } catch (error) {
+    console.error('Failed to test state changes:', error);
+  }
+}
+
+// Debug function to manually test event system
+export function testEventSystem(): void {
+  console.log('=== TESTING EVENT SYSTEM ===');
+
+  try {
+    // Test if we can emit a CLICK.SODA event manually
+    const eventName = (window as any).App?.EVENT_NAMES?.CLICK?.SODA;
+    console.log('Event name:', eventName);
+
+    if ((window as any).App?.events && eventName) {
+      console.log('Emitting test CLICK.SODA event...');
+      (window as any).App.events.emit(eventName, {
+        value: 1,
+        gained: 1,
+        test: true,
+      });
+      console.log('Test event emitted successfully');
+    } else {
+      console.error('Cannot emit test event - event system not ready');
+    }
+  } catch (error) {
+    console.error('Failed to test event system:', error);
+  }
+
+  console.log('=== END EVENT SYSTEM TEST ===');
+}
+
+// Debug function to manually test soda click handling
+export function testSodaClick(): void {
+  console.log('=== TESTING SODA CLICK HANDLING ===');
+
+  try {
+    const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
+    console.log('handleSodaClick function:', {
+      exists: typeof handleSodaClick === 'function',
+      function: handleSodaClick,
+    });
+
+    if (typeof handleSodaClick === 'function') {
+      console.log('Calling handleSodaClick manually...');
+      handleSodaClick(1);
+      console.log('Manual handleSodaClick completed');
+    } else {
+      console.error('handleSodaClick function not available');
+    }
+  } catch (error) {
+    console.error('Failed to test soda click handling:', error);
+  }
+
+  console.log('=== END SODA CLICK TEST ===');
+}
+
+// Debug function to test direct button click simulation
+export function testSodaButtonClick(): void {
+  console.log('=== TESTING DIRECT SODA BUTTON CLICK ===');
+
+  try {
+    const sodaButton = document.getElementById('sodaButton');
+    console.log('Soda button found:', !!sodaButton);
+
+    if (sodaButton) {
+      console.log('Dispatching click event on soda button...');
+      const clickEvent = new Event('click', { bubbles: true });
+      sodaButton.dispatchEvent(clickEvent);
+      console.log('Click event dispatched');
+    } else {
+      console.error('Soda button not found');
+    }
+  } catch (error) {
+    console.error('Failed to test button click:', error);
+  }
+
+  console.log('=== END BUTTON CLICK TEST ===');
+}
+
+// Make debug functions globally available
+if (typeof window !== 'undefined') {
+  (window as any).debugTopIndicators = debugTopIndicators;
+  (window as any).forceUpdateTopIndicators = forceUpdateTopIndicators;
+  (window as any).testStateChangesAndUpdates = testStateChangesAndUpdates;
+  (window as any).testEventSystem = testEventSystem;
+  (window as any).testSodaClick = testSodaClick;
+  (window as any).testSodaButtonClick = testSodaButtonClick;
 }
 
 export { updateCostDisplay, updateButtonState };

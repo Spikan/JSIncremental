@@ -53,7 +53,7 @@ export const setMusicStatusText = labels.setMusicStatusText;
 
 // Initialize UI event listeners
 export function initializeUI(): void {
-  console.log('UI system initialized');
+  // UI system initializing
   buttons.initButtonSystem();
   // Sync options UI on init
   try {
@@ -66,12 +66,18 @@ export function initializeUI(): void {
   } catch (error) {
     console.warn('Failed to update button sounds toggle on init:', error);
   }
+  // Check event system availability
+
   if ((window as any).App?.events) {
+    // Set up CLICK.SODA event listener
     (window as any).App.events.on((window as any).App.EVENT_NAMES?.CLICK?.SODA, (data: any) => {
+      console.log('🔧 CLICK.SODA event received, updating displays');
+
+      updateTopSipCounter();
       updateTopSipsPerDrink();
       updateTopSipsPerSecond();
-      updateTopSipCounter();
       checkUpgradeAffordability();
+
       if (data && typeof data.gained === 'number') {
         showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
       }
@@ -109,6 +115,16 @@ export function initializeUI(): void {
 
 // Update all UI displays (useful for initialization and major state changes)
 export function updateAllDisplays(): void {
+  // Update all displays
+
+  // Check if DOM_CACHE is ready before updating
+  const domCache = (window as any).DOM_CACHE;
+  if (!domCache || !domCache.isReady || !domCache.isReady()) {
+    // DOM_CACHE not ready, retry
+    setTimeout(updateAllDisplays, 100);
+    return;
+  }
+
   updateTopSipsPerDrink();
   updateTopSipsPerSecond();
   updateTopSipCounter();
@@ -121,6 +137,7 @@ export function updateAllDisplays(): void {
   updateShopStats();
   updateAllStats();
   checkUpgradeAffordability();
+  // Update complete
 }
 
 // Move switchTab into UI to eliminate window.switchTab

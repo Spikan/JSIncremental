@@ -299,9 +299,8 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
 }
 
 function setupUnifiedButtonSystem(): void {
-  console.log('🔧 Setting up modern button event handler system...');
+  // Setting up modern button event handler system
   const allButtons = document.querySelectorAll('button');
-  console.log(`🔧 Found ${allButtons.length} buttons with inline onclick to process`);
   allButtons.forEach((button: any) => {
     const onclick = button.getAttribute('onclick');
     if (onclick) {
@@ -339,16 +338,37 @@ function setupUnifiedButtonSystem(): void {
               console.warn('Failed to handle button interaction:', error);
             }
           }
-          console.log(`🔧 Successfully configured button: ${actionName} (${action.type})`);
+          // Button configured successfully
         }
       }
     }
   });
   setupSpecialButtonHandlers();
-  console.log('🔧 Modern button event handler system setup complete');
+  // Button system setup complete
 }
 
 function setupSpecialButtonHandlers(): void {
+  // First ensure clicks system is loaded
+  function ensureClicksSystemLoaded(): Promise<void> {
+    return new Promise(resolve => {
+      const checkClicksSystem = () => {
+        const hasClicksSystem = (window as any).App?.systems?.clicks?.handleSodaClick;
+        const hasDomCache = (window as any).DOM_CACHE;
+        const isDomCacheReady =
+          hasDomCache && (window as any).DOM_CACHE.isReady
+            ? (window as any).DOM_CACHE.isReady()
+            : !!hasDomCache;
+
+        if (hasClicksSystem && isDomCacheReady) {
+          resolve();
+        } else {
+          setTimeout(checkClicksSystem, 100);
+        }
+      };
+      checkClicksSystem();
+    });
+  }
+
   const tabButtons = document.querySelectorAll('.tab-btn');
   tabButtons.forEach((button: any) => {
     if (!button || !button.addEventListener) return;
@@ -364,139 +384,278 @@ function setupSpecialButtonHandlers(): void {
       }
     });
   });
-  const sodaDomCacheBtn = (window as any).DOM_CACHE?.sodaButton;
-  const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
-  if (sodaButton && (sodaButton as any).addEventListener) {
-    if ((window as any).PointerEvent) {
-      let active = false;
-      let moved = false;
-      let sx = 0;
-      let sy = 0;
-      const reset = () => {
-        active = false;
-        moved = false;
-      };
-      sodaButton.addEventListener('pointerdown', (e: any) => {
-        if (!e || e.pointerType === 'mouse') return;
-        active = true;
-        moved = false;
-        sx = e.clientX || 0;
-        sy = e.clientY || 0;
-      });
-      sodaButton.addEventListener('pointermove', (e: any) => {
-        if (!active || !e || e.pointerType === 'mouse') return;
-        const dx = (e.clientX || 0) - sx;
-        const dy = (e.clientY || 0) - sy;
-        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
-      });
-      sodaButton.addEventListener('pointerup', (e: any) => {
-        if (!active || !e || e.pointerType === 'mouse') {
-          reset();
-          return;
-        }
-        if (!moved) {
-          markPointerHandled(sodaButton);
-          try {
-            (sodaButton as any).classList.add('soda-clicked');
-            setTimeout(() => {
-              try {
-                (sodaButton as any).classList.remove('soda-clicked');
-              } catch (error) {
-                console.warn('Failed to handle button interaction:', error);
-              }
-            }, 140);
-          } catch (error) {
-            console.warn('Failed to handle button interaction:', error);
-          }
-          try {
-            (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e);
-          } catch (error) {
-            console.warn('Failed to handle button interaction:', error);
-          }
-        }
-        reset();
-      });
-      sodaButton.addEventListener('pointercancel', reset);
-    } else if ('ontouchstart' in window) {
-      let active = false;
-      let moved = false;
-      let sx = 0;
-      let sy = 0;
-      const reset = () => {
-        active = false;
-        moved = false;
-      };
-      sodaButton.addEventListener(
-        'touchstart',
-        (e: any) => {
-          if (!e || !e.touches || !e.touches[0]) return;
+  // Setup soda button with clicks system check
+  const setupSodaButton = async () => {
+    await ensureClicksSystemLoaded();
+    const sodaDomCacheBtn = (window as any).DOM_CACHE?.sodaButton;
+    const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
+
+    console.log('🔍 SODA BUTTON SEARCH:', {
+      fromDomCache: !!sodaDomCacheBtn,
+      fromDocument: !!document.getElementById('sodaButton'),
+      finalButton: !!sodaButton,
+      buttonId: sodaButton?.id,
+      timestamp: Date.now(),
+    });
+    if (sodaButton && (sodaButton as any).addEventListener) {
+      if ((window as any).PointerEvent) {
+        let active = false;
+        let moved = false;
+        let sx = 0;
+        let sy = 0;
+        const reset = () => {
+          active = false;
+          moved = false;
+        };
+        sodaButton.addEventListener('pointerdown', (e: any) => {
+          if (!e || e.pointerType === 'mouse') return;
           active = true;
           moved = false;
-          sx = e.touches[0].clientX || 0;
-          sy = e.touches[0].clientY || 0;
-        },
-        { passive: true }
-      );
-      sodaButton.addEventListener(
-        'touchmove',
-        (e: any) => {
-          if (!active || !e || !e.touches || !e.touches[0]) return;
-          const dx = (e.touches[0].clientX || 0) - sx;
-          const dy = (e.touches[0].clientY || 0) - sy;
+          sx = e.clientX || 0;
+          sy = e.clientY || 0;
+        });
+        sodaButton.addEventListener('pointermove', (e: any) => {
+          if (!active || !e || e.pointerType === 'mouse') return;
+          const dx = (e.clientX || 0) - sx;
+          const dy = (e.clientY || 0) - sy;
           if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
-        },
-        { passive: true }
-      );
-      sodaButton.addEventListener('touchend', (e: any) => {
-        if (!active) {
+        });
+        sodaButton.addEventListener('pointerup', (e: any) => {
+          if (!active || !e || e.pointerType === 'mouse') {
+            reset();
+            return;
+          }
+          if (!moved) {
+            markPointerHandled(sodaButton);
+            try {
+              (sodaButton as any).classList.add('soda-clicked');
+              setTimeout(() => {
+                try {
+                  (sodaButton as any).classList.remove('soda-clicked');
+                } catch (error) {
+                  console.warn('Failed to handle button interaction:', error);
+                }
+              }, 140);
+            } catch (error) {
+              console.warn('Failed to handle button interaction:', error);
+            }
+            try {
+              // Call handleSodaClick
+
+              // Try multiple ways to call the function
+              const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
+              if (typeof handleSodaClick === 'function') {
+                // Call function directly
+                handleSodaClick(1); // Only pass multiplier, no event
+              } else {
+                // Try fallback
+                // Try fallback: call the function from the clicks-system module directly
+                try {
+                  // Use dynamic import without await (synchronous fallback)
+                  import('../core/systems/clicks-system.ts')
+                    .then(module => {
+                      const fallbackFunc = module.handleSodaClick;
+                      console.log('DEBUG: Using fallback import, calling handleSodaClick');
+                      fallbackFunc(1);
+                    })
+                    .catch(fallbackError => {
+                      console.error('DEBUG: Fallback also failed:', fallbackError);
+                    });
+                } catch (fallbackError) {
+                  console.error('DEBUG: Fallback also failed:', fallbackError);
+                }
+              }
+            } catch (error) {
+              console.warn('Failed to handle button interaction:', error);
+            }
+          }
           reset();
+        });
+        sodaButton.addEventListener('pointercancel', reset);
+      } else if ('ontouchstart' in window) {
+        let active = false;
+        let moved = false;
+        let sx = 0;
+        let sy = 0;
+        const reset = () => {
+          active = false;
+          moved = false;
+        };
+        sodaButton.addEventListener(
+          'touchstart',
+          (e: any) => {
+            if (!e || !e.touches || !e.touches[0]) return;
+            active = true;
+            moved = false;
+            sx = e.touches[0].clientX || 0;
+            sy = e.touches[0].clientY || 0;
+          },
+          { passive: true }
+        );
+        sodaButton.addEventListener(
+          'touchmove',
+          (e: any) => {
+            if (!active || !e || !e.touches || !e.touches[0]) return;
+            const dx = (e.touches[0].clientX || 0) - sx;
+            const dy = (e.touches[0].clientY || 0) - sy;
+            if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
+          },
+          { passive: true }
+        );
+        sodaButton.addEventListener('touchend', (_e: any) => {
+          if (!active) {
+            reset();
+            return;
+          }
+          if (!moved) {
+            markPointerHandled(sodaButton);
+            try {
+              (sodaButton as any).classList.add('soda-clicked');
+              setTimeout(() => {
+                try {
+                  (sodaButton as any).classList.remove('soda-clicked');
+                } catch (error) {
+                  console.warn('Failed to handle button interaction:', error);
+                }
+              }, 140);
+            } catch (error) {
+              console.warn('Failed to handle button interaction:', error);
+            }
+            try {
+              // Call handleSodaClick
+
+              // Try multiple ways to call the function
+              const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
+              if (typeof handleSodaClick === 'function') {
+                // Call function directly
+                handleSodaClick(1); // Only pass multiplier, no event
+              } else {
+                // Try fallback
+                // Try fallback: call the function from the clicks-system module directly
+                try {
+                  // Use dynamic import without await (synchronous fallback)
+                  import('../core/systems/clicks-system.ts')
+                    .then(module => {
+                      const fallbackFunc = module.handleSodaClick;
+                      console.log('DEBUG: Using fallback import, calling handleSodaClick');
+                      fallbackFunc(1);
+                    })
+                    .catch(fallbackError => {
+                      console.error('DEBUG: Fallback also failed:', fallbackError);
+                    });
+                } catch (fallbackError) {
+                  console.error('DEBUG: Fallback also failed:', fallbackError);
+                }
+              }
+            } catch (error) {
+              console.warn('Failed to handle button interaction:', error);
+            }
+          }
+          reset();
+        });
+        sodaButton.addEventListener('touchcancel', reset);
+      }
+
+      // Standard click event handler
+      sodaButton.addEventListener('click', (e: any) => {
+        console.log('🔥 SODA BUTTON STANDARD CLICK EVENT FIRED!', {
+          shouldSuppress: shouldSuppressClick(sodaButton),
+          buttonId: e?.target?.id,
+          timestamp: Date.now(),
+          eventType: e?.type,
+        });
+
+        if (shouldSuppressClick(sodaButton)) {
+          console.log('🔥 Soda button click suppressed');
           return;
         }
-        if (!moved) {
-          markPointerHandled(sodaButton);
-          try {
-            (sodaButton as any).classList.add('soda-clicked');
-            setTimeout(() => {
-              try {
-                (sodaButton as any).classList.remove('soda-clicked');
-              } catch (error) {
-                console.warn('Failed to handle button interaction:', error);
-              }
-            }, 140);
-          } catch (error) {
-            console.warn('Failed to handle button interaction:', error);
-          }
-          try {
-            (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e);
-          } catch (error) {
-            console.warn('Failed to handle button interaction:', error);
-          }
+        try {
+          (sodaButton as any).classList.add('soda-clicked');
+          setTimeout(() => {
+            try {
+              (sodaButton as any).classList.remove('soda-clicked');
+            } catch (error) {
+              console.warn('Failed to handle button interaction:', error);
+            }
+          }, 140);
+        } catch (error) {
+          console.warn('Failed to handle button interaction:', error);
         }
-        reset();
-      });
-      sodaButton.addEventListener('touchcancel', reset);
-    }
-    sodaButton.addEventListener('click', (e: any) => {
-      if (shouldSuppressClick(sodaButton)) return;
-      try {
-        (sodaButton as any).classList.add('soda-clicked');
-        setTimeout(() => {
-          try {
-            (sodaButton as any).classList.remove('soda-clicked');
-          } catch (error) {
-            console.warn('Failed to handle button interaction:', error);
+        try {
+          console.log('🔥 BUTTON CLICK DEBUG:', {
+            buttonId: e?.target?.id || 'unknown',
+            buttonElement: e?.target,
+            hasApp: !!(window as any).App,
+            hasSystems: !!(window as any).App?.systems,
+            hasClicks: !!(window as any).App?.systems?.clicks,
+            hasHandleSodaClick:
+              typeof (window as any).App?.systems?.clicks?.handleSodaClick === 'function',
+            eventType: e?.type,
+            timestamp: Date.now(),
+          });
+
+          // Try multiple ways to call the function
+          const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
+          if (typeof handleSodaClick === 'function') {
+            console.log('DEBUG: Calling handleSodaClick function directly');
+            handleSodaClick(1).catch((error: any) => {
+              console.warn('Failed to handle soda click:', error);
+            }); // Only pass multiplier, no event
+          } else {
+            console.error('DEBUG: handleSodaClick not available, trying fallback...');
+            // Try fallback: call the function from the clicks-system module directly
+            try {
+              // Use dynamic import without await (synchronous fallback)
+              import('../core/systems/clicks-system.ts')
+                .then(module => {
+                  const fallbackFunc = module.handleSodaClick;
+                  console.log('DEBUG: Using fallback import, calling handleSodaClick');
+                  fallbackFunc(1);
+                })
+                .catch(fallbackError => {
+                  console.error('DEBUG: Fallback also failed:', fallbackError);
+                });
+            } catch (fallbackError) {
+              console.error('DEBUG: Fallback also failed:', fallbackError);
+            }
           }
-        }, 140);
-      } catch (error) {
-        console.warn('Failed to handle button interaction:', error);
-      }
-      try {
-        (window as any).App?.systems?.clicks?.handleSodaClick?.(1, e);
-      } catch (error) {
-        console.warn('Failed to handle button interaction:', error);
-      }
+        } catch (error) {
+          console.warn('Failed to handle button interaction:', error);
+        }
+      });
+    }
+    console.log('🚀 SODA BUTTON SETUP COMPLETE:', {
+      buttonFound: !!sodaButton,
+      buttonId: sodaButton?.id,
+      hasAddEventListener: typeof sodaButton?.addEventListener === 'function',
+      timestamp: Date.now(),
     });
-  }
+  };
+
+  // Call the async setup function
+  setupSodaButton().catch(error => {
+    console.error('DEBUG: Failed to setup soda button:', error);
+  });
+
+  // Debug function to check soda button setup
+  (window as any).debugSodaButtonSetup = () => {
+    console.log('=== SODA BUTTON DEBUG ===');
+    const sodaButton = document.getElementById('sodaButton');
+    console.log('Soda button element:', sodaButton);
+    console.log(
+      'Soda button event listeners:',
+      sodaButton ? 'Check browser dev tools' : 'Not found'
+    );
+
+    const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
+    console.log('handleSodaClick available:', typeof handleSodaClick === 'function');
+
+    console.log(
+      'DOM cache ready:',
+      !!(window as any).DOM_CACHE?.isReady && (window as any).DOM_CACHE.isReady()
+    );
+    console.log('=== END SODA BUTTON DEBUG ===');
+  };
   const chatInput = document.getElementById('chatInput') as any;
   if (chatInput) {
     chatInput.addEventListener('keypress', (e: any) => {
@@ -932,10 +1091,8 @@ function initButtonSystem(): void {
   function tryInitialize() {
     const appReady = typeof window !== 'undefined' && !!(window as any).App;
     if (appReady) {
-      console.log('🔧 App ready, setting up modern button system');
       setupUnifiedButtonSystem();
     } else {
-      console.log('🔧 Waiting for App bootstrap...');
       setTimeout(tryInitialize, 200);
     }
   }

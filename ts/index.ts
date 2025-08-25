@@ -31,7 +31,10 @@ console.log('🔧 Initializing Zustand store...');
 const zustandStore = useGameStore;
 
 (window as any).App = {
-  state: zustandStore, // Consolidated Zustand store
+  state: {
+    ...zustandStore,
+    actions: zustandStore.getState().actions, // Add actions for direct access
+  }, // Consolidated Zustand store with actions
   storage,
   events: eventBus,
   EVENT_NAMES,

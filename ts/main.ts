@@ -50,9 +50,7 @@ import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
 
 function initGame() {
   try {
-    console.log('🚀 initGame called - starting game initialization...');
-    console.log('🔧 GAME_CONFIG available:', !!GC && Object.keys(GC).length > 0);
-    console.log('🔧 DOM_CACHE available:', !!(window as any).DOM_CACHE);
+    // Starting game initialization
     console.log('🔧 Unlocks system available:', !!(window as any).App?.systems?.unlocks);
     if (!(window as any).App?.systems?.unlocks) {
       console.log('⏳ Waiting for unlocks system to load...');
@@ -313,8 +311,19 @@ function initGame() {
       console.warn('Failed to seed App.state:', error);
     }
 
-    (window as any).App?.ui?.updateTopSipsPerDrink?.();
-    (window as any).App?.ui?.updateTopSipsPerSecond?.();
+    // Update UI displays after ensuring DOM cache is ready
+    const updateDisplaysWhenReady = () => {
+      const domCache = (window as any).DOM_CACHE;
+      if (!domCache || !domCache.isReady || !domCache.isReady()) {
+        // Waiting for DOM_CACHE
+        setTimeout(updateDisplaysWhenReady, 100);
+        return;
+      }
+      // DOM_CACHE ready, updating displays
+      (window as any).App?.ui?.updateTopSipsPerDrink?.();
+      (window as any).App?.ui?.updateTopSipsPerSecond?.();
+    };
+    updateDisplaysWhenReady();
     try {
       (window as any).App?.systems?.unlocks?.init?.();
     } catch (error) {
