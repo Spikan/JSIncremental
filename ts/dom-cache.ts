@@ -20,7 +20,9 @@ const DOM_CACHE: {
   betterCups: MaybeEl;
   widerStrawsSPD: MaybeEl;
   betterCupsSPD: MaybeEl;
+  totalStrawSPD: MaybeEl;
   totalWiderStrawsSPD: MaybeEl;
+  totalCupSPD: MaybeEl;
   totalBetterCupsSPD: MaybeEl;
   statsTab: MaybeEl;
   progressFill: MaybeEl;
@@ -67,7 +69,9 @@ const DOM_CACHE: {
   betterCups: null,
   widerStrawsSPD: null,
   betterCupsSPD: null,
+  totalStrawSPD: null,
   totalWiderStrawsSPD: null,
+  totalCupSPD: null,
   totalBetterCupsSPD: null,
   statsTab: null,
   progressFill: null,
@@ -112,7 +116,9 @@ const DOM_CACHE: {
     this.betterCups = document.getElementById('betterCups');
     this.widerStrawsSPD = document.getElementById('widerStrawsSPD');
     this.betterCupsSPD = document.getElementById('betterCupsSPD');
+    this.totalStrawSPD = document.getElementById('totalStrawSPD');
     this.totalWiderStrawsSPD = document.getElementById('totalWiderStrawsSPD');
+    this.totalCupSPD = document.getElementById('totalCupSPD');
     this.totalBetterCupsSPD = document.getElementById('totalBetterCupsSPD');
     this.statsTab = document.getElementById('statsTab');
     this.progressFill = document.getElementById('drinkProgressFill');

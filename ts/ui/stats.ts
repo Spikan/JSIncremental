@@ -3,6 +3,7 @@
 
 // Import consolidated utilities
 import { formatNumber } from './utils';
+import { LargeNumber } from '../core/numbers/large-number';
 
 // Update play time display
 export function updatePlayTime(): void {
@@ -333,6 +334,77 @@ export function updatePurchasedCounts(): void {
     console.log('✅ Updated shop betterCups:', betterCupsValue, 'element:', shopBetterCupsElement);
   } else {
     console.log('❌ shop betterCups element not found');
+  }
+
+  // Update total production indicators
+  const totalStrawSPDElement = (window as any).DOM_CACHE?.totalStrawSPD as HTMLElement | undefined;
+  if (totalStrawSPDElement) {
+    const straws = state.straws || 0;
+    const strawSPD = state.strawSPD || 0;
+    const totalStrawProduction = new LargeNumber(straws).multiply(new LargeNumber(strawSPD));
+    const totalStrawValue =
+      typeof totalStrawProduction === 'object' && totalStrawProduction.toSafeNumber
+        ? totalStrawProduction.toSafeNumber()
+        : totalStrawProduction;
+    totalStrawSPDElement.textContent = formatNumber(totalStrawValue);
+    console.log('✅ Updated totalStrawSPD:', totalStrawValue, 'element:', totalStrawSPDElement);
+  } else {
+    console.log('❌ totalStrawSPD element not found');
+  }
+
+  const totalWiderStrawsSPDElement = (window as any).DOM_CACHE?.totalWiderStrawsSPD as
+    | HTMLElement
+    | undefined;
+  if (totalWiderStrawsSPDElement) {
+    const widerStraws = state.widerStraws || 0;
+    const widerStrawsValue =
+      typeof widerStraws === 'object' && widerStraws.toSafeNumber
+        ? widerStraws.toSafeNumber()
+        : widerStraws;
+    totalWiderStrawsSPDElement.textContent = formatNumber(widerStrawsValue * 0.6); // Base multiplier
+    console.log(
+      '✅ Updated totalWiderStrawsSPD:',
+      widerStrawsValue * 0.6,
+      'element:',
+      totalWiderStrawsSPDElement
+    );
+  } else {
+    console.log('❌ totalWiderStrawsSPD element not found');
+  }
+
+  const totalCupSPDElement = (window as any).DOM_CACHE?.totalCupSPD as HTMLElement | undefined;
+  if (totalCupSPDElement) {
+    const cups = state.cups || 0;
+    const cupSPD = state.cupSPD || 0;
+    const totalCupProduction = new LargeNumber(cups).multiply(new LargeNumber(cupSPD));
+    const totalCupValue =
+      typeof totalCupProduction === 'object' && totalCupProduction.toSafeNumber
+        ? totalCupProduction.toSafeNumber()
+        : totalCupProduction;
+    totalCupSPDElement.textContent = formatNumber(totalCupValue);
+    console.log('✅ Updated totalCupSPD:', totalCupValue, 'element:', totalCupSPDElement);
+  } else {
+    console.log('❌ totalCupSPD element not found');
+  }
+
+  const totalBetterCupsSPDElement = (window as any).DOM_CACHE?.totalBetterCupsSPD as
+    | HTMLElement
+    | undefined;
+  if (totalBetterCupsSPDElement) {
+    const betterCups = state.betterCups || 0;
+    const betterCupsValue =
+      typeof betterCups === 'object' && betterCups.toSafeNumber
+        ? betterCups.toSafeNumber()
+        : betterCups;
+    totalBetterCupsSPDElement.textContent = formatNumber(betterCupsValue * 1.2); // Base multiplier
+    console.log(
+      '✅ Updated totalBetterCupsSPD:',
+      betterCupsValue * 1.2,
+      'element:',
+      totalBetterCupsSPDElement
+    );
+  } else {
+    console.log('❌ totalBetterCupsSPD element not found');
   }
 
   // Update suctions purchased count
