@@ -9,7 +9,9 @@ import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
 // Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal || (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
+const Decimal =
+  (globalThis as any).Decimal ||
+  (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
 import { toDecimal, add } from '../numbers/migration-utils';
 
 // Extended state interface with actions

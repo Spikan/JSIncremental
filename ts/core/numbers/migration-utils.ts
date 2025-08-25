@@ -2,7 +2,9 @@
 // No wrapper - direct Decimal operations for maximum performance
 
 // Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal || (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
+const Decimal =
+  (globalThis as any).Decimal ||
+  (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
 import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
 
