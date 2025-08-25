@@ -160,13 +160,23 @@ export function updateEconomyStats(): void {
 
 // Update shop-related statistics
 export function updateShopStats(): void {
+  console.log('🔧 updateShopStats called');
+  console.log('🔧 DOM_CACHE available:', !!(window as any).DOM_CACHE);
+  console.log('🔧 DOM_CACHE.strawsPurchased:', (window as any).DOM_CACHE?.strawsPurchased);
+
   // Straws purchased
   const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
     | HTMLElement
     | undefined;
   if (strawsPurchasedElement) {
+    console.log('🔧 Found strawsPurchasedElement:', strawsPurchasedElement);
     const v = (window as any).App?.state?.getState?.()?.straws || 0;
-    strawsPurchasedElement.textContent = formatNumber(v);
+    console.log('🔧 Straws value:', v, 'Type:', typeof v);
+    const formatted = formatNumber(v);
+    console.log('🔧 Formatted value:', formatted);
+    strawsPurchasedElement.textContent = formatted;
+  } else {
+    console.warn('❌ strawsPurchasedElement not found');
   }
   // Cups purchased
   const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;

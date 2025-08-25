@@ -142,7 +142,7 @@ describe('Backward Compatibility', () => {
     it('should handle Decimal.js-like objects', () => {
       const decimal = new MockDecimal(750);
       const largeNum = toLargeNumber(decimal);
-    expect(largeNum ? largeNum.toNumber() : 0).toBe(750);
+      expect(largeNum ? largeNum.toNumber() : 0).toBe(750);
       expect(toNumber(decimal)).toBe(750);
     });
 

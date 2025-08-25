@@ -260,7 +260,9 @@ describe('User Journey Testing', () => {
         }
 
         // Each strategy should result in different resource distributions
-        expect(gameState.straws.toNumber() + gameState.cups.toNumber() + gameState.suctions.toNumber()).toBeGreaterThan(5);
+        expect(
+          gameState.straws.toNumber() + gameState.cups.toNumber() + gameState.suctions.toNumber()
+        ).toBeGreaterThan(5);
         expect(gameState.sips.toNumber()).toBeGreaterThan(1000);
       });
     });
