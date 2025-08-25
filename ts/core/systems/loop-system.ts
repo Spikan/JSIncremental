@@ -45,17 +45,17 @@ export function start({
       } catch (error) {
         console.warn('Failed to update stats in loop:', error);
       }
-      // Sanitize state periodically to catch any extreme values
+      // Validate extreme values periodically for monitoring
       try {
         import('./purchases-system.ts')
           .then(module => {
-            module.sanitizeAppState?.();
+            module.validateExtremeValues?.();
           })
           .catch(error => {
-            console.warn('Failed to sanitize state in loop:', error);
+            console.warn('Failed to validate extreme values in loop:', error);
           });
       } catch (error) {
-        console.warn('Failed to trigger state sanitization in loop:', error);
+        console.warn('Failed to trigger extreme value validation in loop:', error);
       }
       try {
         if (updatePlayTime) updatePlayTime();

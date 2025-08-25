@@ -453,13 +453,13 @@ export function addExtremeResources(): boolean {
       console.log(`✅ Cups: ${newCups.toString()}`);
     }
 
-    // Sanitize state after adding extreme values
+    // Validate extreme values after adding them
     import('./purchases-system.ts')
       .then(module => {
-        module.sanitizeAppState?.();
+        module.validateExtremeValues?.();
       })
       .catch(error => {
-        console.warn('Failed to sanitize state after extreme values:', error);
+        console.warn('Failed to validate extreme values:', error);
       });
 
     // Update UI
