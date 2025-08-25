@@ -75,7 +75,7 @@ function toDecimal(value) {
 // Test the fixed drink system logic
 function testDrinkSystemFix() {
   console.log('\n🔧 Testing Fixed Drink System Logic');
-  
+
   const drinkRate = 1000;
   const rateInSeconds = drinkRate / 1000;
 
