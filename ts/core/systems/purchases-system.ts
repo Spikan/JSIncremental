@@ -33,18 +33,66 @@ export function purchaseStraw({
   const widerStrawsLarge = toLargeNumber(widerStraws);
   const betterCupsLarge = toLargeNumber(betterCups);
 
-  const cost = nextStrawCost(strawsLarge, baseCost, scaling);
+  let cost: LargeNumber;
+  let newStraws: LargeNumber;
+  let strawSPD: LargeNumber;
+  let cupSPD: LargeNumber;
+  let sipsPerDrink: LargeNumber;
 
-  // Check affordability using LargeNumber comparison
-  if (!gte(sipsLarge, cost)) return null;
+  try {
+    // Validate inputs for extreme values
+    if (!isFinite(Number(sipsLarge.toString())) || !isFinite(Number(strawsLarge.toString()))) {
+      console.warn('🚫 purchaseStraw: Invalid input values detected');
+      return null;
+    }
 
-  const newStraws = strawsLarge.add(new LargeNumber(1));
-  const { strawSPD, cupSPD, sipsPerDrink } = recalcProduction({
-    straws: newStraws,
-    cups: cupsLarge,
-    widerStraws: widerStrawsLarge,
-    betterCups: betterCupsLarge,
-  });
+    cost = nextStrawCost(strawsLarge, baseCost, scaling);
+
+    // Validate cost calculation
+    if (!cost || !isFinite(Number(cost.toString())) || cost.lte(new LargeNumber(0))) {
+      console.warn('🚫 purchaseStraw: Invalid cost calculation:', cost?.toString());
+      return null;
+    }
+
+    // Check affordability using LargeNumber comparison with additional validation
+    if (!gte(sipsLarge, cost)) {
+      console.log(
+        '🚫 purchaseStraw: Not affordable - sips:',
+        sipsLarge.toString(),
+        'cost:',
+        cost.toString()
+      );
+      return null;
+    }
+
+    newStraws = strawsLarge.add(new LargeNumber(1));
+
+    // Recalculate production with error handling
+    const productionResult = recalcProduction({
+      straws: newStraws,
+      cups: cupsLarge,
+      widerStraws: widerStrawsLarge,
+      betterCups: betterCupsLarge,
+    });
+
+    // Validate production results
+    if (
+      !productionResult ||
+      !isFinite(Number(productionResult.strawSPD?.toString() || 'NaN')) ||
+      !isFinite(Number(productionResult.cupSPD?.toString() || 'NaN')) ||
+      !isFinite(Number(productionResult.sipsPerDrink?.toString() || 'NaN'))
+    ) {
+      console.warn('🚫 purchaseStraw: Invalid production calculation');
+      return null;
+    }
+
+    strawSPD = productionResult.strawSPD;
+    cupSPD = productionResult.cupSPD;
+    sipsPerDrink = productionResult.sipsPerDrink;
+  } catch (error) {
+    console.warn('🚫 purchaseStraw: Error during calculation:', error);
+    return null;
+  }
 
   return {
     spent: cost,
@@ -79,26 +127,74 @@ export function purchaseCup({
   const widerStrawsLarge = toLargeNumber(widerStraws);
   const betterCupsLarge = toLargeNumber(betterCups);
 
-  const cost = nextCupCost(cupsLarge, baseCost, scaling);
+  let cost: LargeNumber;
+  let newCups: LargeNumber;
+  let strawSPD: LargeNumber;
+  let cupSPD: LargeNumber;
+  let sipsPerDrink: LargeNumber;
 
-  // Check affordability using LargeNumber comparison
-  if (!gte(sipsLarge, cost)) return null;
+  try {
+    // Validate inputs for extreme values
+    if (!isFinite(Number(sipsLarge.toString())) || !isFinite(Number(cupsLarge.toString()))) {
+      console.warn('🚫 purchaseCup: Invalid input values detected');
+      return null;
+    }
 
-  const newCups = cupsLarge.add(new LargeNumber(1));
-  const { strawSPD, cupSPD, sipsPerDrink } = recalcProduction({
-    straws: strawsLarge,
-    cups: newCups,
-    widerStraws: widerStrawsLarge,
-    betterCups: betterCupsLarge,
-  });
+    cost = nextCupCost(cupsLarge, baseCost, scaling);
 
-  return {
-    spent: cost,
-    cups: newCups,
-    strawSPD,
-    cupSPD,
-    sipsPerDrink,
-  };
+    // Validate cost calculation
+    if (!cost || !isFinite(Number(cost.toString())) || cost.lte(new LargeNumber(0))) {
+      console.warn('🚫 purchaseCup: Invalid cost calculation:', cost?.toString());
+      return null;
+    }
+
+    // Check affordability using LargeNumber comparison with additional validation
+    if (!gte(sipsLarge, cost)) {
+      console.log(
+        '🚫 purchaseCup: Not affordable - sips:',
+        sipsLarge.toString(),
+        'cost:',
+        cost.toString()
+      );
+      return null;
+    }
+
+    newCups = cupsLarge.add(new LargeNumber(1));
+
+    // Recalculate production with error handling
+    const productionResult = recalcProduction({
+      straws: strawsLarge,
+      cups: newCups,
+      widerStraws: widerStrawsLarge,
+      betterCups: betterCupsLarge,
+    });
+
+    // Validate production results
+    if (
+      !productionResult ||
+      !isFinite(Number(productionResult.strawSPD?.toString() || 'NaN')) ||
+      !isFinite(Number(productionResult.cupSPD?.toString() || 'NaN')) ||
+      !isFinite(Number(productionResult.sipsPerDrink?.toString() || 'NaN'))
+    ) {
+      console.warn('🚫 purchaseCup: Invalid production calculation');
+      return null;
+    }
+
+    strawSPD = productionResult.strawSPD;
+    cupSPD = productionResult.cupSPD;
+    sipsPerDrink = productionResult.sipsPerDrink;
+
+    return {
+      spent: cost,
+      cups: newCups,
+      strawSPD,
+      cupSPD,
+      sipsPerDrink,
+    };
+  } catch (error) {
+    console.warn('🚫 purchaseCup: Error during calculation:', error);
+    return null;
+  }
 }
 
 export function purchaseWiderStraws({

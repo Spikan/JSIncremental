@@ -421,6 +421,38 @@ export function updatePurchasedCounts(): void {
     console.log('❌ suctionsPurchased element not found');
   }
 
+  // Update shop display elements for suctions and criticalClicks (if they exist)
+  const shopSuctionsElement = (window as any).DOM_CACHE?.suctions as HTMLElement | undefined;
+  if (shopSuctionsElement) {
+    const suctions = state.suctions || 0;
+    const suctionsValue =
+      typeof suctions === 'object' && suctions.toSafeNumber ? suctions.toSafeNumber() : suctions;
+    shopSuctionsElement.textContent = formatNumber(suctionsValue);
+    console.log('✅ Updated shop suctions:', suctionsValue, 'element:', shopSuctionsElement);
+  } else {
+    console.log('❌ shop suctions element not found (expected for this item)');
+  }
+
+  const shopCriticalClicksElement = (window as any).DOM_CACHE?.criticalClicks as
+    | HTMLElement
+    | undefined;
+  if (shopCriticalClicksElement) {
+    const criticalClicks = state.criticalClicks || 0;
+    const criticalClicksValue =
+      typeof criticalClicks === 'object' && criticalClicks.toSafeNumber
+        ? criticalClicks.toSafeNumber()
+        : criticalClicks;
+    shopCriticalClicksElement.textContent = formatNumber(criticalClicksValue);
+    console.log(
+      '✅ Updated shop criticalClicks:',
+      criticalClicksValue,
+      'element:',
+      shopCriticalClicksElement
+    );
+  } else {
+    console.log('❌ shop criticalClicks element not found (expected for this item)');
+  }
+
   // Update critical clicks purchased count
   const criticalClicksPurchasedElement = (window as any).DOM_CACHE?.criticalClicksPurchased as
     | HTMLElement
