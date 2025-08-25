@@ -10,23 +10,24 @@ export function checkUpgradeAffordability(): void {
   if (typeof window === 'undefined') return;
   getUpgradesAndConfig();
 
-  const currentSipsLarge = toLargeNumber((window as any).App?.state?.getState?.()?.sips || 0);
+  const rawSipsLarge = toLargeNumber((window as any).App?.state?.getState?.()?.sips || 0);
 
   // Debug logging for extreme value diagnosis
-  console.log('🔍 checkUpgradeAffordability: Current sips =', currentSipsLarge.toString());
+  console.log('🔍 checkUpgradeAffordability: Current sips =', rawSipsLarge.toString());
 
-  // Check if current sips is effectively zero or corrupted
-  if (currentSipsLarge.lte(new LargeNumber(0))) {
-    console.warn('🚫 checkUpgradeAffordability: Sips is zero or negative, disabling all buttons');
-    // Don't return - continue to disable all buttons properly
-    // return;
-  }
-
-  // Additional validation for extreme values
-  if (!isFinite(Number(currentSipsLarge.toString()))) {
+  // Determine effective sips value with fallbacks for extreme cases
+  let currentSipsLarge: LargeNumber;
+  if (!isFinite(Number(rawSipsLarge.toString()))) {
     console.warn('🚫 checkUpgradeAffordability: Sips is corrupted (NaN/Infinity), using fallback');
-    // Use fallback sips value for button state calculation
-    // This prevents buttons from being permanently disabled
+    // Use a much larger fallback sips value for extreme cases
+    currentSipsLarge = new LargeNumber('1000000'); // 1M fallback for extreme cases
+    console.log('🔄 Using extreme fallback sips:', currentSipsLarge.toString());
+  } else if (rawSipsLarge.lte(new LargeNumber(0))) {
+    console.warn('🚫 checkUpgradeAffordability: Sips is zero or negative, using fallback');
+    currentSipsLarge = new LargeNumber('1000000'); // 1M fallback for zero/negative cases
+    console.log('🔄 Using fallback sips for zero/negative:', currentSipsLarge.toString());
+  } else {
+    currentSipsLarge = rawSipsLarge;
   }
 
   // Function to check affordability using LargeNumber comparison
@@ -34,18 +35,21 @@ export function checkUpgradeAffordability(): void {
     try {
       const costLarge = toLargeNumber(cost);
 
-      // If sips is corrupted, use a reasonable fallback for button states
-      let effectiveSips = currentSipsLarge;
-      if (
-        !isFinite(Number(currentSipsLarge.toString())) ||
-        currentSipsLarge.lt(new LargeNumber(0))
-      ) {
-        // Use a fallback value that allows reasonable purchases
-        effectiveSips = new LargeNumber('1000');
-        console.log('🔄 Using fallback sips for affordability check:', effectiveSips.toString());
+      // Use the already-validated currentSipsLarge (which may have been set to fallback)
+      const effectiveSips = currentSipsLarge;
+
+      // Handle extreme costs - if cost is astronomically high, consider it unaffordable
+      // but still allow reasonable purchases
+      let result = false;
+      if (costLarge.lt(new LargeNumber('1000000000'))) {
+        // Cost is reasonable (< 1B), do normal comparison
+        result = gte(effectiveSips, costLarge);
+      } else {
+        // Cost is astronomical, mark as unaffordable but don't disable permanently
+        console.log('🚫 Extreme cost detected:', costLarge.toString());
+        result = false;
       }
 
-      const result = gte(effectiveSips, costLarge);
       console.log(
         '🔍 canAfford check: sips =',
         effectiveSips.toString(),
