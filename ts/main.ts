@@ -43,6 +43,7 @@ if (BAL && TIMING && LIMITS) {
 import { saveGameLoader } from './core/systems/save-game-loader';
 import { mobileInputHandler } from './ui/mobile-input';
 import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
+import { toDecimal } from './core/numbers/migration-utils';
 // DecimalOps removed - no longer using toSafeNumber
 
 // Export for potential use
@@ -72,23 +73,23 @@ function initGame() {
     const BAL = CONF.BALANCE || {};
     const TIMING = CONF.TIMING || {};
 
-    (window as any).sips = new Decimal(0);
-    let straws = new Decimal(0);
-    let cups = new Decimal(0);
+    (window as any).sips = toDecimal(0);
+    let straws = toDecimal(0);
+    let cups = toDecimal(0);
     (window as any).straws = straws;
     (window as any).cups = cups;
-    let suctions = new Decimal(0);
+    let suctions = toDecimal(0);
     (window as any).suctions = suctions;
 
-    let spd = new Decimal(0);
-    let strawSPD = new Decimal(0);
-    let cupSPD = new Decimal(0);
-    let suctionClickBonus = new Decimal(0);
-    let widerStraws = new Decimal(0);
+    let spd = toDecimal(0);
+    let strawSPD = toDecimal(0);
+    let cupSPD = toDecimal(0);
+    let suctionClickBonus = toDecimal(0);
+    let widerStraws = toDecimal(0);
     (window as any).widerStraws = widerStraws;
-    let betterCups = new Decimal(0);
+    let betterCups = toDecimal(0);
     (window as any).betterCups = betterCups;
-    let level = new Decimal(1);
+    let level = toDecimal(1);
     (window as any).level = level;
 
     const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE;
@@ -116,17 +117,17 @@ function initGame() {
       });
     }
 
-    let fasterDrinks = new Decimal(0);
+    let fasterDrinks = toDecimal(0);
     (window as any).fasterDrinks = fasterDrinks;
-    const fasterDrinksUpCounter = new Decimal(1);
+    const fasterDrinksUpCounter = toDecimal(1);
     (window as any).fasterDrinksUpCounter = fasterDrinksUpCounter;
 
-    let criticalClickChance = new Decimal(BAL.CRITICAL_CLICK_BASE_CHANCE);
+    let criticalClickChance = toDecimal(BAL.CRITICAL_CLICK_BASE_CHANCE);
     (window as any).criticalClickChance = criticalClickChance;
-    let criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER);
+    let criticalClickMultiplier = toDecimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER);
     (window as any).criticalClickMultiplier = criticalClickMultiplier;
-    let criticalClicks = new Decimal(0);
-    let criticalClickUpCounter = new Decimal(1);
+    let criticalClicks = toDecimal(0);
+    let criticalClickUpCounter = toDecimal(1);
 
     try {
       (window as any).App?.ui?.updateAutosaveStatus?.();
@@ -235,18 +236,18 @@ function initGame() {
       // Preserve extreme SPD values - don't use toSafeNumber
       const spdValue = result.sipsPerDrink;
 
-      strawSPD = new Decimal(strawSPDValue);
-      cupSPD = new Decimal(cupSPDValue);
-      spd = new Decimal(spdValue);
+      strawSPD = toDecimal(strawSPDValue);
+      cupSPD = toDecimal(cupSPDValue);
+      spd = toDecimal(spdValue);
     } else {
-      strawSPD = new Decimal(config.STRAW_BASE_SPD);
-      cupSPD = new Decimal(config.CUP_BASE_SPD);
+      strawSPD = toDecimal(config.STRAW_BASE_SPD);
+      cupSPD = toDecimal(config.CUP_BASE_SPD);
       if (
         widerStraws &&
         typeof widerStraws.greaterThan === 'function' &&
         widerStraws.greaterThan(0)
       ) {
-        const upgradeMultiplier = new Decimal(
+        const upgradeMultiplier = toDecimal(
           // Preserve extreme values in upgrade multipliers
           1 +
             (widerStraws && typeof widerStraws.toNumber === 'function'
@@ -257,7 +258,7 @@ function initGame() {
         strawSPD = strawSPD.times(upgradeMultiplier);
       }
       if (betterCups && typeof betterCups.greaterThan === 'function' && betterCups.greaterThan(0)) {
-        const upgradeMultiplier = new Decimal(
+        const upgradeMultiplier = toDecimal(
           // Preserve extreme values in upgrade multipliers
           1 +
             (betterCups && typeof betterCups.toNumber === 'function'
@@ -267,11 +268,11 @@ function initGame() {
         );
         cupSPD = cupSPD.times(upgradeMultiplier);
       }
-      const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
+      const baseSipsPerDrink = toDecimal(config.BASE_SIPS_PER_DRINK);
       const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
       spd = baseSipsPerDrink.plus(passiveSipsPerDrink);
     }
-    suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
+    suctionClickBonus = toDecimal(config.SUCTION_CLICK_BONUS).times(suctions);
 
     // Restore drink timing if present in save
     try {
