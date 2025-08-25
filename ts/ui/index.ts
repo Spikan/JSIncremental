@@ -90,6 +90,7 @@ export function initializeUI(): void {
         updateTopSipCounter();
         checkUpgradeAffordability();
         updateCriticalClickDisplay();
+        updatePurchasedCounts(); // Update shop owned counters
         if (
           data &&
           data.item &&
