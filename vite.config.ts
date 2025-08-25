@@ -29,6 +29,16 @@ export default defineConfig({
 
     // Optimize chunk splitting for better caching
     rollupOptions: {
+      // Exclude test files from production build
+      external: id => {
+        // Exclude test files and test utilities
+        return (
+          id.includes('/tests/') ||
+          id.includes('.test.') ||
+          id.includes('.spec.') ||
+          id.includes('.bench.')
+        );
+      },
       output: {
         // Split vendor libraries for better caching
         manualChunks: (id: string) => {
