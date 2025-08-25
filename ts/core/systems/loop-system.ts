@@ -45,6 +45,18 @@ export function start({
       } catch (error) {
         console.warn('Failed to update stats in loop:', error);
       }
+      // Sanitize state periodically to catch any extreme values
+      try {
+        import('./purchases-system.ts')
+          .then(module => {
+            module.sanitizeAppState?.();
+          })
+          .catch(error => {
+            console.warn('Failed to sanitize state in loop:', error);
+          });
+      } catch (error) {
+        console.warn('Failed to trigger state sanitization in loop:', error);
+      }
       try {
         if (updatePlayTime) updatePlayTime();
       } catch (error) {

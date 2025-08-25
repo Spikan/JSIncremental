@@ -534,6 +534,66 @@ function sanitizeLargeNumber(value: LargeNumber, fallback: LargeNumber): LargeNu
   }
 }
 
+// Function to sanitize the entire app state and update it
+export function sanitizeAppState(): void {
+  try {
+    const rawState = (window as any).App?.state?.getState?.() || {};
+    const sanitizedState: any = { ...rawState };
+
+    let needsUpdate = false;
+
+    // Check and sanitize sips value
+    if (rawState.sips) {
+      const sipsValue = toLargeNumber(rawState.sips);
+      const sipsNum = Number(sipsValue.toString());
+      if (!isFinite(sipsNum) || sipsNum > 1000000000) {
+        console.warn(
+          '🚫 sanitizeAppState: Sanitizing corrupted/extreme sips value:',
+          sipsValue.toString()
+        );
+        sanitizedState.sips = new LargeNumber('1000000');
+        needsUpdate = true;
+      }
+    }
+
+    // Check and sanitize straws value
+    if (rawState.straws) {
+      const strawsValue = toLargeNumber(rawState.straws);
+      const strawsNum = Number(strawsValue.toString());
+      if (!isFinite(strawsNum) || strawsNum > 1000000) {
+        console.warn(
+          '🚫 sanitizeAppState: Sanitizing corrupted/extreme straws value:',
+          strawsValue.toString()
+        );
+        sanitizedState.straws = new LargeNumber('0');
+        needsUpdate = true;
+      }
+    }
+
+    // Check and sanitize cups value
+    if (rawState.cups) {
+      const cupsValue = toLargeNumber(rawState.cups);
+      const cupsNum = Number(cupsValue.toString());
+      if (!isFinite(cupsNum) || cupsNum > 1000000) {
+        console.warn(
+          '🚫 sanitizeAppState: Sanitizing corrupted/extreme cups value:',
+          cupsValue.toString()
+        );
+        sanitizedState.cups = new LargeNumber('0');
+        needsUpdate = true;
+      }
+    }
+
+    // Update state if sanitization was needed
+    if (needsUpdate) {
+      console.log('🔄 sanitizeAppState: Updating state with sanitized values');
+      (window as any).App?.state?.setState?.(sanitizedState);
+    }
+  } catch (error) {
+    console.warn('🚫 sanitizeAppState: Error during sanitization:', error);
+  }
+}
+
 function getAppState(): any {
   try {
     const rawState = (window as any).App?.state?.getState?.() || {};
@@ -544,27 +604,66 @@ function getAppState(): any {
     // Check and sanitize sips value
     if (rawState.sips) {
       const sipsValue = toLargeNumber(rawState.sips);
-      if (!isFinite(Number(sipsValue.toString()))) {
-        console.warn('🚫 getAppState: Sanitizing corrupted sips value');
+      const sipsNum = Number(sipsValue.toString());
+      console.log(
+        '🔍 getAppState: Raw sips =',
+        sipsValue.toString(),
+        'isFinite =',
+        isFinite(sipsNum)
+      );
+      if (!isFinite(sipsNum) || sipsNum > 1000000000) {
+        console.warn(
+          '🚫 getAppState: Sanitizing corrupted/extreme sips value:',
+          sipsValue.toString()
+        );
         sanitizedState.sips = new LargeNumber('1000000'); // 1M fallback
+        console.log('🔄 getAppState: Sanitized sips to:', sanitizedState.sips.toString());
+      } else {
+        sanitizedState.sips = sipsValue;
       }
     }
 
     // Check and sanitize straws value
     if (rawState.straws) {
       const strawsValue = toLargeNumber(rawState.straws);
-      if (!isFinite(Number(strawsValue.toString()))) {
-        console.warn('🚫 getAppState: Sanitizing corrupted straws value');
+      const strawsNum = Number(strawsValue.toString());
+      console.log(
+        '🔍 getAppState: Raw straws =',
+        strawsValue.toString(),
+        'isFinite =',
+        isFinite(strawsNum)
+      );
+      if (!isFinite(strawsNum) || strawsNum > 1000000) {
+        console.warn(
+          '🚫 getAppState: Sanitizing corrupted/extreme straws value:',
+          strawsValue.toString()
+        );
         sanitizedState.straws = new LargeNumber('0'); // Reset to 0
+        console.log('🔄 getAppState: Sanitized straws to:', sanitizedState.straws.toString());
+      } else {
+        sanitizedState.straws = strawsValue;
       }
     }
 
     // Check and sanitize cups value
     if (rawState.cups) {
       const cupsValue = toLargeNumber(rawState.cups);
-      if (!isFinite(Number(cupsValue.toString()))) {
-        console.warn('🚫 getAppState: Sanitizing corrupted cups value');
+      const cupsNum = Number(cupsValue.toString());
+      console.log(
+        '🔍 getAppState: Raw cups =',
+        cupsValue.toString(),
+        'isFinite =',
+        isFinite(cupsNum)
+      );
+      if (!isFinite(cupsNum) || cupsNum > 1000000) {
+        console.warn(
+          '🚫 getAppState: Sanitizing corrupted/extreme cups value:',
+          cupsValue.toString()
+        );
         sanitizedState.cups = new LargeNumber('0'); // Reset to 0
+        console.log('🔄 getAppState: Sanitized cups to:', sanitizedState.cups.toString());
+      } else {
+        sanitizedState.cups = cupsValue;
       }
     }
 
