@@ -303,6 +303,38 @@ export function updatePurchasedCounts(): void {
     console.log('❌ betterCupsPurchased element not found');
   }
 
+  // Update shop display elements (widerStraws and betterCups)
+  const shopWiderStrawsElement = (window as any).DOM_CACHE?.widerStraws as HTMLElement | undefined;
+  if (shopWiderStrawsElement) {
+    const widerStraws = state.widerStraws || 0;
+    const widerStrawsValue =
+      typeof widerStraws === 'object' && widerStraws.toSafeNumber
+        ? widerStraws.toSafeNumber()
+        : widerStraws;
+    shopWiderStrawsElement.textContent = formatNumber(widerStrawsValue);
+    console.log(
+      '✅ Updated shop widerStraws:',
+      widerStrawsValue,
+      'element:',
+      shopWiderStrawsElement
+    );
+  } else {
+    console.log('❌ shop widerStraws element not found');
+  }
+
+  const shopBetterCupsElement = (window as any).DOM_CACHE?.betterCups as HTMLElement | undefined;
+  if (shopBetterCupsElement) {
+    const betterCups = state.betterCups || 0;
+    const betterCupsValue =
+      typeof betterCups === 'object' && betterCups.toSafeNumber
+        ? betterCups.toSafeNumber()
+        : betterCups;
+    shopBetterCupsElement.textContent = formatNumber(betterCupsValue);
+    console.log('✅ Updated shop betterCups:', betterCupsValue, 'element:', shopBetterCupsElement);
+  } else {
+    console.log('❌ shop betterCups element not found');
+  }
+
   // Update suctions purchased count
   const suctionsPurchasedElement = (window as any).DOM_CACHE?.suctionsPurchased as
     | HTMLElement
