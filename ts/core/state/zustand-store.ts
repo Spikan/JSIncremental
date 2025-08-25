@@ -12,8 +12,9 @@ import type { GameOptions, GameState } from './shape';
 let Decimal: any;
 function getDecimal() {
   if (!Decimal) {
-    Decimal = (globalThis as any).Decimal || 
-              (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
+    Decimal =
+      (globalThis as any).Decimal ||
+      (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
   }
   return Decimal;
 }
@@ -482,9 +483,9 @@ export const useTotalResources = () => {
       suctions,
       total: (state: GameStore) =>
         state.sips
-                  ?.add(state.straws || new (getDecimal())(0))
-        .add(state.cups || new (getDecimal())(0))
-        .add(state.suctions || new (getDecimal())(0))
+          ?.add(state.straws || new (getDecimal())(0))
+          .add(state.cups || new (getDecimal())(0))
+          .add(state.suctions || new (getDecimal())(0))
           .toString() || '0',
     }),
     [sips, straws, cups, suctions]
@@ -521,8 +522,9 @@ export const useClickStats = () => {
       criticalClickMultiplier,
       suctionClickBonus,
       effectiveMultiplier: (state: GameStore) =>
-        state.criticalClickMultiplier?.add(state.suctionClickBonus || new (getDecimal())(0)).toString() ||
-        '0',
+        state.criticalClickMultiplier
+          ?.add(state.suctionClickBonus || new (getDecimal())(0))
+          .toString() || '0',
     }),
     [totalClicks, criticalClickChance, criticalClickMultiplier, suctionClickBonus]
   );

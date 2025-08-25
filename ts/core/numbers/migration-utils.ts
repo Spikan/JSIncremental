@@ -5,8 +5,9 @@
 let Decimal: any;
 function getDecimal() {
   if (!Decimal) {
-    Decimal = (globalThis as any).Decimal || 
-              (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
+    Decimal =
+      (globalThis as any).Decimal ||
+      (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
   }
   return Decimal;
 }
