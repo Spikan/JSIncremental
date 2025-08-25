@@ -24,33 +24,7 @@ export default defineConfig({
         collapse_vars: false,
         reduce_vars: false,
       },
-      mangle: {
-        // Keep longer variable names to avoid conflicts
-        keep_fnames: true,
-        reserved: [
-          'f',
-          'g',
-          'h',
-          'i',
-          'j',
-          'k',
-          'l',
-          'm',
-          'n',
-          'o',
-          'p',
-          'q',
-          'r',
-          's',
-          't',
-          'u',
-          'v',
-          'w',
-          'x',
-          'y',
-          'z',
-        ],
-      },
+      mangle: false, // Disable variable name mangling to prevent conflicts
     },
 
     // Enable compression

@@ -14,8 +14,7 @@ function getDecimal() {
 import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
 
-// Export Decimal for use by other modules
-export { Decimal };
+// Export type for use by other modules
 export type { DecimalType };
 
 export type NumericValue = number | string | DecimalType | any;
