@@ -128,8 +128,8 @@ const DOM_CACHE: {
     this.totalSipsEarned = document.getElementById('totalSipsEarned');
     this.currentSipsPerSecond = document.getElementById('currentSipsPerSecond');
     this.highestSipsPerSecond = document.getElementById('highestSipsPerSecond');
-    this.strawsPurchased = document.getElementById('strawsPurchased');
-    this.cupsPurchased = document.getElementById('cupsPurchased');
+    this.strawsPurchased = document.getElementById('straws');
+    this.cupsPurchased = document.getElementById('cups');
     this.widerStrawsPurchased = document.getElementById('widerStrawsPurchased');
     this.betterCupsPurchased = document.getElementById('betterCupsPurchased');
     this.suctionsPurchased = document.getElementById('suctionsPurchased');

@@ -242,7 +242,9 @@ export function updatePurchasedCounts(): void {
   if (!(window as any).DOM_CACHE) return;
 
   // Update straws purchased count
-  const strawsPurchasedElement = (window as any).DOM_CACHE?.straws as HTMLElement | undefined;
+  const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
+    | HTMLElement
+    | undefined;
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
     const strawsValue =
@@ -250,18 +252,18 @@ export function updatePurchasedCounts(): void {
     strawsPurchasedElement.textContent = formatNumber(strawsValue);
     console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
   } else {
-    console.log('❌ straws element not found');
+    console.log('❌ strawsPurchased element not found');
   }
 
   // Update cups purchased count
-  const cupsPurchasedElement = (window as any).DOM_CACHE?.cups as HTMLElement | undefined;
+  const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
   if (cupsPurchasedElement) {
     const cups = state.cups || 0;
     const cupsValue = typeof cups === 'object' && cups.toSafeNumber ? cups.toSafeNumber() : cups;
     cupsPurchasedElement.textContent = formatNumber(cupsValue);
     console.log('✅ Updated cups:', cupsValue, 'element:', cupsPurchasedElement);
   } else {
-    console.log('❌ cups element not found');
+    console.log('❌ cupsPurchased element not found');
   }
 
   // Update wider straws purchased count
