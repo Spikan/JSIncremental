@@ -1,7 +1,7 @@
 // UI Display Updates (TypeScript)
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
 import { useGameStore } from '../core/state/zustand-store';
-import { LargeNumber } from '../core/numbers/large-number';
+import { Decimal } from '../core/numbers';
 
 // Store subscription references to avoid multiple subscriptions
 let topSipsPerDrinkSubscription: (() => void) | null = null;
@@ -48,7 +48,7 @@ export function updateTopSipsPerDrink(): void {
       spd => {
         // Subscription fired - silent update
         if (topSipsPerDrinkElement) {
-          // Use spd directly - formatNumber will handle LargeNumber properly
+          // Use spd directly - formatNumber will handle Decimal properly
           const formatted = formatNumber(spd);
           // Silent update - no visual feedback needed
           topSipsPerDrinkElement.innerHTML = formatted;
@@ -62,7 +62,7 @@ export function updateTopSipsPerDrink(): void {
     // Fallback: update once
     const state = useGameStore.getState();
     if (topSipsPerDrinkElement && state) {
-      // Use state.spd directly - formatNumber will handle LargeNumber properly
+      // Use state.spd directly - formatNumber will handle Decimal properly
       const formatted = formatNumber(state.spd);
       console.log('DEBUG: topSipsPerDrink fallback update:', formatted);
       topSipsPerDrinkElement.innerHTML = formatted;
@@ -110,18 +110,18 @@ export function updateTopSipsPerSecond(): void {
       ({ spd, drinkRate }) => {
         // Subscription fired - silent update
         if (topSipsPerSecondElement) {
-          // Keep LargeNumber for spd and do division properly
+          // Keep Decimal for spd and do division properly
           const sipsPerDrinkLarge = spd && typeof spd.toNumber === 'function' ? spd : null;
           const drinkRateMs = Number(drinkRate || 0) || 1000;
           const drinkRateSeconds = drinkRateMs / 1000;
 
           let sipsPerSecond;
           if (sipsPerDrinkLarge) {
-            // Convert drinkRateSeconds to LargeNumber for proper division
-            const drinkRateSecondsLarge = new LargeNumber(drinkRateSeconds);
+            // Convert drinkRateSeconds to Decimal for proper division
+            const drinkRateSecondsLarge = new Decimal(drinkRateSeconds);
             sipsPerSecond = sipsPerDrinkLarge.divide(drinkRateSecondsLarge);
           } else {
-            // Fallback for non-LargeNumber values
+            // Fallback for non-Decimal values
             const sipsPerDrink = Number(spd || 0);
             sipsPerSecond = sipsPerDrink / drinkRateSeconds;
           }
@@ -139,7 +139,7 @@ export function updateTopSipsPerSecond(): void {
     // Fallback: update once
     const state = useGameStore.getState();
     if (topSipsPerSecondElement && state) {
-      // Handle LargeNumber for spd and do division properly
+      // Handle Decimal for spd and do division properly
       const sipsPerDrinkLarge =
         state.spd && typeof state.spd.toNumber === 'function' ? state.spd : null;
       const drinkRateMs = Number(state.drinkRate || 0) || 1000;
@@ -147,11 +147,11 @@ export function updateTopSipsPerSecond(): void {
 
       let sipsPerSecond;
       if (sipsPerDrinkLarge) {
-        // Convert drinkRateSeconds to LargeNumber for proper division
-        const drinkRateSecondsLarge = new LargeNumber(drinkRateSeconds);
+        // Convert drinkRateSeconds to Decimal for proper division
+        const drinkRateSecondsLarge = new Decimal(drinkRateSeconds);
         sipsPerSecond = sipsPerDrinkLarge.divide(drinkRateSecondsLarge);
       } else {
-        // Fallback for non-LargeNumber values
+        // Fallback for non-Decimal values
         const sipsPerDrink = Number(state.spd || 0);
         sipsPerSecond = sipsPerDrink / drinkRateSeconds;
       }
@@ -175,7 +175,7 @@ export function updateCriticalClickDisplay(): void {
       state => state.criticalClickChance,
       chance => {
         if (criticalClickChanceCompact) {
-          // criticalClickChance should remain a regular number, not LargeNumber
+          // criticalClickChance should remain a regular number, not Decimal
           const numericChance = Number(chance ?? NaN);
           if (!Number.isNaN(numericChance)) {
             criticalClickChanceCompact.textContent = `${(numericChance * 100).toFixed(1)}%`;
@@ -188,7 +188,7 @@ export function updateCriticalClickDisplay(): void {
     console.warn('Failed to update critical click display:', error);
     // Fallback: update once
     const state = useGameStore.getState();
-    // criticalClickChance should remain a regular number, not LargeNumber
+    // criticalClickChance should remain a regular number, not Decimal
     const chance = Number(state.criticalClickChance ?? NaN);
     if (!Number.isNaN(chance)) {
       criticalClickChanceCompact.textContent = `${(chance * 100).toFixed(1)}%`;
@@ -314,7 +314,7 @@ export function updateTopSipCounter(): void {
   if (topSipElement) {
     try {
       const state = useGameStore.getState();
-      // Use state.sips directly - formatNumber will handle LargeNumber properly
+      // Use state.sips directly - formatNumber will handle Decimal properly
       const formatted = formatNumber(state.sips);
       // Silent update - no visual feedback needed
       (topSipElement as HTMLElement).textContent = formatted;

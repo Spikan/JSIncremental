@@ -44,6 +44,7 @@ if (BAL && TIMING && LIMITS) {
 import { saveGameLoader } from './core/systems/save-game-loader';
 import { mobileInputHandler } from './ui/mobile-input';
 import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
+import { DecimalOps } from './core/numbers/large-number';
 
 // Export for potential use
 (window as any).initSplashScreen = initSplashScreen;
@@ -227,7 +228,7 @@ function initGame() {
         },
       });
 
-      // Handle LargeNumber results properly - convert to numbers for Decimal compatibility
+      // Handle Decimal results properly - convert to numbers for Decimal compatibility
       // Use safe conversion to handle extreme values without returning Infinity
       const strawSPDValue = result.strawSPD.toSafeNumber
         ? result.strawSPD.toSafeNumber()
@@ -251,13 +252,13 @@ function initGame() {
         widerStraws.greaterThan(0)
       ) {
         const upgradeMultiplier = new Decimal(
-          1 + widerStraws.toNumber() * config.WIDER_STRAWS_MULTIPLIER
+          1 + DecimalOps.toSafeNumber(widerStraws) * config.WIDER_STRAWS_MULTIPLIER
         );
         strawSPD = strawSPD.times(upgradeMultiplier);
       }
       if (betterCups && typeof betterCups.greaterThan === 'function' && betterCups.greaterThan(0)) {
         const upgradeMultiplier = new Decimal(
-          1 + betterCups.toNumber() * config.BETTER_CUPS_MULTIPLIER
+          1 + DecimalOps.toSafeNumber(betterCups) * config.BETTER_CUPS_MULTIPLIER
         );
         cupSPD = cupSPD.times(upgradeMultiplier);
       }
@@ -284,7 +285,7 @@ function initGame() {
     // Seed App.state snapshot
     try {
       const toNum = (v: any) =>
-        v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
+        v && typeof v.toNumber === 'function' ? DecimalOps.toSafeNumber(v) : Number(v || 0);
       (window as any).App?.state?.setState?.({
         sips: toNum((window as any).sips),
         straws: toNum(straws),

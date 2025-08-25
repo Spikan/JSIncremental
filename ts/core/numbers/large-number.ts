@@ -1,244 +1,176 @@
-// Large Number wrapper for break_eternity.js integration
-// Provides unified API for handling very large numbers with fallback to native numbers
+// Direct break_eternity.js integration
+// This file provides direct access to break_eternity.js Decimal objects without wrapper
 
-import { NumericOperations } from '../../../types/global';
-import { NativeNumber } from './native-number';
+// Type for break_eternity.js Decimal
+export type Decimal = any;
 
-// Import break_eternity.js
-const BreakEternity = (() => {
-  try {
-    // break_eternity.js exposes Decimal globally
-    return (
-      (globalThis as any).Decimal ||
-      (window as any).Decimal ||
-      // Try to import it directly if available
-      (() => {
-        try {
-          // This will work if the script is loaded globally
-          const Decimal = (globalThis as any).Decimal;
-          if (Decimal && typeof Decimal === 'function') {
-            return Decimal;
-          }
-        } catch (e) {
-          console.warn('break_eternity.js not available globally:', e);
-        }
-        return null;
-      })()
-    );
-  } catch (error) {
-    console.warn('Failed to load break_eternity.js:', error);
-    return null;
+// Get break_eternity.js Decimal constructor
+const getDecimalConstructor = (): any => {
+  const Decimal = (globalThis as any).Decimal || (window as any).Decimal;
+  if (!Decimal) {
+    throw new Error('break_eternity.js not loaded. Ensure break_eternity.min.js is included in index.html');
   }
-})();
+  return Decimal;
+};
 
-export class LargeNumber {
-  private _value: NumericOperations;
-  private _isBreakEternity: boolean = false;
+// Direct Decimal operations - no wrapper, maximum performance
+export const DecimalOps = {
+  // Create a new Decimal
+  create: (value: number | string | Decimal): Decimal => {
+    const Decimal = getDecimalConstructor();
+    return new Decimal(value);
+  },
 
-  constructor(value: number | string | NumericOperations | LargeNumber) {
-    if (value instanceof LargeNumber) {
-      this._value = value._value;
-      this._isBreakEternity = value._isBreakEternity;
-      return;
+  // Arithmetic operations
+  add: (a: Decimal, b: Decimal): Decimal => a.add(b),
+  subtract: (a: Decimal, b: Decimal): Decimal => a.sub(b),
+  multiply: (a: Decimal, b: Decimal): Decimal => a.mul(b),
+  divide: (a: Decimal, b: Decimal): Decimal => a.div(b),
+  power: (base: Decimal, exponent: number): Decimal => base.pow(exponent),
+
+  // Comparison operations
+  greaterThanOrEqual: (a: Decimal, b: Decimal): boolean => a.gte(b),
+  greaterThan: (a: Decimal, b: Decimal): boolean => a.gt(b),
+  lessThanOrEqual: (a: Decimal, b: Decimal): boolean => a.lte(b),
+  lessThan: (a: Decimal, b: Decimal): boolean => a.lt(b),
+  equal: (a: Decimal, b: Decimal): boolean => a.eq(b),
+
+  // Utility functions
+  isFinite: (value: Decimal): boolean => value.isFinite(),
+  isNaN: (value: Decimal): boolean => value.isNaN(),
+  isNegative: (value: Decimal): boolean => value.isNegative(),
+  isPositive: (value: Decimal): boolean => value.isPositive(),
+  isZero: (value: Decimal): boolean => value.isZero(),
+
+  // Conversion functions
+  toString: (value: Decimal): string => value.toString(),
+  toNumber: (value: Decimal): number => value.toNumber(),
+  toExponential: (value: Decimal, precision?: number): string => value.toExponential(precision),
+
+  // Safe number conversion for UI (handles extreme values)
+  toSafeNumber: (value: Decimal): number => {
+    if (!value.isFinite()) return 0;
+    const num = value.toNumber();
+    return isFinite(num) ? num : 0;
+  },
+
+  // Formatting for display
+  format: (value: Decimal, options?: { precision?: number; scientific?: boolean }): string => {
+    if (!value.isFinite()) {
+      return value.isNaN() ? 'NaN' : value.isNegative() ? '-∞' : '∞';
     }
 
-    // Try to use break_eternity.js if available
-    if (BreakEternity) {
-      try {
-        this._value = new BreakEternity(value as any);
-        this._isBreakEternity = true;
-        return;
-      } catch (error) {
-        console.warn('BreakEternity failed, falling back to native numbers:', error);
+    const num = value.toNumber();
+    if (isFinite(num)) {
+      // For small numbers, use regular formatting
+      if (Math.abs(num) < 1000000) {
+        return num.toLocaleString(undefined, {
+          maximumFractionDigits: options?.precision ?? 2
+        });
       }
     }
 
-    // Fallback to native numbers
-    this._value = new NativeNumber(value);
-    this._isBreakEternity = false;
-  }
-
-  // Public API methods that delegate to the underlying implementation
-  add(other: LargeNumber): LargeNumber {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      const result = (this._value as any).add(other._value);
-      return new LargeNumber(result);
+    // For large numbers, use scientific notation
+    if (options?.scientific) {
+      return value.toExponential(options.precision ?? 2);
     }
-    const result = this._value.add(other._value);
-    return new LargeNumber(result);
-  }
 
-  subtract(other: LargeNumber): LargeNumber {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      const result = (this._value as any).sub(other._value);
-      return new LargeNumber(result);
-    }
-    const result = this._value.subtract(other._value);
-    return new LargeNumber(result);
-  }
+    // Let break_eternity handle the formatting for extreme values
+    return value.toString();
+  },
 
-  multiply(other: LargeNumber): LargeNumber {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      const result = (this._value as any).mul(other._value);
-      return new LargeNumber(result);
-    }
-    const result = this._value.multiply(other._value);
-    return new LargeNumber(result);
-  }
+  // Constants
+  get ZERO(): Decimal { return getDecimalConstructor().ZERO; },
+  get ONE(): Decimal { return getDecimalConstructor().ONE; },
+  get INFINITY(): Decimal { return getDecimalConstructor().INFINITY; },
+  get NEGATIVE_INFINITY(): Decimal { return getDecimalConstructor().NEGATIVE_INFINITY; },
 
-  divide(other: LargeNumber): LargeNumber {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      const result = (this._value as any).div(other._value);
-      return new LargeNumber(result);
-    }
-    const result = this._value.divide(other._value);
-    return new LargeNumber(result);
+  // Check if value is a Decimal
+  isDecimal: (value: any): value is Decimal => {
+    return value && typeof value.add === 'function' && typeof value.toString === 'function';
   }
+};
 
-  pow(exponent: number): LargeNumber {
-    if (this._isBreakEternity) {
-      const result = (this._value as any).pow(exponent);
-      return new LargeNumber(result);
-    }
-    const result = this._value.toNumber() ** exponent;
-    return new LargeNumber(result);
+// Export the Decimal constructor for direct use
+export const Decimal = getDecimalConstructor();
+
+// Type guards and utilities
+export const isDecimal = DecimalOps.isDecimal;
+
+// Migration utilities for systematic replacement
+export const MigrationUtils = {
+  // Find all LargeNumber references in a string
+  findLargeNumberReferences: (code: string): string[] => {
+    const patterns = [
+      /LargeNumber/g,
+      /toLargeNumber/g,
+      /new LargeNumber/g,
+      /\.add\(new LargeNumber/g,
+      /\.subtract\(new LargeNumber/g,
+      /\.multiply\(new LargeNumber/g,
+      /\.divide\(new LargeNumber/g,
+      /LargeNumber\./g,
+    ];
+
+    const matches: string[] = [];
+    patterns.forEach(pattern => {
+      const found = code.match(pattern);
+      if (found) matches.push(...found);
+    });
+
+    return [...new Set(matches)]; // Remove duplicates
+  },
+
+  // Replace common LargeNumber patterns
+  migrateCode: (code: string): string => {
+    return code
+      // Import changes
+      .replace(/import \{ LargeNumber \} from ['"].*large-number['"]/g,
+               "import { DecimalOps, Decimal } from './large-number'")
+      .replace(/import \{.*toLargeNumber.*\} from ['"].*migration-utils['"]/g,
+               "import { toDecimal } from './migration-utils'")
+
+      // Type annotations
+      .replace(/number \| LargeNumber/g, 'number | Decimal')
+      .replace(/LargeNumber \| number/g, 'Decimal | number')
+      .replace(/LargeNumber/g, 'Decimal')
+
+      // Constructor calls
+      .replace(/new LargeNumber\(([^)]+)\)/g, 'DecimalOps.create($1)')
+
+      // Arithmetic operations
+      .replace(/\.add\(new LargeNumber\(([^)]+)\)\)/g, (_match, arg) =>
+        `.add(DecimalOps.create(${arg}))`)
+      .replace(/\.subtract\(new LargeNumber\(([^)]+)\)\)/g, (_match, arg) =>
+        `.subtract(DecimalOps.create(${arg}))`)
+      .replace(/\.multiply\(new LargeNumber\(([^)]+)\)\)/g, (_match, arg) =>
+        `.multiply(DecimalOps.create(${arg}))`)
+      .replace(/\.divide\(new LargeNumber\(([^)]+)\)\)/g, (_match, arg) =>
+        `.divide(DecimalOps.create(${arg}))`)
+
+      // Comparison methods
+      .replace(/\.gte\(/g, (_match, after) => `.gte(DecimalOps.create(${after.split(')')[0]}))`)
+      .replace(/\.lte\(/g, (_match, after) => `.lte(DecimalOps.create(${after.split(')')[0]}))`)
+      .replace(/\.gt\(/g, (_match, after) => `.gt(DecimalOps.create(${after.split(')')[0]}))`)
+      .replace(/\.lt\(/g, (_match, after) => `.lt(DecimalOps.create(${after.split(')')[0]}))`)
+      .replace(/\.eq\(/g, (_match, after) => `.eq(DecimalOps.create(${after.split(')')[0]}))`)
+
+      // Conversion functions
+      .replace(/toLargeNumber\(/g, 'toDecimal(')
+      .replace(/\.toNumber\(\)/g, (_match) => 'DecimalOps.toSafeNumber(')
+
+      // Static methods
+      .replace(/LargeNumber\.from\(/g, 'DecimalOps.create(')
+      .replace(/LargeNumber\.add\(/g, 'DecimalOps.add(')
+      .replace(/LargeNumber\.subtract\(/g, 'DecimalOps.subtract(')
+      .replace(/LargeNumber\.multiply\(/g, 'DecimalOps.multiply(')
+      .replace(/LargeNumber\.divide\(/g, 'DecimalOps.divide(');
   }
+};
 
-  gte(other: LargeNumber): boolean {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      return (this._value as any).gte(other._value);
-    }
-    return this._value.toNumber() >= other._value.toNumber();
-  }
-
-  gt(other: LargeNumber): boolean {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      return (this._value as any).gt(other._value);
-    }
-    return this._value.toNumber() > other._value.toNumber();
-  }
-
-  lte(other: LargeNumber): boolean {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      return (this._value as any).lte(other._value);
-    }
-    return this._value.toNumber() <= other._value.toNumber();
-  }
-
-  lt(other: LargeNumber): boolean {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      return (this._value as any).lt(other._value);
-    }
-    return this._value.toNumber() < other._value.toNumber();
-  }
-
-  eq(other: LargeNumber): boolean {
-    if (this._isBreakEternity && other._isBreakEternity) {
-      return (this._value as any).eq(other._value);
-    }
-    return this._value.toNumber() === other._value.toNumber();
-  }
-
-  // Debug method to check internal value type
-  getValueType(): string {
-    return this._isBreakEternity ? 'BreakEternity' : this._value.constructor.name;
-  }
-
-  // Debug method to inspect internal value (for debugging only)
-  getDebugInfo(): any {
-    return {
-      type: this.getValueType(),
-      isBreakEternity: this._isBreakEternity,
-      toString: this.toString(),
-      toNumber: this.toNumber(),
-      internal: this._value,
-    };
-  }
-
-  toString(): string {
-    if (this._isBreakEternity) {
-      return (this._value as any).toString();
-    }
-    return this._value.toString();
-  }
-
-  toNumber(): number {
-    if (this._isBreakEternity) {
-      const num = (this._value as any).toNumber();
-      // For extreme values, JavaScript can't represent them as Numbers
-      // This is the fundamental limitation - extreme values exceed Number.MAX_VALUE
-      return num;
-    }
-    const num = this._value.toNumber();
-    return num;
-  }
-
-  // Safe conversion for UI/display purposes - returns finite number or 0 for extreme values
-  toSafeNumber(): number {
-    if (this._isBreakEternity) {
-      const num = (this._value as any).toNumber();
-      return isFinite(num) ? num : 0;
-    }
-    const num = this._value.toNumber();
-    return isFinite(num) ? num : 0;
-  }
-
-  // Get a value safe for Decimal constructor - handles extreme values
-  toDecimalSafe(): number | string {
-    if (this._isBreakEternity) {
-      const num = (this._value as any).toNumber();
-      return isFinite(num) ? num : this.toString();
-    }
-    const num = this._value.toNumber();
-    return isFinite(num) ? num : this._value.toString();
-  }
-
-  toJSON(): string {
-    if (this._isBreakEternity) {
-      return (this._value as any).toJSON();
-    }
-    return this._value.toJSON();
-  }
-
-  // Static factory methods
-  static from(value: number | string | LargeNumber): LargeNumber {
-    return new LargeNumber(value);
-  }
-
-  static add(a: LargeNumber, b: LargeNumber): LargeNumber {
-    return a.add(b);
-  }
-
-  static subtract(a: LargeNumber, b: LargeNumber): LargeNumber {
-    return a.subtract(b);
-  }
-
-  static multiply(a: LargeNumber, b: LargeNumber): LargeNumber {
-    return a.multiply(b);
-  }
-
-  static divide(a: LargeNumber, b: LargeNumber): LargeNumber {
-    return a.divide(b);
-  }
-
-  static pow(base: LargeNumber, exponent: number): LargeNumber {
-    return base.pow(exponent);
-  }
-
-  // Utility methods for migration
-  static isLargeNumber(value: any): value is LargeNumber {
-    return value instanceof LargeNumber;
-  }
-
-  static toLargeNumber(value: any): LargeNumber {
-    if (this.isLargeNumber(value)) {
-      return value;
-    }
-    return new LargeNumber(value);
-  }
-}
-
-// Export for global use
+// Export for global use (backward compatibility during migration)
 if (typeof window !== 'undefined') {
-  (window as any).LargeNumber = LargeNumber;
+  (window as any).DecimalOps = DecimalOps;
+  (window as any).Decimal = Decimal;
+  (window as any).MigrationUtils = MigrationUtils;
 }

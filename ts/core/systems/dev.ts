@@ -1,8 +1,8 @@
 // Dev system: unlock helpers, time travel, and resource tweaks (TypeScript)
-// Enhanced with LargeNumber scaling test functions
+// Enhanced with Decimal scaling test functions
 
-import { LargeNumber } from '../numbers/large-number';
-import { toLargeNumber, add } from '../numbers/migration-utils';
+import { DecimalOps, Decimal } from '../numbers/large-number';
+import { toDecimal , add} from '../numbers/migration-utils';
 
 type Win = typeof window & {
   Decimal?: any;
@@ -19,7 +19,7 @@ type Win = typeof window & {
 };
 
 function toNum(v: any): number {
-  return v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
+  return v && typeof v.toNumber === 'function' ? DecimalOps.toSafeNumber(v) : Number(v || 0);
 }
 
 export function unlockAll(): boolean {
@@ -134,7 +134,7 @@ export function addSips(amount: number): boolean {
     const w = window as Win;
     if (typeof w.sips === 'undefined' || w.sips === null) return false;
     w.sips = w.sips.plus ? w.sips.plus(amount) : toNum(w.sips) + Number(amount || 0);
-    // Prefer action to keep LargeNumber in state when available
+    // Prefer action to keep Decimal in state when available
     try {
       w.App?.state?.actions?.setSips?.(w.sips);
     } catch (error) {
@@ -264,29 +264,29 @@ export function addMassiveSips(): boolean {
 
     if (!w.sips) return false;
 
-    // Create a LargeNumber with 1e500 sips (way beyond JavaScript limits)
-    const massiveAmount = new LargeNumber('1e500');
+    // Create a Decimal with 1e500 sips (way beyond JavaScript limits)
+    const massiveAmount = new Decimal('1e500');
     console.log(`Adding ${massiveAmount.toString()} sips`);
 
-    // Add to current sips using LargeNumber system
-    const currentSips = toLargeNumber(w.sips);
+    // Add to current sips using Decimal system
+    const currentSips = toDecimal(w.sips);
     const newSips = add(currentSips, massiveAmount);
 
-    // Update the sips value - keep as LargeNumber for proper handling
+    // Update the sips value - keep as Decimal for proper handling
     if (w.Decimal) {
-      // For very large numbers, use LargeNumber directly, fallback to Decimal for smaller values
-      if (Number.isFinite(newSips.toNumber())) {
-        w.sips = new w.Decimal(newSips.toNumber());
+      // For very large numbers, use Decimal directly, fallback to Decimal for smaller values
+      if (Number.isFinite(DecimalOps.toSafeNumber(newSips))) {
+        w.sips = new w.Decimal(DecimalOps.toSafeNumber(newSips));
       } else {
-        // For extremely large numbers, store the LargeNumber directly
+        // For extremely large numbers, store the Decimal directly
         w.sips = newSips;
       }
     } else {
-      // For extremely large numbers, store the LargeNumber directly
+      // For extremely large numbers, store the Decimal directly
       w.sips = newSips;
     }
 
-    // Update state with LargeNumber value
+    // Update state with Decimal value
     w.App?.state?.actions?.setSips?.(newSips);
     w.App?.ui?.updateTopSipCounter?.();
     w.App?.ui?.checkUpgradeAffordability?.();
@@ -310,12 +310,12 @@ export function addHugeStraws(): boolean {
 
     if (typeof w.straws === 'undefined' || w.straws === null) return false;
 
-    // Create a LargeNumber with 1e750 straws (demonstrating break_eternity.js)
-    const hugeAmount = new LargeNumber('1e750');
+    // Create a Decimal with 1e750 straws (demonstrating break_eternity.js)
+    const hugeAmount = new Decimal('1e750');
     console.log(`Adding ${hugeAmount.toString()} straws`);
 
-    // Add to current straws using LargeNumber system
-    const currentStraws = toLargeNumber(w.straws);
+    // Add to current straws using Decimal system
+    const currentStraws = toDecimal(w.straws);
     const newStraws = add(currentStraws, hugeAmount);
 
     // Always update Zustand state first (this is what UI reads from)
@@ -323,15 +323,15 @@ export function addHugeStraws(): boolean {
 
     // Also update window property for compatibility
     try {
-      if (w.Decimal && Number.isFinite(newStraws.toNumber())) {
-        w.straws = new w.Decimal(newStraws.toNumber());
+      if (w.Decimal && Number.isFinite(DecimalOps.toSafeNumber(newStraws))) {
+        w.straws = new w.Decimal(DecimalOps.toSafeNumber(newStraws));
       } else {
         w.straws = newStraws;
       }
     } catch (error) {
-      // Fallback: just set the LargeNumber directly
+      // Fallback: just set the Decimal directly
       w.straws = newStraws;
-      console.warn('Failed to set window.straws, using LargeNumber directly:', error);
+      console.warn('Failed to set window.straws, using Decimal directly:', error);
     }
 
     // Update UI with a small delay to ensure state is settled
@@ -360,12 +360,12 @@ export function addMassiveCups(): boolean {
 
     if (typeof w.cups === 'undefined' || w.cups === null) return false;
 
-    // Create a LargeNumber with 1e1000 cups (extreme break_eternity.js test)
-    const massiveAmount = new LargeNumber('1e1000');
+    // Create a Decimal with 1e1000 cups (extreme break_eternity.js test)
+    const massiveAmount = new Decimal('1e1000');
     console.log(`Adding ${massiveAmount.toString()} cups`);
 
-    // Add to current cups using LargeNumber system
-    const currentCups = toLargeNumber(w.cups);
+    // Add to current cups using Decimal system
+    const currentCups = toDecimal(w.cups);
     const newCups = add(currentCups, massiveAmount);
 
     // Always update Zustand state first (this is what UI reads from)
@@ -373,15 +373,15 @@ export function addMassiveCups(): boolean {
 
     // Also update window property for compatibility
     try {
-      if (w.Decimal && Number.isFinite(newCups.toNumber())) {
-        w.cups = new w.Decimal(newCups.toNumber());
+      if (w.Decimal && Number.isFinite(DecimalOps.toSafeNumber(newCups))) {
+        w.cups = new w.Decimal(DecimalOps.toSafeNumber(newCups));
       } else {
         w.cups = newCups;
       }
     } catch (error) {
-      // Fallback: just set the LargeNumber directly
+      // Fallback: just set the Decimal directly
       w.cups = newCups;
-      console.warn('Failed to set window.cups, using LargeNumber directly:', error);
+      console.warn('Failed to set window.cups, using Decimal directly:', error);
     }
 
     // Update UI with a small delay to ensure state is settled
@@ -408,15 +408,15 @@ export function addExtremeResources(): boolean {
     const w = window as Win;
     console.log('🚀 Adding extreme resources (1e2000 each)...');
 
-    const extremeAmount = new LargeNumber('1e2000');
+    const extremeAmount = new Decimal('1e2000');
 
     // Add sips
     if (typeof w.sips !== 'undefined') {
-      const currentSips = toLargeNumber(w.sips);
+      const currentSips = toDecimal(w.sips);
       const newSips = add(currentSips, extremeAmount);
       if (w.Decimal) {
-        if (Number.isFinite(newSips.toNumber())) {
-          w.sips = new w.Decimal(newSips.toNumber());
+        if (Number.isFinite(DecimalOps.toSafeNumber(newSips))) {
+          w.sips = new w.Decimal(DecimalOps.toSafeNumber(newSips));
         } else {
           w.sips = newSips;
         }
@@ -429,7 +429,7 @@ export function addExtremeResources(): boolean {
 
     // Add straws
     if (typeof w.straws !== 'undefined') {
-      const currentStraws = toLargeNumber(w.straws);
+      const currentStraws = toDecimal(w.straws);
       const newStraws = add(currentStraws, extremeAmount);
 
       // Always update Zustand state first (this is what UI reads from)
@@ -437,15 +437,15 @@ export function addExtremeResources(): boolean {
 
       // Also update window property for compatibility
       try {
-        if (w.Decimal && Number.isFinite(newStraws.toNumber())) {
-          w.straws = new w.Decimal(newStraws.toNumber());
+        if (w.Decimal && Number.isFinite(DecimalOps.toSafeNumber(newStraws))) {
+          w.straws = new w.Decimal(DecimalOps.toSafeNumber(newStraws));
         } else {
           w.straws = newStraws;
         }
       } catch (error) {
-        // Fallback: just set the LargeNumber directly
+        // Fallback: just set the Decimal directly
         w.straws = newStraws;
-        console.warn('Failed to set window.straws, using LargeNumber directly:', error);
+        console.warn('Failed to set window.straws, using Decimal directly:', error);
       }
 
       console.log(`✅ Straws: ${newStraws.toString()}`);
@@ -453,7 +453,7 @@ export function addExtremeResources(): boolean {
 
     // Add cups
     if (typeof w.cups !== 'undefined') {
-      const currentCups = toLargeNumber(w.cups);
+      const currentCups = toDecimal(w.cups);
       const newCups = add(currentCups, extremeAmount);
 
       // Always update Zustand state first (this is what UI reads from)
@@ -461,15 +461,15 @@ export function addExtremeResources(): boolean {
 
       // Also update window property for compatibility
       try {
-        if (w.Decimal && Number.isFinite(newCups.toNumber())) {
-          w.cups = new w.Decimal(newCups.toNumber());
+        if (w.Decimal && Number.isFinite(DecimalOps.toSafeNumber(newCups))) {
+          w.cups = new w.Decimal(DecimalOps.toSafeNumber(newCups));
         } else {
           w.cups = newCups;
         }
       } catch (error) {
-        // Fallback: just set the LargeNumber directly
+        // Fallback: just set the Decimal directly
         w.cups = newCups;
-        console.warn('Failed to set window.cups, using LargeNumber directly:', error);
+        console.warn('Failed to set window.cups, using Decimal directly:', error);
       }
 
       console.log(`✅ Cups: ${newCups.toString()}`);
@@ -515,13 +515,13 @@ export function testScientificNotation(): boolean {
     testAmounts.forEach((amount, index) => {
       setTimeout(() => {
         if (w.sips) {
-          const largeAmount = new LargeNumber(amount);
-          const currentSips = toLargeNumber(w.sips);
+          const largeAmount = new Decimal(amount);
+          const currentSips = toDecimal(w.sips);
           const newSips = add(currentSips, largeAmount);
 
           if (w.Decimal) {
-            if (Number.isFinite(newSips.toNumber())) {
-              w.sips = new w.Decimal(newSips.toNumber());
+            if (Number.isFinite(DecimalOps.toSafeNumber(newSips))) {
+              w.sips = new w.Decimal(DecimalOps.toSafeNumber(newSips));
             } else {
               w.sips = newSips;
             }
@@ -555,9 +555,9 @@ export function resetAllResources(): boolean {
 
     // Always update Zustand state first (this is what UI reads from)
     w.App?.state?.setState?.({
-      sips: new LargeNumber(0),
-      straws: new LargeNumber(0),
-      cups: new LargeNumber(0),
+      sips: new Decimal(0),
+      straws: new Decimal(0),
+      cups: new Decimal(0),
     });
 
     // Also update window properties for compatibility

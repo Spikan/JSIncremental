@@ -1,89 +1,53 @@
-// Migration utilities for gradual transition to LargeNumber
-// Provides helper functions to convert between different number types
+// Direct break_eternity.js utilities
+// No wrapper - direct Decimal operations for maximum performance
 
-import { LargeNumber } from './large-number';
-import { NumericOperations } from '../../../types/global';
+import { DecimalOps, Decimal, isDecimal } from './large-number';
 
-export type NumericValue = number | string | LargeNumber | NumericOperations | any;
+export type NumericValue = number | string | Decimal | any;
 
 /**
- * Safely converts any value to LargeNumber
+ * Safely converts any value to Decimal (direct break_eternity.js)
  */
-export function toLargeNumber(value: NumericValue): LargeNumber {
-  if (value instanceof LargeNumber) {
+export function toDecimal(value: NumericValue): Decimal {
+  if (isDecimal(value)) {
     return value;
-  }
-
-  // Handle NumericOperations objects (including Decimal.js or break_eternity.js objects)
-  if (value && typeof (value as NumericOperations).add === 'function') {
-    try {
-      // If it's already a LargeNumber, return as-is
-      if (value instanceof LargeNumber) {
-        return value;
-      }
-      // Otherwise, convert through string to preserve precision
-      return new LargeNumber(value.toString());
-    } catch (error) {
-      console.warn('Failed to convert NumericOperations to LargeNumber:', error);
-    }
   }
 
   // Handle string representations
   if (typeof value === 'string') {
     try {
-      return new LargeNumber(value);
+      return DecimalOps.create(value);
     } catch (error) {
-      console.warn('Failed to convert string to LargeNumber:', error);
-      return new LargeNumber(0);
+      console.warn('Failed to convert string to Decimal:', error);
+      return DecimalOps.create(0);
     }
   }
 
   // Handle numbers
   if (typeof value === 'number') {
-    return new LargeNumber(value);
+    return DecimalOps.create(value);
   }
 
   // Fallback
-  return new LargeNumber(0);
+  return DecimalOps.create(0);
 }
 
 /**
- * Converts LargeNumber back to number for backward compatibility
+ * Converts Decimal back to number for UI/display purposes
  */
 export function toNumber(value: NumericValue): number {
-  if (value instanceof LargeNumber) {
-    return value.toNumber();
-  }
-
-  // Handle Decimal.js-like objects safely
-  if (
-    value &&
-    (typeof (value as any).toString === 'function' || typeof (value as any).toNumber === 'function')
-  ) {
-    try {
-      const str = (value as any).toString?.();
-      // If string looks like scientific notation or non-finite when parsed, avoid Number()
-      if (typeof str === 'string') {
-        const n = Number(str);
-        if (Number.isFinite(n)) return n;
-        // Non-finite: return 0 to avoid Infinity leaks into UI
-        return 0;
-      }
-      const n = (value as any).toNumber?.();
-      return Number.isFinite(n) ? n : 0;
-    } catch (error) {
-      console.warn('Failed to convert Decimal-like to number:', error);
-    }
-  }
-
-  // Handle strings
-  if (typeof value === 'string') {
-    return Number(value) || 0;
+  if (isDecimal(value)) {
+    return DecimalOps.toSafeNumber(value);
   }
 
   // Handle numbers
   if (typeof value === 'number') {
     return value;
+  }
+
+  // Handle strings
+  if (typeof value === 'string') {
+    return Number(value) || 0;
   }
 
   return 0;
@@ -93,17 +57,8 @@ export function toNumber(value: NumericValue): number {
  * Converts to string representation suitable for display
  */
 export function toString(value: NumericValue): string {
-  if (value instanceof LargeNumber) {
-    return value.toString();
-  }
-
-  // Handle Decimal.js objects
-  if (value && typeof value.toString === 'function') {
-    try {
-      return value.toString();
-    } catch (error) {
-      console.warn('Failed to convert Decimal to string:', error);
-    }
+  if (isDecimal(value)) {
+    return DecimalOps.toString(value);
   }
 
   return String(value || 0);
@@ -112,224 +67,107 @@ export function toString(value: NumericValue): string {
 /**
  * Safely performs addition with mixed number types
  */
-export function add(a: NumericValue, b: NumericValue): LargeNumber {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.add(bLarge);
+export function add(a: NumericValue, b: NumericValue): Decimal {
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.add(aDec, bDec);
 }
 
 /**
  * Safely performs subtraction with mixed number types
  */
-export function subtract(a: NumericValue, b: NumericValue): LargeNumber {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.subtract(bLarge);
+export function subtract(a: NumericValue, b: NumericValue): Decimal {
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.subtract(aDec, bDec);
 }
 
 /**
  * Safely performs multiplication with mixed number types
  */
-export function multiply(a: NumericValue, b: NumericValue): LargeNumber {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.multiply(bLarge);
+export function multiply(a: NumericValue, b: NumericValue): Decimal {
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.multiply(aDec, bDec);
 }
 
 /**
  * Safely performs division with mixed number types
  */
-export function divide(a: NumericValue, b: NumericValue): LargeNumber {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.divide(bLarge);
+export function divide(a: NumericValue, b: NumericValue): Decimal {
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.divide(aDec, bDec);
 }
 
 /**
  * Safely performs exponentiation
  */
-export function pow(base: NumericValue, exponent: number): LargeNumber {
-  const baseLarge = toLargeNumber(base);
-  return baseLarge.pow(exponent);
+export function pow(base: NumericValue, exponent: number): Decimal {
+  const baseDec = toDecimal(base);
+  return DecimalOps.power(baseDec, exponent);
 }
 
 /**
  * Safely compares two values
  */
 export function gte(a: NumericValue, b: NumericValue): boolean {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.gte(bLarge);
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.greaterThanOrEqual(aDec, bDec);
 }
 
 export function gt(a: NumericValue, b: NumericValue): boolean {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.gt(bLarge);
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.greaterThan(aDec, bDec);
 }
 
 export function lte(a: NumericValue, b: NumericValue): boolean {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.lte(bLarge);
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.lessThanOrEqual(aDec, bDec);
 }
 
 export function lt(a: NumericValue, b: NumericValue): boolean {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.lt(bLarge);
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.lessThan(aDec, bDec);
 }
 
 export function eq(a: NumericValue, b: NumericValue): boolean {
-  const aLarge = toLargeNumber(a);
-  const bLarge = toLargeNumber(b);
-  return aLarge.eq(bLarge);
+  const aDec = toDecimal(a);
+  const bDec = toDecimal(b);
+  return DecimalOps.equal(aDec, bDec);
 }
 
 /**
- * Checks if a value is already a LargeNumber
+ * Formats a number for display, handling very large numbers
  */
-export function isLargeNumber(value: any): value is LargeNumber {
-  return value instanceof LargeNumber;
-}
-
-/**
- * Checks if a value supports Decimal.js-like operations
- */
-export function isDecimalLike(value: any): boolean {
-  return (
-    value &&
-    typeof value.toNumber === 'function' &&
-    typeof value.toString === 'function' &&
-    typeof value.plus === 'function'
-  );
-}
-
-/**
- * Migrates a game state object to use LargeNumber
- */
-export function migrateStateToLargeNumber(state: any): any {
-  const migrated: any = {};
-
-  for (const [key, value] of Object.entries(state)) {
-    if (typeof value === 'number') {
-      migrated[key] = toLargeNumber(value);
-    } else if (isDecimalLike(value)) {
-      migrated[key] = toLargeNumber(value);
-    } else {
-      migrated[key] = value;
-    }
+export function formatDecimal(value: NumericValue): string {
+  if (isDecimal(value)) {
+    return DecimalOps.format(value);
   }
 
-  return migrated;
-}
-
-/**
- * Migrates a game state object back to numbers for serialization
- */
-export function migrateStateToNumbers(state: any): any {
-  const migrated: any = {};
-
-  for (const [key, value] of Object.entries(state)) {
-    if (isLargeNumber(value)) {
-      migrated[key] = toNumber(value);
-    } else if (isDecimalLike(value)) {
-      migrated[key] = toNumber(value);
-    } else {
-      migrated[key] = value;
-    }
-  }
-
-  return migrated;
-}
-
-/**
- * Batch converts an array of values to LargeNumber
- */
-export function batchToLargeNumber(values: NumericValue[]): LargeNumber[] {
-  return values.map(value => toLargeNumber(value));
-}
-
-/**
- * Batch converts an array of LargeNumbers to numbers
- */
-export function batchToNumber(values: NumericValue[]): number[] {
-  return values.map(value => toNumber(value));
-}
-
-/**
- * Safely formats a number for display, handling very large numbers
- */
-export function formatLargeNumber(value: NumericValue): string {
-  if (isLargeNumber(value)) {
-    // For LargeNumber with break_eternity, use its built-in formatting
-    try {
-      const debugInfo = value.getDebugInfo();
-      if (debugInfo.isBreakEternity) {
-        // break_eternity.js has excellent formatting capabilities
-        return value.toString();
-      }
-    } catch (error) {
-      console.warn('Failed to get LargeNumber debug info:', error);
-    }
-
-    // For LargeNumber, check if it's very large by comparing with LargeNumber values
-    const oneMillion = new LargeNumber('1000000');
-    const negativeOneMillion = new LargeNumber('-1000000');
-
-    // Use scientific notation for very large numbers
-    if (value.gte(oneMillion) || value.lte(negativeOneMillion)) {
-      return value.toString(); // Let break_eternity handle formatting
-    }
-
-    // For smaller LargeNumbers, try to get the number value safely
-    try {
-      const numValue = value.toNumber();
-      if (Number.isFinite(numValue)) {
-        return numValue.toLocaleString(undefined, { maximumFractionDigits: 2 });
-      } else {
-        // If toNumber() returns Infinity, use toString()
-        return value.toString();
-      }
-    } catch (error) {
-      // Fallback to toString if toNumber fails
-      return value.toString();
-    }
-  }
-
-  // Handle break_eternity.js Decimal objects directly
-  if (isDecimalLike(value)) {
-    try {
-      // Check if it's a break_eternity.js object by looking for specific methods
-      if (typeof (value as any).toString === 'function') {
-        return (value as any).toString();
-      }
-    } catch (error) {
-      console.warn('Failed to format break_eternity.js object:', error);
-    }
-
-    const numValue = toNumber(value);
-    if (numValue >= 1e6 || numValue <= -1e6) {
-      return value.toString();
-    }
-    return numValue.toLocaleString(undefined, { maximumFractionDigits: 2 });
-  }
-
-  // Handle regular numbers
+  // Handle regular numbers with proper type checking
   if (typeof value === 'number') {
     if (value >= 1e6 || value <= -1e6) {
-      return value.toExponential(2);
+      return (value as number).toExponential(2);
     }
-    return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    return (value as number).toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 
   return String(value || 0);
 }
 
+// Legacy function names for backward compatibility during migration
+export const toLargeNumber = toDecimal;
+export const isLargeNumber = isDecimal;
+
 // Export for global use
 if (typeof window !== 'undefined') {
-  (window as any).NumberMigration = {
-    toLargeNumber,
+  (window as any).DecimalUtils = {
+    toDecimal,
     toNumber,
     toString,
     add,
@@ -342,12 +180,10 @@ if (typeof window !== 'undefined') {
     lte,
     lt,
     eq,
+    isDecimal,
+    formatDecimal,
+    // Legacy aliases
+    toLargeNumber,
     isLargeNumber,
-    isDecimalLike,
-    migrateStateToLargeNumber,
-    migrateStateToNumbers,
-    batchToLargeNumber,
-    batchToNumber,
-    formatLargeNumber,
   };
 }

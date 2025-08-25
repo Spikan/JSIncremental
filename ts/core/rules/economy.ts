@@ -1,17 +1,17 @@
-// Economy formulas for SPD and totals with LargeNumber support (TypeScript)
-// Enhanced for very large numbers with scaling and balance considerations
+// Economy formulas for SPD and totals with direct Decimal support (TypeScript)
+// Maximum performance with direct break_eternity.js operations
 
-import { LargeNumber } from '../numbers/large-number';
+import { DecimalOps, Decimal } from '../numbers/large-number';
 import { pow } from '../numbers/migration-utils';
 
 // ===== Safe numeric helpers =====
-function safeExponentFromLarge(exponent: LargeNumber, max: number = 1_000_000): number {
+function safeExponentFromDecimal(exponent: Decimal, max: number = 1_000_000): number {
   try {
-    const n = (exponent as any).toNumber?.();
+    const n = DecimalOps.toSafeNumber(exponent);
     if (Number.isFinite(n)) return Math.max(0, Math.min(n, max));
   } catch {}
   try {
-    const s = (exponent as any).toString?.() as string;
+    const s = DecimalOps.toString(exponent);
     if (typeof s === 'string') {
       // Parse scientific notation like 1.23e+456
       const m = s.match(/^[^eE]+e([+\-]?\d+)$/);
@@ -24,13 +24,13 @@ function safeExponentFromLarge(exponent: LargeNumber, max: number = 1_000_000): 
   return max;
 }
 
-function safeLog10FromLarge(value: LargeNumber): number {
+function safeLog10FromDecimal(value: Decimal): number {
   try {
-    const n = (value as any).toNumber?.();
+    const n = DecimalOps.toSafeNumber(value);
     if (Number.isFinite(n) && n > 0) return Math.log10(n);
   } catch {}
   try {
-    const s = (value as any).toString?.() as string;
+    const s = DecimalOps.toString(value);
     if (typeof s === 'string') {
       // Parse scientific notation mantissa and exponent
       const m = s.match(/^([\d.]+)e([+\-]?\d+)$/i);
@@ -48,129 +48,157 @@ function safeLog10FromLarge(value: LargeNumber): number {
 // Configuration for large number scaling
 const ECONOMY_CONFIG = {
   // Soft caps to prevent numbers from growing too rapidly
-  strawSoftCap: new LargeNumber('1e100'),
-  cupSoftCap: new LargeNumber('1e100'),
-  totalSoftCap: new LargeNumber('1e150'),
+  strawSoftCap: DecimalOps.create('1e100'),
+  cupSoftCap: DecimalOps.create('1e100'),
+  totalSoftCap: DecimalOps.create('1e150'),
 
   // Scaling factors for very large numbers
   largeNumberScaling: {
-    strawMultiplier: new LargeNumber('0.95'), // Slight diminishing returns
-    cupMultiplier: new LargeNumber('0.98'), // Even smaller diminishing returns
-    exponentialBase: new LargeNumber('1.001'), // Very gentle exponential growth
+    strawMultiplier: DecimalOps.create('0.95'), // Slight diminishing returns
+    cupMultiplier: DecimalOps.create('0.98'), // Even smaller diminishing returns
+    exponentialBase: DecimalOps.create('1.001'), // Very gentle exponential growth
   },
 
   // Advanced economy mechanics
-  synergyBonus: new LargeNumber('1.1'), // Bonus when both straws and cups are high
-  milestoneBonus: new LargeNumber('2.0'), // Bonus at certain thresholds
+  synergyBonus: DecimalOps.create('1.1'), // Bonus when both straws and cups are high
+  milestoneBonus: DecimalOps.create('2.0'), // Bonus at certain thresholds
 };
 
 export function computeStrawSPD(
-  straws: number | string | LargeNumber,
-  baseSPD: number | string | LargeNumber,
-  widerStrawsCount: number | string | LargeNumber,
-  widerMultiplierPerLevel: number | string | LargeNumber = 0
-): LargeNumber {
-  const strawCount = new LargeNumber(straws);
-  const baseValue = new LargeNumber(baseSPD);
+  straws: number | string | Decimal,
+  baseSPD: number | string | Decimal,
+  widerStrawsCount: number | string | Decimal,
+  widerMultiplierPerLevel: number | string | Decimal = 0
+): Decimal {
+  const strawCount = DecimalOps.create(straws);
+  const baseValue = DecimalOps.create(baseSPD);
 
   // Basic wider straws multiplier
-  const upgradeMultiplier = new LargeNumber(1).add(
-    new LargeNumber(widerStrawsCount).multiply(new LargeNumber(widerMultiplierPerLevel))
+  const upgradeMultiplier = DecimalOps.add(
+    DecimalOps.create(1),
+    DecimalOps.multiply(
+      DecimalOps.create(widerStrawsCount),
+      DecimalOps.create(widerMultiplierPerLevel)
+    )
   );
 
   // Calculate base production
-  let totalSPD = baseValue.multiply(upgradeMultiplier);
+  let totalSPD = DecimalOps.multiply(baseValue, upgradeMultiplier);
 
   // Apply scaling for very large numbers
-  if (totalSPD.gte(ECONOMY_CONFIG.strawSoftCap)) {
-    const excess = totalSPD.subtract(ECONOMY_CONFIG.strawSoftCap);
-    const exp = safeExponentFromLarge(excess);
+  if (DecimalOps.greaterThanOrEqual(totalSPD, ECONOMY_CONFIG.strawSoftCap)) {
+    const excess = DecimalOps.subtract(totalSPD, ECONOMY_CONFIG.strawSoftCap);
+    const exp = safeExponentFromDecimal(excess);
     const scaledExcess = pow(ECONOMY_CONFIG.largeNumberScaling.exponentialBase, exp);
-    totalSPD = ECONOMY_CONFIG.strawSoftCap.add(
-      excess.multiply(ECONOMY_CONFIG.largeNumberScaling.strawMultiplier).multiply(scaledExcess)
+    totalSPD = DecimalOps.add(
+      ECONOMY_CONFIG.strawSoftCap,
+      DecimalOps.multiply(
+        DecimalOps.multiply(excess, ECONOMY_CONFIG.largeNumberScaling.strawMultiplier),
+        scaledExcess
+      )
     );
   }
 
   // Add milestone bonuses for significant straw counts
-  if (strawCount.gte(new LargeNumber('1e10'))) {
-    totalSPD = totalSPD.multiply(ECONOMY_CONFIG.milestoneBonus);
+  if (DecimalOps.greaterThanOrEqual(strawCount, DecimalOps.create('1e10'))) {
+    totalSPD = DecimalOps.multiply(totalSPD, ECONOMY_CONFIG.milestoneBonus);
   }
 
   return totalSPD;
 }
 
 export function computeCupSPD(
-  cups: number | string | LargeNumber,
-  baseSPD: number | string | LargeNumber,
-  betterCupsCount: number | string | LargeNumber,
-  betterMultiplierPerLevel: number | string | LargeNumber = 0
-): LargeNumber {
-  const cupCount = new LargeNumber(cups);
-  const baseValue = new LargeNumber(baseSPD);
+  cups: number | string | Decimal,
+  baseSPD: number | string | Decimal,
+  betterCupsCount: number | string | Decimal,
+  betterMultiplierPerLevel: number | string | Decimal = 0
+): Decimal {
+  const cupCount = DecimalOps.create(cups);
+  const baseValue = DecimalOps.create(baseSPD);
 
   // Basic better cups multiplier
-  const upgradeMultiplier = new LargeNumber(1).add(
-    new LargeNumber(betterCupsCount).multiply(new LargeNumber(betterMultiplierPerLevel))
+  const upgradeMultiplier = DecimalOps.add(
+    DecimalOps.create(1),
+    DecimalOps.multiply(
+      DecimalOps.create(betterCupsCount),
+      DecimalOps.create(betterMultiplierPerLevel)
+    )
   );
 
   // Calculate base production
-  let totalSPD = baseValue.multiply(upgradeMultiplier);
+  let totalSPD = DecimalOps.multiply(baseValue, upgradeMultiplier);
 
   // Apply scaling for very large numbers
-  if (totalSPD.gte(ECONOMY_CONFIG.cupSoftCap)) {
-    const excess = totalSPD.subtract(ECONOMY_CONFIG.cupSoftCap);
-    const exp = safeExponentFromLarge(excess);
+  if (DecimalOps.greaterThanOrEqual(totalSPD, ECONOMY_CONFIG.cupSoftCap)) {
+    const excess = DecimalOps.subtract(totalSPD, ECONOMY_CONFIG.cupSoftCap);
+    const exp = safeExponentFromDecimal(excess);
     const scaledExcess = pow(ECONOMY_CONFIG.largeNumberScaling.exponentialBase, exp);
-    totalSPD = ECONOMY_CONFIG.cupSoftCap.add(
-      excess.multiply(ECONOMY_CONFIG.largeNumberScaling.cupMultiplier).multiply(scaledExcess)
+    totalSPD = DecimalOps.add(
+      ECONOMY_CONFIG.cupSoftCap,
+      DecimalOps.multiply(
+        DecimalOps.multiply(excess, ECONOMY_CONFIG.largeNumberScaling.cupMultiplier),
+        scaledExcess
+      )
     );
   }
 
   // Add milestone bonuses for significant cup counts
-  if (cupCount.gte(new LargeNumber('1e10'))) {
-    totalSPD = totalSPD.multiply(ECONOMY_CONFIG.milestoneBonus);
+  if (DecimalOps.greaterThanOrEqual(cupCount, DecimalOps.create('1e10'))) {
+    totalSPD = DecimalOps.multiply(totalSPD, ECONOMY_CONFIG.milestoneBonus);
   }
 
   return totalSPD;
 }
 
 export function computeTotalSPD(
-  straws: number | string | LargeNumber,
-  strawSPD: number | string | LargeNumber,
-  cups: number | string | LargeNumber,
-  cupSPD: number | string | LargeNumber
-): LargeNumber {
-  const strawCount = new LargeNumber(straws);
-  const cupCount = new LargeNumber(cups);
-  const strawValue = new LargeNumber(strawSPD);
-  const cupValue = new LargeNumber(cupSPD);
+  straws: number | string | Decimal,
+  strawSPD: number | string | Decimal,
+  cups: number | string | Decimal,
+  cupSPD: number | string | Decimal
+): Decimal {
+  const strawCount = DecimalOps.create(straws);
+  const cupCount = DecimalOps.create(cups);
+  const strawValue = DecimalOps.create(strawSPD);
+  const cupValue = DecimalOps.create(cupSPD);
 
   // Calculate individual contributions
-  const strawContribution = strawValue.multiply(strawCount);
-  const cupContribution = cupValue.multiply(cupCount);
+  const strawContribution = DecimalOps.multiply(strawValue, strawCount);
+  const cupContribution = DecimalOps.multiply(cupValue, cupCount);
 
   // Add synergy bonus when both straws and cups are significant
-  let synergyMultiplier = new LargeNumber(1);
-  if (strawCount.gte(new LargeNumber('100')) && cupCount.gte(new LargeNumber('100'))) {
-    const strawRatio = strawCount.divide(new LargeNumber('100'));
-    const cupRatio = cupCount.divide(new LargeNumber('100'));
-    const synergyRatio = strawRatio.multiply(cupRatio);
-    const exp = safeExponentFromLarge(synergyRatio);
-    synergyMultiplier = synergyMultiplier.add(
-      ECONOMY_CONFIG.synergyBonus.multiply(pow(new LargeNumber('0.999'), exp))
+  let synergyMultiplier = DecimalOps.create(1);
+  if (DecimalOps.greaterThanOrEqual(strawCount, DecimalOps.create('100')) &&
+      DecimalOps.greaterThanOrEqual(cupCount, DecimalOps.create('100'))) {
+    const strawRatio = DecimalOps.divide(strawCount, DecimalOps.create('100'));
+    const cupRatio = DecimalOps.divide(cupCount, DecimalOps.create('100'));
+    const synergyRatio = DecimalOps.multiply(strawRatio, cupRatio);
+    const exp = safeExponentFromDecimal(synergyRatio);
+    synergyMultiplier = DecimalOps.add(
+      synergyMultiplier,
+      DecimalOps.multiply(
+        ECONOMY_CONFIG.synergyBonus,
+        pow(DecimalOps.create('0.999'), exp)
+      )
     );
   }
 
   // Calculate total before scaling
-  let totalSPD = strawContribution.add(cupContribution).multiply(synergyMultiplier);
+  let totalSPD = DecimalOps.multiply(
+    DecimalOps.add(strawContribution, cupContribution),
+    synergyMultiplier
+  );
 
   // Apply soft cap for extremely large totals
-  if (totalSPD.gte(ECONOMY_CONFIG.totalSoftCap)) {
-    const excess = totalSPD.subtract(ECONOMY_CONFIG.totalSoftCap);
-    const exp = safeExponentFromLarge(excess);
+  if (DecimalOps.greaterThanOrEqual(totalSPD, ECONOMY_CONFIG.totalSoftCap)) {
+    const excess = DecimalOps.subtract(totalSPD, ECONOMY_CONFIG.totalSoftCap);
+    const exp = safeExponentFromDecimal(excess);
     const scaledExcess = pow(ECONOMY_CONFIG.largeNumberScaling.exponentialBase, exp);
-    totalSPD = ECONOMY_CONFIG.totalSoftCap.add(
-      excess.multiply(new LargeNumber('0.9')).multiply(scaledExcess)
+    totalSPD = DecimalOps.add(
+      ECONOMY_CONFIG.totalSoftCap,
+      DecimalOps.multiply(
+        DecimalOps.multiply(excess, DecimalOps.create('0.9')),
+        scaledExcess
+      )
     );
   }
 
@@ -178,21 +206,24 @@ export function computeTotalSPD(
 }
 
 export function computeTotalSipsPerDrink(
-  baseSipsPerDrink: number | string | LargeNumber,
-  totalSPD: number | string | LargeNumber
-): LargeNumber {
-  const base = new LargeNumber(baseSipsPerDrink);
-  const spd = new LargeNumber(totalSPD);
+  baseSipsPerDrink: number | string | Decimal,
+  totalSPD: number | string | Decimal
+): Decimal {
+  const base = DecimalOps.create(baseSipsPerDrink);
+  const spd = DecimalOps.create(totalSPD);
 
   // Calculate total sips per drink
-  let totalSips = base.add(spd);
+  let totalSips = DecimalOps.add(base, spd);
 
   // For extremely high SPD values, add diminishing returns
-  if (spd.gte(new LargeNumber('1e50'))) {
-    const excessSPD = spd.subtract(new LargeNumber('1e50'));
-    const exp = safeExponentFromLarge(excessSPD);
-    const diminishingFactor = pow(new LargeNumber('0.9999'), exp);
-    totalSips = base.add(new LargeNumber('1e50')).add(excessSPD.multiply(diminishingFactor));
+  if (DecimalOps.greaterThanOrEqual(spd, DecimalOps.create('1e50'))) {
+    const excessSPD = DecimalOps.subtract(spd, DecimalOps.create('1e50'));
+    const exp = safeExponentFromDecimal(excessSPD);
+    const diminishingFactor = pow(DecimalOps.create('0.9999'), exp);
+    totalSips = DecimalOps.add(
+      DecimalOps.add(base, DecimalOps.create('1e50')),
+      DecimalOps.multiply(excessSPD, diminishingFactor)
+    );
   }
 
   return totalSips;
@@ -204,42 +235,52 @@ export function computeTotalSipsPerDrink(
  * Calculate prestige bonus based on total sips earned
  */
 export function computePrestigeBonus(
-  totalSipsEarned: number | string | LargeNumber,
-  prestigeLevel: number | string | LargeNumber = 0
-): LargeNumber {
-  const totalSips = new LargeNumber(totalSipsEarned);
-  const prestige = new LargeNumber(prestigeLevel);
+  totalSipsEarned: number | string | Decimal,
+  prestigeLevel: number | string | Decimal = 0
+): Decimal {
+  const totalSips = DecimalOps.create(totalSipsEarned);
+  const prestige = DecimalOps.create(prestigeLevel);
 
   // Base prestige bonus scales logarithmically with total sips
-  const log = safeLog10FromLarge(totalSips);
-  const baseBonus = new LargeNumber('1.1').add(
-    log > 0 ? new LargeNumber(log / 10) : new LargeNumber(0)
+  const log = safeLog10FromDecimal(totalSips);
+  const baseBonus = DecimalOps.add(
+    DecimalOps.create('1.1'),
+    log > 0 ? DecimalOps.create(log / 10) : DecimalOps.create(0)
   );
 
   // Additional bonus from prestige level
-  const prestigeMultiplier = new LargeNumber('1').add(prestige.multiply(new LargeNumber('0.5')));
+  const prestigeMultiplier = DecimalOps.add(
+    DecimalOps.create('1'),
+    DecimalOps.multiply(prestige, DecimalOps.create('0.5'))
+  );
 
-  return baseBonus.multiply(prestigeMultiplier);
+  return DecimalOps.multiply(baseBonus, prestigeMultiplier);
 }
 
 /**
  * Calculate golden straw multiplier for very large straw counts
  */
 export function computeGoldenStrawMultiplier(
-  straws: number | string | LargeNumber,
-  goldenStrawCount: number | string | LargeNumber = 0
-): LargeNumber {
-  const strawCount = new LargeNumber(straws);
-  const goldenCount = new LargeNumber(goldenStrawCount);
+  straws: number | string | Decimal,
+  goldenStrawCount: number | string | Decimal = 0
+): Decimal {
+  const strawCount = DecimalOps.create(straws);
+  const goldenCount = DecimalOps.create(goldenStrawCount);
 
   // Base multiplier from golden straws
-  let multiplier = new LargeNumber('1').add(goldenCount.multiply(new LargeNumber('0.1')));
+  let multiplier = DecimalOps.add(
+    DecimalOps.create('1'),
+    DecimalOps.multiply(goldenCount, DecimalOps.create('0.1'))
+  );
 
   // Bonus multiplier for very large straw counts
-  if (strawCount.gte(new LargeNumber('1e20'))) {
-    const log = safeLog10FromLarge(strawCount);
-    const bonusMultiplier = new LargeNumber('2').add(new LargeNumber(log / 10));
-    multiplier = multiplier.multiply(bonusMultiplier);
+  if (DecimalOps.greaterThanOrEqual(strawCount, DecimalOps.create('1e20'))) {
+    const log = safeLog10FromDecimal(strawCount);
+    const bonusMultiplier = DecimalOps.add(
+      DecimalOps.create('2'),
+      DecimalOps.create(log / 10)
+    );
+    multiplier = DecimalOps.multiply(multiplier, bonusMultiplier);
   }
 
   return multiplier;
@@ -249,70 +290,82 @@ export function computeGoldenStrawMultiplier(
  * Calculate efficiency bonus for optimized production
  */
 export function computeEfficiencyBonus(
-  totalSPD: number | string | LargeNumber,
-  optimizationLevel: number | string | LargeNumber = 0
-): LargeNumber {
-  const spd = new LargeNumber(totalSPD);
-  const optimization = new LargeNumber(optimizationLevel);
+  totalSPD: number | string | Decimal,
+  optimizationLevel: number | string | Decimal = 0
+): Decimal {
+  const spd = DecimalOps.create(totalSPD);
+  const optimization = DecimalOps.create(optimizationLevel);
 
   // Base efficiency bonus
-  const baseBonus = optimization.multiply(new LargeNumber('0.05'));
+  const baseBonus = DecimalOps.multiply(optimization, DecimalOps.create('0.05'));
 
   // Additional bonus for high SPD
-  let spdBonus = new LargeNumber(1);
-  if (spd.gte(new LargeNumber('1e30'))) {
-    const log = safeLog10FromLarge(spd);
-    spdBonus = new LargeNumber('1.5').add(new LargeNumber(log / 20));
+  let spdBonus = DecimalOps.create(1);
+  if (DecimalOps.greaterThanOrEqual(spd, DecimalOps.create('1e30'))) {
+    const log = safeLog10FromDecimal(spd);
+    spdBonus = DecimalOps.add(
+      DecimalOps.create('1.5'),
+      DecimalOps.create(log / 20)
+    );
   }
 
-  return new LargeNumber('1').add(baseBonus).multiply(spdBonus);
+  return DecimalOps.multiply(
+    DecimalOps.add(DecimalOps.create('1'), baseBonus),
+    spdBonus
+  );
 }
 
 /**
  * Calculate breakthrough multiplier for milestone achievements
  */
 export function computeBreakthroughMultiplier(
-  totalSipsEarned: number | string | LargeNumber,
-  breakthroughLevel: number | string | LargeNumber = 0
-): LargeNumber {
-  const totalSips = new LargeNumber(totalSipsEarned);
-  const breakthrough = new LargeNumber(breakthroughLevel);
+  totalSipsEarned: number | string | Decimal,
+  breakthroughLevel: number | string | Decimal = 0
+): Decimal {
+  const totalSips = DecimalOps.create(totalSipsEarned);
+  const breakthrough = DecimalOps.create(breakthroughLevel);
 
   // Breakthroughs provide exponential bonuses
-  const breakthroughBonus = pow(new LargeNumber('1.5'), safeExponentFromLarge(breakthrough));
+  const breakthroughBonus = pow(DecimalOps.create('1.5'), safeExponentFromDecimal(breakthrough));
 
   // Additional scaling based on total sips
-  let sipScaling = new LargeNumber(1);
-  if (totalSips.gte(new LargeNumber('1e100'))) {
-    const log = safeLog10FromLarge(totalSips);
-    sipScaling = new LargeNumber('2').add(new LargeNumber(log / 50));
+  let sipScaling = DecimalOps.create(1);
+  if (DecimalOps.greaterThanOrEqual(totalSips, DecimalOps.create('1e100'))) {
+    const log = safeLog10FromDecimal(totalSips);
+    sipScaling = DecimalOps.add(
+      DecimalOps.create('2'),
+      DecimalOps.create(log / 50)
+    );
   }
 
-  return breakthroughBonus.multiply(sipScaling);
+  return DecimalOps.multiply(breakthroughBonus, sipScaling);
 }
 
 /**
  * Calculate inflation rate for very large economies
  */
 export function computeInflationRate(
-  totalSipsEarned: number | string | LargeNumber,
-  totalPurchases: number | string | LargeNumber = 0
-): LargeNumber {
-  const totalSips = new LargeNumber(totalSipsEarned);
-  const purchases = new LargeNumber(totalPurchases);
+  totalSipsEarned: number | string | Decimal,
+  totalPurchases: number | string | Decimal = 0
+): Decimal {
+  const totalSips = DecimalOps.create(totalSipsEarned);
+  const purchases = DecimalOps.create(totalPurchases);
 
   // Base inflation rate scales with total economy size
-  let inflationRate = new LargeNumber('1');
+  let inflationRate = DecimalOps.create('1');
 
-  if (totalSips.gte(new LargeNumber('1e20'))) {
-    const log = safeLog10FromLarge(totalSips);
-    inflationRate = inflationRate.add(new LargeNumber(log / 100));
+  if (DecimalOps.greaterThanOrEqual(totalSips, DecimalOps.create('1e20'))) {
+    const log = safeLog10FromDecimal(totalSips);
+    inflationRate = DecimalOps.add(inflationRate, DecimalOps.create(log / 100));
   }
 
   // Additional inflation from frequent purchases
-  if (purchases.gte(new LargeNumber('1000'))) {
-    const log = safeLog10FromLarge(purchases);
-    inflationRate = inflationRate.multiply(new LargeNumber('1').add(new LargeNumber(log / 100)));
+  if (DecimalOps.greaterThanOrEqual(purchases, DecimalOps.create('1000'))) {
+    const log = safeLog10FromDecimal(purchases);
+    inflationRate = DecimalOps.multiply(
+      inflationRate,
+      DecimalOps.add(DecimalOps.create('1'), DecimalOps.create(log / 100))
+    );
   }
 
   return inflationRate;
@@ -322,23 +375,23 @@ export function computeInflationRate(
  * Calculate interest rate for sip savings (banking system)
  */
 export function computeInterestRate(
-  sipsInBank: number | string | LargeNumber,
-  bankLevel: number | string | LargeNumber = 0
-): LargeNumber {
-  const bankSips = new LargeNumber(sipsInBank);
-  const level = new LargeNumber(bankLevel);
+  sipsInBank: number | string | Decimal,
+  bankLevel: number | string | Decimal = 0
+): Decimal {
+  const bankSips = DecimalOps.create(sipsInBank);
+  const level = DecimalOps.create(bankLevel);
 
   // Base interest rate from bank level
-  const baseRate = new LargeNumber('0.001').multiply(level);
+  const baseRate = DecimalOps.multiply(DecimalOps.create('0.001'), level);
 
   // Bonus rate for large deposits
-  let depositBonus = new LargeNumber(0);
-  if (bankSips.gte(new LargeNumber('1e10'))) {
-    const log = safeLog10FromLarge(bankSips);
-    depositBonus = new LargeNumber(log / 1000);
+  let depositBonus = DecimalOps.create(0);
+  if (DecimalOps.greaterThanOrEqual(bankSips, DecimalOps.create('1e10'))) {
+    const log = safeLog10FromDecimal(bankSips);
+    depositBonus = DecimalOps.create(log / 1000);
   }
 
-  return baseRate.add(depositBonus);
+  return DecimalOps.add(baseRate, depositBonus);
 }
 
 // Legacy functions for backward compatibility
@@ -348,7 +401,7 @@ export function computeStrawSPDLegacy(
   widerStrawsCount: number | string,
   widerMultiplierPerLevel: number | string = 0
 ): number {
-  return computeStrawSPD(straws, baseSPD, widerStrawsCount, widerMultiplierPerLevel).toNumber();
+  return DecimalOps.toSafeNumber(computeStrawSPD(straws, baseSPD, widerStrawsCount, widerMultiplierPerLevel));
 }
 
 export function computeCupSPDLegacy(
@@ -357,7 +410,7 @@ export function computeCupSPDLegacy(
   betterCupsCount: number | string,
   betterMultiplierPerLevel: number | string = 0
 ): number {
-  return computeCupSPD(cups, baseSPD, betterCupsCount, betterMultiplierPerLevel).toNumber();
+  return DecimalOps.toSafeNumber(computeCupSPD(cups, baseSPD, betterCupsCount, betterMultiplierPerLevel));
 }
 
 export function computeTotalSPDLegacy(
@@ -366,12 +419,12 @@ export function computeTotalSPDLegacy(
   cups: number | string,
   cupSPD: number | string
 ): number {
-  return computeTotalSPD(straws, strawSPD, cups, cupSPD).toNumber();
+  return DecimalOps.toSafeNumber(computeTotalSPD(straws, strawSPD, cups, cupSPD));
 }
 
 export function computeTotalSipsPerDrinkLegacy(
   baseSipsPerDrink: number | string,
   totalSPD: number | string
 ): number {
-  return computeTotalSipsPerDrink(baseSipsPerDrink, totalSPD).toNumber();
+  return DecimalOps.toSafeNumber(computeTotalSipsPerDrink(baseSipsPerDrink, totalSPD));
 }

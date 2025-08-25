@@ -1,8 +1,12 @@
+// Migration script for purchases-system.ts
+// This file has been partially migrated to use direct Decimal operations
+// TODO: Complete migration by replacing remaining Decimal references
+
 import { nextCupCost, nextStrawCost } from '../rules/purchases.ts';
 import { recalcProduction } from './resources.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
-import { LargeNumber } from '../numbers/large-number';
-import { toLargeNumber, gte } from '../numbers/migration-utils';
+import { DecimalOps, Decimal } from '../numbers/large-number';
+import { toDecimal, gte } from '../numbers/migration-utils';
 
 function getTypedConfig(): { upgrades: any; config: any } {
   const { upgrades, config } = getUpgradesAndConfig();
@@ -16,28 +20,28 @@ export function purchaseStraw({
   widerStraws,
   betterCups,
 }: {
-  sips: number | LargeNumber;
-  straws: number | LargeNumber;
-  cups: number | LargeNumber;
-  widerStraws: number | LargeNumber;
-  betterCups: number | LargeNumber;
+  sips: number | Decimal;
+  straws: number | Decimal;
+  cups: number | Decimal;
+  widerStraws: number | Decimal;
+  betterCups: number | Decimal;
 }) {
   const { upgrades, config } = getTypedConfig();
   const baseCost = upgrades?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5;
   const scaling = upgrades?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const strawsLarge = toLargeNumber(straws);
-  const cupsLarge = toLargeNumber(cups);
-  const widerStrawsLarge = toLargeNumber(widerStraws);
-  const betterCupsLarge = toLargeNumber(betterCups);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const strawsLarge = toDecimal(straws);
+  const cupsLarge = toDecimal(cups);
+  const widerStrawsLarge = toDecimal(widerStraws);
+  const betterCupsLarge = toDecimal(betterCups);
 
-  let cost: LargeNumber;
-  let newStraws: LargeNumber;
-  let strawSPD: LargeNumber;
-  let cupSPD: LargeNumber;
-  let sipsPerDrink: LargeNumber;
+  let cost: Decimal;
+  let newStraws: Decimal;
+  let strawSPD: Decimal;
+  let cupSPD: Decimal;
+  let sipsPerDrink: Decimal;
 
   try {
     // Validate inputs for extreme values
@@ -49,23 +53,23 @@ export function purchaseStraw({
     cost = nextStrawCost(strawsLarge, baseCost, scaling);
 
     // Validate cost calculation
-    if (!cost || !isFinite(Number(cost.toString())) || cost.lte(new LargeNumber(0))) {
-      console.warn('🚫 purchaseStraw: Invalid cost calculation:', cost?.toString());
+    if (!cost || !DecimalOps.isFinite(cost) || DecimalOps.lessThanOrEqual(cost, DecimalOps.create(0))) {
+      console.warn('🚫 purchaseStraw: Invalid cost calculation:', DecimalOps.toString(cost));
       return null;
     }
 
-    // Check affordability using LargeNumber comparison with additional validation
+    // Check affordability using Decimal comparison with additional validation
     if (!gte(sipsLarge, cost)) {
       console.log(
         '🚫 purchaseStraw: Not affordable - sips:',
-        sipsLarge.toString(),
+        DecimalOps.toString(sipsLarge),
         'cost:',
-        cost.toString()
+        DecimalOps.toString(cost)
       );
       return null;
     }
 
-    newStraws = strawsLarge.add(new LargeNumber(1));
+    newStraws = DecimalOps.add(strawsLarge, DecimalOps.create(1));
 
     // Recalculate production with error handling
     const productionResult = recalcProduction({
@@ -110,28 +114,28 @@ export function purchaseCup({
   widerStraws,
   betterCups,
 }: {
-  sips: number | LargeNumber;
-  straws: number | LargeNumber;
-  cups: number | LargeNumber;
-  widerStraws: number | LargeNumber;
-  betterCups: number | LargeNumber;
+  sips: number | Decimal;
+  straws: number | Decimal;
+  cups: number | Decimal;
+  widerStraws: number | Decimal;
+  betterCups: number | Decimal;
 }) {
   const { upgrades, config } = getTypedConfig();
   const baseCost = upgrades?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15;
   const scaling = upgrades?.cups?.scaling ?? config.CUP_SCALING ?? 1.15;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const strawsLarge = toLargeNumber(straws);
-  const cupsLarge = toLargeNumber(cups);
-  const widerStrawsLarge = toLargeNumber(widerStraws);
-  const betterCupsLarge = toLargeNumber(betterCups);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const strawsLarge = toDecimal(straws);
+  const cupsLarge = toDecimal(cups);
+  const widerStrawsLarge = toDecimal(widerStraws);
+  const betterCupsLarge = toDecimal(betterCups);
 
-  let cost: LargeNumber;
-  let newCups: LargeNumber;
-  let strawSPD: LargeNumber;
-  let cupSPD: LargeNumber;
-  let sipsPerDrink: LargeNumber;
+  let cost: Decimal;
+  let newCups: Decimal;
+  let strawSPD: Decimal;
+  let cupSPD: Decimal;
+  let sipsPerDrink: Decimal;
 
   try {
     // Validate inputs for extreme values
@@ -143,12 +147,12 @@ export function purchaseCup({
     cost = nextCupCost(cupsLarge, baseCost, scaling);
 
     // Validate cost calculation
-    if (!cost || !isFinite(Number(cost.toString())) || cost.lte(new LargeNumber(0))) {
+    if (!cost || !isFinite(Number(cost.toString())) || cost.lte(new Decimal(0))) {
       console.warn('🚫 purchaseCup: Invalid cost calculation:', cost?.toString());
       return null;
     }
 
-    // Check affordability using LargeNumber comparison with additional validation
+    // Check affordability using Decimal comparison with additional validation
     if (!gte(sipsLarge, cost)) {
       console.log(
         '🚫 purchaseCup: Not affordable - sips:',
@@ -159,7 +163,7 @@ export function purchaseCup({
       return null;
     }
 
-    newCups = cupsLarge.add(new LargeNumber(1));
+    newCups = cupsLarge.add(new Decimal(1));
 
     // Recalculate production with error handling
     const productionResult = recalcProduction({
@@ -204,27 +208,27 @@ export function purchaseWiderStraws({
   widerStraws,
   betterCups,
 }: {
-  sips: number | LargeNumber;
-  straws: number | LargeNumber;
-  cups: number | LargeNumber;
-  widerStraws: number | LargeNumber;
-  betterCups: number | LargeNumber;
+  sips: number | Decimal;
+  straws: number | Decimal;
+  cups: number | Decimal;
+  widerStraws: number | Decimal;
+  betterCups: number | Decimal;
 }) {
   const { upgrades, config } = getTypedConfig();
   const baseCost = upgrades?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const strawsLarge = toLargeNumber(straws);
-  const cupsLarge = toLargeNumber(cups);
-  const widerStrawsLarge = toLargeNumber(widerStraws);
-  const betterCupsLarge = toLargeNumber(betterCups);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const strawsLarge = toDecimal(straws);
+  const cupsLarge = toDecimal(cups);
+  const widerStrawsLarge = toDecimal(widerStraws);
+  const betterCupsLarge = toDecimal(betterCups);
 
-  const baseCostLarge = new LargeNumber(baseCost);
-  const newWiderStrawsLarge = widerStrawsLarge.add(new LargeNumber(1));
+  const baseCostLarge = new Decimal(baseCost);
+  const newWiderStrawsLarge = widerStrawsLarge.add(new Decimal(1));
   const cost = baseCostLarge.multiply(newWiderStrawsLarge);
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
   const { strawSPD, cupSPD, sipsPerDrink } = recalcProduction({
@@ -250,27 +254,27 @@ export function purchaseBetterCups({
   widerStraws,
   betterCups,
 }: {
-  sips: number | LargeNumber;
-  straws: number | LargeNumber;
-  cups: number | LargeNumber;
-  widerStraws: number | LargeNumber;
-  betterCups: number | LargeNumber;
+  sips: number | Decimal;
+  straws: number | Decimal;
+  cups: number | Decimal;
+  widerStraws: number | Decimal;
+  betterCups: number | Decimal;
 }) {
   const { upgrades, config } = getTypedConfig();
   const baseCost = upgrades?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const strawsLarge = toLargeNumber(straws);
-  const cupsLarge = toLargeNumber(cups);
-  const widerStrawsLarge = toLargeNumber(widerStraws);
-  const betterCupsLarge = toLargeNumber(betterCups);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const strawsLarge = toDecimal(straws);
+  const cupsLarge = toDecimal(cups);
+  const widerStrawsLarge = toDecimal(widerStraws);
+  const betterCupsLarge = toDecimal(betterCups);
 
-  const baseCostLarge = new LargeNumber(baseCost);
-  const newBetterCupsLarge = betterCupsLarge.add(new LargeNumber(1));
+  const baseCostLarge = new Decimal(baseCost);
+  const newBetterCupsLarge = betterCupsLarge.add(new Decimal(1));
   const cost = baseCostLarge.multiply(newBetterCupsLarge);
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
   const { strawSPD, cupSPD, sipsPerDrink } = recalcProduction({
@@ -293,26 +297,26 @@ export function purchaseSuction({
   sips,
   suctions,
 }: {
-  sips: number | LargeNumber;
-  suctions: number | LargeNumber;
+  sips: number | Decimal;
+  suctions: number | Decimal;
 }) {
   const { upgrades: up, config } = getTypedConfig();
   const baseCost = up?.suction?.baseCost ?? config.SUCTION_BASE_COST;
   const scaling = up?.suction?.scaling ?? config.SUCTION_SCALING;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const suctionsLarge = toLargeNumber(suctions);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const suctionsLarge = toDecimal(suctions);
 
-  const baseCostLarge = new LargeNumber(baseCost);
-  const scalingLarge = new LargeNumber(scaling);
-  const cost = baseCostLarge.multiply(scalingLarge.pow(suctionsLarge.toNumber()));
+  const baseCostLarge = new Decimal(baseCost);
+  const scalingLarge = new Decimal(scaling);
+  const cost = baseCostLarge.multiply(scalingLarge.pow(DecimalOps.toSafeNumber(suctionsLarge)));
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newSuctions = suctionsLarge.add(new LargeNumber(1));
-  const suctionClickBonus = new LargeNumber(config.SUCTION_CLICK_BONUS ?? 0).multiply(newSuctions);
+  const newSuctions = suctionsLarge.add(new Decimal(1));
+  const suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS ?? 0).multiply(newSuctions);
 
   return {
     spent: cost,
@@ -325,23 +329,23 @@ export function upgradeSuction({
   sips,
   suctionUpCounter,
 }: {
-  sips: number | LargeNumber;
-  suctionUpCounter: number | LargeNumber;
+  sips: number | Decimal;
+  suctionUpCounter: number | Decimal;
 }) {
   const { config } = getTypedConfig();
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const counterLarge = toLargeNumber(suctionUpCounter);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const counterLarge = toDecimal(suctionUpCounter);
 
-  const baseCostLarge = new LargeNumber(config.SUCTION_UPGRADE_BASE_COST ?? 0);
+  const baseCostLarge = new Decimal(config.SUCTION_UPGRADE_BASE_COST ?? 0);
   const cost = baseCostLarge.multiply(counterLarge);
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newCounter = counterLarge.add(new LargeNumber(1));
-  const suctionClickBonus = new LargeNumber(config.SUCTION_CLICK_BONUS ?? 0).multiply(newCounter);
+  const newCounter = counterLarge.add(new Decimal(1));
+  const suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS ?? 0).multiply(newCounter);
 
   return {
     spent: cost,
@@ -354,25 +358,25 @@ export function purchaseFasterDrinks({
   sips,
   fasterDrinks,
 }: {
-  sips: number | LargeNumber;
-  fasterDrinks: number | LargeNumber;
+  sips: number | Decimal;
+  fasterDrinks: number | Decimal;
 }) {
   const { upgrades: up, config } = getTypedConfig();
   const baseCost = up?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST;
   const scaling = up?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const fasterDrinksLarge = toLargeNumber(fasterDrinks);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const fasterDrinksLarge = toDecimal(fasterDrinks);
 
-  const baseCostLarge = new LargeNumber(baseCost);
-  const scalingLarge = new LargeNumber(scaling);
-  const cost = baseCostLarge.multiply(scalingLarge.pow(fasterDrinksLarge.toNumber()));
+  const baseCostLarge = new Decimal(baseCost);
+  const scalingLarge = new Decimal(scaling);
+  const cost = baseCostLarge.multiply(scalingLarge.pow(DecimalOps.toSafeNumber(fasterDrinksLarge)));
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newFasterDrinks = fasterDrinksLarge.add(new LargeNumber(1));
+  const newFasterDrinks = fasterDrinksLarge.add(new Decimal(1));
 
   return {
     spent: cost,
@@ -384,23 +388,23 @@ export function upgradeFasterDrinks({
   sips,
   fasterDrinksUpCounter,
 }: {
-  sips: number | LargeNumber;
-  fasterDrinksUpCounter: number | LargeNumber;
+  sips: number | Decimal;
+  fasterDrinksUpCounter: number | Decimal;
 }) {
   const { upgrades: up, config } = getTypedConfig();
   const base = up?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 0;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const counterLarge = toLargeNumber(fasterDrinksUpCounter);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const counterLarge = toDecimal(fasterDrinksUpCounter);
 
-  const baseLarge = new LargeNumber(base);
+  const baseLarge = new Decimal(base);
   const cost = baseLarge.multiply(counterLarge);
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newCounter = counterLarge.add(new LargeNumber(1));
+  const newCounter = counterLarge.add(new Decimal(1));
 
   return {
     spent: cost,
@@ -413,29 +417,29 @@ export function purchaseCriticalClick({
   criticalClicks,
   criticalClickChance,
 }: {
-  sips: number | LargeNumber;
-  criticalClicks: number | LargeNumber;
-  criticalClickChance: number | LargeNumber;
+  sips: number | Decimal;
+  criticalClicks: number | Decimal;
+  criticalClickChance: number | Decimal;
 }) {
   const { upgrades: up, config } = getTypedConfig();
   const baseCost = up?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST;
   const scaling = up?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const criticalClicksLarge = toLargeNumber(criticalClicks);
-  const criticalClickChanceLarge = toLargeNumber(criticalClickChance);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const criticalClicksLarge = toDecimal(criticalClicks);
+  const criticalClickChanceLarge = toDecimal(criticalClickChance);
 
-  const baseCostLarge = new LargeNumber(baseCost);
-  const scalingLarge = new LargeNumber(scaling);
-  const cost = baseCostLarge.multiply(scalingLarge.pow(criticalClicksLarge.toNumber()));
+  const baseCostLarge = new Decimal(baseCost);
+  const scalingLarge = new Decimal(scaling);
+  const cost = baseCostLarge.multiply(scalingLarge.pow(DecimalOps.toSafeNumber(criticalClicksLarge)));
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newCriticalClicks = criticalClicksLarge.add(new LargeNumber(1));
+  const newCriticalClicks = criticalClicksLarge.add(new Decimal(1));
   const newChance = criticalClickChanceLarge.add(
-    new LargeNumber(config.CRITICAL_CLICK_CHANCE_INCREMENT ?? 0)
+    new Decimal(config.CRITICAL_CLICK_CHANCE_INCREMENT ?? 0)
   );
 
   return {
@@ -450,26 +454,26 @@ export function upgradeCriticalClick({
   criticalClickUpCounter,
   criticalClickMultiplier,
 }: {
-  sips: number | LargeNumber;
-  criticalClickUpCounter: number | LargeNumber;
-  criticalClickMultiplier: number | LargeNumber;
+  sips: number | Decimal;
+  criticalClickUpCounter: number | Decimal;
+  criticalClickMultiplier: number | Decimal;
 }) {
   const { config } = getTypedConfig();
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const counterLarge = toLargeNumber(criticalClickUpCounter);
-  const multiplierLarge = toLargeNumber(criticalClickMultiplier);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const counterLarge = toDecimal(criticalClickUpCounter);
+  const multiplierLarge = toDecimal(criticalClickMultiplier);
 
-  const baseCostLarge = new LargeNumber(config.CRITICAL_CLICK_UPGRADE_BASE_COST ?? 0);
+  const baseCostLarge = new Decimal(config.CRITICAL_CLICK_UPGRADE_BASE_COST ?? 0);
   const cost = baseCostLarge.multiply(counterLarge);
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newCounter = counterLarge.add(new LargeNumber(1));
+  const newCounter = counterLarge.add(new Decimal(1));
   const newMultiplier = multiplierLarge.add(
-    new LargeNumber(config.CRITICAL_CLICK_MULTIPLIER_INCREMENT ?? 0)
+    new Decimal(config.CRITICAL_CLICK_MULTIPLIER_INCREMENT ?? 0)
   );
 
   return {
@@ -484,28 +488,28 @@ export function levelUp({
   level,
   sipsPerDrink,
 }: {
-  sips: number | LargeNumber;
-  level: number | LargeNumber;
-  sipsPerDrink: number | LargeNumber;
+  sips: number | Decimal;
+  level: number | Decimal;
+  sipsPerDrink: number | Decimal;
 }) {
   const { config } = getTypedConfig();
   const base = config.LEVEL_UP_BASE_COST ?? 0;
   const scaling = config.LEVEL_UP_SCALING ?? 1;
 
-  // Convert inputs to LargeNumber for calculations
-  const sipsLarge = toLargeNumber(sips);
-  const levelLarge = toLargeNumber(level);
-  const sipsPerDrinkLarge = toLargeNumber(sipsPerDrink);
+  // Convert inputs to Decimal for calculations
+  const sipsLarge = toDecimal(sips);
+  const levelLarge = toDecimal(level);
+  const sipsPerDrinkLarge = toDecimal(sipsPerDrink);
 
-  const baseLarge = new LargeNumber(base);
-  const scalingLarge = new LargeNumber(scaling);
-  const cost = baseLarge.multiply(scalingLarge.pow(levelLarge.toNumber()));
+  const baseLarge = new Decimal(base);
+  const scalingLarge = new Decimal(scaling);
+  const cost = baseLarge.multiply(scalingLarge.pow(DecimalOps.toSafeNumber(levelLarge)));
 
-  // Check affordability using LargeNumber comparison
+  // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
 
-  const newLevel = levelLarge.add(new LargeNumber(1));
-  const sipsGained = new LargeNumber(config.LEVEL_UP_SIPS_MULTIPLIER ?? 1).multiply(
+  const newLevel = levelLarge.add(new Decimal(1));
+  const sipsGained = new Decimal(config.LEVEL_UP_SIPS_MULTIPLIER ?? 1).multiply(
     sipsPerDrinkLarge
   );
   const sipsDelta = sipsGained.subtract(cost);
@@ -519,17 +523,17 @@ export function levelUp({
 }
 
 // Convenience execute-style helpers that read/update App.state directly
-// Helper function to sanitize LargeNumber values
-function sanitizeLargeNumber(value: LargeNumber, fallback: LargeNumber): LargeNumber {
+// Helper function to sanitize Decimal values
+function sanitizeDecimal(value: Decimal, fallback: Decimal): Decimal {
   if (!value) return fallback;
   try {
     if (!isFinite(Number(value.toString()))) {
-      console.warn('🚫 Sanitizing extreme LargeNumber value:', value.toString());
+      console.warn('🚫 Sanitizing extreme Decimal value:', value.toString());
       return fallback;
     }
     return value;
   } catch (error) {
-    console.warn('🚫 Error sanitizing LargeNumber, using fallback:', error);
+    console.warn('🚫 Error sanitizing Decimal, using fallback:', error);
     return fallback;
   }
 }
@@ -542,21 +546,21 @@ export function validateExtremeValues(): void {
 
     // Log extreme values for debugging and monitoring
     if (rawState.sips) {
-      const sipsValue = toLargeNumber(rawState.sips);
+      const sipsValue = toDecimal(rawState.sips);
       if (!isFinite(Number(sipsValue.toString()))) {
         console.log('🔥 validateExtremeValues: Extreme sips detected:', sipsValue.toString());
       }
     }
 
     if (rawState.straws) {
-      const strawsValue = toLargeNumber(rawState.straws);
+      const strawsValue = toDecimal(rawState.straws);
       if (!isFinite(Number(strawsValue.toString()))) {
         console.log('🔥 validateExtremeValues: Extreme straws detected:', strawsValue.toString());
       }
     }
 
     if (rawState.cups) {
-      const cupsValue = toLargeNumber(rawState.cups);
+      const cupsValue = toDecimal(rawState.cups);
       if (!isFinite(Number(cupsValue.toString()))) {
         console.log('🔥 validateExtremeValues: Extreme cups detected:', cupsValue.toString());
       }
@@ -574,21 +578,21 @@ function getAppState(): any {
 
     // Log extreme values for debugging (preserve the actual values)
     if (rawState.sips) {
-      const sipsValue = toLargeNumber(rawState.sips);
+      const sipsValue = toDecimal(rawState.sips);
       if (!isFinite(Number(sipsValue.toString()))) {
         console.log('🔥 getAppState: Extreme sips detected:', sipsValue.toString());
       }
     }
 
     if (rawState.straws) {
-      const strawsValue = toLargeNumber(rawState.straws);
+      const strawsValue = toDecimal(rawState.straws);
       if (!isFinite(Number(strawsValue.toString()))) {
         console.log('🔥 getAppState: Extreme straws detected:', strawsValue.toString());
       }
     }
 
     if (rawState.cups) {
-      const cupsValue = toLargeNumber(rawState.cups);
+      const cupsValue = toDecimal(rawState.cups);
       if (!isFinite(Number(cupsValue.toString()))) {
         console.log('🔥 getAppState: Extreme cups detected:', cupsValue.toString());
       }
@@ -609,14 +613,14 @@ function getAppState(): any {
 //   }
 // }
 // function _toNum(v: any): number {
-//   return v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
+//   return v && typeof v.toNumber === 'function' ? DecimalOps.toSafeNumber(v) : Number(v || 0);
 // }
 
-function subtractFromWallet(spent: number | LargeNumber): any {
+function subtractFromWallet(spent: number | Decimal): any {
   const w: any = (typeof window !== 'undefined' ? window : {}) as any;
-  const spentNum = spent instanceof LargeNumber ? spent.toNumber() : Number(spent || 0);
-  const current = toLargeNumber(w.sips ?? 0);
-  const next = current.subtract(new LargeNumber(spentNum));
+  const spentNum = spent instanceof Decimal ? DecimalOps.toSafeNumber(spent) : Number(spent || 0);
+  const current = toDecimal(w.sips ?? 0);
+  const next = current.subtract(new Decimal(spentNum));
   w.sips = next;
   return next;
 }
@@ -639,16 +643,16 @@ export const execute = {
       console.warn('Failed to update sips after straw purchase:', error);
     }
     try {
-      // Handle LargeNumber straws with extreme value support
+      // Handle Decimal straws with extreme value support
       let strawsValue = result.straws;
-      if (strawsValue instanceof LargeNumber) {
+      if (strawsValue instanceof Decimal) {
         // Log extreme values but preserve them
         if (!isFinite(Number(strawsValue.toString()))) {
           console.log('🔥 Extreme straws value detected in state update:', strawsValue.toString());
         }
       }
       const strawsNum =
-        strawsValue instanceof LargeNumber ? strawsValue.toNumber() : Number(strawsValue);
+        strawsValue instanceof Decimal ? DecimalOps.toSafeNumber(strawsValue) : Number(strawsValue);
       w.straws = new (w.Decimal || Number)(strawsNum);
     } catch (error) {
       console.warn('Failed to update straws after straw purchase:', error);
@@ -656,9 +660,9 @@ export const execute = {
     try {
       const actions = w.App?.state?.actions;
       // Use sanitized values for state update
-      const sanitizedStrawSPD = sanitizeLargeNumber(result.strawSPD, new LargeNumber('0.6'));
-      const sanitizedCupSPD = sanitizeLargeNumber(result.cupSPD, new LargeNumber('1.2'));
-      const sanitizedSPD = sanitizeLargeNumber(result.sipsPerDrink, new LargeNumber('1'));
+      const sanitizedStrawSPD = sanitizeDecimal(result.strawSPD, new Decimal('0.6'));
+      const sanitizedCupSPD = sanitizeDecimal(result.cupSPD, new Decimal('1.2'));
+      const sanitizedSPD = sanitizeDecimal(result.sipsPerDrink, new Decimal('1'));
 
       actions?.setSips?.(w.sips);
       actions?.setStraws?.(result.straws); // Use original result, sanitization happens in window.straws
@@ -730,15 +734,15 @@ export const execute = {
       console.warn('Failed to update sips after cup purchase:', error);
     }
     try {
-      // Handle LargeNumber cups with extreme value support
+      // Handle Decimal cups with extreme value support
       let cupsValue = result.cups;
-      if (cupsValue instanceof LargeNumber) {
+      if (cupsValue instanceof Decimal) {
         // Log extreme values but preserve them
         if (!isFinite(Number(cupsValue.toString()))) {
           console.log('🔥 Extreme cups value detected in state update:', cupsValue.toString());
         }
       }
-      const cupsNum = cupsValue instanceof LargeNumber ? cupsValue.toNumber() : Number(cupsValue);
+      const cupsNum = cupsValue instanceof Decimal ? DecimalOps.toSafeNumber(cupsValue) : Number(cupsValue);
       w.cups = new (w.Decimal || Number)(cupsNum);
     } catch (error) {
       console.warn('Failed to update cups after cup purchase:', error);
@@ -1117,7 +1121,7 @@ export const execute = {
     if (!result) return false;
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
-      // Subtract cost using LargeNumber-safe wallet subtraction
+      // Subtract cost using Decimal-safe wallet subtraction
       subtractFromWallet(result.spent);
     } catch (error) {
       console.warn('Failed to update sips after critical click purchase:', error);

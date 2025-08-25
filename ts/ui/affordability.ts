@@ -1,16 +1,15 @@
-// UI Affordability System (TypeScript) with LargeNumber support
+// UI Affordability System (TypeScript) with Decimal support
 // Handles checking and updating button states based on resource availability
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { updateButtonState, updateCostDisplay } from './utils';
-import { toLargeNumber, gte } from '../core/numbers/migration-utils';
-import { LargeNumber } from '../core/numbers/large-number';
+import { toDecimal, gte, Decimal } from '../core/numbers';
 
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability(): void {
   if (typeof window === 'undefined') return;
   getUpgradesAndConfig();
 
-  const rawSipsLarge = toLargeNumber((window as any).App?.state?.getState?.()?.sips || 0);
+  const rawSipsLarge = toDecimal((window as any).App?.state?.getState?.()?.sips || 0);
 
   // Debug logging for extreme value diagnosis
   console.log('🔍 checkUpgradeAffordability: Current sips =', rawSipsLarge.toString());
@@ -23,16 +22,16 @@ export function checkUpgradeAffordability(): void {
     console.log('🔥 checkUpgradeAffordability: Extreme sips detected:', rawSipsLarge.toString());
   }
 
-  // Function to check affordability using LargeNumber comparison
+  // Function to check affordability using Decimal comparison
   const canAfford = (cost: any): boolean => {
     try {
-      const costLarge = toLargeNumber(cost);
+      const costLarge = toDecimal(cost);
 
       // Use sips as-is for comparison (no arbitrary cost limits)
       const effectiveSips = currentSipsLarge;
 
-      // Always do proper LargeNumber comparison regardless of magnitude
-      // Extreme values should be handled properly by the LargeNumber library
+      // Always do proper Decimal comparison regardless of magnitude
+      // Extreme values should be handled properly by the Decimal library
       const result = gte(effectiveSips, costLarge);
 
       // Log extreme costs for monitoring
@@ -110,15 +109,15 @@ export function updateShopButtonStates(): void {
   checkUpgradeAffordability();
 }
 
-// Calculate all upgrade costs with LargeNumber support
+// Calculate all upgrade costs with Decimal support
 function calculateAllCosts(): any {
   const { upgrades: dataUp, config } = getUpgradesAndConfig();
   const costs: any = {};
 
-  // Straw cost - use LargeNumber calculation with extreme value protection
-  const strawBaseCost = toLargeNumber(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
-  const strawScaling = toLargeNumber(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
-  const strawCount = toLargeNumber((window as any).App?.state?.getState?.()?.straws || 0);
+  // Straw cost - use Decimal calculation with extreme value protection
+  const strawBaseCost = toDecimal(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
+  const strawScaling = toDecimal(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
+  const strawCount = toDecimal((window as any).App?.state?.getState?.()?.straws || 0);
 
   // Use safe exponent conversion with cap for extreme values
   let strawExponent = 0;
@@ -133,10 +132,10 @@ function calculateAllCosts(): any {
   }
   costs.straw = strawBaseCost.multiply(strawScaling.pow(strawExponent));
 
-  // Cup cost - use LargeNumber calculation with extreme value protection
-  const cupBaseCost = toLargeNumber(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
-  const cupScaling = toLargeNumber(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
-  const cupCount = toLargeNumber((window as any).App?.state?.getState?.()?.cups || 0);
+  // Cup cost - use Decimal calculation with extreme value protection
+  const cupBaseCost = toDecimal(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
+  const cupScaling = toDecimal(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
+  const cupCount = toDecimal((window as any).App?.state?.getState?.()?.cups || 0);
 
   // Use safe exponent conversion with cap for extreme values
   let cupExponent = 0;
@@ -151,12 +150,12 @@ function calculateAllCosts(): any {
   }
   costs.cup = cupBaseCost.multiply(cupScaling.pow(cupExponent));
 
-  // Suction cost - use LargeNumber calculation with extreme value protection
-  const suctionBaseCost = toLargeNumber(
+  // Suction cost - use Decimal calculation with extreme value protection
+  const suctionBaseCost = toDecimal(
     dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40
   );
-  const suctionScaling = toLargeNumber(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
-  const suctionCount = toLargeNumber((window as any).App?.state?.getState?.()?.suctions || 0);
+  const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
+  const suctionCount = toDecimal((window as any).App?.state?.getState?.()?.suctions || 0);
 
   // Use safe exponent conversion with cap for extreme values
   let suctionExponent = 0;
@@ -171,14 +170,14 @@ function calculateAllCosts(): any {
   }
   costs.suction = suctionBaseCost.multiply(suctionScaling.pow(suctionExponent));
 
-  // Faster drinks cost - use LargeNumber calculation with extreme value protection
-  const fasterDrinksBaseCost = toLargeNumber(
+  // Faster drinks cost - use Decimal calculation with extreme value protection
+  const fasterDrinksBaseCost = toDecimal(
     dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST ?? 80
   );
-  const fasterDrinksScaling = toLargeNumber(
+  const fasterDrinksScaling = toDecimal(
     dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.1
   );
-  const fasterDrinksCount = toLargeNumber(
+  const fasterDrinksCount = toDecimal(
     (window as any).App?.state?.getState?.()?.fasterDrinks || 0
   );
 
@@ -195,14 +194,14 @@ function calculateAllCosts(): any {
   }
   costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksExponent));
 
-  // Critical click cost - use LargeNumber calculation with extreme value protection
-  const criticalClickBaseCost = toLargeNumber(
+  // Critical click cost - use Decimal calculation with extreme value protection
+  const criticalClickBaseCost = toDecimal(
     dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST ?? 60
   );
-  const criticalClickScaling = toLargeNumber(
+  const criticalClickScaling = toDecimal(
     dataUp?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING ?? 1.12
   );
-  const criticalClickCount = toLargeNumber(
+  const criticalClickCount = toDecimal(
     (window as any).App?.state?.getState?.()?.criticalClicks || 0
   );
 
@@ -221,34 +220,34 @@ function calculateAllCosts(): any {
     criticalClickScaling.pow(criticalClickExponent)
   );
 
-  // Wider straws cost - use LargeNumber calculation
-  const widerStrawsBaseCost = toLargeNumber(
+  // Wider straws cost - use Decimal calculation
+  const widerStrawsBaseCost = toDecimal(
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
   );
-  const widerStrawsCount = toLargeNumber(
+  const widerStrawsCount = toDecimal(
     (window as any).App?.state?.getState?.()?.widerStraws || 0
   );
-  costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(new LargeNumber(1)));
+  costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(new Decimal(1)));
 
-  // Better cups cost - use LargeNumber calculation
-  const betterCupsBaseCost = toLargeNumber(
+  // Better cups cost - use Decimal calculation
+  const betterCupsBaseCost = toDecimal(
     dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400
   );
-  const betterCupsCount = toLargeNumber((window as any).App?.state?.getState?.()?.betterCups || 0);
-  costs.betterCups = betterCupsBaseCost.multiply(betterCupsCount.add(new LargeNumber(1)));
+  const betterCupsCount = toDecimal((window as any).App?.state?.getState?.()?.betterCups || 0);
+  costs.betterCups = betterCupsBaseCost.multiply(betterCupsCount.add(new Decimal(1)));
 
-  // Faster drinks upgrade cost - use LargeNumber calculation
-  const fasterDrinksUpBaseCost = toLargeNumber(
+  // Faster drinks upgrade cost - use Decimal calculation
+  const fasterDrinksUpBaseCost = toDecimal(
     dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 1500
   );
-  const fasterDrinksUpCount = toLargeNumber(
+  const fasterDrinksUpCount = toDecimal(
     (window as any).App?.state?.getState?.()?.fasterDrinksUpCounter || 0
   );
   costs.fasterDrinksUp = fasterDrinksUpBaseCost.multiply(fasterDrinksUpCount);
 
-  // Level up cost - use LargeNumber calculation
-  const levelUpBaseCost = toLargeNumber(config.LEVEL_UP_BASE_COST ?? 3000);
-  const levelCount = toLargeNumber((window as any).App?.state?.getState?.()?.level || 0);
+  // Level up cost - use Decimal calculation
+  const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
+  const levelCount = toDecimal((window as any).App?.state?.getState?.()?.level || 0);
   costs.levelUp = levelUpBaseCost.multiply(levelCount);
 
   return costs;

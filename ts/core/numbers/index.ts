@@ -1,18 +1,14 @@
-// Numbers module - unified interface for large number handling
-// Exports all number-related utilities and classes
+// Direct break_eternity.js numbers module
+// Maximum performance with direct Decimal operations
 
-export { LargeNumber } from './large-number';
+export { DecimalOps, Decimal, isDecimal } from './large-number';
 export * from './migration-utils';
-export { NativeNumber } from './native-number';
 
-// Re-export for convenience
-export type { LargeNumberLike, NumericOperations } from '../../../types/global';
-
-// Import migration utilities for the Numbers object
+// Import required functions
 import {
-  toLargeNumber,
+  toDecimal,
   toNumber,
-  formatLargeNumber,
+  formatDecimal,
   gte,
   gt,
   lte,
@@ -23,27 +19,42 @@ import {
   multiply,
   divide,
   pow,
+  toLargeNumber,
+  isLargeNumber
 } from './migration-utils';
 
-// Create a default instance for global use
+// Import DecimalOps and isDecimal for the Numbers object
+import { DecimalOps, isDecimal } from './large-number';
+
+// Create a unified interface for global use
 export const Numbers = {
-  // LargeNumber,
-  // Migration utilities
-  toLargeNumber,
+  // Direct Decimal operations
+  DecimalOps,
+  Decimal,
+  isDecimal,
+
+  // Migration utilities (with legacy aliases)
+  toDecimal,
   toNumber,
-  formatLargeNumber,
+  formatDecimal,
+
   // Comparison utilities
   gte,
   gt,
   lte,
   lt,
   eq,
+
   // Arithmetic utilities
   add,
   subtract,
   multiply,
   divide,
   pow,
+
+  // Legacy aliases
+  toLargeNumber,
+  isLargeNumber,
 };
 
 // Make available globally for backward compatibility

@@ -1,7 +1,7 @@
-// Clicks system: centralizes click tracking and streak logic with LargeNumber support (TypeScript)
+// Clicks system: centralizes click tracking and streak logic with Decimal support (TypeScript)
 
-import { LargeNumber } from '../numbers/large-number';
-import { toLargeNumber } from '../numbers/migration-utils';
+import { DecimalOps, Decimal } from '../numbers/large-number';
+import { toDecimal } from '../numbers/migration-utils';
 
 export function trackClick() {
   try {
@@ -65,22 +65,22 @@ export async function handleSodaClick(multiplier: number = 1) {
 
     const state = w.App?.state?.getState?.() || {};
 
-    // Calculate click value with LargeNumber support
-    const suctionValue = toLargeNumber(
+    // Calculate click value with Decimal support
+    const suctionValue = toDecimal(
       state.suctions ?? w.suctions?.toNumber?.() ?? Number(w.suctions) ?? 0
     );
-    const multiplierValue = toLargeNumber(multiplier || 1);
+    const multiplierValue = toDecimal(multiplier || 1);
 
     // Base click value (1 sip) + suction bonus (0.3 per suction level)
-    const baseClick = new LargeNumber(1);
-    const suctionBonus = suctionValue.multiply(new LargeNumber(0.3));
+    const baseClick = new Decimal(1);
+    const suctionBonus = suctionValue.multiply(new Decimal(0.3));
     const totalClickValue = baseClick.add(suctionBonus).multiply(multiplierValue);
 
-    // Add to sips with LargeNumber arithmetic
-    const currentSips = toLargeNumber(w.sips || 0);
+    // Add to sips with Decimal arithmetic
+    const currentSips = toDecimal(w.sips || 0);
     w.sips = currentSips.add(totalClickValue);
 
-    // Update state keeping LargeNumber
+    // Update state keeping Decimal
     console.log(
       '🍹 Before state update - sips:',
       w.sips,
@@ -117,23 +117,23 @@ export async function handleSodaClick(multiplier: number = 1) {
       console.warn('Failed to set sips in state:', error);
     }
 
-    // Critical check using state-first with LargeNumber support
+    // Critical check using state-first with Decimal support
     const criticalChance = Number(state.criticalClickChance ?? w.criticalClickChance ?? 0);
     if (Math.random() < criticalChance) {
-      const criticalMultiplier = toLargeNumber(
+      const criticalMultiplier = toDecimal(
         state.criticalClickMultiplier ?? w.criticalClickMultiplier ?? 5
       );
 
       // Calculate critical bonus: totalClickValue * (criticalMultiplier - 1)
       const criticalBonus = totalClickValue.multiply(
-        criticalMultiplier.subtract(new LargeNumber(1))
+        criticalMultiplier.subtract(new Decimal(1))
       );
 
       // Add critical bonus to sips
-      const currentSips = toLargeNumber(w.sips || 0);
+      const currentSips = toDecimal(w.sips || 0);
       w.sips = currentSips.add(criticalBonus);
 
-      // Update state keeping LargeNumber
+      // Update state keeping Decimal
       try {
         w.App?.state?.actions?.setSips?.(w.sips);
       } catch (error) {
@@ -141,25 +141,25 @@ export async function handleSodaClick(multiplier: number = 1) {
       }
       try {
         w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, {
-          bonus: criticalBonus.toNumber(),
+          bonus: DecimalOps.toSafeNumber(criticalBonus),
         });
       } catch (error) {
         console.warn('Failed to emit critical click event:', error);
       }
     }
 
-    // Emit soda click and sync totals with LargeNumber support
+    // Emit soda click and sync totals with Decimal support
     try {
       console.log('DEBUG: Emitting CLICK.SODA event with data:', {
-        value: totalClickValue.toNumber(),
-        gained: totalClickValue.toNumber(),
+        value: DecimalOps.toSafeNumber(totalClickValue),
+        gained: DecimalOps.toSafeNumber(totalClickValue),
         eventName: w.App?.EVENT_NAMES?.CLICK?.SODA,
         hasEventSystem: !!w.App?.events,
         hasEmit: typeof w.App?.events?.emit === 'function',
       });
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, {
-        value: totalClickValue.toNumber(),
-        gained: totalClickValue.toNumber(),
+        value: DecimalOps.toSafeNumber(totalClickValue),
+        gained: DecimalOps.toSafeNumber(totalClickValue),
       });
       console.log('🍹 CLICK.SODA event emitted successfully');
     } catch (error) {
@@ -168,7 +168,7 @@ export async function handleSodaClick(multiplier: number = 1) {
     try {
       w.App?.stateBridge?.autoSync?.();
       const st = w.App?.state?.getState?.() || {};
-      const prevTotal = toLargeNumber(st.totalSipsEarned || 0);
+      const prevTotal = toDecimal(st.totalSipsEarned || 0);
       const newTotal = prevTotal.add(totalClickValue);
       w.App?.state?.actions?.setTotalSipsEarned?.(newTotal);
     } catch (error) {

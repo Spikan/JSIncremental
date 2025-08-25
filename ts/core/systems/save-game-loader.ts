@@ -2,6 +2,7 @@
 // Handles loading and restoring game state from save data
 
 import { storeActions } from '../state/zustand-store';
+import { DecimalOps } from '../numbers/large-number';
 
 export interface SaveGameData {
   sips?: number | string | any;
@@ -75,7 +76,7 @@ export class SaveGameLoader {
   private loadBasicResources(savegame: SaveGameData): void {
     try {
       if (typeof savegame.sips !== 'undefined') {
-        // Pass through raw to let store convert to LargeNumber safely
+        // Pass through raw to let store convert to Decimal safely
         storeActions.setSips(savegame.sips as any);
         (window as any).sips = new (window as any).Decimal(String(savegame.sips));
       }
@@ -206,7 +207,7 @@ export class SaveGameLoader {
   }
 
   /**
-   * Parse decimal value with fallback - handles LargeNumber and Decimal objects
+   * Parse decimal value with fallback - handles Decimal and Decimal objects
    */
   private parseDecimalValue(value: any, defaultValue: number = 0): number {
     if (value === null || value === undefined) return defaultValue;
@@ -214,16 +215,16 @@ export class SaveGameLoader {
     if (typeof value === 'number') return value;
     if (typeof value === 'string') return parseFloat(value) || defaultValue;
 
-    // Handle objects with toNumber method (Decimal.js, LargeNumber)
+    // Handle objects with toNumber method (Decimal.js, Decimal)
     if (value && typeof value.toNumber === 'function') {
       try {
-        return value.toNumber();
+        return DecimalOps.toSafeNumber(value);
       } catch (error) {
         console.warn('Failed to get number from object:', error);
       }
     }
 
-    // Handle serialized LargeNumber objects (might have _value property)
+    // Handle serialized Decimal objects (might have _value property)
     if (value && typeof value._value !== 'undefined') {
       return Number(value._value) || defaultValue;
     }

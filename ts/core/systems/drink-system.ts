@@ -1,6 +1,7 @@
-// Drink system: centralizes drink processing and related state/UI updates with LargeNumber support
+// Drink system: centralizes drink processing and related state/UI updates with Decimal support
 
-import { toLargeNumber } from '../numbers/migration-utils';
+import { toDecimal } from '../numbers/migration-utils';
+import { DecimalOps } from '../numbers/large-number';
 
 export type ProcessDrinkArgs = {
   getNow?: () => number;
@@ -20,24 +21,24 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       const now = getNow();
       if (now - lastDrinkTime < drinkRate) return;
 
-      // Add full sips-per-drink (base + production) with LargeNumber support
-      const spdVal = toLargeNumber(
+      // Add full sips-per-drink (base + production) with Decimal support
+      const spdVal = toDecimal(
         state.spd ?? w.sipsPerDrink?.toNumber?.() ?? w.sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
       );
 
-      // Handle sips accumulation with LargeNumber arithmetic
-      const currentSips = toLargeNumber(w.sips || 0);
+      // Handle sips accumulation with Decimal arithmetic
+      const currentSips = toDecimal(w.sips || 0);
       w.sips = currentSips.add(spdVal);
 
-      // Mirror totals with LargeNumber support
-      const prevTotal = toLargeNumber(w.App?.state?.getState?.()?.totalSipsEarned || 0);
-      const prevHigh = toLargeNumber(w.App?.state?.getState?.()?.highestSipsPerSecond || 0);
-      const spdNum = toLargeNumber(state.spd ?? 0);
+      // Mirror totals with Decimal support
+      const prevTotal = toDecimal(w.App?.state?.getState?.()?.totalSipsEarned || 0);
+      const prevHigh = toDecimal(w.App?.state?.getState?.()?.highestSipsPerSecond || 0);
+      const spdNum = toDecimal(state.spd ?? 0);
 
       // Calculate current sips per second (convert to number for rate calculation)
       const rateInSeconds = drinkRate / 1000;
-      const currentSipsPerSecond = rateInSeconds > 0 ? spdNum.toNumber() / rateInSeconds : 0;
-      const highest = Math.max(prevHigh.toNumber(), currentSipsPerSecond);
+      const currentSipsPerSecond = rateInSeconds > 0 ? DecimalOps.toSafeNumber(spdNum) / rateInSeconds : 0;
+      const highest = Math.max(DecimalOps.toSafeNumber(prevHigh), currentSipsPerSecond);
 
       // Update total sips earned
       const newTotalEarned = prevTotal.add(spdVal);
@@ -58,7 +59,7 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       }
 
       try {
-        // Keep LargeNumber in state for sips and totalSipsEarned to avoid Infinity in UI formatting
+        // Keep Decimal in state for sips and totalSipsEarned to avoid Infinity in UI formatting
         w.App?.state?.setState?.({
           sips: w.sips,
           totalSipsEarned: newTotalEarned,

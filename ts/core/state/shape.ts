@@ -1,7 +1,7 @@
 // Centralized default state shape for the game (TypeScript)
-// Enhanced for LargeNumber support
+// Enhanced for Decimal support
 
-import { LargeNumber } from '../numbers/large-number';
+import { Decimal } from '../numbers/large-number';
 import { NumericValue } from '../numbers/migration-utils';
 
 export type GameOptions = {
@@ -16,7 +16,7 @@ export type GameOptions = {
 };
 
 export type GameState = {
-  // Core resources (now support LargeNumber for unlimited scaling)
+  // Core resources (now support Decimal for unlimited scaling)
   sips: NumericValue;
   straws: NumericValue;
   cups: NumericValue;
@@ -27,7 +27,7 @@ export type GameState = {
   criticalClicks: NumericValue;
   level: NumericValue;
 
-  // Production stats (support LargeNumber for high production rates)
+  // Production stats (support Decimal for high production rates)
   spd: NumericValue; // sips per drink (effective) - renamed from sps for clarity
   strawSPD: NumericValue;
   cupSPD: NumericValue;
@@ -62,21 +62,21 @@ export type GameState = {
 };
 
 export const defaultState: GameState = {
-  // Core resources (using LargeNumber for unlimited scaling)
-  sips: new LargeNumber(0),
-  straws: new LargeNumber(0),
-  cups: new LargeNumber(0),
-  suctions: new LargeNumber(0),
-  widerStraws: new LargeNumber(0),
-  betterCups: new LargeNumber(0),
-  fasterDrinks: new LargeNumber(0),
-  criticalClicks: new LargeNumber(0),
-  level: new LargeNumber(1),
+  // Core resources (using Decimal for unlimited scaling)
+  sips: new Decimal(0),
+  straws: new Decimal(0),
+  cups: new Decimal(0),
+  suctions: new Decimal(0),
+  widerStraws: new Decimal(0),
+  betterCups: new Decimal(0),
+  fasterDrinks: new Decimal(0),
+  criticalClicks: new Decimal(0),
+  level: new Decimal(1),
 
-  // Production stats (using LargeNumber for high production rates)
-  spd: new LargeNumber(0), // sips per drink (renamed from sps for clarity)
-  strawSPD: new LargeNumber(0),
-  cupSPD: new LargeNumber(0),
+  // Production stats (using Decimal for high production rates)
+  spd: new Decimal(0), // sips per drink (renamed from sps for clarity)
+  strawSPD: new Decimal(0),
+  cupSPD: new Decimal(0),
 
   // Drink system (time-based values remain as numbers)
   drinkRate: 0,
@@ -88,20 +88,20 @@ export const defaultState: GameState = {
   lastClickTime: 0,
   sessionStartTime: 0,
   totalPlayTime: 0,
-  totalSipsEarned: new LargeNumber(0),
-  totalClicks: new LargeNumber(0),
-  highestSipsPerSecond: new LargeNumber(0),
+  totalSipsEarned: new Decimal(0),
+  totalClicks: new Decimal(0),
+  highestSipsPerSecond: new Decimal(0),
   currentClickStreak: 0,
   bestClickStreak: 0,
 
   // Click/crit systems
   criticalClickChance: 0,
-  criticalClickMultiplier: new LargeNumber(0),
-  suctionClickBonus: new LargeNumber(0),
+  criticalClickMultiplier: new Decimal(0),
+  suctionClickBonus: new Decimal(0),
 
   // Upgrade counters
-  fasterDrinksUpCounter: new LargeNumber(0),
-  criticalClickUpCounter: new LargeNumber(0),
+  fasterDrinksUpCounter: new Decimal(0),
+  criticalClickUpCounter: new Decimal(0),
 
   // Options
   options: {

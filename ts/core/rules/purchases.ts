@@ -1,15 +1,15 @@
-// Pure cost and stat calculation for purchases with LargeNumber support (TypeScript)
+// Pure cost and stat calculation for purchases with Decimal support (TypeScript)
 
-import { LargeNumber } from '../numbers/large-number';
+import { DecimalOps, Decimal } from '../numbers/large-number';
 
 export function nextStrawCost(
-  strawCount: number | string | LargeNumber,
-  baseCost: number | string | LargeNumber,
-  scaling: number | string | LargeNumber
-): LargeNumber {
-  const base = new LargeNumber(baseCost);
-  const scale = new LargeNumber(scaling);
-  const count = new LargeNumber(strawCount);
+  strawCount: number | string | Decimal,
+  baseCost: number | string | Decimal,
+  scaling: number | string | Decimal
+): Decimal {
+  const base = new Decimal(baseCost);
+  const scale = new Decimal(scaling);
+  const count = new Decimal(strawCount);
   // count is small (player-owned items). Use safe exponent bound.
   {
     const nRaw = (count as any).toNumber?.();
@@ -20,13 +20,13 @@ export function nextStrawCost(
 }
 
 export function nextCupCost(
-  cupCount: number | string | LargeNumber,
-  baseCost: number | string | LargeNumber,
-  scaling: number | string | LargeNumber
-): LargeNumber {
-  const base = new LargeNumber(baseCost);
-  const scale = new LargeNumber(scaling);
-  const count = new LargeNumber(cupCount);
+  cupCount: number | string | Decimal,
+  baseCost: number | string | Decimal,
+  scaling: number | string | Decimal
+): Decimal {
+  const base = new Decimal(baseCost);
+  const scale = new Decimal(scaling);
+  const count = new Decimal(cupCount);
   {
     const nRaw = (count as any).toNumber?.();
     const n = (nRaw ?? Number(count as any)) || 0;
@@ -41,7 +41,7 @@ export function nextStrawCostLegacy(
   baseCost: number | string,
   scaling: number | string
 ): number {
-  return Math.floor(nextStrawCost(strawCount, baseCost, scaling).toNumber());
+  return Math.floor(DecimalOps.toSafeNumber(nextStrawCost(strawCount, baseCost, scaling)));
 }
 
 export function nextCupCostLegacy(
@@ -49,5 +49,5 @@ export function nextCupCostLegacy(
   baseCost: number | string,
   scaling: number | string
 ): number {
-  return Math.floor(nextCupCost(cupCount, baseCost, scaling).toNumber());
+  return Math.floor(DecimalOps.toSafeNumber(nextCupCost(cupCount, baseCost, scaling)));
 }

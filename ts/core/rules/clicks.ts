@@ -1,6 +1,6 @@
-// Pure helpers for click outcomes with LargeNumber support (TypeScript)
+// Pure helpers for click outcomes with Decimal support (TypeScript)
 
-import { LargeNumber } from '../numbers/large-number';
+import { Decimal } from '../numbers/large-number';
 
 export function computeClick({
   baseClick,
@@ -8,19 +8,19 @@ export function computeClick({
   criticalChance,
   criticalMultiplier,
 }: {
-  baseClick: number | string | LargeNumber;
-  suctionBonus: number | string | LargeNumber;
+  baseClick: number | string | Decimal;
+  suctionBonus: number | string | Decimal;
   criticalChance: number;
-  criticalMultiplier: number | string | LargeNumber;
-}): { gained: LargeNumber; critical: boolean } {
-  const base = new LargeNumber(baseClick);
-  const bonus = new LargeNumber(suctionBonus);
-  const mult = new LargeNumber(criticalMultiplier);
+  criticalMultiplier: number | string | Decimal;
+}): { gained: Decimal; critical: boolean } {
+  const base = new Decimal(baseClick);
+  const bonus = new Decimal(suctionBonus);
+  const mult = new Decimal(criticalMultiplier);
   const isCritical = Math.random() < criticalChance;
 
   // Calculate gained sips: (base + bonus) * (critical ? multiplier : 1)
   const basePlusBonus = base.add(bonus);
-  const effectiveMultiplier = isCritical ? mult : new LargeNumber(1);
+  const effectiveMultiplier = isCritical ? mult : new Decimal(1);
   const gained = basePlusBonus.multiply(effectiveMultiplier);
 
   return { gained, critical: isCritical };

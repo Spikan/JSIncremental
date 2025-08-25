@@ -1,32 +1,32 @@
 // Typed legacy state bridge that mirrors globals into App.state
-// Enhanced for LargeNumber support with unlimited scaling
+// Enhanced for Decimal support with unlimited scaling
 
 import type { GameState } from './shape';
-import { LargeNumber } from '../numbers/large-number';
-import { toLargeNumber } from '../numbers/migration-utils';
+import { DecimalOps, Decimal } from '../numbers/large-number';
+import { toDecimal } from '../numbers/migration-utils';
 
-// Type for actions available in the Zustand store (enhanced for LargeNumber)
+// Type for actions available in the Zustand store (enhanced for Decimal)
 interface StateActions {
   setDrinkRate?: (value: number) => void;
   setDrinkProgress?: (value: number) => void;
   setLastDrinkTime?: (value: number) => void;
   setLevel?: (value: number) => void;
-  setSips?: (value: number | LargeNumber) => void;
-  setStraws?: (value: number | LargeNumber) => void;
-  setCups?: (value: number | LargeNumber) => void;
-  setSuctions?: (value: number | LargeNumber) => void;
-  setWiderStraws?: (value: number | LargeNumber) => void;
-  setBetterCups?: (value: number | LargeNumber) => void;
-  setFasterDrinks?: (value: number | LargeNumber) => void;
-  setCriticalClicks?: (value: number | LargeNumber) => void;
+  setSips?: (value: number | Decimal) => void;
+  setStraws?: (value: number | Decimal) => void;
+  setCups?: (value: number | Decimal) => void;
+  setSuctions?: (value: number | Decimal) => void;
+  setWiderStraws?: (value: number | Decimal) => void;
+  setBetterCups?: (value: number | Decimal) => void;
+  setFasterDrinks?: (value: number | Decimal) => void;
+  setCriticalClicks?: (value: number | Decimal) => void;
   setCriticalClickChance?: (value: number) => void;
-  setCriticalClickMultiplier?: (value: number | LargeNumber) => void;
-  setSuctionClickBonus?: (value: number | LargeNumber) => void;
-  setSPD?: (value: number | LargeNumber) => void;
-  setStrawSPD?: (value: number | LargeNumber) => void;
-  setCupSPD?: (value: number | LargeNumber) => void;
-  setFasterDrinksUpCounter?: (value: number | LargeNumber) => void;
-  setCriticalClickUpCounter?: (value: number | LargeNumber) => void;
+  setCriticalClickMultiplier?: (value: number | Decimal) => void;
+  setSuctionClickBonus?: (value: number | Decimal) => void;
+  setSPD?: (value: number | Decimal) => void;
+  setStrawSPD?: (value: number | Decimal) => void;
+  setCupSPD?: (value: number | Decimal) => void;
+  setFasterDrinksUpCounter?: (value: number | Decimal) => void;
+  setCriticalClickUpCounter?: (value: number | Decimal) => void;
 }
 
 type AppLike = {
@@ -37,13 +37,13 @@ type AppLike = {
   };
 };
 
-// Type for values that can be LargeNumber or primitive (enhanced for unlimited scaling)
-type NumericValue = number | string | LargeNumber | { toNumber(): number } | { _v: number };
+// Type for values that can be Decimal or primitive (enhanced for unlimited scaling)
+type NumericValue = number | string | Decimal | { toNumber(): number } | { _v: number };
 
 export function createStateBridge(app: AppLike) {
   function setDrinkRate(value: NumericValue) {
     try {
-      const numericValue = toLargeNumber(value).toNumber();
+      const numericValue = DecimalOps.toSafeNumber(toDecimal(value));
       app.state.actions?.setDrinkRate?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -52,7 +52,7 @@ export function createStateBridge(app: AppLike) {
 
   function setDrinkProgress(value: NumericValue) {
     try {
-      const numericValue = toLargeNumber(value).toNumber();
+      const numericValue = DecimalOps.toSafeNumber(toDecimal(value));
       app.state.actions?.setDrinkProgress?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -61,7 +61,7 @@ export function createStateBridge(app: AppLike) {
 
   function setLastDrinkTime(value: NumericValue) {
     try {
-      const numericValue = toLargeNumber(value).toNumber();
+      const numericValue = DecimalOps.toSafeNumber(toDecimal(value));
       app.state.actions?.setLastDrinkTime?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -69,7 +69,7 @@ export function createStateBridge(app: AppLike) {
   }
 
   function setLevel(value: NumericValue) {
-    const numeric = toLargeNumber(value).toNumber();
+    const numeric = DecimalOps.toSafeNumber(toDecimal(value));
     try {
       app.state.actions?.setLevel?.(numeric);
     } catch (error) {
@@ -77,13 +77,13 @@ export function createStateBridge(app: AppLike) {
     }
   }
 
-  function toLargeNumberValue(value: NumericValue): LargeNumber {
-    return toLargeNumber(value);
+  function toDecimalValue(value: NumericValue): Decimal {
+    return toDecimal(value);
   }
 
   function syncSips(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setSips?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -92,7 +92,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncStraws(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setStraws?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -101,7 +101,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncCups(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setCups?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -110,7 +110,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncSuctions(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setSuctions?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -119,7 +119,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncWiderStraws(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setWiderStraws?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -128,7 +128,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncBetterCups(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setBetterCups?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -137,7 +137,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncFasterDrinks(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setFasterDrinks?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -146,7 +146,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncCriticalClicks(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setCriticalClicks?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -155,7 +155,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncCriticalClickChance(value: NumericValue) {
     try {
-      app.state.actions?.setCriticalClickChance?.(toLargeNumberValue(value).toNumber());
+      app.state.actions?.setCriticalClickChance?.(DecimalOps.toSafeNumber(toDecimal(value)));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -163,7 +163,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncCriticalClickMultiplier(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setCriticalClickMultiplier?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -172,7 +172,7 @@ export function createStateBridge(app: AppLike) {
 
   function syncSuctionClickBonus(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       app.state.actions?.setSuctionClickBonus?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -181,10 +181,10 @@ export function createStateBridge(app: AppLike) {
 
   function syncSpd(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       // For compatibility, convert to number if it's reasonable size
-      if (largeNumberValue.toNumber() < Number.MAX_SAFE_INTEGER) {
-        app.state.actions?.setSPD?.(largeNumberValue.toNumber());
+      if (DecimalOps.toSafeNumber(largeNumberValue) < Number.MAX_SAFE_INTEGER) {
+        app.state.actions?.setSPD?.(DecimalOps.toSafeNumber(largeNumberValue));
       } else {
         app.state.actions?.setSPD?.(largeNumberValue);
       }
@@ -195,10 +195,10 @@ export function createStateBridge(app: AppLike) {
 
   function syncStrawSPD(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       // For compatibility, convert to number if it's reasonable size
-      if (largeNumberValue.toNumber() < Number.MAX_SAFE_INTEGER) {
-        app.state.actions?.setStrawSPD?.(largeNumberValue.toNumber());
+      if (DecimalOps.toSafeNumber(largeNumberValue) < Number.MAX_SAFE_INTEGER) {
+        app.state.actions?.setStrawSPD?.(DecimalOps.toSafeNumber(largeNumberValue));
       } else {
         app.state.actions?.setStrawSPD?.(largeNumberValue);
       }
@@ -209,10 +209,10 @@ export function createStateBridge(app: AppLike) {
 
   function syncCupSPD(value: NumericValue) {
     try {
-      const largeNumberValue = toLargeNumberValue(value);
+      const largeNumberValue = toDecimalValue(value);
       // For compatibility, convert to number if it's reasonable size
-      if (largeNumberValue.toNumber() < Number.MAX_SAFE_INTEGER) {
-        app.state.actions?.setCupSPD?.(largeNumberValue.toNumber());
+      if (DecimalOps.toSafeNumber(largeNumberValue) < Number.MAX_SAFE_INTEGER) {
+        app.state.actions?.setCupSPD?.(DecimalOps.toSafeNumber(largeNumberValue));
       } else {
         app.state.actions?.setCupSPD?.(largeNumberValue);
       }
@@ -239,9 +239,9 @@ export function createStateBridge(app: AppLike) {
             typeof seedKey === 'string' &&
             (seedKey === 'drinkRate' || seedKey === 'drinkProgress' || seedKey === 'lastDrinkTime')
           ) {
-            (seed as any)[seedKey] = toLargeNumberValue(value).toNumber();
+            (seed as any)[seedKey] = DecimalOps.toSafeNumber(toDecimal(value));
           } else if (seedKey === 'level') {
-            (seed as any)[seedKey] = toLargeNumberValue(value);
+            (seed as any)[seedKey] = toDecimalValue(value);
           } else if (
             typeof seedKey === 'string' &&
             (seedKey === 'criticalClickChance' ||
@@ -249,10 +249,10 @@ export function createStateBridge(app: AppLike) {
               seedKey === 'bestClickStreak')
           ) {
             // These remain as numbers
-            (seed as any)[seedKey] = toLargeNumberValue(value).toNumber();
+            (seed as any)[seedKey] = DecimalOps.toSafeNumber(toDecimal(value));
           } else {
-            // All other values become LargeNumber
-            (seed as any)[seedKey] = toLargeNumberValue(value);
+            // All other values become Decimal
+            (seed as any)[seedKey] = toDecimalValue(value);
           }
         }
       };

@@ -5,8 +5,8 @@ import {
   computeTotalSipsPerDrink,
 } from '../rules/economy.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
-import { LargeNumber } from '../numbers/large-number';
-import { toLargeNumber } from '../numbers/migration-utils';
+import { Decimal } from '../numbers/large-number';
+import { toDecimal } from '../numbers/migration-utils';
 
 function getConfig(): { upgrades: any; config: any } {
   return getUpgradesAndConfig();
@@ -20,51 +20,51 @@ export function recalcProduction({
   base = {},
   multipliers = {},
 }: {
-  straws: number | LargeNumber;
-  cups: number | LargeNumber;
-  widerStraws: number | LargeNumber;
-  betterCups: number | LargeNumber;
+  straws: number | Decimal;
+  cups: number | Decimal;
+  widerStraws: number | Decimal;
+  betterCups: number | Decimal;
   base?: {
-    strawBaseSPD?: number | LargeNumber;
-    cupBaseSPD?: number | LargeNumber;
-    baseSipsPerDrink?: number | LargeNumber;
+    strawBaseSPD?: number | Decimal;
+    cupBaseSPD?: number | Decimal;
+    baseSipsPerDrink?: number | Decimal;
   };
   multipliers?: {
-    widerStrawsPerLevel?: number | LargeNumber;
-    betterCupsPerLevel?: number | LargeNumber;
+    widerStrawsPerLevel?: number | Decimal;
+    betterCupsPerLevel?: number | Decimal;
   };
-}): { strawSPD: LargeNumber; cupSPD: LargeNumber; sipsPerDrink: LargeNumber } {
+}): { strawSPD: Decimal; cupSPD: Decimal; sipsPerDrink: Decimal } {
   const { upgrades, config } = getConfig();
 
-  // Convert all values to LargeNumber for consistent calculations
-  const strawBaseSPD = toLargeNumber(
+  // Convert all values to Decimal for consistent calculations
+  const strawBaseSPD = toDecimal(
     base.strawBaseSPD ?? upgrades?.straws?.baseSPD ?? config.STRAW_BASE_SPD ?? 0.6
   );
-  const cupBaseSPD = toLargeNumber(
+  const cupBaseSPD = toDecimal(
     base.cupBaseSPD ?? upgrades?.cups?.baseSPD ?? config.CUP_BASE_SPD ?? 1.2
   );
-  const baseSipsPerDrink = toLargeNumber(base.baseSipsPerDrink ?? config.BASE_SIPS_PER_DRINK ?? 1);
+  const baseSipsPerDrink = toDecimal(base.baseSipsPerDrink ?? config.BASE_SIPS_PER_DRINK ?? 1);
 
-  const widerStrawsPerLevel = toLargeNumber(
+  const widerStrawsPerLevel = toDecimal(
     multipliers.widerStrawsPerLevel ??
       upgrades?.widerStraws?.multiplierPerLevel ??
       config.WIDER_STRAWS_MULTIPLIER ??
       0.5
   );
-  const betterCupsPerLevel = toLargeNumber(
+  const betterCupsPerLevel = toDecimal(
     multipliers.betterCupsPerLevel ??
       upgrades?.betterCups?.multiplierPerLevel ??
       config.BETTER_CUPS_MULTIPLIER ??
       0.4
   );
 
-  // Use LargeNumber versions of all inputs
-  const strawsLarge = toLargeNumber(straws);
-  const cupsLarge = toLargeNumber(cups);
-  const widerStrawsLarge = toLargeNumber(widerStraws);
-  const betterCupsLarge = toLargeNumber(betterCups);
+  // Use Decimal versions of all inputs
+  const strawsLarge = toDecimal(straws);
+  const cupsLarge = toDecimal(cups);
+  const widerStrawsLarge = toDecimal(widerStraws);
+  const betterCupsLarge = toDecimal(betterCups);
 
-  // Calculate production values with LargeNumber support
+  // Calculate production values with Decimal support
   const strawSPD = computeStrawSPD(
     strawsLarge,
     strawBaseSPD,

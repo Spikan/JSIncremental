@@ -5,15 +5,15 @@ export type DecimalLike = {
   toString?: () => string;
 };
 
-import { formatLargeNumber } from '../core/numbers/migration-utils';
+import { DecimalOps, formatDecimal } from '../core/numbers';
 
 export function formatNumber(value: any): string {
   try {
-    // Try using the new LargeNumber formatting first, but post-process to ensure 2 decimal places
-    const formatted = formatLargeNumber(value);
+    // Try using the new Decimal formatting first, but post-process to ensure 2 decimal places
+    const formatted = formatDecimal(value);
     return postProcessDecimals(formatted);
   } catch (error) {
-    console.warn('Failed to format with LargeNumber, falling back:', error);
+    console.warn('Failed to format with Decimal, falling back:', error);
   }
 
   // Legacy formatting for backward compatibility
@@ -153,7 +153,7 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
   let currentSips = '0';
   try {
     const st = (window as any).App?.state?.getState?.();
-    // Use sips directly - formatNumber will handle LargeNumber properly
+    // Use sips directly - formatNumber will handle Decimal properly
     currentSips = formatNumber(st?.sips || 0);
   } catch (error) {
     console.warn('Failed to get current sips for button title:', error);
@@ -208,10 +208,10 @@ export const GameState = {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
     const sipsValue = st && typeof st.sips !== 'undefined' ? st.sips : (window as any).sips;
-    // Convert LargeNumber to number safely
+    // Convert Decimal to number safely
     if (sipsValue && typeof sipsValue.toNumber === 'function') {
       try {
-        const numValue = sipsValue.toNumber();
+        const numValue = DecimalOps.toSafeNumber(sipsValue);
         return Number.isFinite(numValue) ? numValue : 0;
       } catch (error) {
         console.warn('Failed to convert sips to number:', error);
@@ -231,10 +231,10 @@ export const GameState = {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
     const spdValue = st && typeof st.spd !== 'undefined' ? st.spd : (window as any).spd;
-    // Convert LargeNumber to number safely
+    // Convert Decimal to number safely
     if (spdValue && typeof spdValue.toNumber === 'function') {
       try {
-        const numValue = spdValue.toNumber();
+        const numValue = DecimalOps.toSafeNumber(spdValue);
         return Number.isFinite(numValue) ? numValue : 0;
       } catch (error) {
         console.warn('Failed to convert spd to number:', error);
