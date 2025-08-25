@@ -252,3 +252,24 @@ export const GameState = {
 
 export const safePrettify = formatNumber;
 export const prettify = formatNumber;
+
+// Game calculation utilities with consistent 2-decimal precision
+export function roundToTwoDecimals(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+export function formatGameNumber(value: any): string {
+  return formatNumber(value);
+}
+
+export function calculatePercentage(current: number, total: number): number {
+  if (total === 0) return 0;
+  return roundToTwoDecimals((current / total) * 100);
+}
+
+export function calculateBonusPercentage(base: number, current: number): number {
+  if (base === 0) return 0;
+  return roundToTwoDecimals(((current - base) / base) * 100);
+}
+
+export {};

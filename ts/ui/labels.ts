@@ -1,5 +1,7 @@
 // UI Labels helpers: small, reusable text setters for common UI labels (TypeScript)
 
+import { formatNumber } from './utils';
+
 // Update the Click Sounds toggle label and style
 export function updateClickSoundsToggleText(enabled: boolean): void {
   const toggle = document.getElementById('clickSoundsToggle');
@@ -16,7 +18,7 @@ export function updateCountdownText(secondsRemaining: number): void {
     (window as any).DOM_CACHE?.drinkCountdown || document.getElementById('drinkCountdown');
   if (!countdown) return;
   const seconds = Math.max(0, Number(secondsRemaining) || 0);
-  (countdown as HTMLElement).textContent = `${seconds.toFixed(1)}s`;
+  (countdown as HTMLElement).textContent = `${formatNumber(seconds)}s`;
 }
 
 // Generic music status label setter

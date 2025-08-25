@@ -204,7 +204,7 @@ export function updateDrinkSpeedDisplay(): void {
     const state = useGameStore.getState();
     if (currentDrinkSpeedCompact && state) {
       const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
-      currentDrinkSpeedCompact.textContent = `${drinkRateSeconds.toFixed(2)}s`;
+      currentDrinkSpeedCompact.textContent = `${formatNumber(drinkRateSeconds)}s`;
     }
     if (drinkSpeedBonusCompact && state) {
       const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
@@ -286,7 +286,7 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
       0,
       currentDrinkRate - (clampedProgress / 100) * currentDrinkRate
     );
-    const remainingSeconds = (remainingTime / 1000).toFixed(1);
+    const remainingSeconds = formatNumber(remainingTime / 1000);
     (countdown as HTMLElement).textContent = `${remainingSeconds}s`;
     if (remainingTime <= 1000) {
       (countdown as HTMLElement).classList.add('countdown-warning');
@@ -362,7 +362,7 @@ export function updateDrinkRate(): void {
     const state = useGameStore.getState();
     if (drinkRateElement && state) {
       const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
-      drinkRateElement.textContent = `${drinkRateSeconds.toFixed(2)}s`;
+      drinkRateElement.textContent = `${formatNumber(drinkRateSeconds)}s`;
     }
   } catch (error) {
     console.warn('Failed to update display:', error);
@@ -377,7 +377,7 @@ export function updateCompactDrinkSpeedDisplays(): void {
     const state = useGameStore.getState();
     if (currentDrinkSpeedCompact && state) {
       const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
-      currentDrinkSpeedCompact.textContent = `${drinkRateSeconds.toFixed(2)}s`;
+      currentDrinkSpeedCompact.textContent = `${formatNumber(drinkRateSeconds)}s`;
     }
     if (drinkSpeedBonusCompact && state) {
       const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
@@ -394,7 +394,7 @@ export function updateCompactDrinkSpeedDisplays(): void {
       const state = useGameStore.getState();
       if ((display as HTMLElement).id.includes('DrinkSpeed') && state) {
         const drinkRateSeconds = Number(state.drinkRate || 0) / 1000;
-        (display as HTMLElement).textContent = `${drinkRateSeconds.toFixed(2)}s`;
+        (display as HTMLElement).textContent = `${formatNumber(drinkRateSeconds)}s`;
       }
     } catch (error) {
       console.warn('Failed to update display:', error);
