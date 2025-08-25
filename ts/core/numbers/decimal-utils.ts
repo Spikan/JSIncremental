@@ -20,8 +20,6 @@ export const checkIsDecimal = (value: any): value is DecimalType => {
   }
 };
 
-
-
 // Minimal formatting utility for UI display
 export const formatDecimal = (value: any): string => {
   if (!checkIsDecimal(value)) {

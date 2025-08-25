@@ -1,6 +1,10 @@
 // Direct break_eternity.js utilities
 // No wrapper - direct Decimal operations for maximum performance
 
+// Import checkIsDecimal first to avoid temporal dead zone
+import { checkIsDecimal, DecimalType } from './decimal-utils';
+import { isValidDecimalString } from './safe-conversion';
+
 // Direct break_eternity.js access - function-based to avoid initialization issues
 function getDecimal() {
   try {
@@ -13,8 +17,6 @@ function getDecimal() {
     return undefined;
   }
 }
-import { checkIsDecimal, DecimalType } from './decimal-utils';
-import { isValidDecimalString } from './safe-conversion';
 
 // Export type for use by other modules
 export type { DecimalType };
