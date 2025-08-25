@@ -14,7 +14,7 @@ export function toLargeNumber(value: NumericValue): LargeNumber {
     return value;
   }
 
-  // Handle NumericOperations objects (including Decimal.js or break_infinity objects)
+  // Handle NumericOperations objects (including Decimal.js or break_eternity.js objects)
   if (value && typeof (value as NumericOperations).add === 'function') {
     try {
       // If it's already a LargeNumber, return as-is
@@ -262,13 +262,24 @@ export function batchToNumber(values: NumericValue[]): number[] {
  */
 export function formatLargeNumber(value: NumericValue): string {
   if (isLargeNumber(value)) {
+    // For LargeNumber with break_eternity, use its built-in formatting
+    try {
+      const debugInfo = value.getDebugInfo();
+      if (debugInfo.isBreakEternity) {
+        // break_eternity.js has excellent formatting capabilities
+        return value.toString();
+      }
+    } catch (error) {
+      console.warn('Failed to get LargeNumber debug info:', error);
+    }
+
     // For LargeNumber, check if it's very large by comparing with LargeNumber values
     const oneMillion = new LargeNumber('1000000');
     const negativeOneMillion = new LargeNumber('-1000000');
 
     // Use scientific notation for very large numbers
     if (value.gte(oneMillion) || value.lte(negativeOneMillion)) {
-      return value.toString(); // Let break_infinity handle formatting
+      return value.toString(); // Let break_eternity handle formatting
     }
 
     // For smaller LargeNumbers, try to get the number value safely
@@ -286,8 +297,17 @@ export function formatLargeNumber(value: NumericValue): string {
     }
   }
 
-  // Handle Decimal.js objects
+  // Handle break_eternity.js Decimal objects directly
   if (isDecimalLike(value)) {
+    try {
+      // Check if it's a break_eternity.js object by looking for specific methods
+      if (typeof (value as any).toString === 'function') {
+        return (value as any).toString();
+      }
+    } catch (error) {
+      console.warn('Failed to format break_eternity.js object:', error);
+    }
+
     const numValue = toNumber(value);
     if (numValue >= 1e6 || numValue <= -1e6) {
       return value.toString();

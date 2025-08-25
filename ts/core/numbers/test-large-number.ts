@@ -10,8 +10,8 @@ function runExtremeValueTests() {
   console.log('=== EXTREME VALUE TESTS ===');
 
   // Check library availability
-  const hasBreakInfinity = typeof (globalThis as any).Decimal !== 'undefined';
-  console.log('break_infinity.js available:', hasBreakInfinity);
+  const hasBreakEternity = typeof (globalThis as any).Decimal !== 'undefined';
+  console.log('break_eternity.js available:', hasBreakEternity);
 
   // Test the exact problematic values
   const extreme1 = new LargeNumber('1e2000');
@@ -37,9 +37,9 @@ function runExtremeValueTests() {
   console.log('2.5e4000 toNumber():', extreme3.toNumber());
   console.log('2.5e4000 toSafeNumber():', extreme3.toSafeNumber());
 
-  // Test break_infinity directly
+  // Test break_eternity.js directly
   if (typeof (globalThis as any).Decimal !== 'undefined') {
-    console.log('=== DIRECT BREAK_INFINITY TEST ===');
+    console.log('=== DIRECT BREAK_ETERNITY TEST ===');
     const directDecimal = new (globalThis as any).Decimal('1e2000');
     console.log('Direct Decimal 1e2000 toString():', directDecimal.toString());
     console.log('Direct Decimal 1e2000 toNumber():', directDecimal.toNumber());

@@ -2,7 +2,7 @@
 
 ## Overview
 
-These dev tools allow you to test the break_infinity integration with extremely large numbers that go way beyond JavaScript's native limits (1e308+).
+These dev tools allow you to test the break_eternity.js integration with extremely large numbers that go way beyond JavaScript's native limits (1e308+).
 
 ## Available Functions
 
@@ -125,14 +125,14 @@ The easiest way to test large numbers is through the **🌌 Large Number Scaling
 
 ## Expected Behavior
 
-### With break_infinity:
+### With break_eternity.js:
 
 - ✅ Numbers display in scientific notation (1e500, 1e750, etc.)
 - ✅ Calculations work without overflow errors
 - ✅ Performance remains smooth
 - ✅ Save/load works with massive numbers
 
-### Without break_infinity:
+### Without break_eternity.js:
 
 - ❌ Numbers would be `Infinity` or cause errors
 - ❌ Calculations would overflow
@@ -164,7 +164,7 @@ Adding 1e500 sips
 
 ### Numbers showing as Infinity?
 
-- The break_infinity library might not be loaded
+- The break_eternity.js library might not be loaded
 - Check the browser console for errors
 - Verify the CDN link in index.html
 
@@ -202,6 +202,6 @@ for (let i = 0; i < 10; i++) {
 If you encounter issues:
 
 1. Check the browser console for error messages
-2. Verify break_infinity.js is loading from the CDN
+2. Verify break_eternity.js is loading from the CDN
 3. Try the functions in different browsers
 4. Report any issues with the specific error messages

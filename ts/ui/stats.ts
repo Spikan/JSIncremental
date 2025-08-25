@@ -228,35 +228,13 @@ export function updateAchievementStats(): void {
 
 // Update purchased item counts in shop displays
 export function updatePurchasedCounts(): void {
-  console.log('🔄 updatePurchasedCounts called');
-
-  if (typeof window === 'undefined') {
-    console.log('❌ window is undefined');
-    return;
-  }
+  if (typeof window === 'undefined') return;
 
   const state = (window as any).App?.state?.getState?.();
-  if (!state) {
-    console.log('❌ no state found');
-    return;
-  }
-
-  console.log('📊 Current state:', {
-    straws: state.straws,
-    cups: state.cups,
-    widerStraws: state.widerStraws,
-    betterCups: state.betterCups,
-    suctions: state.suctions,
-    criticalClicks: state.criticalClicks,
-  });
+  if (!state) return;
 
   // Check if DOM_CACHE is available
-  if (!(window as any).DOM_CACHE) {
-    console.log('❌ DOM_CACHE not available');
-    return;
-  }
-
-  console.log('🗂️ DOM_CACHE available:', Object.keys((window as any).DOM_CACHE || {}));
+  if (!(window as any).DOM_CACHE) return;
 
   // Update straws purchased count
   const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
@@ -267,9 +245,6 @@ export function updatePurchasedCounts(): void {
     const strawsValue =
       typeof straws === 'object' && straws.toSafeNumber ? straws.toSafeNumber() : straws;
     strawsPurchasedElement.textContent = formatNumber(strawsValue);
-    console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
-  } else {
-    console.log('❌ strawsPurchased element not found');
   }
 
   // Update cups purchased count
@@ -278,9 +253,6 @@ export function updatePurchasedCounts(): void {
     const cups = state.cups || 0;
     const cupsValue = typeof cups === 'object' && cups.toSafeNumber ? cups.toSafeNumber() : cups;
     cupsPurchasedElement.textContent = formatNumber(cupsValue);
-    console.log('✅ Updated cups:', cupsValue, 'element:', cupsPurchasedElement);
-  } else {
-    console.log('❌ cupsPurchased element not found');
   }
 
   // Update wider straws purchased count

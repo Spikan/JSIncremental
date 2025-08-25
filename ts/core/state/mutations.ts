@@ -1,5 +1,5 @@
 // Pure mutation helpers for LargeNumber values (TypeScript)
-// Enhanced for unlimited scaling with break_infinity support
+// Enhanced for unlimited scaling with break_eternity.js support
 
 import { LargeNumber } from '../numbers/large-number';
 import { toLargeNumber, add, subtract, multiply } from '../numbers/migration-utils';

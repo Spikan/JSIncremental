@@ -1,5 +1,5 @@
 // Performance benchmarks for LargeNumber operations
-// Demonstrates the capabilities and efficiency of the break_infinity integration
+// Demonstrates the capabilities and efficiency of the break_eternity.js integration
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { LargeNumber } from '../ts/core/numbers/large-number';

@@ -252,7 +252,7 @@ export function openImportDialog(): boolean {
 }
 
 // Large Number Scaling Test Functions
-// These functions help test the break_infinity integration with very large numbers
+// These functions help test the break_eternity.js integration with very large numbers
 
 /**
  * Add a massive amount of sips (1e500) to test large number scaling
@@ -310,7 +310,7 @@ export function addHugeStraws(): boolean {
 
     if (typeof w.straws === 'undefined' || w.straws === null) return false;
 
-    // Create a LargeNumber with 1e750 straws (demonstrating break_infinity)
+    // Create a LargeNumber with 1e750 straws (demonstrating break_eternity.js)
     const hugeAmount = new LargeNumber('1e750');
     console.log(`Adding ${hugeAmount.toString()} straws`);
 
@@ -356,7 +356,7 @@ export function addMassiveCups(): boolean {
 
     if (typeof w.cups === 'undefined' || w.cups === null) return false;
 
-    // Create a LargeNumber with 1e1000 cups (extreme break_infinity test)
+    // Create a LargeNumber with 1e1000 cups (extreme break_eternity.js test)
     const massiveAmount = new LargeNumber('1e1000');
     console.log(`Adding ${massiveAmount.toString()} cups`);
 

@@ -1,5 +1,5 @@
 // Native JavaScript number implementation for LargeNumber fallback
-// This provides a consistent interface when break_infinity is not available
+// This provides a consistent interface when break_eternity.js is not available
 
 import { NumericOperations } from '../../../types/global';
 

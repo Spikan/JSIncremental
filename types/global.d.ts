@@ -1,6 +1,6 @@
 // Global type definitions for large number libraries
 
-// BreakInfinity.js interface (from break_infinity.js library)
+// BreakEternity.js interface (from break_eternity.js library)
 interface BreakInfinityStatic {
   new (value: number | string | BreakInfinity): BreakInfinity;
   (value: number | string | BreakInfinity): BreakInfinity;

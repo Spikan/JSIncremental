@@ -124,12 +124,12 @@ describe('LargeNumber System', () => {
   });
 
   describe('Library detection and fallback', () => {
-    it('should use break_infinity when available', () => {
-      // This test depends on whether break_infinity is loaded
-      const hasBreakInfinity = typeof (globalThis as any).BreakInfinity !== 'undefined';
+    it('should use break_eternity.js when available', () => {
+      // This test depends on whether break_eternity.js is loaded
+      const hasBreakEternity = typeof (globalThis as any).BreakEternity !== 'undefined';
       const hasDecimal = typeof (globalThis as any).Decimal !== 'undefined';
 
-      if (hasBreakInfinity || hasDecimal) {
+      if (hasBreakEternity || hasDecimal) {
         const num = new LargeNumber('1e50');
         // Should be able to handle very large numbers
         expect(() => num.toString()).not.toThrow();
