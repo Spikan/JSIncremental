@@ -8,10 +8,15 @@ import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
-// Direct break_eternity.js access
-const Decimal =
-  (globalThis as any).Decimal ||
-  (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
+// Direct break_eternity.js access - lazy loading to avoid initialization issues
+let Decimal: any;
+function getDecimal() {
+  if (!Decimal) {
+    Decimal = (globalThis as any).Decimal || 
+              (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
+  }
+  return Decimal;
+}
 import { toDecimal, add } from '../numbers/migration-utils';
 
 // Extended state interface with actions
@@ -291,7 +296,7 @@ export const useGameStore = create<GameStore>()(
           const parsed = JSON.parse(str, (_key, value) => {
             if (value && typeof value === 'object' && value.__largeNumber) {
               // Restore Decimal from string representation
-              return new Decimal(value.value);
+              return new (getDecimal())(value.value);
             }
             return value;
           });
@@ -477,9 +482,9 @@ export const useTotalResources = () => {
       suctions,
       total: (state: GameStore) =>
         state.sips
-          ?.add(state.straws || new Decimal(0))
-          .add(state.cups || new Decimal(0))
-          .add(state.suctions || new Decimal(0))
+                  ?.add(state.straws || new (getDecimal())(0))
+        .add(state.cups || new (getDecimal())(0))
+        .add(state.suctions || new (getDecimal())(0))
           .toString() || '0',
     }),
     [sips, straws, cups, suctions]
@@ -497,7 +502,7 @@ export const useProductionStats = () => {
       strawSPD,
       cupSPD,
       totalSPD: (state: GameStore) =>
-        state.strawSPD?.add(state.cupSPD || new Decimal(0)).toString() || '0',
+        state.strawSPD?.add(state.cupSPD || new (getDecimal())(0)).toString() || '0',
     }),
     [spd, strawSPD, cupSPD]
   );
@@ -516,7 +521,7 @@ export const useClickStats = () => {
       criticalClickMultiplier,
       suctionClickBonus,
       effectiveMultiplier: (state: GameStore) =>
-        state.criticalClickMultiplier?.add(state.suctionClickBonus || new Decimal(0)).toString() ||
+        state.criticalClickMultiplier?.add(state.suctionClickBonus || new (getDecimal())(0)).toString() ||
         '0',
     }),
     [totalClicks, criticalClickChance, criticalClickMultiplier, suctionClickBonus]

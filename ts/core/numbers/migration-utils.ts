@@ -1,10 +1,15 @@
 // Direct break_eternity.js utilities
 // No wrapper - direct Decimal operations for maximum performance
 
-// Direct break_eternity.js access
-const Decimal =
-  (globalThis as any).Decimal ||
-  (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
+// Direct break_eternity.js access - lazy loading to avoid initialization issues
+let Decimal: any;
+function getDecimal() {
+  if (!Decimal) {
+    Decimal = (globalThis as any).Decimal || 
+              (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
+  }
+  return Decimal;
+}
 import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
 
@@ -19,6 +24,7 @@ export type NumericValue = number | string | DecimalType | any;
  */
 export function toDecimal(value: NumericValue): DecimalType {
   // Check if Decimal is available
+  const Decimal = getDecimal();
   if (!Decimal) {
     console.warn('Decimal library not available, returning fallback value');
     return value as any;
@@ -33,11 +39,11 @@ export function toDecimal(value: NumericValue): DecimalType {
     // Validate string format before conversion
     if (!isValidDecimalString(value)) {
       console.warn('Invalid decimal string format:', value);
-      return new Decimal(0);
+      return new (getDecimal())(0);
     }
 
     try {
-      const result = new Decimal(value);
+      const result = new (getDecimal())(value);
 
       // Check for extreme values that might cause performance issues
       if (result.toNumber() >= 1e100) {
@@ -47,7 +53,7 @@ export function toDecimal(value: NumericValue): DecimalType {
       return result;
     } catch (error) {
       console.error('Failed to convert string to Decimal:', error, 'Value:', value);
-      return new Decimal(0);
+      return new (getDecimal())(0);
     }
   }
 
@@ -55,13 +61,13 @@ export function toDecimal(value: NumericValue): DecimalType {
   if (typeof value === 'number') {
     if (!isFinite(value)) {
       console.warn('Non-finite number provided:', value);
-      return new Decimal(0);
+      return new (getDecimal())(0);
     }
-    return new Decimal(value);
+    return new (getDecimal())(value);
   }
 
   console.warn('Invalid value type for Decimal conversion:', typeof value, value);
-  return new Decimal(0);
+  return new (getDecimal())(0);
 }
 
 /**
