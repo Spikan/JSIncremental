@@ -514,9 +514,7 @@ export const execute = {
       console.warn('Failed to update all stats after straw purchase:', error);
     }
     try {
-      console.log('🔧 Calling updateShopStats after straw purchase');
       w.App?.ui?.updateShopStats?.();
-      console.log('🔧 Calling updateAllDisplays after straw purchase');
       w.App?.ui?.updateAllDisplays?.();
     } catch (error) {
       console.warn('Failed to update shop displays after straw purchase:', error);
