@@ -25,6 +25,16 @@ run_check() {
   fi
 }
 
+# Auto-format code first
+echo ""
+echo "🎨 Auto-formatting code with Prettier..."
+echo "----------------------------------------"
+if npm run format; then
+  echo "✅ Code formatted successfully"
+else
+  echo "⚠️  Formatting completed with warnings"
+fi
+
 # Run ESLint
 run_check "📝 Checking code quality with ESLint..." "npm run lint" "lint:fix"
 

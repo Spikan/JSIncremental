@@ -234,7 +234,9 @@ function initGame() {
       const strawSPDValue = result.strawSPD.toSafeNumber
         ? result.strawSPD.toSafeNumber()
         : Number(result.strawSPD);
-      const cupSPDValue = result.cupSPD.toSafeNumber ? result.cupSPD.toSafeNumber() : Number(result.cupSPD);
+      const cupSPDValue = result.cupSPD.toSafeNumber
+        ? result.cupSPD.toSafeNumber()
+        : Number(result.cupSPD);
       const spdValue = result.sipsPerDrink.toSafeNumber
         ? result.sipsPerDrink.toSafeNumber()
         : Number(result.sipsPerDrink);
