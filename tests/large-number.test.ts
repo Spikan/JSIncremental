@@ -144,6 +144,24 @@ describe('LargeNumber', () => {
     expect(expResult.toString()).toMatch(/^1e\+?100$/);
   });
 
+  it('should handle break_infinity extreme values in browser', () => {
+    // This test documents the behavior when break_infinity.js is available
+    // In browser environment, extreme values may become Infinity due to precision limits
+    console.log('Testing extreme values with available break_infinity.js...');
+
+    // Test that extreme values work without crashing
+    const extremeValue = new LargeNumber('1e2000');
+    expect(() => extremeValue.toString()).not.toThrow();
+    expect(() => extremeValue.toNumber()).not.toThrow();
+
+    // The actual result depends on the underlying library's precision
+    const result = extremeValue.toString();
+    console.log(`1e2000 result: ${result}`);
+
+    // Should not crash, even if precision is lost
+    expect(typeof result).toBe('string');
+  });
+
   it('should format very large numbers correctly', () => {
     const veryLargeNumber = new LargeNumber('1e1000');
     const formatted = formatLargeNumber(veryLargeNumber);

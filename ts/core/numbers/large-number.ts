@@ -40,9 +40,10 @@ export class LargeNumber {
 
   // Public API methods that delegate to the underlying implementation
   add(other: LargeNumber): LargeNumber {
-    // For extreme values, try to preserve precision by using string manipulation
-    const thisStr = this.toString();
-    const otherStr = other.toString();
+    // For extreme values, warn about potential precision loss
+    if (this._value.toNumber() > 1e100 || other._value.toNumber() > 1e100) {
+      console.warn('Extreme value addition may lose precision');
+    }
 
     // Simple case: if both are regular numbers, use native arithmetic
     if (this._value.toNumber() < 1e15 && other._value.toNumber() < 1e15) {
@@ -50,14 +51,9 @@ export class LargeNumber {
       return new LargeNumber(result);
     }
 
-    // For extreme values, use string-based calculation (simplified approach)
-    try {
-      const result = this._value.toNumber() + other._value.toNumber();
-      return new LargeNumber(result);
-    } catch (error) {
-      console.warn('Extreme value addition precision loss:', error);
-      return new LargeNumber(this._value.toNumber() + other._value.toNumber());
-    }
+    // For extreme values, use native arithmetic with precision warning
+    const result = this._value.toNumber() + other._value.toNumber();
+    return new LargeNumber(result);
   }
 
   subtract(other: LargeNumber): LargeNumber {

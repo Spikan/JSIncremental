@@ -77,23 +77,23 @@ interface GameStore extends GameState {
   };
 }
 
-// Default state from shape.ts
+// Default state from shape.ts - using LargeNumber for all numeric values
 const defaultState: GameState = {
   // Core resources
-  sips: 0,
-  straws: 0,
-  cups: 0,
-  suctions: 0,
-  widerStraws: 0,
-  betterCups: 0,
-  fasterDrinks: 0,
-  criticalClicks: 0,
-  level: 1,
+  sips: toLargeNumber(0),
+  straws: toLargeNumber(0),
+  cups: toLargeNumber(0),
+  suctions: toLargeNumber(0),
+  widerStraws: toLargeNumber(0),
+  betterCups: toLargeNumber(0),
+  fasterDrinks: toLargeNumber(0),
+  criticalClicks: toLargeNumber(0),
+  level: toLargeNumber(1),
 
   // Production stats
-  spd: 0, // sips per drink (renamed from sps for clarity)
-  strawSPD: 0,
-  cupSPD: 0,
+  spd: toLargeNumber(0), // sips per drink (renamed from sps for clarity)
+  strawSPD: toLargeNumber(0),
+  cupSPD: toLargeNumber(0),
 
   // Drink system
   drinkRate: 0,
@@ -105,20 +105,20 @@ const defaultState: GameState = {
   lastClickTime: 0,
   sessionStartTime: 0,
   totalPlayTime: 0,
-  totalSipsEarned: 0,
+  totalSipsEarned: toLargeNumber(0),
   totalClicks: 0,
-  highestSipsPerSecond: 0,
+  highestSipsPerSecond: toLargeNumber(0),
   currentClickStreak: 0,
   bestClickStreak: 0,
 
   // Click/crit systems
-  criticalClickChance: 0,
-  criticalClickMultiplier: 0,
-  suctionClickBonus: 0,
+  criticalClickChance: toLargeNumber(0),
+  criticalClickMultiplier: toLargeNumber(0),
+  suctionClickBonus: toLargeNumber(0),
 
   // Upgrade counters
-  fasterDrinksUpCounter: 0,
-  criticalClickUpCounter: 0,
+  fasterDrinksUpCounter: toLargeNumber(0),
+  criticalClickUpCounter: toLargeNumber(0),
 
   // Options
   options: {
