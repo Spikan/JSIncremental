@@ -24,6 +24,13 @@ const largeNum = new LargeNumber('1e100');
 console.log('Large number:', largeNum.toString());
 console.log('Large number + 1:', largeNum.add(new LargeNumber(1)).toString());
 
+// Test 3: Extreme values (the main issue)
+console.log('\n🧪 Testing extreme values...');
+const extremeNum = new LargeNumber('1e2000');
+console.log('Extreme number:', extremeNum.toString());
+console.log('Extreme number toNumber():', extremeNum.toNumber());
+console.log('Extreme number _value type:', extremeNum._value.constructor.name);
+
 // Test 3: Native number fallback
 const nativeNum = new NativeNumber(42);
 console.log('Native number:', nativeNum.toString());

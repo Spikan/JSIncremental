@@ -49,7 +49,7 @@ export type GameState = {
   bestClickStreak: number;
 
   // Click/crit systems (migrate from globals)
-  criticalClickChance: number;
+  criticalClickChance: NumericValue;
   criticalClickMultiplier: NumericValue;
   suctionClickBonus: NumericValue;
 

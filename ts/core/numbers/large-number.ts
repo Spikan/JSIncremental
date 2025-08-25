@@ -8,6 +8,8 @@ export class LargeNumber {
   private _value: NumericOperations;
 
   constructor(value: number | string | NumericOperations | LargeNumber) {
+    console.log('🏗️ Creating LargeNumber with value:', value, 'type:', typeof value);
+
     if (value instanceof LargeNumber) {
       this._value = value._value;
       return;
@@ -17,25 +19,42 @@ export class LargeNumber {
     const BreakInfinityLib = this.getBreakInfinityLibrary();
     if (BreakInfinityLib) {
       try {
+        console.log('✅ Using break_infinity library for value:', value);
         this._value = new BreakInfinityLib(value as any);
+        console.log('✅ Created break_infinity object:', this._value, 'toString():', this._value.toString());
         return;
       } catch (error) {
-        console.warn('BreakInfinity failed, falling back to native numbers:', error);
+        console.warn('❌ BreakInfinity failed, falling back to native numbers:', error);
       }
+    } else {
+      console.log('⚠️ No break_infinity library found, using NativeNumber');
     }
 
     // Fallback to native numbers
     this._value = new NativeNumber(value);
+    console.log('✅ Created NativeNumber:', this._value, 'toString():', this._value.toString());
   }
 
   private getBreakInfinityLibrary(): any {
-    // Try break_infinity first, then Decimal.js as fallback
-    return (
-      (globalThis as any).BreakInfinity ||
-      (window as any).BreakInfinity ||
+    // break_infinity.js exposes Decimal globally, not BreakInfinity
+    // Check for Decimal first (break_infinity.js), then Decimal.js as fallback
+
+    // Debug logging to see what's available
+    console.log('🔍 Checking for large number libraries...');
+    console.log('🔍 globalThis.Decimal:', typeof (globalThis as any).Decimal);
+    console.log('🔍 window.Decimal:', typeof (window as any)?.Decimal);
+    console.log('🔍 globalThis.BreakInfinity:', typeof (globalThis as any).BreakInfinity);
+    console.log('🔍 window.BreakInfinity:', typeof (window as any)?.BreakInfinity);
+
+    const lib = (
       (globalThis as any).Decimal ||
-      (window as any).Decimal
+      (window as any).Decimal ||
+      (globalThis as any).BreakInfinity ||
+      (window as any).BreakInfinity
     );
+
+    console.log('🔍 Selected library:', lib ? 'FOUND' : 'NOT FOUND');
+    return lib;
   }
 
   // Public API methods that delegate to the underlying implementation

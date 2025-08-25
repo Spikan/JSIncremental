@@ -1,6 +1,6 @@
 // Comprehensive tests for Zustand store implementation
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { expectLargeNumberToEqual } from './test-utils';
+import { expectLargeNumberToEqual, setupTestEnvironment } from './test-utils';
 import {
   useGameStore,
   storeActions,
@@ -18,7 +18,6 @@ import {
   selectors,
   migrateToZustand,
 } from '../ts/core/state/zustand-bridge';
-import { setupTestEnvironment, expectLargeNumberToEqual } from './test-utils';
 
 describe('Zustand Store - Core Functionality', () => {
   let cleanup: () => void;

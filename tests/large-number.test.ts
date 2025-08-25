@@ -145,9 +145,9 @@ describe('LargeNumber', () => {
   });
 
   it('should handle break_infinity extreme values in browser', () => {
-    // This test documents the behavior when break_infinity.js is available
-    // In browser environment, extreme values may become Infinity due to precision limits
-    console.log('Testing extreme values with available break_infinity.js...');
+    // Test if break_infinity.js is actually available and working
+    const hasBreakInfinity = typeof (globalThis as any).Decimal !== 'undefined';
+    console.log('break_infinity.js (Decimal) available:', hasBreakInfinity);
 
     // Test that extreme values work without crashing
     const extremeValue = new LargeNumber('1e2000');
@@ -157,9 +157,17 @@ describe('LargeNumber', () => {
     // The actual result depends on the underlying library's precision
     const result = extremeValue.toString();
     console.log(`1e2000 result: ${result}`);
+    console.log(`1e2000 is break_infinity object:`, hasBreakInfinity && result.includes('e+'));
 
     // Should not crash, even if precision is lost
     expect(typeof result).toBe('string');
+
+    // If break_infinity is available, should not just return "Infinity"
+    if (hasBreakInfinity) {
+      console.log('✅ break_infinity.js is working for extreme values');
+      // break_infinity.js should handle numbers up to 1e300000 or more
+      expect(result).not.toBe('Infinity');
+    }
   });
 
   it('should format very large numbers correctly', () => {
