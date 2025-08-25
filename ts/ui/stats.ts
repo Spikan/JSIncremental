@@ -279,8 +279,7 @@ export function updatePurchasedCounts(): void {
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
     console.log('🔍 Raw straws value:', straws, 'type:', typeof straws);
-    const strawsValue =
-      typeof straws === 'object' && straws.toSafeNumber ? straws.toSafeNumber() : straws;
+    const strawsValue = typeof straws === 'object' && straws.toString ? straws.toString() : straws;
     console.log('🔍 Processed straws value:', strawsValue);
     const formattedStraws = formatNumber(strawsValue);
     console.log('🔍 Formatted straws:', formattedStraws);
@@ -296,7 +295,7 @@ export function updatePurchasedCounts(): void {
   if (cupsPurchasedElement) {
     const cups = state.cups || 0;
     console.log('🔍 Raw cups value:', cups, 'type:', typeof cups);
-    const cupsValue = typeof cups === 'object' && cups.toSafeNumber ? cups.toSafeNumber() : cups;
+    const cupsValue = typeof cups === 'object' && cups.toString ? cups.toString() : cups;
     console.log('🔍 Processed cups value:', cupsValue);
     const formattedCups = formatNumber(cupsValue);
     console.log('🔍 Formatted cups:', formattedCups);
@@ -313,8 +312,8 @@ export function updatePurchasedCounts(): void {
   if (widerStrawsPurchasedElement) {
     const widerStraws = state.widerStraws || 0;
     const widerStrawsValue =
-      typeof widerStraws === 'object' && widerStraws.toSafeNumber
-        ? widerStraws.toSafeNumber()
+      typeof widerStraws === 'object' && widerStraws.toString
+        ? widerStraws.toString()
         : widerStraws;
     widerStrawsPurchasedElement.textContent = formatNumber(widerStrawsValue);
     console.log(
@@ -334,9 +333,7 @@ export function updatePurchasedCounts(): void {
   if (betterCupsPurchasedElement) {
     const betterCups = state.betterCups || 0;
     const betterCupsValue =
-      typeof betterCups === 'object' && betterCups.toSafeNumber
-        ? betterCups.toSafeNumber()
-        : betterCups;
+      typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
     betterCupsPurchasedElement.textContent = formatNumber(betterCupsValue);
     console.log('✅ Updated betterCups:', betterCupsValue, 'element:', betterCupsPurchasedElement);
   } else {
@@ -348,8 +345,8 @@ export function updatePurchasedCounts(): void {
   if (shopWiderStrawsElement) {
     const widerStraws = state.widerStraws || 0;
     const widerStrawsValue =
-      typeof widerStraws === 'object' && widerStraws.toSafeNumber
-        ? widerStraws.toSafeNumber()
+      typeof widerStraws === 'object' && widerStraws.toString
+        ? widerStraws.toString()
         : widerStraws;
     shopWiderStrawsElement.textContent = formatNumber(widerStrawsValue);
     console.log(
@@ -366,9 +363,7 @@ export function updatePurchasedCounts(): void {
   if (shopBetterCupsElement) {
     const betterCups = state.betterCups || 0;
     const betterCupsValue =
-      typeof betterCups === 'object' && betterCups.toSafeNumber
-        ? betterCups.toSafeNumber()
-        : betterCups;
+      typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
     shopBetterCupsElement.textContent = formatNumber(betterCupsValue);
     console.log('✅ Updated shop betterCups:', betterCupsValue, 'element:', shopBetterCupsElement);
   } else {
@@ -382,8 +377,8 @@ export function updatePurchasedCounts(): void {
     const strawSPD = state.strawSPD || 0;
     const totalStrawProduction = new LargeNumber(straws).multiply(new LargeNumber(strawSPD));
     const totalStrawValue =
-      typeof totalStrawProduction === 'object' && totalStrawProduction.toSafeNumber
-        ? totalStrawProduction.toSafeNumber()
+      typeof totalStrawProduction === 'object' && totalStrawProduction.toString
+        ? totalStrawProduction.toString()
         : totalStrawProduction;
     totalStrawSPDElement.textContent = formatNumber(totalStrawValue);
     console.log('✅ Updated totalStrawSPD:', totalStrawValue, 'element:', totalStrawSPDElement);
@@ -397,8 +392,8 @@ export function updatePurchasedCounts(): void {
   if (totalWiderStrawsSPDElement) {
     const widerStraws = state.widerStraws || 0;
     const widerStrawsValue =
-      typeof widerStraws === 'object' && widerStraws.toSafeNumber
-        ? widerStraws.toSafeNumber()
+      typeof widerStraws === 'object' && widerStraws.toString
+        ? widerStraws.toString()
         : widerStraws;
     totalWiderStrawsSPDElement.textContent = formatNumber(widerStrawsValue * 0.6); // Base multiplier
     console.log(
@@ -417,8 +412,8 @@ export function updatePurchasedCounts(): void {
     const cupSPD = state.cupSPD || 0;
     const totalCupProduction = new LargeNumber(cups).multiply(new LargeNumber(cupSPD));
     const totalCupValue =
-      typeof totalCupProduction === 'object' && totalCupProduction.toSafeNumber
-        ? totalCupProduction.toSafeNumber()
+      typeof totalCupProduction === 'object' && totalCupProduction.toString
+        ? totalCupProduction.toString()
         : totalCupProduction;
     totalCupSPDElement.textContent = formatNumber(totalCupValue);
     console.log('✅ Updated totalCupSPD:', totalCupValue, 'element:', totalCupSPDElement);
@@ -432,9 +427,7 @@ export function updatePurchasedCounts(): void {
   if (totalBetterCupsSPDElement) {
     const betterCups = state.betterCups || 0;
     const betterCupsValue =
-      typeof betterCups === 'object' && betterCups.toSafeNumber
-        ? betterCups.toSafeNumber()
-        : betterCups;
+      typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
     totalBetterCupsSPDElement.textContent = formatNumber(betterCupsValue * 1.2); // Base multiplier
     console.log(
       '✅ Updated totalBetterCupsSPD:',
@@ -453,7 +446,7 @@ export function updatePurchasedCounts(): void {
   if (suctionsPurchasedElement) {
     const suctions = state.suctions || 0;
     const suctionsValue =
-      typeof suctions === 'object' && suctions.toSafeNumber ? suctions.toSafeNumber() : suctions;
+      typeof suctions === 'object' && suctions.toString ? suctions.toString() : suctions;
     suctionsPurchasedElement.textContent = formatNumber(suctionsValue);
     console.log('✅ Updated suctions:', suctionsValue, 'element:', suctionsPurchasedElement);
   } else {
@@ -465,7 +458,7 @@ export function updatePurchasedCounts(): void {
   if (shopSuctionsElement) {
     const suctions = state.suctions || 0;
     const suctionsValue =
-      typeof suctions === 'object' && suctions.toSafeNumber ? suctions.toSafeNumber() : suctions;
+      typeof suctions === 'object' && suctions.toString ? suctions.toString() : suctions;
     shopSuctionsElement.textContent = formatNumber(suctionsValue);
     console.log('✅ Updated shop suctions:', suctionsValue, 'element:', shopSuctionsElement);
   } else {
@@ -478,8 +471,8 @@ export function updatePurchasedCounts(): void {
   if (shopCriticalClicksElement) {
     const criticalClicks = state.criticalClicks || 0;
     const criticalClicksValue =
-      typeof criticalClicks === 'object' && criticalClicks.toSafeNumber
-        ? criticalClicks.toSafeNumber()
+      typeof criticalClicks === 'object' && criticalClicks.toString
+        ? criticalClicks.toString()
         : criticalClicks;
     shopCriticalClicksElement.textContent = formatNumber(criticalClicksValue);
     console.log(
@@ -499,8 +492,8 @@ export function updatePurchasedCounts(): void {
   if (criticalClicksPurchasedElement) {
     const criticalClicks = state.criticalClicks || 0;
     const criticalClicksValue =
-      typeof criticalClicks === 'object' && criticalClicks.toSafeNumber
-        ? criticalClicks.toSafeNumber()
+      typeof criticalClicks === 'object' && criticalClicks.toString
+        ? criticalClicks.toString()
         : criticalClicks;
     criticalClicksPurchasedElement.textContent = formatNumber(criticalClicksValue);
     console.log(
