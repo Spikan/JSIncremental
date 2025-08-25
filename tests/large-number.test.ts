@@ -119,6 +119,31 @@ describe('LargeNumber', () => {
     expect(num.toString()).toBe('1e100');
   });
 
+  it('should handle extreme value operations', () => {
+    // Test extreme multiplication - check that result is approximately correct
+    const a = new LargeNumber('1e100');
+    const b = new LargeNumber('1e50');
+    const result = a.multiply(b);
+    expect(result.toString()).toMatch(/^1\.\d*e\+150$/); // Allow for precision variations
+
+    // Test extreme addition
+    const c = new LargeNumber('1e200');
+    const d = new LargeNumber('1e199');
+    const addResult = c.add(d);
+    expect(addResult.toString()).toMatch(/^1\.1e\+200$/);
+
+    // Test extreme division
+    const e = new LargeNumber('1e300');
+    const f = new LargeNumber('1e100');
+    const divResult = e.divide(f);
+    expect(divResult.toString()).toMatch(/^1e\+200$/);
+
+    // Test extreme exponentiation
+    const g = new LargeNumber('10');
+    const expResult = g.pow(100);
+    expect(expResult.toString()).toMatch(/^1e\+?100$/);
+  });
+
   it('should format very large numbers correctly', () => {
     const veryLargeNumber = new LargeNumber('1e1000');
     const formatted = formatLargeNumber(veryLargeNumber);
