@@ -151,9 +151,7 @@ function calculateAllCosts(): any {
   costs.cup = cupBaseCost.multiply(cupScaling.pow(cupExponent));
 
   // Suction cost - use Decimal calculation with extreme value protection
-  const suctionBaseCost = toDecimal(
-    dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40
-  );
+  const suctionBaseCost = toDecimal(dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40);
   const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
   const suctionCount = toDecimal((window as any).App?.state?.getState?.()?.suctions || 0);
 
@@ -177,9 +175,7 @@ function calculateAllCosts(): any {
   const fasterDrinksScaling = toDecimal(
     dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.1
   );
-  const fasterDrinksCount = toDecimal(
-    (window as any).App?.state?.getState?.()?.fasterDrinks || 0
-  );
+  const fasterDrinksCount = toDecimal((window as any).App?.state?.getState?.()?.fasterDrinks || 0);
 
   // Use safe exponent conversion with cap for extreme values
   let fasterDrinksExponent = 0;
@@ -224,9 +220,7 @@ function calculateAllCosts(): any {
   const widerStrawsBaseCost = toDecimal(
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
   );
-  const widerStrawsCount = toDecimal(
-    (window as any).App?.state?.getState?.()?.widerStraws || 0
-  );
+  const widerStrawsCount = toDecimal((window as any).App?.state?.getState?.()?.widerStraws || 0);
   costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(new Decimal(1)));
 
   // Better cups cost - use Decimal calculation

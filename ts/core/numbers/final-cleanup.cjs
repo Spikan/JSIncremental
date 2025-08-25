@@ -2,12 +2,7 @@
 const fs = require('fs');
 
 // Fix import paths in UI files
-const uiFiles = [
-  'ts/ui/affordability.ts',
-  'ts/ui/displays.ts',
-  'ts/ui/stats.ts',
-  'ts/ui/utils.ts'
-];
+const uiFiles = ['ts/ui/affordability.ts', 'ts/ui/displays.ts', 'ts/ui/stats.ts', 'ts/ui/utils.ts'];
 
 console.log('🔧 Starting final cleanup...\n');
 
@@ -63,10 +58,7 @@ uiFiles.forEach(filePath => {
 });
 
 // Fix missing imports in core files
-const coreFiles = [
-  'ts/core/systems/dev.ts',
-  'ts/core/state/zustand-store.ts'
-];
+const coreFiles = ['ts/core/systems/dev.ts', 'ts/core/state/zustand-store.ts'];
 
 coreFiles.forEach(filePath => {
   if (fs.existsSync(filePath)) {
@@ -75,7 +67,7 @@ coreFiles.forEach(filePath => {
     let changes = 0;
 
     // Add missing import for 'add' function
-    if (content.includes('add(') && !content.includes("import { add }")) {
+    if (content.includes('add(') && !content.includes('import { add }')) {
       // Find the migration-utils import line and add 'add' to it
       const importPattern = /import \{([^}]+)\} from ['"].*migration-utils['"]/;
       if (importPattern.test(content)) {
@@ -90,7 +82,7 @@ coreFiles.forEach(filePath => {
     }
 
     // Add missing import for 'gte' function
-    if (content.includes('gte(') && !content.includes("import { gte }")) {
+    if (content.includes('gte(') && !content.includes('import { gte }')) {
       const importPattern = /import \{([^}]+)\} from ['"].*migration-utils['"]/;
       if (importPattern.test(content)) {
         content = content.replace(importPattern, (match, imports) => {
@@ -121,10 +113,7 @@ if (fs.existsSync(selectorFile)) {
   let originalContent = content;
 
   // Fix the identity function signature issue - replace (value) => value with proper type
-  content = content.replace(
-    /\(value\) => value,/g,
-    '(value: number) => value,'
-  );
+  content = content.replace(/\(value\) => value,/g, '(value: number) => value,');
 
   // Fix createSelector calls that might be missing the third parameter
   content = content.replace(

@@ -8,7 +8,9 @@ export type Decimal = any;
 const getDecimalConstructor = (): any => {
   const Decimal = (globalThis as any).Decimal || (window as any).Decimal;
   if (!Decimal) {
-    throw new Error('break_eternity.js not loaded. Ensure break_eternity.min.js is included in index.html');
+    throw new Error(
+      'break_eternity.js not loaded. Ensure break_eternity.min.js is included in index.html'
+    );
   }
   return Decimal;
 };
@@ -65,7 +67,7 @@ export const DecimalOps = {
       // For small numbers, use regular formatting
       if (Math.abs(num) < 1000000) {
         return num.toLocaleString(undefined, {
-          maximumFractionDigits: options?.precision ?? 2
+          maximumFractionDigits: options?.precision ?? 2,
         });
       }
     }
@@ -80,15 +82,23 @@ export const DecimalOps = {
   },
 
   // Constants
-  get ZERO(): Decimal { return getDecimalConstructor().ZERO; },
-  get ONE(): Decimal { return getDecimalConstructor().ONE; },
-  get INFINITY(): Decimal { return getDecimalConstructor().INFINITY; },
-  get NEGATIVE_INFINITY(): Decimal { return getDecimalConstructor().NEGATIVE_INFINITY; },
+  get ZERO(): Decimal {
+    return getDecimalConstructor().ZERO;
+  },
+  get ONE(): Decimal {
+    return getDecimalConstructor().ONE;
+  },
+  get INFINITY(): Decimal {
+    return getDecimalConstructor().INFINITY;
+  },
+  get NEGATIVE_INFINITY(): Decimal {
+    return getDecimalConstructor().NEGATIVE_INFINITY;
+  },
 
   // Check if value is a Decimal
   isDecimal: (value: any): value is Decimal => {
     return value && typeof value.add === 'function' && typeof value.toString === 'function';
-  }
+  },
 };
 
 // Export the Decimal constructor for direct use
@@ -123,49 +133,63 @@ export const MigrationUtils = {
 
   // Replace common LargeNumber patterns
   migrateCode: (code: string): string => {
-    return code
-      // Import changes
-      .replace(/import \{ LargeNumber \} from ['"].*large-number['"]/g,
-               "import { DecimalOps, Decimal } from './large-number'")
-      .replace(/import \{.*toLargeNumber.*\} from ['"].*migration-utils['"]/g,
-               "import { toDecimal } from './migration-utils'")
+    return (
+      code
+        // Import changes
+        .replace(
+          /import \{ LargeNumber \} from ['"].*large-number['"]/g,
+          "import { DecimalOps, Decimal } from './large-number'"
+        )
+        .replace(
+          /import \{.*toLargeNumber.*\} from ['"].*migration-utils['"]/g,
+          "import { toDecimal } from './migration-utils'"
+        )
 
-      // Type annotations
-      .replace(/number \| LargeNumber/g, 'number | Decimal')
-      .replace(/LargeNumber \| number/g, 'Decimal | number')
-      .replace(/LargeNumber/g, 'Decimal')
+        // Type annotations
+        .replace(/number \| LargeNumber/g, 'number | Decimal')
+        .replace(/LargeNumber \| number/g, 'Decimal | number')
+        .replace(/LargeNumber/g, 'Decimal')
 
-      // Constructor calls
-      .replace(/new LargeNumber\(([^)]+)\)/g, 'DecimalOps.create($1)')
+        // Constructor calls
+        .replace(/new LargeNumber\(([^)]+)\)/g, 'DecimalOps.create($1)')
 
-      // Arithmetic operations
-      .replace(/\.add\(new LargeNumber\(([^)]+)\)\)/g, (_match, arg) =>
-        `.add(DecimalOps.create(${arg}))`)
-      .replace(/\.subtract\(new LargeNumber\(([^)]+)\)\)/g, (_match, arg) =>
-        `.subtract(DecimalOps.create(${arg}))`)
-      .replace(/\.multiply\(new LargeNumber\(([^)]+)\)\)/g, (_match, arg) =>
-        `.multiply(DecimalOps.create(${arg}))`)
-      .replace(/\.divide\(new LargeNumber\(([^)]+)\)\)/g, (_match, arg) =>
-        `.divide(DecimalOps.create(${arg}))`)
+        // Arithmetic operations
+        .replace(
+          /\.add\(new LargeNumber\(([^)]+)\)\)/g,
+          (_match, arg) => `.add(DecimalOps.create(${arg}))`
+        )
+        .replace(
+          /\.subtract\(new LargeNumber\(([^)]+)\)\)/g,
+          (_match, arg) => `.subtract(DecimalOps.create(${arg}))`
+        )
+        .replace(
+          /\.multiply\(new LargeNumber\(([^)]+)\)\)/g,
+          (_match, arg) => `.multiply(DecimalOps.create(${arg}))`
+        )
+        .replace(
+          /\.divide\(new LargeNumber\(([^)]+)\)\)/g,
+          (_match, arg) => `.divide(DecimalOps.create(${arg}))`
+        )
 
-      // Comparison methods
-      .replace(/\.gte\(/g, (_match, after) => `.gte(DecimalOps.create(${after.split(')')[0]}))`)
-      .replace(/\.lte\(/g, (_match, after) => `.lte(DecimalOps.create(${after.split(')')[0]}))`)
-      .replace(/\.gt\(/g, (_match, after) => `.gt(DecimalOps.create(${after.split(')')[0]}))`)
-      .replace(/\.lt\(/g, (_match, after) => `.lt(DecimalOps.create(${after.split(')')[0]}))`)
-      .replace(/\.eq\(/g, (_match, after) => `.eq(DecimalOps.create(${after.split(')')[0]}))`)
+        // Comparison methods
+        .replace(/\.gte\(/g, (_match, after) => `.gte(DecimalOps.create(${after.split(')')[0]}))`)
+        .replace(/\.lte\(/g, (_match, after) => `.lte(DecimalOps.create(${after.split(')')[0]}))`)
+        .replace(/\.gt\(/g, (_match, after) => `.gt(DecimalOps.create(${after.split(')')[0]}))`)
+        .replace(/\.lt\(/g, (_match, after) => `.lt(DecimalOps.create(${after.split(')')[0]}))`)
+        .replace(/\.eq\(/g, (_match, after) => `.eq(DecimalOps.create(${after.split(')')[0]}))`)
 
-      // Conversion functions
-      .replace(/toLargeNumber\(/g, 'toDecimal(')
-      .replace(/\.toNumber\(\)/g, (_match) => 'DecimalOps.toSafeNumber(')
+        // Conversion functions
+        .replace(/toLargeNumber\(/g, 'toDecimal(')
+        .replace(/\.toNumber\(\)/g, _match => 'DecimalOps.toSafeNumber(')
 
-      // Static methods
-      .replace(/LargeNumber\.from\(/g, 'DecimalOps.create(')
-      .replace(/LargeNumber\.add\(/g, 'DecimalOps.add(')
-      .replace(/LargeNumber\.subtract\(/g, 'DecimalOps.subtract(')
-      .replace(/LargeNumber\.multiply\(/g, 'DecimalOps.multiply(')
-      .replace(/LargeNumber\.divide\(/g, 'DecimalOps.divide(');
-  }
+        // Static methods
+        .replace(/LargeNumber\.from\(/g, 'DecimalOps.create(')
+        .replace(/LargeNumber\.add\(/g, 'DecimalOps.add(')
+        .replace(/LargeNumber\.subtract\(/g, 'DecimalOps.subtract(')
+        .replace(/LargeNumber\.multiply\(/g, 'DecimalOps.multiply(')
+        .replace(/LargeNumber\.divide\(/g, 'DecimalOps.divide(')
+    );
+  },
 };
 
 // Export for global use (backward compatibility during migration)

@@ -20,7 +20,7 @@ import {
   divide,
   pow,
   toLargeNumber,
-  isLargeNumber
+  isLargeNumber,
 } from './migration-utils';
 
 // Import DecimalOps and isDecimal for the Numbers object

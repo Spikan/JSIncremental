@@ -37,7 +37,8 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
 
       // Calculate current sips per second (convert to number for rate calculation)
       const rateInSeconds = drinkRate / 1000;
-      const currentSipsPerSecond = rateInSeconds > 0 ? DecimalOps.toSafeNumber(spdNum) / rateInSeconds : 0;
+      const currentSipsPerSecond =
+        rateInSeconds > 0 ? DecimalOps.toSafeNumber(spdNum) / rateInSeconds : 0;
       const highest = Math.max(DecimalOps.toSafeNumber(prevHigh), currentSipsPerSecond);
 
       // Update total sips earned

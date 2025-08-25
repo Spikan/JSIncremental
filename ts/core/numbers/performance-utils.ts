@@ -68,11 +68,7 @@ export function memoizedPow(base: any, exponent: number): Decimal {
 /**
  * Efficient calculation of exponential growth with caching
  */
-export function cachedExponentialGrowth(
-  baseValue: any,
-  growthRate: any,
-  time: number
-): Decimal {
+export function cachedExponentialGrowth(baseValue: any, growthRate: any, time: number): Decimal {
   const key = `${baseValue.toString()}:${growthRate.toString()}:${time}`;
 
   let result = economyCalculationCache.get(key);

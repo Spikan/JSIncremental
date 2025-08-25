@@ -9,7 +9,7 @@ const files = [
   'ts/main.ts',
   'ts/ui/utils.ts',
   'ts/core/numbers/test-large-number.ts',
-  'ts/core/systems/save-game-loader.ts'
+  'ts/core/systems/save-game-loader.ts',
 ];
 
 console.log('🔧 Starting targeted syntax fix...\n');
@@ -53,10 +53,23 @@ files.forEach(filePath => {
     // Write back if changes were made
     if (content !== originalContent) {
       fs.writeFileSync(filePath, content, 'utf8');
-      console.log('✅ ' + filePath + ': ' + changes + ' changes made (' +
-        pattern1Matches + ' p1, ' + pattern2Matches + ' p2, ' +
-        pattern3Matches + ' p3, ' + pattern4Matches + ' p4, ' +
-        pattern5Matches + ' p5)');
+      console.log(
+        '✅ ' +
+          filePath +
+          ': ' +
+          changes +
+          ' changes made (' +
+          pattern1Matches +
+          ' p1, ' +
+          pattern2Matches +
+          ' p2, ' +
+          pattern3Matches +
+          ' p3, ' +
+          pattern4Matches +
+          ' p4, ' +
+          pattern5Matches +
+          ' p5)'
+      );
     } else {
       console.log('ℹ️  ' + filePath + ': No changes needed');
     }

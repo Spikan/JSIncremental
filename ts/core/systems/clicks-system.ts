@@ -125,9 +125,7 @@ export async function handleSodaClick(multiplier: number = 1) {
       );
 
       // Calculate critical bonus: totalClickValue * (criticalMultiplier - 1)
-      const criticalBonus = totalClickValue.multiply(
-        criticalMultiplier.subtract(new Decimal(1))
-      );
+      const criticalBonus = totalClickValue.multiply(criticalMultiplier.subtract(new Decimal(1)));
 
       // Add critical bonus to sips
       const currentSips = toDecimal(w.sips || 0);

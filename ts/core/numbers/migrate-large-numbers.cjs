@@ -33,85 +33,85 @@ const migrationPatterns = [
   // Import statements
   {
     pattern: /import \{ LargeNumber \} from ['"].*large-number['"]/g,
-    replacement: "import { DecimalOps, Decimal } from '../numbers/large-number'"
+    replacement: "import { DecimalOps, Decimal } from '../numbers/large-number'",
   },
   {
     pattern: /import \{.*toLargeNumber.*\} from ['"].*migration-utils['"]/g,
-    replacement: "import { toDecimal } from '../numbers/migration-utils'"
+    replacement: "import { toDecimal } from '../numbers/migration-utils'",
   },
   {
     pattern: /import \{.*LargeNumber.*\} from ['"].*migration-utils['"]/g,
-    replacement: "import { DecimalOps, Decimal } from '../numbers/large-number'"
+    replacement: "import { DecimalOps, Decimal } from '../numbers/large-number'",
   },
 
   // Type annotations
   {
     pattern: /number \| LargeNumber/g,
-    replacement: 'number | Decimal'
+    replacement: 'number | Decimal',
   },
   {
     pattern: /LargeNumber \| number/g,
-    replacement: 'Decimal | number'
+    replacement: 'Decimal | number',
   },
   {
     pattern: /LargeNumber/g,
-    replacement: 'Decimal'
+    replacement: 'Decimal',
   },
 
   // Constructor calls
   {
     pattern: /new LargeNumber\(([^)]+)\)/g,
-    replacement: 'DecimalOps.create($1)'
+    replacement: 'DecimalOps.create($1)',
   },
 
   // Common arithmetic patterns
   {
     pattern: /\.add\(new LargeNumber\(([^)]+)\)\)/g,
-    replacement: '.add(DecimalOps.create($1))'
+    replacement: '.add(DecimalOps.create($1))',
   },
   {
     pattern: /\.subtract\(new LargeNumber\(([^)]+)\)\)/g,
-    replacement: '.subtract(DecimalOps.create($1))'
+    replacement: '.subtract(DecimalOps.create($1))',
   },
   {
     pattern: /\.multiply\(new LargeNumber\(([^)]+)\)\)/g,
-    replacement: '.multiply(DecimalOps.create($1))'
+    replacement: '.multiply(DecimalOps.create($1))',
   },
   {
     pattern: /\.divide\(new LargeNumber\(([^)]+)\)\)/g,
-    replacement: '.divide(DecimalOps.create($1))'
+    replacement: '.divide(DecimalOps.create($1))',
   },
 
   // Function calls
   {
     pattern: /toLargeNumber\(/g,
-    replacement: 'toDecimal('
+    replacement: 'toDecimal(',
   },
   {
     pattern: /\.toNumber\(\)/g,
-    replacement: 'DecimalOps.toSafeNumber('
+    replacement: 'DecimalOps.toSafeNumber(',
   },
 
   // Static method calls
   {
     pattern: /LargeNumber\.from\(/g,
-    replacement: 'DecimalOps.create('
+    replacement: 'DecimalOps.create(',
   },
   {
     pattern: /LargeNumber\.add\(/g,
-    replacement: 'DecimalOps.add('
+    replacement: 'DecimalOps.add(',
   },
   {
     pattern: /LargeNumber\.subtract\(/g,
-    replacement: 'DecimalOps.subtract('
+    replacement: 'DecimalOps.subtract(',
   },
   {
     pattern: /LargeNumber\.multiply\(/g,
-    replacement: 'DecimalOps.multiply('
+    replacement: 'DecimalOps.multiply(',
   },
   {
     pattern: /LargeNumber\.divide\(/g,
-    replacement: 'DecimalOps.divide('
+    replacement: 'DecimalOps.divide(',
   },
 ];
 
@@ -133,16 +133,13 @@ function migrateFile(filePath) {
     });
 
     // Special handling for comparison methods that need DecimalOps.create
-    content = content.replace(
-      /(\.gte|\.lte|\.gt|\.lt|\.eq)\(([^)]+)\)/g,
-      (match, method, args) => {
-        // Only wrap with DecimalOps.create if args don't already contain it
-        if (!args.includes('DecimalOps.create') && !args.includes('new Decimal')) {
-          return `${method}(DecimalOps.create(${args}))`;
-        }
-        return match;
+    content = content.replace(/(\.gte|\.lte|\.gt|\.lt|\.eq)\(([^)]+)\)/g, (match, method, args) => {
+      // Only wrap with DecimalOps.create if args don't already contain it
+      if (!args.includes('DecimalOps.create') && !args.includes('new Decimal')) {
+        return `${method}(DecimalOps.create(${args}))`;
       }
-    );
+      return match;
+    });
 
     // Write back if changes were made
     if (content !== originalContent) {
@@ -153,7 +150,6 @@ function migrateFile(filePath) {
       console.log(`ℹ️  ${filePath}: No changes needed`);
       return false;
     }
-
   } catch (error) {
     console.error(`❌ Error migrating ${filePath}:`, error.message);
     return false;

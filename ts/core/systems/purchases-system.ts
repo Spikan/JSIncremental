@@ -53,7 +53,11 @@ export function purchaseStraw({
     cost = nextStrawCost(strawsLarge, baseCost, scaling);
 
     // Validate cost calculation
-    if (!cost || !DecimalOps.isFinite(cost) || DecimalOps.lessThanOrEqual(cost, DecimalOps.create(0))) {
+    if (
+      !cost ||
+      !DecimalOps.isFinite(cost) ||
+      DecimalOps.lessThanOrEqual(cost, DecimalOps.create(0))
+    ) {
       console.warn('🚫 purchaseStraw: Invalid cost calculation:', DecimalOps.toString(cost));
       return null;
     }
@@ -432,7 +436,9 @@ export function purchaseCriticalClick({
 
   const baseCostLarge = new Decimal(baseCost);
   const scalingLarge = new Decimal(scaling);
-  const cost = baseCostLarge.multiply(scalingLarge.pow(DecimalOps.toSafeNumber(criticalClicksLarge)));
+  const cost = baseCostLarge.multiply(
+    scalingLarge.pow(DecimalOps.toSafeNumber(criticalClicksLarge))
+  );
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
@@ -509,9 +515,7 @@ export function levelUp({
   if (!gte(sipsLarge, cost)) return null;
 
   const newLevel = levelLarge.add(new Decimal(1));
-  const sipsGained = new Decimal(config.LEVEL_UP_SIPS_MULTIPLIER ?? 1).multiply(
-    sipsPerDrinkLarge
-  );
+  const sipsGained = new Decimal(config.LEVEL_UP_SIPS_MULTIPLIER ?? 1).multiply(sipsPerDrinkLarge);
   const sipsDelta = sipsGained.subtract(cost);
 
   return {
@@ -742,7 +746,8 @@ export const execute = {
           console.log('🔥 Extreme cups value detected in state update:', cupsValue.toString());
         }
       }
-      const cupsNum = cupsValue instanceof Decimal ? DecimalOps.toSafeNumber(cupsValue) : Number(cupsValue);
+      const cupsNum =
+        cupsValue instanceof Decimal ? DecimalOps.toSafeNumber(cupsValue) : Number(cupsValue);
       w.cups = new (w.Decimal || Number)(cupsNum);
     } catch (error) {
       console.warn('Failed to update cups after cup purchase:', error);

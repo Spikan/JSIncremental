@@ -21,10 +21,7 @@ if (fs.existsSync(selectorFile)) {
     'total: sips() + straws() + cups() + suctions()'
   );
 
-  content = content.replace(
-    /totalSPD: strawSPD \+ cupSPD/g,
-    'totalSPD: strawSPD() + cupSPD()'
-  );
+  content = content.replace(/totalSPD: strawSPD \+ cupSPD/g, 'totalSPD: strawSPD() + cupSPD()');
 
   content = content.replace(
     /effectiveMultiplier: criticalClickMultiplier \+ suctionClickBonus/g,
@@ -38,12 +35,7 @@ if (fs.existsSync(selectorFile)) {
 }
 
 // 2. Fix import paths for UI files (they were already fixed but double-check)
-const uiFiles = [
-  'ts/ui/affordability.ts',
-  'ts/ui/displays.ts',
-  'ts/ui/stats.ts',
-  'ts/ui/utils.ts'
-];
+const uiFiles = ['ts/ui/affordability.ts', 'ts/ui/displays.ts', 'ts/ui/stats.ts', 'ts/ui/utils.ts'];
 
 uiFiles.forEach(filePath => {
   if (fs.existsSync(filePath)) {
@@ -74,7 +66,7 @@ uiFiles.forEach(filePath => {
     }
 
     // Add missing gte import if needed
-    if (content.includes('gte(') && !content.includes("import { gte }")) {
+    if (content.includes('gte(') && !content.includes('import { gte }')) {
       const importPattern = /import \{([^}]+)\} from ['"].*migration-utils['"]/;
       if (importPattern.test(content)) {
         content = content.replace(importPattern, (match, imports) => {
@@ -98,7 +90,7 @@ uiFiles.forEach(filePath => {
 const filesNeedingDecimalOps = [
   'ts/core/systems/drink-system.ts',
   'ts/core/systems/save-game-loader.ts',
-  'ts/main.ts'
+  'ts/main.ts',
 ];
 
 filesNeedingDecimalOps.forEach(filePath => {
@@ -107,7 +99,7 @@ filesNeedingDecimalOps.forEach(filePath => {
     let originalContent = content;
 
     // Add DecimalOps import if DecimalOps is used but not imported
-    if (content.includes('DecimalOps.') && !content.includes("import { DecimalOps }")) {
+    if (content.includes('DecimalOps.') && !content.includes('import { DecimalOps }')) {
       // Find a good place to add the import (after existing imports)
       const importMatch = content.match(/import.*from.*;\n/g);
       if (importMatch) {
@@ -133,7 +125,9 @@ if (fs.existsSync(indexFile)) {
 
   // Fix the Numbers object to properly export the imported values
   const exportPattern = /export const Numbers = \{[\s\S]*?\};/;
-  content = content.replace(exportPattern, `export const Numbers = {
+  content = content.replace(
+    exportPattern,
+    `export const Numbers = {
   // Direct Decimal operations
   DecimalOps,
   Decimal,
@@ -161,7 +155,8 @@ if (fs.existsSync(indexFile)) {
   // Legacy aliases
   toLargeNumber,
   isLargeNumber,
-};`);
+};`
+  );
 
   if (content !== originalContent) {
     fs.writeFileSync(indexFile, content, 'utf8');

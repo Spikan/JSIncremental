@@ -25,10 +25,7 @@ if (fs.existsSync(selectorFile)) {
   let originalContent = content;
 
   // Fix the selector functions to have proper type annotations
-  content = content.replace(
-    /  value => value,/g,
-    '  (value: number) => value,'
-  );
+  content = content.replace(/  value => value,/g, '  (value: number) => value,');
 
   // Fix the computed selector calls to use proper function references
   content = content.replace(
@@ -53,12 +50,7 @@ if (fs.existsSync(selectorFile)) {
 }
 
 // 3. Fix import paths in UI files
-const uiFiles = [
-  'ts/ui/affordability.ts',
-  'ts/ui/displays.ts',
-  'ts/ui/stats.ts',
-  'ts/ui/utils.ts'
-];
+const uiFiles = ['ts/ui/affordability.ts', 'ts/ui/displays.ts', 'ts/ui/stats.ts', 'ts/ui/utils.ts'];
 
 uiFiles.forEach(filePath => {
   if (fs.existsSync(filePath)) {
@@ -102,20 +94,11 @@ if (fs.existsSync(largeNumberFile)) {
   let originalContent = content;
 
   // Replace unused match parameters with underscore
-  content = content.replace(
-    /\(match, arg\) =>/g,
-    '(_match, arg) =>'
-  );
+  content = content.replace(/\(match, arg\) =>/g, '(_match, arg) =>');
 
-  content = content.replace(
-    /\(match, after\) =>/g,
-    '(_match, after) =>'
-  );
+  content = content.replace(/\(match, after\) =>/g, '(_match, after) =>');
 
-  content = content.replace(
-    /\(match\) =>/g,
-    '(_match) =>'
-  );
+  content = content.replace(/\(match\) =>/g, '(_match) =>');
 
   if (content !== originalContent) {
     fs.writeFileSync(largeNumberFile, content, 'utf8');
@@ -171,7 +154,10 @@ if (fs.existsSync(migrateScript)) {
   content = content.replace(/totalChanges \+= /g, '');
 
   // Fix parameter type annotation (remove it since it's JS)
-  content = content.replace(/function migrateFile\(filePath: string\) \{/g, 'function migrateFile(filePath) {');
+  content = content.replace(
+    /function migrateFile\(filePath: string\) \{/g,
+    'function migrateFile(filePath) {'
+  );
 
   if (content !== originalContent) {
     fs.writeFileSync(migrateScript, content, 'utf8');
@@ -185,7 +171,7 @@ const coreFiles = [
   'ts/core/state/mutations.ts',
   'ts/core/state/shape.ts',
   'ts/core/systems/purchases-system.ts',
-  'ts/core/systems/resources.ts'
+  'ts/core/systems/resources.ts',
 ];
 
 coreFiles.forEach(filePath => {
@@ -206,7 +192,11 @@ coreFiles.forEach(filePath => {
       content = content.replace(/import \{ isDecimal \} from [^;]+;\n/g, '');
     }
 
-    if (content.includes('Decimal') && !content.match(/Decimal[^O]/) && !content.includes('DecimalOps')) {
+    if (
+      content.includes('Decimal') &&
+      !content.match(/Decimal[^O]/) &&
+      !content.includes('DecimalOps')
+    ) {
       content = content.replace(/, Decimal/g, '');
       content = content.replace(/Decimal, /g, '');
       content = content.replace(/import \{ Decimal \} from [^;]+;\n/g, '');

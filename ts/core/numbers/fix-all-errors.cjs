@@ -25,10 +25,7 @@ if (fs.existsSync(selectorFile)) {
   let originalContent = content;
 
   // Fix the selector functions - they should just return the value directly, not as identity functions
-  content = content.replace(
-    /\(value: number\) => value,/g,
-    'value => value,'
-  );
+  content = content.replace(/\(value: number\) => value,/g, 'value => value,');
 
   // Fix the computed selector calls to pass the value parameter
   content = content.replace(
@@ -71,12 +68,7 @@ if (fs.existsSync(mainFile)) {
 }
 
 // 4. Fix UI import paths (double-check)
-const uiFiles = [
-  'ts/ui/affordability.ts',
-  'ts/ui/displays.ts',
-  'ts/ui/stats.ts',
-  'ts/ui/utils.ts'
-];
+const uiFiles = ['ts/ui/affordability.ts', 'ts/ui/displays.ts', 'ts/ui/stats.ts', 'ts/ui/utils.ts'];
 
 uiFiles.forEach(filePath => {
   if (fs.existsSync(filePath)) {
@@ -139,7 +131,7 @@ const filesToClean = [
   'ts/core/systems/resources.ts',
   'ts/ui/affordability.ts',
   'ts/ui/displays.ts',
-  'ts/ui/utils.ts'
+  'ts/ui/utils.ts',
 ];
 
 filesToClean.forEach(filePath => {
@@ -162,7 +154,11 @@ filesToClean.forEach(filePath => {
     }
 
     // Remove unused Decimal imports
-    if (content.includes('Decimal') && !content.match(/Decimal[^O]/) && !content.includes('DecimalOps')) {
+    if (
+      content.includes('Decimal') &&
+      !content.match(/Decimal[^O]/) &&
+      !content.includes('DecimalOps')
+    ) {
       content = content.replace(/, Decimal/g, '');
       content = content.replace(/Decimal, /g, '');
       content = content.replace(/import \{ Decimal \} from [^;]+;\n/g, '');
@@ -198,7 +194,7 @@ const scriptFiles = [
   'ts/core/numbers/migrate-large-numbers.js',
   'ts/core/numbers/fix-syntax-errors.cjs',
   'ts/core/numbers/final-cleanup.cjs',
-  'ts/core/numbers/final-fix.cjs'
+  'ts/core/numbers/final-fix.cjs',
 ];
 
 scriptFiles.forEach(filePath => {
@@ -219,7 +215,7 @@ scriptFiles.forEach(filePath => {
     // Fix error handling
     content = content.replace(
       /console\.error\(`❌ Error migrating \${filePath}:`, error\.message\);/g,
-      "console.error(`❌ Error migrating ${filePath}:`, error);"
+      'console.error(`❌ Error migrating ${filePath}:`, error);'
     );
 
     if (content !== originalContent) {

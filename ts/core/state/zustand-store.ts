@@ -4,7 +4,7 @@ import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
 import { DecimalOps, Decimal } from '../numbers/large-number';
-import { toDecimal , add} from '../numbers/migration-utils';
+import { toDecimal, add } from '../numbers/migration-utils';
 
 // Extended state interface with actions
 interface GameStore extends GameState {
@@ -333,77 +333,65 @@ const createSelector = <T>(
 };
 
 // Basic resource selectors - convert Decimal to numbers for UI display
-export const useSips = createSelector(
-  state => DecimalOps.toSafeNumber(state.sips) || 0,
-  0,
-  "sips"
-);
+export const useSips = createSelector(state => DecimalOps.toSafeNumber(state.sips) || 0, 0, 'sips');
 
 export const useStraws = createSelector(
   state => DecimalOps.toSafeNumber(state.straws) || 0,
   0,
-  "straws"
+  'straws'
 );
 
-export const useCups = createSelector(
-  state => DecimalOps.toSafeNumber(state.cups) || 0,
-  0,
-  "cups"
-);
+export const useCups = createSelector(state => DecimalOps.toSafeNumber(state.cups) || 0, 0, 'cups');
 
 export const useSuctions = createSelector(
   state => DecimalOps.toSafeNumber(state.suctions) || 0,
   0,
-  "suctions"
+  'suctions'
 );
 
 export const useWiderStraws = createSelector(
   state => DecimalOps.toSafeNumber(state.widerStraws) || 0,
   0,
-  "widerStraws"
+  'widerStraws'
 );
 
 export const useBetterCups = createSelector(
   state => DecimalOps.toSafeNumber(state.betterCups) || 0,
   0,
-  "betterCups"
+  'betterCups'
 );
 
 export const useFasterDrinks = createSelector(
   state => DecimalOps.toSafeNumber(state.fasterDrinks) || 0,
   0,
-  "fasterDrinks"
+  'fasterDrinks'
 );
 
 export const useCriticalClicks = createSelector(
   state => DecimalOps.toSafeNumber(state.criticalClicks) || 0,
   0,
-  "criticalClicks"
+  'criticalClicks'
 );
 
 export const useLevel = createSelector(
   state => DecimalOps.toSafeNumber(state.level) || 1,
   0,
-  "level"
+  'level'
 );
 
 // Production and performance selectors - convert Decimal to numbers for UI display
-export const useSPD = createSelector(
-  state => DecimalOps.toSafeNumber(state.spd) || 0,
-  0,
-  "spd"
-);
+export const useSPD = createSelector(state => DecimalOps.toSafeNumber(state.spd) || 0, 0, 'spd');
 
 export const useStrawSPD = createSelector(
   state => DecimalOps.toSafeNumber(state.strawSPD) || 0,
   0,
-  "strawSPD"
+  'strawSPD'
 );
 
 export const useCupSPD = createSelector(
   state => DecimalOps.toSafeNumber(state.cupSPD) || 0,
   0,
-  "cupSPD"
+  'cupSPD'
 );
 
 // Drink system selectors
@@ -423,26 +411,26 @@ export const useCriticalClickChance = createSelector(
 export const useCriticalClickMultiplier = createSelector(
   state => DecimalOps.toSafeNumber(state.criticalClickMultiplier) || 0,
   0,
-  "criticalClickMultiplier"
+  'criticalClickMultiplier'
 );
 
 export const useSuctionClickBonus = createSelector(
   state => DecimalOps.toSafeNumber(state.suctionClickBonus) || 0,
   0,
-  "suctionClickBonus"
+  'suctionClickBonus'
 );
 
 // Session and statistics selectors - convert Decimal to numbers for UI display
 export const useTotalClicks = createSelector(
   state => DecimalOps.toSafeNumber(state.totalClicks) || 0,
   0,
-  "totalClicks"
+  'totalClicks'
 );
 
 export const useTotalSipsEarned = createSelector(
   state => DecimalOps.toSafeNumber(state.totalSipsEarned) || 0,
   0,
-  "totalSipsEarned"
+  'totalSipsEarned'
 );
 
 export const useTotalPlayTime = createSelector(state => state.totalPlayTime, 0, 'totalPlayTime');
@@ -450,7 +438,7 @@ export const useTotalPlayTime = createSelector(state => state.totalPlayTime, 0, 
 export const useHighestSipsPerSecond = createSelector(
   state => DecimalOps.toSafeNumber(state.highestSipsPerSecond) || 0,
   0,
-  "highestSipsPerSecond"
+  'highestSipsPerSecond'
 );
 
 export const useCurrentClickStreak = createSelector(
@@ -490,7 +478,11 @@ export const useTotalResources = () => {
       straws,
       cups,
       suctions,
-      total: (state: GameStore) => (DecimalOps.toSafeNumber(state.sips) || 0) + (DecimalOps.toSafeNumber(state.straws) || 0) + (DecimalOps.toSafeNumber(state.cups) || 0) + (DecimalOps.toSafeNumber(state.suctions) || 0),
+      total: (state: GameStore) =>
+        (DecimalOps.toSafeNumber(state.sips) || 0) +
+        (DecimalOps.toSafeNumber(state.straws) || 0) +
+        (DecimalOps.toSafeNumber(state.cups) || 0) +
+        (DecimalOps.toSafeNumber(state.suctions) || 0),
     }),
     [sips, straws, cups, suctions]
   );
@@ -506,7 +498,9 @@ export const useProductionStats = () => {
       spd,
       strawSPD,
       cupSPD,
-      totalSPD: (state: GameStore) => (DecimalOps.toSafeNumber(state.strawSPD) || 0) + (DecimalOps.toSafeNumber(state.cupSPD) || 0),
+      totalSPD: (state: GameStore) =>
+        (DecimalOps.toSafeNumber(state.strawSPD) || 0) +
+        (DecimalOps.toSafeNumber(state.cupSPD) || 0),
     }),
     [spd, strawSPD, cupSPD]
   );
@@ -524,7 +518,9 @@ export const useClickStats = () => {
       criticalClickChance,
       criticalClickMultiplier,
       suctionClickBonus,
-      effectiveMultiplier: (state: GameStore) => (DecimalOps.toSafeNumber(state.criticalClickMultiplier) || 0) + (DecimalOps.toSafeNumber(state.suctionClickBonus) || 0),
+      effectiveMultiplier: (state: GameStore) =>
+        (DecimalOps.toSafeNumber(state.criticalClickMultiplier) || 0) +
+        (DecimalOps.toSafeNumber(state.suctionClickBonus) || 0),
     }),
     [totalClicks, criticalClickChance, criticalClickMultiplier, suctionClickBonus]
   );

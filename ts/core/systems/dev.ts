@@ -2,7 +2,7 @@
 // Enhanced with Decimal scaling test functions
 
 import { DecimalOps, Decimal } from '../numbers/large-number';
-import { toDecimal , add} from '../numbers/migration-utils';
+import { toDecimal, add } from '../numbers/migration-utils';
 
 type Win = typeof window & {
   Decimal?: any;
