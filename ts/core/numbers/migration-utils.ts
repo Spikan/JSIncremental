@@ -1,15 +1,12 @@
 // Direct break_eternity.js utilities
 // No wrapper - direct Decimal operations for maximum performance
 
-// Direct break_eternity.js access - lazy loading to avoid initialization issues
-let DecimalLibrary: any;
+// Direct break_eternity.js access - function-based to avoid initialization issues
 function getDecimal() {
-  if (!DecimalLibrary) {
-    DecimalLibrary =
-      (globalThis as any).Decimal ||
-      (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
-  }
-  return DecimalLibrary;
+  return (
+    (globalThis as any).Decimal ||
+    (typeof window !== 'undefined' ? (window as any).Decimal : undefined)
+  );
 }
 import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';

@@ -8,16 +8,7 @@ import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
-// Direct break_eternity.js access - lazy loading to avoid initialization issues
-let Decimal: any;
-function getDecimal() {
-  if (!Decimal) {
-    Decimal =
-      (globalThis as any).Decimal ||
-      (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
-  }
-  return Decimal;
-}
+// Import toDecimal for lazy loading
 import { toDecimal, add } from '../numbers/migration-utils';
 
 // Extended state interface with actions
@@ -297,7 +288,7 @@ export const useGameStore = create<GameStore>()(
           const parsed = JSON.parse(str, (_key, value) => {
             if (value && typeof value === 'object' && value.__largeNumber) {
               // Restore Decimal from string representation
-              return new (getDecimal())(value.value);
+              return toDecimal(value.value);
             }
             return value;
           });
@@ -483,9 +474,9 @@ export const useTotalResources = () => {
       suctions,
       total: (state: GameStore) =>
         state.sips
-          ?.add(state.straws || new (getDecimal())(0))
-          .add(state.cups || new (getDecimal())(0))
-          .add(state.suctions || new (getDecimal())(0))
+          ?.add(state.straws || toDecimal(0))
+          .add(state.cups || toDecimal(0))
+          .add(state.suctions || toDecimal(0))
           .toString() || '0',
     }),
     [sips, straws, cups, suctions]
@@ -503,7 +494,7 @@ export const useProductionStats = () => {
       strawSPD,
       cupSPD,
       totalSPD: (state: GameStore) =>
-        state.strawSPD?.add(state.cupSPD || new (getDecimal())(0)).toString() || '0',
+        state.strawSPD?.add(state.cupSPD || toDecimal(0)).toString() || '0',
     }),
     [spd, strawSPD, cupSPD]
   );
@@ -523,7 +514,7 @@ export const useClickStats = () => {
       suctionClickBonus,
       effectiveMultiplier: (state: GameStore) =>
         state.criticalClickMultiplier
-          ?.add(state.suctionClickBonus || new (getDecimal())(0))
+          ?.add(state.suctionClickBonus || toDecimal(0))
           .toString() || '0',
     }),
     [totalClicks, criticalClickChance, criticalClickMultiplier, suctionClickBonus]
