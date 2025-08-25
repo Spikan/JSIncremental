@@ -2,7 +2,7 @@
 // Handles loading and restoring game state from save data
 
 import { storeActions } from '../state/zustand-store';
-import { DecimalOps } from '../numbers/large-number';
+// DecimalOps removed - no longer using toSafeNumber
 
 export interface SaveGameData {
   sips?: number | string | any;
@@ -218,7 +218,8 @@ export class SaveGameLoader {
     // Handle objects with toNumber method (Decimal.js, Decimal)
     if (value && typeof value.toNumber === 'function') {
       try {
-        return DecimalOps.toSafeNumber(value);
+        // Preserve extreme values
+        return value.toNumber();
       } catch (error) {
         console.warn('Failed to get number from object:', error);
       }

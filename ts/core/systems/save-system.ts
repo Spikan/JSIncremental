@@ -211,21 +211,20 @@ export function resetGameState() {
 
     // Seed App.state snapshot exactly like initGame
     try {
-      const toNum = (v: any) =>
-        v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v || 0);
+      // Preserve extreme values - don't convert to regular numbers
       w.App?.state?.setState?.({
-        sips: toNum(w.sips),
-        straws: toNum(straws),
-        cups: toNum(cups),
-        suctions: toNum(suctions),
-        widerStraws: toNum(widerStraws),
-        betterCups: toNum(betterCups),
-        fasterDrinks: toNum(fasterDrinks),
-        criticalClicks: toNum(criticalClicks),
-        level: toNum(level),
-        spd: toNum(spd),
-        strawSPD: toNum(strawSPD),
-        cupSPD: toNum(cupSPD),
+        sips: w.sips,
+        straws: straws,
+        cups: cups,
+        suctions: suctions,
+        widerStraws: widerStraws,
+        betterCups: betterCups,
+        fasterDrinks: fasterDrinks,
+        criticalClicks: criticalClicks,
+        level: level,
+        spd: spd,
+        strawSPD: strawSPD,
+        cupSPD: cupSPD,
         drinkRate: Number(drinkRate || 0),
         drinkProgress: Number(drinkProgress || 0),
         lastDrinkTime: Number(lastDrinkTime || 0),
@@ -237,11 +236,12 @@ export function resetGameState() {
         highestSipsPerSecond: 0,
         currentClickStreak: 0,
         bestClickStreak: 0,
-        criticalClickChance: toNum(criticalClickChance),
-        criticalClickMultiplier: toNum(criticalClickMultiplier),
-        suctionClickBonus: toNum(suctionClickBonus),
-        fasterDrinksUpCounter: toNum(fasterDrinksUpCounter),
-        criticalClickUpCounter: toNum(criticalClickUpCounter),
+        // Preserve extreme values for click bonuses and counters
+        criticalClickChance: criticalClickChance,
+        criticalClickMultiplier: criticalClickMultiplier,
+        suctionClickBonus: suctionClickBonus,
+        fasterDrinksUpCounter: fasterDrinksUpCounter,
+        criticalClickUpCounter: criticalClickUpCounter,
       });
     } catch (error) {
       console.warn('Failed to seed App.state:', error);

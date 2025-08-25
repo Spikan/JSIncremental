@@ -1,7 +1,7 @@
 // Centralized default state shape for the game (TypeScript)
 // Enhanced for Decimal support
 
-import { Decimal } from '../numbers/large-number';
+// Direct Decimal access - no wrapper needed
 import { NumericValue } from '../numbers/migration-utils';
 
 export type GameOptions = {

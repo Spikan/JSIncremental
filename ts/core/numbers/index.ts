@@ -1,14 +1,30 @@
-// Direct break_eternity.js numbers module
-// Maximum performance with direct Decimal operations
+// 🚀 DIRECT BREAK_ETERNITY.JS ACCESS - MAXIMUM PERFORMANCE, ZERO WRAPPER
+//
+// PROJECT-WIDE MEMORY: SPD, SPS, AND ALL PURCHASE COSTS MUST USE BREAK_ETERNITY
+// PROJECT-WIDE MEMORY: EXTREMELY LARGE VALUES ARE THE INTENDED RESULT OF GAMEPLAY
+// MEMORY: NEVER CONVERT CORE GAME VALUES TO JAVASCRIPT NUMBERS
+// MEMORY: PRESERVE FULL DECIMAL PRECISION THROUGHOUT ENTIRE PIPELINE
+//
+// DIRECT BREAK_ETERNITY USAGE:
+// 1. new Decimal(value) - Create Decimal objects
+// 2. decimal.add(other) - Direct arithmetic operations
+// 3. decimal.toString() - Convert to string to preserve extreme values
+// 4. isDecimal(value) - Type checking
 
-export { DecimalOps, Decimal, isDecimal } from './large-number';
+// Direct break_eternity.js access - Decimal imported from migration-utils.ts
+export { formatDecimal } from './decimal-utils';
 export * from './migration-utils';
+
+// Explicitly export Decimal for files that need it directly
+export { Decimal } from './migration-utils';
+
+// Import isDecimal separately since it's used in the Numbers object
+import { isDecimal } from './decimal-utils';
 
 // Import required functions
 import {
   toDecimal,
-  toNumber,
-  formatDecimal,
+  formatDecimal as migrationFormatDecimal,
   gte,
   gt,
   lte,
@@ -23,20 +39,17 @@ import {
   isLargeNumber,
 } from './migration-utils';
 
-// Import DecimalOps and isDecimal for the Numbers object
-import { DecimalOps, isDecimal } from './large-number';
+// Decimal is available from migration-utils.ts export
 
 // Create a unified interface for global use
 export const Numbers = {
-  // Direct Decimal operations
-  DecimalOps,
+  // Direct Decimal operations - Decimal available from migration-utils.ts
   Decimal,
   isDecimal,
 
   // Migration utilities (with legacy aliases)
   toDecimal,
-  toNumber,
-  formatDecimal,
+  formatDecimal: migrationFormatDecimal,
 
   // Comparison utilities
   gte,

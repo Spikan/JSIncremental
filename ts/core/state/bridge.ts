@@ -1,9 +1,15 @@
 // Typed legacy state bridge that mirrors globals into App.state
 // Enhanced for Decimal support with unlimited scaling
+//
+// MEMORY: ALL VALUE SYNCHRONIZATION MUST PRESERVE BREAK_ETERNITY DECIMAL PRECISION
+// MEMORY: EXTREME VALUES IN WINDOW OBJECTS SHOULD BE PRESERVED IN STATE
+// MEMORY: NEVER APPLY MAX_SAFE_INTEGER LIMITS TO SPD OR OTHER CORE VALUES
+// MEMORY: BRIDGE SHOULD MAINTAIN FULL PRECISION ACROSS WINDOW ↔ ZUSTAND BOUNDARY
 
 import type { GameState } from './shape';
-import { DecimalOps, Decimal } from '../numbers/large-number';
+// Direct break_eternity.js access
 import { toDecimal } from '../numbers/migration-utils';
+import { DecimalType } from '../numbers/decimal-utils';
 
 // Type for actions available in the Zustand store (enhanced for Decimal)
 interface StateActions {
@@ -11,22 +17,22 @@ interface StateActions {
   setDrinkProgress?: (value: number) => void;
   setLastDrinkTime?: (value: number) => void;
   setLevel?: (value: number) => void;
-  setSips?: (value: number | Decimal) => void;
-  setStraws?: (value: number | Decimal) => void;
-  setCups?: (value: number | Decimal) => void;
-  setSuctions?: (value: number | Decimal) => void;
-  setWiderStraws?: (value: number | Decimal) => void;
-  setBetterCups?: (value: number | Decimal) => void;
-  setFasterDrinks?: (value: number | Decimal) => void;
-  setCriticalClicks?: (value: number | Decimal) => void;
+  setSips?: (value: number | DecimalType) => void;
+  setStraws?: (value: number | DecimalType) => void;
+  setCups?: (value: number | DecimalType) => void;
+  setSuctions?: (value: number | DecimalType) => void;
+  setWiderStraws?: (value: number | DecimalType) => void;
+  setBetterCups?: (value: number | DecimalType) => void;
+  setFasterDrinks?: (value: number | DecimalType) => void;
+  setCriticalClicks?: (value: number | DecimalType) => void;
   setCriticalClickChance?: (value: number) => void;
-  setCriticalClickMultiplier?: (value: number | Decimal) => void;
-  setSuctionClickBonus?: (value: number | Decimal) => void;
-  setSPD?: (value: number | Decimal) => void;
-  setStrawSPD?: (value: number | Decimal) => void;
-  setCupSPD?: (value: number | Decimal) => void;
-  setFasterDrinksUpCounter?: (value: number | Decimal) => void;
-  setCriticalClickUpCounter?: (value: number | Decimal) => void;
+  setCriticalClickMultiplier?: (value: number | DecimalType) => void;
+  setSuctionClickBonus?: (value: number | DecimalType) => void;
+  setSPD?: (value: number | DecimalType) => void;
+  setStrawSPD?: (value: number | DecimalType) => void;
+  setCupSPD?: (value: number | DecimalType) => void;
+  setFasterDrinksUpCounter?: (value: number | DecimalType) => void;
+  setCriticalClickUpCounter?: (value: number | DecimalType) => void;
 }
 
 type AppLike = {
@@ -38,12 +44,13 @@ type AppLike = {
 };
 
 // Type for values that can be Decimal or primitive (enhanced for unlimited scaling)
-type NumericValue = number | string | Decimal | { toNumber(): number } | { _v: number };
+type NumericValue = number | string | DecimalType | { toNumber(): number } | { _v: number };
 
 export function createStateBridge(app: AppLike) {
   function setDrinkRate(value: NumericValue) {
     try {
-      const numericValue = DecimalOps.toSafeNumber(toDecimal(value));
+      // Preserve extreme values - no truncation
+      const numericValue = toDecimal(value).toNumber();
       app.state.actions?.setDrinkRate?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -52,7 +59,8 @@ export function createStateBridge(app: AppLike) {
 
   function setDrinkProgress(value: NumericValue) {
     try {
-      const numericValue = DecimalOps.toSafeNumber(toDecimal(value));
+      // Preserve extreme values - no truncation
+      const numericValue = toDecimal(value).toNumber();
       app.state.actions?.setDrinkProgress?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -61,7 +69,8 @@ export function createStateBridge(app: AppLike) {
 
   function setLastDrinkTime(value: NumericValue) {
     try {
-      const numericValue = DecimalOps.toSafeNumber(toDecimal(value));
+      // Preserve extreme values - no truncation
+      const numericValue = toDecimal(value).toNumber();
       app.state.actions?.setLastDrinkTime?.(numericValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
@@ -69,7 +78,8 @@ export function createStateBridge(app: AppLike) {
   }
 
   function setLevel(value: NumericValue) {
-    const numeric = DecimalOps.toSafeNumber(toDecimal(value));
+    // Preserve extreme values - no truncation
+    const numeric = toDecimal(value).toNumber();
     try {
       app.state.actions?.setLevel?.(numeric);
     } catch (error) {
@@ -77,7 +87,7 @@ export function createStateBridge(app: AppLike) {
     }
   }
 
-  function toDecimalValue(value: NumericValue): Decimal {
+  function toDecimalValue(value: NumericValue): DecimalType {
     return toDecimal(value);
   }
 
@@ -155,7 +165,8 @@ export function createStateBridge(app: AppLike) {
 
   function syncCriticalClickChance(value: NumericValue) {
     try {
-      app.state.actions?.setCriticalClickChance?.(DecimalOps.toSafeNumber(toDecimal(value)));
+      // Preserve extreme values - no truncation
+      app.state.actions?.setCriticalClickChance?.(toDecimal(value).toNumber());
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -182,12 +193,8 @@ export function createStateBridge(app: AppLike) {
   function syncSpd(value: NumericValue) {
     try {
       const largeNumberValue = toDecimalValue(value);
-      // For compatibility, convert to number if it's reasonable size
-      if (DecimalOps.toSafeNumber(largeNumberValue) < Number.MAX_SAFE_INTEGER) {
-        app.state.actions?.setSPD?.(DecimalOps.toSafeNumber(largeNumberValue));
-      } else {
-        app.state.actions?.setSPD?.(largeNumberValue);
-      }
+      // Preserve extreme values - always use Decimal for SPD
+      app.state.actions?.setSPD?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -196,12 +203,8 @@ export function createStateBridge(app: AppLike) {
   function syncStrawSPD(value: NumericValue) {
     try {
       const largeNumberValue = toDecimalValue(value);
-      // For compatibility, convert to number if it's reasonable size
-      if (DecimalOps.toSafeNumber(largeNumberValue) < Number.MAX_SAFE_INTEGER) {
-        app.state.actions?.setStrawSPD?.(DecimalOps.toSafeNumber(largeNumberValue));
-      } else {
-        app.state.actions?.setStrawSPD?.(largeNumberValue);
-      }
+      // Preserve extreme values - always use Decimal for StrawSPD
+      app.state.actions?.setStrawSPD?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -210,12 +213,8 @@ export function createStateBridge(app: AppLike) {
   function syncCupSPD(value: NumericValue) {
     try {
       const largeNumberValue = toDecimalValue(value);
-      // For compatibility, convert to number if it's reasonable size
-      if (DecimalOps.toSafeNumber(largeNumberValue) < Number.MAX_SAFE_INTEGER) {
-        app.state.actions?.setCupSPD?.(DecimalOps.toSafeNumber(largeNumberValue));
-      } else {
-        app.state.actions?.setCupSPD?.(largeNumberValue);
-      }
+      // Preserve extreme values - always use Decimal for CupSPD
+      app.state.actions?.setCupSPD?.(largeNumberValue);
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -239,7 +238,8 @@ export function createStateBridge(app: AppLike) {
             typeof seedKey === 'string' &&
             (seedKey === 'drinkRate' || seedKey === 'drinkProgress' || seedKey === 'lastDrinkTime')
           ) {
-            (seed as any)[seedKey] = DecimalOps.toSafeNumber(toDecimal(value));
+            // Preserve extreme values - no truncation
+            (seed as any)[seedKey] = toDecimal(value).toNumber();
           } else if (seedKey === 'level') {
             (seed as any)[seedKey] = toDecimalValue(value);
           } else if (
@@ -249,7 +249,8 @@ export function createStateBridge(app: AppLike) {
               seedKey === 'bestClickStreak')
           ) {
             // These remain as numbers
-            (seed as any)[seedKey] = DecimalOps.toSafeNumber(toDecimal(value));
+            // Preserve extreme values - no truncation
+            (seed as any)[seedKey] = toDecimal(value).toNumber();
           } else {
             // All other values become Decimal
             (seed as any)[seedKey] = toDecimalValue(value);

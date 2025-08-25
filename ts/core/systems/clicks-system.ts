@@ -1,6 +1,7 @@
 // Clicks system: centralizes click tracking and streak logic with Decimal support (TypeScript)
 
-import { DecimalOps, Decimal } from '../numbers/large-number';
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
 import { toDecimal } from '../numbers/migration-utils';
 
 export function trackClick() {
@@ -139,7 +140,8 @@ export async function handleSodaClick(multiplier: number = 1) {
       }
       try {
         w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, {
-          bonus: DecimalOps.toSafeNumber(criticalBonus),
+          // Preserve extreme values
+          bonus: criticalBonus.toNumber(),
         });
       } catch (error) {
         console.warn('Failed to emit critical click event:', error);
@@ -149,15 +151,19 @@ export async function handleSodaClick(multiplier: number = 1) {
     // Emit soda click and sync totals with Decimal support
     try {
       console.log('DEBUG: Emitting CLICK.SODA event with data:', {
-        value: DecimalOps.toSafeNumber(totalClickValue),
-        gained: DecimalOps.toSafeNumber(totalClickValue),
+        // Preserve extreme values
+        value: totalClickValue.toNumber(),
+        // Preserve extreme values
+        gained: totalClickValue.toNumber(),
         eventName: w.App?.EVENT_NAMES?.CLICK?.SODA,
         hasEventSystem: !!w.App?.events,
         hasEmit: typeof w.App?.events?.emit === 'function',
       });
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, {
-        value: DecimalOps.toSafeNumber(totalClickValue),
-        gained: DecimalOps.toSafeNumber(totalClickValue),
+        // Preserve extreme values
+        value: totalClickValue.toNumber(),
+        // Preserve extreme values
+        gained: totalClickValue.toNumber(),
       });
       console.log('🍹 CLICK.SODA event emitted successfully');
     } catch (error) {

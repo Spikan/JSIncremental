@@ -1,37 +1,38 @@
 // Pure mutation helpers for direct Decimal values (TypeScript)
 // Maximum performance with direct break_eternity.js operations
 
-import { DecimalOps, Decimal } from '../numbers/large-number';
+// Direct break_eternity.js access
 import { toDecimal, add, subtract, multiply } from '../numbers/migration-utils';
+import { DecimalType } from '../numbers/decimal-utils';
 
 // Type for values that can be Decimal or converted to Decimal
-export type NumericValue = number | string | Decimal | any;
+export type NumericValue = number | string | DecimalType | any;
 
 /**
  * Add sips to current amount - returns Decimal for unlimited scaling
  */
-export function addSips(currentSips: NumericValue, amount: NumericValue): Decimal {
+export function addSips(currentSips: NumericValue, amount: NumericValue): DecimalType {
   return add(currentSips, amount);
 }
 
 /**
  * Subtract sips from current amount - returns Decimal for unlimited scaling
  */
-export function subtractSips(currentSips: NumericValue, amount: NumericValue): Decimal {
+export function subtractSips(currentSips: NumericValue, amount: NumericValue): DecimalType {
   return subtract(currentSips, amount);
 }
 
 /**
  * Increment a count by specified amount - returns Decimal for unlimited scaling
  */
-export function incrementCount(currentCount: NumericValue, by: number = 1): Decimal {
+export function incrementCount(currentCount: NumericValue, by: number = 1): DecimalType {
   return add(currentCount, by);
 }
 
 /**
  * Multiply a value by specified factor - returns Decimal for unlimited scaling
  */
-export function multiplyValue(value: NumericValue, factor: NumericValue): Decimal {
+export function multiplyValue(value: NumericValue, factor: NumericValue): DecimalType {
   return multiply(value, factor);
 }
 
@@ -41,7 +42,7 @@ export function multiplyValue(value: NumericValue, factor: NumericValue): Decima
 export function isGreaterOrEqual(value1: NumericValue, value2: NumericValue): boolean {
   const dec1 = toDecimal(value1);
   const dec2 = toDecimal(value2);
-  return DecimalOps.greaterThanOrEqual(dec1, dec2);
+  return dec1.gte(dec2);
 }
 
 /**
@@ -50,7 +51,7 @@ export function isGreaterOrEqual(value1: NumericValue, value2: NumericValue): bo
 export function isGreater(value1: NumericValue, value2: NumericValue): boolean {
   const dec1 = toDecimal(value1);
   const dec2 = toDecimal(value2);
-  return DecimalOps.greaterThan(dec1, dec2);
+  return dec1.gt(dec2);
 }
 
 /**
@@ -59,7 +60,7 @@ export function isGreater(value1: NumericValue, value2: NumericValue): boolean {
 export function isLessOrEqual(value1: NumericValue, value2: NumericValue): boolean {
   const dec1 = toDecimal(value1);
   const dec2 = toDecimal(value2);
-  return DecimalOps.lessThanOrEqual(dec1, dec2);
+  return dec1.lte(dec2);
 }
 
 /**
@@ -68,7 +69,7 @@ export function isLessOrEqual(value1: NumericValue, value2: NumericValue): boole
 export function isLess(value1: NumericValue, value2: NumericValue): boolean {
   const dec1 = toDecimal(value1);
   const dec2 = toDecimal(value2);
-  return DecimalOps.lessThan(dec1, dec2);
+  return dec1.lt(dec2);
 }
 
 /**
@@ -77,25 +78,25 @@ export function isLess(value1: NumericValue, value2: NumericValue): boolean {
 export function areEqual(value1: NumericValue, value2: NumericValue): boolean {
   const dec1 = toDecimal(value1);
   const dec2 = toDecimal(value2);
-  return DecimalOps.equal(dec1, dec2);
+  return dec1.eq(dec2);
 }
 
 /**
  * Get the maximum of two values
  */
-export function max(value1: NumericValue, value2: NumericValue): Decimal {
+export function max(value1: NumericValue, value2: NumericValue): DecimalType {
   const dec1 = toDecimal(value1);
   const dec2 = toDecimal(value2);
-  return DecimalOps.greaterThanOrEqual(dec1, dec2) ? dec1 : dec2;
+  return dec1.gte(dec2) ? dec1 : dec2;
 }
 
 /**
  * Get the minimum of two values
  */
-export function min(value1: NumericValue, value2: NumericValue): Decimal {
+export function min(value1: NumericValue, value2: NumericValue): DecimalType {
   const dec1 = toDecimal(value1);
   const dec2 = toDecimal(value2);
-  return DecimalOps.lessThanOrEqual(dec1, dec2) ? dec1 : dec2;
+  return dec1.lte(dec2) ? dec1 : dec2;
 }
 
 export {};

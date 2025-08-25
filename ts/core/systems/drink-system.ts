@@ -1,7 +1,12 @@
 // Drink system: centralizes drink processing and related state/UI updates with Decimal support
+//
+// MEMORY: SPD (SIPS PER DRINK) MUST ALWAYS USE BREAK_ETERNITY DECIMAL OPERATIONS
+// MEMORY: EXTREMELY LARGE SPD VALUES ARE THE INTENDED RESULT OF PROGRESSION
+// MEMORY: NEVER CONVERT SPD TO JAVASCRIPT NUMBERS - PRESERVE FULL DECIMAL PRECISION
+// MEMORY: DRINK PROGRESSION SHOULD PRODUCE EXPONENTIALLY LARGE VALUES AS INTENDED
 
 import { toDecimal } from '../numbers/migration-utils';
-import { DecimalOps } from '../numbers/large-number';
+// Direct Decimal access - no wrapper needed
 
 export type ProcessDrinkArgs = {
   getNow?: () => number;
@@ -38,8 +43,10 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       // Calculate current sips per second (convert to number for rate calculation)
       const rateInSeconds = drinkRate / 1000;
       const currentSipsPerSecond =
-        rateInSeconds > 0 ? DecimalOps.toSafeNumber(spdNum) / rateInSeconds : 0;
-      const highest = Math.max(DecimalOps.toSafeNumber(prevHigh), currentSipsPerSecond);
+        // Preserve extreme values in SPS calculation
+        rateInSeconds > 0 ? spdNum.toNumber() / rateInSeconds : 0;
+      // Preserve extreme values when comparing highest SPS
+      const highest = Math.max(prevHigh.toNumber(), currentSipsPerSecond);
 
       // Update total sips earned
       const newTotalEarned = prevTotal.add(spdVal);

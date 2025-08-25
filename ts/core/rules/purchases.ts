@@ -1,12 +1,15 @@
 // Pure cost and stat calculation for purchases with Decimal support (TypeScript)
 
-import { DecimalOps, Decimal } from '../numbers/large-number';
+// DecimalOps removed - no longer using toSafeNumber
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
+import { DecimalType } from '../numbers/decimal-utils';
 
 export function nextStrawCost(
-  strawCount: number | string | Decimal,
-  baseCost: number | string | Decimal,
-  scaling: number | string | Decimal
-): Decimal {
+  strawCount: number | string | DecimalType,
+  baseCost: number | string | DecimalType,
+  scaling: number | string | DecimalType
+): DecimalType {
   const base = new Decimal(baseCost);
   const scale = new Decimal(scaling);
   const count = new Decimal(strawCount);
@@ -20,10 +23,10 @@ export function nextStrawCost(
 }
 
 export function nextCupCost(
-  cupCount: number | string | Decimal,
-  baseCost: number | string | Decimal,
-  scaling: number | string | Decimal
-): Decimal {
+  cupCount: number | string | DecimalType,
+  baseCost: number | string | DecimalType,
+  scaling: number | string | DecimalType
+): DecimalType {
   const base = new Decimal(baseCost);
   const scale = new Decimal(scaling);
   const count = new Decimal(cupCount);
@@ -41,7 +44,8 @@ export function nextStrawCostLegacy(
   baseCost: number | string,
   scaling: number | string
 ): number {
-  return Math.floor(DecimalOps.toSafeNumber(nextStrawCost(strawCount, baseCost, scaling)));
+  // Preserve extreme values - direct toNumber
+  return Math.floor(nextStrawCost(strawCount, baseCost, scaling).toNumber());
 }
 
 export function nextCupCostLegacy(
@@ -49,5 +53,6 @@ export function nextCupCostLegacy(
   baseCost: number | string,
   scaling: number | string
 ): number {
-  return Math.floor(DecimalOps.toSafeNumber(nextCupCost(cupCount, baseCost, scaling)));
+  // Preserve extreme values - direct toNumber
+  return Math.floor(nextCupCost(cupCount, baseCost, scaling).toNumber());
 }

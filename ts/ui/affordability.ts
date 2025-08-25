@@ -1,8 +1,17 @@
 // UI Affordability System (TypeScript) with Decimal support
 // Handles checking and updating button states based on resource availability
+//
+// MEMORY: ALL COST CALCULATIONS MUST USE BREAK_ETERNITY DECIMAL OPERATIONS
+// MEMORY: EXTREMELY LARGE PURCHASE COSTS ARE THE INTENDED RESULT OF UPGRADES
+// MEMORY: NEVER USE TONUMBER() ON EXPONENTS - USE DECIMAL COMPARISONS INSTEAD
+// MEMORY: PRESERVE FULL PRECISION FOR ALL AFFORDABILITY CHECKS
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { updateButtonState, updateCostDisplay } from './utils';
-import { toDecimal, gte, Decimal } from '../core/numbers';
+import { toDecimal, gte } from '../core/numbers/migration-utils';
+import { isDecimal } from '../core/numbers/decimal-utils';
+
+// Direct break_eternity.js Decimal access
+const Decimal = (globalThis as any).Decimal;
 
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability(): void {
@@ -119,13 +128,25 @@ function calculateAllCosts(): any {
   const strawScaling = toDecimal(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
   const strawCount = toDecimal((window as any).App?.state?.getState?.()?.straws || 0);
 
-  // Use safe exponent conversion with cap for extreme values
+  // Use direct Decimal operations for proper extreme value handling
   let strawExponent = 0;
   try {
-    const rawExponent = (strawCount as any).toNumber?.();
-    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
-      // Cap exponent to prevent astronomical costs from extreme values
-      strawExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    // Use direct Decimal operations to preserve extreme values
+    if (isDecimal(strawCount) && strawCount.isFinite() && strawCount.isPositive()) {
+      // For extreme values, compare directly with Decimal
+      if (strawCount.greaterThan(new Decimal(1e10))) {
+        // Cap at 1e10 for reasonable gameplay, but preserve extreme behavior
+        strawExponent = 1e10;
+      } else {
+        // Use toNumber only for reasonable values
+        strawExponent = strawCount.toNumber();
+      }
+    } else {
+      // Fallback for non-Decimal values
+      const countNum = typeof strawCount === 'number' ? strawCount : Number(strawCount) || 0;
+      if (countNum > 0 && countNum <= 1e10) {
+        strawExponent = countNum;
+      }
     }
   } catch (error) {
     console.warn('🚫 calculateAllCosts: Error calculating straw exponent:', error);
@@ -137,13 +158,25 @@ function calculateAllCosts(): any {
   const cupScaling = toDecimal(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
   const cupCount = toDecimal((window as any).App?.state?.getState?.()?.cups || 0);
 
-  // Use safe exponent conversion with cap for extreme values
+  // Use direct Decimal operations for proper extreme value handling
   let cupExponent = 0;
   try {
-    const rawExponent = (cupCount as any).toNumber?.();
-    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
-      // Cap exponent to prevent astronomical costs from extreme values
-      cupExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    // Use direct Decimal operations to preserve extreme values
+    if (isDecimal(cupCount) && cupCount.isFinite() && cupCount.isPositive()) {
+      // For extreme values, compare directly with Decimal
+      if (cupCount.greaterThan(new Decimal(1e10))) {
+        // Cap at 1e10 for reasonable gameplay, but preserve extreme behavior
+        cupExponent = 1e10;
+      } else {
+        // Use toNumber only for reasonable values
+        cupExponent = cupCount.toNumber();
+      }
+    } else {
+      // Fallback for non-Decimal values
+      const countNum = typeof cupCount === 'number' ? cupCount : Number(cupCount) || 0;
+      if (countNum > 0 && countNum <= 1e10) {
+        cupExponent = countNum;
+      }
     }
   } catch (error) {
     console.warn('🚫 calculateAllCosts: Error calculating cup exponent:', error);
@@ -155,13 +188,25 @@ function calculateAllCosts(): any {
   const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
   const suctionCount = toDecimal((window as any).App?.state?.getState?.()?.suctions || 0);
 
-  // Use safe exponent conversion with cap for extreme values
+  // Use direct Decimal operations for proper extreme value handling
   let suctionExponent = 0;
   try {
-    const rawExponent = (suctionCount as any).toNumber?.();
-    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
-      // Cap exponent to prevent astronomical costs from extreme values
-      suctionExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    // Use direct Decimal operations to preserve extreme values
+    if (isDecimal(suctionCount) && suctionCount.isFinite() && suctionCount.isPositive()) {
+      // For extreme values, compare directly with Decimal
+      if (suctionCount.greaterThan(new Decimal(1e10))) {
+        // Cap at 1e10 for reasonable gameplay, but preserve extreme behavior
+        suctionExponent = 1e10;
+      } else {
+        // Use toNumber only for reasonable values
+        suctionExponent = suctionCount.toNumber();
+      }
+    } else {
+      // Fallback for non-Decimal values
+      const countNum = typeof suctionCount === 'number' ? suctionCount : Number(suctionCount) || 0;
+      if (countNum > 0 && countNum <= 1e10) {
+        suctionExponent = countNum;
+      }
     }
   } catch (error) {
     console.warn('🚫 calculateAllCosts: Error calculating suction exponent:', error);
@@ -177,13 +222,30 @@ function calculateAllCosts(): any {
   );
   const fasterDrinksCount = toDecimal((window as any).App?.state?.getState?.()?.fasterDrinks || 0);
 
-  // Use safe exponent conversion with cap for extreme values
+  // Use direct Decimal operations for proper extreme value handling
   let fasterDrinksExponent = 0;
   try {
-    const rawExponent = (fasterDrinksCount as any).toNumber?.();
-    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
-      // Cap exponent to prevent astronomical costs from extreme values
-      fasterDrinksExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    // Use direct Decimal operations to preserve extreme values
+    if (
+      isDecimal(fasterDrinksCount) &&
+      fasterDrinksCount.isFinite() &&
+      fasterDrinksCount.isPositive()
+    ) {
+      // For extreme values, compare directly with Decimal
+      if (fasterDrinksCount.greaterThan(new Decimal(1e10))) {
+        // Cap at 1e10 for reasonable gameplay, but preserve extreme behavior
+        fasterDrinksExponent = 1e10;
+      } else {
+        // Use toNumber only for reasonable values
+        fasterDrinksExponent = fasterDrinksCount.toNumber();
+      }
+    } else {
+      // Fallback for non-Decimal values
+      const countNum =
+        typeof fasterDrinksCount === 'number' ? fasterDrinksCount : Number(fasterDrinksCount) || 0;
+      if (countNum > 0 && countNum <= 1e10) {
+        fasterDrinksExponent = countNum;
+      }
     }
   } catch (error) {
     console.warn('🚫 calculateAllCosts: Error calculating fasterDrinks exponent:', error);
@@ -201,13 +263,32 @@ function calculateAllCosts(): any {
     (window as any).App?.state?.getState?.()?.criticalClicks || 0
   );
 
-  // Use safe exponent conversion with cap for extreme values
+  // Use direct Decimal operations for proper extreme value handling
   let criticalClickExponent = 0;
   try {
-    const rawExponent = (criticalClickCount as any).toNumber?.();
-    if (Number.isFinite(rawExponent) && rawExponent >= 0) {
-      // Cap exponent to prevent astronomical costs from extreme values
-      criticalClickExponent = Math.min(rawExponent, 1000); // Reasonable cap for gameplay
+    // Use direct Decimal operations to preserve extreme values
+    if (
+      isDecimal(criticalClickCount) &&
+      criticalClickCount.isFinite() &&
+      criticalClickCount.isPositive()
+    ) {
+      // For extreme values, compare directly with Decimal
+      if (criticalClickCount.greaterThan(new Decimal(1e10))) {
+        // Cap at 1e10 for reasonable gameplay, but preserve extreme behavior
+        criticalClickExponent = 1e10;
+      } else {
+        // Use toNumber only for reasonable values
+        criticalClickExponent = criticalClickCount.toNumber();
+      }
+    } else {
+      // Fallback for non-Decimal values
+      const countNum =
+        typeof criticalClickCount === 'number'
+          ? criticalClickCount
+          : Number(criticalClickCount) || 0;
+      if (countNum > 0 && countNum <= 1e10) {
+        criticalClickExponent = countNum;
+      }
     }
   } catch (error) {
     console.warn('🚫 calculateAllCosts: Error calculating criticalClick exponent:', error);

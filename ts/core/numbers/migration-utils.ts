@@ -1,14 +1,20 @@
 // Direct break_eternity.js utilities
 // No wrapper - direct Decimal operations for maximum performance
 
-import { DecimalOps, Decimal, isDecimal } from './large-number';
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
+import { isDecimal, DecimalType } from './decimal-utils';
 
-export type NumericValue = number | string | Decimal | any;
+// Export Decimal for use by other modules
+export { Decimal };
+export type { DecimalType };
+
+export type NumericValue = number | string | DecimalType | any;
 
 /**
  * Safely converts any value to Decimal (direct break_eternity.js)
  */
-export function toDecimal(value: NumericValue): Decimal {
+export function toDecimal(value: NumericValue): DecimalType {
   if (isDecimal(value)) {
     return value;
   }
@@ -16,41 +22,20 @@ export function toDecimal(value: NumericValue): Decimal {
   // Handle string representations
   if (typeof value === 'string') {
     try {
-      return DecimalOps.create(value);
+      return new Decimal(value);
     } catch (error) {
       console.warn('Failed to convert string to Decimal:', error);
-      return DecimalOps.create(0);
+      return new Decimal(0);
     }
   }
 
   // Handle numbers
   if (typeof value === 'number') {
-    return DecimalOps.create(value);
+    return new Decimal(value);
   }
 
   // Fallback
-  return DecimalOps.create(0);
-}
-
-/**
- * Converts Decimal back to number for UI/display purposes
- */
-export function toNumber(value: NumericValue): number {
-  if (isDecimal(value)) {
-    return DecimalOps.toSafeNumber(value);
-  }
-
-  // Handle numbers
-  if (typeof value === 'number') {
-    return value;
-  }
-
-  // Handle strings
-  if (typeof value === 'string') {
-    return Number(value) || 0;
-  }
-
-  return 0;
+  return new Decimal(0);
 }
 
 /**
@@ -58,7 +43,7 @@ export function toNumber(value: NumericValue): number {
  */
 export function toString(value: NumericValue): string {
   if (isDecimal(value)) {
-    return DecimalOps.toString(value);
+    return value.toString();
   }
 
   return String(value || 0);
@@ -67,45 +52,45 @@ export function toString(value: NumericValue): string {
 /**
  * Safely performs addition with mixed number types
  */
-export function add(a: NumericValue, b: NumericValue): Decimal {
+export function add(a: NumericValue, b: NumericValue): DecimalType {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.add(aDec, bDec);
+  return aDec.add(bDec);
 }
 
 /**
  * Safely performs subtraction with mixed number types
  */
-export function subtract(a: NumericValue, b: NumericValue): Decimal {
+export function subtract(a: NumericValue, b: NumericValue): DecimalType {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.subtract(aDec, bDec);
+  return aDec.sub(bDec);
 }
 
 /**
  * Safely performs multiplication with mixed number types
  */
-export function multiply(a: NumericValue, b: NumericValue): Decimal {
+export function multiply(a: NumericValue, b: NumericValue): DecimalType {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.multiply(aDec, bDec);
+  return aDec.mul(bDec);
 }
 
 /**
  * Safely performs division with mixed number types
  */
-export function divide(a: NumericValue, b: NumericValue): Decimal {
+export function divide(a: NumericValue, b: NumericValue): DecimalType {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.divide(aDec, bDec);
+  return aDec.div(bDec);
 }
 
 /**
  * Safely performs exponentiation
  */
-export function pow(base: NumericValue, exponent: number): Decimal {
+export function pow(base: NumericValue, exponent: number): DecimalType {
   const baseDec = toDecimal(base);
-  return DecimalOps.power(baseDec, exponent);
+  return baseDec.pow(exponent);
 }
 
 /**
@@ -114,31 +99,31 @@ export function pow(base: NumericValue, exponent: number): Decimal {
 export function gte(a: NumericValue, b: NumericValue): boolean {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.greaterThanOrEqual(aDec, bDec);
+  return aDec.gte(bDec);
 }
 
 export function gt(a: NumericValue, b: NumericValue): boolean {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.greaterThan(aDec, bDec);
+  return aDec.gt(bDec);
 }
 
 export function lte(a: NumericValue, b: NumericValue): boolean {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.lessThanOrEqual(aDec, bDec);
+  return aDec.lte(bDec);
 }
 
 export function lt(a: NumericValue, b: NumericValue): boolean {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.lessThan(aDec, bDec);
+  return aDec.lt(bDec);
 }
 
 export function eq(a: NumericValue, b: NumericValue): boolean {
   const aDec = toDecimal(a);
   const bDec = toDecimal(b);
-  return DecimalOps.equal(aDec, bDec);
+  return aDec.eq(bDec);
 }
 
 /**
@@ -146,7 +131,7 @@ export function eq(a: NumericValue, b: NumericValue): boolean {
  */
 export function formatDecimal(value: NumericValue): string {
   if (isDecimal(value)) {
-    return DecimalOps.format(value);
+    return value.toString();
   }
 
   // Handle regular numbers with proper type checking
@@ -171,7 +156,6 @@ export const isLargeNumber = isDecimal;
 if (typeof window !== 'undefined') {
   (window as any).DecimalUtils = {
     toDecimal,
-    toNumber,
     toString,
     add,
     subtract,

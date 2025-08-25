@@ -5,8 +5,9 @@ import {
   computeTotalSipsPerDrink,
 } from '../rules/economy.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
-import { Decimal } from '../numbers/large-number';
+// Direct Decimal access - no wrapper needed
 import { toDecimal } from '../numbers/migration-utils';
+import { DecimalType } from '../numbers/decimal-utils';
 
 function getConfig(): { upgrades: any; config: any } {
   return getUpgradesAndConfig();
@@ -20,20 +21,20 @@ export function recalcProduction({
   base = {},
   multipliers = {},
 }: {
-  straws: number | Decimal;
-  cups: number | Decimal;
-  widerStraws: number | Decimal;
-  betterCups: number | Decimal;
+  straws: number | DecimalType;
+  cups: number | DecimalType;
+  widerStraws: number | DecimalType;
+  betterCups: number | DecimalType;
   base?: {
-    strawBaseSPD?: number | Decimal;
-    cupBaseSPD?: number | Decimal;
-    baseSipsPerDrink?: number | Decimal;
+    strawBaseSPD?: number | DecimalType;
+    cupBaseSPD?: number | DecimalType;
+    baseSipsPerDrink?: number | DecimalType;
   };
   multipliers?: {
-    widerStrawsPerLevel?: number | Decimal;
-    betterCupsPerLevel?: number | Decimal;
+    widerStrawsPerLevel?: number | DecimalType;
+    betterCupsPerLevel?: number | DecimalType;
   };
-}): { strawSPD: Decimal; cupSPD: Decimal; sipsPerDrink: Decimal } {
+}): { strawSPD: DecimalType; cupSPD: DecimalType; sipsPerDrink: DecimalType } {
   const { upgrades, config } = getConfig();
 
   // Convert all values to Decimal for consistent calculations

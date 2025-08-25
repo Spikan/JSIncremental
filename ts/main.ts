@@ -44,7 +44,7 @@ if (BAL && TIMING && LIMITS) {
 import { saveGameLoader } from './core/systems/save-game-loader';
 import { mobileInputHandler } from './ui/mobile-input';
 import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
-import { DecimalOps } from './core/numbers/large-number';
+// DecimalOps removed - no longer using toSafeNumber
 
 // Export for potential use
 (window as any).initSplashScreen = initSplashScreen;
@@ -230,15 +230,11 @@ function initGame() {
 
       // Handle Decimal results properly - convert to numbers for Decimal compatibility
       // Use safe conversion to handle extreme values without returning Infinity
-      const strawSPDValue = result.strawSPD.toSafeNumber
-        ? result.strawSPD.toSafeNumber()
-        : Number(result.strawSPD);
-      const cupSPDValue = result.cupSPD.toSafeNumber
-        ? result.cupSPD.toSafeNumber()
-        : Number(result.cupSPD);
-      const spdValue = result.sipsPerDrink.toSafeNumber
-        ? result.sipsPerDrink.toSafeNumber()
-        : Number(result.sipsPerDrink);
+      // Preserve extreme SPD values - don't use toSafeNumber
+      const strawSPDValue = result.strawSPD;
+      const cupSPDValue = result.cupSPD;
+      // Preserve extreme SPD values - don't use toSafeNumber
+      const spdValue = result.sipsPerDrink;
 
       strawSPD = new Decimal(strawSPDValue);
       cupSPD = new Decimal(cupSPDValue);
@@ -252,13 +248,23 @@ function initGame() {
         widerStraws.greaterThan(0)
       ) {
         const upgradeMultiplier = new Decimal(
-          1 + DecimalOps.toSafeNumber(widerStraws) * config.WIDER_STRAWS_MULTIPLIER
+          // Preserve extreme values in upgrade multipliers
+          1 +
+            (widerStraws && typeof widerStraws.toNumber === 'function'
+              ? widerStraws.toNumber()
+              : Number(widerStraws || 0)) *
+              config.WIDER_STRAWS_MULTIPLIER
         );
         strawSPD = strawSPD.times(upgradeMultiplier);
       }
       if (betterCups && typeof betterCups.greaterThan === 'function' && betterCups.greaterThan(0)) {
         const upgradeMultiplier = new Decimal(
-          1 + DecimalOps.toSafeNumber(betterCups) * config.BETTER_CUPS_MULTIPLIER
+          // Preserve extreme values in upgrade multipliers
+          1 +
+            (betterCups && typeof betterCups.toNumber === 'function'
+              ? betterCups.toNumber()
+              : Number(betterCups || 0)) *
+              config.BETTER_CUPS_MULTIPLIER
         );
         cupSPD = cupSPD.times(upgradeMultiplier);
       }
@@ -284,29 +290,31 @@ function initGame() {
 
     // Seed App.state snapshot
     try {
-      const toNum = (v: any) =>
-        v && typeof v.toNumber === 'function' ? DecimalOps.toSafeNumber(v) : Number(v || 0);
+      // Preserve extreme values - don't convert to regular numbers
       (window as any).App?.state?.setState?.({
-        sips: toNum((window as any).sips),
-        straws: toNum(straws),
-        cups: toNum(cups),
-        suctions: toNum((window as any).suctions),
-        widerStraws: toNum(widerStraws),
-        betterCups: toNum(betterCups),
-        fasterDrinks: toNum((window as any).fasterDrinks),
-        criticalClicks: toNum(criticalClicks),
-        level: toNum(level),
-        spd: toNum(spd),
-        strawSPD: toNum(strawSPD),
-        cupSPD: toNum(cupSPD),
+        sips: (window as any).sips,
+        straws: straws,
+        cups: cups,
+        suctions: (window as any).suctions,
+        widerStraws: widerStraws,
+        betterCups: betterCups,
+        fasterDrinks: (window as any).fasterDrinks,
+        criticalClicks: criticalClicks,
+        level: level,
+        // Preserve extreme SPD values
+        spd: spd,
+        strawSPD: strawSPD,
+        cupSPD: cupSPD,
         drinkRate: Number(drinkRate || 0),
         drinkProgress: Number(drinkProgress || 0),
         lastDrinkTime: Number(lastDrinkTime || 0),
-        criticalClickChance: toNum(criticalClickChance),
-        criticalClickMultiplier: toNum(criticalClickMultiplier),
-        suctionClickBonus: toNum(suctionClickBonus),
-        fasterDrinksUpCounter: toNum(fasterDrinksUpCounter),
-        criticalClickUpCounter: toNum(criticalClickUpCounter),
+        // Preserve extreme click values
+        criticalClickChance: criticalClickChance,
+        criticalClickMultiplier: criticalClickMultiplier,
+        // Preserve extreme bonus values
+        suctionClickBonus: suctionClickBonus,
+        fasterDrinksUpCounter: fasterDrinksUpCounter,
+        criticalClickUpCounter: criticalClickUpCounter,
       });
     } catch (error) {
       console.warn('Failed to seed App.state:', error);

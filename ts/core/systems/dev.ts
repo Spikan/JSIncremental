@@ -1,7 +1,13 @@
 // Dev system: unlock helpers, time travel, and resource tweaks (TypeScript)
 // Enhanced with Decimal scaling test functions
+//
+// MEMORY: DEV FUNCTIONS SHOULD GENERATE EXTREMELY LARGE VALUES AS INTENDED
+// MEMORY: NEVER CONVERT EXTREME VALUES TO JAVASCRIPT NUMBERS WHEN STORING
+// MEMORY: PRESERVE FULL DECIMAL PRECISION IN ALL DEV OPERATIONS
+// MEMORY: EXTREME VALUE TESTING IS A CORE FEATURE - DO NOT SANITIZE
 
-import { DecimalOps, Decimal } from '../numbers/large-number';
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
 import { toDecimal, add } from '../numbers/migration-utils';
 
 type Win = typeof window & {
@@ -17,10 +23,6 @@ type Win = typeof window & {
   lastDrinkTime?: any;
   lastSaveTime?: any;
 };
-
-function toNum(v: any): number {
-  return v && typeof v.toNumber === 'function' ? DecimalOps.toSafeNumber(v) : Number(v || 0);
-}
 
 export function unlockAll(): boolean {
   try {
@@ -104,9 +106,11 @@ export function addTime(milliseconds: number): boolean {
           ? Number(st.spd)
           : Number(config.BASE_SIPS_PER_DRINK || 1);
       const gain = spdVal * drinks;
-      const currentSips = toNum(w.sips);
-      const nextSips = currentSips + gain;
-      w.sips = w.Decimal ? new w.Decimal(nextSips) : nextSips;
+      // Preserve extreme values - don't convert to regular numbers
+      const currentSips = toDecimal(w.sips);
+      const gainDecimal = toDecimal(gain);
+      const nextSips = add(currentSips, gainDecimal);
+      w.sips = nextSips;
       const prevTotal = Number(st.totalSipsEarned || 0);
       w.App?.state?.setState?.({ sips: nextSips, totalSipsEarned: prevTotal + gain });
     }
@@ -133,12 +137,19 @@ export function addSips(amount: number): boolean {
   try {
     const w = window as Win;
     if (typeof w.sips === 'undefined' || w.sips === null) return false;
-    w.sips = w.sips.plus ? w.sips.plus(amount) : toNum(w.sips) + Number(amount || 0);
+    // Preserve extreme values - use Decimal arithmetic
+    if (w.sips.plus) {
+      w.sips = w.sips.plus(amount);
+    } else {
+      const currentSips = toDecimal(w.sips);
+      const gainDecimal = toDecimal(amount);
+      w.sips = add(currentSips, gainDecimal);
+    }
     // Prefer action to keep Decimal in state when available
     try {
       w.App?.state?.actions?.setSips?.(w.sips);
     } catch (error) {
-      w.App?.state?.setState?.({ sips: toNum(w.sips) });
+      w.App?.state?.setState?.({ sips: w.sips });
     }
     w.App?.ui?.updateTopSipCounter?.();
     w.App?.ui?.checkUpgradeAffordability?.();
@@ -228,12 +239,12 @@ export function openImportDialog(): boolean {
             w.cups = w.Decimal ? new w.Decimal(saveData.cups) : Number(saveData.cups);
           if (saveData.level != null)
             w.level = w.Decimal ? new w.Decimal(saveData.level) : Number(saveData.level);
-          // Mirror to App.state minimally
+          // Mirror to App.state minimally - preserve extreme values
           w.App?.state?.setState?.({
-            sips: toNum(w.sips),
-            straws: toNum(w.straws),
-            cups: toNum(w.cups),
-            level: toNum(w.level),
+            sips: w.sips,
+            straws: w.straws,
+            cups: w.cups,
+            level: w.level,
           });
           w.App?.ui?.updateAllStats?.();
           w.App?.ui?.checkUpgradeAffordability?.();
@@ -274,13 +285,8 @@ export function addMassiveSips(): boolean {
 
     // Update the sips value - keep as Decimal for proper handling
     if (w.Decimal) {
-      // For very large numbers, use Decimal directly, fallback to Decimal for smaller values
-      if (Number.isFinite(DecimalOps.toSafeNumber(newSips))) {
-        w.sips = new w.Decimal(DecimalOps.toSafeNumber(newSips));
-      } else {
-        // For extremely large numbers, store the Decimal directly
-        w.sips = newSips;
-      }
+      // Preserve extreme values - always use Decimal directly for sips
+      w.sips = newSips;
     } else {
       // For extremely large numbers, store the Decimal directly
       w.sips = newSips;
@@ -323,11 +329,8 @@ export function addHugeStraws(): boolean {
 
     // Also update window property for compatibility
     try {
-      if (w.Decimal && Number.isFinite(DecimalOps.toSafeNumber(newStraws))) {
-        w.straws = new w.Decimal(DecimalOps.toSafeNumber(newStraws));
-      } else {
-        w.straws = newStraws;
-      }
+      // Preserve extreme values - direct assignment
+      w.straws = newStraws;
     } catch (error) {
       // Fallback: just set the Decimal directly
       w.straws = newStraws;
@@ -373,11 +376,8 @@ export function addMassiveCups(): boolean {
 
     // Also update window property for compatibility
     try {
-      if (w.Decimal && Number.isFinite(DecimalOps.toSafeNumber(newCups))) {
-        w.cups = new w.Decimal(DecimalOps.toSafeNumber(newCups));
-      } else {
-        w.cups = newCups;
-      }
+      // Preserve extreme values - direct assignment
+      w.cups = newCups;
     } catch (error) {
       // Fallback: just set the Decimal directly
       w.cups = newCups;
@@ -414,17 +414,19 @@ export function addExtremeResources(): boolean {
     if (typeof w.sips !== 'undefined') {
       const currentSips = toDecimal(w.sips);
       const newSips = add(currentSips, extremeAmount);
-      if (w.Decimal) {
-        if (Number.isFinite(DecimalOps.toSafeNumber(newSips))) {
-          w.sips = new w.Decimal(DecimalOps.toSafeNumber(newSips));
-        } else {
+      if (w.Decimal && newSips) {
+        try {
+          // Preserve extreme values - direct assignment
+          w.sips = newSips;
+        } catch (error) {
+          console.warn('Error converting sips to safe number:', error);
           w.sips = newSips;
         }
       } else {
         w.sips = newSips;
       }
       w.App?.state?.actions?.setSips?.(newSips);
-      console.log(`✅ Sips: ${newSips.toString()}`);
+      console.log(`✅ Sips: ${newSips?.toString?.() || 'unknown'}`);
     }
 
     // Add straws
@@ -437,11 +439,8 @@ export function addExtremeResources(): boolean {
 
       // Also update window property for compatibility
       try {
-        if (w.Decimal && Number.isFinite(DecimalOps.toSafeNumber(newStraws))) {
-          w.straws = new w.Decimal(DecimalOps.toSafeNumber(newStraws));
-        } else {
-          w.straws = newStraws;
-        }
+        // Preserve extreme values - direct assignment
+        w.straws = newStraws;
       } catch (error) {
         // Fallback: just set the Decimal directly
         w.straws = newStraws;
@@ -461,11 +460,8 @@ export function addExtremeResources(): boolean {
 
       // Also update window property for compatibility
       try {
-        if (w.Decimal && Number.isFinite(DecimalOps.toSafeNumber(newCups))) {
-          w.cups = new w.Decimal(DecimalOps.toSafeNumber(newCups));
-        } else {
-          w.cups = newCups;
-        }
+        // Preserve extreme values - direct assignment
+        w.cups = newCups;
       } catch (error) {
         // Fallback: just set the Decimal directly
         w.cups = newCups;
@@ -520,11 +516,8 @@ export function testScientificNotation(): boolean {
           const newSips = add(currentSips, largeAmount);
 
           if (w.Decimal) {
-            if (Number.isFinite(DecimalOps.toSafeNumber(newSips))) {
-              w.sips = new w.Decimal(DecimalOps.toSafeNumber(newSips));
-            } else {
-              w.sips = newSips;
-            }
+            // Preserve extreme values - direct assignment
+            w.sips = newSips;
           } else {
             w.sips = newSips;
           }

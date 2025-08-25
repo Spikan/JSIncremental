@@ -1,8 +1,9 @@
 // Performance optimization utilities for LargeNumber operations
 // Provides caching, memoization, and efficient calculation patterns
 
-import { DecimalOps, Decimal } from './large-number';
-import { pow, multiply } from './migration-utils';
+// Direct break_eternity.js access
+const Decimal = (globalThis as any).Decimal;
+import { pow, multiply, DecimalType } from './migration-utils';
 
 // Simple LRU cache implementation
 class LRUCache<K, V> {
@@ -45,14 +46,14 @@ class LRUCache<K, V> {
 }
 
 // Global caches for expensive operations
-const powCache = new LRUCache<string, Decimal>(200);
-const economyCalculationCache = new LRUCache<string, Decimal>(500);
+const powCache = new LRUCache<string, DecimalType>(200);
+const economyCalculationCache = new LRUCache<string, DecimalType>(500);
 const formatCache = new LRUCache<string, string>(300);
 
 /**
  * Memoized power calculation with caching
  */
-export function memoizedPow(base: any, exponent: number): Decimal {
+export function memoizedPow(base: any, exponent: number): DecimalType {
   const key = `${base.toString()}:${exponent}`;
 
   let result = powCache.get(key);
@@ -68,7 +69,11 @@ export function memoizedPow(base: any, exponent: number): Decimal {
 /**
  * Efficient calculation of exponential growth with caching
  */
-export function cachedExponentialGrowth(baseValue: any, growthRate: any, time: number): Decimal {
+export function cachedExponentialGrowth(
+  baseValue: any,
+  growthRate: any,
+  time: number
+): DecimalType {
   const key = `${baseValue.toString()}:${growthRate.toString()}:${time}`;
 
   let result = economyCalculationCache.get(key);
@@ -93,14 +98,14 @@ export function cachedExponentialGrowth(baseValue: any, growthRate: any, time: n
 /**
  * Binary exponentiation for efficient large exponent calculations
  */
-function binaryExponentiation(base: any, growthRate: any, exponent: number): Decimal {
+function binaryExponentiation(base: any, growthRate: any, exponent: number): DecimalType {
   if (exponent === 0) {
-    return DecimalOps.create(1);
+    return new Decimal(1);
   }
 
-  let result = DecimalOps.create(1);
-  let currentBase = DecimalOps.create(base);
-  let currentGrowth = DecimalOps.create(growthRate);
+  let result = new Decimal(1);
+  let currentBase = new Decimal(base);
+  let currentGrowth = new Decimal(growthRate);
 
   while (exponent > 0) {
     if (exponent % 2 === 1) {
@@ -147,7 +152,7 @@ export function batchCalculateStrawSPD(
   baseSPDArray: any[],
   widerStrawsArray: any[],
   widerMultiplierArray: any[]
-): Decimal[] {
+): DecimalType[] {
   return strawsArray.map((straws, index) => {
     const key = `strawSPD:${straws}:${baseSPDArray[index]}:${widerStrawsArray[index]}:${widerMultiplierArray[index]}`;
 
@@ -158,21 +163,19 @@ export function batchCalculateStrawSPD(
 
     // Calculate straw SPD (simplified version for batch processing)
     // const strawCount = new LargeNumber(straws);
-    const baseValue = DecimalOps.create(baseSPDArray[index]);
-    const upgradeMultiplier = DecimalOps.create(1).add(
-      DecimalOps.create(widerStrawsArray[index]).multiply(
-        DecimalOps.create(widerMultiplierArray[index])
-      )
+    const baseValue = new Decimal(baseSPDArray[index]);
+    const upgradeMultiplier = new Decimal(1).add(
+      new Decimal(widerStrawsArray[index]).multiply(new Decimal(widerMultiplierArray[index]))
     );
 
     result = baseValue.multiply(upgradeMultiplier);
 
     // Apply basic scaling for very large numbers
-    if (result.gte(DecimalOps.create('1e100'))) {
-      const excess = result.subtract(DecimalOps.create('1e100'));
-      const scaledExcess = memoizedPow(DecimalOps.create('1.001'), excess.toNumber());
-      result = DecimalOps.create('1e100').add(
-        excess.multiply(DecimalOps.create('0.95')).multiply(scaledExcess)
+    if (result.gte(new Decimal('1e100'))) {
+      const excess = result.subtract(new Decimal('1e100'));
+      const scaledExcess = memoizedPow(new Decimal('1.001'), excess.toNumber());
+      result = new Decimal('1e100').add(
+        excess.multiply(new Decimal('0.95')).multiply(scaledExcess)
       );
     }
 
@@ -189,7 +192,7 @@ export function optimizedSynergyCalculation(
   cupCount: any,
   strawSPD: any,
   cupSPD: any
-): Decimal {
+): DecimalType {
   const key = `synergy:${strawCount}:${cupCount}:${strawSPD}:${cupSPD}`;
 
   let result = economyCalculationCache.get(key);
@@ -197,27 +200,25 @@ export function optimizedSynergyCalculation(
     return result;
   }
 
-  const straws = DecimalOps.create(strawCount);
-  const cups = DecimalOps.create(cupCount);
-  const sSPD = DecimalOps.create(strawSPD);
-  const cSPD = DecimalOps.create(cupSPD);
+  const straws = new Decimal(strawCount);
+  const cups = new Decimal(cupCount);
+  const sSPD = new Decimal(strawSPD);
+  const cSPD = new Decimal(cupSPD);
 
   // Calculate individual contributions
   const strawContribution = sSPD.multiply(straws);
   const cupContribution = cSPD.multiply(cups);
 
   // Optimized synergy calculation
-  let synergyMultiplier = DecimalOps.create(1);
-  if (straws.gte(DecimalOps.create('100')) && cups.gte(DecimalOps.create('100'))) {
-    const strawRatio = straws.divide(DecimalOps.create('100'));
-    const cupRatio = cups.divide(DecimalOps.create('100'));
+  let synergyMultiplier = new Decimal(1);
+  if (straws.gte(new Decimal('100')) && cups.gte(new Decimal('100'))) {
+    const strawRatio = straws.divide(new Decimal('100'));
+    const cupRatio = cups.divide(new Decimal('100'));
     const synergyRatio = strawRatio.multiply(cupRatio);
 
     // Use more efficient calculation for synergy
     synergyMultiplier = synergyMultiplier.add(
-      DecimalOps.create('1.1').multiply(
-        memoizedPow(DecimalOps.create('0.999'), synergyRatio.toNumber())
-      )
+      new Decimal('1.1').multiply(memoizedPow(new Decimal('0.999'), synergyRatio.toNumber()))
     );
   }
 
