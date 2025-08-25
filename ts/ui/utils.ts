@@ -9,8 +9,9 @@ import { formatLargeNumber } from '../core/numbers/migration-utils';
 
 export function formatNumber(value: any): string {
   try {
-    // Try using the new LargeNumber formatting first
-    return formatLargeNumber(value);
+    // Try using the new LargeNumber formatting first, but post-process to ensure 2 decimal places
+    const formatted = formatLargeNumber(value);
+    return postProcessDecimals(formatted);
   } catch (error) {
     console.warn('Failed to format with LargeNumber, falling back:', error);
   }
@@ -19,7 +20,8 @@ export function formatNumber(value: any): string {
   try {
     if (typeof (window as any)?.prettify === 'function') {
       try {
-        return (window as any).prettify(value);
+        const formatted = (window as any).prettify(value);
+        return postProcessDecimals(formatted);
       } catch (error) {
         console.warn('Failed to prettify value:', error);
       }
@@ -46,9 +48,39 @@ export function formatNumber(value: any): string {
     return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 
-  if (typeof value === 'string') return value;
-  if (value && typeof value.toString === 'function') return value.toString();
+  if (typeof value === 'string') return postProcessDecimals(value);
+  if (value && typeof value.toString === 'function') return postProcessDecimals(value.toString());
   return String(value);
+}
+
+/**
+ * Post-process a formatted number string to ensure it has at most 2 decimal places
+ */
+function postProcessDecimals(formatted: string): string {
+  // If it's scientific notation, keep it as is
+  if (formatted.includes('e') || formatted.includes('E')) {
+    return formatted;
+  }
+
+  // If it contains a decimal point, limit to 2 decimal places
+  if (formatted.includes('.')) {
+    const parts = formatted.split('.');
+    if (parts.length === 2 && parts[0] && parts[1]) {
+      // Limit decimal part to 2 digits
+      parts[1] = parts[1].substring(0, 2);
+      // Remove trailing zeros
+      while (parts[1].endsWith('0') && parts[1].length > 0) {
+        parts[1] = parts[1].slice(0, -1);
+      }
+      // If no decimal part left, remove the decimal point
+      if (parts[1].length === 0) {
+        return parts[0];
+      }
+      return parts.join('.');
+    }
+  }
+
+  return formatted;
 }
 
 export function findElement(elementId: string): HTMLElement | null {
