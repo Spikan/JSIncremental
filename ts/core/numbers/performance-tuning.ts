@@ -418,8 +418,6 @@ export class PerformanceDashboard {
     `;
   }
 
-
-
   /**
    * Get average cache hit rate
    */

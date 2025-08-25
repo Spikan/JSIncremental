@@ -822,15 +822,27 @@
 
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
-    <script type="module" src="ts/config.ts"></script>
-    <script type="module" src="ts/core/constants.ts"></script>
-    <!-- event-bus.ts is loaded dynamically in ts/index.ts -->
-    <!-- schemas.ts is imported where needed; no global include required -->
-    <!-- storage.ts is loaded dynamically in ts/index.ts -->
-    <script type="module" src="ts/dom-cache.ts"></script>
-    <script type="module" src="ts/index.ts"></script>
-    <script type="module" src="ts/god.ts"></script>
-    <script type="module" src="ts/main.ts"></script>
+
+    <!-- Load modules in proper dependency order -->
+    <script type="module">
+      // Ensure all dependencies are loaded before initializing modules
+      window.addEventListener('load', async () => {
+        try {
+          // Load modules in dependency order
+          await import('./ts/config.ts');
+          await import('./ts/core/constants.ts');
+          await import('./ts/dom-cache.ts');
+          await import('./ts/index.ts');
+          await import('./ts/god.ts');
+          await import('./ts/main.ts');
+
+          console.log('✅ All modules loaded successfully');
+        } catch (error) {
+          console.error('❌ Error loading modules:', error);
+        }
+      });
+    </script>
+
     <script>
       // Ensure Decimal is available globally before loading main.js
       if (typeof Decimal === 'undefined') {
@@ -838,9 +850,6 @@
       } else {
         console.log('✅ Decimal library loaded successfully');
       }
-
-      // Let main.js handle the script loading since the modular files are now working
-      console.log('🔧 Core scripts loaded, main.js will handle the rest...');
     </script>
   </body>
 </html>

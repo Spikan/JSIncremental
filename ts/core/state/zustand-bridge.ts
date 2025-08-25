@@ -43,11 +43,11 @@ export const appStore = createLegacyStore<any>({ version: 1 });
 
 // Legacy selectors for backward compatibility
 export const selectors = {
-  sips: (_s: any) => _s.sips,
-  level: (_s: any) => _s.level,
-  drinkProgress: (_s: any) => _s.drinkProgress,
-  drinkRate: (_s: any) => _s.drinkRate,
-  options: (_s: any) => _s.options || {},
+  sips: (s: any) => s.sips,
+  level: (s: any) => s.level,
+  drinkProgress: (s: any) => s.drinkProgress,
+  drinkRate: (s: any) => s.drinkRate,
+  options: (s: any) => s.options || {},
 };
 
 // Migration helper functions
