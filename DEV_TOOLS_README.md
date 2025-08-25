@@ -131,12 +131,50 @@ The easiest way to test large numbers is through the **🌌 Large Number Scaling
 - ✅ Calculations work without overflow errors
 - ✅ Performance remains smooth
 - ✅ Save/load works with massive numbers
+- ✅ Full precision maintained for values up to 1e2000, 1e5000+
 
 ### Without break_eternity.js:
 
 - ❌ Numbers would be `Infinity` or cause errors
-- ❌ Calculations would overflow
+- ❌ Calculations would overflow at 1e308
 - ❌ Game would crash with large values
+- ❌ Precision completely lost beyond JavaScript limits
+
+## ⚠️ Critical Precision Safety Rules
+
+When using these dev tools or working with extreme numbers:
+
+### ✅ SAFE Operations:
+
+```javascript
+// For display - preserves extreme precision
+decimal.toString(); // Always use this for UI display
+decimal.toString(); // Always use this for storage
+
+// For arithmetic - direct operations maintain precision
+decimal.add(other); // Direct addition
+decimal.mul(other); // Direct multiplication
+decimal.gte(other); // Safe comparisons
+```
+
+### ❌ DANGEROUS Operations (DESTROY PRECISION):
+
+```javascript
+// These kill precision for values > 1e308
+decimal.toNumber(); // ❌ NEVER use for display
+Number(decimal); // ❌ NEVER convert to JavaScript numbers
+parseFloat(decimal); // ❌ NEVER parse for extreme values
+```
+
+### 🧪 Testing Precision:
+
+```javascript
+// Test precision is maintained
+const extreme = new Decimal('1e2000');
+console.log('Value:', extreme.toString()); // ✅ "1e2000"
+console.log('Display:', extreme.toString()); // ✅ "1e2000"
+console.log('Broken:', extreme.toNumber()); // ❌ Infinity (expected, but don't use)
+```
 
 ## Console Messages
 
@@ -172,6 +210,14 @@ Adding 1e500 sips
 
 - Try calling `App.ui.updateAllStats()` after adding resources
 - Check if the UI system is properly initialized
+
+### Precision being lost?
+
+- Check console for warnings about `toNumber()` usage
+- Verify you're using `.toString()` for display, not `.toNumber()`
+- Test with smaller extreme values (1e100, 1e200) first
+- Ensure break_eternity.js is loaded from the CDN
+- Check that the library is available: `console.log(typeof Decimal)`
 
 ## Advanced Usage
 

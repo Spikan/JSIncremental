@@ -114,6 +114,15 @@ soda-clicker-pro/
 │   │   └── 📁 validation/        # Data validation schemas
 │   │       └── 📄 schemas.ts     # Zod validation schemas
 │   │
+│   │   └── 📁 numbers/           # Extreme number precision system
+│   │       ├── 📄 index.ts       # Number system exports and utilities
+│   │       ├── 📄 migration-utils.ts # Safe type conversions & arithmetic
+│   │       ├── 📄 decimal-utils.ts # Type guards and formatting utilities
+│   │       ├── 📄 performance-utils.ts # Memoized calculations and caching
+│   │       ├── 📄 large-number.ts # Legacy wrapper (deprecated)
+│   │       ├── 📄 native-number.ts # Legacy native number handling
+│   │       └── 📄 test-large-number.ts # Extreme number testing utilities
+│   │
 │   ├── 📁 services/              # Service layer
 │   │   ├── 📄 storage.ts         # Abstracted localStorage operations
 │   │   ├── 📄 event-bus.ts       # Event bus implementation
@@ -301,6 +310,72 @@ computeTotalSipsPerDrink(baseSips, totalSPD);
 - Cost scaling formulas
 - Affordability checking
 - Purchase validation
+
+### 5. **Extreme Number Precision System** (`ts/core/numbers/`)
+
+**Purpose**: Handle numbers beyond JavaScript's native limits using break_eternity.js
+
+**Key Components**:
+
+#### **break_eternity.js Integration**:
+
+- **Direct Library Access**: No wrapper layers - direct `new Decimal()` operations
+- **Type Safety**: `DecimalType` interface for TypeScript compatibility
+- **Performance**: Optimized calculations with memoized expensive operations
+
+#### **Core Number Modules**:
+
+**Migration Utils** (`migration-utils.ts`):
+
+```typescript
+// Safe type conversions with full precision
+export function toDecimal(value: NumericValue): DecimalType;
+export function add(a: NumericValue, b: NumericValue): DecimalType;
+export function multiply(a: NumericValue, b: NumericValue): DecimalType;
+export function toString(value: NumericValue): string; // Preserves precision
+```
+
+**Decimal Utils** (`decimal-utils.ts`):
+
+```typescript
+// Type guards and formatting
+export const isDecimal = (value: any): value is DecimalType
+export const formatDecimal = (value: any): string  // Handles extreme values
+```
+
+**Performance Utils** (`performance-utils.ts`):
+
+```typescript
+// Optimized calculations with caching
+export function memoizedPow(base: any, exponent: number): DecimalType;
+export function calculateSynergySPD(straws, cups, strawSPD, cupSPD): DecimalType;
+```
+
+#### **Precision Safety Rules**:
+
+- ✅ **Always use `.toString()`** for display - preserves extreme values
+- ❌ **Never use `.toNumber()`** - destroys precision for values > 1e308
+- ✅ **Direct Decimal arithmetic** - `decimal.add()`, `decimal.mul()`, etc.
+- ✅ **String conversion for storage** - preserves precision in save files
+
+#### **Extreme Value Capabilities**:
+
+- **Range**: Beyond 1e308 (JavaScript's limit) up to 1e2000, 1e5000, 1e10000+
+- **Performance**: Sub-millisecond calculations even with massive numbers
+- **Display**: Automatic scientific notation (1e500, 1e750, 1e1000, etc.)
+- **Persistence**: Seamless save/load with extreme values
+
+#### **Usage Examples**:
+
+```typescript
+// Safe extreme number handling
+const extremeValue = new Decimal('1e2000');
+const displayValue = extremeValue.toString(); // ✅ "1e2000" (preserves precision)
+const brokenValue = extremeValue.toNumber(); // ❌ Infinity (precision lost)
+
+// Safe arithmetic with mixed types
+const result = add(userInput, gameState.value); // Handles numbers, strings, Decimals
+```
 
 ### 6. **Game Systems** (`ts/core/systems/`)
 

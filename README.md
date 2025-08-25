@@ -10,6 +10,8 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 - **Options**: Configurable auto-save and game settings
 - **Divine Oracle**: Sacred guidance through biblical wisdom and spiritual insight 🏛️<br/>
   _(If you know, you know... runs on 64-bit divine processing power ⚡)_
+- **Extreme Number Precision**: Handle massive values (1e2000+) using break*eternity.js ⚛️<br/>
+  *(Beyond JavaScript's limits with full precision and performance)\_
 
 ## 🎮 How to Play
 
@@ -18,6 +20,25 @@ A delightful idle game inspired by Soda Drinker Pro, featuring soda clicking, up
 3. **Level Up**: Reach milestones for bonus income
 4. **Divine Oracle**: Experience spiritual guidance through sacred wisdom
 5. **Track Progress**: Monitor your statistics and achievements
+
+## ⚛️ Extreme Number Precision
+
+Soda Clicker Pro uses **break_eternity.js** to handle numbers far beyond JavaScript's native limits:
+
+- **Beyond 1e308**: Handle values like 1e2000, 1e5000, 1e10000+ without precision loss
+- **Scientific Notation**: Automatic display in scientific notation (1e500, 1e750, etc.)
+- **Performance**: Optimized calculations that remain fast even with massive numbers
+- **Persistence**: Save and load games with extreme values seamlessly
+
+### Testing Extreme Values
+
+Use the Dev Tools menu to test massive scaling:
+
+```javascript
+// Add extreme resources instantly
+addExtremeResources(); // Adds 1e2000 of all resources
+testScientificNotation(); // Watch progressive scaling
+```
 
 ## 🛠️ Development
 

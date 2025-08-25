@@ -274,4 +274,114 @@ npm run dev
 
 ---
 
+## ⚛️ Extreme Number Precision Testing
+
+### Testing break_eternity.js Integration
+
+The project uses **break_eternity.js** for handling numbers beyond JavaScript's native limits (1e308+). When testing, ensure extreme values maintain precision:
+
+#### **Available Test Functions**
+
+```javascript
+// Test extreme values from browser console
+addExtremeResources(); // Adds 1e2000 of all resources
+addMassiveSips(); // Adds 1e500 sips
+testScientificNotation(); // Progressive scaling test
+resetAllResources(); // Clean slate
+```
+
+#### **Precision Verification**
+
+```javascript
+// ✅ Verify extreme values work correctly
+const extreme = new Decimal('1e2000');
+console.log(extreme.toString()); // "1e2000" ✅ (preserves precision)
+console.log(extreme.toNumber()); // Infinity ❌ (expected, but don't use for display)
+```
+
+#### **Testing Best Practices**
+
+- **Always test with extreme values** (1e2000+) during development
+- **Never use `.toNumber()`** for display - it destroys precision
+- **Use `.toString()`** for all UI display and storage
+- **Verify save/load** works with extreme values
+- **Check console warnings** for precision loss attempts
+
+### Extreme Value Test Scenarios
+
+#### **Basic Scaling Test**
+
+```javascript
+resetAllResources();
+addExtremeResources(); // 1e2000 of everything
+// Check that UI displays scientific notation correctly
+// Verify calculations don't crash
+// Test save/load functionality
+```
+
+#### **Progressive Scaling Test**
+
+```javascript
+resetAllResources();
+testScientificNotation(); // Watch 1e100 → 1e5000 progression
+// Should see smooth scientific notation display
+// No performance degradation
+```
+
+#### **Edge Case Testing**
+
+```javascript
+// Test boundary values
+const boundary1 = new Decimal('1e308'); // JavaScript limit
+const boundary2 = new Decimal('1e309'); // Beyond JavaScript limit
+console.log(boundary1.toString()); // Should work
+console.log(boundary2.toString()); // Should work with break_eternity.js
+```
+
+### Precision Safety Checklist
+
+When adding new code that handles numbers:
+
+- [ ] **No `.toNumber()` calls** on Decimal objects for display
+- [ ] **Use `.toString()`** for all UI rendering
+- [ ] **Direct Decimal arithmetic** (`decimal.add()`, `decimal.mul()`)
+- [ ] **Type annotations** use `DecimalType`, not raw `Decimal`
+- [ ] **Test with extreme values** (1e2000+)
+- [ ] **Verify save/load compatibility**
+
+### Performance Testing
+
+#### **Benchmark Extreme Calculations**
+
+```javascript
+// Test calculation performance with extreme values
+const hugeValue = new Decimal('1e1000');
+const start = performance.now();
+
+// Perform calculations
+for (let i = 0; i < 1000; i++) {
+  hugeValue.add(new Decimal('1e500')).mul(new Decimal('2'));
+}
+
+const end = performance.now();
+console.log(`1000 calculations took: ${end - start}ms`);
+// Should be sub-millisecond performance
+```
+
+#### **Memory Usage Verification**
+
+```javascript
+// Verify memory efficiency
+const extremeValues = [];
+for (let i = 0; i < 10000; i++) {
+  extremeValues.push(new Decimal(`1e${1000 + i}`));
+}
+console.log('Created 10,000 extreme values');
+// Memory usage should remain reasonable
+```
+
+---
+
 **Remember**: Quality tools are here to help, not hinder. Use them to write better, more maintainable code! 🎯
+
+**Precision Reminder**: Always test with extreme values (1e2000+) to ensure your code handles the full range that break_eternity.js enables! ⚛️
