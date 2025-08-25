@@ -3,7 +3,7 @@
 
 // Import consolidated utilities
 import { formatNumber } from './utils';
-import { LargeNumber } from '../core/numbers/large-number';
+import { toLargeNumber } from '../core/numbers/migration-utils';
 
 // Update play time display
 export function updatePlayTime(): void {
@@ -161,16 +161,19 @@ export function updateEconomyStats(): void {
 
 // Update shop-related statistics
 export function updateShopStats(): void {
-  console.log('📊 updateShopStats() called');
+  // Reduce logging frequency for memory optimization
+  const shouldLog = Math.random() < 0.05; // Only log 5% of the time
+  if (shouldLog) console.log('📊 updateShopStats() called');
 
   // Debug: Log current state values
   const state = (window as any).App?.state?.getState?.();
   if (state) {
-    console.log('🔍 Current state values:', {
-      straws: state.straws,
-      cups: state.cups,
-      sips: state.sips,
-    });
+    if (shouldLog)
+      console.log('🔍 Current state values:', {
+        straws: state.straws,
+        cups: state.cups,
+        sips: state.sips,
+      });
   }
 
   // Always call updatePurchasedCounts regardless of tab state
@@ -181,7 +184,8 @@ export function updateShopStats(): void {
     | undefined;
   if (strawsPurchasedElement) {
     const v = (window as any).App?.state?.getState?.()?.straws || 0;
-    console.log('🔍 updateShopStats: Straws value =', v, 'formatted =', formatNumber(v));
+    if (shouldLog)
+      console.log('🔍 updateShopStats: Straws value =', v, 'formatted =', formatNumber(v));
     strawsPurchasedElement.textContent = formatNumber(v);
   } else {
     console.warn('🚫 updateShopStats: strawsPurchasedElement not found in DOM_CACHE');
@@ -190,7 +194,8 @@ export function updateShopStats(): void {
   const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
   if (cupsPurchasedElement) {
     const v = (window as any).App?.state?.getState?.()?.cups || 0;
-    console.log('🔍 updateShopStats: Cups value =', v, 'formatted =', formatNumber(v));
+    if (shouldLog)
+      console.log('🔍 updateShopStats: Cups value =', v, 'formatted =', formatNumber(v));
     cupsPurchasedElement.textContent = formatNumber(v);
   } else {
     console.warn('🚫 updateShopStats: cupsPurchasedElement not found in DOM_CACHE');
@@ -249,60 +254,76 @@ export function updateAchievementStats(): void {
 
 // Update purchased item counts in shop displays
 export function updatePurchasedCounts(): void {
-  console.log('📊 updatePurchasedCounts() called');
+  // Reduce console logging frequency to optimize memory usage
+  const shouldLog = Math.random() < 0.1; // Only log 10% of the time
+  if (shouldLog) if (shouldLog) console.log('📊 updatePurchasedCounts() called');
+
   if (typeof window === 'undefined') return;
 
   const state = (window as any).App?.state?.getState?.();
   if (!state) {
-    console.log('📊 No state available');
+    if (shouldLog) if (shouldLog) console.log('📊 No state available');
     return;
   }
-  console.log('📊 Current state:', { straws: state.straws, cups: state.cups });
+  if (shouldLog)
+    if (shouldLog) console.log('📊 Current state:', { straws: state.straws, cups: state.cups });
 
-  // Debug: Check DOM_CACHE availability
+  // Check DOM_CACHE availability
   if (!(window as any).DOM_CACHE) {
-    console.log('📊 DOM_CACHE not available');
+    if (shouldLog) if (shouldLog) console.log('📊 DOM_CACHE not available');
     return;
   }
-  console.log('📊 DOM_CACHE available:', (window as any).DOM_CACHE);
 
   // Update straws purchased count
   const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
     | HTMLElement
     | undefined;
-  console.log(
-    '🔍 strawsPurchasedElement:',
-    strawsPurchasedElement,
-    'exists:',
-    !!strawsPurchasedElement
-  );
+  if (shouldLog)
+    if (shouldLog)
+      console.log(
+        '🔍 strawsPurchasedElement:',
+        strawsPurchasedElement,
+        'exists:',
+        !!strawsPurchasedElement
+      );
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
-    console.log('🔍 Raw straws value:', straws, 'type:', typeof straws);
+    if (shouldLog)
+      if (shouldLog) console.log('🔍 Raw straws value:', straws, 'type:', typeof straws);
     const strawsValue = typeof straws === 'object' && straws.toString ? straws.toString() : straws;
-    console.log('🔍 Processed straws value:', strawsValue);
+    if (shouldLog) if (shouldLog) console.log('🔍 Processed straws value:', strawsValue);
     const formattedStraws = formatNumber(strawsValue);
-    console.log('🔍 Formatted straws:', formattedStraws);
+    if (shouldLog) if (shouldLog) console.log('🔍 Formatted straws:', formattedStraws);
     strawsPurchasedElement.textContent = formattedStraws;
-    console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
+    if (shouldLog)
+      if (shouldLog)
+        console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
   } else {
-    console.log('❌ strawsPurchased element not found');
+    if (shouldLog) if (shouldLog) console.log('❌ strawsPurchased element not found');
   }
 
   // Update cups purchased count
   const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
-  console.log('🔍 cupsPurchasedElement:', cupsPurchasedElement, 'exists:', !!cupsPurchasedElement);
+  if (shouldLog)
+    if (shouldLog)
+      console.log(
+        '🔍 cupsPurchasedElement:',
+        cupsPurchasedElement,
+        'exists:',
+        !!cupsPurchasedElement
+      );
   if (cupsPurchasedElement) {
     const cups = state.cups || 0;
-    console.log('🔍 Raw cups value:', cups, 'type:', typeof cups);
+    if (shouldLog) if (shouldLog) console.log('🔍 Raw cups value:', cups, 'type:', typeof cups);
     const cupsValue = typeof cups === 'object' && cups.toString ? cups.toString() : cups;
-    console.log('🔍 Processed cups value:', cupsValue);
+    if (shouldLog) if (shouldLog) console.log('🔍 Processed cups value:', cupsValue);
     const formattedCups = formatNumber(cupsValue);
-    console.log('🔍 Formatted cups:', formattedCups);
+    if (shouldLog) if (shouldLog) console.log('🔍 Formatted cups:', formattedCups);
     cupsPurchasedElement.textContent = formattedCups;
-    console.log('✅ Updated cups:', cupsValue, 'element:', cupsPurchasedElement);
+    if (shouldLog)
+      if (shouldLog) console.log('✅ Updated cups:', cupsValue, 'element:', cupsPurchasedElement);
   } else {
-    console.log('❌ cupsPurchased element not found');
+    if (shouldLog) if (shouldLog) console.log('❌ cupsPurchased element not found');
   }
 
   // Update wider straws purchased count
@@ -316,14 +337,15 @@ export function updatePurchasedCounts(): void {
         ? widerStraws.toString()
         : widerStraws;
     widerStrawsPurchasedElement.textContent = formatNumber(widerStrawsValue);
-    console.log(
-      '✅ Updated widerStraws:',
-      widerStrawsValue,
-      'element:',
-      widerStrawsPurchasedElement
-    );
+    if (shouldLog)
+      console.log(
+        '✅ Updated widerStraws:',
+        widerStrawsValue,
+        'element:',
+        widerStrawsPurchasedElement
+      );
   } else {
-    console.log('❌ widerStrawsPurchased element not found');
+    if (shouldLog) console.log('❌ widerStrawsPurchased element not found');
   }
 
   // Update better cups purchased count
@@ -335,9 +357,15 @@ export function updatePurchasedCounts(): void {
     const betterCupsValue =
       typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
     betterCupsPurchasedElement.textContent = formatNumber(betterCupsValue);
-    console.log('✅ Updated betterCups:', betterCupsValue, 'element:', betterCupsPurchasedElement);
+    if (shouldLog)
+      console.log(
+        '✅ Updated betterCups:',
+        betterCupsValue,
+        'element:',
+        betterCupsPurchasedElement
+      );
   } else {
-    console.log('❌ betterCupsPurchased element not found');
+    if (shouldLog) console.log('❌ betterCupsPurchased element not found');
   }
 
   // Update shop display elements (widerStraws and betterCups)
@@ -349,14 +377,15 @@ export function updatePurchasedCounts(): void {
         ? widerStraws.toString()
         : widerStraws;
     shopWiderStrawsElement.textContent = formatNumber(widerStrawsValue);
-    console.log(
-      '✅ Updated shop widerStraws:',
-      widerStrawsValue,
-      'element:',
-      shopWiderStrawsElement
-    );
+    if (shouldLog)
+      console.log(
+        '✅ Updated shop widerStraws:',
+        widerStrawsValue,
+        'element:',
+        shopWiderStrawsElement
+      );
   } else {
-    console.log('❌ shop widerStraws element not found');
+    if (shouldLog) console.log('❌ shop widerStraws element not found');
   }
 
   const shopBetterCupsElement = (window as any).DOM_CACHE?.betterCups as HTMLElement | undefined;
@@ -365,9 +394,15 @@ export function updatePurchasedCounts(): void {
     const betterCupsValue =
       typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
     shopBetterCupsElement.textContent = formatNumber(betterCupsValue);
-    console.log('✅ Updated shop betterCups:', betterCupsValue, 'element:', shopBetterCupsElement);
+    if (shouldLog)
+      console.log(
+        '✅ Updated shop betterCups:',
+        betterCupsValue,
+        'element:',
+        shopBetterCupsElement
+      );
   } else {
-    console.log('❌ shop betterCups element not found');
+    if (shouldLog) console.log('❌ shop betterCups element not found');
   }
 
   // Update total production indicators
@@ -375,15 +410,16 @@ export function updatePurchasedCounts(): void {
   if (totalStrawSPDElement) {
     const straws = state.straws || 0;
     const strawSPD = state.strawSPD || 0;
-    const totalStrawProduction = new LargeNumber(straws).multiply(new LargeNumber(strawSPD));
-    const totalStrawValue =
-      typeof totalStrawProduction === 'object' && totalStrawProduction.toString
-        ? totalStrawProduction.toString()
-        : totalStrawProduction;
+    // Use toLargeNumber helper for better memory efficiency
+    const strawsLarge = toLargeNumber(straws);
+    const strawSPDLarge = toLargeNumber(strawSPD);
+    const totalStrawProduction = strawsLarge.multiply(strawSPDLarge);
+    const totalStrawValue = totalStrawProduction.toString();
     totalStrawSPDElement.textContent = formatNumber(totalStrawValue);
-    console.log('✅ Updated totalStrawSPD:', totalStrawValue, 'element:', totalStrawSPDElement);
+    if (shouldLog)
+      console.log('✅ Updated totalStrawSPD:', totalStrawValue, 'element:', totalStrawSPDElement);
   } else {
-    console.log('❌ totalStrawSPD element not found');
+    if (shouldLog) console.log('❌ totalStrawSPD element not found');
   }
 
   const totalWiderStrawsSPDElement = (window as any).DOM_CACHE?.totalWiderStrawsSPD as
@@ -396,29 +432,31 @@ export function updatePurchasedCounts(): void {
         ? widerStraws.toString()
         : widerStraws;
     totalWiderStrawsSPDElement.textContent = formatNumber(widerStrawsValue * 0.6); // Base multiplier
-    console.log(
-      '✅ Updated totalWiderStrawsSPD:',
-      widerStrawsValue * 0.6,
-      'element:',
-      totalWiderStrawsSPDElement
-    );
+    if (shouldLog)
+      console.log(
+        '✅ Updated totalWiderStrawsSPD:',
+        widerStrawsValue * 0.6,
+        'element:',
+        totalWiderStrawsSPDElement
+      );
   } else {
-    console.log('❌ totalWiderStrawsSPD element not found');
+    if (shouldLog) console.log('❌ totalWiderStrawsSPD element not found');
   }
 
   const totalCupSPDElement = (window as any).DOM_CACHE?.totalCupSPD as HTMLElement | undefined;
   if (totalCupSPDElement) {
     const cups = state.cups || 0;
     const cupSPD = state.cupSPD || 0;
-    const totalCupProduction = new LargeNumber(cups).multiply(new LargeNumber(cupSPD));
-    const totalCupValue =
-      typeof totalCupProduction === 'object' && totalCupProduction.toString
-        ? totalCupProduction.toString()
-        : totalCupProduction;
+    // Use toLargeNumber helper for better memory efficiency
+    const cupsLarge = toLargeNumber(cups);
+    const cupSPDLarge = toLargeNumber(cupSPD);
+    const totalCupProduction = cupsLarge.multiply(cupSPDLarge);
+    const totalCupValue = totalCupProduction.toString();
     totalCupSPDElement.textContent = formatNumber(totalCupValue);
-    console.log('✅ Updated totalCupSPD:', totalCupValue, 'element:', totalCupSPDElement);
+    if (shouldLog)
+      console.log('✅ Updated totalCupSPD:', totalCupValue, 'element:', totalCupSPDElement);
   } else {
-    console.log('❌ totalCupSPD element not found');
+    if (shouldLog) console.log('❌ totalCupSPD element not found');
   }
 
   const totalBetterCupsSPDElement = (window as any).DOM_CACHE?.totalBetterCupsSPD as
@@ -429,14 +467,15 @@ export function updatePurchasedCounts(): void {
     const betterCupsValue =
       typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
     totalBetterCupsSPDElement.textContent = formatNumber(betterCupsValue * 1.2); // Base multiplier
-    console.log(
-      '✅ Updated totalBetterCupsSPD:',
-      betterCupsValue * 1.2,
-      'element:',
-      totalBetterCupsSPDElement
-    );
+    if (shouldLog)
+      console.log(
+        '✅ Updated totalBetterCupsSPD:',
+        betterCupsValue * 1.2,
+        'element:',
+        totalBetterCupsSPDElement
+      );
   } else {
-    console.log('❌ totalBetterCupsSPD element not found');
+    if (shouldLog) console.log('❌ totalBetterCupsSPD element not found');
   }
 
   // Update suctions purchased count
@@ -448,9 +487,10 @@ export function updatePurchasedCounts(): void {
     const suctionsValue =
       typeof suctions === 'object' && suctions.toString ? suctions.toString() : suctions;
     suctionsPurchasedElement.textContent = formatNumber(suctionsValue);
-    console.log('✅ Updated suctions:', suctionsValue, 'element:', suctionsPurchasedElement);
+    if (shouldLog)
+      console.log('✅ Updated suctions:', suctionsValue, 'element:', suctionsPurchasedElement);
   } else {
-    console.log('❌ suctionsPurchased element not found');
+    if (shouldLog) console.log('❌ suctionsPurchased element not found');
   }
 
   // Update shop display elements for suctions and criticalClicks (if they exist)
@@ -460,9 +500,10 @@ export function updatePurchasedCounts(): void {
     const suctionsValue =
       typeof suctions === 'object' && suctions.toString ? suctions.toString() : suctions;
     shopSuctionsElement.textContent = formatNumber(suctionsValue);
-    console.log('✅ Updated shop suctions:', suctionsValue, 'element:', shopSuctionsElement);
+    if (shouldLog)
+      console.log('✅ Updated shop suctions:', suctionsValue, 'element:', shopSuctionsElement);
   } else {
-    console.log('❌ shop suctions element not found (expected for this item)');
+    if (shouldLog) console.log('❌ shop suctions element not found (expected for this item)');
   }
 
   const shopCriticalClicksElement = (window as any).DOM_CACHE?.criticalClicks as
@@ -475,14 +516,15 @@ export function updatePurchasedCounts(): void {
         ? criticalClicks.toString()
         : criticalClicks;
     shopCriticalClicksElement.textContent = formatNumber(criticalClicksValue);
-    console.log(
-      '✅ Updated shop criticalClicks:',
-      criticalClicksValue,
-      'element:',
-      shopCriticalClicksElement
-    );
+    if (shouldLog)
+      console.log(
+        '✅ Updated shop criticalClicks:',
+        criticalClicksValue,
+        'element:',
+        shopCriticalClicksElement
+      );
   } else {
-    console.log('❌ shop criticalClicks element not found (expected for this item)');
+    if (shouldLog) console.log('❌ shop criticalClicks element not found (expected for this item)');
   }
 
   // Update critical clicks purchased count
@@ -496,24 +538,26 @@ export function updatePurchasedCounts(): void {
         ? criticalClicks.toString()
         : criticalClicks;
     criticalClicksPurchasedElement.textContent = formatNumber(criticalClicksValue);
-    console.log(
-      '✅ Updated criticalClicks:',
-      criticalClicksValue,
-      'element:',
-      criticalClicksPurchasedElement
-    );
+    if (shouldLog)
+      console.log(
+        '✅ Updated criticalClicks:',
+        criticalClicksValue,
+        'element:',
+        criticalClicksPurchasedElement
+      );
   } else {
-    console.log('❌ criticalClicksPurchased element not found');
+    if (shouldLog) console.log('❌ criticalClicksPurchased element not found');
   }
 
-  console.log('🎉 updatePurchasedCounts completed');
+  if (shouldLog) console.log('🎉 updatePurchasedCounts completed');
 
   // Make function available globally for testing
   if (typeof window !== 'undefined') {
     (window as any).testShopCounts = () => {
-      console.log('🧪 Manual test of shop counts...');
+      if (shouldLog) console.log('🧪 Manual test of shop counts...');
       updatePurchasedCounts();
     };
-    console.log('💡 Call testShopCounts() in console to manually test shop displays');
+    if (shouldLog)
+      console.log('💡 Call testShopCounts() in console to manually test shop displays');
   }
 }
