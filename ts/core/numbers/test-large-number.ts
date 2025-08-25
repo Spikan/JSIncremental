@@ -17,6 +17,7 @@ function runExtremeValueTests() {
   const extreme1 = new LargeNumber('1e2000');
   console.log('1e2000:', extreme1.toString());
   console.log('1e2000 toNumber():', extreme1.toNumber());
+  console.log('1e2000 toSafeNumber():', extreme1.toSafeNumber());
   console.log('1e2000 type:', extreme1.getValueType());
 
   // Test smaller values that should work
@@ -29,10 +30,12 @@ function runExtremeValueTests() {
   const extreme2 = new LargeNumber('1.5e3000');
   console.log('1.5e3000:', extreme2.toString());
   console.log('1.5e3000 toNumber():', extreme2.toNumber());
+  console.log('1.5e3000 toSafeNumber():', extreme2.toSafeNumber());
 
   const extreme3 = new LargeNumber('2.5e4000');
   console.log('2.5e4000:', extreme3.toString());
   console.log('2.5e4000 toNumber():', extreme3.toNumber());
+  console.log('2.5e4000 toSafeNumber():', extreme3.toSafeNumber());
 
   // Test break_infinity directly
   if (typeof (globalThis as any).Decimal !== 'undefined') {

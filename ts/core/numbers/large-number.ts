@@ -106,15 +106,21 @@ export class LargeNumber {
 
   toNumber(): number {
     const num = this._value.toNumber();
-    // For extreme values that exceed JavaScript's Number.MAX_VALUE,
-    // return the mantissa to provide a reasonable approximation
-    if (!isFinite(num) && this._value.toString().includes('e+')) {
-      // Extract mantissa from scientific notation (e.g., "1.23e+400" -> 1.23)
-      const str = this._value.toString();
-      const mantissa = parseFloat(str.split('e')[0]);
-      return isFinite(mantissa) ? mantissa : 1; // fallback to 1 if parsing fails
-    }
+    // For extreme values, JavaScript can't represent them as Numbers
+    // This is the fundamental limitation - extreme values exceed Number.MAX_VALUE
     return num;
+  }
+
+  // Safe conversion for UI/display purposes - returns finite number or 0 for extreme values
+  toSafeNumber(): number {
+    const num = this._value.toNumber();
+    return isFinite(num) ? num : 0;
+  }
+
+  // Get a value safe for Decimal constructor - handles extreme values
+  toDecimalSafe(): number | string {
+    const num = this._value.toNumber();
+    return isFinite(num) ? num : this._value.toString();
   }
 
   toJSON(): string {

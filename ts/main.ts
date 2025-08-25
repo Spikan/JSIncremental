@@ -230,12 +230,13 @@ function initGame() {
       });
 
       // Handle LargeNumber results properly - convert to numbers for Decimal compatibility
-      const strawSPDValue = result.strawSPD.toNumber
-        ? result.strawSPD.toNumber()
+      // Use safe conversion to handle extreme values without returning Infinity
+      const strawSPDValue = result.strawSPD.toSafeNumber
+        ? result.strawSPD.toSafeNumber()
         : Number(result.strawSPD);
-      const cupSPDValue = result.cupSPD.toNumber ? result.cupSPD.toNumber() : Number(result.cupSPD);
-      const spdValue = result.sipsPerDrink.toNumber
-        ? result.sipsPerDrink.toNumber()
+      const cupSPDValue = result.cupSPD.toSafeNumber ? result.cupSPD.toSafeNumber() : Number(result.cupSPD);
+      const spdValue = result.sipsPerDrink.toSafeNumber
+        ? result.sipsPerDrink.toSafeNumber()
         : Number(result.sipsPerDrink);
 
       strawSPD = new Decimal(strawSPDValue);
