@@ -12,8 +12,7 @@
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types
 
-// Import test utilities for debugging extreme values
-import './core/numbers/test-large-number';
+// Test utilities removed from production build
 
 // These are used in the game configuration
 const BAL = (GC && GC.BALANCE) || {};
