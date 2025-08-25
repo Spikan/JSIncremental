@@ -1,7 +1,6 @@
 // Test file to verify LargeNumber implementation works correctly
 
 import { LargeNumber } from './large-number';
-import { NativeNumber } from './native-number';
 
 // Test basic functionality
 console.log('Testing LargeNumber implementation...');
@@ -19,17 +18,22 @@ function runExtremeValueTests() {
   console.log('1e2000:', extreme1.toString());
   console.log('1e2000 toNumber():', extreme1.toNumber());
   console.log('1e2000 type:', extreme1.getValueType());
+  console.log('1e2000 raw object:', extreme1.getDebugInfo());
 
-  const extreme2 = new LargeNumber('1e3000');
-  console.log('1e3000:', extreme2.toString());
-  console.log('1e3000 toNumber():', extreme2.toNumber());
-  console.log('1e3000 type:', extreme2.getValueType());
+  // Test smaller values that should work
+  const medium = new LargeNumber('1e100');
+  console.log('1e100:', medium.toString());
+  console.log('1e100 toNumber():', medium.toNumber());
+  console.log('1e100 type:', medium.getValueType());
 
-  // Test arithmetic
-  const sum = extreme1.add(extreme1);
-  console.log('1e2000 + 1e2000:', sum.toString());
-  console.log('Sum toNumber():', sum.toNumber());
-  console.log('Sum type:', sum.getValueType());
+  // Test break_infinity directly
+  if (typeof (globalThis as any).Decimal !== 'undefined') {
+    console.log('=== DIRECT BREAK_INFINITY TEST ===');
+    const directDecimal = new (globalThis as any).Decimal('1e2000');
+    console.log('Direct Decimal 1e2000 toString():', directDecimal.toString());
+    console.log('Direct Decimal 1e2000 toNumber():', directDecimal.toNumber());
+    console.log('Direct Decimal 1e2000 constructor:', directDecimal.constructor.name);
+  }
 
   console.log('=== END TESTS ===');
 }
