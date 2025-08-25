@@ -521,7 +521,39 @@ export function levelUp({
 // Convenience execute-style helpers that read/update App.state directly
 function getAppState(): any {
   try {
-    return (window as any).App?.state?.getState?.() || {};
+    const rawState = (window as any).App?.state?.getState?.() || {};
+
+    // Sanitize extreme values that could break purchase calculations
+    const sanitizedState = { ...rawState };
+
+    // Check and sanitize sips value
+    if (rawState.sips) {
+      const sipsValue = toLargeNumber(rawState.sips);
+      if (!isFinite(Number(sipsValue.toString()))) {
+        console.warn('🚫 getAppState: Sanitizing corrupted sips value');
+        sanitizedState.sips = new LargeNumber('1000000'); // 1M fallback
+      }
+    }
+
+    // Check and sanitize straws value
+    if (rawState.straws) {
+      const strawsValue = toLargeNumber(rawState.straws);
+      if (!isFinite(Number(strawsValue.toString()))) {
+        console.warn('🚫 getAppState: Sanitizing corrupted straws value');
+        sanitizedState.straws = new LargeNumber('0'); // Reset to 0
+      }
+    }
+
+    // Check and sanitize cups value
+    if (rawState.cups) {
+      const cupsValue = toLargeNumber(rawState.cups);
+      if (!isFinite(Number(cupsValue.toString()))) {
+        console.warn('🚫 getAppState: Sanitizing corrupted cups value');
+        sanitizedState.cups = new LargeNumber('0'); // Reset to 0
+      }
+    }
+
+    return sanitizedState;
   } catch (error) {
     console.warn('Failed to get app state, returning empty object:', error);
     return {};
