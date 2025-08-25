@@ -140,8 +140,8 @@ describe('LargeNumber', () => {
     expect(divResult.toString()).toMatch(/^1e\+200$/);
 
     // Test extreme exponentiation
-    const g = new LargeNumber('10');
-    const expResult = g.pow(100);
+    const baseNumber = new LargeNumber('10');
+    const expResult = baseNumber.pow(100);
     expect(expResult.toString()).toMatch(/^1e\+?100$/);
   });
 

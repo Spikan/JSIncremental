@@ -2,7 +2,7 @@
 // No wrapper - direct Decimal operations for maximum performance
 
 // Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal;
+const Decimal = (globalThis as any).Decimal || (typeof window !== 'undefined' ? (window as any).Decimal : undefined);
 import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
 
@@ -16,6 +16,12 @@ export type NumericValue = number | string | DecimalType | any;
  * Safely converts any value to Decimal (direct break_eternity.js)
  */
 export function toDecimal(value: NumericValue): DecimalType {
+  // Check if Decimal is available
+  if (!Decimal) {
+    console.warn('Decimal library not available, returning fallback value');
+    return value as any;
+  }
+
   if (isDecimal(value)) {
     return value;
   }

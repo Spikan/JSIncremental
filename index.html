@@ -823,43 +823,13 @@
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
 
-    <!-- Load modules in proper dependency order -->
-    <script type="module">
-      // Ensure all dependencies are loaded before initializing modules
-      window.addEventListener('load', async () => {
-        try {
-          // Wait for external libraries to be available
-          if (typeof Decimal === 'undefined') {
-            console.log('⏳ Waiting for Decimal library...');
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-
-          // Load modules in dependency order with error handling
-          console.log('🔧 Loading config module...');
-          await import('./ts/config.ts');
-
-          console.log('🔧 Loading constants module...');
-          await import('./ts/core/constants.ts');
-
-          console.log('🔧 Loading DOM cache module...');
-          await import('./ts/dom-cache.ts');
-
-          console.log('🔧 Loading index module...');
-          await import('./ts/index.ts');
-
-          console.log('🔧 Loading god module...');
-          await import('./ts/god.ts');
-
-          console.log('🔧 Loading main module...');
-          await import('./ts/main.ts');
-
-          console.log('✅ All modules loaded successfully');
-        } catch (error) {
-          console.error('❌ Error loading modules:', error);
-          console.error('Error details:', error.message, error.stack);
-        }
-      });
-    </script>
+        <!-- Load modules in proper dependency order -->
+    <script type="module" src="ts/config.ts"></script>
+    <script type="module" src="ts/core/constants.ts"></script>
+    <script type="module" src="ts/dom-cache.ts"></script>
+    <script type="module" src="ts/index.ts"></script>
+    <script type="module" src="ts/god.ts"></script>
+    <script type="module" src="ts/main.ts"></script>
 
     <script>
       // Ensure Decimal is available globally before loading main.js
