@@ -3,10 +3,15 @@
 
 // Direct break_eternity.js access - function-based to avoid initialization issues
 function getDecimal() {
-  return (
-    (globalThis as any).Decimal ||
-    (typeof window !== 'undefined' ? (window as any).Decimal : undefined)
-  );
+  try {
+    return (
+      (globalThis as any).Decimal ||
+      (typeof window !== 'undefined' ? (window as any).Decimal : undefined)
+    );
+  } catch (error) {
+    console.warn('Decimal library not available:', error);
+    return undefined;
+  }
 }
 import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
