@@ -136,8 +136,9 @@ export function updateAllDisplays(): void {
   updateAutosaveStatus();
   updatePlayTime();
   updateLastSaveTime();
-  // Always update shop stats regardless of active tab
+  // Always update shop stats and purchased counts regardless of active tab
   updateShopStats();
+  updatePurchasedCounts();
   updateAllStats();
   checkUpgradeAffordability();
   // Update complete

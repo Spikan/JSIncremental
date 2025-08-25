@@ -337,6 +337,7 @@ export function addHugeStraws(): boolean {
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
       w.App?.ui?.updateAllStats?.();
+      w.App?.ui?.updatePurchasedCounts?.();
       w.App?.ui?.checkUpgradeAffordability?.();
       w.App?.ui?.updateAllDisplays?.();
     }, 10);
@@ -386,6 +387,7 @@ export function addMassiveCups(): boolean {
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
       w.App?.ui?.updateAllStats?.();
+      w.App?.ui?.updatePurchasedCounts?.();
       w.App?.ui?.checkUpgradeAffordability?.();
       w.App?.ui?.updateAllDisplays?.();
     }, 10);
@@ -485,6 +487,7 @@ export function addExtremeResources(): boolean {
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
       w.App?.ui?.updateAllStats?.();
+      w.App?.ui?.updatePurchasedCounts?.();
       w.App?.ui?.checkUpgradeAffordability?.();
       w.App?.ui?.updateAllDisplays?.();
     }, 10);

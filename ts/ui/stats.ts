@@ -172,6 +172,9 @@ export function updateShopStats(): void {
       sips: state.sips,
     });
   }
+
+  // Always call updatePurchasedCounts regardless of tab state
+  updatePurchasedCounts();
   // Straws purchased
   const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
     | HTMLElement
