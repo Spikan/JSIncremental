@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Splash Screen Debug</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #001789;
+        color: white;
+      }
+      .debug-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .debug-section {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+      }
+      .debug-button {
+        background: #ff3d02;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .debug-button:hover {
+        background: #e63500;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+      }
+      .status.success {
+        background: rgba(0, 255, 0, 0.2);
+      }
+      .status.error {
+        background: rgba(255, 0, 0, 0.2);
+      }
+      .status.warning {
+        background: rgba(255, 255, 0, 0.2);
+        color: black;
+      }
+      .status.info {
+        background: rgba(0, 0, 255, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>Splash Screen Debug Tool</h1>
+
+      <div class="debug-section">
+        <h2>Environment Check</h2>
+        <div id="env-status"></div>
+        <button class="debug-button" onclick="checkEnvironment()">Check Environment</button>
+      </div>
+
+      <div class="debug-section">
+        <h2>DOM Elements Check</h2>
+        <div id="dom-status"></div>
+        <button class="debug-button" onclick="checkDOMElements()">Check DOM Elements</button>
+      </div>
+
+      <div class="debug-section">
+        <h2>App Object Check</h2>
+        <div id="app-status"></div>
+        <button class="debug-button" onclick="checkAppObject()">Check App Object</button>
+      </div>
+
+      <div class="debug-section">
+        <h2>Event Handlers Check</h2>
+        <div id="event-status"></div>
+        <button class="debug-button" onclick="checkEventHandlers()">Check Event Handlers</button>
+      </div>
+
+      <div class="debug-section">
+        <h2>Manual Start Game</h2>
+        <button class="debug-button" onclick="manualStartGame()">Manual Start Game</button>
+        <button class="debug-button" onclick="forceStartGame()">Force Start Game</button>
+      </div>
+
+      <div class="debug-section">
+        <h2>Console Output</h2>
+        <div
+          id="console-output"
+          style="
+            background: black;
+            color: lime;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
+          "
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      // Capture console output
+      const originalLog = console.log;
+      const originalError = console.error;
+      const originalWarn = console.warn;
+
+      function addToConsole(type, ...args) {
+          const output = document.getElementById('console-output');
+          const timestamp = new Date().toLocaleTimeString();
+          const message = `[${timestamp}] [${type}] ${args.join(' ')}`;
+          output.innerHTML += message + '<br>';
+          output.scrollTop = output.scrollHeight;
+      }
+
+      console.log = (...args) => {
+          originalLog.apply(console, args);
+          addToConsole('LOG', ...args);
+      };
+
+      console.error = (...args) => {
+          originalError.apply(console, args);
+          addToConsole('ERROR', ...args);
+      };
+
+      console.warn = (...args) => {
+          originalWarn.apply(console, args);
+          addToConsole('WARN', ...args);
+      };
+
+      function addStatus(elementId, message, type = 'info') {
+          const element = document.getElementById(elementId);
+          element.innerHTML = `<div class="status ${type}">${message}</div>`;
+      }
+
+      function checkEnvironment() {
+          console.log('Checking environment...');
+
+          const checks = [
+              { name: 'Window Object', check: () => typeof window !== 'undefined' },
+              { name: 'Document Object', check: () => typeof document !== 'undefined' },
+              { name: 'DOM Ready State', check: () => document.readyState },
+              { name: 'ES6 Modules', check: () => typeof import !== 'undefined' },
+              { name: 'Fetch API', check: () => typeof fetch !== 'undefined' },
+              { name: 'JSON Support', check: () => typeof JSON !== 'undefined' },
+          ];
+
+          let results = '';
+          checks.forEach(({ name, check }) => {
+              try {
+                  const result = check();
+                  const status = result ? '✅' : '❌';
+                  results += `${status} ${name}: ${result}<br>`;
+              } catch (error) {
+                  results += `❌ ${name}: Error - ${error.message}<br>`;
+              }
+          });
+
+          addStatus('env-status', results, 'info');
+      }
+
+      function checkDOMElements() {
+          console.log('Checking DOM elements...');
+
+          const elements = [
+              'splashScreen',
+              'gameContent',
+              'splash-start-btn'
+          ];
+
+          let results = '';
+          elements.forEach(id => {
+              const element = document.getElementById(id);
+              const status = element ? '✅' : '❌';
+              results += `${status} ${id}: ${element ? 'Found' : 'Not found'}<br>`;
+          });
+
+          addStatus('dom-status', results, 'info');
+      }
+
+      function checkAppObject() {
+          console.log('Checking App object...');
+
+          const app = window.App;
+          if (!app) {
+              addStatus('app-status', '❌ App object not found', 'error');
+              return;
+          }
+
+          const checks = [
+              { name: 'App.state', check: () => app.state },
+              { name: 'App.events', check: () => app.events },
+              { name: 'App.storage', check: () => app.storage },
+              { name: 'App.systems', check: () => app.systems },
+              { name: 'App.ui', check: () => app.ui },
+              { name: 'startGame function', check: () => window.startGame },
+          ];
+
+          let results = '';
+          checks.forEach(({ name, check }) => {
+              try {
+                  const result = check();
+                  const status = result ? '✅' : '❌';
+                  results += `${status} ${name}: ${result ? 'Available' : 'Not available'}<br>`;
+              } catch (error) {
+                  results += `❌ ${name}: Error - ${error.message}<br>`;
+              }
+          });
+
+          addStatus('app-status', results, 'info');
+      }
+
+      function checkEventHandlers() {
+          console.log('Checking event handlers...');
+
+          const splashScreen = document.getElementById('splashScreen');
+          const startBtn = document.querySelector('.splash-start-btn');
+
+          let results = '';
+
+          if (splashScreen) {
+              const clickListeners = getEventListeners(splashScreen, 'click');
+              results += `✅ Splash screen click listeners: ${clickListeners.length}<br>`;
+          } else {
+              results += '❌ Splash screen not found<br>';
+          }
+
+          if (startBtn) {
+              const clickListeners = getEventListeners(startBtn, 'click');
+              results += `✅ Start button click listeners: ${clickListeners.length}<br>`;
+          } else {
+              results += '❌ Start button not found<br>';
+          }
+
+          addStatus('event-status', results, 'info');
+      }
+
+      function getEventListeners(element, eventType) {
+          // This is a simplified check - in real browsers you'd need dev tools
+          return []; // Placeholder
+      }
+
+      function manualStartGame() {
+          console.log('Attempting manual start game...');
+
+          if (window.startGame) {
+              try {
+                  window.startGame();
+                  addStatus('event-status', '✅ Manual start game called successfully', 'success');
+              } catch (error) {
+                  addStatus('event-status', `❌ Manual start game failed: ${error.message}`, 'error');
+              }
+          } else {
+              addStatus('event-status', '❌ startGame function not available', 'error');
+          }
+      }
+
+      function forceStartGame() {
+          console.log('Attempting force start game...');
+
+          const splashScreen = document.getElementById('splashScreen');
+          const gameContent = document.getElementById('gameContent');
+
+          if (splashScreen && gameContent) {
+              splashScreen.style.display = 'none';
+              gameContent.style.display = 'block';
+              addStatus('event-status', '✅ Force start game completed', 'success');
+          } else {
+              addStatus('event-status', '❌ Required DOM elements not found', 'error');
+          }
+      }
+
+      // Auto-run environment check on load
+      window.addEventListener('load', () => {
+          setTimeout(checkEnvironment, 100);
+          setTimeout(checkDOMElements, 200);
+          setTimeout(checkAppObject, 300);
+      });
+    </script>
+  </body>
+</html>

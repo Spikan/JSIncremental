@@ -1,7 +1,7 @@
 // UI Display Updates (TypeScript)
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
 import { useGameStore } from '../core/state/zustand-store';
-import { Decimal } from '../core/numbers';
+// Decimal is accessed via lazy loading in migration-utils
 
 // Store subscription references to avoid multiple subscriptions
 let topSipsPerDrinkSubscription: (() => void) | null = null;

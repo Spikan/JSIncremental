@@ -12,8 +12,7 @@
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types
 
-// Import test utilities for debugging extreme values
-import './core/numbers/test-large-number';
+// Test utilities removed from production build
 
 // These are used in the game configuration
 const BAL = (GC && GC.BALANCE) || {};
@@ -41,9 +40,9 @@ if (BAL && TIMING && LIMITS) {
 })();
 
 // Import modular systems at the top
-import { saveGameLoader } from './core/systems/save-game-loader';
 import { mobileInputHandler } from './ui/mobile-input';
 import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
+import { toDecimal } from './core/numbers/migration-utils';
 // DecimalOps removed - no longer using toSafeNumber
 
 // Export for potential use
@@ -51,6 +50,8 @@ import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
 
 function initGame() {
   try {
+    console.log('🔧 Starting game initialization...');
+
     // Starting game initialization
     console.log('🔧 Unlocks system available:', !!(window as any).App?.systems?.unlocks);
     if (!(window as any).App?.systems?.unlocks) {
@@ -69,27 +70,29 @@ function initGame() {
       return;
     }
 
+    console.log('✅ All dependencies available, proceeding with initialization...');
+
     const CONF = GC || {};
     const BAL = CONF.BALANCE || {};
     const TIMING = CONF.TIMING || {};
 
-    (window as any).sips = new Decimal(0);
-    let straws = new Decimal(0);
-    let cups = new Decimal(0);
+    (window as any).sips = toDecimal(0);
+    let straws = toDecimal(0);
+    let cups = toDecimal(0);
     (window as any).straws = straws;
     (window as any).cups = cups;
-    let suctions = new Decimal(0);
+    let suctions = toDecimal(0);
     (window as any).suctions = suctions;
 
-    let spd = new Decimal(0);
-    let strawSPD = new Decimal(0);
-    let cupSPD = new Decimal(0);
-    let suctionClickBonus = new Decimal(0);
-    let widerStraws = new Decimal(0);
+    let spd = toDecimal(0);
+    let strawSPD = toDecimal(0);
+    let cupSPD = toDecimal(0);
+    let suctionClickBonus = toDecimal(0);
+    let widerStraws = toDecimal(0);
     (window as any).widerStraws = widerStraws;
-    let betterCups = new Decimal(0);
+    let betterCups = toDecimal(0);
     (window as any).betterCups = betterCups;
-    let level = new Decimal(1);
+    let level = toDecimal(1);
     (window as any).level = level;
 
     const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE;
@@ -99,197 +102,78 @@ function initGame() {
     try {
       (window as any).App?.state?.setState?.({ lastDrinkTime, drinkRate });
     } catch (error) {
-      console.warn('Failed to set drink time state:', error);
-    }
-    if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
-      Object.defineProperty(window, 'lastDrinkTime', {
-        get() {
-          return lastDrinkTime;
-        },
-        set(v) {
-          lastDrinkTime = Number(v) || 0;
-          try {
-            (window as any).App?.stateBridge?.setLastDrinkTime(lastDrinkTime);
-          } catch (error) {
-            console.warn('Failed to set last drink time via bridge:', error);
-          }
-        },
-      });
+      console.warn('Failed to set initial drink timing:', error);
     }
 
-    let fasterDrinks = new Decimal(0);
+    let fasterDrinks = toDecimal(0);
     (window as any).fasterDrinks = fasterDrinks;
-    const fasterDrinksUpCounter = new Decimal(1);
-    (window as any).fasterDrinksUpCounter = fasterDrinksUpCounter;
-
-    let criticalClickChance = new Decimal(BAL.CRITICAL_CLICK_BASE_CHANCE);
+    let criticalClicks = toDecimal(0);
+    (window as any).criticalClicks = criticalClicks;
+    let criticalClickChance = toDecimal(BAL.CRITICAL_CLICK_BASE_CHANCE);
     (window as any).criticalClickChance = criticalClickChance;
-    let criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER);
+    let criticalClickMultiplier = toDecimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER);
     (window as any).criticalClickMultiplier = criticalClickMultiplier;
-    let criticalClicks = new Decimal(0);
-    let criticalClickUpCounter = new Decimal(1);
+    let fasterDrinksUpCounter = toDecimal(0);
+    (window as any).fasterDrinksUpCounter = fasterDrinksUpCounter;
+    let criticalClickUpCounter = toDecimal(0);
+    (window as any).criticalClickUpCounter = criticalClickUpCounter;
 
+    console.log('✅ Game variables initialized');
+
+    // Load saved game if available
     try {
-      (window as any).App?.ui?.updateAutosaveStatus?.();
-    } catch (error) {
-      console.warn('Failed to update autosave status:', error);
-    }
-    const gameStartTime = Date.now();
-    let lastSaveTime: any = null;
-    if (!Object.getOwnPropertyDescriptor(window, 'lastSaveTime')) {
-      Object.defineProperty(window, 'lastSaveTime', {
-        get() {
-          try {
-            return Number(
-              (window as any).App?.state?.getState?.()?.lastSaveTime ?? lastSaveTime ?? 0
-            );
-          } catch (error) {
-            console.warn('Failed to get last save time from App state:', error);
-          }
-          return Number(lastSaveTime || 0);
-        },
-        set(v) {
-          lastSaveTime = Number(v) || 0;
-          try {
-            (window as any).App?.state?.setState?.({ lastSaveTime });
-          } catch (error) {
-            console.warn('Failed to set last save time in App state:', error);
-          }
-        },
-      });
-    }
-    try {
-      (window as any).App?.state?.setState?.({ sessionStartTime: gameStartTime, totalPlayTime: 0 });
-    } catch (error) {
-      console.warn('Failed to set session start time:', error);
-    }
-
-    let gameStartDate = Date.now();
-    try {
-      (window as any).App?.state?.setState?.({ sessionStartTime: Number(gameStartDate) });
-    } catch (error) {
-      console.warn('Failed to set game start date:', error);
-    }
-    try {
-      (window as any).App?.state?.setState?.({ lastClickTime: 0 });
-    } catch (error) {
-      console.warn('Failed to set last click time:', error);
-    }
-
-    try {
-      DOM_CACHE.init();
-    } catch (error) {
-      console.warn('Failed to initialize DOM_CACHE:', error);
-    }
-
-    // Load save using modular system
-    let savegame: any = null;
-    try {
-      const w: any = window as any;
-      if (w.App && w.App.storage && typeof w.App.storage.loadGame === 'function') {
-        savegame = w.App.storage.loadGame();
-      } else {
-        savegame = JSON.parse(localStorage.getItem('save') as any);
-      }
-    } catch (e) {
-      console.warn('Failed to load save, starting fresh.', e);
-      savegame = null;
-    }
-
-    // Use modular save game loader
-    saveGameLoader.loadGameState(savegame);
-
-    try {
-      (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.GAME?.LOADED, {
-        save: !!savegame,
-      });
-    } catch (error) {
-      console.warn('Failed to emit game loaded event:', error);
-    }
-
-    // Compute production
-    const config = BAL || {};
-    if ((window as any).App?.systems?.resources?.recalcProduction) {
-      const up = (window as any).App?.data?.upgrades || {};
-      const result = (window as any).App.systems.resources.recalcProduction({
-        straws: straws,
-        cups: cups,
-        widerStraws: widerStraws,
-        betterCups: betterCups,
-        base: {
-          strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
-          cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,
-          baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
-        },
-        multipliers: {
-          widerStrawsPerLevel:
-            up?.widerStraws?.multiplierPerLevel ?? config.WIDER_STRAWS_MULTIPLIER,
-          betterCupsPerLevel: up?.betterCups?.multiplierPerLevel ?? config.BETTER_CUPS_MULTIPLIER,
-        },
-      });
-
-      // Handle Decimal results properly - convert to numbers for Decimal compatibility
-      // Use safe conversion to handle extreme values without returning Infinity
-      // Preserve extreme SPD values - don't use toSafeNumber
-      const strawSPDValue = result.strawSPD;
-      const cupSPDValue = result.cupSPD;
-      // Preserve extreme SPD values - don't use toSafeNumber
-      const spdValue = result.sipsPerDrink;
-
-      strawSPD = new Decimal(strawSPDValue);
-      cupSPD = new Decimal(cupSPDValue);
-      spd = new Decimal(spdValue);
-    } else {
-      strawSPD = new Decimal(config.STRAW_BASE_SPD);
-      cupSPD = new Decimal(config.CUP_BASE_SPD);
-      if (
-        widerStraws &&
-        typeof widerStraws.greaterThan === 'function' &&
-        widerStraws.greaterThan(0)
-      ) {
-        const upgradeMultiplier = new Decimal(
-          // Preserve extreme values in upgrade multipliers
-          1 +
-            (widerStraws && typeof widerStraws.toNumber === 'function'
-              ? widerStraws.toNumber()
-              : Number(widerStraws || 0)) *
-              config.WIDER_STRAWS_MULTIPLIER
+      console.log('🔧 Attempting to load saved game...');
+      const savedGame = (window as any).App?.systems?.save?.loadGame?.();
+      if (savedGame) {
+        console.log('✅ Saved game loaded successfully');
+        (window as any).sips = toDecimal(savedGame.sips || 0);
+        straws = toDecimal(savedGame.straws || 0);
+        (window as any).straws = straws;
+        cups = toDecimal(savedGame.cups || 0);
+        (window as any).cups = cups;
+        (window as any).suctions = toDecimal(savedGame.suctions || 0);
+        widerStraws = toDecimal(savedGame.widerStraws || 0);
+        (window as any).widerStraws = widerStraws;
+        betterCups = toDecimal(savedGame.betterCups || 0);
+        (window as any).betterCups = betterCups;
+        level = toDecimal(savedGame.level || 1);
+        (window as any).level = level;
+        (window as any).fasterDrinks = toDecimal(savedGame.fasterDrinks || 0);
+        (window as any).criticalClicks = toDecimal(savedGame.criticalClicks || 0);
+        criticalClickChance = toDecimal(
+          savedGame.criticalClickChance || BAL.CRITICAL_CLICK_BASE_CHANCE
         );
-        strawSPD = strawSPD.times(upgradeMultiplier);
-      }
-      if (betterCups && typeof betterCups.greaterThan === 'function' && betterCups.greaterThan(0)) {
-        const upgradeMultiplier = new Decimal(
-          // Preserve extreme values in upgrade multipliers
-          1 +
-            (betterCups && typeof betterCups.toNumber === 'function'
-              ? betterCups.toNumber()
-              : Number(betterCups || 0)) *
-              config.BETTER_CUPS_MULTIPLIER
+        (window as any).criticalClickChance = criticalClickChance;
+        criticalClickMultiplier = toDecimal(
+          savedGame.criticalClickMultiplier || BAL.CRITICAL_CLICK_BASE_MULTIPLIER
         );
-        cupSPD = cupSPD.times(upgradeMultiplier);
-      }
-      const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-      const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-      spd = baseSipsPerDrink.plus(passiveSipsPerDrink);
-    }
-    suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
+        (window as any).criticalClickMultiplier = criticalClickMultiplier;
+        (window as any).fasterDrinksUpCounter = toDecimal(savedGame.fasterDrinksUpCounter || 0);
+        (window as any).criticalClickUpCounter = toDecimal(savedGame.criticalClickUpCounter || 0);
 
-    // Restore drink timing if present in save
-    try {
-      if (savegame) {
-        if (typeof savegame.lastDrinkTime === 'number' && savegame.lastDrinkTime > 0) {
-          lastDrinkTime = savegame.lastDrinkTime;
-        } else if (typeof savegame.drinkProgress === 'number' && savegame.drinkProgress >= 0) {
-          const progressMs = (savegame.drinkProgress / 100) * drinkRate;
-          lastDrinkTime = Date.now() - progressMs;
+        // Restore drink timing
+        const savedDrinkRate = savedGame.drinkRate || DEFAULT_DRINK_RATE;
+        const savedLastDrinkTime = savedGame.lastDrinkTime || Date.now() - DEFAULT_DRINK_RATE;
+        const savedDrinkProgress = savedGame.drinkProgress || 0;
+        try {
+          (window as any).App?.state?.setState?.({
+            drinkRate: savedDrinkRate,
+            lastDrinkTime: savedLastDrinkTime,
+            drinkProgress: savedDrinkProgress,
+          });
+        } catch (error) {
+          console.warn('Failed to restore drink timing:', error);
         }
+      } else {
+        console.log('ℹ️ No saved game found, starting fresh');
       }
     } catch (error) {
-      console.warn('Failed to restore drink timing:', error);
+      console.warn('Failed to load saved game:', error);
     }
 
     // Seed App.state snapshot
     try {
+      console.log('🔧 Seeding App.state with game data...');
       // Preserve extreme values - don't convert to regular numbers
       (window as any).App?.state?.setState?.({
         sips: (window as any).sips,
@@ -316,6 +200,7 @@ function initGame() {
         fasterDrinksUpCounter: fasterDrinksUpCounter,
         criticalClickUpCounter: criticalClickUpCounter,
       });
+      console.log('✅ App.state seeded successfully');
     } catch (error) {
       console.warn('Failed to seed App.state:', error);
     }
@@ -325,34 +210,102 @@ function initGame() {
       const domCache = (window as any).DOM_CACHE;
       if (!domCache || !domCache.isReady || !domCache.isReady()) {
         // Waiting for DOM_CACHE
+        console.log('⏳ Waiting for DOM_CACHE to be ready...');
         setTimeout(updateDisplaysWhenReady, 100);
         return;
       }
       // DOM_CACHE ready, updating displays
-      (window as any).App?.ui?.updateTopSipsPerDrink?.();
-      (window as any).App?.ui?.updateTopSipsPerSecond?.();
+      console.log('✅ DOM_CACHE ready, updating displays...');
+      try {
+        (window as any).App?.ui?.updateTopSipsPerDrink?.();
+        (window as any).App?.ui?.updateTopSipsPerSecond?.();
+        console.log('✅ Initial displays updated');
+      } catch (error) {
+        console.warn('Failed to update initial displays:', error);
+      }
     };
     updateDisplaysWhenReady();
+
     try {
+      console.log('🔧 Initializing unlocks system...');
       (window as any).App?.systems?.unlocks?.init?.();
+      console.log('✅ Unlocks system initialized');
     } catch (error) {
       console.warn('Failed to initialize unlocks system:', error);
     }
 
     // Initialize mobile input handling using modular system
-    mobileInputHandler.initialize();
     try {
+      console.log('🔧 Initializing mobile input handler...');
+      mobileInputHandler.initialize();
+      console.log('✅ Mobile input handler initialized');
+    } catch (error) {
+      console.warn('Failed to initialize mobile input handler:', error);
+    }
+
+    try {
+      console.log('🔧 Initializing button audio system...');
       (window as any).App?.systems?.audio?.button?.initButtonAudioSystem?.();
+      console.log('✅ Button audio system initialized');
     } catch (error) {
       console.warn('Failed to initialize button audio system:', error);
     }
+
     try {
+      console.log('🔧 Updating button sounds toggle...');
       (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+      console.log('✅ Button sounds toggle updated');
     } catch (error) {
       console.warn('Failed to update button sounds toggle:', error);
     }
+
+    // Initialize UI systems if not already done
+    try {
+      console.log('🔧 Initializing UI systems...');
+      if (
+        (window as any).App?.ui?.initializeUI &&
+        typeof (window as any).App.ui.initializeUI === 'function'
+      ) {
+        (window as any).App.ui.initializeUI();
+        console.log('✅ UI systems initialized');
+      }
+    } catch (error) {
+      console.warn('Failed to initialize UI systems:', error);
+    }
+
+    // Initialize button system if not already done
+    try {
+      console.log('🔧 Initializing button system...');
+      if (
+        (window as any).App?.ui?.initButtonSystem &&
+        typeof (window as any).App.ui.initButtonSystem === 'function'
+      ) {
+        (window as any).App.ui.initButtonSystem();
+        console.log('✅ Button system initialized');
+      }
+    } catch (error) {
+      console.warn('Failed to initialize button system:', error);
+    }
+
+    // Update all displays
+    try {
+      console.log('🔧 Updating all displays...');
+      setTimeout(() => {
+        if (
+          (window as any).App?.ui?.updateAllDisplays &&
+          typeof (window as any).App.ui.updateAllDisplays === 'function'
+        ) {
+          (window as any).App.ui.updateAllDisplays();
+          console.log('✅ All displays updated');
+        }
+      }, 100);
+    } catch (error) {
+      console.warn('Failed to update all displays:', error);
+    }
+
+    console.log('✅ Game initialization complete');
   } catch (error) {
-    console.error('Error in initGame:', error);
+    console.error('❌ Error in initGame:', error);
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     if (splashScreen && gameContent) {
@@ -369,7 +322,56 @@ export function setupMobileTouchHandling() {
 
 function startGame() {
   try {
-    (window as any).App?.systems?.gameInit?.startGame?.();
+    // Check if App object is available first
+    if (!(window as any).App) {
+      console.log('⏳ startGame called but App object not ready, retrying...');
+      let retryCount = 0;
+      const maxRetries = 30; // Max 3 seconds (30 * 100ms)
+      const retryInterval = () => {
+        retryCount++;
+        if ((window as any).App) {
+          console.log('✅ App object now available, checking gameInit...');
+          startGame(); // Recursively call to check gameInit
+        } else if (retryCount >= maxRetries) {
+          console.error('❌ startGame failed: App object not available after max retries');
+        } else {
+          setTimeout(retryInterval, 100);
+        }
+      };
+      setTimeout(retryInterval, 100);
+      return;
+    }
+
+    // Check if gameInit is actually available
+    const gameInit = (window as any).App?.systems?.gameInit;
+    if (gameInit && typeof gameInit.startGame === 'function') {
+      console.log('🚀 Starting game via gameInit...');
+      gameInit.startGame();
+    } else {
+      console.log('⏳ startGame called but gameInit not ready, retrying...');
+      // Retry with exponential backoff
+      let retryCount = 0;
+      const maxRetries = 20; // Max 2 seconds (20 * 100ms)
+      const retryInterval = () => {
+        retryCount++;
+        const gameInitRetry = (window as any).App?.systems?.gameInit;
+        if (gameInitRetry && typeof gameInitRetry.startGame === 'function') {
+          console.log('✅ gameInit now ready, starting game...');
+          gameInitRetry.startGame();
+        } else if (retryCount >= maxRetries) {
+          console.error('❌ startGame failed: gameInit not available after max retries');
+          console.log('🔍 Debug info:', {
+            appExists: !!(window as any).App,
+            systemsExists: !!(window as any).App?.systems,
+            gameInitExists: !!(window as any).App?.systems?.gameInit,
+            gameInitType: typeof (window as any).App?.systems?.gameInit,
+          });
+        } else {
+          setTimeout(retryInterval, 100);
+        }
+      };
+      setTimeout(retryInterval, 100);
+    }
   } catch (error) {
     console.error('Error in startGame:', error);
   }

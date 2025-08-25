@@ -1,9 +1,8 @@
 // Economy formulas for SPD and totals with direct Decimal support (TypeScript)
 // Maximum performance with direct break_eternity.js operations
 
-// Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal;
-import { pow, DecimalType } from '../numbers/migration-utils';
+// Import toDecimal for lazy loading
+import { toDecimal, pow, DecimalType } from '../numbers/migration-utils';
 
 // ===== Safe numeric helpers =====
 // No artificial numeric helpers needed - break_eternity.js handles all scaling naturally
@@ -18,11 +17,11 @@ export function computeStrawSPD(
   widerStrawsCount: number | string | DecimalType,
   widerMultiplierPerLevel: number | string | DecimalType = 0
 ): DecimalType {
-  const baseValue = new Decimal(baseSPD);
+  const baseValue = toDecimal(baseSPD);
 
   // Basic wider straws multiplier
-  const upgradeMultiplier = new Decimal(1).add(
-    new Decimal(widerStrawsCount).mul(new Decimal(widerMultiplierPerLevel))
+  const upgradeMultiplier = toDecimal(1).add(
+    toDecimal(widerStrawsCount).mul(toDecimal(widerMultiplierPerLevel))
   );
 
   // Calculate base production
@@ -41,11 +40,11 @@ export function computeCupSPD(
   betterCupsCount: number | string | DecimalType,
   betterMultiplierPerLevel: number | string | DecimalType = 0
 ): DecimalType {
-  const baseValue = new Decimal(baseSPD);
+  const baseValue = toDecimal(baseSPD);
 
   // Basic better cups multiplier
-  const upgradeMultiplier = new Decimal(1).add(
-    new Decimal(betterCupsCount).mul(new Decimal(betterMultiplierPerLevel))
+  const upgradeMultiplier = toDecimal(1).add(
+    toDecimal(betterCupsCount).mul(toDecimal(betterMultiplierPerLevel))
   );
 
   // Calculate base production
@@ -64,17 +63,17 @@ export function computeTotalSPD(
   cups: number | string | DecimalType,
   cupSPD: number | string | DecimalType
 ): DecimalType {
-  const strawCount = new Decimal(straws);
-  const cupCount = new Decimal(cups);
-  const strawValue = new Decimal(strawSPD);
-  const cupValue = new Decimal(cupSPD);
+  const strawCount = toDecimal(straws);
+  const cupCount = toDecimal(cups);
+  const strawValue = toDecimal(strawSPD);
+  const cupValue = toDecimal(cupSPD);
 
   // Calculate individual contributions
   const strawContribution = strawValue.mul(strawCount);
   const cupContribution = cupValue.mul(cupCount);
 
   // NO artificial synergy calculations - break_eternity.js handles all scaling naturally
-  const synergyMultiplier = new Decimal(1);
+  const synergyMultiplier = toDecimal(1);
 
   // Calculate total before scaling
   let totalSPD = strawContribution.add(cupContribution).mul(synergyMultiplier);
@@ -88,8 +87,8 @@ export function computeTotalSipsPerDrink(
   baseSipsPerDrink: number | string | DecimalType,
   totalSPD: number | string | DecimalType
 ): DecimalType {
-  const base = new Decimal(baseSipsPerDrink);
-  const spd = new Decimal(totalSPD);
+  const base = toDecimal(baseSipsPerDrink);
+  const spd = toDecimal(totalSPD);
 
   // Calculate total sips per drink
   let totalSips = base.add(spd);
@@ -108,12 +107,12 @@ export function computePrestigeBonus(
   _totalSipsEarned: number | string | DecimalType, // eslint-disable-line @typescript-eslint/no-unused-vars
   prestigeLevel: number | string | DecimalType = 0
 ): DecimalType {
-  const prestige = new Decimal(prestigeLevel);
+  const prestige = toDecimal(prestigeLevel);
 
   // NO artificial prestige bonuses - break_eternity.js handles all scaling naturally
 
   // Only prestige level bonus remains
-  const prestigeMultiplier = new Decimal('1').add(prestige.mul(new Decimal('0.5')));
+  const prestigeMultiplier = toDecimal('1').add(prestige.mul(toDecimal('0.5')));
 
   return prestigeMultiplier;
 }
@@ -125,10 +124,10 @@ export function computeGoldenStrawMultiplier(
   _straws: number | string | DecimalType, // unused - artificial caps removed
   goldenStrawCount: number | string | DecimalType = 0
 ): DecimalType {
-  const goldenCount = new Decimal(goldenStrawCount);
+  const goldenCount = toDecimal(goldenStrawCount);
 
   // Base multiplier from golden straws
-  let multiplier = new Decimal('1').add(goldenCount.mul(new Decimal('0.1')));
+  let multiplier = toDecimal('1').add(goldenCount.mul(toDecimal('0.1')));
 
   // NO artificial golden straw bonuses - break_eternity.js handles all scaling naturally
 
@@ -142,14 +141,14 @@ export function computeEfficiencyBonus(
   _totalSPD: number | string | DecimalType, // eslint-disable-line @typescript-eslint/no-unused-vars
   optimizationLevel: number | string | DecimalType = 0
 ): DecimalType {
-  const optimization = new Decimal(optimizationLevel);
+  const optimization = toDecimal(optimizationLevel);
 
   // Base efficiency bonus
-  const baseBonus = optimization.mul(new Decimal('0.05'));
+  const baseBonus = optimization.mul(toDecimal('0.05'));
 
   // NO artificial SPD bonuses - break_eternity.js handles all scaling naturally
 
-  return new Decimal('1').add(baseBonus);
+  return toDecimal('1').add(baseBonus);
 }
 
 /**
@@ -159,10 +158,10 @@ export function computeBreakthroughMultiplier(
   _totalSipsEarned: number | string | DecimalType, // eslint-disable-line @typescript-eslint/no-unused-vars
   breakthroughLevel: number | string | DecimalType = 0
 ): DecimalType {
-  const breakthrough = new Decimal(breakthroughLevel);
+  const breakthrough = toDecimal(breakthroughLevel);
 
   // Breakthroughs provide exponential bonuses - use Decimal directly
-  const breakthroughBonus = pow(new Decimal('1.5'), breakthrough);
+  const breakthroughBonus = pow(toDecimal('1.5'), breakthrough);
 
   // NO artificial sip scaling - break_eternity.js handles all scaling naturally
 
@@ -177,7 +176,7 @@ export function computeInflationRate(
   _totalPurchases: number | string | DecimalType = 0 // unused - artificial caps removed
 ): DecimalType {
   // NO artificial inflation rates - break_eternity.js handles all scaling naturally
-  const inflationRate = new Decimal('1');
+  const inflationRate = toDecimal('1');
 
   // NO artificial inflation scaling - break_eternity.js handles all scaling naturally
 
@@ -191,10 +190,10 @@ export function computeInterestRate(
   _sipsInBank: number | string | DecimalType, // unused - artificial caps removed
   bankLevel: number | string | DecimalType = 0
 ): DecimalType {
-  const level = new Decimal(bankLevel);
+  const level = toDecimal(bankLevel);
 
   // Base interest rate from bank level
-  const baseRate = new Decimal('0.001').mul(level);
+  const baseRate = toDecimal('0.001').mul(level);
 
   // NO artificial deposit bonuses - break_eternity.js handles all scaling naturally
 

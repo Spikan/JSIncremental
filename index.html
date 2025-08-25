@@ -7,8 +7,8 @@
     <title>Soda Clicker Pro</title>
     <meta name="description" content="Soda Clicker Pro" />
     <meta name="author" content="Spikan" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
-    <link rel="icon" type="image/png" href="images/regSoda.png" />
+
+    <link rel="icon" type="image/png" href="/assets/regSoda-AP9mlaHX.png" />
 
     <!-- Eruda Mobile Debug Tool -->
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
@@ -37,11 +37,31 @@
         setTimeout(checkFunctionsLoaded, 1000);
       });
     </script>
+    <script type="module" crossorigin src="/assets/index-CbzFvQ08.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/game-systems-qTyZVtHL.js" />
+    <link rel="modulepreload" crossorigin href="/assets/game-ui-DaP5bmRF.js" />
+    <link rel="modulepreload" crossorigin href="/assets/index-CbzFvQ08.js" />
+    <link rel="modulepreload" crossorigin href="/assets/vendor-D12Tu0ll.js" />
+    <link rel="modulepreload" crossorigin href="/assets/vendor-zustand-DMGjmEWk.js" />
+    <link rel="modulepreload" crossorigin href="/assets/game-core-BYxwnpoD.js" />
+    <link rel="stylesheet" crossorigin href="/assets/index-8k9QaZXe.css" />
   </head>
 
   <body>
+    <!-- Debug: Test if JavaScript runs immediately -->
+    <script>
+      console.log('🚀 IMMEDIATE JAVASCRIPT TEST - Page loaded, JS is running');
+      console.log('🚀 Window object available:', typeof window);
+      console.log('🚀 Document readyState:', document.readyState);
+    </script>
+
     <!-- Splash Screen -->
-    <div id="splashScreen" class="splash-overlay">
+    <div
+      id="splashScreen"
+      class="splash-overlay"
+      onclick="console.log('🔥 DIRECT HTML CLICK:', event.clientX, event.clientY, event.target, event.target.style.display);"
+      style="display: block !important"
+    >
       <div class="splash-content">
         <div class="splash-title">
           <h1 class="splash-main-title">SODA CLICKER</h1>
@@ -58,12 +78,346 @@
         </div>
         <div class="splash-buttons">
           <button class="splash-start-btn" data-action="startGame">START</button>
+          <button
+            class="splash-start-btn"
+            onclick="forceStartGame()"
+            style="margin-top: 10px; background: #ff6b35"
+          >
+            FORCE START
+          </button>
+          <button
+            class="splash-start-btn"
+            onclick="debugSplashHandlers()"
+            style="margin-top: 10px; background: #4a90e2; font-size: 12px"
+          >
+            DEBUG HANDLERS
+          </button>
+          <button
+            class="splash-start-btn"
+            onclick="debugSplashScreen()"
+            style="margin-top: 10px; background: #e74c3c; font-size: 12px"
+          >
+            DEBUG SCREEN
+          </button>
         </div>
         <div class="splash-version">
           <p>v1.0 - Inspired by Soda Drinker Pro</p>
         </div>
       </div>
     </div>
+
+    <!-- Fallback script for splash screen issues -->
+    <script>
+      // Fallback mechanism for splash screen issues
+      function forceStartGame() {
+        console.log('🔄 Force start game called');
+        const splashScreen = document.getElementById('splashScreen');
+        const gameContent = document.getElementById('gameContent');
+
+        if (splashScreen && gameContent) {
+          splashScreen.style.display = 'none';
+          gameContent.style.display = 'block';
+          console.log('✅ Game content shown via fallback');
+
+          // Enhanced initialization sequence for fallback
+          initializeGameSystems();
+        } else {
+          console.error('❌ Required DOM elements not found for fallback');
+        }
+      }
+
+      // Comprehensive game systems initialization
+      function initializeGameSystems() {
+        console.log('🔧 Initializing game systems via fallback...');
+
+        // Step 1: Ensure App object exists
+        if (!window.App) {
+          console.error('❌ App object not found - cannot initialize game systems');
+          return;
+        }
+
+        // Step 2: Initialize DOM cache if needed
+        if (window.DOM_CACHE && typeof window.DOM_CACHE.init === 'function') {
+          try {
+            window.DOM_CACHE.init();
+            console.log('✅ DOM cache initialized');
+          } catch (error) {
+            console.warn('⚠️ Failed to initialize DOM cache:', error);
+          }
+        }
+
+        // Step 3: Initialize UI systems
+        if (window.App.ui && typeof window.App.ui.initializeUI === 'function') {
+          try {
+            window.App.ui.initializeUI();
+            console.log('✅ UI systems initialized');
+          } catch (error) {
+            console.warn('⚠️ Failed to initialize UI systems:', error);
+          }
+        }
+
+        // Step 4: Initialize button system
+        if (window.App.ui && typeof window.App.ui.initButtonSystem === 'function') {
+          try {
+            window.App.ui.initButtonSystem();
+            console.log('✅ Button system initialized');
+          } catch (error) {
+            console.warn('⚠️ Failed to initialize button system:', error);
+          }
+        }
+
+        // Step 5: Initialize game logic
+        if (typeof window.initGame === 'function') {
+          try {
+            window.initGame();
+            console.log('✅ Game logic initialized');
+          } catch (error) {
+            console.error('❌ Failed to initialize game logic:', error);
+          }
+        }
+
+        // Step 6: Update all displays
+        if (window.App.ui && typeof window.App.ui.updateAllDisplays === 'function') {
+          try {
+            setTimeout(() => {
+              window.App.ui.updateAllDisplays();
+              console.log('✅ All displays updated');
+            }, 100);
+          } catch (error) {
+            console.warn('⚠️ Failed to update displays:', error);
+          }
+        }
+
+        // Step 7: Start game loop with retry until loop system is ready
+        const tryStartLoop = () => {
+          if (
+            window.App.systems &&
+            window.App.systems.loop &&
+            typeof window.App.systems.loop.start === 'function'
+          ) {
+            try {
+              window.App.systems.loop.start({
+                updateDrinkProgress: () => {
+                  try {
+                    const st = window.App?.state?.getState?.() || {};
+                    const now = Date.now();
+                    const last = Number(st.lastDrinkTime || 0);
+                    const rate = Number(st.drinkRate || 1000);
+                    const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
+                    window.App?.state?.setState?.({ drinkProgress: pct });
+                    window.App?.ui?.updateDrinkProgress?.(pct, rate);
+                  } catch (error) {
+                    console.warn('Error updating drink progress:', error);
+                  }
+                },
+                processDrink: () => {
+                  try {
+                    window.App?.systems?.drink?.processDrink?.();
+                  } catch (error) {
+                    console.warn('Error processing drink:', error);
+                  }
+                },
+                updateStats: () => {
+                  try {
+                    window.App?.ui?.updatePlayTime?.();
+                    window.App?.ui?.updateLastSaveTime?.();
+                    window.App?.ui?.updateAllStats?.();
+                    window.App?.ui?.updatePurchasedCounts?.();
+                    window.App?.ui?.checkUpgradeAffordability?.();
+                    window.App?.systems?.unlocks?.checkAllUnlocks?.();
+                  } catch (error) {
+                    console.warn('Error updating stats:', error);
+                  }
+                },
+                updatePlayTime: () => {
+                  try {
+                    window.App?.ui?.updatePlayTime?.();
+                  } catch (error) {
+                    console.warn('Error updating play time:', error);
+                  }
+                },
+                updateLastSaveTime: () => {
+                  try {
+                    window.App?.ui?.updateLastSaveTime?.();
+                  } catch (error) {
+                    console.warn('Error updating last save time:', error);
+                  }
+                },
+              });
+              console.log('✅ Game loop started');
+            } catch (error) {
+              console.warn('⚠️ Failed to start game loop:', error);
+            }
+          } else {
+            console.log('⏳ Loop system not ready in fallback, retrying...');
+            setTimeout(tryStartLoop, 100);
+          }
+        };
+        setTimeout(tryStartLoop, 200);
+
+        console.log('✅ Fallback initialization sequence complete');
+      }
+
+      // Auto-fallback after 10 seconds if splash screen is still visible
+      setTimeout(() => {
+        const splashScreen = document.getElementById('splashScreen');
+        if (splashScreen && splashScreen.style.display !== 'none') {
+          console.log('⏰ Auto-fallback triggered after 10 seconds');
+          forceStartGame();
+        }
+      }, 10000);
+
+      // Expose globally
+      window.forceStartGame = forceStartGame;
+      window.initializeGameSystems = initializeGameSystems;
+
+      // Debug function to check splash screen state
+      window.debugSplashScreen = function () {
+        console.log('=== SPLASH SCREEN STATE DEBUG ===');
+
+        const splashScreen = document.getElementById('splashScreen');
+        const gameContent = document.getElementById('gameContent');
+
+        console.log('Splash screen element exists:', !!splashScreen);
+        console.log('Game content element exists:', !!gameContent);
+        console.log('startGame function exists:', typeof window.startGame);
+
+        if (splashScreen) {
+          console.log('Splash screen computed style:', {
+            display: window.getComputedStyle(splashScreen).display,
+            visibility: window.getComputedStyle(splashScreen).visibility,
+            opacity: window.getComputedStyle(splashScreen).opacity,
+            zIndex: window.getComputedStyle(splashScreen).zIndex,
+            position: window.getComputedStyle(splashScreen).position,
+            pointerEvents: window.getComputedStyle(splashScreen).pointerEvents,
+            width: window.getComputedStyle(splashScreen).width,
+            height: window.getComputedStyle(splashScreen).height,
+          });
+
+          console.log('Splash screen bounding rect:', splashScreen.getBoundingClientRect());
+
+          // Test if element is actually clickable
+          const rect = splashScreen.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          console.log('Center point for testing:', centerX, centerY);
+
+          // Test element at point
+          const elementAtPoint = document.elementFromPoint(centerX, centerY);
+          console.log('Element at center point:', elementAtPoint);
+          console.log('Is splash screen at center?', elementAtPoint === splashScreen);
+
+          // Add temporary visual indicator
+          splashScreen.style.backgroundColor = '#ff6b35'; // Temporary red background
+          setTimeout(() => {
+            splashScreen.style.backgroundColor = '#001789'; // Restore original
+          }, 2000);
+        }
+      };
+
+      // Debug function to check splash screen event handlers
+      window.debugSplashHandlers = function () {
+        console.log('=== SPLASH SCREEN DEBUG ===');
+
+        const splashScreen = document.getElementById('splashScreen');
+        const startBtn = document.querySelector('.splash-start-btn[data-action="startGame"]');
+
+        console.log('Splash screen element:', !!splashScreen);
+        console.log('Start button element:', !!startBtn);
+        console.log('startGame function on window:', typeof window.startGame);
+
+        if (startBtn) {
+          console.log('Start button event listeners:');
+          // Get event listeners (if available)
+          if (startBtn._events || startBtn.__events__) {
+            console.log('Has event listeners:', !!startBtn._events || !!startBtn.__events__);
+          } else {
+            console.log('Event listeners check: Not accessible via standard properties');
+          }
+        }
+
+        if (splashScreen) {
+          console.log('Splash screen event listeners:');
+          if (splashScreen._events || splashScreen.__events__) {
+            console.log(
+              'Has event listeners:',
+              !!splashScreen._events || !!splashScreen.__events__
+            );
+          } else {
+            console.log('Event listeners check: Not accessible via standard properties');
+          }
+        }
+
+        // Test if we can manually trigger the start
+        console.log('Testing manual startGame call...');
+        try {
+          if (typeof window.startGame === 'function') {
+            console.log('✅ startGame function exists, calling it...');
+            window.startGame();
+          } else {
+            console.log('❌ startGame function not available');
+          }
+        } catch (error) {
+          console.log('❌ Error calling startGame:', error);
+        }
+      };
+
+      // Debug function to check game system status
+      window.debugGameSystems = function () {
+        console.log('=== GAME SYSTEMS DEBUG ===');
+
+        // Check App object
+        console.log('App object:', !!window.App);
+        if (window.App) {
+          console.log('App.state:', !!window.App.state);
+          console.log('App.ui:', !!window.App.ui);
+          console.log('App.systems:', !!window.App.systems);
+          console.log('App.events:', !!window.App.events);
+        }
+
+        // Check DOM elements
+        console.log('splashScreen:', !!document.getElementById('splashScreen'));
+        console.log('gameContent:', !!document.getElementById('gameContent'));
+        console.log('sodaButton:', !!document.getElementById('sodaButton'));
+
+        // Check DOM cache
+        console.log('DOM_CACHE:', !!window.DOM_CACHE);
+        if (window.DOM_CACHE) {
+          console.log(
+            'DOM_CACHE.isReady():',
+            window.DOM_CACHE.isReady ? window.DOM_CACHE.isReady() : 'N/A'
+          );
+        }
+
+        // Check key functions
+        console.log('initGame function:', typeof window.initGame);
+        console.log('startGame function:', typeof window.startGame);
+        console.log('switchTab function:', typeof window.App?.ui?.switchTab);
+        console.log(
+          'handleSodaClick function:',
+          typeof window.App?.systems?.clicks?.handleSodaClick
+        );
+
+        // Check button system
+        console.log('Button system initialized:', typeof window.App?.ui?.initButtonSystem);
+
+        // Check game loop
+        console.log('Game loop system:', typeof window.App?.systems?.loop?.start);
+
+        // Check tab buttons
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        console.log('Tab buttons found:', tabButtons.length);
+
+        // Check soda button
+        const sodaButton = document.getElementById('sodaButton');
+        console.log('Soda button found:', !!sodaButton);
+        if (sodaButton) {
+          console.log('Soda button event listeners:', 'Check browser dev tools');
+        }
+
+        console.log('=== END GAME SYSTEMS DEBUG ===');
+      };
+    </script>
 
     <!-- Main Game Content -->
     <div id="gameContent" class="game-content" style="display: none">
@@ -147,7 +501,7 @@
         <div id="sodaDiv" class="center">
           <div class="soda-container">
             <img
-              src="images/regSoda.png"
+              src="/assets/regSoda-AP9mlaHX.png"
               id="sodaButton"
               data-action="sodaClick"
               data-args="1"
@@ -588,7 +942,7 @@
               <div class="message god-message">
                 <div class="message-avatar">
                   <img
-                    src="images/TempleOS.jpg"
+                    src="/assets/TempleOS-nua8Yw7k.jpg"
                     alt="God"
                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px"
                   />
@@ -822,15 +1176,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
-    <script type="module" src="ts/config.ts"></script>
-    <script type="module" src="ts/core/constants.ts"></script>
-    <!-- event-bus.ts is loaded dynamically in ts/index.ts -->
-    <!-- schemas.ts is imported where needed; no global include required -->
-    <!-- storage.ts is loaded dynamically in ts/index.ts -->
-    <script type="module" src="ts/dom-cache.ts"></script>
-    <script type="module" src="ts/index.ts"></script>
-    <script type="module" src="ts/god.ts"></script>
-    <script type="module" src="ts/main.ts"></script>
+
+    <!-- Load modules in proper dependency order -->
+
     <script>
       // Ensure Decimal is available globally before loading main.js
       if (typeof Decimal === 'undefined') {
@@ -838,9 +1186,6 @@
       } else {
         console.log('✅ Decimal library loaded successfully');
       }
-
-      // Let main.js handle the script loading since the modular files are now working
-      console.log('🔧 Core scripts loaded, main.js will handle the rest...');
     </script>
   </body>
 </html>

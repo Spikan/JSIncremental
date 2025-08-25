@@ -135,13 +135,13 @@ describe('LargeNumber', () => {
 
     // Test extreme division
     const e = new LargeNumber('1e300');
-    const f = new LargeNumber('1e100');
-    const divResult = e.divide(f);
+    const divisor = new LargeNumber('1e100');
+    const divResult = e.divide(divisor);
     expect(divResult.toString()).toMatch(/^1e\+200$/);
 
     // Test extreme exponentiation
-    const g = new LargeNumber('10');
-    const expResult = g.pow(100);
+    const baseNumber = new LargeNumber('10');
+    const expResult = baseNumber.pow(100);
     expect(expResult.toString()).toMatch(/^1e\+?100$/);
   });
 

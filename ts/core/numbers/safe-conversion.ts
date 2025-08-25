@@ -1,14 +1,14 @@
 // Safe conversion utilities for break_eternity.js Decimal objects
 // Prevents precision loss when converting extreme values
 
-import { isDecimal, DecimalType } from './decimal-utils';
+import { checkIsDecimal, DecimalType } from './decimal-utils';
 
 /**
  * Safely converts a Decimal to a JavaScript number
  * Returns fallback value if conversion would lose precision
  */
 export function safeToNumber(decimal: DecimalType, fallback: number = 0): number {
-  if (!isDecimal(decimal)) return fallback;
+  if (!checkIsDecimal(decimal)) return fallback;
 
   try {
     const num = decimal.toNumber();
@@ -27,7 +27,7 @@ export function safeToNumber(decimal: DecimalType, fallback: number = 0): number
  * Always preserves full precision
  */
 export function safeToString(decimal: DecimalType): string {
-  if (!isDecimal(decimal)) return '0';
+  if (!checkIsDecimal(decimal)) return '0';
 
   try {
     return decimal.toString();
@@ -41,7 +41,7 @@ export function safeToString(decimal: DecimalType): string {
  * (beyond JavaScript's safe number range)
  */
 export function isExtremeValue(decimal: DecimalType): boolean {
-  if (!isDecimal(decimal)) return false;
+  if (!checkIsDecimal(decimal)) return false;
 
   try {
     const num = decimal.toNumber();
@@ -56,7 +56,7 @@ export function isExtremeValue(decimal: DecimalType): boolean {
  * Uses scientific notation for extreme values
  */
 export function safeFormat(decimal: DecimalType): string {
-  if (!isDecimal(decimal)) return '0';
+  if (!checkIsDecimal(decimal)) return '0';
 
   try {
     if (isExtremeValue(decimal)) {
@@ -82,7 +82,7 @@ export function safeFormat(decimal: DecimalType): string {
  * Returns true if a >= b
  */
 export function safeGte(a: any, b: any): boolean {
-  if (!isDecimal(a) || !isDecimal(b)) {
+  if (!checkIsDecimal(a) || !checkIsDecimal(b)) {
     return Number(a || 0) >= Number(b || 0);
   }
 
@@ -97,7 +97,7 @@ export function safeGte(a: any, b: any): boolean {
  * Safely adds two values using Decimal operations
  */
 export function safeAdd(a: any, b: any): DecimalType {
-  if (!isDecimal(a) || !isDecimal(b)) {
+  if (!checkIsDecimal(a) || !checkIsDecimal(b)) {
     return new (globalThis as any).Decimal(Number(a || 0) + Number(b || 0));
   }
 
@@ -112,7 +112,7 @@ export function safeAdd(a: any, b: any): DecimalType {
  * Safely multiplies two values using Decimal operations
  */
 export function safeMultiply(a: any, b: any): DecimalType {
-  if (!isDecimal(a) || !isDecimal(b)) {
+  if (!checkIsDecimal(a) || !checkIsDecimal(b)) {
     return new (globalThis as any).Decimal(Number(a || 0) * Number(b || 0));
   }
 
@@ -127,7 +127,7 @@ export function safeMultiply(a: any, b: any): DecimalType {
  * Safely divides two values using Decimal operations
  */
 export function safeDivide(a: any, b: any): DecimalType {
-  if (!isDecimal(a) || !isDecimal(b)) {
+  if (!checkIsDecimal(a) || !checkIsDecimal(b)) {
     const numA = Number(a || 0);
     const numB = Number(b || 1);
     return new (globalThis as any).Decimal(numB !== 0 ? numA / numB : 0);
@@ -164,7 +164,7 @@ export function isValidDecimalString(str: string): boolean {
  * Gets a human-readable description of a Decimal's magnitude
  */
 export function getMagnitudeDescription(decimal: DecimalType): string {
-  if (!isDecimal(decimal)) return 'Invalid';
+  if (!checkIsDecimal(decimal)) return 'Invalid';
 
   try {
     if (isExtremeValue(decimal)) {

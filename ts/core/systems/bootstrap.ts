@@ -42,13 +42,24 @@ export class BootstrapSystem {
    * Get the status of all dependencies
    */
   public getDependencyStatus(): DependencyStatus {
-    return {
+    const status = {
       UNLOCKS_SYSTEM: !!(window as any).App?.systems?.unlocks,
       DOM_CACHE: typeof DOM_CACHE !== 'undefined',
       GAME_CONFIG: !!this.getGameConfig() && Object.keys(this.getGameConfig()).length > 0,
       Decimal: typeof Decimal !== 'undefined',
       App: typeof (window as any).App !== 'undefined',
     };
+
+    // Log missing dependencies for debugging
+    const missing = Object.entries(status)
+      .filter(([, ok]) => !ok)
+      .map(([k]) => k);
+
+    if (missing.length > 0) {
+      console.log('⏳ Missing dependencies:', missing.join(', '));
+    }
+
+    return status;
   }
 
   /**

@@ -11,15 +11,8 @@ export default defineConfig({
     // Enable source maps for better debugging
     sourcemap: false, // Disable for production to reduce size
 
-    // Optimize minification
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'] as string[],
-      },
-    },
+    // Disable minification entirely to prevent variable conflicts
+    minify: false,
 
     // Enable compression
     reportCompressedSize: true,
