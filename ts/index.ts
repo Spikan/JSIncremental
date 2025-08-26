@@ -175,11 +175,17 @@ try {
       document.removeEventListener('pointerdown', unlock, true);
       document.removeEventListener('touchstart', unlock, true);
       document.removeEventListener('click', unlock, true);
+      document.removeEventListener('keydown', unlock, true);
+      document.removeEventListener('mousedown', unlock, true);
+      document.removeEventListener('touchend', unlock, true);
     } catch {}
   };
   document.addEventListener('pointerdown', unlock, { capture: true, once: true } as any);
   document.addEventListener('touchstart', unlock, { capture: true, once: true } as any);
   document.addEventListener('click', unlock, { capture: true, once: true } as any);
+  document.addEventListener('keydown', unlock, { capture: true, once: true } as any);
+  document.addEventListener('mousedown', unlock, { capture: true, once: true } as any);
+  document.addEventListener('touchend', unlock, { capture: true, once: true } as any);
   __pushDiag({ type: 'audio', stage: 'initialized' });
 } catch (e) {
   __pushDiag({ type: 'audio', stage: 'init-failed', err: String((e && (e as any).message) || e) });
