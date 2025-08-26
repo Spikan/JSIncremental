@@ -8,7 +8,8 @@ import './core/constants.ts';
 import './dom-cache.ts';
 import './god.ts';
 import './main.ts';
-
+import * as gameInitStatic from './core/systems/game-init.ts';
+import * as unlocksStatic from './feature-unlocks.ts';
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || {
   loadGame: () => null,
@@ -72,6 +73,26 @@ const zustandStore = useGameStore;
 };
 
 __pushDiag({ type: 'index', stage: 'app-created' });
+
+// Ensure critical deps for splash/bootstrap are present (unlocks, game-init)
+try {
+  (window as any).App.systems.unlocks = (unlocksStatic as any)?.FEATURE_UNLOCKS || {};
+  Object.assign((window as any).App.systems.gameInit, gameInitStatic);
+  (window as any).initOnDomReady = (gameInitStatic as any).initOnDomReady;
+  try {
+    if (
+      !(window as any).App.systems.gameInit.startGame &&
+      (window as any).App.systems.gameInit.startGameCore
+    ) {
+      (window as any).App.systems.gameInit.startGame = (
+        window as any
+      ).App.systems.gameInit.startGameCore;
+    }
+  } catch {}
+  __pushDiag({ type: 'wire', module: 'critical-static', ok: true });
+} catch (e) {
+  __pushDiag({ type: 'wire', module: 'critical-static', ok: false, err: String((e && (e as any).message) || e) });
+}
 
 // Initialize UI immediately when available
 try {
