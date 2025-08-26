@@ -15,6 +15,9 @@
     <script>
       eruda.init();
     </script>
+    <!-- Ensure Decimal/Zod are available before any modules execute (prod places module in head) -->
+    <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
+    <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
     <script>
       // Safety check to ensure functions are available - moved to after main.js loads
       window.addEventListener('load', function () {
@@ -820,8 +823,6 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
-    <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
     <script type="module" src="ts/config.ts"></script>
     <script type="module" src="ts/core/constants.ts"></script>
     <!-- event-bus.ts is loaded dynamically in ts/index.ts -->
