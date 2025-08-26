@@ -132,7 +132,14 @@ __pushDiag({ type: 'import-start', module: 'game-init-early' });
           } catch {}
           __pushDiag({ type: 'import', module: 'game-init-early', ok: true });
           try {
-            (window as any).initOnDomReady?.();
+            // Prefer module init function directly to avoid global timing gaps
+            if (typeof (gameInit as any).initOnDomReady === 'function') {
+              (gameInit as any).initOnDomReady();
+            } else if (typeof (gameInit as any).initSplashScreen === 'function') {
+              (gameInit as any).initSplashScreen();
+            } else {
+              (window as any).initOnDomReady?.();
+            }
           } catch {}
         } catch (err) {
           __pushDiag({
