@@ -38,6 +38,44 @@
 
         // Start checking after a brief initial delay
         setTimeout(checkFunctionsLoaded, 1000);
+
+        // HTML-level splash fallback: ensure any interaction starts the game
+        try {
+          var startIfPossible = function (e) {
+            try {
+              var splash = document.getElementById('splashScreen');
+              if (splash && splash.style.display !== 'none') {
+                e && e.preventDefault && e.preventDefault();
+                e && e.stopPropagation && e.stopPropagation();
+                if (typeof window.startGame === 'function') {
+                  window.startGame();
+                } else if (
+                  window.App &&
+                  window.App.systems &&
+                  window.App.systems.gameInit &&
+                  typeof window.App.systems.gameInit.startGameCore === 'function'
+                ) {
+                  window.App.systems.gameInit.startGameCore();
+                }
+              }
+            } catch (err) {
+              console.warn('HTML-level fallback failed:', err);
+            }
+          };
+          document.addEventListener('click', startIfPossible, { capture: true });
+          document.addEventListener('pointerdown', startIfPossible, { capture: true });
+          document.addEventListener('keydown', function (e) {
+            if (e.code === 'Space' || e.code === 'Enter') startIfPossible(e);
+          });
+          setTimeout(function () {
+            var splash = document.getElementById('splashScreen');
+            if (splash && splash.style.display !== 'none') {
+              startIfPossible({ preventDefault: function () {}, stopPropagation: function () {} });
+            }
+          }, 3000);
+        } catch (err) {
+          console.warn('Failed to attach HTML-level splash fallback:', err);
+        }
       });
     </script>
   </head>
