@@ -12,6 +12,7 @@ import * as loopStatic from './core/systems/loop-system.ts';
 import { processDrinkFactory as processDrinkFactoryStatic } from './core/systems/drink-system.ts';
 import * as uiStatic from './ui/index.ts';
 import * as unlocksStatic from './feature-unlocks.ts';
+import * as clicksStatic from './core/systems/clicks-system.ts';
 import './main.ts';
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || {
@@ -91,6 +92,8 @@ try {
     const factory = processDrinkFactoryStatic?.();
     if (factory) (window as any).App.systems.drink.processDrink = factory;
   } catch {}
+  // Clicks system
+  Object.assign((window as any).App.systems.clicks, clicksStatic);
   // Unlocks
   (window as any).App.systems.unlocks = (unlocksStatic as any)?.FEATURE_UNLOCKS || {};
   // Game init
@@ -111,6 +114,10 @@ try {
   try {
     if (typeof (window as any).App.ui.initializeUI === 'function')
       (window as any).App.ui.initializeUI();
+  } catch {}
+  // Initialize unlocks after UI is ready so visibility updates apply
+  try {
+    (window as any).App.systems.unlocks?.init?.();
   } catch {}
   __pushDiag({ type: 'wire', module: 'core-static', ok: true });
 } catch (e) {
