@@ -3,25 +3,12 @@
 import { useGameStore } from './core/state/zustand-store.ts';
 import { createEventBus } from './services/event-bus.ts';
 import { performanceMonitor } from './services/performance.ts';
-// Eager-load critical systems in production to avoid dynamic import issues on Pages
-import * as staticLoop from './core/systems/loop-system.ts';
-import { processDrinkFactory as staticProcessDrinkFactory } from './core/systems/drink-system.ts';
-// Statically import UI and core systems to avoid dynamic import stalls on Pages
-import * as uiModuleStatic from './ui/index.ts';
 import './config.ts';
 import './core/constants.ts';
 import './dom-cache.ts';
 import './god.ts';
 import './main.ts';
-import * as resourcesStatic from './core/systems/resources.ts';
-import * as purchasesStatic from './core/systems/purchases-system.ts';
-import * as saveStatic from './core/systems/save-system.ts';
-import * as autosaveStatic from './core/systems/autosave.ts';
-import * as clicksStatic from './core/systems/clicks-system.ts';
-import * as audioButtonStatic from './core/systems/button-audio.ts';
-import * as devStatic from './core/systems/dev.ts';
-import * as gameInitStatic from './core/systems/game-init.ts';
-import * as unlocksStatic from './feature-unlocks.ts';
+
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || {
   loadGame: () => null,
@@ -85,76 +72,6 @@ const zustandStore = useGameStore;
 };
 
 __pushDiag({ type: 'index', stage: 'app-created' });
-
-// Wire eagerly imported critical systems
-try {
-  Object.assign((window as any).App.systems.loop, staticLoop);
-  __pushDiag({ type: 'import', module: 'loop-static', ok: true });
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'loop-static',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-}
-try {
-  const factory = staticProcessDrinkFactory?.();
-  if (factory) {
-    (window as any).App.systems.drink.processDrink = factory;
-  }
-  __pushDiag({ type: 'import', module: 'drink-static', ok: true });
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'drink-static',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-}
-
-// Wire statically imported systems/UI
-try {
-  // Systems
-  (window as any).App.systems.resources &&
-    Object.assign((window as any).App.systems.resources, resourcesStatic);
-  (window as any).App.systems.purchases &&
-    Object.assign((window as any).App.systems.purchases, purchasesStatic);
-  (window as any).App.systems.save && Object.assign((window as any).App.systems.save, saveStatic);
-  (window as any).App.systems.autosave &&
-    Object.assign((window as any).App.systems.autosave, autosaveStatic);
-  (window as any).App.systems.clicks &&
-    Object.assign((window as any).App.systems.clicks, clicksStatic);
-  (window as any).App.systems.audio &&
-    (window as any).App.systems.audio.button &&
-    Object.assign((window as any).App.systems.audio.button, audioButtonStatic);
-  (window as any).App.systems.dev = devStatic as any;
-  (window as any).App.systems.gameInit &&
-    Object.assign((window as any).App.systems.gameInit, gameInitStatic);
-  (window as any).App.systems.unlocks = (unlocksStatic as any)?.FEATURE_UNLOCKS || {};
-  // UI
-  Object.assign((window as any).App.ui, uiModuleStatic);
-  // Expose helper used elsewhere
-  (window as any).initOnDomReady = (gameInitStatic as any).initOnDomReady;
-  try {
-    if (
-      !(window as any).App.systems.gameInit.startGame &&
-      (window as any).App.systems.gameInit.startGameCore
-    ) {
-      (window as any).App.systems.gameInit.startGame = (
-        window as any
-      ).App.systems.gameInit.startGameCore;
-    }
-  } catch {}
-  __pushDiag({ type: 'wire', module: 'static-systems-ui', ok: true });
-} catch (e) {
-  __pushDiag({
-    type: 'wire',
-    module: 'static-systems-ui',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-}
 
 // Initialize UI immediately when available
 try {
