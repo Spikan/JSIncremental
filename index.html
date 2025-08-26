@@ -31,7 +31,10 @@
           window.addEventListener('unhandledrejection', function (e) {
             try {
               var r = e && e.reason;
-              window.__diag.push({ type: 'unhandledrejection', reason: (r && (r.message || r)) + '' });
+              window.__diag.push({
+                type: 'unhandledrejection',
+                reason: (r && (r.message || r)) + '',
+              });
             } catch {}
           });
         } catch {}
@@ -65,7 +68,9 @@
               var game = document.getElementById('gameContent');
               if (splash && game) {
                 try {
-                  document.body && document.body.classList && document.body.classList.add('game-started');
+                  document.body &&
+                    document.body.classList &&
+                    document.body.classList.add('game-started');
                 } catch {}
                 try {
                   splash.style.display = 'none';
@@ -79,24 +84,72 @@
                   game.style.opacity = '1';
                   game.classList && game.classList.add('active');
                 } catch {}
+                // After showing the game, try to initialize and start loop when available
                 try {
-                  var loopStart =
-                    window.App &&
-                    window.App.systems &&
-                    window.App.systems.loop &&
-                    window.App.systems.loop.start;
-                  if (typeof loopStart === 'function') {
-                    loopStart({
-                      updateDrinkProgress: function () {},
-                      processDrink: function () {},
-                      updateStats: function () {},
-                      updatePlayTime: function () {},
-                      updateLastSaveTime: function () {},
-                    });
-                  }
+                  var startOnce = (function () {
+                    var done = false;
+                    return function (fn) {
+                      if (done) return;
+                      done = true;
+                      try { fn && fn(); } catch {}
+                    };
+                  })();
+
+                  var pollInitAndLoop = function () {
+                    try {
+                      // Call initGame if it exists
+                      if (typeof window.initGame === 'function') {
+                        startOnce(function () { window.initGame(); });
+                      }
+
+                      // Start main loop with real callbacks when available
+                      var loopStart =
+                        window.App &&
+                        window.App.systems &&
+                        window.App.systems.loop &&
+                        window.App.systems.loop.start;
+
+                      if (typeof loopStart === 'function') {
+                        loopStart({
+                          updateDrinkProgress: function () {
+                            try {
+                              var st = (window.App && window.App.state && window.App.state.getState && window.App.state.getState()) || {};
+                              var now = Date.now();
+                              var last = Number((st && st.lastDrinkTime) || (window.lastDrinkTime || 0));
+                              var rate = Number((st && st.drinkRate) || (window.drinkRate || 1000));
+                              var pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
+                              window.App && window.App.state && window.App.state.setState && window.App.state.setState({ drinkProgress: pct });
+                              window.App && window.App.ui && window.App.ui.updateDrinkProgress && window.App.ui.updateDrinkProgress(pct, rate);
+                            } catch {}
+                          },
+                          processDrink: function () {
+                            try { window.App && window.App.systems && window.App.systems.drink && window.App.systems.drink.processDrink && window.App.systems.drink.processDrink(); } catch {}
+                          },
+                          updateStats: function () {
+                            try {
+                              window.App && window.App.ui && window.App.ui.updatePlayTime && window.App.ui.updatePlayTime();
+                              window.App && window.App.ui && window.App.ui.updateLastSaveTime && window.App.ui.updateLastSaveTime();
+                              window.App && window.App.ui && window.App.ui.updateAllStats && window.App.ui.updateAllStats();
+                              window.App && window.App.ui && window.App.ui.updatePurchasedCounts && window.App.ui.updatePurchasedCounts();
+                              window.App && window.App.ui && window.App.ui.checkUpgradeAffordability && window.App.ui.checkUpgradeAffordability();
+                              window.App && window.App.systems && window.App.systems.unlocks && window.App.systems.unlocks.checkAllUnlocks && window.App.systems.unlocks.checkAllUnlocks();
+                            } catch {}
+                          },
+                          updatePlayTime: function () { try { window.App && window.App.ui && window.App.ui.updatePlayTime && window.App.ui.updatePlayTime(); } catch {} },
+                          updateLastSaveTime: function () { try { window.App && window.App.ui && window.App.ui.updateLastSaveTime && window.App.ui.updateLastSaveTime(); } catch {} },
+                        });
+                        try { window.__diag && window.__diag.push({ type: 'shim', used: 'loopStart' }); } catch {}
+                        return; // loop started, stop polling
+                      }
+                    } catch {}
+                    setTimeout(pollInitAndLoop, 100);
+                  };
+                  pollInitAndLoop();
                 } catch {}
               }
-              try { window.__diag && window.__diag.push({ type: 'shim', used: 'manualStart' }); } catch {}
+              try {
+                window.__diag && window.__diag.push({ type: 'shim', used: 'manualStart' });
+              } catch {}
             } catch {}
           };
 
@@ -108,7 +161,9 @@
                 e && e.stopPropagation && e.stopPropagation();
                 if (typeof window.startGame === 'function') {
                   window.startGame();
-                  try { window.__diag && window.__diag.push({ type: 'shim', call: 'startGame' }); } catch {}
+                  try {
+                    window.__diag && window.__diag.push({ type: 'shim', call: 'startGame' });
+                  } catch {}
                 } else if (
                   window.App &&
                   window.App.systems &&
@@ -116,7 +171,9 @@
                   typeof window.App.systems.gameInit.startGameCore === 'function'
                 ) {
                   window.App.systems.gameInit.startGameCore();
-                  try { window.__diag && window.__diag.push({ type: 'shim', call: 'startGameCore' }); } catch {}
+                  try {
+                    window.__diag && window.__diag.push({ type: 'shim', call: 'startGameCore' });
+                  } catch {}
                 } else {
                   manualStart();
                 }
