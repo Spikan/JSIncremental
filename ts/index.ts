@@ -80,6 +80,7 @@ __pushDiag({ type: 'index', stage: 'app-created' });
 try {
   (function () {
     let invoked = false;
+    const startedAt = Date.now();
     (window as any).initOnDomReady = function () {
       if (invoked) return;
       invoked = true;
@@ -92,6 +93,24 @@ try {
             return;
           }
         } catch {}
+        // After 1s, force-show game content to avoid being stuck on splash
+        if (Date.now() - startedAt > 1000) {
+          try {
+            const splash = document.getElementById('splashScreen') as any;
+            const game = document.getElementById('gameContent') as any;
+            if (splash && game) {
+              splash.style.display = 'none';
+              splash.style.visibility = 'hidden';
+              splash.style.pointerEvents = 'none';
+              game.style.display = 'block';
+              game.style.visibility = 'visible';
+              game.style.opacity = '1';
+              document.body?.classList?.add('game-started');
+              __pushDiag({ type: 'splash', action: 'forced-hide' });
+            }
+          } catch {}
+          return;
+        }
         invoked = false;
         setTimeout(() => (window as any).initOnDomReady?.(), 100);
       };
