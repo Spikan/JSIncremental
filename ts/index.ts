@@ -39,6 +39,11 @@ function __pushDiag(marker: any): void {
 
 console.log('🔧 index.ts starting App initialization...');
 __pushDiag({ type: 'index', stage: 'start' });
+// Report resolved base for dynamic imports
+try {
+  console.log('BASE_URL =', import.meta.env.BASE_URL);
+  __pushDiag({ type: 'base', base: import.meta.env.BASE_URL, url: import.meta.url });
+} catch {}
 
 // Initialize Zustand store
 console.log('🔧 Initializing Zustand store...');
