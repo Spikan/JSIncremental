@@ -78,6 +78,7 @@ const zustandStore = useGameStore;
 __pushDiag({ type: 'index', stage: 'app-created' });
 
 // Early dynamic import of game-init and unlocks to keep splash deterministic without static wiring
+__pushDiag({ type: 'import-start', module: 'game-init-early' });
 try {
   const gameInit = await import('./core/systems/game-init.ts');
   Object.assign((window as any).App.systems.gameInit, gameInit);
@@ -101,6 +102,7 @@ try {
     err: String((e && (e as any).message) || e),
   });
 }
+__pushDiag({ type: 'import-start', module: 'unlocks-early' });
 try {
   const unlocks = await import('./feature-unlocks.ts');
   (window as any).App.systems.unlocks =
