@@ -8,8 +8,6 @@ import './core/constants.ts';
 import './dom-cache.ts';
 import './god.ts';
 import './main.ts';
-import * as gameInitStatic from './core/systems/game-init.ts';
-import * as unlocksStatic from './feature-unlocks.ts';
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || {
   loadGame: () => null,
@@ -74,11 +72,11 @@ const zustandStore = useGameStore;
 
 __pushDiag({ type: 'index', stage: 'app-created' });
 
-// Ensure critical deps for splash/bootstrap are present (unlocks, game-init)
+// Early dynamic import of game-init and unlocks to keep splash deterministic without static wiring
 try {
-  (window as any).App.systems.unlocks = (unlocksStatic as any)?.FEATURE_UNLOCKS || {};
-  Object.assign((window as any).App.systems.gameInit, gameInitStatic);
-  (window as any).initOnDomReady = (gameInitStatic as any).initOnDomReady;
+  const gameInit = await import('./core/systems/game-init.ts');
+  Object.assign((window as any).App.systems.gameInit, gameInit);
+  (window as any).initOnDomReady = (gameInit as any).initOnDomReady;
   try {
     if (
       !(window as any).App.systems.gameInit.startGame &&
@@ -89,9 +87,27 @@ try {
       ).App.systems.gameInit.startGameCore;
     }
   } catch {}
-  __pushDiag({ type: 'wire', module: 'critical-static', ok: true });
+  __pushDiag({ type: 'import', module: 'game-init-early', ok: true });
 } catch (e) {
-  __pushDiag({ type: 'wire', module: 'critical-static', ok: false, err: String((e && (e as any).message) || e) });
+  __pushDiag({
+    type: 'import',
+    module: 'game-init-early',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
+}
+try {
+  const unlocks = await import('./feature-unlocks.ts');
+  (window as any).App.systems.unlocks =
+    unlocks && (unlocks as any).FEATURE_UNLOCKS ? (unlocks as any).FEATURE_UNLOCKS : {};
+  __pushDiag({ type: 'import', module: 'unlocks-early', ok: true });
+} catch (e) {
+  __pushDiag({
+    type: 'import',
+    module: 'unlocks-early',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
 }
 
 // Initialize UI immediately when available
@@ -205,9 +221,7 @@ try {
 }
 
 try {
-  const unlocks = await import('./feature-unlocks.ts');
-  (window as any).App.systems.unlocks =
-    unlocks && (unlocks as any).FEATURE_UNLOCKS ? (unlocks as any).FEATURE_UNLOCKS : {};
+  // unlocks already loaded early
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -347,31 +361,7 @@ try {
   });
   console.warn('⚠️ dev system load failed:', e);
 }
-try {
-  const gameInit = await import('./core/systems/game-init.ts');
-  Object.assign((window as any).App.systems.gameInit, gameInit);
-  (window as any).initOnDomReady = (gameInit as any).initOnDomReady;
-  try {
-    if (
-      !(window as any).App.systems.gameInit.startGame &&
-      (window as any).App.systems.gameInit.startGameCore
-    ) {
-      (window as any).App.systems.gameInit.startGame = (
-        window as any
-      ).App.systems.gameInit.startGameCore;
-    }
-  } catch (error) {
-    console.warn('Failed to initialize game init system:', error);
-  }
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'game-init',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-  console.warn('⚠️ game-init system load failed:', e);
-}
+// game-init already loaded early
 
 console.log('✅ App object created and ready');
 console.log('🔧 index.ts finished loading, App object created:', !!(window as any).App);

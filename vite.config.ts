@@ -4,8 +4,13 @@ import { visualizer } from 'rollup-plugin-visualizer';
 export default defineConfig(({ mode }) => {
   const isAnalyze = mode === 'analyze';
   return {
-    // Set this to your repo name (e.g., '/your-repo-name/') for GitHub Pages
-    base: (process.env as any).VITE_BASE_PATH || '/',
+    // Base path for assets. On GitHub Pages it must be '/<repo>/' so dynamic imports resolve.
+    // Priority: explicitly provided VITE_BASE_PATH -> derive from GITHUB_REPOSITORY -> '/'
+    base:
+      (process.env as any).VITE_BASE_PATH ||
+      ((process.env as any).GITHUB_REPOSITORY
+        ? `/${String((process.env as any).GITHUB_REPOSITORY).split('/')[1]}/`
+        : '/'),
 
     build: {
       target: 'esnext',
