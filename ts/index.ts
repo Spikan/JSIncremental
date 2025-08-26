@@ -117,6 +117,14 @@ try {
       attempt();
     };
     __pushDiag({ type: 'wire', module: 'initOnDomReady-default' });
+    try {
+      setTimeout(() => {
+        try {
+          (window as any).initOnDomReady?.();
+          __pushDiag({ type: 'initOnDomReady', used: 'default-invoked' });
+        } catch {}
+      }, 0);
+    } catch {}
   })();
 } catch {}
 
