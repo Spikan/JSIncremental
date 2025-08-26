@@ -172,8 +172,25 @@ export function startGameCore(): void {
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     if (splashScreen && gameContent) {
-      splashScreen.style.display = 'none';
-      gameContent.style.display = 'block';
+      try {
+        (window as any).__GAME_STARTED__ = true;
+        document.body.classList?.add('game-started');
+      } catch {}
+      // Robustly remove/disable splash overlay
+      try {
+        splashScreen.style.display = 'none';
+        splashScreen.style.visibility = 'hidden';
+        (splashScreen as HTMLElement).style.pointerEvents = 'none';
+        if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
+      } catch {}
+      // Force-show game content
+      try {
+        gameContent.style.display = 'block';
+        (gameContent as HTMLElement).style.visibility = 'visible';
+        (gameContent as HTMLElement).style.opacity = '1';
+        gameContent.classList?.add('active');
+      } catch {}
+      // Initialize game
       try {
         (window as any).initGame?.();
       } catch (error) {
