@@ -161,15 +161,14 @@ try {
   __pushDiag({ type: 'ui', stage: 'init-failed', err: String((e && (e as any).message) || e) });
 }
 
-// Initialize button audio system and ensure it unlocks on first interaction
+// Initialize button audio system on first user interaction (prevents autoplay warnings)
 try {
-  (window as any).App?.systems?.audio?.button?.initButtonAudioSystem?.();
-  (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
-  // Best-effort unlock on first user interaction
   const unlock = () => {
     try {
-      (window as any).App?.systems?.audio?.button?.playButtonClickSound?.();
-      (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+      const audio = (window as any).App?.systems?.audio?.button;
+      audio?.initButtonAudioSystem?.();
+      audio?.playButtonClickSound?.();
+      audio?.updateButtonSoundsToggleButton?.();
     } catch {}
     try {
       document.removeEventListener('pointerdown', unlock, true);
