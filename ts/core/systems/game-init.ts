@@ -66,8 +66,23 @@ export function initSplashScreen(): void {
         const game = document.getElementById('gameContent');
         if (splash && game) {
           started = true;
-          splash.style.display = 'none';
-          game.style.display = 'block';
+          try {
+            (window as any).__GAME_STARTED__ = true;
+          } catch {}
+          // Make splash removal robust against CSS overrides
+          try {
+            splash.style.display = 'none';
+            splash.style.visibility = 'hidden';
+            splash.style.pointerEvents = 'none';
+            // Remove from DOM to prevent any reflow bringing it back
+            if (splash.parentNode) splash.parentNode.removeChild(splash);
+          } catch {}
+          try {
+            game.style.display = 'block';
+            (game as HTMLElement).style.visibility = 'visible';
+            (game as HTMLElement).style.opacity = '1';
+            game.classList?.add('active');
+          } catch {}
           try {
             (window as any).initGame?.();
           } catch (error) {
@@ -128,10 +143,14 @@ export function initSplashScreen(): void {
       };
       window.addEventListener('pointerdown', startIfSplashVisible, { capture: true } as any);
       document.addEventListener('click', startIfSplashVisible, { capture: true } as any);
-      document.addEventListener('touchstart', startIfSplashVisible as any, {
-        capture: true,
-        passive: true,
-      } as any);
+      document.addEventListener(
+        'touchstart',
+        startIfSplashVisible as any,
+        {
+          capture: true,
+          passive: true,
+        } as any
+      );
     } catch {}
 
     // Timed fallback: auto-start after a short delay if still on splash
