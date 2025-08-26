@@ -76,6 +76,31 @@ const zustandStore = useGameStore;
 
 __pushDiag({ type: 'index', stage: 'app-created' });
 
+// Ensure a default, non-blocking initOnDomReady exists even if early imports stall
+try {
+  (function () {
+    let invoked = false;
+    (window as any).initOnDomReady = function () {
+      if (invoked) return;
+      invoked = true;
+      const attempt = () => {
+        try {
+          const fn = (window as any).App?.systems?.gameInit?.initSplashScreen;
+          if (typeof fn === 'function') {
+            fn();
+            __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
+            return;
+          }
+        } catch {}
+        invoked = false;
+        setTimeout(() => (window as any).initOnDomReady?.(), 100);
+      };
+      attempt();
+    };
+    __pushDiag({ type: 'wire', module: 'initOnDomReady-default' });
+  })();
+} catch {}
+
 // Early dynamic import of game-init and unlocks to keep splash deterministic without static wiring
 // Use Vite's import.meta.glob to ensure stable module resolution on Pages
 const earlyModules: Record<string, () => Promise<any>> = import.meta.glob([
