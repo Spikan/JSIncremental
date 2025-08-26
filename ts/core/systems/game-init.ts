@@ -58,11 +58,14 @@ export function initSplashScreen(): void {
       } catch {}
     }
 
+    let started = false;
     function startGame(): void {
       try {
+        if (started) return;
         const splash = document.getElementById('splashScreen');
         const game = document.getElementById('gameContent');
         if (splash && game) {
+          started = true;
           splash.style.display = 'none';
           game.style.display = 'block';
           try {
@@ -109,6 +112,38 @@ export function initSplashScreen(): void {
         }
       }
     });
+
+    // Global fallbacks: capture any interaction to start the game if splash is visible
+    try {
+      const startIfSplashVisible = (e: Event) => {
+        try {
+          if (!splashScreen) return;
+          const visible = splashScreen.style.display !== 'none';
+          if (visible) {
+            e?.preventDefault?.();
+            e?.stopPropagation?.();
+            startGame();
+          }
+        } catch {}
+      };
+      window.addEventListener('pointerdown', startIfSplashVisible, { capture: true } as any);
+      document.addEventListener('click', startIfSplashVisible, { capture: true } as any);
+      document.addEventListener('touchstart', startIfSplashVisible as any, {
+        capture: true,
+        passive: true,
+      } as any);
+    } catch {}
+
+    // Timed fallback: auto-start after a short delay if still on splash
+    try {
+      setTimeout(() => {
+        try {
+          if (splashScreen && splashScreen.style.display !== 'none') {
+            startGame();
+          }
+        } catch {}
+      }, 3000);
+    } catch {}
   } catch {}
 }
 
@@ -126,7 +161,7 @@ export function startGameCore(): void {
       }
       // Start loop via system (authoritative)
       try {
-        const restart = () => {
+        const restart = (): void => {
           const w: any = window as any;
           const loopStart = w.App?.systems?.loop?.start;
           if (!loopStart) return void setTimeout(restart, 100);
