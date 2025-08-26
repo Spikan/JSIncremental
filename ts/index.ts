@@ -111,28 +111,44 @@ try {
 // Wire statically imported systems/UI
 try {
   // Systems
-  (window as any).App.systems.resources && Object.assign((window as any).App.systems.resources, resourcesStatic);
-  (window as any).App.systems.purchases && Object.assign((window as any).App.systems.purchases, purchasesStatic);
+  (window as any).App.systems.resources &&
+    Object.assign((window as any).App.systems.resources, resourcesStatic);
+  (window as any).App.systems.purchases &&
+    Object.assign((window as any).App.systems.purchases, purchasesStatic);
   (window as any).App.systems.save && Object.assign((window as any).App.systems.save, saveStatic);
-  (window as any).App.systems.autosave && Object.assign((window as any).App.systems.autosave, autosaveStatic);
-  (window as any).App.systems.clicks && Object.assign((window as any).App.systems.clicks, clicksStatic);
-  (window as any).App.systems.audio && (window as any).App.systems.audio.button &&
+  (window as any).App.systems.autosave &&
+    Object.assign((window as any).App.systems.autosave, autosaveStatic);
+  (window as any).App.systems.clicks &&
+    Object.assign((window as any).App.systems.clicks, clicksStatic);
+  (window as any).App.systems.audio &&
+    (window as any).App.systems.audio.button &&
     Object.assign((window as any).App.systems.audio.button, audioButtonStatic);
   (window as any).App.systems.dev = devStatic as any;
-  (window as any).App.systems.gameInit && Object.assign((window as any).App.systems.gameInit, gameInitStatic);
+  (window as any).App.systems.gameInit &&
+    Object.assign((window as any).App.systems.gameInit, gameInitStatic);
   (window as any).App.systems.unlocks = (unlocksStatic as any)?.FEATURE_UNLOCKS || {};
   // UI
   Object.assign((window as any).App.ui, uiModuleStatic);
   // Expose helper used elsewhere
   (window as any).initOnDomReady = (gameInitStatic as any).initOnDomReady;
   try {
-    if (!(window as any).App.systems.gameInit.startGame && (window as any).App.systems.gameInit.startGameCore) {
-      (window as any).App.systems.gameInit.startGame = (window as any).App.systems.gameInit.startGameCore;
+    if (
+      !(window as any).App.systems.gameInit.startGame &&
+      (window as any).App.systems.gameInit.startGameCore
+    ) {
+      (window as any).App.systems.gameInit.startGame = (
+        window as any
+      ).App.systems.gameInit.startGameCore;
     }
   } catch {}
   __pushDiag({ type: 'wire', module: 'static-systems-ui', ok: true });
 } catch (e) {
-  __pushDiag({ type: 'wire', module: 'static-systems-ui', ok: false, err: String((e && (e as any).message) || e) });
+  __pushDiag({
+    type: 'wire',
+    module: 'static-systems-ui',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
 }
 
 // Initialize UI immediately when available
@@ -143,6 +159,30 @@ try {
   }
 } catch (e) {
   __pushDiag({ type: 'ui', stage: 'init-failed', err: String((e && (e as any).message) || e) });
+}
+
+// Initialize button audio system and ensure it unlocks on first interaction
+try {
+  (window as any).App?.systems?.audio?.button?.initButtonAudioSystem?.();
+  (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+  // Best-effort unlock on first user interaction
+  const unlock = () => {
+    try {
+      (window as any).App?.systems?.audio?.button?.playButtonClickSound?.();
+      (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+    } catch {}
+    try {
+      document.removeEventListener('pointerdown', unlock, true);
+      document.removeEventListener('touchstart', unlock, true);
+      document.removeEventListener('click', unlock, true);
+    } catch {}
+  };
+  document.addEventListener('pointerdown', unlock, { capture: true, once: true } as any);
+  document.addEventListener('touchstart', unlock, { capture: true, once: true } as any);
+  document.addEventListener('click', unlock, { capture: true, once: true } as any);
+  __pushDiag({ type: 'audio', stage: 'initialized' });
+} catch (e) {
+  __pushDiag({ type: 'audio', stage: 'init-failed', err: String((e && (e as any).message) || e) });
 }
 
 try {
