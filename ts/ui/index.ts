@@ -53,6 +53,8 @@ export const setMusicStatusText = labels.setMusicStatusText;
 
 // Initialize UI event listeners
 export function initializeUI(): void {
+  if ((window as any).__UI_WIRED__) return;
+  (window as any).__UI_WIRED__ = true;
   // UI system initializing
   buttons.initButtonSystem();
   // Sync options UI on init
