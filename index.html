@@ -91,7 +91,9 @@
                     return function (fn) {
                       if (done) return;
                       done = true;
-                      try { fn && fn(); } catch {}
+                      try {
+                        fn && fn();
+                      } catch {}
                     };
                   })();
 
@@ -99,7 +101,9 @@
                     try {
                       // Call initGame if it exists
                       if (typeof window.initGame === 'function') {
-                        startOnce(function () { window.initGame(); });
+                        startOnce(function () {
+                          window.initGame();
+                        });
                       }
 
                       // Start main loop with real callbacks when available
@@ -110,35 +114,116 @@
                         window.App.systems.loop.start;
 
                       if (typeof loopStart === 'function') {
+                        try {
+                          var cfg = (window.GAME_CONFIG && window.GAME_CONFIG.TIMING) || {};
+                          var DEFAULT_RATE = Number(cfg.DEFAULT_DRINK_RATE || 5000);
+                          var st0 =
+                            (window.App &&
+                              window.App.state &&
+                              window.App.state.getState &&
+                              window.App.state.getState()) ||
+                            {};
+                          var rate0 = Number(st0.drinkRate || window.drinkRate || 0);
+                          if (!rate0 || rate0 <= 0) {
+                            var now0 = Date.now();
+                            window.drinkRate = DEFAULT_RATE;
+                            window.lastDrinkTime = now0 - DEFAULT_RATE;
+                            window.App &&
+                              window.App.state &&
+                              window.App.state.setState &&
+                              window.App.state.setState({
+                                drinkRate: DEFAULT_RATE,
+                                lastDrinkTime: window.lastDrinkTime,
+                                drinkProgress: 0,
+                              });
+                            try {
+                              window.__diag && window.__diag.push({ type: 'shim', fix: 'setDefaultDrinkRate' });
+                            } catch {}
+                          }
+                        } catch {}
                         loopStart({
                           updateDrinkProgress: function () {
                             try {
-                              var st = (window.App && window.App.state && window.App.state.getState && window.App.state.getState()) || {};
+                              var st =
+                                (window.App &&
+                                  window.App.state &&
+                                  window.App.state.getState &&
+                                  window.App.state.getState()) ||
+                                {};
                               var now = Date.now();
-                              var last = Number((st && st.lastDrinkTime) || (window.lastDrinkTime || 0));
-                              var rate = Number((st && st.drinkRate) || (window.drinkRate || 1000));
+                              var last = Number(
+                                (st && st.lastDrinkTime) || window.lastDrinkTime || 0
+                              );
+                              var rate = Number((st && st.drinkRate) || window.drinkRate || 1000);
                               var pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-                              window.App && window.App.state && window.App.state.setState && window.App.state.setState({ drinkProgress: pct });
-                              window.App && window.App.ui && window.App.ui.updateDrinkProgress && window.App.ui.updateDrinkProgress(pct, rate);
+                              window.App &&
+                                window.App.state &&
+                                window.App.state.setState &&
+                                window.App.state.setState({ drinkProgress: pct });
+                              window.App &&
+                                window.App.ui &&
+                                window.App.ui.updateDrinkProgress &&
+                                window.App.ui.updateDrinkProgress(pct, rate);
                             } catch {}
                           },
                           processDrink: function () {
-                            try { window.App && window.App.systems && window.App.systems.drink && window.App.systems.drink.processDrink && window.App.systems.drink.processDrink(); } catch {}
+                            try {
+                              window.App &&
+                                window.App.systems &&
+                                window.App.systems.drink &&
+                                window.App.systems.drink.processDrink &&
+                                window.App.systems.drink.processDrink();
+                            } catch {}
                           },
                           updateStats: function () {
                             try {
-                              window.App && window.App.ui && window.App.ui.updatePlayTime && window.App.ui.updatePlayTime();
-                              window.App && window.App.ui && window.App.ui.updateLastSaveTime && window.App.ui.updateLastSaveTime();
-                              window.App && window.App.ui && window.App.ui.updateAllStats && window.App.ui.updateAllStats();
-                              window.App && window.App.ui && window.App.ui.updatePurchasedCounts && window.App.ui.updatePurchasedCounts();
-                              window.App && window.App.ui && window.App.ui.checkUpgradeAffordability && window.App.ui.checkUpgradeAffordability();
-                              window.App && window.App.systems && window.App.systems.unlocks && window.App.systems.unlocks.checkAllUnlocks && window.App.systems.unlocks.checkAllUnlocks();
+                              window.App &&
+                                window.App.ui &&
+                                window.App.ui.updatePlayTime &&
+                                window.App.ui.updatePlayTime();
+                              window.App &&
+                                window.App.ui &&
+                                window.App.ui.updateLastSaveTime &&
+                                window.App.ui.updateLastSaveTime();
+                              window.App &&
+                                window.App.ui &&
+                                window.App.ui.updateAllStats &&
+                                window.App.ui.updateAllStats();
+                              window.App &&
+                                window.App.ui &&
+                                window.App.ui.updatePurchasedCounts &&
+                                window.App.ui.updatePurchasedCounts();
+                              window.App &&
+                                window.App.ui &&
+                                window.App.ui.checkUpgradeAffordability &&
+                                window.App.ui.checkUpgradeAffordability();
+                              window.App &&
+                                window.App.systems &&
+                                window.App.systems.unlocks &&
+                                window.App.systems.unlocks.checkAllUnlocks &&
+                                window.App.systems.unlocks.checkAllUnlocks();
                             } catch {}
                           },
-                          updatePlayTime: function () { try { window.App && window.App.ui && window.App.ui.updatePlayTime && window.App.ui.updatePlayTime(); } catch {} },
-                          updateLastSaveTime: function () { try { window.App && window.App.ui && window.App.ui.updateLastSaveTime && window.App.ui.updateLastSaveTime(); } catch {} },
+                          updatePlayTime: function () {
+                            try {
+                              window.App &&
+                                window.App.ui &&
+                                window.App.ui.updatePlayTime &&
+                                window.App.ui.updatePlayTime();
+                            } catch {}
+                          },
+                          updateLastSaveTime: function () {
+                            try {
+                              window.App &&
+                                window.App.ui &&
+                                window.App.ui.updateLastSaveTime &&
+                                window.App.ui.updateLastSaveTime();
+                            } catch {}
+                          },
                         });
-                        try { window.__diag && window.__diag.push({ type: 'shim', used: 'loopStart' }); } catch {}
+                        try {
+                          window.__diag && window.__diag.push({ type: 'shim', used: 'loopStart' });
+                        } catch {}
                         return; // loop started, stop polling
                       }
                     } catch {}
