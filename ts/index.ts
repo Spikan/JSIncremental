@@ -75,7 +75,12 @@ try {
   Object.assign((window as any).App.systems.loop, staticLoop);
   __pushDiag({ type: 'import', module: 'loop-static', ok: true });
 } catch (e) {
-  __pushDiag({ type: 'import', module: 'loop-static', ok: false, err: String((e && (e as any).message) || e) });
+  __pushDiag({
+    type: 'import',
+    module: 'loop-static',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
 }
 try {
   const factory = staticProcessDrinkFactory?.();
@@ -84,7 +89,12 @@ try {
   }
   __pushDiag({ type: 'import', module: 'drink-static', ok: true });
 } catch (e) {
-  __pushDiag({ type: 'import', module: 'drink-static', ok: false, err: String((e && (e as any).message) || e) });
+  __pushDiag({
+    type: 'import',
+    module: 'drink-static',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
 }
 
 try {
@@ -330,6 +340,55 @@ try {
 console.log('✅ App object created and ready');
 console.log('🔧 index.ts finished loading, App object created:', !!(window as any).App);
 __pushDiag({ type: 'index', stage: 'end' });
+
+// Pages-only safety: seed minimal state if initGame isn't present soon, so loop can tick
+try {
+  const seedIfNeeded = () => {
+    try {
+      if (typeof (window as any).initGame === 'function') return;
+      const w: any = window as any;
+      const app = w.App;
+      if (!app?.state?.setState) return;
+      const CFG = (w.GAME_CONFIG || {}) as any;
+      const BAL = (CFG.BALANCE || {}) as any;
+      const TIMING = (CFG.TIMING || {}) as any;
+      const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
+      const now = Date.now();
+      const lastDrinkTime = now - DEFAULT_RATE;
+
+      w.lastDrinkTime = lastDrinkTime;
+      w.drinkRate = DEFAULT_RATE;
+
+      const DecimalCtor = (w as any).Decimal || Number;
+      const toDec = (v: any) => (DecimalCtor === Number ? Number(v || 0) : new DecimalCtor(String(v ?? 0)));
+      const baseSPD = BAL.BASE_SIPS_PER_DRINK ?? 1;
+      const strawBaseSPD = BAL.STRAW_BASE_SPD ?? 0.6;
+      const cupBaseSPD = BAL.CUP_BASE_SPD ?? 1.2;
+
+      app.state.setState({
+        sips: toDec(0),
+        straws: toDec(0),
+        cups: toDec(0),
+        suctions: toDec(0),
+        widerStraws: toDec(0),
+        betterCups: toDec(0),
+        fasterDrinks: toDec(0),
+        criticalClicks: toDec(0),
+        level: toDec(1),
+        spd: toDec(baseSPD),
+        strawSPD: toDec(strawBaseSPD),
+        cupSPD: toDec(cupBaseSPD),
+        drinkRate: DEFAULT_RATE,
+        drinkProgress: 0,
+        lastDrinkTime: lastDrinkTime,
+      });
+      __pushDiag({ type: 'seed', ok: true });
+    } catch (e) {
+      __pushDiag({ type: 'seed', ok: false, err: String((e && (e as any).message) || e) });
+    }
+  };
+  setTimeout(seedIfNeeded, 400);
+} catch {}
 
 try {
   if ((window as any).initOnDomReady) {
