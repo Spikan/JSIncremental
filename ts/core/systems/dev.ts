@@ -32,6 +32,7 @@ export function unlockAll(): boolean {
     const allFeatures = Object.keys(fu.unlockConditions || {});
     allFeatures.forEach(f => fu.unlockedFeatures.add(f));
     fu.updateFeatureVisibility?.();
+    fu.saveUnlockedFeatures?.();
     fu.updateUnlocksTab?.();
     return true;
   } catch (error) {
@@ -47,6 +48,7 @@ export function unlockShop(): boolean {
     if (!fu) return false;
     fu.unlockedFeatures.add('shop');
     fu.updateFeatureVisibility?.();
+    fu.saveUnlockedFeatures?.();
     return true;
   } catch (error) {
     console.warn('Dev function failed:', error);
@@ -63,6 +65,7 @@ export function unlockUpgrades(): boolean {
       fu.unlockedFeatures.add(f)
     );
     fu.updateFeatureVisibility?.();
+    fu.saveUnlockedFeatures?.();
     return true;
   } catch (error) {
     console.warn('Dev function failed:', error);
