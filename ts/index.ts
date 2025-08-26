@@ -7,7 +7,6 @@ import './config.ts';
 import './core/constants.ts';
 import './dom-cache.ts';
 import './god.ts';
-import './main.ts';
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || {
   loadGame: () => null,
@@ -92,6 +91,10 @@ try {
     : await import('./core/systems/game-init.ts');
   Object.assign((window as any).App.systems.gameInit, gameInit);
   (window as any).initOnDomReady = (gameInit as any).initOnDomReady;
+  if (!(gameInit as any).initOnDomReady && (window as any).App.systems.gameInit?.initSplashScreen) {
+    (window as any).initOnDomReady = () => (window as any).App.systems.gameInit.initSplashScreen();
+    __pushDiag({ type: 'wire', module: 'initOnDomReady-fallback' });
+  }
   try {
     if (
       !(window as any).App.systems.gameInit.startGame &&
@@ -107,6 +110,18 @@ try {
   __pushDiag({
     type: 'import',
     module: 'game-init-early',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
+}
+__pushDiag({ type: 'import-start', module: 'main' });
+try {
+  await import('./main.ts');
+  __pushDiag({ type: 'import', module: 'main', ok: true });
+} catch (e) {
+  __pushDiag({
+    type: 'import',
+    module: 'main',
     ok: false,
     err: String((e && (e as any).message) || e),
   });
