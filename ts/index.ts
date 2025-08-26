@@ -78,9 +78,18 @@ const zustandStore = useGameStore;
 __pushDiag({ type: 'index', stage: 'app-created' });
 
 // Early dynamic import of game-init and unlocks to keep splash deterministic without static wiring
+// Use Vite's import.meta.glob to ensure stable module resolution on Pages
+const earlyModules: Record<string, () => Promise<any>> = import.meta.glob([
+  './core/systems/game-init.ts',
+  './feature-unlocks.ts',
+]);
+
 __pushDiag({ type: 'import-start', module: 'game-init-early' });
 try {
-  const gameInit = await import('./core/systems/game-init.ts');
+  const gameInitLoader = earlyModules['./core/systems/game-init.ts'];
+  const gameInit = gameInitLoader
+    ? await gameInitLoader()
+    : await import('./core/systems/game-init.ts');
   Object.assign((window as any).App.systems.gameInit, gameInit);
   (window as any).initOnDomReady = (gameInit as any).initOnDomReady;
   try {
@@ -104,7 +113,8 @@ try {
 }
 __pushDiag({ type: 'import-start', module: 'unlocks-early' });
 try {
-  const unlocks = await import('./feature-unlocks.ts');
+  const unlocksLoader = earlyModules['./feature-unlocks.ts'];
+  const unlocks = unlocksLoader ? await unlocksLoader() : await import('./feature-unlocks.ts');
   (window as any).App.systems.unlocks =
     unlocks && (unlocks as any).FEATURE_UNLOCKS ? (unlocks as any).FEATURE_UNLOCKS : {};
   __pushDiag({ type: 'import', module: 'unlocks-early', ok: true });
