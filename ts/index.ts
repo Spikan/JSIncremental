@@ -7,6 +7,12 @@ import './config.ts';
 import './core/constants.ts';
 import './dom-cache.ts';
 import './god.ts';
+import * as gameInitStatic from './core/systems/game-init.ts';
+import * as loopStatic from './core/systems/loop-system.ts';
+import { processDrinkFactory as processDrinkFactoryStatic } from './core/systems/drink-system.ts';
+import * as uiStatic from './ui/index.ts';
+import * as unlocksStatic from './feature-unlocks.ts';
+import './main.ts';
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || {
   loadGame: () => null,
@@ -75,6 +81,46 @@ const zustandStore = useGameStore;
 };
 
 __pushDiag({ type: 'index', stage: 'app-created' });
+
+// Static wiring of core systems/UI for deterministic bootstrap
+try {
+  // Loop system
+  Object.assign((window as any).App.systems.loop, loopStatic);
+  // Drink system
+  try {
+    const factory = processDrinkFactoryStatic?.();
+    if (factory) (window as any).App.systems.drink.processDrink = factory;
+  } catch {}
+  // Unlocks
+  (window as any).App.systems.unlocks = (unlocksStatic as any)?.FEATURE_UNLOCKS || {};
+  // Game init
+  Object.assign((window as any).App.systems.gameInit, gameInitStatic);
+  (window as any).initOnDomReady = (gameInitStatic as any).initOnDomReady;
+  try {
+    if (
+      !(window as any).App.systems.gameInit.startGame &&
+      (window as any).App.systems.gameInit.startGameCore
+    ) {
+      (window as any).App.systems.gameInit.startGame = (
+        window as any
+      ).App.systems.gameInit.startGameCore;
+    }
+  } catch {}
+  // UI
+  Object.assign((window as any).App.ui, uiStatic);
+  try {
+    if (typeof (window as any).App.ui.initializeUI === 'function')
+      (window as any).App.ui.initializeUI();
+  } catch {}
+  __pushDiag({ type: 'wire', module: 'core-static', ok: true });
+} catch (e) {
+  __pushDiag({
+    type: 'wire',
+    module: 'core-static',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
+}
 
 // Ensure a default, non-blocking initOnDomReady exists even if early imports stall
 try {
@@ -257,121 +303,7 @@ try {
   })();
 } catch {}
 
-// Early dynamic import of game-init and unlocks to keep splash deterministic without static wiring
-// Use Vite's import.meta.glob to ensure stable module resolution on Pages
-const earlyModules: Record<string, () => Promise<any>> = import.meta.glob([
-  './core/systems/game-init.ts',
-  './feature-unlocks.ts',
-]);
-
-__pushDiag({ type: 'import-start', module: 'game-init-early' });
-(() => {
-  try {
-    const gameInitLoader = earlyModules['./core/systems/game-init.ts'];
-    const p = gameInitLoader ? gameInitLoader() : import('./core/systems/game-init.ts');
-    (p as Promise<any>)
-      .then(gameInit => {
-        try {
-          Object.assign((window as any).App.systems.gameInit, gameInit);
-          if ((gameInit as any).initOnDomReady) {
-            (window as any).initOnDomReady = (gameInit as any).initOnDomReady;
-          }
-          try {
-            if (
-              !(window as any).App.systems.gameInit.startGame &&
-              (window as any).App.systems.gameInit.startGameCore
-            ) {
-              (window as any).App.systems.gameInit.startGame = (
-                window as any
-              ).App.systems.gameInit.startGameCore;
-            }
-          } catch {}
-          __pushDiag({ type: 'import', module: 'game-init-early', ok: true });
-          try {
-            // Prefer module init function directly to avoid global timing gaps
-            if (typeof (gameInit as any).initOnDomReady === 'function') {
-              (gameInit as any).initOnDomReady();
-            } else if (typeof (gameInit as any).initSplashScreen === 'function') {
-              (gameInit as any).initSplashScreen();
-            } else {
-              (window as any).initOnDomReady?.();
-            }
-          } catch {}
-        } catch (err) {
-          __pushDiag({
-            type: 'import',
-            module: 'game-init-early',
-            ok: false,
-            err: String((err && (err as any).message) || err),
-          });
-        }
-      })
-      .catch(e => {
-        __pushDiag({
-          type: 'import',
-          module: 'game-init-early',
-          ok: false,
-          err: String((e && (e as any).message) || e),
-        });
-      });
-  } catch (e) {
-    __pushDiag({
-      type: 'import',
-      module: 'game-init-early',
-      ok: false,
-      err: String((e && (e as any).message) || e),
-    });
-  }
-})();
-__pushDiag({ type: 'import-start', module: 'main' });
-try {
-  await import('./main.ts');
-  __pushDiag({ type: 'import', module: 'main', ok: true });
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'main',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-}
-__pushDiag({ type: 'import-start', module: 'unlocks-early' });
-(() => {
-  try {
-    const unlocksLoader = earlyModules['./feature-unlocks.ts'];
-    const p2 = unlocksLoader ? unlocksLoader() : import('./feature-unlocks.ts');
-    (p2 as Promise<any>)
-      .then(unlocks => {
-        try {
-          (window as any).App.systems.unlocks =
-            unlocks && (unlocks as any).FEATURE_UNLOCKS ? (unlocks as any).FEATURE_UNLOCKS : {};
-          __pushDiag({ type: 'import', module: 'unlocks-early', ok: true });
-        } catch (err) {
-          __pushDiag({
-            type: 'import',
-            module: 'unlocks-early',
-            ok: false,
-            err: String((err && (err as any).message) || err),
-          });
-        }
-      })
-      .catch(e => {
-        __pushDiag({
-          type: 'import',
-          module: 'unlocks-early',
-          ok: false,
-          err: String((e && (e as any).message) || e),
-        });
-      });
-  } catch (e) {
-    __pushDiag({
-      type: 'import',
-      module: 'unlocks-early',
-      ok: false,
-      err: String((e && (e as any).message) || e),
-    });
-  }
-})();
+// Remove early dynamic imports; core is now statically wired above for stability
 
 // Initialize UI immediately when available
 try {
