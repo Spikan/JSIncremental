@@ -68,6 +68,7 @@ export function initSplashScreen(): void {
           started = true;
           try {
             (window as any).__GAME_STARTED__ = true;
+            document.body.classList?.add('game-started');
           } catch {}
           // Make splash removal robust against CSS overrides
           try {

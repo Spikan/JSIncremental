@@ -49,6 +49,20 @@ body {
   background-color: #001f9e;
 }
 
+/* Ensure splash never blocks clicks after start */
+.game-started .splash-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Ensure game content becomes visible after start */
+.game-started #gameContent {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 .splash-content {
   text-align: center;
   animation: fadeIn 2s ease-in;
