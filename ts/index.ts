@@ -90,6 +90,80 @@ try {
           if (typeof fn === 'function') {
             fn();
             __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
+            try {
+              // Kick game progression after splash via loop once available
+              const w: any = window as any;
+              let booted = false;
+              const tryBoot = () => {
+                try {
+                  // Ensure baseline timing state
+                  if (w.App?.state?.getState && w.App?.state?.setState) {
+                    const st = w.App.state.getState();
+                    const CFG = (w.GAME_CONFIG || {}) as any;
+                    const TIMING = (CFG.TIMING || {}) as any;
+                    const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
+                    if (!st.drinkRate || Number(st.drinkRate) <= 0) {
+                      w.App.state.setState({ drinkRate: DEFAULT_RATE });
+                    }
+                    if (!st.lastDrinkTime) {
+                      w.App.state.setState({ lastDrinkTime: Date.now() - DEFAULT_RATE });
+                    }
+                  }
+                  // Call initGame if present (one-time)
+                  if (!booted && typeof w.initGame === 'function') {
+                    try {
+                      w.initGame();
+                    } catch {}
+                  }
+                  const loopStart = w.App?.systems?.loop?.start;
+                  if (!booted && typeof loopStart === 'function') {
+                    loopStart({
+                      updateDrinkProgress: () => {
+                        try {
+                          const st = w.App?.state?.getState?.() || {};
+                          const now = Date.now();
+                          const last = Number(st.lastDrinkTime ?? w.lastDrinkTime ?? 0);
+                          const rate = Number(st.drinkRate ?? w.drinkRate ?? 1000);
+                          const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
+                          w.App?.state?.setState?.({ drinkProgress: pct });
+                          w.App?.ui?.updateDrinkProgress?.(pct, rate);
+                        } catch {}
+                      },
+                      processDrink: () => {
+                        try {
+                          w.App?.systems?.drink?.processDrink?.();
+                        } catch {}
+                      },
+                      updateStats: () => {
+                        try {
+                          w.App?.ui?.updatePlayTime?.();
+                          w.App?.ui?.updateLastSaveTime?.();
+                          w.App?.ui?.updateAllStats?.();
+                          w.App?.ui?.updatePurchasedCounts?.();
+                          w.App?.ui?.checkUpgradeAffordability?.();
+                          w.App?.systems?.unlocks?.checkAllUnlocks?.();
+                        } catch {}
+                      },
+                      updatePlayTime: () => {
+                        try {
+                          w.App?.ui?.updatePlayTime?.();
+                        } catch {}
+                      },
+                      updateLastSaveTime: () => {
+                        try {
+                          w.App?.ui?.updateLastSaveTime?.();
+                        } catch {}
+                      },
+                    });
+                    booted = true;
+                    __pushDiag({ type: 'loop', stage: 'fallback-started' });
+                    return;
+                  }
+                } catch {}
+                setTimeout(tryBoot, 100);
+              };
+              tryBoot();
+            } catch {}
             return;
           }
         } catch {}
@@ -107,6 +181,61 @@ try {
               game.style.opacity = '1';
               document.body?.classList?.add('game-started');
               __pushDiag({ type: 'splash', action: 'forced-hide' });
+              // After forced hide, also try to boot the loop
+              try {
+                const w: any = window as any;
+                let booted = false;
+                const tryBoot2 = () => {
+                  try {
+                    const loopStart = w.App?.systems?.loop?.start;
+                    if (!booted && typeof loopStart === 'function') {
+                      loopStart({
+                        updateDrinkProgress: () => {
+                          try {
+                            const st = w.App?.state?.getState?.() || {};
+                            const now = Date.now();
+                            const last = Number(st.lastDrinkTime ?? w.lastDrinkTime ?? 0);
+                            const rate = Number(st.drinkRate ?? w.drinkRate ?? 1000);
+                            const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
+                            w.App?.state?.setState?.({ drinkProgress: pct });
+                            w.App?.ui?.updateDrinkProgress?.(pct, rate);
+                          } catch {}
+                        },
+                        processDrink: () => {
+                          try {
+                            w.App?.systems?.drink?.processDrink?.();
+                          } catch {}
+                        },
+                        updateStats: () => {
+                          try {
+                            w.App?.ui?.updatePlayTime?.();
+                            w.App?.ui?.updateLastSaveTime?.();
+                            w.App?.ui?.updateAllStats?.();
+                            w.App?.ui?.updatePurchasedCounts?.();
+                            w.App?.ui?.checkUpgradeAffordability?.();
+                            w.App?.systems?.unlocks?.checkAllUnlocks?.();
+                          } catch {}
+                        },
+                        updatePlayTime: () => {
+                          try {
+                            w.App?.ui?.updatePlayTime?.();
+                          } catch {}
+                        },
+                        updateLastSaveTime: () => {
+                          try {
+                            w.App?.ui?.updateLastSaveTime?.();
+                          } catch {}
+                        },
+                      });
+                      booted = true;
+                      __pushDiag({ type: 'loop', stage: 'fallback-started-post-hide' });
+                      return;
+                    }
+                  } catch {}
+                  setTimeout(tryBoot2, 100);
+                };
+                tryBoot2();
+              } catch {}
             }
           } catch {}
           return;
