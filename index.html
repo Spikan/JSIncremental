@@ -19,6 +19,24 @@
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
     <script>
+      // Diagnostics + start shims for production
+      (function () {
+        try {
+          window.__diag = Array.isArray(window.__diag) ? window.__diag : [];
+          window.addEventListener('error', function (e) {
+            try {
+              window.__diag.push({ type: 'error', msg: e.message, src: e.filename, ln: e.lineno });
+            } catch {}
+          });
+          window.addEventListener('unhandledrejection', function (e) {
+            try {
+              var r = e && e.reason;
+              window.__diag.push({ type: 'unhandledrejection', reason: (r && (r.message || r)) + '' });
+            } catch {}
+          });
+        } catch {}
+      })();
+
       // Safety check to ensure functions are available - moved to after main.js loads
       window.addEventListener('load', function () {
         // Wait for modules to load and APIs to be available
@@ -41,6 +59,47 @@
 
         // HTML-level splash fallback: ensure any interaction starts the game
         try {
+          var manualStart = function () {
+            try {
+              var splash = document.getElementById('splashScreen');
+              var game = document.getElementById('gameContent');
+              if (splash && game) {
+                try {
+                  document.body && document.body.classList && document.body.classList.add('game-started');
+                } catch {}
+                try {
+                  splash.style.display = 'none';
+                  splash.style.visibility = 'hidden';
+                  splash.style.pointerEvents = 'none';
+                  if (splash.parentNode) splash.parentNode.removeChild(splash);
+                } catch {}
+                try {
+                  game.style.display = 'block';
+                  game.style.visibility = 'visible';
+                  game.style.opacity = '1';
+                  game.classList && game.classList.add('active');
+                } catch {}
+                try {
+                  var loopStart =
+                    window.App &&
+                    window.App.systems &&
+                    window.App.systems.loop &&
+                    window.App.systems.loop.start;
+                  if (typeof loopStart === 'function') {
+                    loopStart({
+                      updateDrinkProgress: function () {},
+                      processDrink: function () {},
+                      updateStats: function () {},
+                      updatePlayTime: function () {},
+                      updateLastSaveTime: function () {},
+                    });
+                  }
+                } catch {}
+              }
+              try { window.__diag && window.__diag.push({ type: 'shim', used: 'manualStart' }); } catch {}
+            } catch {}
+          };
+
           var startIfPossible = function (e) {
             try {
               var splash = document.getElementById('splashScreen');
@@ -49,6 +108,7 @@
                 e && e.stopPropagation && e.stopPropagation();
                 if (typeof window.startGame === 'function') {
                   window.startGame();
+                  try { window.__diag && window.__diag.push({ type: 'shim', call: 'startGame' }); } catch {}
                 } else if (
                   window.App &&
                   window.App.systems &&
@@ -56,6 +116,9 @@
                   typeof window.App.systems.gameInit.startGameCore === 'function'
                 ) {
                   window.App.systems.gameInit.startGameCore();
+                  try { window.__diag && window.__diag.push({ type: 'shim', call: 'startGameCore' }); } catch {}
+                } else {
+                  manualStart();
                 }
               }
             } catch (err) {
