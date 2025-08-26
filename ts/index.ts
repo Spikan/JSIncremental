@@ -109,36 +109,57 @@ const earlyModules: Record<string, () => Promise<any>> = import.meta.glob([
 ]);
 
 __pushDiag({ type: 'import-start', module: 'game-init-early' });
-try {
-  const gameInitLoader = earlyModules['./core/systems/game-init.ts'];
-  const gameInit = gameInitLoader
-    ? await gameInitLoader()
-    : await import('./core/systems/game-init.ts');
-  Object.assign((window as any).App.systems.gameInit, gameInit);
-  (window as any).initOnDomReady = (gameInit as any).initOnDomReady;
-  if (!(gameInit as any).initOnDomReady && (window as any).App.systems.gameInit?.initSplashScreen) {
-    (window as any).initOnDomReady = () => (window as any).App.systems.gameInit.initSplashScreen();
-    __pushDiag({ type: 'wire', module: 'initOnDomReady-fallback' });
-  }
+(() => {
   try {
-    if (
-      !(window as any).App.systems.gameInit.startGame &&
-      (window as any).App.systems.gameInit.startGameCore
-    ) {
-      (window as any).App.systems.gameInit.startGame = (
-        window as any
-      ).App.systems.gameInit.startGameCore;
-    }
-  } catch {}
-  __pushDiag({ type: 'import', module: 'game-init-early', ok: true });
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'game-init-early',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-}
+    const gameInitLoader = earlyModules['./core/systems/game-init.ts'];
+    const p = gameInitLoader ? gameInitLoader() : import('./core/systems/game-init.ts');
+    (p as Promise<any>)
+      .then(gameInit => {
+        try {
+          Object.assign((window as any).App.systems.gameInit, gameInit);
+          if ((gameInit as any).initOnDomReady) {
+            (window as any).initOnDomReady = (gameInit as any).initOnDomReady;
+          }
+          try {
+            if (
+              !(window as any).App.systems.gameInit.startGame &&
+              (window as any).App.systems.gameInit.startGameCore
+            ) {
+              (window as any).App.systems.gameInit.startGame = (
+                window as any
+              ).App.systems.gameInit.startGameCore;
+            }
+          } catch {}
+          __pushDiag({ type: 'import', module: 'game-init-early', ok: true });
+          try {
+            (window as any).initOnDomReady?.();
+          } catch {}
+        } catch (err) {
+          __pushDiag({
+            type: 'import',
+            module: 'game-init-early',
+            ok: false,
+            err: String((err && (err as any).message) || err),
+          });
+        }
+      })
+      .catch(e => {
+        __pushDiag({
+          type: 'import',
+          module: 'game-init-early',
+          ok: false,
+          err: String((e && (e as any).message) || e),
+        });
+      });
+  } catch (e) {
+    __pushDiag({
+      type: 'import',
+      module: 'game-init-early',
+      ok: false,
+      err: String((e && (e as any).message) || e),
+    });
+  }
+})();
 __pushDiag({ type: 'import-start', module: 'main' });
 try {
   await import('./main.ts');
@@ -152,20 +173,42 @@ try {
   });
 }
 __pushDiag({ type: 'import-start', module: 'unlocks-early' });
-try {
-  const unlocksLoader = earlyModules['./feature-unlocks.ts'];
-  const unlocks = unlocksLoader ? await unlocksLoader() : await import('./feature-unlocks.ts');
-  (window as any).App.systems.unlocks =
-    unlocks && (unlocks as any).FEATURE_UNLOCKS ? (unlocks as any).FEATURE_UNLOCKS : {};
-  __pushDiag({ type: 'import', module: 'unlocks-early', ok: true });
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'unlocks-early',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-}
+(() => {
+  try {
+    const unlocksLoader = earlyModules['./feature-unlocks.ts'];
+    const p2 = unlocksLoader ? unlocksLoader() : import('./feature-unlocks.ts');
+    (p2 as Promise<any>)
+      .then(unlocks => {
+        try {
+          (window as any).App.systems.unlocks =
+            unlocks && (unlocks as any).FEATURE_UNLOCKS ? (unlocks as any).FEATURE_UNLOCKS : {};
+          __pushDiag({ type: 'import', module: 'unlocks-early', ok: true });
+        } catch (err) {
+          __pushDiag({
+            type: 'import',
+            module: 'unlocks-early',
+            ok: false,
+            err: String((err && (err as any).message) || err),
+          });
+        }
+      })
+      .catch(e => {
+        __pushDiag({
+          type: 'import',
+          module: 'unlocks-early',
+          ok: false,
+          err: String((e && (e as any).message) || e),
+        });
+      });
+  } catch (e) {
+    __pushDiag({
+      type: 'import',
+      module: 'unlocks-early',
+      ok: false,
+      err: String((e && (e as any).message) || e),
+    });
+  }
+})();
 
 // Initialize UI immediately when available
 try {
