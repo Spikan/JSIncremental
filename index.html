@@ -137,7 +137,8 @@
                                 drinkProgress: 0,
                               });
                             try {
-                              window.__diag && window.__diag.push({ type: 'shim', fix: 'setDefaultDrinkRate' });
+                              window.__diag &&
+                                window.__diag.push({ type: 'shim', fix: 'setDefaultDrinkRate' });
                             } catch {}
                           }
                         } catch {}
@@ -1066,15 +1067,8 @@
       </div>
     </div>
 
-    <script type="module" src="ts/config.ts"></script>
-    <script type="module" src="ts/core/constants.ts"></script>
-    <!-- event-bus.ts is loaded dynamically in ts/index.ts -->
-    <!-- schemas.ts is imported where needed; no global include required -->
-    <!-- storage.ts is loaded dynamically in ts/index.ts -->
-    <script type="module" src="ts/dom-cache.ts"></script>
+    <!-- Single entry: ts/index.ts will import all other modules -->
     <script type="module" src="ts/index.ts"></script>
-    <script type="module" src="ts/god.ts"></script>
-    <script type="module" src="ts/main.ts"></script>
     <script>
       // Ensure Decimal is available globally before loading main.js
       if (typeof Decimal === 'undefined') {

@@ -8,6 +8,11 @@ import * as staticLoop from './core/systems/loop-system.ts';
 import { processDrinkFactory as staticProcessDrinkFactory } from './core/systems/drink-system.ts';
 // Statically import UI and core systems to avoid dynamic import stalls on Pages
 import * as uiModuleStatic from './ui/index.ts';
+import './config.ts';
+import './core/constants.ts';
+import './dom-cache.ts';
+import './god.ts';
+import './main.ts';
 import * as resourcesStatic from './core/systems/resources.ts';
 import * as purchasesStatic from './core/systems/purchases-system.ts';
 import * as saveStatic from './core/systems/save-system.ts';
