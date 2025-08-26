@@ -1,4 +1,8 @@
 // Game Init System: splash and start logic (TypeScript)
+try {
+  (window as any).__diag = Array.isArray((window as any).__diag) ? (window as any).__diag : [];
+  (window as any).__diag.push({ type: 'module', module: 'game-init', stage: 'eval-start' });
+} catch {}
 
 export function initSplashScreen(): void {
   try {
@@ -297,3 +301,23 @@ export function initOnDomReady(): void {
     }
   } catch {}
 }
+
+// Best-effort wiring to global App if available (helps when import timing is odd on Pages)
+try {
+  const w: any = window as any;
+  if (w.App && w.App.systems && w.App.systems.gameInit) {
+    Object.assign(w.App.systems.gameInit, {
+      initSplashScreen,
+      startGameCore,
+      initOnDomReady,
+    });
+    try {
+      (w.__diag || []).push({ type: 'wire', module: 'game-init', method: 'direct-assign' });
+    } catch {}
+  }
+} catch {}
+
+try {
+  (window as any).__diag &&
+    (window as any).__diag.push({ type: 'module', module: 'game-init', stage: 'eval-end' });
+} catch {}
