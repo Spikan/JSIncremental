@@ -188,7 +188,6 @@ const BUTTON_CONFIG: {
       type: 'save-btn',
       label: 'Import Save',
     },
-
   },
 };
 
