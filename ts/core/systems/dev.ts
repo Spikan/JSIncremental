@@ -9,6 +9,7 @@
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
 import { toDecimal, add } from '../numbers/migration-utils';
+import { recalcProduction } from './resources';
 
 type Win = typeof window & {
   Decimal?: any;
@@ -299,8 +300,16 @@ export function addMassiveSips(): boolean {
     // Update state with Decimal value
     w.App?.state?.actions?.setSips?.(newSips);
 
-    // Recalculate SPD (though this function only adds sips, not production resources)
-    recalculateSPD();
+    // SPD doesn't change with just sips, but ensure state is consistent
+    const state = w.App?.state?.getState?.();
+    if (state) {
+      updateSPDFromResources(
+        state.straws || 0,
+        state.cups || 0,
+        state.widerStraws || 0,
+        state.betterCups || 0
+      );
+    }
 
     w.App?.ui?.updateTopSipCounter?.();
     w.App?.ui?.checkUpgradeAffordability?.();
@@ -345,8 +354,16 @@ export function addHugeStraws(): boolean {
       console.warn('Failed to set window.straws, using Decimal directly:', error);
     }
 
-    // Recalculate SPD based on new straw amounts
-    recalculateSPD();
+    // Update SPD with the new straw values
+    const state = w.App?.state?.getState?.();
+    if (state) {
+      updateSPDFromResources(
+        state.straws || newStraws,
+        state.cups || 0,
+        state.widerStraws || 0,
+        state.betterCups || 0
+      );
+    }
 
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
@@ -395,8 +412,16 @@ export function addMassiveCups(): boolean {
       console.warn('Failed to set window.cups, using Decimal directly:', error);
     }
 
-    // Recalculate SPD based on new cup amounts
-    recalculateSPD();
+    // Update SPD with the new cup values
+    const state = w.App?.state?.getState?.();
+    if (state) {
+      updateSPDFromResources(
+        state.straws || 0,
+        state.cups || newCups,
+        state.widerStraws || 0,
+        state.betterCups || 0
+      );
+    }
 
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
@@ -494,8 +519,16 @@ export function addExtremeResources(): boolean {
         console.warn('Failed to validate extreme values:', error);
       });
 
-    // Recalculate SPD based on new resource amounts
-    recalculateSPD();
+    // Update SPD with the new extreme values
+    const state = w.App?.state?.getState?.();
+    if (state) {
+      const finalStraws = state.straws || extremeAmount;
+      const finalCups = state.cups || extremeAmount;
+      const finalWiderStraws = state.widerStraws || 0;
+      const finalBetterCups = state.betterCups || 0;
+
+      updateSPDFromResources(finalStraws, finalCups, finalWiderStraws, finalBetterCups);
+    }
 
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
@@ -593,18 +626,61 @@ export function resetAllResources(): boolean {
 }
 
 /**
+ * Update SPD after resource changes (similar to purchase functions)
+ * This properly recalculates and updates SPD using the same method as normal purchases
+ */
+export function updateSPDFromResources(straws: any, cups: any, widerStraws: any = 0, betterCups: any = 0): boolean {
+  try {
+    const w = window as Win;
+    console.log('🔄 Updating SPD from resource values...');
+
+    // Recalculate production with the new values
+    const result = recalcProduction({
+      straws: straws,
+      cups: cups,
+      widerStraws: widerStraws,
+      betterCups: betterCups,
+    });
+
+    if (!result || !result.sipsPerDrink) {
+      console.warn('SPD calculation failed - no result returned');
+      return false;
+    }
+
+    // Update SPD in state (same pattern as purchase functions)
+    w.App?.state?.actions?.setSPD?.(result.sipsPerDrink);
+    w.App?.state?.actions?.setStrawSPD?.(result.strawSPD);
+    w.App?.state?.actions?.setCupSPD?.(result.cupSPD);
+
+    // Also update via setState as fallback (same pattern as purchase functions)
+    w.App?.state?.setState?.({
+      strawSPD: result.strawSPD,
+      cupSPD: result.cupSPD,
+      spd: result.sipsPerDrink,
+    });
+
+    // Update window properties for compatibility
+    if (w.Decimal && result.sipsPerDrink) {
+      w.spd = result.sipsPerDrink;
+    }
+
+    console.log(`✅ SPD updated: ${result.sipsPerDrink?.toString?.() || 'unknown'}`);
+    return true;
+  } catch (error) {
+    console.warn('SPD update failed:', error);
+    return false;
+  }
+}
+
+/**
  * Recalculate SPD (Sips Per Drink) based on current resources
  * This is needed when dev tools add resources but don't trigger SPD recalculation
+ * @deprecated Use updateSPDFromResources() instead for better reliability
  */
 export function recalculateSPD(): boolean {
   try {
     const w = window as Win;
     console.log('🔄 Recalculating SPD based on current resources...');
-
-    if (!w.App?.systems?.resources?.recalcProduction) {
-      console.warn('Resources system not available for SPD recalculation');
-      return false;
-    }
 
     // Get current resource values from state
     const state = w.App?.state?.getState?.();
@@ -613,36 +689,12 @@ export function recalculateSPD(): boolean {
       return false;
     }
 
-    const straws = state.straws || 0;
-    const cups = state.cups || 0;
-    const widerStraws = state.widerStraws || 0;
-    const betterCups = state.betterCups || 0;
-
-    // Recalculate production
-    const result = w.App.systems.resources.recalcProduction({
-      straws: straws,
-      cups: cups,
-      widerStraws: widerStraws,
-      betterCups: betterCups,
-    });
-
-    if (!result || !result.sipsPerDrink) {
-      console.warn('SPD recalculation failed - no result returned');
-      return false;
-    }
-
-    // Update SPD in state
-    w.App?.state?.actions?.setSPD?.(result.sipsPerDrink);
-    w.App?.state?.actions?.setStrawSPD?.(result.strawSPD);
-    w.App?.state?.actions?.setCupSPD?.(result.cupSPD);
-
-    // Update window properties for compatibility
-    if (w.Decimal && result.sipsPerDrink) {
-      w.spd = result.sipsPerDrink;
-    }
-
-    console.log(`✅ SPD recalculated: ${result.sipsPerDrink?.toString?.() || 'unknown'}`);
-    return true;
+    return updateSPDFromResources(
+      state.straws || 0,
+      state.cups || 0,
+      state.widerStraws || 0,
+      state.betterCups || 0
+    );
   } catch (error) {
     console.warn('SPD recalculation failed:', error);
     return false;
@@ -659,6 +711,7 @@ try {
     (window as any).testScientificNotation = testScientificNotation;
     (window as any).resetAllResources = resetAllResources;
     (window as any).recalculateSPD = recalculateSPD;
+    (window as any).updateSPDFromResources = updateSPDFromResources;
     console.log('🔧 Dev tools exposed globally - try: addMassiveSips()');
   }
 } catch (error) {
@@ -690,9 +743,9 @@ export function testSPDIndicators(): boolean {
       w.App?.state?.actions?.setStraws?.(extremeAmount);
       w.App?.state?.actions?.setCups?.(extremeAmount);
 
-      // Recalculate SPD
-      console.log('Recalculating SPD...');
-      recalculateSPD();
+      // Update SPD with extreme values
+      console.log('Updating SPD...');
+      updateSPDFromResources(extremeAmount, extremeAmount, 0, 0);
 
       // Check the results
       setTimeout(() => {

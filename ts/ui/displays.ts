@@ -40,33 +40,17 @@ export function updateTopSipsPerDrink(): void {
   }
 
   try {
-    console.log('🔧 UPDATE TOP SIPS PER DRINK: Setting up subscription');
-    // Set up subscription
-    // Subscribe to SPS changes only
-    topSipsPerDrinkSubscription = useGameStore.subscribe(
-      state => state.spd,
-      spd => {
-        // Subscription fired - silent update
-        if (topSipsPerDrinkElement) {
-          // Use spd directly - formatNumber will handle Decimal properly
-          const formatted = formatNumber(spd);
-          // Silent update - no visual feedback needed
-          topSipsPerDrinkElement.innerHTML = formatted;
-        }
-      },
-      { fireImmediately: true }
-    );
-    console.log('🔧 UPDATE TOP SIPS PER DRINK: Subscription setup complete');
+    // Get current state and update immediately
+    const state = useGameStore.getState();
+    if (state && state.spd !== undefined) {
+      const formatted = formatNumber(state.spd);
+      console.log('🔧 UPDATE TOP SIPS PER DRINK: Updating with value:', formatted);
+      topSipsPerDrinkElement.innerHTML = formatted;
+    } else {
+      console.log('🔧 UPDATE TOP SIPS PER DRINK: No SPD value available');
+    }
   } catch (error) {
     console.warn('Failed to update top sips per drink:', error);
-    // Fallback: update once
-    const state = useGameStore.getState();
-    if (topSipsPerDrinkElement && state) {
-      // Use state.spd directly - formatNumber will handle Decimal properly
-      const formatted = formatNumber(state.spd);
-      console.log('DEBUG: topSipsPerDrink fallback update:', formatted);
-      topSipsPerDrinkElement.innerHTML = formatted;
-    }
   }
 }
 
@@ -102,43 +86,9 @@ export function updateTopSipsPerSecond(): void {
   }
 
   try {
-    console.log('🔧 UPDATE TOP SIPS PER SECOND: Setting up subscription');
-    // Set up subscription
-    // Subscribe to both SPS and drink rate changes
-    topSipsPerSecondSubscription = useGameStore.subscribe(
-      state => ({ spd: state.spd, drinkRate: state.drinkRate }),
-      ({ spd, drinkRate }) => {
-        // Subscription fired - silent update
-        if (topSipsPerSecondElement) {
-          // Keep Decimal for spd and do division properly
-          const sipsPerDrinkLarge = spd && typeof spd.toNumber === 'function' ? spd : null;
-          const drinkRateMs = Number(drinkRate || 0) || 1000;
-          const drinkRateSeconds = drinkRateMs / 1000;
-
-          let sipsPerSecond;
-          if (sipsPerDrinkLarge) {
-            // Convert drinkRateSeconds to Decimal for proper division
-            const drinkRateSecondsLarge = new Decimal(drinkRateSeconds);
-            sipsPerSecond = sipsPerDrinkLarge.divide(drinkRateSecondsLarge);
-          } else {
-            // Fallback for non-Decimal values
-            const sipsPerDrink = Number(spd || 0);
-            sipsPerSecond = sipsPerDrink / drinkRateSeconds;
-          }
-
-          const formatted = formatNumber(sipsPerSecond);
-          // Silent update - no visual feedback needed
-          topSipsPerSecondElement.innerHTML = formatted;
-        }
-      },
-      { fireImmediately: true }
-    );
-    console.log('🔧 UPDATE TOP SIPS PER SECOND: Subscription setup complete');
-  } catch (error) {
-    console.warn('Failed to update top sips per second:', error);
-    // Fallback: update once
+    // Get current state and update immediately
     const state = useGameStore.getState();
-    if (topSipsPerSecondElement && state) {
+    if (state && state.spd !== undefined && state.drinkRate !== undefined) {
       // Handle Decimal for spd and do division properly
       const sipsPerDrinkLarge =
         state.spd && typeof state.spd.toNumber === 'function' ? state.spd : null;
@@ -157,9 +107,13 @@ export function updateTopSipsPerSecond(): void {
       }
 
       const formatted = formatNumber(sipsPerSecond);
-      console.log('DEBUG: topSipsPerSecond fallback update:', formatted);
+      console.log('🔧 UPDATE TOP SIPS PER SECOND: Updating with value:', formatted);
       topSipsPerSecondElement.innerHTML = formatted;
+    } else {
+      console.log('🔧 UPDATE TOP SIPS PER SECOND: Missing SPD or drinkRate values');
     }
+  } catch (error) {
+    console.warn('Failed to update top sips per second:', error);
   }
 }
 
