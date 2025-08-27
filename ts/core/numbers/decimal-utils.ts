@@ -22,7 +22,13 @@ export const isDecimal = (value: any): value is DecimalType => {
 
 // Helper function to clean up precision artifacts in extreme values
 export const cleanExtremeDecimals = (str: string): string => {
-  if (!str.includes('.') || str.includes('e') || str.includes('E')) {
+  // Handle scientific notation - return as-is
+  if (str.includes('e') || str.includes('E')) {
+    return str;
+  }
+
+  // No decimal point - return as-is
+  if (!str.includes('.')) {
     return str;
   }
 
@@ -32,18 +38,35 @@ export const cleanExtremeDecimals = (str: string): string => {
   const integerPart = parts[0];
   let decimalPart = parts[1];
 
-  // For very long decimal parts, check if they're just precision artifacts
-  if (decimalPart.length > 10) {
-    // Check if the decimal part is mostly zeros or repeating patterns
-    const firstNonZero = decimalPart.search(/[1-9]/);
-    if (firstNonZero === -1 || firstNonZero > 5) {
-      // No significant digits in first 5 decimal places, treat as zero
+  // For very long decimal parts (>15 chars), be very aggressive
+  if (decimalPart.length > 15) {
+    // Look for the first significant digit
+    const firstSignificantDigit = decimalPart.search(/[1-9]/);
+
+    // If no significant digits at all, or they're very far out, treat as integer
+    if (firstSignificantDigit === -1 || firstSignificantDigit > 10) {
       return integerPart;
     }
-    // Keep only significant digits, but limit to 2
+
+    // Keep only up to 2 significant digits beyond the first
+    const keepDigits = Math.min(2, decimalPart.length - firstSignificantDigit);
+    decimalPart = decimalPart.substring(0, firstSignificantDigit + keepDigits);
+  }
+  // For moderately long decimals (6-15 chars), check for precision artifacts
+  else if (decimalPart.length > 6) {
+    // Look for patterns of repeating digits or long zeros
+    const firstNonZero = decimalPart.search(/[1-9]/);
+
+    // If mostly zeros or insignificant digits, be more aggressive
+    if (firstNonZero === -1 || firstNonZero > 3) {
+      return integerPart;
+    }
+
+    // Keep only significant digits, limited to 2
     decimalPart = decimalPart.substring(0, Math.min(2, firstNonZero + 2));
-  } else if (decimalPart.length > 2) {
-    // Standard case: limit to 2 digits
+  }
+  // Standard case: limit to 2 digits
+  else if (decimalPart.length > 2) {
     decimalPart = decimalPart.substring(0, 2);
   }
 
@@ -83,8 +106,18 @@ export const formatDecimal = (value: any): string => {
       return num.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
     }
 
-    // For large numbers, use intelligent decimal cleanup
-    return cleanExtremeDecimals(value.toString());
+    // For large numbers, always use intelligent decimal cleanup
+    // This handles precision artifacts even in very large numbers
+    const rawString = value.toString();
+    if (rawString.includes('.') && !rawString.includes('e') && !rawString.includes('E')) {
+      const parts = rawString.split('.');
+      if (parts.length === 2 && parts[1].length > 2) {
+        // Apply our improved cleanup for any number with >2 decimal places
+        return cleanExtremeDecimals(rawString);
+      }
+    }
+
+    return rawString;
   } catch (error) {
     console.warn('formatDecimal: Error processing value:', error);
     return String(value || 0);

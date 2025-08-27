@@ -789,6 +789,31 @@ export function testNumberFormatting(): boolean {
   try {
     console.log('🧮 Testing 2-decimal place number formatting...');
 
+    // Test our improved cleanExtremeDecimals function first
+    console.log('🧮 Testing cleanExtremeDecimals function:');
+    import('../numbers/decimal-utils').then(({ cleanExtremeDecimals }) => {
+      const extremeTestCases = [
+        '1000000000000000000000.0000000000000000001',
+        '1.0000000000000000000000000000000000000001',
+        '999999999999999.999999999999999999999999',
+        '123.0000000000000000000000000000000000000001',
+        '1.0000000000000000000000000000000000000000000001',
+        '999999999999999999999999999999.999999999',
+        '1000.0000000000000000000000000000000000000001',
+      ];
+
+      extremeTestCases.forEach((testCase, index) => {
+        const cleaned = cleanExtremeDecimals(testCase);
+        const improvement =
+          testCase.length > cleaned.length
+            ? ` (reduced by ${testCase.length - cleaned.length} chars!)`
+            : '';
+        console.log(`  Extreme ${index + 1}: ${testCase} → ${cleaned}${improvement}`);
+      });
+
+      console.log('✅ cleanExtremeDecimals test completed!');
+    });
+
     // Import the formatting function
     import('../../ui/utils').then(({ formatNumber }) => {
       const testValues = [
