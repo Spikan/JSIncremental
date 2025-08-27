@@ -40,10 +40,20 @@ export const formatDecimal = (value: any): string => {
 
     const num = value.toNumber();
     if (isFinite(num) && Math.abs(num) < 1000000) {
-      return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      return num.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
     }
 
-    return value.toString();
+    // For large numbers, try to format with limited decimals if possible
+    const str = value.toString();
+    if (str.includes('.') && !str.includes('e') && !str.includes('E')) {
+      // Has decimal part, limit to 2 places
+      const parts = str.split('.');
+      if (parts.length === 2 && parts[1].length > 2) {
+        return parts[0] + '.' + parts[1].substring(0, 2);
+      }
+    }
+
+    return str;
   } catch (error) {
     console.warn('formatDecimal: Error processing value:', error);
     return String(value || 0);

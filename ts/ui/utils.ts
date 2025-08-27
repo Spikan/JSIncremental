@@ -45,7 +45,7 @@ export function formatNumber(value: any): string {
     if (Math.abs(value) >= 1e6) {
       return value.toExponential(2);
     }
-    return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    return value.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
   }
 
   if (typeof value === 'string') return postProcessDecimals(value);
@@ -67,16 +67,24 @@ function postProcessDecimals(formatted: string): string {
     const parts = formatted.split('.');
     if (parts.length === 2 && parts[0] && parts[1]) {
       // Limit decimal part to 2 digits
-      parts[1] = parts[1].substring(0, 2);
-      // Remove trailing zeros
-      while (parts[1].endsWith('0') && parts[1].length > 0) {
-        parts[1] = parts[1].slice(0, -1);
+      let decimalPart = parts[1].substring(0, 2);
+
+      // Remove trailing zeros to avoid unnecessary decimals
+      while (decimalPart.endsWith('0') && decimalPart.length > 0) {
+        decimalPart = decimalPart.slice(0, -1);
       }
+
       // If no decimal part left, remove the decimal point
-      if (parts[1].length === 0) {
+      if (decimalPart.length === 0) {
         return parts[0];
       }
-      return parts.join('.');
+
+      // Ensure we don't have more than 2 characters
+      if (decimalPart.length > 2) {
+        decimalPart = decimalPart.substring(0, 2);
+      }
+
+      return parts[0] + '.' + decimalPart;
     }
   }
 
