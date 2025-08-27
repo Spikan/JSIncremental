@@ -629,7 +629,12 @@ export function resetAllResources(): boolean {
  * Update SPD after resource changes (similar to purchase functions)
  * This properly recalculates and updates SPD using the same method as normal purchases
  */
-export function updateSPDFromResources(straws: any, cups: any, widerStraws: any = 0, betterCups: any = 0): boolean {
+export function updateSPDFromResources(
+  straws: any,
+  cups: any,
+  widerStraws: any = 0,
+  betterCups: any = 0
+): boolean {
   try {
     const w = window as Win;
     console.log('🔄 Updating SPD from resource values...');
@@ -712,6 +717,7 @@ try {
     (window as any).resetAllResources = resetAllResources;
     (window as any).recalculateSPD = recalculateSPD;
     (window as any).updateSPDFromResources = updateSPDFromResources;
+    (window as any).testNumberFormatting = testNumberFormatting;
     console.log('🔧 Dev tools exposed globally - try: addMassiveSips()');
   }
 } catch (error) {
@@ -771,6 +777,65 @@ export function testSPDIndicators(): boolean {
     return true;
   } catch (error) {
     console.warn('SPD indicator test failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Test function to demonstrate 2-decimal place formatting
+ * Call this from console: testNumberFormatting()
+ */
+export function testNumberFormatting(): boolean {
+  try {
+    console.log('🧮 Testing 2-decimal place number formatting...');
+
+    // Import the formatting function
+    import('../../ui/utils').then(({ formatNumber }) => {
+      const testValues = [
+        // Regular numbers
+        1.23456,
+        12.789,
+        123.456789,
+        1234.56789,
+        123456.789,
+        1234567.89,
+        1.1,
+        1.0,
+        0.123456,
+        0.00123456,
+        // Decimal objects
+        new Decimal('123.456789'),
+        new Decimal('1234567.891234'),
+        new Decimal('1.23456789'),
+        new Decimal('0.123456789'),
+        // Extreme values that might have trailing decimals
+        new Decimal('1e1000'),
+        new Decimal('2.123456789e500'),
+        new Decimal('1.0000000000000001e308'),
+        new Decimal('999999999999999999999999999999.999999999'),
+        new Decimal('1.0000000000000000000000000000001e100'),
+        // Values with precision artifacts that should be cleaned up
+        new Decimal('1000000000000000000000.0000000000000000001'),
+        new Decimal('1.0000000000000000000000000000000000000001'),
+        new Decimal('999999999999999.999999999999999999999999'),
+        new Decimal('1e10').plus(new Decimal('0.0000000000000000000001')),
+      ];
+
+      console.log('📊 Test Results (showing decimal cleanup):');
+      testValues.forEach((value, index) => {
+        const formatted = formatNumber(value);
+        const originalStr = value.toString ? value.toString() : String(value);
+        const improvement = originalStr.length > formatted.length ? ' (cleaned!)' : '';
+        console.log(`  ${index + 1}. ${originalStr.padEnd(30)} → ${formatted}${improvement}`);
+      });
+
+      console.log('✅ Number formatting test completed!');
+      console.log('💡 All numbers should be limited to 2 decimal places (or fewer)');
+    });
+
+    return true;
+  } catch (error) {
+    console.warn('Number formatting test failed:', error);
     return false;
   }
 }

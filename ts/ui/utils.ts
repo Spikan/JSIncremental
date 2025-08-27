@@ -5,7 +5,7 @@ export type DecimalLike = {
   toString?: () => string;
 };
 
-import { formatDecimal } from '../core/numbers/decimal-utils';
+import { formatDecimal, cleanExtremeDecimals } from '../core/numbers/decimal-utils';
 
 export function formatNumber(value: any): string {
   try {
@@ -45,7 +45,7 @@ export function formatNumber(value: any): string {
     if (Math.abs(value) >= 1e6) {
       return value.toExponential(2);
     }
-    return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    return value.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
   }
 
   if (typeof value === 'string') return postProcessDecimals(value);
@@ -55,32 +55,11 @@ export function formatNumber(value: any): string {
 
 /**
  * Post-process a formatted number string to ensure it has at most 2 decimal places
+ * Uses intelligent cleanup for trailing decimals and precision artifacts
  */
 function postProcessDecimals(formatted: string): string {
-  // If it's scientific notation, keep it as is
-  if (formatted.includes('e') || formatted.includes('E')) {
-    return formatted;
-  }
-
-  // If it contains a decimal point, limit to 2 decimal places
-  if (formatted.includes('.')) {
-    const parts = formatted.split('.');
-    if (parts.length === 2 && parts[0] && parts[1]) {
-      // Limit decimal part to 2 digits
-      parts[1] = parts[1].substring(0, 2);
-      // Remove trailing zeros
-      while (parts[1].endsWith('0') && parts[1].length > 0) {
-        parts[1] = parts[1].slice(0, -1);
-      }
-      // If no decimal part left, remove the decimal point
-      if (parts[1].length === 0) {
-        return parts[0];
-      }
-      return parts.join('.');
-    }
-  }
-
-  return formatted;
+  // Use the intelligent decimal cleanup function for consistency
+  return cleanExtremeDecimals(formatted);
 }
 
 export function findElement(elementId: string): HTMLElement | null {
