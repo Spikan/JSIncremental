@@ -169,12 +169,6 @@ export async function handleSodaClick(multiplier: number = 1) {
     } catch (error) {
       console.warn('Failed to emit soda click event:', error);
     }
-    // Ensure visual feedback even if event bus listener timing varies
-    try {
-      (w.App as any)?.ui?.showClickFeedback?.(totalClickValue.toNumber());
-    } catch (error) {
-      console.warn('Failed to show click feedback directly:', error);
-    }
     try {
       w.App?.stateBridge?.autoSync?.();
       const st = w.App?.state?.getState?.() || {};
