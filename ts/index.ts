@@ -16,12 +16,12 @@ import * as clicksStatic from './core/systems/clicks-system.ts';
 import * as audioButtonStatic from './core/systems/button-audio.ts';
 import * as purchasesStatic from './core/systems/purchases-system.ts';
 import * as devStatic from './core/systems/dev.ts';
+import * as saveStatic from './core/systems/save-system.ts';
+import * as optionsStatic from './core/systems/options-system.ts';
+import { AppStorage as storageImpl } from './services/storage.ts';
 import './main.ts';
 
-let storage: any = (typeof window !== 'undefined' && (window as any).storage) || {
-  loadGame: () => null,
-  saveGame: () => {},
-};
+let storage: any = (typeof window !== 'undefined' && (window as any).storage) || storageImpl;
 const eventBus = createEventBus();
 try {
   (window as any).eventBus = eventBus;
@@ -121,6 +121,14 @@ try {
   // Audio (button) system
   try {
     Object.assign((window as any).App.systems.audio.button, audioButtonStatic);
+  } catch {}
+  // Save system
+  try {
+    Object.assign((window as any).App.systems.save, saveStatic);
+  } catch {}
+  // Options system
+  try {
+    Object.assign((window as any).App.systems.options, optionsStatic);
   } catch {}
   // Dev tools
   try {
