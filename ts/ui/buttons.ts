@@ -148,24 +148,10 @@ const BUTTON_CONFIG: {
       type: 'dev-btn',
       label: 'Add Sips',
     },
-    devToggleDevMode: {
-      func: () => (window as any).App?.systems?.dev?.toggleDevMode?.(),
-      type: 'dev-btn',
-      label: 'Toggle Dev Mode',
-    },
-    devToggleGodMode: {
-      func: () => (window as any).App?.systems?.dev?.toggleGodMode?.(),
-      type: 'dev-btn',
-      label: 'Toggle God Mode',
-    },
-    devShowDebugInfo: {
-      func: () => (window as any).App?.systems?.dev?.showDebugInfo?.(),
-      type: 'dev-btn',
-      label: 'Show Debug Info',
-    },
+
     devExportSave: {
       func: () => (window as any).App?.systems?.dev?.exportSave?.(),
-      type: 'dev-btn',
+      type: 'save-btn',
       label: 'Export Save',
     },
     // Large Number Testing Actions
@@ -199,22 +185,10 @@ const BUTTON_CONFIG: {
     },
     devImportSave: {
       func: () => (window as any).App?.systems?.dev?.openImportDialog?.(),
-      type: 'dev-btn',
+      type: 'save-btn',
       label: 'Import Save',
     },
-    quickUnlock: {
-      func: () => {
-        try {
-          (window as any).App?.systems?.dev?.unlockAll?.();
-          (window as any).App?.systems?.dev?.addSips?.(10000);
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      type: 'dev-btn',
-      label: 'Quick Unlock',
-    },
+
   },
 };
 
