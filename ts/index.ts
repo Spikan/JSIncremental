@@ -13,6 +13,9 @@ import { processDrinkFactory as processDrinkFactoryStatic } from './core/systems
 import * as uiStatic from './ui/index.ts';
 import * as unlocksStatic from './feature-unlocks.ts';
 import * as clicksStatic from './core/systems/clicks-system.ts';
+import * as audioButtonStatic from './core/systems/button-audio.ts';
+import * as purchasesStatic from './core/systems/purchases-system.ts';
+import * as devStatic from './core/systems/dev.ts';
 import './main.ts';
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || {
@@ -94,6 +97,10 @@ try {
   } catch {}
   // Clicks system
   Object.assign((window as any).App.systems.clicks, clicksStatic);
+  // Purchases system
+  try {
+    Object.assign((window as any).App.systems.purchases, purchasesStatic);
+  } catch {}
   // Unlocks
   (window as any).App.systems.unlocks = (unlocksStatic as any)?.FEATURE_UNLOCKS || {};
   // Game init
@@ -111,6 +118,14 @@ try {
   } catch {}
   // UI
   Object.assign((window as any).App.ui, uiStatic);
+  // Audio (button) system
+  try {
+    Object.assign((window as any).App.systems.audio.button, audioButtonStatic);
+  } catch {}
+  // Dev tools
+  try {
+    (window as any).App.systems.dev = devStatic as any;
+  } catch {}
   try {
     if (typeof (window as any).App.ui.initializeUI === 'function')
       (window as any).App.ui.initializeUI();

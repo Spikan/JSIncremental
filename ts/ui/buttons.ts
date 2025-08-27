@@ -260,12 +260,6 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
           console.warn('Failed to play button click sound:', error);
         }
       }
-    } else if ((window as any).playButtonPurchaseSound && (window as any).playButtonClickSound) {
-      if (buttonType.audio === 'purchase') {
-        (window as any).playButtonPurchaseSound();
-      } else {
-        (window as any).playButtonClickSound();
-      }
     }
   } catch (error) {
     console.warn('Failed to play button audio:', error);
