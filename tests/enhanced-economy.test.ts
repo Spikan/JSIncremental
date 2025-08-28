@@ -124,7 +124,7 @@ describe('Enhanced Economy Functions', () => {
         '1e50', // Large but not extreme
         '1e50', // Large but not extreme
         '1e50', // Large but not extreme
-        '1e50'  // Large but not extreme
+        '1e50' // Large but not extreme
       );
 
       expect(totalSPD).toBeInstanceOf(Decimal);

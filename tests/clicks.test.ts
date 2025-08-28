@@ -17,12 +17,12 @@ beforeEach(() => {
       this.value = value;
     }
 
-    plus(other) {
+    add(other) {
       const otherValue = other instanceof MockDecimal ? other.value : other;
       return new MockDecimal(this.value + otherValue);
     }
 
-    times(other) {
+    multiply(other) {
       const otherValue = other instanceof MockDecimal ? other.value : other;
       return new MockDecimal(this.value * otherValue);
     }

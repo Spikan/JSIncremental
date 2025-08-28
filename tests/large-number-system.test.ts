@@ -179,10 +179,10 @@ describe('LargeNumber System', () => {
       // MockDecimal currently returns NaN for invalid inputs, which is acceptable behavior
       const nanResult = new Decimal(NaN).toNumber();
       expect(isNaN(nanResult)).toBe(true);
-      
+
       const invalidResult = new Decimal('invalid').toNumber();
       expect(invalidResult).toBe(0);
-      
+
       const nullResult = new Decimal(null as any).toNumber();
       expect(nullResult).toBe(0);
     });

@@ -151,12 +151,7 @@ describe('Performance Optimization', () => {
 
   describe('Optimized Synergy Calculations', () => {
     it('should calculate synergy efficiently', () => {
-      const result = optimizedSynergyCalculation(
-        '1000',
-        '500',
-        '2000',
-        '1000'
-      );
+      const result = optimizedSynergyCalculation('1000', '500', '2000', '1000');
 
       expect(result).toBeInstanceOf(Decimal);
       expect(result.toNumber()).toBeGreaterThan(2000); // Should show synergy bonus
