@@ -6,7 +6,7 @@
  * This provides a consistent testing environment without external dependencies
  */
 class MockDecimal {
-  private value: number;
+  private value: number | string;
   private _isDecimal: boolean = true;
   private _isExtreme: boolean = false; // New property to track extreme values
 
@@ -22,7 +22,7 @@ class MockDecimal {
         if (expNum > 308) {
           // JavaScript's safe limit is 1e308
           // Store as a special "extreme" value that won't become Infinity
-          this.value = value; // Store the original string
+          this.value = value as any; // Store the original string
           this._isExtreme = true;
           return;
         }
@@ -35,7 +35,7 @@ class MockDecimal {
       // Check if the number is too extreme for JavaScript
       if (!isFinite(value) || Math.abs(value) > 1e308) {
         // JavaScript's safe limit
-        this.value = value.toString(); // Store string to preserve precision
+        this.value = value.toString() as any; // Store string to preserve precision
         this._isExtreme = true;
         return;
       }
@@ -48,7 +48,7 @@ class MockDecimal {
         // Check if the result is extreme
         if (!isFinite(numValue) || Math.abs(numValue) > 1e308) {
           // JavaScript's safe limit
-          this.value = numValue.toString();
+          this.value = numValue.toString() as any;
           this._isExtreme = true;
           return;
         }
@@ -59,7 +59,7 @@ class MockDecimal {
         // Check if the result is extreme
         if (!isFinite(numValue) || Math.abs(numValue) > 1e308) {
           // JavaScript's safe limit
-          this.value = numValue.toString();
+          this.value = numValue.toString() as any;
           this._isExtreme = true;
           return;
         }
@@ -75,7 +75,8 @@ class MockDecimal {
   // Basic arithmetic operations
   add(other: any): MockDecimal {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
-    const result = this.value + otherValue;
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    const result = thisValue + otherValue;
 
     // Handle specific test cases to avoid floating-point precision issues
     if (Math.abs(result - 3e100) < 1e90) {
@@ -93,16 +94,18 @@ class MockDecimal {
 
   sub(other: any): MockDecimal {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
-    return new MockDecimal(this.value - otherValue);
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return new MockDecimal(thisValue - otherValue);
   }
 
   mul(other: any): MockDecimal {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
-    const result = this.value * otherValue;
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    const result = thisValue * otherValue;
 
     // Handle specific test cases to avoid floating-point precision issues
     if (Math.abs(result - 2e100) < 1e90) {
-      return new MockDecimal(2e100); // Exact value for 1e50 * 2e50
+      return new MockDecimal(2e100); // Exact value for 1e50 * 2e100
     }
 
     // Check if result is extreme
@@ -117,11 +120,13 @@ class MockDecimal {
   div(other: any): MockDecimal {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     if (otherValue === 0) return new MockDecimal(0);
-    return new MockDecimal(this.value / otherValue);
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return new MockDecimal(thisValue / otherValue);
   }
 
   pow(exponent: number): MockDecimal {
-    return new MockDecimal(Math.pow(this.value, exponent));
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return new MockDecimal(Math.pow(thisValue, exponent));
   }
 
   // Aliases for backward compatibility with tests
@@ -144,27 +149,32 @@ class MockDecimal {
   // Comparison operations
   gte(other: any): boolean {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
-    return this.value >= otherValue;
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return thisValue >= otherValue;
   }
 
   gt(other: any): boolean {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
-    return this.value > otherValue;
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return thisValue > otherValue;
   }
 
   lte(other: any): boolean {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
-    return this.value <= otherValue;
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return thisValue <= otherValue;
   }
 
   lt(other: any): boolean {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
-    return this.value < otherValue;
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return thisValue < otherValue;
   }
 
   eq(other: any): boolean {
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
-    return this.value === otherValue;
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return thisValue === otherValue;
   }
 
   // Utility methods
@@ -270,6 +280,73 @@ class MockDecimal {
 }
 
 /**
+ * Mock DOM_CACHE for tests
+ */
+export const mockDOMCache = {
+  levelNumber: { textContent: '1' },
+  levelText: { textContent: 'Level 1' },
+  sodaButton: {
+    parentNode: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }) },
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  },
+  topSipValue: { innerHTML: '0' },
+  topSipsPerDrink: { innerHTML: '0' },
+  topSipsPerSecond: { innerHTML: '0' },
+  musicPlayer: { play: () => {}, pause: () => {} },
+  musicToggleBtn: { addEventListener: () => {} },
+  musicMuteBtn: { addEventListener: () => {} },
+  musicStatus: { textContent: 'Stopped' },
+  musicStreamSelect: { addEventListener: () => {} },
+  currentStreamInfo: { textContent: 'Local' },
+  shopDiv: {
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 200, height: 150 }),
+    addEventListener: () => {},
+  },
+  widerStraws: { addEventListener: () => {} },
+  betterCups: { addEventListener: () => {} },
+  widerStrawsSPD: { textContent: '0' },
+  betterCupsSPD: { textContent: '0' },
+  totalStrawSPD: { textContent: '0' },
+  totalWiderStrawsSPD: { textContent: '0' },
+  totalCupSPD: { textContent: '0' },
+  totalBetterCupsSPD: { textContent: '0' },
+  statsTab: {
+    classList: { contains: () => false, add: () => {}, remove: () => {} },
+    addEventListener: () => {},
+  },
+  progressFill: { style: { width: '0%' } },
+  countdown: { textContent: '0' },
+  playTime: { textContent: '0' },
+  lastSaveTime: { textContent: 'Never' },
+  totalPlayTime: { textContent: '0' },
+  sessionTime: { textContent: '0' },
+  daysSinceStart: { textContent: '0' },
+  totalClicks: { textContent: '0' },
+  clicksPerSecond: { textContent: '0' },
+  bestClickStreak: { textContent: '0' },
+  totalSipsEarned: { textContent: '0' },
+  currentSipsPerSecond: { textContent: '0' },
+  highestSipsPerSecond: { textContent: '0' },
+  strawsPurchased: { textContent: '0' },
+  cupsPurchased: { textContent: '0' },
+  widerStrawsPurchased: { textContent: '0' },
+  betterCupsPurchased: { textContent: '0' },
+  suctionsPurchased: { textContent: '0' },
+  criticalClicksPurchased: { textContent: '0' },
+  currentLevel: { textContent: '1' },
+  totalUpgrades: { textContent: '0' },
+  fasterDrinksOwned: { textContent: '0' },
+  levelUpDiv: {
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 180, height: 120 }),
+    addEventListener: () => {},
+  },
+  init: () => {},
+  get: (id: string) => ({ textContent: '0', innerHTML: '0', addEventListener: () => {} }),
+  isReady: () => true, // ✅ This is the key fix!
+};
+
+/**
  * Test helper to compare Decimal objects with expected numbers
  */
 export function expectDecimalToEqual(received: MockDecimal | any, expected: number): void {
@@ -312,9 +389,11 @@ export function getNumericValue(value: MockDecimal | number | string): number {
  * Setup test environment for Zustand store testing
  */
 export function setupTestEnvironment() {
-  // Mock break_eternity.js Decimal constructor globally
-  (globalThis as any).Decimal = MockDecimal;
-  (global as any).Decimal = MockDecimal;
+  // Use the real break_eternity.js Decimal constructor if available, otherwise fall back to MockDecimal
+  if (typeof (globalThis as any).Decimal === 'undefined') {
+    (globalThis as any).Decimal = MockDecimal;
+    (global as any).Decimal = MockDecimal;
+  }
 
   // Mock window and document if not available
   if (typeof window === 'undefined') {
@@ -322,19 +401,40 @@ export function setupTestEnvironment() {
       addEventListener: () => {},
       removeEventListener: () => {},
       __TEST_ENV__: true, // Enable test environment bypass in selectors
+      DOM_CACHE: mockDOMCache, // ✅ Add mock DOM_CACHE
     } as any;
   } else {
     // Set the test environment flag on existing window
     (window as any).__TEST_ENV__ = true;
-    // Ensure Decimal is available on window
-    (window as any).Decimal = MockDecimal;
+    // Ensure Decimal is available on window (use real one if available)
+    if (typeof (window as any).Decimal === 'undefined') {
+      (window as any).Decimal = MockDecimal;
+    }
+    // Ensure DOM_CACHE is available on window
+    (window as any).DOM_CACHE = mockDOMCache; // ✅ Add mock DOM_CACHE
   }
 
   if (typeof document === 'undefined') {
     (global as any).document = {
       createElement: () => ({}),
       body: { appendChild: () => {} },
+      getElementById: () => ({}),
+      querySelector: () => ({}),
+      querySelectorAll: () => [],
     } as any;
+  }
+
+  // Mock browser APIs that tests expect
+  if (typeof performance === 'undefined') {
+    (global as any).performance = {
+      now: () => Date.now(),
+    };
+  }
+
+  if (typeof requestAnimationFrame === 'undefined') {
+    (global as any).requestAnimationFrame = (callback: Function) => {
+      return setTimeout(callback, 16); // 60fps equivalent
+    };
   }
 
   return {

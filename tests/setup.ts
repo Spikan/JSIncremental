@@ -1,6 +1,9 @@
 // Global test setup - runs before all tests
 // This ensures the Decimal constructor is available in the test environment
 
+// Import break_eternity.js to make Decimal available globally
+import 'break_eternity.js';
+
 import { setupTestEnvironment } from './test-utils';
 
 // Setup the test environment globally

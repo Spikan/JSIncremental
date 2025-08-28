@@ -187,11 +187,11 @@ describe('Dev Tools Large Number Functions', () => {
       const sipsValue = (window as any).sips.toNumber();
       const strawsValue = (window as any).straws.toNumber();
       const cupsValue = (window as any).cups.toNumber();
-      
+
       expect(sipsValue).toBeGreaterThan(100);
       expect(strawsValue).toBeGreaterThan(20);
       expect(cupsValue).toBeGreaterThan(30);
-      
+
       // The function adds 1e2000, so the results should be extremely large
       // Since JavaScript can't handle 1e2000, we expect Infinity or very large numbers
       expect(sipsValue).toBeGreaterThan(1e100);
@@ -273,7 +273,7 @@ describe('Dev Tools Large Number Functions', () => {
       // Create a copy of window without App
       const windowWithoutApp = { ...(window as any) };
       delete windowWithoutApp.App;
-      
+
       // Set up sips using the global Decimal
       windowWithoutApp.sips = new Decimal(100);
 
@@ -286,14 +286,14 @@ describe('Dev Tools Large Number Functions', () => {
       // Create a copy of App without UI
       const appWithoutUI = { ...(window as any).App };
       delete appWithoutUI.ui;
-      
+
       // Set up sips
       (window as any).sips = new Decimal(100);
       (window as any).App = appWithoutUI;
 
       const result = addMassiveSips();
       expect(typeof result !== 'undefined').toBe(true);
-      
+
       // Restore original App
       (window as any).App = mockWindow.App;
     });
@@ -307,14 +307,14 @@ describe('Dev Tools Large Number Functions', () => {
           throw new Error('State error');
         },
       };
-      
+
       // Set up sips
       (window as any).sips = new Decimal(100);
       (window as any).App = appWithError;
 
       const result = addMassiveSips();
       expect(typeof result !== 'undefined').toBe(true);
-      
+
       // Restore original App
       (window as any).App = mockWindow.App;
     });

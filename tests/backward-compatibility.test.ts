@@ -1,14 +1,14 @@
 // Tests for backward compatibility with existing saves and data formats
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { LargeNumber } from '../ts/core/numbers/large-number';
 import {
+  LargeNumber,
   toLargeNumber,
   toNumber,
   formatLargeNumber,
   migrateStateToLargeNumber,
   migrateStateToNumbers,
-} from '../ts/core/numbers/migration-utils';
+} from '../ts/core/numbers/large-number';
 import { computeClick } from '../ts/core/rules/clicks';
 import { computeTotalSipsPerDrink } from '../ts/core/rules/economy';
 import { nextStrawCost } from '../ts/core/rules/purchases';
@@ -243,7 +243,9 @@ describe('Backward Compatibility', () => {
 
       const result = computeTotalSipsPerDrink(new LargeNumber(1), largeNumber);
 
-      expect(result.toString()).toBe('3.7015217857933866e+56');
+      // The function adds baseSipsPerDrink (1) to totalSPD (1e100)
+      // Result should be 1 + 1e100 = 1e100 (since 1 is negligible compared to 1e100)
+      expect(result.toString()).toBe('1e+100');
     });
 
     it('should maintain calculation accuracy with large numbers', () => {

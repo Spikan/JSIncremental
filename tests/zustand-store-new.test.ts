@@ -17,7 +17,11 @@ import {
   selectors,
   migrateToZustand,
 } from '../ts/core/state/zustand-bridge';
-import { setupTestEnvironment, expectLargeNumberToEqual, expectLargeNumberToEqualString } from './test-utils';
+import {
+  setupTestEnvironment,
+  expectLargeNumberToEqual,
+  expectLargeNumberToEqualString,
+} from './test-utils';
 
 describe('Zustand Store - Core Functionality', () => {
   let cleanup: () => void;
