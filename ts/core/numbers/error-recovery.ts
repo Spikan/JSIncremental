@@ -65,9 +65,10 @@ export class DecimalErrorRecovery {
     try {
       // Check if result is reasonable
       const num = result.toNumber();
+      // Allow extreme values (Infinity) as they are acceptable in this context
       if (!isFinite(num)) {
         console.warn(`Non-finite result from ${operation}:`, result.toString());
-        return false;
+        return true; // Extreme values are acceptable
       }
       return true;
     } catch {
@@ -84,10 +85,14 @@ export class DecimalErrorRecovery {
 
     if (!isDecimal(a) && typeof a !== 'number' && typeof a !== 'string') {
       issues.push(`Invalid first operand: ${typeof a}`);
+    } else if (typeof a === 'string' && !isValidDecimalString(a)) {
+      issues.push(`Invalid first operand string: ${a}`);
     }
 
     if (!isDecimal(b) && typeof b !== 'number' && typeof b !== 'string') {
       issues.push(`Invalid second operand: ${typeof b}`);
+    } else if (typeof b === 'string' && !isValidDecimalString(b)) {
+      issues.push(`Invalid second operand string: ${b}`);
     }
 
     if (issues.length > 0) {

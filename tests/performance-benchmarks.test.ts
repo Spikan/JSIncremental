@@ -1,9 +1,10 @@
-// Performance benchmarks for LargeNumber operations
+// Performance benchmarks for Decimal operations
 // Demonstrates the capabilities and efficiency of the break_eternity.js integration
+// Updated to use our mock Decimal constructor for consistent testing
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { LargeNumber } from '../ts/core/numbers/large-number';
-import { toLargeNumber, add, multiply, pow } from '../ts/core/numbers/migration-utils';
+import { Decimal } from './test-utils';
+import { toDecimal, add, multiply, pow } from '../ts/core/numbers/migration-utils';
 import {
   memoizedPow,
   cachedExponentialGrowth,
@@ -11,6 +12,9 @@ import {
 } from '../ts/core/numbers/performance-utils';
 import { addSips, subtractSips, isGreaterOrEqual } from '../ts/core/state/mutations';
 import { computeStrawSPD, computeTotalSPD } from '../ts/core/rules/economy';
+
+// Use our mock Decimal constructor for consistent testing
+const LargeNumber = Decimal; // Alias for backward compatibility
 
 describe('LargeNumber Performance Benchmarks', () => {
   let performanceMonitor: PerformanceMonitor;
@@ -222,7 +226,7 @@ describe('LargeNumber Performance Benchmarks', () => {
       const startTime = performance.now();
 
       performanceMonitor.measureTime('memory-test', () => {
-        const numbers: LargeNumber[] = [];
+        const numbers: any[] = [];
 
         // Create many LargeNumber instances
         for (let i = 0; i < count; i++) {

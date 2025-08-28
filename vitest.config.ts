@@ -16,12 +16,23 @@ export default defineConfig({
         },
       },
     },
-    setupFiles: ['tests/test-utils.ts'],
+    setupFiles: ['tests/setup.ts'],
     globals: true,
     testTimeout: 10000,
     // Add performance tracking
     benchmark: {
       include: ['**/*.bench.{js,ts}'],
+    },
+    // Ensure proper environment setup
+    environmentOptions: {
+      jsdom: {
+        // Mock global objects that tests expect
+        globals: {
+          Decimal: true,
+          window: true,
+          document: true,
+        },
+      },
     },
   },
 });

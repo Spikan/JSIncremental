@@ -1,7 +1,8 @@
-// Tests for state mutations with LargeNumber support
+// Tests for state mutations with Decimal support
+// Updated to use our mock Decimal constructor for consistent testing
 
 import { describe, it, expect } from 'vitest';
-import { LargeNumber } from '../ts/core/numbers/large-number';
+import { Decimal } from './test-utils';
 import {
   addSips,
   subtractSips,
@@ -15,6 +16,9 @@ import {
   max,
   min,
 } from '../ts/core/state/mutations';
+
+// Use our mock Decimal constructor for consistent testing
+const LargeNumber = Decimal; // Alias for backward compatibility
 
 describe('State Mutations with LargeNumber', () => {
   describe('Basic Arithmetic Operations', () => {

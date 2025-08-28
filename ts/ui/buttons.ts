@@ -1,5 +1,7 @@
 // Modern Button System - Unified button event handling and management (TypeScript)
 
+import { mobileInputHandler } from './mobile-input';
+
 type ButtonActionMeta = { func: () => any; type: string; label: string };
 type ButtonTypeMeta = {
   audio: 'purchase' | 'click';
@@ -98,24 +100,50 @@ const BUTTON_CONFIG: {
         if (audio?.toggleButtonSounds) {
           audio.toggleButtonSounds();
           try {
-            (window as any).App?.ui?.updateAutosaveStatus?.();
+            const button = document.querySelector('.sound-toggle-btn');
+            if (button) {
+              const icon = button.querySelector('i');
+              if (icon) {
+                icon.textContent = audio.buttonSoundsEnabled ? '🔊' : '🔇';
+              }
+            }
           } catch (error) {
-            console.warn('Failed to update autosave status in sound toggle:', error);
+            console.warn('Failed to update sound toggle icon:', error);
           }
         }
       },
       type: 'sound-toggle-btn',
       label: 'Toggle Button Sounds',
     },
-    sendMessage: {
-      func: () => (window as any).sendMessage?.(),
-      type: 'chat-send-btn',
-      label: 'Send Message',
-    },
     startGame: {
-      func: () => (window as any).startGame?.(),
+      func: () => {
+        try {
+          (window as any).App?.ui?.hideSplashScreen?.();
+        } catch (error) {
+          console.warn('Failed to start game:', error);
+        }
+      },
       type: 'splash-start-btn',
       label: 'Start Game',
+    },
+    sendChat: {
+      func: () => {
+        try {
+          const chatInput = document.querySelector('#chatInput') as HTMLInputElement;
+          const chatSendBtn = document.querySelector('.chat-send-btn');
+          if (chatInput && chatInput.value.trim()) {
+            (window as any).App?.systems?.chat?.sendMessage?.(chatInput.value.trim());
+            chatInput.value = '';
+            if (chatSendBtn) {
+              chatSendBtn.setAttribute('disabled', 'true');
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to send chat message:', error);
+        }
+      },
+      type: 'chat-send-btn',
+      label: 'Send Chat Message',
     },
     // Dev actions
     devUnlockAll: {
@@ -191,7 +219,10 @@ const BUTTON_CONFIG: {
   },
 };
 
-const POINTER_SUPPRESS_MS = 500;
+// Enhanced accidental press prevention constants
+const POINTER_SUPPRESS_MS = 300; // Reduced from 500ms for better responsiveness
+const MOVEMENT_THRESHOLD = 15; // Increased from 8px for better tolerance
+
 function markPointerHandled(element: any): void {
   try {
     element.__lastPointerTs = Date.now();
@@ -266,6 +297,13 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
 }
 
 function setupUnifiedButtonSystem(): void {
+  // Initialize mobile input handler for enhanced touch validation
+  try {
+    mobileInputHandler.initialize();
+  } catch (error) {
+    console.warn('Failed to initialize mobile input handler:', error);
+  }
+
   // Setting up modern button event handler system
   const allButtons = document.querySelectorAll('button');
   allButtons.forEach((button: any) => {
@@ -278,15 +316,31 @@ function setupUnifiedButtonSystem(): void {
         if (action) {
           button.removeAttribute('onclick');
           if ((window as any).PointerEvent) {
+            // Visual feedback on press, action on release
             button.addEventListener('pointerdown', (e: any) => {
+              if (e && e.pointerType && e.pointerType !== 'mouse') {
+                // Just visual feedback on press
+                button.classList.add('button-clicked');
+              }
+            });
+            button.addEventListener('pointerup', (e: any) => {
               if (e && e.pointerType && e.pointerType !== 'mouse') {
                 markPointerHandled(button);
                 handleButtonClick(e, button, actionName);
               }
             });
           } else if ('ontouchstart' in window) {
+            // Visual feedback on touch start, action on touch end
             button.addEventListener(
               'touchstart',
+              (_e: any) => {
+                // Just visual feedback on touch start
+                button.classList.add('button-clicked');
+              },
+              { passive: true }
+            );
+            button.addEventListener(
+              'touchend',
               (e: any) => {
                 markPointerHandled(button);
                 handleButtonClick(e, button, actionName);
@@ -339,12 +393,12 @@ function setupSpecialButtonHandlers(): void {
   const tabButtons = document.querySelectorAll('.tab-btn');
   tabButtons.forEach((button: any) => {
     if (!button || !button.addEventListener) return;
-    button.addEventListener('click', (e: any) => {
+    button.addEventListener('click', (_e: any) => {
       const action = button.getAttribute('data-action');
       if (action && action.startsWith('switchTab:')) {
         const tabName = action.split(':')[1];
         try {
-          (window as any).App?.ui?.switchTab?.(tabName, e);
+          (window as any).App?.ui?.switchTab?.(tabName, _e);
         } catch (error) {
           console.warn('Failed to handle button interaction:', error);
         }
@@ -373,6 +427,10 @@ function setupSpecialButtonHandlers(): void {
         const reset = () => {
           active = false;
           moved = false;
+          // Clear stored scroll position
+          if (sodaButton) {
+            (sodaButton as any).__touchStartScrollY = undefined;
+          }
         };
         sodaButton.addEventListener('pointerdown', (e: any) => {
           if (!e || e.pointerType === 'mouse') return;
@@ -380,31 +438,51 @@ function setupSpecialButtonHandlers(): void {
           moved = false;
           sx = e.clientX || 0;
           sy = e.clientY || 0;
+
+          // Store scroll position for scroll detection
+          (sodaButton as any).__touchStartScrollY = window.scrollY;
+
+          // Visual feedback on press
+          try {
+            (sodaButton as any).classList.add('soda-clicked');
+          } catch (error) {
+            console.warn('Failed to add visual feedback:', error);
+          }
         });
         sodaButton.addEventListener('pointermove', (e: any) => {
           if (!active || !e || e.pointerType === 'mouse') return;
           const dx = (e.clientX || 0) - sx;
           const dy = (e.clientY || 0) - sy;
-          if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
+          if (Math.abs(dx) > MOVEMENT_THRESHOLD || Math.abs(dy) > MOVEMENT_THRESHOLD) moved = true;
         });
         sodaButton.addEventListener('pointerup', (e: any) => {
           if (!active || !e || e.pointerType === 'mouse') {
             reset();
             return;
           }
-          if (!moved) {
+
+          // Check if this was likely a scroll vs a tap
+          const scrollDelta = Math.abs(
+            window.scrollY - (sodaButton.__touchStartScrollY || window.scrollY)
+          );
+          const isScroll =
+            mobileInputHandler.isActive() &&
+            mobileInputHandler.isLikelyScroll(
+              sx,
+              sy,
+              e.clientX || sx,
+              e.clientY || sy,
+              scrollDelta
+            );
+
+          if (!moved && !isScroll) {
             markPointerHandled(sodaButton);
+
+            // Remove visual feedback (was added on press)
             try {
-              (sodaButton as any).classList.add('soda-clicked');
-              setTimeout(() => {
-                try {
-                  (sodaButton as any).classList.remove('soda-clicked');
-                } catch (error) {
-                  console.warn('Failed to handle button interaction:', error);
-                }
-              }, 140);
+              (sodaButton as any).classList.remove('soda-clicked');
             } catch (error) {
-              console.warn('Failed to handle button interaction:', error);
+              console.warn('Failed to remove visual feedback:', error);
             }
             try {
               // Call handleSodaClick
@@ -447,6 +525,10 @@ function setupSpecialButtonHandlers(): void {
         const reset = () => {
           active = false;
           moved = false;
+          // Clear stored scroll position
+          if (sodaButton) {
+            (sodaButton as any).__touchStartScrollY = undefined;
+          }
         };
         sodaButton.addEventListener(
           'touchstart',
@@ -456,6 +538,16 @@ function setupSpecialButtonHandlers(): void {
             moved = false;
             sx = e.touches[0].clientX || 0;
             sy = e.touches[0].clientY || 0;
+
+            // Store scroll position for scroll detection
+            (sodaButton as any).__touchStartScrollY = window.scrollY;
+
+            // Visual feedback on touch start
+            try {
+              (sodaButton as any).classList.add('soda-clicked');
+            } catch (error) {
+              console.warn('Failed to add visual feedback:', error);
+            }
           },
           { passive: true }
         );
@@ -465,28 +557,38 @@ function setupSpecialButtonHandlers(): void {
             if (!active || !e || !e.touches || !e.touches[0]) return;
             const dx = (e.touches[0].clientX || 0) - sx;
             const dy = (e.touches[0].clientY || 0) - sy;
-            if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
+            if (Math.abs(dx) > MOVEMENT_THRESHOLD || Math.abs(dy) > MOVEMENT_THRESHOLD)
+              moved = true;
           },
           { passive: true }
         );
-        sodaButton.addEventListener('touchend', (_e: any) => {
+        sodaButton.addEventListener('touchend', (e: any) => {
           if (!active) {
             reset();
             return;
           }
-          if (!moved) {
+          // Check if this was likely a scroll vs a tap
+          const scrollDelta = Math.abs(
+            window.scrollY - (sodaButton.__touchStartScrollY || window.scrollY)
+          );
+          const isScroll =
+            mobileInputHandler.isActive() &&
+            mobileInputHandler.isLikelyScroll(
+              sx,
+              sy,
+              e.changedTouches[0]?.clientX || sx,
+              e.changedTouches[0]?.clientY || sy,
+              scrollDelta
+            );
+
+          if (!moved && !isScroll) {
             markPointerHandled(sodaButton);
+
+            // Remove visual feedback (was added on touch start)
             try {
-              (sodaButton as any).classList.add('soda-clicked');
-              setTimeout(() => {
-                try {
-                  (sodaButton as any).classList.remove('soda-clicked');
-                } catch (error) {
-                  console.warn('Failed to handle button interaction:', error);
-                }
-              }, 140);
+              (sodaButton as any).classList.remove('soda-clicked');
             } catch (error) {
-              console.warn('Failed to handle button interaction:', error);
+              console.warn('Failed to remove visual feedback:', error);
             }
             try {
               // Call handleSodaClick
@@ -1069,6 +1171,36 @@ function initButtonSystem(): void {
     });
   } else {
     setTimeout(tryInitialize, 100);
+  }
+}
+
+/**
+ * Configure touch sensitivity for accidental press prevention
+ * @param config Configuration object for touch validation
+ */
+export function configureTouchSensitivity(config: {
+  movementThreshold?: number;
+  timeThreshold?: number;
+  scrollThreshold?: number;
+  multiTouchThreshold?: number;
+}): void {
+  try {
+    mobileInputHandler.updateTouchValidation(config);
+    console.log('Touch sensitivity configured:', config);
+  } catch (error) {
+    console.warn('Failed to configure touch sensitivity:', error);
+  }
+}
+
+/**
+ * Get current touch sensitivity configuration
+ */
+export function getTouchSensitivityConfig() {
+  try {
+    return mobileInputHandler.getTouchValidationConfig();
+  } catch (error) {
+    console.warn('Failed to get touch sensitivity config:', error);
+    return null;
   }
 }
 
