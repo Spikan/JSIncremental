@@ -17,7 +17,7 @@ import {
   selectors,
   migrateToZustand,
 } from '../ts/core/state/zustand-bridge';
-import { setupTestEnvironment, expectLargeNumberToEqual } from './test-utils';
+import { setupTestEnvironment, expectLargeNumberToEqual, expectLargeNumberToEqualString } from './test-utils';
 
 describe('Zustand Store - Core Functionality', () => {
   let cleanup: () => void;
@@ -38,10 +38,10 @@ describe('Zustand Store - Core Functionality', () => {
     it('should initialize with default state', () => {
       const state = useGameStore.getState();
 
-      expect(state.sips).toBe(0);
-      expect(state.straws).toBe(0);
-      expect(state.cups).toBe(0);
-      expect(state.level).toBe(1);
+      expectLargeNumberToEqual(state.sips, 0);
+      expectLargeNumberToEqual(state.straws, 0);
+      expectLargeNumberToEqual(state.cups, 0);
+      expectLargeNumberToEqual(state.level, 1);
       expect(state.options.autosaveEnabled).toBe(true);
     });
 
@@ -270,7 +270,7 @@ describe('Zustand Store - Core Functionality', () => {
       expect(state.sips).toBe(1000);
       expect(state.straws).toBe(10);
       expect(state.level).toBe(5);
-      expect(state.cups).toBe(0); // Should preserve other values
+      expectLargeNumberToEqual(state.cups, 0); // Should preserve other values
     });
 
     it('should reset state correctly', () => {
@@ -285,9 +285,9 @@ describe('Zustand Store - Core Functionality', () => {
       storeActions.resetState();
 
       const state = useGameStore.getState();
-      expect(state.sips).toBe(0);
-      expect(state.straws).toBe(0);
-      expect(state.level).toBe(1);
+      expectLargeNumberToEqual(state.sips, 0);
+      expectLargeNumberToEqual(state.straws, 0);
+      expectLargeNumberToEqual(state.level, 1);
     });
 
     it('should load state correctly', () => {
@@ -367,31 +367,31 @@ describe('Zustand Store - Selectors', () => {
     it('should select sips correctly', () => {
       storeActions.setSips(1500);
       const sips = useSips();
-      expect(sips).toBe(1500);
+      expectLargeNumberToEqual(sips, 1500);
     });
 
     it('should select straws correctly', () => {
       storeActions.setStraws(12);
       const straws = useStraws();
-      expect(straws).toBe(12);
+      expectLargeNumberToEqualString(straws, '12');
     });
 
     it('should select cups correctly', () => {
       storeActions.setCups(6);
       const cups = useCups();
-      expect(cups).toBe(6);
+      expectLargeNumberToEqualString(cups, '6');
     });
 
     it('should select level correctly', () => {
       storeActions.setLevel(8);
       const level = useLevel();
-      expect(level).toBe(8);
+      expectLargeNumberToEqualString(level, '8');
     });
 
     it('should select SPS correctly', () => {
       storeActions.setHighestSipsPerSecond(45.5);
       const sps = useHighestSipsPerSecond();
-      expectLargeNumberToEqual(sps, 45.5);
+      expectLargeNumberToEqualString(sps, '45.5');
     });
 
     it('should select options correctly', () => {
@@ -440,8 +440,8 @@ describe('Zustand Store - Legacy Compatibility', () => {
       const legacyStore = createLegacyStore({});
       const state = legacyStore.getState();
 
-      expect((state as any).sips).toBe(0);
-      expect((state as any).straws).toBe(0);
+      expectLargeNumberToEqual((state as any).sips, 0);
+      expectLargeNumberToEqual((state as any).straws, 0);
     });
 
     it('should set state through legacy interface', () => {
@@ -480,8 +480,8 @@ describe('Zustand Store - Legacy Compatibility', () => {
     it('should work with legacy selectors', () => {
       const state = appStore.getState();
 
-      expect(selectors.sips(state)).toBe(0);
-      expect(selectors.level(state)).toBe(1);
+      expectLargeNumberToEqual(selectors.sips(state), 0);
+      expectLargeNumberToEqual(selectors.level(state), 1);
       expect(selectors.drinkProgress(state)).toBe(0);
       expect(selectors.drinkRate(state)).toBe(0);
       expect(selectors.options(state)).toEqual({

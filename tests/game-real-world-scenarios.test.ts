@@ -250,16 +250,16 @@ describe('Real-World Game Scenarios', () => {
       const sipsPerDrink = computeTotalSipsPerDrink(1, totalSPD);
 
       // Should handle large numbers without overflow
-      expect(strawSPD).toBeGreaterThan(10);
-      expect(cupSPD).toBeGreaterThan(20);
-      expect(totalSPD).toBeGreaterThan(30);
-      expect(sipsPerDrink).toBeGreaterThan(1);
+      expect(strawSPD.toNumber()).toBeGreaterThan(10);
+      expect(cupSPD.toNumber()).toBeGreaterThan(20);
+      expect(totalSPD.toNumber()).toBeGreaterThan(30);
+      expect(sipsPerDrink.toNumber()).toBeGreaterThan(1);
 
       // Should be finite numbers
-      expect(Number.isFinite(strawSPD)).toBe(true);
-      expect(Number.isFinite(cupSPD)).toBe(true);
-      expect(Number.isFinite(totalSPD)).toBe(true);
-      expect(Number.isFinite(sipsPerDrink)).toBe(true);
+      expect(Number.isFinite(strawSPD.toNumber())).toBe(true);
+      expect(Number.isFinite(cupSPD.toNumber())).toBe(true);
+      expect(Number.isFinite(totalSPD.toNumber())).toBe(true);
+      expect(Number.isFinite(sipsPerDrink.toNumber())).toBe(true);
     });
 
     it('should test save/load corruption handling', () => {
