@@ -269,7 +269,7 @@ describe('Migration Utilities', () => {
     expect(decimal.toString()).toBe('1000');
 
     const largeDecimal = toDecimal(1000000);
-    expect(largeDecimal.toString()).toMatch(/1\.0*e\+6|1000000/);
+    expect(largeDecimal.toString()).toMatch(/1\.0*e\+6|1e\+6|1000000/);
   });
 });
 
