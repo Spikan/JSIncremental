@@ -3801,6 +3801,27 @@ button:focus {
   color: var(--neutral-white);
 }
 
+/* Debug Tools Button Styles */
+.dev-btn.debug-tools {
+  border-color: var(--primary-cyan);
+  background-color: rgba(0, 188, 212, 0.1);
+  color: var(--primary-cyan);
+}
+
+.dev-btn.debug-tools:hover {
+  background-color: var(--primary-cyan);
+  color: var(--neutral-white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
+}
+
+.dev-btn.debug-tools.active {
+  background-color: var(--primary-cyan);
+  color: var(--neutral-white);
+  border-color: var(--secondary-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.3);
+}
+
 /* Chat Send Button */
 .chat-send-btn {
   padding: var(--btn-padding-sm);

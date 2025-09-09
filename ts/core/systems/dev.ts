@@ -869,3 +869,143 @@ export function testNumberFormatting(): boolean {
 if (typeof window !== 'undefined') {
   (window as any).testSPDIndicators = testSPDIndicators;
 }
+
+// ========================================
+// DEBUG TOOLS FUNCTIONS
+// ========================================
+
+let erudaLoaded = false;
+let erudaInstance: any = null;
+
+/**
+ * Toggle Eruda mobile debug console
+ */
+export function toggleEruda(): boolean {
+  try {
+    if (!erudaLoaded) {
+      // Load Eruda dynamically
+      const script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/eruda';
+      script.onload = () => {
+        erudaInstance = (window as any).eruda;
+        erudaInstance.init();
+        erudaLoaded = true;
+        updateErudaButtonState(true);
+        console.log('🐛 Eruda mobile debug console loaded and activated');
+      };
+      script.onerror = () => {
+        console.error('❌ Failed to load Eruda debug console');
+        updateErudaButtonState(false);
+      };
+      document.head.appendChild(script);
+    } else {
+      // Toggle existing Eruda instance
+      if (erudaInstance) {
+        erudaInstance.show();
+        updateErudaButtonState(true);
+        console.log('🐛 Eruda mobile debug console shown');
+      }
+    }
+    return true;
+  } catch (error) {
+    console.warn('Failed to toggle Eruda:', error);
+    return false;
+  }
+}
+
+/**
+ * Clear browser console
+ */
+export function clearConsole(): boolean {
+  try {
+    console.clear();
+    console.log('🧹 Console cleared');
+    return true;
+  } catch (error) {
+    console.warn('Failed to clear console:', error);
+    return false;
+  }
+}
+
+/**
+ * Export current game state as JSON
+ */
+export function exportState(): boolean {
+  try {
+    const w = window as Win;
+    const state = w.App?.state?.getState?.();
+    if (!state) {
+      console.warn('No game state available to export');
+      return false;
+    }
+
+    const stateJson = JSON.stringify(state, null, 2);
+    const blob = new Blob([stateJson], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `soda-clicker-state-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    console.log('💾 Game state exported successfully');
+    return true;
+  } catch (error) {
+    console.warn('Failed to export state:', error);
+    return false;
+  }
+}
+
+/**
+ * Run performance test
+ */
+export function performanceTest(): boolean {
+  try {
+    console.log('⚡ Starting performance test...');
+    
+    const startTime = performance.now();
+    const iterations = 10000;
+    
+    // Test basic arithmetic operations
+    for (let i = 0; i < iterations; i++) {
+      const testValue = Math.random() * 1000;
+      Math.sqrt(testValue);
+    }
+    
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    
+    console.log(`⚡ Performance test completed:`);
+    console.log(`   - ${iterations} operations in ${duration.toFixed(2)}ms`);
+    console.log(`   - Average: ${(duration / iterations).toFixed(4)}ms per operation`);
+    console.log(`   - Operations per second: ${Math.round(iterations / (duration / 1000))}`);
+    
+    return true;
+  } catch (error) {
+    console.warn('Performance test failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Update Eruda button state
+ */
+function updateErudaButtonState(active: boolean): void {
+  try {
+    const button = document.getElementById('erudaToggleBtn');
+    if (button) {
+      if (active) {
+        button.classList.add('active');
+        button.querySelector('.dev-btn-text')!.textContent = 'Hide Debug Console';
+      } else {
+        button.classList.remove('active');
+        button.querySelector('.dev-btn-text')!.textContent = 'Mobile Debug Console';
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to update Eruda button state:', error);
+  }
+}

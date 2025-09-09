@@ -176,6 +176,27 @@ const BUTTON_CONFIG: {
       type: 'dev-btn',
       label: 'Add Sips',
     },
+    // Debug Tools Actions
+    devToggleEruda: {
+      func: () => (window as any).App?.systems?.dev?.toggleEruda?.(),
+      type: 'dev-btn',
+      label: 'Toggle Mobile Debug Console',
+    },
+    devClearConsole: {
+      func: () => (window as any).App?.systems?.dev?.clearConsole?.(),
+      type: 'dev-btn',
+      label: 'Clear Console',
+    },
+    devExportState: {
+      func: () => (window as any).App?.systems?.dev?.exportState?.(),
+      type: 'dev-btn',
+      label: 'Export State',
+    },
+    devPerformanceTest: {
+      func: () => (window as any).App?.systems?.dev?.performanceTest?.(),
+      type: 'dev-btn',
+      label: 'Performance Test',
+    },
 
     devExportSave: {
       func: () => (window as any).App?.systems?.dev?.exportSave?.(),

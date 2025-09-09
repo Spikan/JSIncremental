@@ -10,11 +10,6 @@
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <link rel="icon" type="image/png" href="images/regSoda.png" />
 
-    <!-- Eruda Mobile Debug Tool -->
-    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
-    <script>
-      eruda.init();
-    </script>
     <!-- Ensure Decimal/Zod are available before any modules execute (prod places module in head) -->
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
@@ -1054,6 +1049,36 @@
                 <div class="dev-btn-icon">🥤</div>
                 <div class="dev-btn-text">+1M Sips</div>
               </button>
+            </div>
+          </div>
+
+          <div class="dev-section">
+            <h3>🐛 Debug Tools</h3>
+            <div class="dev-grid">
+              <button data-action="devToggleEruda" class="dev-btn debug-tools" id="erudaToggleBtn">
+                <div class="dev-btn-icon">📱</div>
+                <div class="dev-btn-text">Mobile Debug Console</div>
+              </button>
+              <button data-action="devClearConsole" class="dev-btn debug-tools">
+                <div class="dev-btn-icon">🧹</div>
+                <div class="dev-btn-text">Clear Console</div>
+              </button>
+              <button data-action="devExportState" class="dev-btn debug-tools">
+                <div class="dev-btn-icon">💾</div>
+                <div class="dev-btn-text">Export State</div>
+              </button>
+              <button data-action="devPerformanceTest" class="dev-btn debug-tools">
+                <div class="dev-btn-icon">⚡</div>
+                <div class="dev-btn-text">Performance Test</div>
+              </button>
+            </div>
+            <div class="dev-info">
+              <p>
+                🐛 <strong>Debug Tools:</strong> Advanced debugging utilities for development and testing.
+              </p>
+              <p>
+                📱 <strong>Mobile Debug Console:</strong> Toggle Eruda mobile debugging interface (useful for mobile testing).
+              </p>
             </div>
           </div>
 
