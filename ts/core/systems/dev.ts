@@ -885,6 +885,8 @@ let erudaVisible = false;
  */
 export function toggleEruda(): boolean {
   try {
+    console.log('🔧 toggleEruda called, erudaLoaded:', erudaLoaded, 'erudaInstance:', !!erudaInstance);
+    
     // Check if Eruda is already available globally
     if (!erudaLoaded && (window as any).eruda) {
       console.log('📱 Eruda already available globally, using existing instance');
@@ -899,7 +901,11 @@ export function toggleEruda(): boolean {
           return true;
         } catch (initError) {
           console.error('❌ Eruda global initialization failed:', initError);
+          return false;
         }
+      } else {
+        console.error('❌ Eruda global instance not valid');
+        return false;
       }
     }
 
@@ -977,6 +983,19 @@ export function toggleEruda(): boolean {
     return true;
   } catch (error) {
     console.warn('Failed to toggle Eruda:', error);
+    return false;
+  }
+}
+
+/**
+ * Test function to verify dev system is working
+ */
+export function testDevSystem(): boolean {
+  try {
+    console.log('🧪 Dev system test - this should appear in console');
+    return true;
+  } catch (error) {
+    console.error('❌ Dev system test failed:', error);
     return false;
   }
 }

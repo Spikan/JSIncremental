@@ -202,6 +202,11 @@ const BUTTON_CONFIG: {
       type: 'dev-btn',
       label: 'Refresh Console',
     },
+    devTestSystem: {
+      func: () => (window as any).App?.systems?.dev?.testDevSystem?.(),
+      type: 'dev-btn',
+      label: 'Test Dev System',
+    },
 
     devExportSave: {
       func: () => (window as any).App?.systems?.dev?.exportSave?.(),
@@ -308,6 +313,14 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
   }
   try {
     if (action.func && typeof action.func === 'function') {
+      // Special handling for dev actions to ensure dev system is loaded
+      if (actionName.startsWith('dev')) {
+        if (!(window as any).App?.systems?.dev) {
+          console.error('❌ Dev system not loaded yet, cannot execute:', actionName);
+          return;
+        }
+        console.log('🔧 Executing dev action:', actionName);
+      }
       action.func();
       if (buttonType.feedback === 'levelup') {
         try {
@@ -319,6 +332,12 @@ function handleButtonClick(event: any, button: any, actionName: string): void {
     }
   } catch (error) {
     console.error(`Button action ${actionName} failed:`, error);
+    // Don't let dev action errors crash the page
+    if (actionName.startsWith('dev')) {
+      console.error('❌ Dev action failed, but continuing...');
+    } else {
+      throw error; // Re-throw non-dev errors
+    }
   }
 }
 
