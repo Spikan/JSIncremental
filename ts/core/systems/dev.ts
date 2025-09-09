@@ -917,34 +917,34 @@ export function toggleEruda(): boolean {
             erudaInstance.init({
               container: document.body,
               tool: ['console', 'elements', 'network', 'resources', 'info'],
-              useShadowDom: true
+              useShadowDom: true,
             });
-            
+
             erudaLoaded = true;
             erudaVisible = true;
             updateErudaButtonState(true);
-            
+
             console.log('🐛 Eruda mobile debug console loaded and activated');
             console.log('📱 Eruda instance:', erudaInstance);
             console.log('📱 Eruda methods available:', Object.getOwnPropertyNames(erudaInstance));
             console.log('📱 Eruda show method:', typeof erudaInstance.show);
             console.log('📱 Eruda hide method:', typeof erudaInstance.hide);
             console.log('📱 Eruda console available:', !!erudaInstance.console);
-            
+
             // Add some test data to verify console is working
             console.log('🧪 Test data for Eruda console:');
             console.log('   - Current time:', new Date().toISOString());
             console.log('   - User agent:', navigator.userAgent);
             console.log('   - Window size:', window.innerWidth + 'x' + window.innerHeight);
             console.log('   - Game state available:', !!(window as any).App?.state);
-            
+
             // Force Eruda console to refresh/update
             setTimeout(() => {
               if (erudaInstance.console && typeof erudaInstance.console.show === 'function') {
                 erudaInstance.console.show();
               }
               console.log('🔄 Eruda console refreshed');
-              
+
               // Add more test data after refresh
               console.log('🎮 Additional test data:');
               console.log('   - Random number:', Math.random());
@@ -1100,15 +1100,15 @@ export function refreshErudaConsole(): boolean {
       if (typeof erudaInstance.console.show === 'function') {
         erudaInstance.console.show();
       }
-      
+
       // Add some fresh test data
       console.log('🔄 Eruda console refreshed at:', new Date().toISOString());
       console.log('🎮 Game state:', (window as any).App?.state?.getState?.());
       console.log('📊 Performance:', {
         memory: (performance as any).memory?.usedJSHeapSize || 'N/A',
-        timing: performance.now()
+        timing: performance.now(),
       });
-      
+
       return true;
     }
     return false;
