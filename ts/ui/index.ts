@@ -57,6 +57,10 @@ export function initializeUI(): void {
   (window as any).__UI_WIRED__ = true;
   // UI system initializing
   buttons.initButtonSystem();
+
+  // Initialize mobile navigation features
+  initializeMobileNavigation();
+
   // Sync options UI on init
   try {
     updateAutosaveStatus();
@@ -118,6 +122,112 @@ export function initializeUI(): void {
   }
 }
 
+// Initialize mobile navigation features
+function initializeMobileNavigation(): void {
+  if (!isMobileDevice()) return;
+
+  // Add keyboard navigation support for mobile tabs
+  const mobileTabItems = document.querySelectorAll('.mobile-tab-item');
+  mobileTabItems.forEach((item: any) => {
+    // Handle keyboard navigation
+    item.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const action = item.getAttribute('data-action');
+        if (action && action.startsWith('switchTab:')) {
+          const tabName = action.split(':')[1];
+          switchTab(tabName, e);
+        }
+      }
+    });
+
+    // Handle touch events
+    item.addEventListener('touchstart', (e: TouchEvent) => {
+      e.preventDefault();
+      item.classList.add('touching');
+    });
+
+    item.addEventListener('touchend', (e: TouchEvent) => {
+      e.preventDefault();
+      item.classList.remove('touching');
+      const action = item.getAttribute('data-action');
+      if (action && action.startsWith('switchTab:')) {
+        const tabName = action.split(':')[1];
+        switchTab(tabName, e);
+      }
+    });
+  });
+
+  // Initialize swipe gestures for tab content
+  initializeSwipeGestures();
+
+  console.log('✅ Mobile navigation initialized');
+}
+
+// Initialize swipe gestures for tab switching
+function initializeSwipeGestures(): void {
+  const tabContents = document.querySelectorAll('.tab-content');
+  const tabOrder = ['soda', 'unlocks', 'shop', 'stats', 'god', 'options', 'dev'];
+
+  let startX = 0;
+  let startY = 0;
+  let currentTabIndex = 0;
+
+  // Find current tab index
+  function getCurrentTabIndex(): number {
+    const activeTab = document.querySelector('.tab-content.active');
+    if (!activeTab) return 0;
+
+    const tabId = activeTab.id.replace('Tab', '');
+    return tabOrder.indexOf(tabId);
+  }
+
+  // Switch to tab by index
+  function switchToTabByIndex(index: number): void {
+    if (index < 0 || index >= tabOrder.length) return;
+
+    const tabName = tabOrder[index];
+    if (tabName) {
+      const event = new Event('swipe');
+      switchTab(tabName, event);
+    }
+  }
+
+  // Add swipe listeners to all tab content areas
+  tabContents.forEach((tabContent: any) => {
+    tabContent.addEventListener('touchstart', (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 0 && e.touches[0]) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        currentTabIndex = getCurrentTabIndex();
+      }
+    });
+
+    tabContent.addEventListener('touchend', (e: TouchEvent) => {
+      if (e.changedTouches && e.changedTouches.length > 0 && e.changedTouches[0]) {
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+
+        // Only process horizontal swipes
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+          if (deltaX > 0) {
+            // Swipe right - previous tab
+            switchToTabByIndex(currentTabIndex - 1);
+          } else {
+            // Swipe left - next tab
+            switchToTabByIndex(currentTabIndex + 1);
+          }
+        }
+      }
+    });
+  });
+
+  console.log('✅ Swipe gestures initialized');
+}
+
 // Update all UI displays (useful for initialization and major state changes)
 export function updateAllDisplays(): void {
   // Update all displays
@@ -146,22 +256,55 @@ export function updateAllDisplays(): void {
   // Update complete
 }
 
-// Move switchTab into UI to eliminate window.switchTab
+// Enhanced switchTab function for both desktop and mobile navigation
 export function switchTab(tabName: string, event: any): void {
+  // Update tab content visibility
   const tabContents = document.querySelectorAll('.tab-content');
   tabContents.forEach((tab: any) => tab.classList.remove('active'));
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  tabButtons.forEach((btn: any) => btn.classList.remove('active'));
   const selectedTab = document.getElementById(`${tabName}Tab`);
   if (selectedTab) {
     selectedTab.classList.add('active');
   }
-  const clickedButton = event?.target as any;
-  try {
-    clickedButton?.classList?.add('active');
-  } catch (error) {
-    console.warn('Failed to activate tab button:', error);
+
+  // Update desktop tab buttons
+  const desktopTabButtons = document.querySelectorAll('.tab-btn');
+  desktopTabButtons.forEach((btn: any) => btn.classList.remove('active'));
+
+  // Update mobile tab items
+  const mobileTabItems = document.querySelectorAll('.mobile-tab-item');
+  mobileTabItems.forEach((item: any) => item.classList.remove('active'));
+
+  // Find and activate the correct tab button/item
+  const clickedElement = event?.target as any;
+  let targetElement = clickedElement;
+
+  // If clicking on a child element, find the parent tab element
+  if (
+    clickedElement &&
+    !clickedElement.classList.contains('tab-btn') &&
+    !clickedElement.classList.contains('mobile-tab-item')
+  ) {
+    targetElement =
+      clickedElement.closest('.tab-btn') || clickedElement.closest('.mobile-tab-item');
   }
+
+  // Activate the clicked element
+  if (targetElement) {
+    targetElement.classList.add('active');
+  } else {
+    // Fallback: activate by data-action attribute
+    const fallbackElement = document.querySelector(`[data-action="switchTab:${tabName}"]`);
+    if (fallbackElement) {
+      fallbackElement.classList.add('active');
+    }
+  }
+
+  // Add haptic feedback on mobile
+  if (isMobileDevice()) {
+    triggerHapticFeedback();
+  }
+
+  // Tab-specific updates
   if (tabName === 'stats') {
     try {
       updateAllStats();
@@ -176,6 +319,28 @@ export function switchTab(tabName: string, event: any): void {
     } catch (error) {
       console.warn('Failed to update unlocks tab:', error);
     }
+  }
+}
+
+// Helper function to detect mobile device
+function isMobileDevice(): boolean {
+  return (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+  );
+}
+
+// Helper function to trigger haptic feedback
+function triggerHapticFeedback(): void {
+  try {
+    // Check if vibration API is available
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50); // Short vibration
+    }
+  } catch (error) {
+    // Haptic feedback is not critical, so we can silently fail
+    console.debug('Haptic feedback not available:', error);
   }
 }
 

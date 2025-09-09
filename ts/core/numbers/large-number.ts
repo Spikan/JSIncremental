@@ -62,7 +62,11 @@ export function migrateStateToLargeNumber(state: any): any {
       } else {
         migrated[key] = new Decimal(0);
       }
-    } else if (value && typeof value === 'object' && typeof (value as any).toNumber === 'function') {
+    } else if (
+      value &&
+      typeof value === 'object' &&
+      typeof (value as any).toNumber === 'function'
+    ) {
       // Handle MockDecimal and other Decimal-like objects
       try {
         const numValue = (value as any).toNumber();

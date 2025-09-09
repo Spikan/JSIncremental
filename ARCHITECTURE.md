@@ -429,16 +429,25 @@ const result = add(userInput, gameState.value); // Handles numbers, strings, Dec
 
 ### 7. **UI System** (`ts/ui/`)
 
-**Purpose**: Coordinated UI updates and user interaction
+**Purpose**: Coordinated UI updates and user interaction with responsive mobile navigation
 
 **Components**:
 
-- **Displays** (`displays.js`): Update game statistics and counters
-- **Stats** (`stats.js`): Statistics panel management
-- **Feedback** (`feedback.js`): Visual feedback for actions
-- **Affordability** (`affordability.js`): Upgrade button states
-- **Labels** (`labels.js`): Text label management
+- **Displays** (`displays.ts`): Update game statistics and counters
+- **Stats** (`stats.ts`): Statistics panel management
+- **Feedback** (`feedback.ts`): Visual feedback for actions
+- **Affordability** (`affordability.ts`): Upgrade button states
+- **Labels** (`labels.ts`): Text label management
+- **Mobile Navigation** (`index.ts`): Responsive tab system with bottom navigation and swipe gestures
 - **Utils** (`utils.js`): Common UI operations
+
+**Mobile Navigation Features**:
+
+- **Responsive Design**: Dual navigation system (desktop horizontal tabs, mobile bottom navigation)
+- **Touch Optimizations**: 48px minimum touch targets, haptic feedback, visual touch states
+- **Swipe Gestures**: Horizontal swipe navigation between tabs on mobile devices
+- **Accessibility**: Keyboard navigation, ARIA labels, focus management
+- **Progressive Enhancement**: Graceful fallback for non-touch devices
 
 **Event-Driven Updates**:
 

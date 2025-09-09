@@ -302,13 +302,280 @@ body {
   min-height: 100vh;
 }
 
-/* Tab Navigation */
+/* ========================================
+   RESPONSIVE TAB NAVIGATION SYSTEM
+   ======================================== */
+
+/* Utility Classes for Responsive Design */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* Desktop Tab Navigation */
 .tab-navigation {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
   margin: 1rem 0;
   padding: 0 1rem;
+}
+
+/* Desktop Tab Button Structure */
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 150px;
+  min-height: var(--btn-md);
+  padding: var(--btn-padding-sm);
+  font-size: 1rem;
+  background-color: var(--primary-blue);
+  color: var(--neutral-white);
+  border-color: var(--primary-green);
+  border: 2px solid;
+  border-radius: var(--btn-radius-md);
+  cursor: pointer;
+  transition: var(--btn-transition);
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.tab-label {
+  font-weight: bold;
+  flex: 1;
+  text-align: center;
+}
+
+/* Mobile Bottom Navigation */
+.mobile-tab-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #001789, #0024b3);
+  border-top: 2px solid #00b36b;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 4px;
+  z-index: 1000;
+  box-shadow: 0 -4px 12px rgba(0, 179, 107, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.mobile-tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mobile-tab-icon {
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+  transition: all 0.2s ease;
+}
+
+.mobile-tab-label {
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Mobile Tab Active State */
+.mobile-tab-item.active {
+  color: #ffffff;
+  background: rgba(0, 179, 107, 0.2);
+  transform: scale(1.05);
+}
+
+.mobile-tab-item.active .mobile-tab-icon {
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 4px rgba(0, 179, 107, 0.5));
+}
+
+.mobile-tab-item.active .mobile-tab-label {
+  color: #00d97f;
+  font-weight: bold;
+}
+
+/* Mobile Tab Hover Effects */
+.mobile-tab-item:hover:not(.active) {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 179, 107, 0.1);
+  transform: scale(1.02);
+}
+
+.mobile-tab-item:active {
+  transform: scale(0.98);
+  background: rgba(0, 179, 107, 0.3);
+}
+
+/* Mobile Content Padding */
+.mobile-content-padding {
+  padding-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .mobile-content-padding {
+    padding-bottom: 80px;
+  }
+}
+
+/* Mobile Tab Touch Feedback */
+.mobile-tab-item:focus {
+  outline: 2px solid #00d97f;
+  outline-offset: 2px;
+}
+
+/* Mobile Tab Ripple Effect */
+.mobile-tab-item::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.3s ease,
+    height 0.3s ease;
+  pointer-events: none;
+}
+
+.mobile-tab-item:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+/* Mobile Tab Badge Support (for future notifications) */
+.mobile-tab-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #ff3d02;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile Tab Accessibility */
+.mobile-tab-item[aria-selected='true'] {
+  background: rgba(0, 179, 107, 0.2);
+  color: #ffffff;
+}
+
+/* Mobile Tab Keyboard Navigation */
+.mobile-tab-item:focus-visible {
+  outline: 2px solid #00d97f;
+  outline-offset: 2px;
+  background: rgba(0, 179, 107, 0.1);
+}
+
+/* Mobile Tab Touch State */
+.mobile-tab-item.touching {
+  transform: scale(0.95);
+  background: rgba(0, 179, 107, 0.3);
+}
+
+/* Swipe Gesture Visual Feedback */
+.tab-content {
+  transition: transform 0.3s ease;
+}
+
+.tab-content.swiping-left {
+  transform: translateX(-10px);
+}
+
+.tab-content.swiping-right {
+  transform: translateX(10px);
+}
+
+/* Mobile Tab Indicators (for swipe feedback) */
+.mobile-tab-indicators {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.mobile-tab-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.mobile-tab-indicator.active {
+  background: #00d97f;
+  transform: scale(1.2);
+}
+
+/* Mobile Tab Swipe Hint */
+.mobile-swipe-hint {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  z-index: 1001;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-swipe-hint.show {
+  opacity: 1;
 }
 
 /* Music Player */
@@ -1673,14 +1940,14 @@ h3 {
     text-align: center;
   }
 
-  .tab-navigation {
-    flex-direction: column;
-    align-items: center;
+  /* Hide desktop navigation on mobile */
+  .tab-navigation.desktop-only {
+    display: none;
   }
 
-  .tab-btn {
-    width: 100%;
-    max-width: 250px;
+  /* Show mobile navigation on mobile */
+  .mobile-tab-navigation.mobile-only {
+    display: flex;
   }
 
   .tick-progress-container {
@@ -1890,6 +2157,24 @@ h3 {
 }
 
 /* Medium mobile devices - allow horizontal stacking when possible */
+/* Desktop and Tablet Breakpoints */
+@media (min-width: 769px) {
+  /* Show desktop navigation on desktop/tablet */
+  .tab-navigation.desktop-only {
+    display: flex;
+  }
+
+  /* Hide mobile navigation on desktop/tablet */
+  .mobile-tab-navigation.mobile-only {
+    display: none;
+  }
+
+  /* Remove mobile content padding on desktop */
+  .mobile-content-padding {
+    padding-bottom: 0;
+  }
+}
+
 @media (min-width: 600px) and (max-width: 768px) {
   .shop-container {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -3138,17 +3423,7 @@ button:focus {
    SPECIFIC BUTTON TYPES
    ======================================== */
 
-/* Tab Buttons */
-.tab-btn {
-  min-width: 150px;
-  min-height: var(--btn-md);
-  padding: var(--btn-padding-sm);
-  font-size: 1rem;
-  background-color: var(--primary-blue);
-  color: var(--neutral-white);
-  border-color: var(--primary-green);
-}
-
+/* Desktop Tab Button Hover States */
 .tab-btn:hover {
   background-color: var(--primary-green);
   color: var(--neutral-white);
@@ -3169,26 +3444,26 @@ button:focus {
 }
 
 /* God Tab - Special styling but consistent behavior */
-.tab-btn[onclick*='god'] {
+.tab-btn[data-action*='god'] {
   background-color: var(--primary-blue);
   color: var(--neutral-white);
   border-color: var(--primary-purple);
 }
 
-.tab-btn[onclick*='god']:hover {
+.tab-btn[data-action*='god']:hover {
   background-color: var(--primary-purple);
   color: var(--neutral-white);
   transform: translateY(-2px);
 }
 
-.tab-btn[onclick*='god'].active {
+.tab-btn[data-action*='god'].active {
   background-color: var(--primary-purple);
   color: var(--neutral-white);
   border-color: var(--primary-orange);
   box-shadow: var(--btn-shadow-md);
 }
 
-.tab-btn[onclick*='god']:active {
+.tab-btn[data-action*='god']:active {
   transform: scale(0.95);
   background-color: var(--primary-purple);
   color: var(--neutral-white);

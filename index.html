@@ -313,7 +313,7 @@
     </div>
 
     <!-- Main Game Content -->
-    <div id="gameContent" class="game-content" style="display: none">
+    <div id="gameContent" class="game-content mobile-content-padding" style="display: none">
       <div id="topDiv" class="center">
         <div id="levelDiv">
           <h2>Level <span id="levelNumber">1</span></h2>
@@ -340,15 +340,110 @@
         </h1>
       </div>
 
-      <!-- Tab Navigation -->
-      <div class="tab-navigation">
-        <button class="tab-btn active" data-action="switchTab:soda">🥤 Soda Clicking</button>
-        <button class="tab-btn" data-action="switchTab:unlocks">🔓 Unlocks</button>
-        <button class="tab-btn" data-action="switchTab:shop">🛒 Shop & Upgrades</button>
-        <button class="tab-btn" data-action="switchTab:stats">📊 Statistics</button>
-        <button class="tab-btn" data-action="switchTab:god">🙏 Talk to God</button>
-        <button class="tab-btn" data-action="switchTab:options">⚙️ Options</button>
-        <button class="tab-btn" data-action="switchTab:dev">🔧 Dev Tools</button>
+      <!-- Desktop Tab Navigation -->
+      <div class="tab-navigation desktop-only">
+        <button class="tab-btn active" data-action="switchTab:soda" aria-label="Soda Clicking Tab">
+          <span class="tab-icon">🥤</span>
+          <span class="tab-label">Soda Clicking</span>
+        </button>
+        <button class="tab-btn" data-action="switchTab:unlocks" aria-label="Unlocks Tab">
+          <span class="tab-icon">🔓</span>
+          <span class="tab-label">Unlocks</span>
+        </button>
+        <button class="tab-btn" data-action="switchTab:shop" aria-label="Shop & Upgrades Tab">
+          <span class="tab-icon">🛒</span>
+          <span class="tab-label">Shop & Upgrades</span>
+        </button>
+        <button class="tab-btn" data-action="switchTab:stats" aria-label="Statistics Tab">
+          <span class="tab-icon">📊</span>
+          <span class="tab-label">Statistics</span>
+        </button>
+        <button class="tab-btn" data-action="switchTab:god" aria-label="Talk to God Tab">
+          <span class="tab-icon">🙏</span>
+          <span class="tab-label">Talk to God</span>
+        </button>
+        <button class="tab-btn" data-action="switchTab:options" aria-label="Options Tab">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">Options</span>
+        </button>
+        <button class="tab-btn" data-action="switchTab:dev" aria-label="Dev Tools Tab">
+          <span class="tab-icon">🔧</span>
+          <span class="tab-label">Dev Tools</span>
+        </button>
+      </div>
+
+      <!-- Mobile Bottom Navigation -->
+      <div class="mobile-tab-navigation mobile-only">
+        <div
+          class="mobile-tab-item active"
+          data-action="switchTab:soda"
+          aria-label="Soda Clicking Tab"
+          role="button"
+          tabindex="0"
+        >
+          <div class="mobile-tab-icon">🥤</div>
+          <div class="mobile-tab-label">Soda</div>
+        </div>
+        <div
+          class="mobile-tab-item"
+          data-action="switchTab:unlocks"
+          aria-label="Unlocks Tab"
+          role="button"
+          tabindex="0"
+        >
+          <div class="mobile-tab-icon">🔓</div>
+          <div class="mobile-tab-label">Unlock</div>
+        </div>
+        <div
+          class="mobile-tab-item"
+          data-action="switchTab:shop"
+          aria-label="Shop & Upgrades Tab"
+          role="button"
+          tabindex="0"
+        >
+          <div class="mobile-tab-icon">🛒</div>
+          <div class="mobile-tab-label">Shop</div>
+        </div>
+        <div
+          class="mobile-tab-item"
+          data-action="switchTab:stats"
+          aria-label="Statistics Tab"
+          role="button"
+          tabindex="0"
+        >
+          <div class="mobile-tab-icon">📊</div>
+          <div class="mobile-tab-label">Stats</div>
+        </div>
+        <div
+          class="mobile-tab-item"
+          data-action="switchTab:god"
+          aria-label="Talk to God Tab"
+          role="button"
+          tabindex="0"
+        >
+          <div class="mobile-tab-icon">🙏</div>
+          <div class="mobile-tab-label">God</div>
+        </div>
+        <div
+          class="mobile-tab-item"
+          data-action="switchTab:options"
+          aria-label="Options Tab"
+          role="button"
+          tabindex="0"
+        >
+          <div class="mobile-tab-icon">⚙️</div>
+          <div class="mobile-tab-label">Opt</div>
+        </div>
+        <div
+          class="mobile-tab-item"
+          data-action="switchTab:dev"
+          aria-label="Dev Tools Tab"
+          role="button"
+          tabindex="0"
+        >
+          <div class="mobile-tab-icon">🔧</div>
+          <div class="mobile-tab-label">Dev</div>
+        </div>
       </div>
 
       <!-- Drink Progress Bar - Moved to Header -->
