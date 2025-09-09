@@ -921,7 +921,7 @@ export function toggleEruda(): boolean {
             console.log('📱 Eruda methods available:', Object.getOwnPropertyNames(erudaInstance));
             console.log('📱 Eruda show method:', typeof erudaInstance.show);
             console.log('📱 Eruda hide method:', typeof erudaInstance.hide);
-            
+
             // Add some test data to verify console is working
             console.log('🧪 Test data for Eruda console:');
             console.log('   - Current time:', new Date().toISOString());
