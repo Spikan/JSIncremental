@@ -913,12 +913,8 @@ export function toggleEruda(): boolean {
         erudaInstance = (window as any).eruda;
         if (erudaInstance && typeof erudaInstance.init === 'function') {
           try {
-            // Initialize Eruda with console configuration
-            erudaInstance.init({
-              container: document.body,
-              tool: ['console', 'elements', 'network', 'resources', 'info'],
-              useShadowDom: true,
-            });
+            // Initialize Eruda with simple, reliable configuration
+            erudaInstance.init();
 
             erudaLoaded = true;
             erudaVisible = true;
@@ -938,19 +934,14 @@ export function toggleEruda(): boolean {
             console.log('   - Window size:', window.innerWidth + 'x' + window.innerHeight);
             console.log('   - Game state available:', !!(window as any).App?.state);
 
-            // Force Eruda console to refresh/update
+            // Add more test data after a short delay
             setTimeout(() => {
-              if (erudaInstance.console && typeof erudaInstance.console.show === 'function') {
-                erudaInstance.console.show();
-              }
-              console.log('🔄 Eruda console refreshed');
-
-              // Add more test data after refresh
               console.log('🎮 Additional test data:');
               console.log('   - Random number:', Math.random());
               console.log('   - Array test:', [1, 2, 3, 'test']);
               console.log('   - Object test:', { key: 'value', nested: { data: 123 } });
-            }, 100);
+              console.log('🔄 Eruda console should now show this data');
+            }, 500);
           } catch (initError) {
             console.error('❌ Eruda initialization failed:', initError);
             updateErudaButtonState(false);
