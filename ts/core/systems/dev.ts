@@ -868,6 +868,7 @@ export function testNumberFormatting(): boolean {
 // Expose test function globally
 if (typeof window !== 'undefined') {
   (window as any).testSPDIndicators = testSPDIndicators;
+  (window as any).testEruda = toggleEruda;
 }
 
 // ========================================
@@ -917,6 +918,16 @@ export function toggleEruda(): boolean {
             updateErudaButtonState(true);
             console.log('🐛 Eruda mobile debug console loaded and activated');
             console.log('📱 Eruda instance:', erudaInstance);
+            console.log('📱 Eruda methods available:', Object.getOwnPropertyNames(erudaInstance));
+            console.log('📱 Eruda show method:', typeof erudaInstance.show);
+            console.log('📱 Eruda hide method:', typeof erudaInstance.hide);
+            
+            // Add some test data to verify console is working
+            console.log('🧪 Test data for Eruda console:');
+            console.log('   - Current time:', new Date().toISOString());
+            console.log('   - User agent:', navigator.userAgent);
+            console.log('   - Window size:', window.innerWidth + 'x' + window.innerHeight);
+            console.log('   - Game state available:', !!(window as any).App?.state);
           } catch (initError) {
             console.error('❌ Eruda initialization failed:', initError);
             updateErudaButtonState(false);
