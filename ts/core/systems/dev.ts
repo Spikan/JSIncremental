@@ -942,7 +942,7 @@ export function exportState(): boolean {
     const stateJson = JSON.stringify(state, null, 2);
     const blob = new Blob([stateJson], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    
+
     const a = document.createElement('a');
     a.href = url;
     a.download = `soda-clicker-state-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
@@ -950,7 +950,7 @@ export function exportState(): boolean {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     console.log('💾 Game state exported successfully');
     return true;
   } catch (error) {
@@ -965,24 +965,24 @@ export function exportState(): boolean {
 export function performanceTest(): boolean {
   try {
     console.log('⚡ Starting performance test...');
-    
+
     const startTime = performance.now();
     const iterations = 10000;
-    
+
     // Test basic arithmetic operations
     for (let i = 0; i < iterations; i++) {
       const testValue = Math.random() * 1000;
       Math.sqrt(testValue);
     }
-    
+
     const endTime = performance.now();
     const duration = endTime - startTime;
-    
+
     console.log(`⚡ Performance test completed:`);
     console.log(`   - ${iterations} operations in ${duration.toFixed(2)}ms`);
     console.log(`   - Average: ${(duration / iterations).toFixed(4)}ms per operation`);
     console.log(`   - Operations per second: ${Math.round(iterations / (duration / 1000))}`);
-    
+
     return true;
   } catch (error) {
     console.warn('Performance test failed:', error);
