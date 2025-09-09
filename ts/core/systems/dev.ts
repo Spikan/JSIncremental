@@ -876,22 +876,55 @@ if (typeof window !== 'undefined') {
 
 let erudaLoaded = false;
 let erudaInstance: any = null;
+let erudaVisible = false;
 
 /**
  * Toggle Eruda mobile debug console
  */
 export function toggleEruda(): boolean {
   try {
+    // Check if Eruda is already available globally
+    if (!erudaLoaded && (window as any).eruda) {
+      console.log('📱 Eruda already available globally, using existing instance');
+      erudaInstance = (window as any).eruda;
+      if (erudaInstance && typeof erudaInstance.init === 'function') {
+        try {
+          erudaInstance.init();
+          erudaLoaded = true;
+          erudaVisible = true;
+          updateErudaButtonState(true);
+          console.log('🐛 Eruda mobile debug console activated from global instance');
+          return true;
+        } catch (initError) {
+          console.error('❌ Eruda global initialization failed:', initError);
+        }
+      }
+    }
+
     if (!erudaLoaded) {
       // Load Eruda dynamically
+      console.log('📱 Loading Eruda from CDN...');
       const script = document.createElement('script');
       script.src = '//cdn.jsdelivr.net/npm/eruda';
       script.onload = () => {
+        console.log('📱 Eruda script loaded, initializing...');
         erudaInstance = (window as any).eruda;
-        erudaInstance.init();
-        erudaLoaded = true;
-        updateErudaButtonState(true);
-        console.log('🐛 Eruda mobile debug console loaded and activated');
+        if (erudaInstance && typeof erudaInstance.init === 'function') {
+          try {
+            erudaInstance.init();
+            erudaLoaded = true;
+            erudaVisible = true;
+            updateErudaButtonState(true);
+            console.log('🐛 Eruda mobile debug console loaded and activated');
+            console.log('📱 Eruda instance:', erudaInstance);
+          } catch (initError) {
+            console.error('❌ Eruda initialization failed:', initError);
+            updateErudaButtonState(false);
+          }
+        } else {
+          console.error('❌ Eruda not available or invalid:', erudaInstance);
+          updateErudaButtonState(false);
+        }
       };
       script.onerror = () => {
         console.error('❌ Failed to load Eruda debug console');
@@ -901,9 +934,19 @@ export function toggleEruda(): boolean {
     } else {
       // Toggle existing Eruda instance
       if (erudaInstance) {
-        erudaInstance.show();
-        updateErudaButtonState(true);
-        console.log('🐛 Eruda mobile debug console shown');
+        if (erudaVisible) {
+          erudaInstance.hide();
+          erudaVisible = false;
+          updateErudaButtonState(false);
+          console.log('🐛 Eruda mobile debug console hidden');
+        } else {
+          erudaInstance.show();
+          erudaVisible = true;
+          updateErudaButtonState(true);
+          console.log('🐛 Eruda mobile debug console shown');
+        }
+      } else {
+        console.warn('⚠️ Eruda instance not available for toggle');
       }
     }
     return true;
@@ -997,12 +1040,15 @@ function updateErudaButtonState(active: boolean): void {
   try {
     const button = document.getElementById('erudaToggleBtn');
     if (button) {
-      if (active) {
-        button.classList.add('active');
-        button.querySelector('.dev-btn-text')!.textContent = 'Hide Debug Console';
-      } else {
-        button.classList.remove('active');
-        button.querySelector('.dev-btn-text')!.textContent = 'Mobile Debug Console';
+      const textElement = button.querySelector('.dev-btn-text');
+      if (textElement) {
+        if (active) {
+          button.classList.add('active');
+          textElement.textContent = 'Hide Debug Console';
+        } else {
+          button.classList.remove('active');
+          textElement.textContent = 'Mobile Debug Console';
+        }
       }
     }
   } catch (error) {
