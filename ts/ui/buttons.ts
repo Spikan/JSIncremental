@@ -197,6 +197,11 @@ const BUTTON_CONFIG: {
       type: 'dev-btn',
       label: 'Performance Test',
     },
+    devRefreshEruda: {
+      func: () => (window as any).App?.systems?.dev?.refreshErudaConsole?.(),
+      type: 'dev-btn',
+      label: 'Refresh Console',
+    },
 
     devExportSave: {
       func: () => (window as any).App?.systems?.dev?.exportSave?.(),
