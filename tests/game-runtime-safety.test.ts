@@ -19,6 +19,7 @@ declare global {
       levelUpDiv?: {
         getBoundingClientRect?: () => { left: number; top: number; width: number; height: number };
       };
+      isReady?: () => boolean;
     };
     GAME_CONFIG?: {
       LIMITS?: {
@@ -107,6 +108,7 @@ declare global {
     levelUpDiv: {
       getBoundingClientRect: vi.fn(() => ({ left: 400, top: 300, width: 180, height: 120 })),
     },
+    isReady: vi.fn(() => true),
   },
   GAME_CONFIG: {
     LIMITS: {
