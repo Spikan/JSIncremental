@@ -104,7 +104,9 @@ export function updateTopSipsPerSecond(): void {
       } else {
         // Fallback for non-Decimal values - use safe conversion
         const sipsPerDrink = safeToNumberOrDecimal(state.spd || 0);
-        sipsPerSecond = (typeof sipsPerDrink === 'number' ? sipsPerDrink : sipsPerDrink.toNumber()) / drinkRateSeconds;
+        sipsPerSecond =
+          (typeof sipsPerDrink === 'number' ? sipsPerDrink : sipsPerDrink.toNumber()) /
+          drinkRateSeconds;
       }
 
       const formatted = formatNumber(sipsPerSecond);

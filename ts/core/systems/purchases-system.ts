@@ -1306,14 +1306,12 @@ export const execute = {
     if (!result) return false;
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
-      // Preserve extreme values - use safe conversion
-      const spent = safeToNumberOrDecimal(result.spent);
-      const gained = safeToNumberOrDecimal(result.sipsGained);
+      // Preserve extreme values - use Decimal operations directly
       const curr = st.sips as any;
       const nextLarge =
         curr && curr.add && curr.subtract
           ? curr.add(result.sipsGained as any).subtract(result.spent as any)
-          : (curr ?? 0) + (typeof gained === 'number' ? gained : gained.toNumber()) - (typeof spent === 'number' ? spent : spent.toNumber());
+          : new Decimal(curr ?? 0).add(result.sipsGained as any).subtract(result.spent as any);
       w.sips = nextLarge;
       const actions = w.App?.state?.actions;
       actions?.setSips?.(nextLarge);
