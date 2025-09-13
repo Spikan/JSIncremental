@@ -137,23 +137,11 @@ describe('LargeNumber System', () => {
       }
     });
 
-    it('should fall back to NativeNumber when libraries unavailable', () => {
-      // Mock the absence of libraries
-      const originalBreakInfinity = (globalThis as any).BreakInfinity;
-      const originalDecimal = (globalThis as any).Decimal;
-
-      delete (globalThis as any).BreakInfinity;
-      delete (globalThis as any).Decimal;
-
-      try {
-        const num = new LargeNumber(42);
-        expect(num._value instanceof NativeNumber).toBe(true);
-        expect(num.toNumber()).toBe(42);
-      } finally {
-        // Restore original values
-        (globalThis as any).BreakInfinity = originalBreakInfinity;
-        (globalThis as any).Decimal = originalDecimal;
-      }
+    it('should always use break_eternity.js Decimal', () => {
+      // LargeNumber should always use break_eternity.js Decimal
+      const num = new LargeNumber(42);
+      expect(num instanceof Decimal).toBe(true);
+      expect(num.toNumber()).toBe(42);
     });
   });
 
