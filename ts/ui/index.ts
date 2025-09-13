@@ -84,8 +84,17 @@ export function initializeUI(): void {
       updateTopSipsPerSecond();
       checkUpgradeAffordability();
 
-      if (data && typeof data.gained === 'number') {
-        showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
+      if (data && data.gained) {
+        // Convert Decimal to number for feedback display, preserving extreme values
+        let feedbackValue = data.gained;
+        if (typeof feedbackValue.toNumber === 'function') {
+          const numValue = feedbackValue.toNumber();
+          // For extreme values, use a safe display number
+          feedbackValue = isFinite(numValue) && Math.abs(numValue) < 1e15 ? numValue : 999999999;
+        } else if (typeof feedbackValue !== 'number') {
+          feedbackValue = Number(feedbackValue) || 0;
+        }
+        showClickFeedback(feedbackValue, data.critical, data.clickX, data.clickY);
       }
     });
     (window as any).App.events.on(
