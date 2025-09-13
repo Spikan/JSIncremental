@@ -174,11 +174,6 @@ const BUTTON_CONFIG: {
       label: 'Add Sips',
     },
     // Debug Tools Actions
-    devToggleEruda: {
-      func: () => (window as any).App?.systems?.dev?.toggleEruda?.(),
-      type: 'dev-btn',
-      label: 'Toggle Mobile Debug Console',
-    },
     devClearConsole: {
       func: () => (window as any).App?.systems?.dev?.clearConsole?.(),
       type: 'dev-btn',
@@ -194,16 +189,6 @@ const BUTTON_CONFIG: {
       type: 'dev-btn',
       label: 'Performance Test',
     },
-    devRefreshEruda: {
-      func: () => (window as any).App?.systems?.dev?.refreshErudaConsole?.(),
-      type: 'dev-btn',
-      label: 'Refresh Console',
-    },
-    devTestSystem: {
-      func: () => (window as any).App?.systems?.dev?.testDevSystem?.(),
-      type: 'dev-btn',
-      label: 'Test Dev System',
-    },
 
     devExportSave: {
       func: () => (window as any).App?.systems?.dev?.exportSave?.(),
@@ -214,26 +199,15 @@ const BUTTON_CONFIG: {
     largeNumberTest: {
       func: (action?: string) => {
         switch (action) {
-          case 'addMassiveSips':
-            (window as any).addMassiveSips?.();
-            break;
-          case 'addHugeStraws':
-            (window as any).addHugeStraws?.();
-            break;
-          case 'addMassiveCups':
-            (window as any).addMassiveCups?.();
-            break;
           case 'addExtremeResources':
             (window as any).addExtremeResources?.();
-            break;
-          case 'testScientificNotation':
-            (window as any).testScientificNotation?.();
             break;
           case 'resetAllResources':
             (window as any).resetAllResources?.();
             break;
           default:
-            console.warn('Unknown large number test action:', action);
+            // Unknown action - no logging for production
+            break;
         }
       },
       type: 'dev-btn',

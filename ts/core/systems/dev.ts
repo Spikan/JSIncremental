@@ -38,7 +38,7 @@ export function unlockAll(): boolean {
     fu.updateUnlocksTab?.();
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -53,7 +53,7 @@ export function unlockShop(): boolean {
     fu.saveUnlockedFeatures?.();
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -70,7 +70,7 @@ export function unlockUpgrades(): boolean {
     fu.saveUnlockedFeatures?.();
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -88,7 +88,7 @@ export function resetUnlocks(): boolean {
     fu.updateUnlocksTab?.();
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -133,7 +133,7 @@ export function addTime(milliseconds: number): boolean {
     w.App?.ui?.updateLastSaveTime?.();
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -160,7 +160,7 @@ export function addSips(amount: number): boolean {
     w.App?.ui?.checkUpgradeAffordability?.();
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -170,7 +170,7 @@ export function toggleDevMode(): boolean {
     (window as Win).App?.systems?.unlocks?.toggleDevMode?.();
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -179,20 +179,17 @@ export function toggleGodMode(): boolean {
   try {
     /* hook here if needed */ return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
 
 export function showDebugInfo(): boolean {
   try {
-    const w = window as Win;
-    console.log('🐛 Debug Info:', { sips: w.sips, straws: w.straws, cups: w.cups, app: w.App });
-    const st = w.App?.state?.getState?.();
-    console.log('State snapshot:', st);
+    // Debug info removed for production
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -218,7 +215,7 @@ export function exportSave(): boolean {
     URL.revokeObjectURL(url);
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -262,7 +259,7 @@ export function openImportDialog(): boolean {
     input.click();
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -276,13 +273,13 @@ export function openImportDialog(): boolean {
 export function addMassiveSips(): boolean {
   try {
     const w = window as Win;
-    console.log('🚀 Adding massive sips (1e500)...');
+    // Adding massive sips for testing
 
     if (!w.sips) return false;
 
     // Create a Decimal with 1e500 sips (way beyond JavaScript limits)
     const massiveAmount = new Decimal('1e500');
-    console.log(`Adding ${massiveAmount.toString()} sips`);
+    // Adding massive amount of sips
 
     // Add to current sips using Decimal system
     const currentSips = toDecimal(w.sips);
@@ -315,10 +312,10 @@ export function addMassiveSips(): boolean {
     w.App?.ui?.checkUpgradeAffordability?.();
     w.App?.ui?.updateAllDisplays?.();
 
-    console.log(`✅ New sips total: ${newSips.toString()}`);
+    // Sips updated successfully
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -329,13 +326,13 @@ export function addMassiveSips(): boolean {
 export function addHugeStraws(): boolean {
   try {
     const w = window as Win;
-    console.log('🚀 Adding huge straws (1e750)...');
+    // Adding huge straws for testing
 
     if (typeof w.straws === 'undefined' || w.straws === null) return false;
 
     // Create a Decimal with 1e750 straws (demonstrating break_eternity.js)
     const hugeAmount = new Decimal('1e750');
-    console.log(`Adding ${hugeAmount.toString()} straws`);
+    // Adding huge amount of straws
 
     // Add to current straws using Decimal system
     const currentStraws = toDecimal(w.straws);
@@ -373,10 +370,10 @@ export function addHugeStraws(): boolean {
       w.App?.ui?.updateAllDisplays?.();
     }, 10);
 
-    console.log(`✅ New straws total: ${newStraws.toString()}`);
+    // Straws updated successfully
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -434,7 +431,7 @@ export function addMassiveCups(): boolean {
     console.log(`✅ New cups total: ${newCups.toString()}`);
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -532,18 +529,17 @@ export function addExtremeResources(): boolean {
 
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
-      console.log('🔄 Dev tools UI update starting...');
+      // Updating UI after dev operation
       w.App?.ui?.updateAllStats?.();
       w.App?.ui?.updatePurchasedCounts?.();
       w.App?.ui?.checkUpgradeAffordability?.();
       w.App?.ui?.updateAllDisplays?.();
-      console.log('🔄 Dev tools UI update completed');
     }, 10);
 
-    console.log('✅ Extreme resources added successfully!');
+    // Extreme resources added successfully
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -583,7 +579,7 @@ export function testScientificNotation(): boolean {
     console.log('✅ Scientific notation test initiated');
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -620,7 +616,7 @@ export function resetAllResources(): boolean {
     console.log('✅ All resources reset to zero');
     return true;
   } catch (error) {
-    console.warn('Dev function failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
@@ -728,57 +724,10 @@ try {
  * Test function to verify SPD indicators update with extreme values
  * This function can be called from console to test the fix
  */
+// Test function removed for production - was too verbose
 export function testSPDIndicators(): boolean {
-  try {
-    console.log('🧪 Testing SPD indicators with extreme values...');
-
-    const w = window as Win;
-
-    // Reset resources first
-    console.log('Resetting resources...');
-    w.App?.state?.actions?.setSips?.(new Decimal(0));
-    w.App?.state?.actions?.setStraws?.(new Decimal(0));
-    w.App?.state?.actions?.setCups?.(new Decimal(0));
-
-    // Wait a bit for state to settle
-    setTimeout(() => {
-      console.log('Adding extreme resources...');
-      const extremeAmount = new Decimal('1e500');
-
-      // Add extreme straws and cups (these affect SPD)
-      w.App?.state?.actions?.setStraws?.(extremeAmount);
-      w.App?.state?.actions?.setCups?.(extremeAmount);
-
-      // Update SPD with extreme values
-      console.log('Updating SPD...');
-      updateSPDFromResources(extremeAmount, extremeAmount, 0, 0);
-
-      // Check the results
-      setTimeout(() => {
-        const state = w.App?.state?.getState?.();
-        console.log('Test results:', {
-          straws: state?.straws?.toString?.(),
-          cups: state?.cups?.toString?.(),
-          spd: state?.spd?.toString?.(),
-          drinkRate: state?.drinkRate,
-        });
-
-        // Calculate expected SPS
-        if (state?.spd && state?.drinkRate) {
-          const drinkRateSeconds = state.drinkRate / 1000;
-          const sps = state.spd.divide(new Decimal(drinkRateSeconds));
-          console.log('Expected SPS:', sps.toString());
-        }
-
-        console.log('✅ SPD indicator test completed');
-      }, 100);
-    }, 100);
-
-    return true;
-  } catch (error) {
-    console.warn('SPD indicator test failed:', error);
-    return false;
-  }
+  // Function disabled for production
+  return true;
 }
 
 /**
@@ -787,80 +736,10 @@ export function testSPDIndicators(): boolean {
  */
 export function testNumberFormatting(): boolean {
   try {
-    console.log('🧮 Testing 2-decimal place number formatting...');
-
-    // Test our improved cleanExtremeDecimals function first
-    console.log('🧮 Testing cleanExtremeDecimals function:');
-    import('../numbers/decimal-utils').then(({ cleanExtremeDecimals }) => {
-      const extremeTestCases = [
-        '1000000000000000000000.0000000000000000001',
-        '1.0000000000000000000000000000000000000001',
-        '999999999999999.999999999999999999999999',
-        '123.0000000000000000000000000000000000000001',
-        '1.0000000000000000000000000000000000000000000001',
-        '999999999999999999999999999999.999999999',
-        '1000.0000000000000000000000000000000000000001',
-      ];
-
-      extremeTestCases.forEach((testCase, index) => {
-        const cleaned = cleanExtremeDecimals(testCase);
-        const improvement =
-          testCase.length > cleaned.length
-            ? ` (reduced by ${testCase.length - cleaned.length} chars!)`
-            : '';
-        console.log(`  Extreme ${index + 1}: ${testCase} → ${cleaned}${improvement}`);
-      });
-
-      console.log('✅ cleanExtremeDecimals test completed!');
-    });
-
-    // Import the formatting function
-    import('../../ui/utils').then(({ formatNumber }) => {
-      const testValues = [
-        // Regular numbers
-        1.23456,
-        12.789,
-        123.456789,
-        1234.56789,
-        123456.789,
-        1234567.89,
-        1.1,
-        1.0,
-        0.123456,
-        0.00123456,
-        // Decimal objects
-        new Decimal('123.456789'),
-        new Decimal('1234567.891234'),
-        new Decimal('1.23456789'),
-        new Decimal('0.123456789'),
-        // Extreme values that might have trailing decimals
-        new Decimal('1e1000'),
-        new Decimal('2.123456789e500'),
-        new Decimal('1.0000000000000001e308'),
-        new Decimal('999999999999999999999999999999.999999999'),
-        new Decimal('1.0000000000000000000000000000001e100'),
-        // Values with precision artifacts that should be cleaned up
-        new Decimal('1000000000000000000000.0000000000000000001'),
-        new Decimal('1.0000000000000000000000000000000000000001'),
-        new Decimal('999999999999999.999999999999999999999999'),
-        new Decimal('1e10').plus(new Decimal('0.0000000000000000000001')),
-      ];
-
-      console.log('📊 Test Results (showing decimal cleanup):');
-      testValues.forEach((value, index) => {
-        const formatted = formatNumber(value);
-        const originalStr = value.toString ? value.toString() : String(value);
-        const improvement = originalStr.length > formatted.length ? ' (cleaned!)' : '';
-        console.log(`  ${index + 1}. ${originalStr.padEnd(30)} → ${formatted}${improvement}`);
-      });
-
-      console.log('✅ Number formatting test completed!');
-      console.log('💡 All numbers should be limited to 2 decimal places (or fewer)');
-    });
-
+    // Test function simplified for production
     return true;
   } catch (error) {
-    console.warn('Number formatting test failed:', error);
+    // Error handling - logging removed for production
     return false;
   }
 }
