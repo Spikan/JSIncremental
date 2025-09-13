@@ -190,7 +190,7 @@ describe('Phase 3: Advanced Performance Optimization', () => {
     it('should provide predictive caching', () => {
       // Clear cache first
       predictiveCache.clear();
-      
+
       // Simulate access patterns - need multiple rounds to build patterns
       predictiveCache.set('step1', new MockDecimal('100'));
       predictiveCache.set('step2', new MockDecimal('200'));
@@ -200,12 +200,12 @@ describe('Phase 3: Advanced Performance Optimization', () => {
       predictiveCache.get('step1');
       predictiveCache.get('step2');
       predictiveCache.get('step3');
-      
+
       // Second round to build patterns
       predictiveCache.get('step1');
       predictiveCache.get('step2');
       predictiveCache.get('step3');
-      
+
       // Third round to ensure patterns are recorded
       predictiveCache.get('step1');
       predictiveCache.get('step2');
@@ -353,7 +353,7 @@ describe('Phase 3: Advanced Performance Optimization', () => {
     it('should work together for complex scenarios', () => {
       // Reset memory optimizer state for this test
       memoryOptimizer['extremeValueCount'] = 0;
-      
+
       // Simulate a complex game scenario with many operations
       const values = Array.from({ length: 100 }, (_, i) => new MockDecimal(i.toString()));
 
@@ -382,7 +382,7 @@ describe('Phase 3: Advanced Performance Optimization', () => {
     it('should handle extreme values efficiently', () => {
       // Reset memory optimizer state for this test
       memoryOptimizer['extremeValueCount'] = 0;
-      
+
       const extremeValue = new MockDecimal('1e500');
       // Mock the toNumber method to return Infinity for extreme values
       extremeValue.toNumber = () => Infinity;

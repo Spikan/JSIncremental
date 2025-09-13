@@ -59,7 +59,7 @@ export class PredictiveCache {
         this.accessPatterns.set(recentKey, pattern);
       }
     }
-    
+
     // Also record the current key as a pattern starter
     if (!this.accessPatterns.has(key)) {
       this.accessPatterns.set(key, []);
