@@ -208,6 +208,13 @@ function initGame() {
       console.warn('Failed to emit game loaded event:', error);
     }
 
+    // CRITICAL FIX: Update local variables with loaded values before recalculating production
+    // The save loader updates window globals and store, but we need to sync local variables
+    straws = (window as any).straws || straws;
+    cups = (window as any).cups || cups;
+    widerStraws = (window as any).widerStraws || widerStraws;
+    betterCups = (window as any).betterCups || betterCups;
+
     // Compute production
     const config = BAL || {};
     if ((window as any).App?.systems?.resources?.recalcProduction) {
@@ -240,6 +247,22 @@ function initGame() {
       strawSPD = new Decimal(strawSPDValue);
       cupSPD = new Decimal(cupSPDValue);
       spd = new Decimal(spdValue);
+      
+      // CRITICAL FIX: Update window globals and store with recalculated SPD values
+      (window as any).strawSPD = strawSPD;
+      (window as any).cupSPD = cupSPD;
+      (window as any).spd = spd;
+      
+      // Update Zustand store with recalculated SPD values
+      try {
+        (window as any).App?.state?.setState?.({
+          strawSPD: strawSPD,
+          cupSPD: cupSPD,
+          spd: spd
+        });
+      } catch (error) {
+        console.warn('Failed to update store with recalculated SPD values:', error);
+      }
     } else {
       strawSPD = new Decimal(config.STRAW_BASE_SPD);
       cupSPD = new Decimal(config.CUP_BASE_SPD);
