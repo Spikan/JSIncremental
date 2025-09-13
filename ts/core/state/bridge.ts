@@ -49,9 +49,8 @@ type NumericValue = number | string | DecimalType | { toNumber(): number } | { _
 export function createStateBridge(app: AppLike) {
   function setDrinkRate(value: NumericValue) {
     try {
-      // Preserve extreme values - no truncation
-      const numericValue = toDecimal(value).toNumber();
-      app.state.actions?.setDrinkRate?.(numericValue);
+      // Preserve extreme values - pass Decimal directly
+      app.state.actions?.setDrinkRate?.(toDecimal(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -59,9 +58,8 @@ export function createStateBridge(app: AppLike) {
 
   function setDrinkProgress(value: NumericValue) {
     try {
-      // Preserve extreme values - no truncation
-      const numericValue = toDecimal(value).toNumber();
-      app.state.actions?.setDrinkProgress?.(numericValue);
+      // Preserve extreme values - pass Decimal directly
+      app.state.actions?.setDrinkProgress?.(toDecimal(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -69,19 +67,17 @@ export function createStateBridge(app: AppLike) {
 
   function setLastDrinkTime(value: NumericValue) {
     try {
-      // Preserve extreme values - no truncation
-      const numericValue = toDecimal(value).toNumber();
-      app.state.actions?.setLastDrinkTime?.(numericValue);
+      // Preserve extreme values - pass Decimal directly
+      app.state.actions?.setLastDrinkTime?.(toDecimal(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
   }
 
   function setLevel(value: NumericValue) {
-    // Preserve extreme values - no truncation
-    const numeric = toDecimal(value).toNumber();
+    // Preserve extreme values - pass Decimal directly
     try {
-      app.state.actions?.setLevel?.(numeric);
+      app.state.actions?.setLevel?.(toDecimal(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -166,7 +162,7 @@ export function createStateBridge(app: AppLike) {
   function syncCriticalClickChance(value: NumericValue) {
     try {
       // Preserve extreme values - no truncation
-      app.state.actions?.setCriticalClickChance?.(toDecimal(value).toNumber());
+      app.state.actions?.setCriticalClickChance?.(toDecimal(value));
     } catch (error) {
       console.warn('State bridge operation failed:', error);
     }
@@ -248,9 +244,10 @@ export function createStateBridge(app: AppLike) {
               seedKey === 'currentClickStreak' ||
               seedKey === 'bestClickStreak')
           ) {
-            // These remain as numbers
-            // Preserve extreme values - no truncation
-            (seed as any)[seedKey] = toDecimal(value).toNumber();
+            // These remain as numbers - use safe conversion
+            const decimalValue = toDecimal(value);
+            (seed as any)[seedKey] = typeof decimalValue.toNumber === 'function' && 
+              Math.abs(decimalValue.toNumber()) < 1e15 ? decimalValue.toNumber() : 0;
           } else {
             // All other values become Decimal
             (seed as any)[seedKey] = toDecimalValue(value);

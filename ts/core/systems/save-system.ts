@@ -184,10 +184,10 @@ export function resetGameState() {
     if (w.App?.systems?.resources?.recalcProduction) {
       const up = w.App?.data?.upgrades || {};
       w.App.systems.resources.recalcProduction({
-        straws: straws.toNumber(),
-        cups: cups.toNumber(),
-        widerStraws: widerStraws.toNumber(),
-        betterCups: betterCups.toNumber(),
+        straws: straws,
+        cups: cups,
+        widerStraws: widerStraws,
+        betterCups: betterCups,
         base: {
           strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
           cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,

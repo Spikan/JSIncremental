@@ -21,7 +21,13 @@ export function toLargeNumber(value: any): any {
 
 export function toNumber(value: any): number {
   if (value && typeof value.toNumber === 'function') {
-    return value.toNumber();
+    const num = value.toNumber();
+    // Only return the number if it's within safe range to preserve extreme values
+    if (isFinite(num) && Math.abs(num) < 1e15) {
+      return num;
+    }
+    // For extreme values, return 0 to prevent precision loss
+    return 0;
   }
   return Number(value) || 0;
 }
