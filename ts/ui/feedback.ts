@@ -47,7 +47,7 @@ function getSafePosition(
 
 // Show feedback at specific click coordinates
 function showFeedbackAtCoordinates(
-  sipsGained: number,
+  sipsGained: number | any, // Accept both numbers and Decimal objects
   isCritical: boolean,
   clickX: number,
   clickY: number
@@ -121,7 +121,7 @@ function showFeedbackAtCoordinates(
 
 // Helper to show feedback with a given container
 function showFeedbackWithContainer(
-  sipsGained: number,
+  sipsGained: number | any, // Accept both numbers and Decimal objects
   isCritical: boolean,
   sodaContainer: HTMLElement
 ): void {
@@ -191,7 +191,7 @@ function showFeedbackWithContainer(
 
 // Show click feedback numbers
 export function showClickFeedback(
-  sipsGained: number,
+  sipsGained: number | any, // Accept both numbers and Decimal objects
   isCritical: boolean = false,
   clickX: number | null = null,
   clickY: number | null = null
