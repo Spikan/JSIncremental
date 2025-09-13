@@ -234,8 +234,9 @@ export function createStateBridge(app: AppLike) {
             typeof seedKey === 'string' &&
             (seedKey === 'drinkRate' || seedKey === 'drinkProgress' || seedKey === 'lastDrinkTime')
           ) {
-            // Preserve extreme values - no truncation
-            (seed as any)[seedKey] = toDecimal(value).toNumber();
+            // Preserve extreme values - use safe conversion
+            const decimalValue = toDecimal(value);
+            (seed as any)[seedKey] = Math.abs(decimalValue.toNumber()) < 1e15 ? decimalValue.toNumber() : 0;
           } else if (seedKey === 'level') {
             (seed as any)[seedKey] = toDecimalValue(value);
           } else if (

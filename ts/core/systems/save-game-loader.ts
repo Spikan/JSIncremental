@@ -233,17 +233,20 @@ export class SaveGameLoader {
 
     // Handle serialized Decimal objects (might have _value property)
     if (value && typeof value._value !== 'undefined') {
-      return Number(value._value) || defaultValue;
+      const num = Number(value._value);
+      return isFinite(num) && Math.abs(num) < 1e15 ? num : defaultValue;
     }
 
     // Handle objects with value property (alternative serialization format)
     if (value && typeof value.value !== 'undefined') {
-      return Number(value.value) || defaultValue;
+      const num = Number(value.value);
+      return isFinite(num) && Math.abs(num) < 1e15 ? num : defaultValue;
     }
 
     // Handle arrays (some serialization might convert to arrays)
     if (Array.isArray(value) && value.length > 0) {
-      return Number(value[0]) || defaultValue;
+      const num = Number(value[0]);
+      return isFinite(num) && Math.abs(num) < 1e15 ? num : defaultValue;
     }
 
     return defaultValue;

@@ -8,6 +8,7 @@
 // but here we inline the logic from original main.js, adapted for TS types.
 
 // Ported inline from original main.js (TS-ified minimal changes)
+import { safeToNumberOrDecimal } from './core/numbers/safe-conversion';
 
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types
@@ -309,9 +310,9 @@ function initGame() {
         spd: spd,
         strawSPD: strawSPD,
         cupSPD: cupSPD,
-        drinkRate: Number(drinkRate || 0),
-        drinkProgress: Number(drinkProgress || 0),
-        lastDrinkTime: Number(lastDrinkTime || 0),
+        drinkRate: safeToNumberOrDecimal(drinkRate || 0),
+        drinkProgress: safeToNumberOrDecimal(drinkProgress || 0),
+        lastDrinkTime: safeToNumberOrDecimal(lastDrinkTime || 0),
         // Preserve extreme click values
         criticalClickChance: criticalClickChance,
         criticalClickMultiplier: criticalClickMultiplier,
