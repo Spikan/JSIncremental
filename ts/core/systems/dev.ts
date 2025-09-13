@@ -237,13 +237,13 @@ export function openImportDialog(): boolean {
         try {
           const saveData = JSON.parse(ev?.target?.result || '{}');
           if (saveData.sips != null)
-            w.sips = w.Decimal ? new w.Decimal(saveData.sips) : Number(saveData.sips);
+            w.sips = w.Decimal ? new w.Decimal(saveData.sips) : new w.Decimal(saveData.sips);
           if (saveData.straws != null)
-            w.straws = w.Decimal ? new w.Decimal(saveData.straws) : Number(saveData.straws);
+            w.straws = w.Decimal ? new w.Decimal(saveData.straws) : new w.Decimal(saveData.straws);
           if (saveData.cups != null)
-            w.cups = w.Decimal ? new w.Decimal(saveData.cups) : Number(saveData.cups);
+            w.cups = w.Decimal ? new w.Decimal(saveData.cups) : new w.Decimal(saveData.cups);
           if (saveData.level != null)
-            w.level = w.Decimal ? new w.Decimal(saveData.level) : Number(saveData.level);
+            w.level = w.Decimal ? new w.Decimal(saveData.level) : new w.Decimal(saveData.level);
           // Mirror to App.state minimally - preserve extreme values
           w.App?.state?.setState?.({
             sips: w.sips,

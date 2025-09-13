@@ -140,8 +140,8 @@ export async function handleSodaClick(multiplier: number = 1) {
       }
       try {
         w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, {
-          // Preserve extreme values
-          bonus: criticalBonus.toNumber(),
+          // Preserve extreme values - use safe conversion
+          bonus: criticalBonus,
         });
       } catch (error) {
         console.warn('Failed to emit critical click event:', error);
@@ -151,19 +151,19 @@ export async function handleSodaClick(multiplier: number = 1) {
     // Emit soda click and sync totals with Decimal support
     try {
       console.log('DEBUG: Emitting CLICK.SODA event with data:', {
-        // Preserve extreme values
-        value: totalClickValue.toNumber(),
-        // Preserve extreme values
-        gained: totalClickValue.toNumber(),
+        // Preserve extreme values - keep as Decimal
+        value: totalClickValue,
+        // Preserve extreme values - keep as Decimal
+        gained: totalClickValue,
         eventName: w.App?.EVENT_NAMES?.CLICK?.SODA,
         hasEventSystem: !!w.App?.events,
         hasEmit: typeof w.App?.events?.emit === 'function',
       });
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.SODA, {
-        // Preserve extreme values
-        value: totalClickValue.toNumber(),
-        // Preserve extreme values
-        gained: totalClickValue.toNumber(),
+        // Preserve extreme values - keep as Decimal
+        value: totalClickValue,
+        // Preserve extreme values - keep as Decimal
+        gained: totalClickValue,
       });
       console.log('🍹 CLICK.SODA event emitted successfully');
     } catch (error) {

@@ -15,8 +15,15 @@ export function nextStrawCost(
   const count = new Decimal(strawCount);
   // count is small (player-owned items). Use safe exponent bound.
   {
+    // Use safe conversion to preserve extreme values
     const nRaw = (count as any).toNumber?.();
-    const n = (nRaw ?? Number(count as any)) || 0;
+    let n: number;
+    if (nRaw !== undefined && isFinite(nRaw) && Math.abs(nRaw) < 1e15) {
+      n = nRaw;
+    } else {
+      // For extreme values, use a safe fallback instead of truncating
+      n = 0;
+    }
     const exp = Math.max(0, Math.min(n, 1_000_000));
     return base.multiply(scale.pow(exp));
   }
@@ -31,8 +38,15 @@ export function nextCupCost(
   const scale = new Decimal(scaling);
   const count = new Decimal(cupCount);
   {
+    // Use safe conversion to preserve extreme values
     const nRaw = (count as any).toNumber?.();
-    const n = (nRaw ?? Number(count as any)) || 0;
+    let n: number;
+    if (nRaw !== undefined && isFinite(nRaw) && Math.abs(nRaw) < 1e15) {
+      n = nRaw;
+    } else {
+      // For extreme values, use a safe fallback instead of truncating
+      n = 0;
+    }
     const exp = Math.max(0, Math.min(n, 1_000_000));
     return base.multiply(scale.pow(exp));
   }

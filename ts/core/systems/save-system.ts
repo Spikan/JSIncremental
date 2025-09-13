@@ -25,12 +25,8 @@ export function performSaveSnapshot(): any {
     const state = w.App?.state?.getState?.() || {};
     const payload = {
       sips: String(w.sips || 0),
-      straws:
-        w.straws && typeof w.straws.toNumber === 'function'
-          ? w.straws.toNumber()
-          : Number(w.straws || 0),
-      cups:
-        w.cups && typeof w.cups.toNumber === 'function' ? w.cups.toNumber() : Number(w.cups || 0),
+      straws: String(w.straws || 0),
+      cups: String(w.cups || 0),
       widerStraws: String(w.widerStraws || 0),
       betterCups: String(w.betterCups || 0),
       suctions: String(w.suctions || 0),
@@ -43,10 +39,7 @@ export function performSaveSnapshot(): any {
       lastSaveTime: Date.now(),
       totalPlayTime: Number(state.totalPlayTime || 0),
       totalClicks: Number(state.totalClicks || w.totalClicks || 0),
-      level:
-        w.level && typeof w.level.toNumber === 'function'
-          ? w.level.toNumber()
-          : Number(w.level || 1),
+      level: String(w.level || 1),
     };
 
     w.App?.storage?.saveGame?.(payload);
