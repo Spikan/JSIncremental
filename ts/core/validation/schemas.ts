@@ -93,8 +93,8 @@ export const UpgradesSchema = z.object({
 export type GameSave = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sips: any;
-  straws: number;
-  cups: number;
+  straws: number | string;
+  cups: number | string;
   widerStraws: any;
   betterCups: any;
   suctions: any;
@@ -112,12 +112,16 @@ export type GameSave = {
   totalPlayTime?: number;
   totalClicks?: number;
   totalSips?: any;
-  level?: number;
+  level?: number | string;
 };
 export const GameSaveSchema = z.object({
   sips: z.any(),
-  straws: z.number().min(0),
-  cups: z.number().min(0),
+  straws: z
+    .union([z.number().min(0), z.string()])
+    .transform((val: number | string) => (typeof val === 'string' ? parseFloat(val) || 0 : val)),
+  cups: z
+    .union([z.number().min(0), z.string()])
+    .transform((val: number | string) => (typeof val === 'string' ? parseFloat(val) || 0 : val)),
   widerStraws: z.any(),
   betterCups: z.any(),
   suctions: z.any(),
@@ -135,7 +139,10 @@ export const GameSaveSchema = z.object({
   totalPlayTime: z.number().optional(),
   totalClicks: z.number().min(0).optional(),
   totalSips: z.any().optional(),
-  level: z.number().min(1).optional(),
+  level: z
+    .union([z.number().min(1), z.string()])
+    .transform((val: number | string) => (typeof val === 'string' ? parseInt(val) || 1 : val))
+    .optional(),
 });
 
 export type GameOptions = {
