@@ -101,6 +101,10 @@ export type GameSave = {
   criticalClicks: any;
   fasterDrinks: any;
   totalSipsEarned?: any;
+  // SPD values for extreme value preservation
+  spd?: any;
+  strawSPD?: any;
+  cupSPD?: any;
   drinkRate?: number;
   lastDrinkTime?: number;
   drinkProgress?: number;
@@ -120,6 +124,10 @@ export const GameSaveSchema = z.object({
   criticalClicks: z.any(),
   fasterDrinks: z.any(),
   totalSipsEarned: z.any().optional(),
+  // SPD values for extreme value preservation
+  spd: z.any().optional(),
+  strawSPD: z.any().optional(),
+  cupSPD: z.any().optional(),
   drinkRate: z.number().min(0).optional(),
   lastDrinkTime: z.number().min(0).optional(),
   drinkProgress: z.number().min(0).optional(),

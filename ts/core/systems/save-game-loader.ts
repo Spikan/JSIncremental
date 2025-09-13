@@ -24,6 +24,10 @@ export interface SaveGameData {
   totalPlayTime?: number | string | any;
   lastDrinkTime?: number | string | any;
   drinkProgress?: number | string | any;
+  // SPD values for extreme value preservation
+  spd?: number | string | any;
+  strawSPD?: number | string | any;
+  cupSPD?: number | string | any;
 }
 
 export class SaveGameLoader {
@@ -94,6 +98,22 @@ export class SaveGameLoader {
       if (typeof savegame.suctions !== 'undefined') {
         storeActions.setSuctions(savegame.suctions as any);
         (window as any).suctions = new (window as any).Decimal(String(savegame.suctions));
+      }
+
+      // Load SPD values to preserve extreme values
+      if (typeof savegame.spd !== 'undefined') {
+        storeActions.setSPD(savegame.spd as any);
+        (window as any).spd = new (window as any).Decimal(String(savegame.spd));
+      }
+
+      if (typeof savegame.strawSPD !== 'undefined') {
+        storeActions.setStrawSPD(savegame.strawSPD as any);
+        (window as any).strawSPD = new (window as any).Decimal(String(savegame.strawSPD));
+      }
+
+      if (typeof savegame.cupSPD !== 'undefined') {
+        storeActions.setCupSPD(savegame.cupSPD as any);
+        (window as any).cupSPD = new (window as any).Decimal(String(savegame.cupSPD));
       }
     } catch (error) {
       console.warn('Failed to load basic resources:', error);

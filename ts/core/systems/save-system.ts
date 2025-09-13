@@ -33,6 +33,10 @@ export function performSaveSnapshot(): any {
       criticalClicks: String(w.criticalClicks || 0),
       fasterDrinks: String(w.fasterDrinks || 0),
       totalSipsEarned: String(w.totalSipsEarned || 0),
+      // Save SPD values to preserve extreme values
+      spd: String(state.spd || w.spd || 0),
+      strawSPD: String(state.strawSPD || w.strawSPD || 0),
+      cupSPD: String(state.cupSPD || w.cupSPD || 0),
       drinkRate: Number(w.drinkRate || 0),
       lastDrinkTime: Number(w.lastDrinkTime || 0),
       drinkProgress: Number(w.drinkProgress || 0),
