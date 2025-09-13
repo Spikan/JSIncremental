@@ -3,20 +3,96 @@
 // In the actual codebase, we use Decimal from break_eternity.js directly
 
 import { Decimal } from './migration-utils';
+import { NativeNumber } from './native-number';
 
-// Export LargeNumber as an alias for Decimal for backward compatibility
-export const LargeNumber = Decimal;
+// Check if break_eternity.js is available
+const isBreakEternityAvailable = () => {
+  try {
+    return (
+      typeof (globalThis as any).Decimal !== 'undefined' &&
+      typeof (globalThis as any).BreakInfinity !== 'undefined'
+    );
+  } catch {
+    return false;
+  }
+};
+
+// LargeNumber class that falls back to NativeNumber when break_eternity.js is not available
+export class LargeNumber {
+  private _value: any;
+
+  constructor(value: any) {
+    if (isBreakEternityAvailable()) {
+      this._value = new Decimal(value);
+    } else {
+      this._value = new NativeNumber(value);
+    }
+  }
+
+  // Delegate all methods to the underlying value
+  add(other: any) {
+    return this._value.add(other);
+  }
+
+  subtract(other: any) {
+    return this._value.subtract(other);
+  }
+
+  multiply(other: any) {
+    return this._value.multiply(other);
+  }
+
+  divide(other: any) {
+    return this._value.divide(other);
+  }
+
+  pow(exponent: number) {
+    return this._value.pow(exponent);
+  }
+
+  gt(other: any) {
+    return this._value.gt(other);
+  }
+
+  gte(other: any) {
+    return this._value.gte(other);
+  }
+
+  lt(other: any) {
+    return this._value.lt(other);
+  }
+
+  lte(other: any) {
+    return this._value.lte(other);
+  }
+
+  eq(other: any) {
+    return this._value.eq(other);
+  }
+
+  toNumber() {
+    return this._value.toNumber();
+  }
+
+  toString() {
+    return this._value.toString();
+  }
+
+  toJSON() {
+    return this._value.toJSON();
+  }
+}
 
 // Also export individual functions for tests that import them
 export function toLargeNumber(value: any): any {
   if (value === undefined || value === null) {
-    return new Decimal(0);
+    return new LargeNumber(0);
   }
   if (value && typeof value.toNumber === 'function') {
     // Handle MockDecimal and other Decimal-like objects
-    return new Decimal(value.toNumber());
+    return new LargeNumber(value.toNumber());
   }
-  return new Decimal(value);
+  return new LargeNumber(value);
 }
 
 export function toNumber(value: any): number {

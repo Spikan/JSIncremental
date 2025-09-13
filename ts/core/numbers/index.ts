@@ -54,6 +54,9 @@ import {
   isLargeNumber,
 } from './migration-utils';
 
+// Import additional functions from large-number.ts
+import { toNumber, formatLargeNumber } from './large-number';
+
 // Import safe conversion utilities
 import {
   safeToNumber,
@@ -185,6 +188,10 @@ export const Numbers = {
   // Legacy aliases
   toLargeNumber,
   isLargeNumber,
+
+  // Additional utility functions
+  toNumber,
+  formatLargeNumber,
 };
 
 // Make available globally for backward compatibility
