@@ -8,6 +8,7 @@
 // MEMORY: SPD CALCULATIONS MUST PRESERVE DECIMAL PRECISION THROUGHOUT
 
 import { nextCupCost, nextStrawCost } from '../rules/purchases.ts';
+import { safeToNumberOrDecimal } from '../numbers/safe-conversion';
 import { recalcProduction } from './resources.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
 // Direct break_eternity.js access
@@ -1157,9 +1158,8 @@ export const execute = {
       console.warn('Failed to update critical clicks after purchase:', error);
     }
     try {
-      w.criticalClickChance = new (w.Decimal || Number)(
-        (result.criticalClickChance as any).toNumber?.() ?? Number(result.criticalClickChance)
-      );
+      // Preserve extreme values - use Decimal constructor directly
+      w.criticalClickChance = new (w.Decimal || Number)(result.criticalClickChance);
     } catch (error) {
       console.warn('Failed to update critical click chance after purchase:', error);
     }
@@ -1306,17 +1306,18 @@ export const execute = {
     if (!result) return false;
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
-      const spent = (result.spent as any).toNumber?.() ?? Number(result.spent);
-      const gained = (result.sipsGained as any).toNumber?.() ?? Number(result.sipsGained);
+      // Preserve extreme values - use safe conversion
+      const spent = safeToNumberOrDecimal(result.spent);
+      const gained = safeToNumberOrDecimal(result.sipsGained);
       const curr = st.sips as any;
       const nextLarge =
         curr && curr.add && curr.subtract
           ? curr.add(result.sipsGained as any).subtract(result.spent as any)
-          : (curr ?? 0) + gained - spent;
+          : (curr ?? 0) + (typeof gained === 'number' ? gained : gained.toNumber()) - (typeof spent === 'number' ? spent : spent.toNumber());
       w.sips = nextLarge;
       const actions = w.App?.state?.actions;
       actions?.setSips?.(nextLarge);
-      actions?.setLevel?.(((result.level as any).toNumber?.() ?? Number(result.level)) as any);
+      actions?.setLevel?.(safeToNumberOrDecimal(result.level));
     } catch (error) {
       console.warn('Failed to update state after level up:', error);
       try {

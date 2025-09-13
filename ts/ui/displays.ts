@@ -2,6 +2,7 @@
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
 import { useGameStore } from '../core/state/zustand-store';
 import { Decimal } from '../core/numbers';
+import { safeToNumberOrDecimal } from '../core/numbers/safe-conversion';
 
 // Store subscription references to avoid multiple subscriptions
 let topSipsPerDrinkSubscription: (() => void) | null = null;
@@ -101,9 +102,9 @@ export function updateTopSipsPerSecond(): void {
         const drinkRateSecondsLarge = new Decimal(drinkRateSeconds);
         sipsPerSecond = sipsPerDrinkLarge.divide(drinkRateSecondsLarge);
       } else {
-        // Fallback for non-Decimal values
-        const sipsPerDrink = Number(state.spd || 0);
-        sipsPerSecond = sipsPerDrink / drinkRateSeconds;
+        // Fallback for non-Decimal values - use safe conversion
+        const sipsPerDrink = safeToNumberOrDecimal(state.spd || 0);
+        sipsPerSecond = (typeof sipsPerDrink === 'number' ? sipsPerDrink : sipsPerDrink.toNumber()) / drinkRateSeconds;
       }
 
       const formatted = formatNumber(sipsPerSecond);

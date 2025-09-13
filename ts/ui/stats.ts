@@ -146,7 +146,7 @@ export function updateEconomyStats(): void {
     | HTMLElement
     | undefined;
   if (totalSipsEarnedElement) {
-    const total = Number((window as any).App?.state?.getState?.()?.totalSipsEarned || 0);
+    const total = (window as any).App?.state?.getState?.()?.totalSipsEarned || 0;
     totalSipsEarnedElement.textContent = formatNumber(total);
   }
   // Highest sips per second
@@ -154,7 +154,7 @@ export function updateEconomyStats(): void {
     | HTMLElement
     | undefined;
   if (highestSipsPerSecondElement) {
-    const high = Number((window as any).App?.state?.getState?.()?.highestSipsPerSecond || 0);
+    const high = (window as any).App?.state?.getState?.()?.highestSipsPerSecond || 0;
     highestSipsPerSecondElement.textContent = formatNumber(high);
   }
 }
