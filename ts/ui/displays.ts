@@ -19,6 +19,9 @@ const DEBOUNCE_KEYS = {
   UPDATE_AFFORDABILITY: 'updateAffordability',
   UPDATE_PURCHASED_COUNTS: 'updatePurchasedCounts',
   UPDATE_STATS: 'updateStats',
+  UPDATE_DRINK_SPEED: 'updateDrinkSpeedDisplay',
+  UPDATE_AUTOSAVE_STATUS: 'updateAutosaveStatus',
+  UPDATE_LAST_SAVE_TIME: 'updateLastSaveTime',
 } as const;
 
 // Performance-optimized update intervals (ms)
@@ -707,6 +710,57 @@ export const updatePurchasedCountsOptimized = debounceManager.debounce(
   },
   UPDATE_INTERVALS.SLOW,
   { trailing: true, maxWait: UPDATE_INTERVALS.VERY_SLOW }
+);
+
+/**
+ * Throttled version of updateDrinkSpeedDisplay for better performance
+ */
+export const updateDrinkSpeedDisplayOptimized = debounceManager.throttle(
+  DEBOUNCE_KEYS.UPDATE_DRINK_SPEED,
+  () => {
+    try {
+      updateDrinkSpeedDisplay();
+    } catch (error) {
+      console.warn('Error in optimized drink speed display update:', error);
+    }
+  },
+  UPDATE_INTERVALS.NORMAL,
+  { leading: false, trailing: true }
+);
+
+/**
+ * Throttled version of updateAutosaveStatus for better performance
+ */
+export const updateAutosaveStatusOptimized = debounceManager.throttle(
+  DEBOUNCE_KEYS.UPDATE_AUTOSAVE_STATUS,
+  () => {
+    try {
+      updateAutosaveStatus();
+    } catch (error) {
+      console.warn('Error in optimized autosave status update:', error);
+    }
+  },
+  UPDATE_INTERVALS.SLOW,
+  { leading: false, trailing: true }
+);
+
+/**
+ * Throttled version of updateLastSaveTime for better performance
+ */
+export const updateLastSaveTimeOptimized = debounceManager.throttle(
+  DEBOUNCE_KEYS.UPDATE_LAST_SAVE_TIME,
+  () => {
+    try {
+      // Import and call the actual stats update
+      import('./stats').then(({ updateLastSaveTime }) => {
+        updateLastSaveTime();
+      });
+    } catch (error) {
+      console.warn('Error in optimized last save time update:', error);
+    }
+  },
+  UPDATE_INTERVALS.SLOW,
+  { leading: false, trailing: true }
 );
 
 /**

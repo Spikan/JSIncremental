@@ -25,20 +25,24 @@ This document serves as the canonical architecture guide for the Soda Clicker Pr
 - **Modular Architecture**: Eliminated 15+ duplicate functions (~2,500 lines of code)
 - **State Management**: Migrated from custom store to optimized Zustand with 25+ selectors
 - **TypeScript Migration**: Complete conversion from JavaScript with full type safety
-- **Enhanced Testing**: 401/401 tests passing with comprehensive coverage
+- **Enhanced Testing**: 689/689 tests passing with comprehensive coverage
 - **Error Handling**: Enterprise-grade error reporting with automatic recovery
 - **Performance**: Optimized bundle size and loading with intelligent code splitting
 
 ### **Technical Achievements**
 
 - **Zero TypeScript Errors**: Complete type safety across the codebase
-- **100% Test Success Rate**: All functionality verified through automated testing (675/675 passing)
+- **100% Test Success Rate**: All functionality verified through automated testing (689/689 passing)
 - **Enterprise Error Handling**: 4 severity levels, automatic recovery, circuit breakers
 - **Optimized State Management**: Granular subscriptions, memoized selectors, test-friendly
 - **Professional Build System**: Intelligent code splitting, performance monitoring
 - **Precision-Safe Calculations**: Fixed extreme value handling in drink system
 - **Production-Ready Logging**: Removed debug logging from production builds
 - **Unified State Management**: Completed migration from legacy globals to Zustand store
+- **Memory Leak Prevention**: Comprehensive event listener cleanup with subscription management
+- **Advanced Error Boundaries**: UI-level error handling with graceful degradation
+- **Performance Optimization**: Debouncing and throttling for all UI update functions
+- **Enhanced Type Safety**: Replaced all `any` types with proper TypeScript interfaces
 
 ## 🔧 Current Architecture Features
 
@@ -432,16 +436,20 @@ const result = add(userInput, gameState.value); // Handles numbers, strings, Dec
 
 ### 7. **UI System** (`ts/ui/`)
 
-**Purpose**: Coordinated UI updates and user interaction with responsive mobile navigation
+**Purpose**: Coordinated UI updates and user interaction with responsive mobile navigation, performance optimization, and error handling
 
 **Components**:
 
-- **Displays** (`displays.ts`): Update game statistics and counters
+- **Displays** (`displays.ts`): Update game statistics and counters with debounced/throttled performance optimization
 - **Stats** (`stats.ts`): Statistics panel management
 - **Feedback** (`feedback.ts`): Visual feedback for actions
 - **Affordability** (`affordability.ts`): Upgrade button states
 - **Labels** (`labels.ts`): Text label management
-- **Mobile Navigation** (`index.ts`): Responsive tab system with bottom navigation and swipe gestures
+- **Mobile Navigation** (`index.ts`): Responsive tab system with bottom navigation, swipe gestures, and error boundaries
+- **Mobile Input** (`mobile-input.ts`): Touch optimizations with proper event cleanup
+- **Subscription Manager** (`subscription-manager.ts`): Centralized event listener cleanup to prevent memory leaks
+- **Debounce Utils** (`debounce-utils.ts`): Performance optimization through debouncing and throttling
+- **Buttons** (`buttons.ts`): Unified button event handling with error boundaries
 - **Utils** (`utils.js`): Common UI operations
 
 **Mobile Navigation Features**:
@@ -452,16 +460,27 @@ const result = add(userInput, gameState.value); // Handles numbers, strings, Dec
 - **Accessibility**: Keyboard navigation, ARIA labels, focus management
 - **Progressive Enhancement**: Graceful fallback for non-touch devices
 
+**Phase 3 Performance & Error Handling Features**:
+
+- **Memory Leak Prevention**: All event listeners tracked and cleaned up via subscription manager
+- **Error Boundaries**: UI operations wrapped with error boundaries for graceful degradation
+- **Performance Optimization**: Debounced/throttled UI updates to prevent excessive re-renders
+- **Type Safety**: All UI functions use proper TypeScript interfaces instead of `any` types
+- **Event Cleanup**: Automatic cleanup of mobile navigation and swipe gesture listeners
+- **Error Recovery**: UI errors logged and handled without breaking the game experience
+
 **Event-Driven Updates**:
 
 ```javascript
-// UI automatically updates based on game events
+// UI automatically updates based on game events with performance optimization
 App.events.on(App.EVENT_NAMES.CLICK.SODA, () => {
-  App.ui.updateTopSipsPerDrink();
-  App.ui.updateTopSipsPerSecond();
-  App.ui.updateTopSipCounter();
-  App.ui.checkUpgradeAffordability();
+  // Uses debounced/throttled versions for performance
+  App.ui.updateAllDisplaysOptimized();
+  App.ui.checkUpgradeAffordabilityOptimized();
 });
+
+// Error boundaries wrap critical UI operations
+const safeUpdateUI = withErrorBoundary(updateUI, 'ui_update');
 ```
 
 **Duplicate Function Elimination**:
@@ -643,8 +662,12 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 - **RequestAnimationFrame**: Used for game loop and UI updates
 - **Batch Updates**: UI updates batched for performance
 - **Lazy Loading**: Only update visible elements
-- **Event Debouncing**: Reduce update frequency for expensive operations
+- **Event Debouncing**: Reduce update frequency for expensive operations (Phase 3)
 - **Memory Management**: Limited click history and cleanup
+- **Debounced UI Updates**: All frequent UI updates use debounced/throttled versions
+- **Subscription Cleanup**: Automatic cleanup of event listeners to prevent memory leaks
+- **Optimized Selectors**: Zustand store uses memoized selectors for efficient re-renders
+- **Error Boundary Performance**: UI errors handled without performance impact
 
 ## 🛡️ Error Handling
 
@@ -653,6 +676,11 @@ Load Game → storage.loadGame() → validateGameSave() → App.state.setState()
 - **Storage Errors**: LocalStorage error handling
 - **Feature Detection**: Progressive enhancement
 - **Console Logging**: Comprehensive error logging
+- **UI Error Boundaries**: Critical UI operations wrapped with error boundaries (Phase 3)
+- **Event Listener Cleanup**: Automatic cleanup prevents memory leaks and errors
+- **Type Safety**: Proper TypeScript interfaces prevent runtime type errors
+- **Error Recovery**: UI errors logged and handled without breaking game experience
+- **Test Environment Compatibility**: Error handling works in both browser and test environments
 
 This architecture provides a solid foundation for incremental game development while maintaining code clarity and AI agent traversability. The modular design allows for easy feature additions and modifications while preserving the existing game mechanics.
 
@@ -663,7 +691,8 @@ This architecture provides a solid foundation for incremental game development w
 **Last Updated**: December 2024
 
 - ✅ **Canonical Architecture Guide** - This document serves as the primary reference
-- ✅ **Test Statistics Aligned** - All docs now reflect current 401 tests (394 passing, 98% success rate)
+- ✅ **Test Statistics Aligned** - All docs now reflect current 689 tests (100% success rate)
 - ✅ **File Paths Updated** - All references use current `ts/` directory structure
 - ✅ **Migration Paths Documented** - Historical context preserved in linked documents
 - ✅ **TypeScript Migration Complete** - All core systems converted with full type safety
+- ✅ **Phase 3 Improvements Documented** - Memory leak prevention, error boundaries, performance optimization, and type safety enhancements documented

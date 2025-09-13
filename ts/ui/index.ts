@@ -2,6 +2,14 @@
 // Main entry point for all UI-related functionality
 
 import * as displays from './displays';
+import {
+  updateAllDisplaysOptimized,
+  checkUpgradeAffordabilityOptimized,
+  updatePurchasedCountsOptimized,
+  updateDrinkSpeedDisplayOptimized,
+  updateAutosaveStatusOptimized,
+  updateLastSaveTimeOptimized,
+} from './displays';
 import * as stats from './stats';
 import * as feedback from './feedback';
 import * as affordability from './affordability';
@@ -14,6 +22,16 @@ import subscriptionManager from './subscription-manager';
 export { displays, stats, feedback, affordability, buttons };
 export { labels };
 
+// Export optimized functions
+export {
+  updateAllDisplaysOptimized,
+  checkUpgradeAffordabilityOptimized,
+  updatePurchasedCountsOptimized,
+  updateDrinkSpeedDisplayOptimized,
+  updateAutosaveStatusOptimized,
+  updateLastSaveTimeOptimized,
+};
+
 // Simple error severity levels
 enum ErrorSeverity {
   LOW = 'low',
@@ -22,9 +40,31 @@ enum ErrorSeverity {
   CRITICAL = 'critical',
 }
 
+// Event data types
+interface ClickSodaEventData {
+  value?: unknown;
+  gained?: unknown;
+  eventName?: string;
+  hasEventSystem?: boolean;
+  hasEmit?: boolean;
+  critical?: boolean;
+  clickX?: number;
+  clickY?: number;
+}
+
+interface PurchaseEventData {
+  item: string;
+  cost: unknown;
+  gained?: unknown;
+  clickX?: number;
+  clickY?: number;
+}
+
+// Using existing global Window.App declaration from app-types.ts
+
 // Helper function to report UI errors with proper categorization
 function reportUIError(
-  error: any,
+  error: Error | string | unknown,
   context: string,
   severity: ErrorSeverity = ErrorSeverity.MEDIUM
 ): void {
@@ -107,7 +147,7 @@ export function initializeUI(): void {
 
   // Sync options UI on init
   try {
-    updateAutosaveStatus();
+    updateAutosaveStatusOptimized();
   } catch (error) {
     reportUIError(error, 'update_autosave_status_init', ErrorSeverity.LOW);
   }
@@ -118,39 +158,41 @@ export function initializeUI(): void {
   }
   // Check event system availability
 
-  if ((window as any).App?.events) {
+  if (window.App?.events) {
     // Set up CLICK.SODA event listener
-    (window as any).App.events.on((window as any).App.EVENT_NAMES?.CLICK?.SODA, (data: any) => {
-      updateTopSipCounter();
-      updateTopSipsPerDrink();
-      updateTopSipsPerSecond();
-      checkUpgradeAffordability();
+    window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA!, (data: unknown) => {
+      const clickData = data as ClickSodaEventData;
+      // Use optimized batch update for better performance
+      updateAllDisplaysOptimized();
+      checkUpgradeAffordabilityOptimized();
 
-      if (data && data.gained) {
+      if (clickData && clickData.gained) {
         // Pass the value directly - showClickFeedback will handle Decimal objects properly
-        showClickFeedback(data.gained, data.critical, data.clickX, data.clickY);
+        showClickFeedback(clickData.gained, clickData.critical, clickData.clickX, clickData.clickY);
       }
     });
-    (window as any).App.events.on(
-      (window as any).App.EVENT_NAMES?.ECONOMY?.PURCHASE,
-      (data: any) => {
-        updateTopSipsPerDrink();
-        updateTopSipsPerSecond();
-        updateTopSipCounter();
-        checkUpgradeAffordability();
-        updateCriticalClickDisplay();
-        updatePurchasedCounts(); // Update shop owned counters
-        if (
-          data &&
-          data.item &&
-          data.cost &&
-          typeof data.clickX === 'number' &&
-          typeof data.clickY === 'number'
-        ) {
-          showPurchaseFeedback(data.item, data.cost, data.clickX, data.clickY);
-        }
+    window.App.events.on(window.App.EVENT_NAMES?.ECONOMY?.PURCHASE!, (data: unknown) => {
+      const purchaseData = data as PurchaseEventData;
+      // Use optimized batch update for better performance
+      updateAllDisplaysOptimized();
+      checkUpgradeAffordabilityOptimized();
+      updateCriticalClickDisplay();
+      updatePurchasedCountsOptimized(); // Use optimized version
+      if (
+        purchaseData &&
+        purchaseData.item &&
+        purchaseData.cost &&
+        typeof purchaseData.clickX === 'number' &&
+        typeof purchaseData.clickY === 'number'
+      ) {
+        showPurchaseFeedback(
+          purchaseData.item,
+          Number(purchaseData.cost),
+          purchaseData.clickX,
+          purchaseData.clickY
+        );
       }
-    );
+    });
     (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.SAVED, () => {
       updateLastSaveTime();
     });
@@ -328,14 +370,13 @@ export function updateAllDisplays(): void {
     return;
   }
 
-  updateTopSipsPerDrink();
-  updateTopSipsPerSecond();
-  updateTopSipCounter();
+  // Use optimized batch update for better performance
+  updateAllDisplaysOptimized();
   updateCriticalClickDisplay();
-  updateDrinkSpeedDisplay();
-  updateAutosaveStatus();
+  updateDrinkSpeedDisplayOptimized();
+  updateAutosaveStatusOptimized();
   updatePlayTime();
-  updateLastSaveTime();
+  updateLastSaveTimeOptimized();
   // Always update shop stats and purchased counts regardless of active tab
   updateShopStats();
   updatePurchasedCounts();
@@ -345,10 +386,10 @@ export function updateAllDisplays(): void {
 }
 
 // Enhanced switchTab function for both desktop and mobile navigation
-export function switchTab(tabName: string, event: any): void {
+export function switchTab(tabName: string, event?: Event | null): void {
   // Update tab content visibility
   const tabContents = document.querySelectorAll('.tab-content');
-  tabContents.forEach((tab: any) => tab.classList.remove('active'));
+  tabContents.forEach(tab => (tab as Element).classList.remove('active'));
   const selectedTab = document.getElementById(`${tabName}Tab`);
   if (selectedTab) {
     selectedTab.classList.add('active');
@@ -420,7 +461,7 @@ function isMobileDevice(): boolean {
 }
 
 // Error Boundary Wrapper for Critical UI Operations
-export function withErrorBoundary<T extends (...args: any[]) => any>(
+export function withErrorBoundary<T extends (...args: unknown[]) => unknown>(
   fn: T,
   context: string,
   severity: ErrorSeverity = ErrorSeverity.MEDIUM,
@@ -453,11 +494,10 @@ export const safeUpdateAllDisplays = withErrorBoundary(
   'update_all_displays',
   ErrorSeverity.HIGH,
   () => {
-    // Fallback: try to update basic displays only
+    // Fallback: try to update basic displays only with optimized versions
     try {
-      displays.updateTopSipsPerDrink();
-      displays.updateTopSipsPerSecond();
-      displays.updateDrinkSpeedDisplay();
+      updateAllDisplaysOptimized();
+      updateDrinkSpeedDisplayOptimized();
     } catch (fallbackError) {
       reportUIError(fallbackError, 'basic_display_fallback', ErrorSeverity.CRITICAL);
     }
@@ -465,7 +505,10 @@ export const safeUpdateAllDisplays = withErrorBoundary(
 );
 
 export const safeSwitchTab = withErrorBoundary(
-  switchTab,
+  (...args: unknown[]) => {
+    const [tabName, event] = args;
+    return switchTab(tabName as string, event as Event | null | undefined);
+  },
   'switch_tab',
   ErrorSeverity.MEDIUM,
   () => {

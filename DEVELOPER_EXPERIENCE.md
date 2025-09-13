@@ -52,6 +52,133 @@ export function switchTab(tabName: string, event: any): void {
 }
 ```
 
+## 🚀 Phase 3 Development Guidelines
+
+### Performance Optimization
+
+**Debouncing and Throttling Guidelines**:
+
+- **UI Updates**: Always use debounced/throttled versions for frequent UI updates
+- **Event Handlers**: Use optimized versions in event listeners to prevent performance bottlenecks
+- **Update Intervals**: Follow established intervals (FAST: 16ms, MEDIUM: 100ms, SLOW: 300ms)
+
+```typescript
+// ✅ Correct: Use optimized versions
+App.events.on(App.EVENT_NAMES.CLICK.SODA, () => {
+  App.ui.updateAllDisplaysOptimized(); // Debounced
+  App.ui.checkUpgradeAffordabilityOptimized(); // Throttled
+});
+
+// ❌ Avoid: Direct function calls in frequent events
+App.events.on(App.EVENT_NAMES.CLICK.SODA, () => {
+  App.ui.updateAllDisplays(); // Can cause performance issues
+});
+```
+
+### Memory Management
+
+**Event Listener Cleanup Guidelines**:
+
+- **Always Track Listeners**: Register all event listeners with the subscription manager
+- **Cleanup Functions**: Provide cleanup functions for all UI components
+- **Memory Leak Prevention**: Never add event listeners without corresponding cleanup
+
+```typescript
+// ✅ Correct: Track and cleanup event listeners
+const eventListeners: Array<{ element: Element; type: string; handler: EventListener }> = [];
+
+element.addEventListener('click', handler);
+eventListeners.push({ element, type: 'click', handler });
+
+// Register cleanup
+subscriptionManager.register(
+  'component-name',
+  () => {
+    eventListeners.forEach(({ element, type, handler }) => {
+      element.removeEventListener(type, handler);
+    });
+    eventListeners.length = 0;
+  },
+  'Component Event Listeners'
+);
+```
+
+### Error Boundaries
+
+**Error Handling Guidelines**:
+
+- **Wrap Critical Operations**: Use error boundaries for all critical UI operations
+- **Graceful Degradation**: Provide fallback behavior when errors occur
+- **Error Logging**: Log errors with proper context and severity levels
+
+```typescript
+// ✅ Correct: Wrap UI operations with error boundaries
+const safeUpdateUI = withErrorBoundary(updateUI, 'ui_update');
+safeUpdateUI();
+
+// ✅ Correct: Handle errors gracefully
+try {
+  criticalOperation();
+} catch (error) {
+  reportUIError(error, 'operation_context', ErrorSeverity.HIGH);
+  // Provide fallback behavior
+  fallbackOperation();
+}
+```
+
+### Type Safety
+
+**TypeScript Guidelines**:
+
+- **No Any Types**: Replace all `any` types with proper interfaces
+- **Event Data Types**: Create specific interfaces for event data
+- **Function Signatures**: Use proper parameter and return types
+
+```typescript
+// ✅ Correct: Use proper interfaces
+interface ClickSodaEventData {
+  critical: boolean;
+  clickX: number;
+  clickY: number;
+}
+
+// ✅ Correct: Type event handlers
+const handleClick = (data: unknown) => {
+  const clickData = data as ClickSodaEventData;
+  // Use typed data safely
+};
+
+// ❌ Avoid: Using any types
+const handleClick = (data: any) => {
+  // No type safety
+};
+```
+
+### Testing Integration
+
+**Test Development Guidelines**:
+
+- **Integration Tests**: Create integration tests for complex features
+- **Error Scenarios**: Test error boundary behavior and recovery
+- **Performance Tests**: Verify debouncing and throttling work correctly
+- **Memory Tests**: Ensure proper cleanup and no memory leaks
+
+```typescript
+// ✅ Correct: Integration test example
+describe('Phase 3 Improvements - Integration Tests', () => {
+  it('should handle errors gracefully in error boundaries', async () => {
+    const uiIndex = await import('../ts/ui/index');
+    const throwingFunction = () => {
+      throw new Error('Test error');
+    };
+    const safeFunction = uiIndex.withErrorBoundary(throwingFunction, 'test_error_boundary');
+
+    expect(() => safeFunction()).not.toThrow();
+    // Verify error was logged appropriately
+  });
+});
+```
+
 ## 🛠️ Code Quality Tools
 
 ### ESLint
