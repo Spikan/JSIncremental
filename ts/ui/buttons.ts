@@ -130,15 +130,13 @@ const BUTTON_CONFIG: {
       func: () => {
         try {
           const chatInput = document.querySelector('#chatInput') as HTMLInputElement;
-          const chatSendBtn = document.querySelector('.chat-send-btn');
           if (chatInput && chatInput.value.trim()) {
             (window as any).sendMessage?.();
-            if (chatSendBtn) {
-              chatSendBtn.setAttribute('disabled', 'true');
-            }
+            // Clear input after sending instead of disabling button
+            chatInput.value = '';
           }
         } catch (error) {
-          console.warn('Failed to send chat message:', error);
+          // Error handling - logging removed for production
         }
       },
       type: 'chat-send-btn',
@@ -285,13 +283,13 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
         try {
           audio.playButtonPurchaseSound();
         } catch (error) {
-          console.warn('Failed to handle button interaction:', error);
+          // Error handling - logging removed for production
         }
       } else {
         try {
           audio.playButtonClickSound();
         } catch (error) {
-          console.warn('Failed to play button click sound:', error);
+          // Error handling - logging removed for production
         }
       }
     }
@@ -324,7 +322,7 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
         try {
           (window as any).App?.ui?.showLevelUpFeedback?.(0);
         } catch (error) {
-          console.warn('Failed to handle button interaction:', error);
+          // Error handling - logging removed for production
         }
       }
     }
@@ -399,7 +397,7 @@ function setupUnifiedButtonSystem(): void {
             try {
               button.classList.add(action.type);
             } catch (error) {
-              console.warn('Failed to handle button interaction:', error);
+              // Error handling - logging removed for production
             }
           }
           // Button configured successfully
@@ -449,7 +447,7 @@ function setupSpecialButtonHandlers(): void {
         try {
           (window as any).App?.ui?.switchTab?.(tabName, _e);
         } catch (error) {
-          console.warn('Failed to handle button interaction:', error);
+          // Error handling - logging removed for production
         }
       }
     });
@@ -560,7 +558,7 @@ function setupSpecialButtonHandlers(): void {
                 }
               }
             } catch (error) {
-              console.warn('Failed to handle button interaction:', error);
+              // Error handling - logging removed for production
             }
           }
           reset();
@@ -668,7 +666,7 @@ function setupSpecialButtonHandlers(): void {
                 }
               }
             } catch (error) {
-              console.warn('Failed to handle button interaction:', error);
+              // Error handling - logging removed for production
             }
           }
           reset();
@@ -695,11 +693,11 @@ function setupSpecialButtonHandlers(): void {
             try {
               (sodaButton as any).classList.remove('soda-clicked');
             } catch (error) {
-              console.warn('Failed to handle button interaction:', error);
+              // Error handling - logging removed for production
             }
           }, 140);
         } catch (error) {
-          console.warn('Failed to handle button interaction:', error);
+          // Error handling - logging removed for production
         }
         try {
           // Button click handling
@@ -730,7 +728,7 @@ function setupSpecialButtonHandlers(): void {
             }
           }
         } catch (error) {
-          console.warn('Failed to handle button interaction:', error);
+          // Error handling - logging removed for production
         }
       });
     }
@@ -788,7 +786,7 @@ function setupSpecialButtonHandlers(): void {
         try {
           (window as any).startGame?.();
         } catch (error) {
-          console.warn('Failed to handle button interaction:', error);
+          // Error handling - logging removed for production
         }
       });
     } else if ('ontouchstart' in window) {
@@ -801,7 +799,7 @@ function setupSpecialButtonHandlers(): void {
           try {
             (window as any).startGame?.();
           } catch (error) {
-            console.warn('Failed to handle button interaction:', error);
+            // Error handling - logging removed for production
           }
         },
         { passive: true }
@@ -814,7 +812,7 @@ function setupSpecialButtonHandlers(): void {
       try {
         (window as any).startGame?.();
       } catch (error) {
-        console.warn('Failed to handle button interaction:', error);
+        // Error handling - logging removed for production
       }
     });
   }
@@ -871,7 +869,7 @@ function setupSpecialButtonHandlers(): void {
             try {
               (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.();
             } catch (error) {
-              console.warn('Failed to handle button interaction:', error);
+              // Error handling - logging removed for production
             }
             (window as any).App?.ui?.switchTab?.(args[0], e);
             return;
@@ -889,7 +887,7 @@ function setupSpecialButtonHandlers(): void {
                     (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
                   }
                 } catch (error) {
-                  console.warn('Failed to handle button interaction:', error);
+                  // Error handling - logging removed for production
                 }
                 try {
                   const btnType = meta.type;
@@ -907,7 +905,7 @@ function setupSpecialButtonHandlers(): void {
                     }
                   }
                 } catch (error) {
-                  console.warn('Failed to handle button interaction:', error);
+                  // Error handling - logging removed for production
                 }
               } else {
                 if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) {
@@ -930,7 +928,7 @@ function setupSpecialButtonHandlers(): void {
                     }
                   }
                 } catch (error) {
-                  console.warn('Failed to handle button interaction:', error);
+                  // Error handling - logging removed for production
                 }
               }
               if (
@@ -948,7 +946,7 @@ function setupSpecialButtonHandlers(): void {
                     costValue = match ? Number(match[0]) : undefined;
                   }
                 } catch (error) {
-                  console.warn('Failed to handle button interaction:', error);
+                  // Error handling - logging removed for production
                 }
                 const rect = el.getBoundingClientRect();
                 const cx = typeof e.clientX === 'number' ? e.clientX : rect.left + rect.width / 2;
@@ -1013,7 +1011,7 @@ function setupSpecialButtonHandlers(): void {
           try {
             (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.();
           } catch (error) {
-            console.warn('Failed to handle button interaction:', error);
+            // Error handling - logging removed for production
           }
           (window as any).App?.ui?.switchTab?.(args[0], e);
           return;
@@ -1031,7 +1029,7 @@ function setupSpecialButtonHandlers(): void {
                   (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
                 }
               } catch (error) {
-                console.warn('Failed to handle button interaction:', error);
+                // Error handling - logging removed for production
               }
               try {
                 const btnType = meta.type;
@@ -1049,7 +1047,7 @@ function setupSpecialButtonHandlers(): void {
                   }
                 }
               } catch (error) {
-                console.warn('Failed to handle button interaction:', error);
+                // Error handling - logging removed for production
               }
             } else {
               if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) {
@@ -1072,7 +1070,7 @@ function setupSpecialButtonHandlers(): void {
                   }
                 }
               } catch (error) {
-                console.warn('Failed to handle button interaction:', error);
+                // Error handling - logging removed for production
               }
             }
             if (
@@ -1090,7 +1088,7 @@ function setupSpecialButtonHandlers(): void {
                   costValue = match ? Number(match[0]) : undefined;
                 }
               } catch (error) {
-                console.warn('Failed to handle button interaction:', error);
+                // Error handling - logging removed for production
               }
               const cx =
                 typeof e.clientX === 'number'

@@ -64,7 +64,7 @@ export function updateTopSipsPerDrink(): void {
       topSipsPerDrinkElement.innerHTML = formatted;
     }
   } catch (error) {
-    console.warn('Failed to update top sips per drink:', error);
+    // Error handling - logging removed for production
   }
 }
 
@@ -443,72 +443,7 @@ function getLevelText(level: number): string {
   return levelTexts[index] || levelTexts[levelTexts.length - 1] || 'Unknown Level';
 }
 
-// Debug function for testing top indicators
-export function debugTopIndicators(): void {
-  console.log('=== TOP INDICATORS DEBUG ===');
-  console.log('DOM_CACHE available:', !!(window as any).DOM_CACHE);
-  console.log('DOM_CACHE.isReady():', (window as any).DOM_CACHE?.isReady?.());
-
-  const elements = ['topSipValue', 'topSipsPerDrink', 'topSipsPerSecond'];
-
-  elements.forEach(id => {
-    const element = document.getElementById(id);
-    const cachedElement = (window as any).DOM_CACHE?.[id];
-    console.log(`Element ${id}:`, {
-      direct: !!element,
-      cached: !!cachedElement,
-      same: element === cachedElement,
-      content: element?.textContent || 'N/A',
-    });
-  });
-
-  // Test state access
-  try {
-    const state = useGameStore.getState();
-    console.log('Game state:', {
-      sips: state.sips,
-      spd: state.spd,
-      drinkRate: state.drinkRate,
-    });
-  } catch (error) {
-    console.error('Failed to access game state:', error);
-  }
-
-  // Test event system
-  try {
-    const events = (window as any).App?.events;
-    console.log('Event system available:', !!events);
-    if (events) {
-      console.log('Available events:', Object.keys(events));
-    }
-  } catch (error) {
-    console.error('Failed to access event system:', error);
-  }
-
-  // Test if functions are available
-  const testFunctions = ['updateTopSipCounter', 'updateTopSipsPerDrink', 'updateTopSipsPerSecond'];
-
-  testFunctions.forEach(funcName => {
-    const func = (window as any).App?.ui?.[funcName];
-    console.log(`Function ${funcName} available:`, typeof func === 'function');
-  });
-
-  console.log('=== END DEBUG ===');
-}
-
-// Debug function to manually trigger updates
-export function forceUpdateTopIndicators(): void {
-  console.log('=== FORCE UPDATE TOP INDICATORS ===');
-  try {
-    updateTopSipCounter();
-    updateTopSipsPerDrink();
-    updateTopSipsPerSecond();
-    console.log('Manual updates completed');
-  } catch (error) {
-    console.error('Failed to force update:', error);
-  }
-  console.log('=== END FORCE UPDATE ===');
-}
+// Debug functions removed for production
 
 // Debug function to test state changes and subscriptions
 export function testStateChangesAndUpdates(): void {
@@ -647,15 +582,7 @@ export function testSodaButtonClick(): void {
   console.log('=== END BUTTON CLICK TEST ===');
 }
 
-// Make debug functions globally available
-if (typeof window !== 'undefined') {
-  (window as any).debugTopIndicators = debugTopIndicators;
-  (window as any).forceUpdateTopIndicators = forceUpdateTopIndicators;
-  (window as any).testStateChangesAndUpdates = testStateChangesAndUpdates;
-  (window as any).testEventSystem = testEventSystem;
-  (window as any).testSodaClick = testSodaClick;
-  (window as any).testSodaButtonClick = testSodaButtonClick;
-}
+// Debug functions removed for production
 
 // Performance-optimized batch update functions
 /**

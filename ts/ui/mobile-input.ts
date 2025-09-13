@@ -75,7 +75,7 @@ export class MobileInputHandler {
         (sodaButton.style as any).webkitUserSelect = 'none';
         sodaButton.style.userSelect = 'none';
       }
-      console.log('✅ Touch handling configured');
+      // Touch handling configured
     } catch (error) {
       console.warn('Failed to set mobile touch styles:', error);
     }
@@ -112,32 +112,23 @@ export class MobileInputHandler {
   }
 
   /**
-   * Check if a touch event should be considered valid for button activation
-   * This is a helper function that can be used by the button system
+   * Simplified touch validation - if it's a touch, it's valid
    */
   public validateTouchForButton(
-    startX: number,
-    startY: number,
-    endX: number,
-    endY: number,
-    duration: number,
-    touchCount: number,
-    scrollDelta: number = 0
+    _startX: number,
+    _startY: number,
+    _endX: number,
+    _endY: number,
+    _duration: number,
+    _touchCount: number,
+    _scrollDelta: number = 0
   ): boolean {
-    const deltaY = Math.abs(endY - startY);
-
-    return (
-      Math.abs(endX - startX) <= this.touchValidationConfig.movementThreshold &&
-      deltaY <= this.touchValidationConfig.movementThreshold &&
-      duration >= this.touchValidationConfig.timeThreshold &&
-      touchCount <= this.touchValidationConfig.multiTouchThreshold &&
-      scrollDelta <= this.touchValidationConfig.scrollThreshold
-    );
+    // Simplified: accept all touches for better user experience
+    return true;
   }
 
   /**
-   * Check if a touch should be considered a scroll vs a tap
-   * Returns true if it's likely a scroll, false if it's likely a tap
+   * Simplified scroll detection - only check for significant vertical movement
    */
   public isLikelyScroll(
     _startX: number,
@@ -147,54 +138,23 @@ export class MobileInputHandler {
     scrollDelta: number
   ): boolean {
     const deltaY = Math.abs(endY - startY);
-
-    // If there's significant vertical movement or scrolling, it's likely a scroll
-    return (
-      deltaY > this.touchValidationConfig.movementThreshold ||
-      scrollDelta > this.touchValidationConfig.scrollThreshold
-    );
+    // Simplified: only consider it a scroll if there's significant vertical movement
+    return deltaY > 50 || scrollDelta > 30;
   }
 
   /**
-   * Get recommended thresholds for different use cases
+   * Get recommended thresholds - simplified for better UX
    */
   public getRecommendedThresholds(
-    useCase: 'strict' | 'balanced' | 'lenient' | 'gaming' | 'accessibility'
+    _useCase: 'strict' | 'balanced' | 'lenient' | 'gaming' | 'accessibility'
   ): TouchValidationConfig {
-    const presets = {
-      strict: {
-        movementThreshold: 8,
-        timeThreshold: 100,
-        scrollThreshold: 10,
-        multiTouchThreshold: 1,
-      },
-      balanced: {
-        movementThreshold: 15,
-        timeThreshold: 30,
-        scrollThreshold: 25,
-        multiTouchThreshold: 1,
-      },
-      lenient: {
-        movementThreshold: 25,
-        timeThreshold: 20,
-        scrollThreshold: 40,
-        multiTouchThreshold: 2,
-      },
-      gaming: {
-        movementThreshold: 30,
-        timeThreshold: 15,
-        scrollThreshold: 50,
-        multiTouchThreshold: 1,
-      },
-      accessibility: {
-        movementThreshold: 35,
-        timeThreshold: 200,
-        scrollThreshold: 60,
-        multiTouchThreshold: 1,
-      },
+    // Simplified: return balanced settings for all use cases
+    return {
+      movementThreshold: 20,
+      timeThreshold: 50,
+      scrollThreshold: 30,
+      multiTouchThreshold: 1,
     };
-
-    return presets[useCase] || presets.balanced;
   }
 
   /**
@@ -202,7 +162,7 @@ export class MobileInputHandler {
    */
   public updateTouchValidation(config: Partial<TouchValidationConfig>): void {
     this.touchValidationConfig = { ...this.touchValidationConfig, ...config };
-    console.log('Touch validation config updated:', this.touchValidationConfig);
+    // Touch validation config updated
   }
 
   /**

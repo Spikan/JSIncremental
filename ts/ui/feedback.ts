@@ -64,9 +64,9 @@ function showFeedbackAtCoordinates(
       : `Gained ${formatNumber(sipsGained)} sips`
   );
   const isMobile = isMobileDevice();
-  const fontSize = isMobile ? (isCritical ? '1.3em' : '1.1em') : isCritical ? '1.5em' : '1.2em';
-  const offsetX = (Math.random() - 0.5) * 20;
-  const offsetY = (Math.random() - 0.5) * 20;
+  const fontSize = isCritical ? '1.4em' : '1.2em';
+  const offsetX = (Math.random() - 0.5) * 15; // Reduced randomness
+  const offsetY = (Math.random() - 0.5) * 15;
   feedback.style.cssText = `
         position: fixed;
         left: ${clickX + offsetX}px;

@@ -3801,6 +3801,71 @@ button:focus {
   color: var(--neutral-white);
 }
 
+/* Unlock Notification Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.unlock-notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.unlock-notification-icon {
+  font-size: 24px;
+  animation: bounce 0.6s ease-in-out;
+}
+
+.unlock-notification-text {
+  flex: 1;
+}
+
+.unlock-notification-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.unlock-notification-feature {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
 /* Debug Tools Button Styles */
 .dev-btn.debug-tools {
   border-color: var(--primary-cyan);

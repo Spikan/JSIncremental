@@ -105,19 +105,53 @@ export const FEATURE_UNLOCKS = {
     try {
       const notification = document.createElement('div');
       notification.className = 'unlock-notification';
-      notification.textContent = `New feature unlocked: ${feature}!`;
+      notification.innerHTML = `
+        <div class="unlock-notification-content">
+          <div class="unlock-notification-icon">🔓</div>
+          <div class="unlock-notification-text">
+            <div class="unlock-notification-title">New Feature Unlocked!</div>
+            <div class="unlock-notification-feature">${feature}</div>
+          </div>
+        </div>
+      `;
+
+      // Add styles for better visibility
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideInRight 0.3s ease-out;
+      `;
+
       document.body.appendChild(notification);
-      const config: any = (window as any).GAME_CONFIG || {};
-      const duration = config.TIMING?.UNLOCK_NOTIFICATION_DURATION || 2000;
+
+      // Play unlock sound
+      try {
+        (window as any).App?.systems?.audio?.button?.playLevelUpSound?.();
+      } catch (error) {
+        // Sound error - continue without sound
+      }
+
+      const duration = 3000; // 3 seconds
       setTimeout(() => {
         try {
-          notification.remove();
+          notification.style.animation = 'slideOutRight 0.3s ease-in';
+          setTimeout(() => notification.remove(), 300);
         } catch (error) {
-          console.warn('Failed to remove unlock notification:', error);
+          // Error handling - logging removed for production
         }
       }, duration);
     } catch (error) {
-      console.warn('Failed to show unlock notification:', error);
+      // Error handling - logging removed for production
     }
   },
   updateFeatureVisibility() {

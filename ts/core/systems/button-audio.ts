@@ -107,16 +107,16 @@ export function playButtonClickSound() {
   if (!buttonSoundsEnabled || !audioContext) return;
   try {
     ensureContext();
-    const base = randBetween(700, 900);
+    // Simple, satisfying click sound
     playTone({
-      freqStart: base,
-      freqEnd: base * 0.5,
-      duration: 0.08,
-      type: 'triangle',
-      gain: 0.28,
+      freqStart: 800,
+      freqEnd: 400,
+      duration: 0.1,
+      type: 'square',
+      gain: 0.15,
     });
   } catch (error) {
-    console.error('Error playing button click sound:', error);
+    // Error handling - logging removed for production
   }
 }
 
@@ -124,24 +124,16 @@ export function playButtonPurchaseSound() {
   if (!buttonSoundsEnabled || !audioContext) return;
   try {
     ensureContext();
-    const start = randBetween(700, 850);
-    // Softer purchase: triangle primary + sine undertone, gentler gain
+    // Simple purchase sound - ascending tone
     playTone({
-      freqStart: start,
-      freqEnd: start * 0.65,
-      duration: 0.1,
-      type: 'triangle',
-      gain: 0.16,
-    });
-    playTone({
-      freqStart: start * 0.6,
-      freqEnd: start * 0.5,
-      duration: 0.12,
+      freqStart: 600,
+      freqEnd: 800,
+      duration: 0.15,
       type: 'sine',
-      gain: 0.09,
+      gain: 0.12,
     });
   } catch (error) {
-    console.error('Error playing button purchase sound:', error);
+    // Error handling - logging removed for production
   }
 }
 
@@ -149,17 +141,16 @@ export function playButtonCriticalClickSound() {
   if (!buttonSoundsEnabled || !audioContext) return;
   try {
     ensureContext();
-    const base = randBetween(1100, 1400);
-    playTone({ freqStart: base, freqEnd: base * 0.55, duration: 0.18, type: 'square', gain: 0.32 });
+    // Simple critical click sound - higher pitch
     playTone({
-      freqStart: base * 0.5,
-      freqEnd: base * 0.35,
-      duration: 0.18,
-      type: 'triangle',
-      gain: 0.18,
+      freqStart: 1000,
+      freqEnd: 1200,
+      duration: 0.2,
+      type: 'square',
+      gain: 0.2,
     });
   } catch (error) {
-    console.error('Error playing button critical click sound:', error);
+    // Error handling - logging removed for production
   }
 }
 
@@ -172,24 +163,16 @@ export function playSodaClickSound() {
   if (!buttonSoundsEnabled || !audioContext) return;
   try {
     ensureContext();
-    const base = randBetween(180, 240);
+    // Simple soda click sound - lower pitch
     playTone({
-      freqStart: base,
-      freqEnd: base * 1.15,
-      duration: 0.05,
+      freqStart: 200,
+      freqEnd: 300,
+      duration: 0.08,
       type: 'triangle',
-      gain: 0.22,
-    });
-    playTone({
-      freqStart: base * 1.2,
-      freqEnd: base * 0.9,
-      duration: 0.06,
-      type: 'sine',
       gain: 0.18,
-      when: 0.03,
     });
   } catch (error) {
-    console.warn('Failed to play soda click sound:', error);
+    // Error handling - logging removed for production
   }
 }
 
@@ -197,27 +180,16 @@ export function playLevelUpSound() {
   if (!buttonSoundsEnabled || !audioContext) return;
   try {
     ensureContext();
-    const root = randBetween(300, 360);
-    // Upward arpeggio: root, major third, fifth
-    playTone({ freqStart: root, freqEnd: root, duration: 0.09, type: 'sine', gain: 0.25 });
+    // Simple level up sound - ascending chord
     playTone({
-      freqStart: root * 1.25,
-      freqEnd: root * 1.25,
-      duration: 0.09,
-      type: 'triangle',
-      gain: 0.22,
-      when: 0.09,
-    });
-    playTone({
-      freqStart: root * 1.5,
-      freqEnd: root * 1.5,
-      duration: 0.12,
-      type: 'square',
+      freqStart: 400,
+      freqEnd: 600,
+      duration: 0.3,
+      type: 'sine',
       gain: 0.2,
-      when: 0.18,
     });
   } catch (error) {
-    console.warn('Failed to play level up sound:', error);
+    // Error handling - logging removed for production
   }
 }
 
