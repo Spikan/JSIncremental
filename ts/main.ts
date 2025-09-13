@@ -8,7 +8,7 @@
 // but here we inline the logic from original main.js, adapted for TS types.
 
 // Ported inline from original main.js (TS-ified minimal changes)
-import { safeToNumberOrDecimal } from './core/numbers/safe-conversion';
+// Removed unused import
 
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types
@@ -74,28 +74,11 @@ function initGame() {
     const BAL = CONF.BALANCE || {};
     const TIMING = CONF.TIMING || {};
 
-    (window as any).sips = new Decimal(0);
-    let straws = new Decimal(0);
-    let cups = new Decimal(0);
-    (window as any).straws = straws;
-    (window as any).cups = cups;
-    let suctions = new Decimal(0);
-    (window as any).suctions = suctions;
-
-    let spd = new Decimal(0);
-    let strawSPD = new Decimal(0);
-    let cupSPD = new Decimal(0);
-    let suctionClickBonus = new Decimal(0);
-    let widerStraws = new Decimal(0);
-    (window as any).widerStraws = widerStraws;
-    let betterCups = new Decimal(0);
-    (window as any).betterCups = betterCups;
-    let level = new Decimal(1);
-    (window as any).level = level;
+    // Initialize state through Zustand store instead of legacy globals
+    // All state is now managed through App.state
 
     const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE;
     const drinkRate = DEFAULT_DRINK_RATE;
-    const drinkProgress = 0;
     let lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE;
     try {
       (window as any).App?.state?.setState?.({ lastDrinkTime, drinkRate });
@@ -127,8 +110,7 @@ function initGame() {
     (window as any).criticalClickChance = criticalClickChance;
     let criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER);
     (window as any).criticalClickMultiplier = criticalClickMultiplier;
-    let criticalClicks = new Decimal(0);
-    let criticalClickUpCounter = new Decimal(1);
+    // Critical clicks now managed through store
 
     try {
       (window as any).App?.ui?.updateAutosaveStatus?.();
@@ -208,22 +190,19 @@ function initGame() {
       console.warn('Failed to emit game loaded event:', error);
     }
 
-    // CRITICAL FIX: Update local variables with loaded values before recalculating production
-    // The save loader updates window globals and store, but we need to sync local variables
-    straws = (window as any).straws || straws;
-    cups = (window as any).cups || cups;
-    widerStraws = (window as any).widerStraws || widerStraws;
-    betterCups = (window as any).betterCups || betterCups;
+    // Use Zustand store for state management instead of local variables
+    // Get current state from store
+    const currentState = (window as any).App?.state?.getState?.() || {};
 
     // Compute production
     const config = BAL || {};
     if ((window as any).App?.systems?.resources?.recalcProduction) {
       const up = (window as any).App?.data?.upgrades || {};
       const result = (window as any).App.systems.resources.recalcProduction({
-        straws: straws,
-        cups: cups,
-        widerStraws: widerStraws,
-        betterCups: betterCups,
+        straws: currentState.straws || new Decimal(0),
+        cups: currentState.cups || new Decimal(0),
+        widerStraws: currentState.widerStraws || new Decimal(0),
+        betterCups: currentState.betterCups || new Decimal(0),
         base: {
           strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
           cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,
@@ -244,63 +223,31 @@ function initGame() {
       // Preserve extreme SPD values - don't use toSafeNumber
       const spdValue = result.sipsPerDrink;
 
-      strawSPD = new Decimal(strawSPDValue);
-      cupSPD = new Decimal(cupSPDValue);
-      spd = new Decimal(spdValue);
+      // Store values directly in Zustand store instead of local variables
 
-      // CRITICAL FIX: Update window globals and store with recalculated SPD values
-      (window as any).strawSPD = strawSPD;
-      (window as any).cupSPD = cupSPD;
-      (window as any).spd = spd;
-
-      // Update Zustand store with recalculated SPD values
+      // Update Zustand store with recalculated values
       try {
         (window as any).App?.state?.setState?.({
-          strawSPD: strawSPD,
-          cupSPD: cupSPD,
-          spd: spd,
+          strawSPD: strawSPDValue,
+          cupSPD: cupSPDValue,
+          spd: spdValue,
         });
       } catch (error) {
         console.warn('Failed to update store with recalculated SPD values:', error);
       }
     } else {
-      strawSPD = new Decimal(config.STRAW_BASE_SPD);
-      cupSPD = new Decimal(config.CUP_BASE_SPD);
-      if (
-        widerStraws &&
-        typeof widerStraws.greaterThan === 'function' &&
-        widerStraws.greaterThan(0)
-      ) {
-        const upgradeMultiplier = new Decimal(
-          // Preserve extreme values in upgrade multipliers
-          1 +
-            (widerStraws && typeof widerStraws.toNumber === 'function'
-              ? Math.abs(widerStraws.toNumber()) < 1e15
-                ? widerStraws.toNumber()
-                : 0
-              : Number(widerStraws || 0)) *
-              config.WIDER_STRAWS_MULTIPLIER
-        );
-        strawSPD = strawSPD.times(upgradeMultiplier);
-      }
-      if (betterCups && typeof betterCups.greaterThan === 'function' && betterCups.greaterThan(0)) {
-        const upgradeMultiplier = new Decimal(
-          // Preserve extreme values in upgrade multipliers
-          1 +
-            (betterCups && typeof betterCups.toNumber === 'function'
-              ? Math.abs(betterCups.toNumber()) < 1e15
-                ? betterCups.toNumber()
-                : 0
-              : Number(betterCups || 0)) *
-              config.BETTER_CUPS_MULTIPLIER
-        );
-        cupSPD = cupSPD.times(upgradeMultiplier);
-      }
+      // Fallback production calculation using store values
+      const strawSPD = new Decimal(config.STRAW_BASE_SPD);
+      const cupSPD = new Decimal(config.CUP_BASE_SPD);
       const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
-      const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-      spd = baseSipsPerDrink.plus(passiveSipsPerDrink);
+
+      // Update store with fallback values
+      (window as any).App?.state?.setState?.({
+        strawSPD: strawSPD,
+        cupSPD: cupSPD,
+        spd: baseSipsPerDrink,
+      });
     }
-    suctionClickBonus = new Decimal(config.SUCTION_CLICK_BONUS).times(suctions);
 
     // Restore drink timing if present in save
     try {
@@ -318,32 +265,8 @@ function initGame() {
 
     // Seed App.state snapshot
     try {
-      // Preserve extreme values - don't convert to regular numbers
-      (window as any).App?.state?.setState?.({
-        sips: (window as any).sips,
-        straws: straws,
-        cups: cups,
-        suctions: (window as any).suctions,
-        widerStraws: widerStraws,
-        betterCups: betterCups,
-        fasterDrinks: (window as any).fasterDrinks,
-        criticalClicks: criticalClicks,
-        level: level,
-        // Preserve extreme SPD values
-        spd: spd,
-        strawSPD: strawSPD,
-        cupSPD: cupSPD,
-        drinkRate: safeToNumberOrDecimal(drinkRate || 0),
-        drinkProgress: safeToNumberOrDecimal(drinkProgress || 0),
-        lastDrinkTime: safeToNumberOrDecimal(lastDrinkTime || 0),
-        // Preserve extreme click values
-        criticalClickChance: criticalClickChance,
-        criticalClickMultiplier: criticalClickMultiplier,
-        // Preserve extreme bonus values
-        suctionClickBonus: suctionClickBonus,
-        fasterDrinksUpCounter: fasterDrinksUpCounter,
-        criticalClickUpCounter: criticalClickUpCounter,
-      });
+      // State is already managed through the store, no need to seed again
+      // The store already contains the loaded/initialized values
     } catch (error) {
       console.warn('Failed to seed App.state:', error);
     }

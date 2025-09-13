@@ -31,31 +31,23 @@ const UPDATE_INTERVALS = {
 
 // Optimized display update functions using subscribeWithSelector
 export function updateTopSipsPerDrink(): void {
-  console.log('🔧 UPDATE TOP SIPS PER DRINK: Function called');
   if (typeof window === 'undefined') return;
 
   // Check if DOM_CACHE is ready
   const domCache = (window as any).DOM_CACHE;
   if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
-    console.log('DEBUG: updateTopSipsPerDrink - DOM_CACHE not ready, skipping update');
     return;
   }
 
   const topSipsPerDrinkElement: HTMLElement | null =
     domCache.topSipsPerDrink || document.getElementById('topSipsPerDrink');
 
-  console.log('🔧 UPDATE TOP SIPS PER DRINK: Element found =', !!topSipsPerDrinkElement);
-
-  // Silent updates unless there's an issue
-
   if (!topSipsPerDrinkElement) {
-    console.error('DEBUG: updateTopSipsPerDrink - element not found!');
     return;
   }
 
   // Clean up existing subscription if any
   if (subscriptionManager.has(SUBSCRIPTION_KEYS.TOP_SIPS_PER_DRINK)) {
-    console.log('🔧 UPDATE TOP SIPS PER DRINK: Cleaning up existing subscription');
     subscriptionManager.unregister(SUBSCRIPTION_KEYS.TOP_SIPS_PER_DRINK);
   }
 
@@ -64,10 +56,7 @@ export function updateTopSipsPerDrink(): void {
     const state = useGameStore.getState();
     if (state && state.spd !== undefined) {
       const formatted = formatNumber(state.spd);
-      console.log('🔧 UPDATE TOP SIPS PER DRINK: Updating with value:', formatted);
       topSipsPerDrinkElement.innerHTML = formatted;
-    } else {
-      console.log('🔧 UPDATE TOP SIPS PER DRINK: No SPD value available');
     }
   } catch (error) {
     console.warn('Failed to update top sips per drink:', error);
@@ -75,31 +64,23 @@ export function updateTopSipsPerDrink(): void {
 }
 
 export function updateTopSipsPerSecond(): void {
-  console.log('🔧 UPDATE TOP SIPS PER SECOND: Function called');
   if (typeof window === 'undefined') return;
 
   // Check if DOM_CACHE is ready
   const domCache = (window as any).DOM_CACHE;
   if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
-    console.log('DEBUG: updateTopSipsPerSecond - DOM_CACHE not ready, skipping update');
     return;
   }
 
   const topSipsPerSecondElement: HTMLElement | null =
     domCache.topSipsPerSecond || document.getElementById('topSipsPerSecond');
 
-  console.log('🔧 UPDATE TOP SIPS PER SECOND: Element found =', !!topSipsPerSecondElement);
-
-  // Silent updates unless there's an issue
-
   if (!topSipsPerSecondElement) {
-    console.error('DEBUG: updateTopSipsPerSecond - element not found!');
     return;
   }
 
   // Clean up existing subscription if any
   if (subscriptionManager.has(SUBSCRIPTION_KEYS.TOP_SIPS_PER_SECOND)) {
-    console.log('🔧 UPDATE TOP SIPS PER SECOND: Cleaning up existing subscription');
     subscriptionManager.unregister(SUBSCRIPTION_KEYS.TOP_SIPS_PER_SECOND);
   }
 
@@ -136,10 +117,7 @@ export function updateTopSipsPerSecond(): void {
       }
 
       const formatted = formatNumber(sipsPerSecond);
-      console.log('🔧 UPDATE TOP SIPS PER SECOND: Updating with value:', formatted);
       topSipsPerSecondElement.innerHTML = formatted;
-    } else {
-      console.log('🔧 UPDATE TOP SIPS PER SECOND: Missing SPD or drinkRate values');
     }
   } catch (error) {
     console.warn('Failed to update top sips per second:', error);
@@ -301,13 +279,11 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
 }
 
 export function updateTopSipCounter(): void {
-  console.log('🔧 UPDATE TOP SIP COUNTER: Function called');
   if (typeof window === 'undefined') return;
 
   // Check if DOM_CACHE is ready
   const domCache = (window as any).DOM_CACHE;
   if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
-    console.log('DEBUG: updateTopSipCounter - DOM_CACHE not ready, skipping update');
     return;
   }
 

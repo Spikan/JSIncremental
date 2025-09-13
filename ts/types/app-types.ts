@@ -435,8 +435,8 @@ declare global {
     DOM_CACHE: DOMCache;
     EVENT_NAMES: EventNames;
     Decimal: typeof import('../core/numbers/decimal').Decimal;
-    subscriptionManager: import('../ui/subscription-manager').SubscriptionManager;
-    debounceManager: import('../ui/debounce-utils').DebounceManager;
+    subscriptionManager: any;
+    debounceManager: any;
     storage: StorageAPI;
     eventBus: EventBus;
     bus: EventBus;
@@ -464,7 +464,12 @@ declare global {
 
 // DOM Cache interface
 export interface DOMCache {
-  [key: string]: HTMLElement | null | (() => void) | ((id: string) => HTMLElement | null) | (() => boolean);
+  [key: string]:
+    | HTMLElement
+    | null
+    | (() => void)
+    | ((id: string) => HTMLElement | null)
+    | (() => boolean);
   init(): void;
   get(id: string): HTMLElement | null;
   isReady(): boolean;

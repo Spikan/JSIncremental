@@ -68,9 +68,9 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       }
 
       try {
-        // Keep Decimal in state for sips and totalSipsEarned to avoid Infinity in UI formatting
-        // Convert highestSipsPerSecond to number for UI compatibility while preserving precision
-        const highestForUI = highest.gte(toDecimal(1e6)) ? highest.toString() : highest.toNumber();
+        // Keep Decimal in state for sips and totalSipsPerSecond to preserve extreme value precision
+        // Always use string representation to avoid precision loss with extreme values
+        const highestForUI = highest.toString();
 
         w.App?.state?.setState?.({
           sips: w.sips,

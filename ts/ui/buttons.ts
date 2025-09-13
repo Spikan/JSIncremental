@@ -262,7 +262,7 @@ function markPointerHandled(element: HTMLElement): void {
 }
 function shouldSuppressClick(element: HTMLElement): boolean {
   try {
-    const last = Number((element && element.__lastPointerTs) || 0);
+    const last = Number((element && (element as any).__lastPointerTs) || 0);
     return Date.now() - last < POINTER_SUPPRESS_MS;
   } catch (error) {
     console.warn('Failed to check pointer suppression:', error);
@@ -318,7 +318,6 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
           console.error('❌ Dev system not loaded yet, cannot execute:', actionName);
           return;
         }
-        console.log('🔧 Executing dev action:', actionName);
       }
       action.func();
       if (buttonType.feedback === 'levelup') {
@@ -417,6 +416,12 @@ function setupSpecialButtonHandlers(): void {
   function ensureClicksSystemLoaded(): Promise<void> {
     return new Promise(resolve => {
       const checkClicksSystem = () => {
+        // Check if we're in a test environment and window is not available
+        if (typeof window === 'undefined') {
+          resolve();
+          return;
+        }
+
         const hasClicksSystem = (window as any).App?.systems?.clicks?.handleSodaClick;
         const hasDomCache = (window as any).DOM_CACHE;
         const isDomCacheReady =

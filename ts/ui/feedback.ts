@@ -52,12 +52,6 @@ function showFeedbackAtCoordinates(
   clickX: number,
   clickY: number
 ): void {
-  console.log('🔧 showFeedbackAtCoordinates called with:', {
-    sipsGained,
-    isCritical,
-    clickX,
-    clickY,
-  });
   const feedback = document.createElement('div');
   feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
   feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
@@ -196,7 +190,6 @@ export function showClickFeedback(
   clickX: number | null = null,
   clickY: number | null = null
 ): void {
-  console.log('🔧 showClickFeedback called with:', { sipsGained, isCritical, clickX, clickY });
   if (clickX !== null && clickY !== null) {
     showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY);
     return;
@@ -214,7 +207,6 @@ export function showPurchaseFeedback(
   clickX: number | null = null,
   clickY: number | null = null
 ): void {
-  console.log('🔧 showPurchaseFeedback called with:', { itemName, cost, clickX, clickY });
   const feedback = document.createElement('div');
   feedback.className = 'purchase-feedback';
   feedback.innerHTML = `
@@ -228,18 +220,15 @@ export function showPurchaseFeedback(
   if (clickX !== null && clickY !== null) {
     left = clickX;
     top = clickY;
-    console.log('🔧 Using click coordinates directly - left:', left, 'top:', top);
   } else {
     const shopDiv = (window as any).DOM_CACHE?.shopDiv as HTMLElement | undefined;
     if (shopDiv) {
       const shopRect = shopDiv.getBoundingClientRect();
       left = shopRect.left + shopRect.width / 2;
       top = shopRect.top + shopRect.height / 2;
-      console.log('🔧 Using fallback positioning - left:', left, 'top:', top);
     } else {
       left = window.innerWidth / 2;
       top = window.innerHeight / 2;
-      console.log('🔧 Using viewport center - left:', left, 'top:', top);
     }
   }
   feedback.style.cssText = `
@@ -259,8 +248,6 @@ export function showPurchaseFeedback(
         transform-origin: center center;
     `;
   feedback.style.transform = 'translate(-50%, -50%)';
-  console.log('🔧 Final feedback positioning - left:', left, 'top:', top);
-  console.log('🔧 Feedback element style:', (feedback as any).style?.cssText);
   document.body.appendChild(feedback);
   const startTime = Date.now();
   const animate = () => {
