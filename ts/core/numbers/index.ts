@@ -50,12 +50,15 @@ import {
   multiply,
   divide,
   pow,
-  toLargeNumber,
   isLargeNumber,
 } from './migration-utils';
 
 // Import additional functions from large-number.ts
-import { toNumber, formatLargeNumber } from './large-number';
+import {
+  toNumber,
+  formatLargeNumber,
+  toLargeNumber as toLargeNumberFromLargeNumber,
+} from './large-number';
 
 // Import safe conversion utilities
 import {
@@ -186,7 +189,7 @@ export const Numbers = {
   performanceDashboard,
 
   // Legacy aliases
-  toLargeNumber,
+  toLargeNumber: toLargeNumberFromLargeNumber, // Use the one from large-number.ts
   isLargeNumber,
 
   // Additional utility functions

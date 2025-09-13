@@ -885,8 +885,13 @@ let erudaVisible = false;
  */
 export function toggleEruda(): boolean {
   try {
-    console.log('🔧 toggleEruda called, erudaLoaded:', erudaLoaded, 'erudaInstance:', !!erudaInstance);
-    
+    console.log(
+      '🔧 toggleEruda called, erudaLoaded:',
+      erudaLoaded,
+      'erudaInstance:',
+      !!erudaInstance
+    );
+
     // Check if Eruda is already available globally
     if (!erudaLoaded && (window as any).eruda) {
       console.log('📱 Eruda already available globally, using existing instance');

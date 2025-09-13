@@ -51,6 +51,8 @@ describe('User Journey Testing', () => {
         level: 1,
         totalClicks: 0,
         totalSipsEarned: 0,
+        criticalClickChance: 0.1, // 10% chance for critical hits
+        criticalClickMultiplier: 5,
       };
 
       const actions: Array<{ type: string; time: number; sipsGained: number; critical: boolean }> =
@@ -199,9 +201,21 @@ describe('User Journey Testing', () => {
       }
 
       // Should have made good progress
-      expect(gameState.straws.toNumber()).toBeGreaterThan(5);
-      expect(gameState.cups.toNumber()).toBeGreaterThan(2);
-      expect(gameState.suctions.toNumber()).toBeGreaterThan(0);
+      expect(
+        gameState.straws && typeof gameState.straws.toNumber === 'function'
+          ? gameState.straws.toNumber()
+          : Number(gameState.straws)
+      ).toBeGreaterThan(5);
+      expect(
+        gameState.cups && typeof gameState.cups.toNumber === 'function'
+          ? gameState.cups.toNumber()
+          : Number(gameState.cups)
+      ).toBeGreaterThan(2);
+      expect(
+        gameState.suctions && typeof gameState.suctions.toNumber === 'function'
+          ? gameState.suctions.toNumber()
+          : Number(gameState.suctions)
+      ).toBeGreaterThan(0);
       expect(gameState.sips).toBeGreaterThan(1000);
       expect(gameState.totalClicks).toBeGreaterThan(3000);
     });
@@ -260,10 +274,24 @@ describe('User Journey Testing', () => {
         }
 
         // Each strategy should result in different resource distributions
-        expect(
-          gameState.straws.toNumber() + gameState.cups.toNumber() + gameState.suctions.toNumber()
-        ).toBeGreaterThan(5);
-        expect(gameState.sips.toNumber()).toBeGreaterThan(1000);
+        const strawsNum =
+          gameState.straws && typeof gameState.straws.toNumber === 'function'
+            ? gameState.straws.toNumber()
+            : Number(gameState.straws);
+        const cupsNum =
+          gameState.cups && typeof gameState.cups.toNumber === 'function'
+            ? gameState.cups.toNumber()
+            : Number(gameState.cups);
+        const suctionsNum =
+          gameState.suctions && typeof gameState.suctions.toNumber === 'function'
+            ? gameState.suctions.toNumber()
+            : Number(gameState.suctions);
+        expect(strawsNum + cupsNum + suctionsNum).toBeGreaterThan(5);
+        const sipsNum =
+          gameState.sips && typeof gameState.sips.toNumber === 'function'
+            ? gameState.sips.toNumber()
+            : Number(gameState.sips);
+        expect(sipsNum).toBeGreaterThan(1000);
       });
     });
   });
@@ -332,7 +360,11 @@ describe('User Journey Testing', () => {
 
       // Should get more critical hits with higher chance
       expect(criticalHits).toBeGreaterThan(0);
-      expect(gameState.totalSipsEarned.toNumber()).toBeGreaterThan(criticalHits * 5);
+      const totalSipsNum =
+        gameState.totalSipsEarned && typeof gameState.totalSipsEarned.toNumber === 'function'
+          ? gameState.totalSipsEarned.toNumber()
+          : Number(gameState.totalSipsEarned);
+      expect(totalSipsNum).toBeGreaterThan(criticalHits * 5);
     });
   });
 
@@ -369,10 +401,25 @@ describe('User Journey Testing', () => {
       const sipsPerDrink = computeTotalSipsPerDrink(1, totalSPD);
 
       // Should handle large-scale production
-      expect(strawSPD).toBeGreaterThan(100);
-      expect(cupSPD).toBeGreaterThan(200);
-      expect(totalSPD).toBeGreaterThan(300);
-      expect(sipsPerDrink).toBeGreaterThan(300);
+      const strawSPDNum =
+        strawSPD && typeof strawSPD.toNumber === 'function'
+          ? strawSPD.toNumber()
+          : Number(strawSPD);
+      const cupSPDNum =
+        cupSPD && typeof cupSPD.toNumber === 'function' ? cupSPD.toNumber() : Number(cupSPD);
+      const totalSPDNum =
+        totalSPD && typeof totalSPD.toNumber === 'function'
+          ? totalSPD.toNumber()
+          : Number(totalSPD);
+      const sipsPerDrinkNum =
+        sipsPerDrink && typeof sipsPerDrink.toNumber === 'function'
+          ? sipsPerDrink.toNumber()
+          : Number(sipsPerDrink);
+
+      expect(strawSPDNum).toBeGreaterThan(100);
+      expect(cupSPDNum).toBeGreaterThan(200);
+      expect(totalSPDNum).toBeGreaterThan(300);
+      expect(sipsPerDrinkNum).toBeGreaterThan(300);
 
       // Should be able to afford expensive upgrades
       const expensiveUpgradeCost = computeCost(1000, 1.15, 100);
@@ -497,9 +544,13 @@ describe('User Journey Testing', () => {
       const startTime = performance.now();
 
       // Test operations on large state
+      const strawSPD = computeStrawSPD(largeGameState.straws, 0.6, 1000, 2.0);
+      const cupSPD = computeCupSPD(largeGameState.cups, 1.2, 500, 2.0);
       const sps =
-        computeStrawSPD(largeGameState.straws, 0.6, 1000, 2.0) +
-        computeCupSPD(largeGameState.cups, 1.2, 500, 2.0);
+        (strawSPD && typeof strawSPD.toNumber === 'function'
+          ? strawSPD.toNumber()
+          : Number(strawSPD)) +
+        (cupSPD && typeof cupSPD.toNumber === 'function' ? cupSPD.toNumber() : Number(cupSPD));
 
       const endTime = performance.now();
       const duration = endTime - startTime;
