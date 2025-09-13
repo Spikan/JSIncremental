@@ -8,6 +8,7 @@ import * as affordability from './affordability';
 import * as labels from './labels';
 import * as utils from './utils';
 import * as buttons from './buttons';
+import subscriptionManager from './subscription-manager';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability, buttons };
@@ -125,9 +126,12 @@ function initializeMobileNavigation(): void {
 
   // Add keyboard navigation support for mobile tabs
   const mobileTabItems = document.querySelectorAll('.mobile-tab-item');
+  const mobileEventListeners: Array<{ element: Element; type: string; handler: EventListener }> =
+    [];
+
   mobileTabItems.forEach((item: any) => {
     // Handle keyboard navigation
-    item.addEventListener('keydown', (e: KeyboardEvent) => {
+    const keydownHandler = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         const action = item.getAttribute('data-action');
@@ -136,15 +140,15 @@ function initializeMobileNavigation(): void {
           switchTab(tabName, e);
         }
       }
-    });
+    };
 
     // Handle touch events
-    item.addEventListener('touchstart', (e: TouchEvent) => {
+    const touchstartHandler = (e: TouchEvent) => {
       e.preventDefault();
       item.classList.add('touching');
-    });
+    };
 
-    item.addEventListener('touchend', (e: TouchEvent) => {
+    const touchendHandler = (e: TouchEvent) => {
       e.preventDefault();
       item.classList.remove('touching');
       const action = item.getAttribute('data-action');
@@ -152,13 +156,36 @@ function initializeMobileNavigation(): void {
         const tabName = action.split(':')[1];
         switchTab(tabName, e);
       }
-    });
+    };
+
+    // Add event listeners and track them for cleanup
+    item.addEventListener('keydown', keydownHandler);
+    item.addEventListener('touchstart', touchstartHandler);
+    item.addEventListener('touchend', touchendHandler);
+
+    mobileEventListeners.push(
+      { element: item, type: 'keydown', handler: keydownHandler as EventListener },
+      { element: item, type: 'touchstart', handler: touchstartHandler as EventListener },
+      { element: item, type: 'touchend', handler: touchendHandler as EventListener }
+    );
   });
+
+  // Register cleanup with subscription manager
+  subscriptionManager.register(
+    'mobile-navigation',
+    () => {
+      mobileEventListeners.forEach(({ element, type, handler }) => {
+        element.removeEventListener(type, handler);
+      });
+      mobileEventListeners.length = 0;
+    },
+    'Mobile Navigation Event Listeners'
+  );
 
   // Initialize swipe gestures for tab content
   initializeSwipeGestures();
 
-  console.log('✅ Mobile navigation initialized');
+  // Mobile navigation initialized
 }
 
 // Initialize swipe gestures for tab switching
@@ -191,16 +218,18 @@ function initializeSwipeGestures(): void {
   }
 
   // Add swipe listeners to all tab content areas
+  const swipeEventListeners: Array<{ element: Element; type: string; handler: EventListener }> = [];
+
   tabContents.forEach((tabContent: any) => {
-    tabContent.addEventListener('touchstart', (e: TouchEvent) => {
+    const touchstartHandler = (e: TouchEvent) => {
       if (e.touches && e.touches.length > 0 && e.touches[0]) {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         currentTabIndex = getCurrentTabIndex();
       }
-    });
+    };
 
-    tabContent.addEventListener('touchend', (e: TouchEvent) => {
+    const touchendHandler = (e: TouchEvent) => {
       if (e.changedTouches && e.changedTouches.length > 0 && e.changedTouches[0]) {
         const endX = e.changedTouches[0].clientX;
         const endY = e.changedTouches[0].clientY;
@@ -219,10 +248,29 @@ function initializeSwipeGestures(): void {
           }
         }
       }
-    });
+    };
+
+    // Add event listeners and track them for cleanup
+    tabContent.addEventListener('touchstart', touchstartHandler);
+    tabContent.addEventListener('touchend', touchendHandler);
+
+    swipeEventListeners.push(
+      { element: tabContent, type: 'touchstart', handler: touchstartHandler as EventListener },
+      { element: tabContent, type: 'touchend', handler: touchendHandler as EventListener }
+    );
   });
 
-  console.log('✅ Swipe gestures initialized');
+  // Register cleanup with subscription manager
+  subscriptionManager.register(
+    'swipe-gestures',
+    () => {
+      swipeEventListeners.forEach(({ element, type, handler }) => {
+        element.removeEventListener(type, handler);
+      });
+      swipeEventListeners.length = 0;
+    },
+    'Swipe Gesture Event Listeners'
+  );
 }
 
 // Update all UI displays (useful for initialization and major state changes)

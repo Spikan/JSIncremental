@@ -549,7 +549,7 @@ function setupSpecialButtonHandlers(): void {
                   import('../core/systems/clicks-system.ts')
                     .then(module => {
                       const fallbackFunc = module.handleSodaClick;
-                      console.log('DEBUG: Using fallback import, calling handleSodaClick');
+                      // Using fallback import
                       fallbackFunc(1);
                     })
                     .catch(fallbackError => {
@@ -657,7 +657,7 @@ function setupSpecialButtonHandlers(): void {
                   import('../core/systems/clicks-system.ts')
                     .then(module => {
                       const fallbackFunc = module.handleSodaClick;
-                      console.log('DEBUG: Using fallback import, calling handleSodaClick');
+                      // Using fallback import
                       fallbackFunc(1);
                     })
                     .catch(fallbackError => {
@@ -702,41 +702,31 @@ function setupSpecialButtonHandlers(): void {
           console.warn('Failed to handle button interaction:', error);
         }
         try {
-          console.log('🔥 BUTTON CLICK DEBUG:', {
-            buttonId: e?.target?.id || 'unknown',
-            buttonElement: e?.target,
-            hasApp: !!(window as any).App,
-            hasSystems: !!(window as any).App?.systems,
-            hasClicks: !!(window as any).App?.systems?.clicks,
-            hasHandleSodaClick:
-              typeof (window as any).App?.systems?.clicks?.handleSodaClick === 'function',
-            eventType: e?.type,
-            timestamp: Date.now(),
-          });
+          // Button click handling
 
           // Try multiple ways to call the function
           const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
           if (typeof handleSodaClick === 'function') {
-            console.log('DEBUG: Calling handleSodaClick function directly');
+            // Calling handleSodaClick function directly
             handleSodaClick(1).catch((error: any) => {
               console.warn('Failed to handle soda click:', error);
             }); // Only pass multiplier, no event
           } else {
-            console.error('DEBUG: handleSodaClick not available, trying fallback...');
+            // handleSodaClick not available, trying fallback
             // Try fallback: call the function from the clicks-system module directly
             try {
               // Use dynamic import without await (synchronous fallback)
               import('../core/systems/clicks-system.ts')
                 .then(module => {
                   const fallbackFunc = module.handleSodaClick;
-                  console.log('DEBUG: Using fallback import, calling handleSodaClick');
+                  // Using fallback import
                   fallbackFunc(1);
                 })
                 .catch(fallbackError => {
-                  console.error('DEBUG: Fallback also failed:', fallbackError);
+                  console.warn('Fallback also failed:', fallbackError);
                 });
             } catch (fallbackError) {
-              console.error('DEBUG: Fallback also failed:', fallbackError);
+              console.warn('Fallback also failed:', fallbackError);
             }
           }
         } catch (error) {
@@ -754,7 +744,7 @@ function setupSpecialButtonHandlers(): void {
 
   // Call the async setup function
   setupSodaButton().catch(error => {
-    console.error('DEBUG: Failed to setup soda button:', error);
+    console.warn('Failed to setup soda button:', error);
   });
 
   // Debug function to check soda button setup

@@ -12,6 +12,7 @@ export interface TouchValidationConfig {
 export class MobileInputHandler {
   private static instance: MobileInputHandler;
   private isInitialized = false;
+  private eventListeners: Array<{ element: Element; type: string; handler: EventListener }> = [];
   private touchValidationConfig: TouchValidationConfig = {
     movementThreshold: 15, // Allow moderate movement
     timeThreshold: 30, // Quick touches allowed
@@ -31,20 +32,16 @@ export class MobileInputHandler {
    */
   public initialize(): void {
     if (this.isInitialized) {
-      console.log('Mobile input handler already initialized');
       return;
     }
 
     if (!this.isMobileDevice()) {
-      console.log('Not a mobile device, skipping mobile input setup');
       return;
     }
 
-    console.log('Setting up mobile input optimizations...');
     this.setupTouchHandling();
     this.setupContextMenuPrevention();
     this.isInitialized = true;
-    console.log('✅ Mobile input handler initialized');
   }
 
   /**
@@ -94,11 +91,19 @@ export class MobileInputHandler {
 
     try {
       if (this.hasEventListenerSupport(sodaButton)) {
-        sodaButton.addEventListener('contextmenu', (e: Event) => {
+        const contextMenuHandler = (e: Event) => {
           e.preventDefault();
+        };
+
+        sodaButton.addEventListener('contextmenu', contextMenuHandler);
+
+        // Track event listener for cleanup
+        this.eventListeners.push({
+          element: sodaButton,
+          type: 'contextmenu',
+          handler: contextMenuHandler,
         });
       }
-      console.log('✅ Context menu prevention configured');
     } catch (error) {
       console.warn('Failed to add context menu handler:', error);
     }
@@ -231,11 +236,21 @@ export class MobileInputHandler {
   }
 
   /**
+   * Cleanup all event listeners
+   */
+  public cleanup(): void {
+    this.eventListeners.forEach(({ element, type, handler }) => {
+      element.removeEventListener(type, handler);
+    });
+    this.eventListeners.length = 0;
+    this.isInitialized = false;
+  }
+
+  /**
    * Reinitialize mobile handling (useful after DOM changes)
    */
   public reinitialize(): void {
-    console.log('Reinitializing mobile input handler...');
-    this.isInitialized = false;
+    this.cleanup();
     this.initialize();
   }
 
@@ -249,6 +264,19 @@ export class MobileInputHandler {
 
 // Export singleton instance
 export const mobileInputHandler = MobileInputHandler.getInstance();
+
+// Register cleanup with subscription manager
+if (typeof window !== 'undefined') {
+  import('./subscription-manager').then(({ default: subscriptionManager }) => {
+    subscriptionManager.register(
+      'mobile-input-handler',
+      () => {
+        mobileInputHandler.cleanup();
+      },
+      'Mobile Input Handler Event Listeners'
+    );
+  });
+}
 
 // Legacy function for backward compatibility
 export function setupMobileTouchHandling(): void {
