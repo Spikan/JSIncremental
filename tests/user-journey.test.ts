@@ -222,7 +222,7 @@ describe('User Journey Testing', () => {
         straws: safeConvertForTest(gameState.straws),
         cups: safeConvertForTest(gameState.cups),
         suctions: safeConvertForTest(gameState.suctions),
-        totalClicks: gameState.totalClicks
+        totalClicks: gameState.totalClicks,
       });
       expect(safeConvertForTest(gameState.straws)).toBeGreaterThanOrEqual(1);
       expect(safeConvertForTest(gameState.cups)).toBeGreaterThan(0);

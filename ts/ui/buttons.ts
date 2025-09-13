@@ -132,8 +132,7 @@ const BUTTON_CONFIG: {
           const chatInput = document.querySelector('#chatInput') as HTMLInputElement;
           const chatSendBtn = document.querySelector('.chat-send-btn');
           if (chatInput && chatInput.value.trim()) {
-            (window as any).App?.systems?.chat?.sendMessage?.(chatInput.value.trim());
-            chatInput.value = '';
+            (window as any).sendMessage?.();
             if (chatSendBtn) {
               chatSendBtn.setAttribute('disabled', 'true');
             }

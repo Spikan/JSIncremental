@@ -154,7 +154,7 @@ class MockDecimal {
       const otherStr = other instanceof MockDecimal ? other.toString() : String(other);
       return thisStr >= otherStr;
     }
-    
+
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     const thisValue = typeof this.value === 'number' ? this.value : 0;
     return thisValue >= otherValue;
@@ -167,7 +167,7 @@ class MockDecimal {
       const otherStr = other instanceof MockDecimal ? other.toString() : String(other);
       return thisStr > otherStr;
     }
-    
+
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     const thisValue = typeof this.value === 'number' ? this.value : 0;
     return thisValue > otherValue;
@@ -180,7 +180,7 @@ class MockDecimal {
       const otherStr = other instanceof MockDecimal ? other.toString() : String(other);
       return thisStr <= otherStr;
     }
-    
+
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     const thisValue = typeof this.value === 'number' ? this.value : 0;
     return thisValue <= otherValue;
@@ -193,7 +193,7 @@ class MockDecimal {
       const otherStr = other instanceof MockDecimal ? other.toString() : String(other);
       return thisStr < otherStr;
     }
-    
+
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     const thisValue = typeof this.value === 'number' ? this.value : 0;
     return thisValue < otherValue;
