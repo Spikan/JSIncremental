@@ -251,7 +251,9 @@ function initGame() {
           // Preserve extreme values in upgrade multipliers
           1 +
             (widerStraws && typeof widerStraws.toNumber === 'function'
-              ? (Math.abs(widerStraws.toNumber()) < 1e15 ? widerStraws.toNumber() : 0)
+              ? Math.abs(widerStraws.toNumber()) < 1e15
+                ? widerStraws.toNumber()
+                : 0
               : Number(widerStraws || 0)) *
               config.WIDER_STRAWS_MULTIPLIER
         );
@@ -262,7 +264,9 @@ function initGame() {
           // Preserve extreme values in upgrade multipliers
           1 +
             (betterCups && typeof betterCups.toNumber === 'function'
-              ? (Math.abs(betterCups.toNumber()) < 1e15 ? betterCups.toNumber() : 0)
+              ? Math.abs(betterCups.toNumber()) < 1e15
+                ? betterCups.toNumber()
+                : 0
               : Number(betterCups || 0)) *
               config.BETTER_CUPS_MULTIPLIER
         );

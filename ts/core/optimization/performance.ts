@@ -67,7 +67,7 @@ export function memoizedFormat(value: any): string {
   if (value instanceof Decimal) {
     const numValue = value.toNumber();
     // For very large numbers, preserve scientific notation
-    if (typeof numValue === 'number' && isFinite(numValue)) {
+    if (typeof numValue === 'number' && isFinite(numValue) && Math.abs(numValue) < 1e15) {
       if (Math.abs(numValue) >= 1e6) {
         // Use scientific notation for large numbers
         formatted = numValue.toExponential();
@@ -219,7 +219,10 @@ export function optimizedSynergyCalculation(
   // Calculate synergy bonus (straws and cups work together)
   const synergyBonus = strawsDec.mul(cupsDec).div(1000);
   // Use Math.min since our MockDecimal doesn't have min method
-  const cappedBonus = Math.min(synergyBonus.toNumber(), 0.5);
+  const cappedBonus = Math.min(
+    Math.abs(synergyBonus.toNumber()) < 1e15 ? synergyBonus.toNumber() : 0, 
+    0.5
+  );
   const synergyMultiplier = new Decimal(1).add(cappedBonus);
 
   const totalSPD = strawsDec.mul(strawSPDDec).add(cupsDec.mul(cupSPDDec));

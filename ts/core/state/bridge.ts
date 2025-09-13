@@ -246,8 +246,11 @@ export function createStateBridge(app: AppLike) {
           ) {
             // These remain as numbers - use safe conversion
             const decimalValue = toDecimal(value);
-            (seed as any)[seedKey] = typeof decimalValue.toNumber === 'function' && 
-              Math.abs(decimalValue.toNumber()) < 1e15 ? decimalValue.toNumber() : 0;
+            (seed as any)[seedKey] =
+              typeof decimalValue.toNumber === 'function' &&
+              Math.abs(decimalValue.toNumber()) < 1e15
+                ? decimalValue.toNumber()
+                : 0;
           } else {
             // All other values become Decimal
             (seed as any)[seedKey] = toDecimalValue(value);

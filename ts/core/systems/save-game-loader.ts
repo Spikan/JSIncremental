@@ -218,10 +218,16 @@ export class SaveGameLoader {
     // Handle objects with toNumber method (Decimal.js, Decimal)
     if (value && typeof value.toNumber === 'function') {
       try {
-        // Preserve extreme values
-        return value.toNumber();
+        // Preserve extreme values - only convert if within safe range
+        const num = value.toNumber();
+        if (isFinite(num) && Math.abs(num) < 1e15) {
+          return num;
+        }
+        // For extreme values, return default to prevent precision loss
+        return defaultValue;
       } catch (error) {
         console.warn('Failed to get number from object:', error);
+        return defaultValue;
       }
     }
 
