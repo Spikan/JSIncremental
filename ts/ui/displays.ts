@@ -5,6 +5,8 @@ import { Decimal } from '../core/numbers';
 import { safeToNumberOrDecimal } from '../core/numbers/safe-conversion';
 import subscriptionManager from './subscription-manager';
 import debounceManager from './debounce-utils';
+import { updateLastSaveTime, updatePurchasedCounts } from './stats';
+import { checkUpgradeAffordability } from './affordability';
 
 // Subscription keys for tracking
 const SUBSCRIPTION_KEYS = {
@@ -681,10 +683,8 @@ export const checkUpgradeAffordabilityOptimized = debounceManager.throttle(
   DEBOUNCE_KEYS.UPDATE_AFFORDABILITY,
   () => {
     try {
-      // Import and call the actual affordability check
-      import('./affordability').then(({ checkUpgradeAffordability }) => {
-        checkUpgradeAffordability();
-      });
+      // Call the actual affordability check directly
+      checkUpgradeAffordability();
     } catch (error) {
       console.warn('Error in optimized affordability check:', error);
     }
@@ -700,10 +700,8 @@ export const updatePurchasedCountsOptimized = debounceManager.debounce(
   DEBOUNCE_KEYS.UPDATE_PURCHASED_COUNTS,
   () => {
     try {
-      // Import and call the actual stats update
-      import('./stats').then(({ updatePurchasedCounts }) => {
-        updatePurchasedCounts();
-      });
+      // Call the actual stats update directly
+      updatePurchasedCounts();
     } catch (error) {
       console.warn('Error in optimized purchased counts update:', error);
     }
@@ -751,10 +749,8 @@ export const updateLastSaveTimeOptimized = debounceManager.throttle(
   DEBOUNCE_KEYS.UPDATE_LAST_SAVE_TIME,
   () => {
     try {
-      // Import and call the actual stats update
-      import('./stats').then(({ updateLastSaveTime }) => {
-        updateLastSaveTime();
-      });
+      // Call the actual stats update directly
+      updateLastSaveTime();
     } catch (error) {
       console.warn('Error in optimized last save time update:', error);
     }

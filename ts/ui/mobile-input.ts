@@ -1,6 +1,8 @@
 // Mobile Input Handling System
 // Handles mobile-specific touch and input optimizations
 
+import subscriptionManager from './subscription-manager';
+
 export interface TouchValidationConfig {
   movementThreshold: number; // Pixels of movement allowed before canceling
   timeThreshold: number; // Minimum time touch must be held (ms)
@@ -267,15 +269,13 @@ export const mobileInputHandler = MobileInputHandler.getInstance();
 
 // Register cleanup with subscription manager
 if (typeof window !== 'undefined') {
-  import('./subscription-manager').then(({ default: subscriptionManager }) => {
-    subscriptionManager.register(
-      'mobile-input-handler',
-      () => {
-        mobileInputHandler.cleanup();
-      },
-      'Mobile Input Handler Event Listeners'
-    );
-  });
+  subscriptionManager.register(
+    'mobile-input-handler',
+    () => {
+      mobileInputHandler.cleanup();
+    },
+    'Mobile Input Handler Event Listeners'
+  );
 }
 
 // Legacy function for backward compatibility
