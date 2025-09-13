@@ -38,10 +38,16 @@ export function formatNumber(value: any): string {
       const numValue = (value as DecimalLike).toNumber!();
       if (isFinite(numValue) && Math.abs(numValue) < 1e15) {
         value = numValue;
+      } else {
+        // For extreme values, use toString() directly on the Decimal object
+        return postProcessDecimals((value as DecimalLike).toString!());
       }
-      // For extreme values, keep as Decimal and use toString()
     } catch (error) {
       console.warn('Failed to convert decimal to number:', error);
+      // If toNumber fails but toString works, use toString
+      if (typeof (value as DecimalLike).toString === 'function') {
+        return postProcessDecimals((value as DecimalLike).toString!());
+      }
     }
   }
 
@@ -188,18 +194,18 @@ export function updateCostDisplay(elementId: string, cost: number, isAffordable:
 }
 
 export const GameState = {
-  get sips(): number {
+  get sips(): number | any {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
     const sipsValue = st && typeof st.sips !== 'undefined' ? st.sips : (window as any).sips;
-    // Safe Decimal to number conversion - preserve extreme values
+    // CRITICAL FIX: Don't truncate extreme values to 0 - return the Decimal for proper formatting
     if (sipsValue && typeof sipsValue.toNumber === 'function') {
       const rawNumber = sipsValue.toNumber();
       if (Number.isFinite(rawNumber) && Math.abs(rawNumber) < 1e15) {
         return rawNumber;
       } else {
-        // For extreme values, return a safe fallback instead of truncating
-        return 0;
+        // For extreme values, return the Decimal object so formatNumber can handle it properly
+        return sipsValue;
       }
     }
     return Number(sipsValue || 0);
@@ -211,18 +217,18 @@ export const GameState = {
       ? Number(st.level || 1)
       : Number((window as any).level || 1);
   },
-  get spd(): number {
+  get spd(): number | any {
     if (typeof window === 'undefined') return 0;
     const st = (window as any).App?.state?.getState?.();
     const spdValue = st && typeof st.spd !== 'undefined' ? st.spd : (window as any).spd;
-    // Safe Decimal to number conversion - preserve extreme values
+    // CRITICAL FIX: Don't truncate extreme values to 0 - return the Decimal for proper formatting
     if (spdValue && typeof spdValue.toNumber === 'function') {
       const numValue = spdValue.toNumber();
       if (Number.isFinite(numValue) && Math.abs(numValue) < 1e15) {
         return numValue;
       } else {
-        // For extreme values, return a safe fallback instead of truncating
-        return 0;
+        // For extreme values, return the Decimal object so formatNumber can handle it properly
+        return spdValue;
       }
     }
     return Number(spdValue || 0);

@@ -80,40 +80,64 @@ export class SaveGameLoader {
   private loadBasicResources(savegame: SaveGameData): void {
     try {
       if (typeof savegame.sips !== 'undefined') {
-        // Pass through raw to let store convert to Decimal safely
-        storeActions.setSips(savegame.sips as any);
-        (window as any).sips = new (window as any).Decimal(String(savegame.sips));
+        // Use parseDecimalValue to preserve extreme values
+        const sipsValue = this.parseDecimalValue(savegame.sips);
+        storeActions.setSips(sipsValue);
+        (window as any).sips = typeof sipsValue === 'number' 
+          ? new (window as any).Decimal(sipsValue) 
+          : sipsValue;
       }
 
       if (typeof savegame.straws !== 'undefined') {
-        storeActions.setStraws(savegame.straws as any);
-        (window as any).straws = new (window as any).Decimal(String(savegame.straws));
+        const strawsValue = this.parseDecimalValue(savegame.straws);
+        storeActions.setStraws(strawsValue);
+        (window as any).straws = typeof strawsValue === 'number' 
+          ? new (window as any).Decimal(strawsValue) 
+          : strawsValue;
       }
 
       if (typeof savegame.cups !== 'undefined') {
-        storeActions.setCups(savegame.cups as any);
-        (window as any).cups = new (window as any).Decimal(String(savegame.cups));
+        const cupsValue = this.parseDecimalValue(savegame.cups);
+        storeActions.setCups(cupsValue);
+        (window as any).cups = typeof cupsValue === 'number' 
+          ? new (window as any).Decimal(cupsValue) 
+          : cupsValue;
       }
 
       if (typeof savegame.suctions !== 'undefined') {
-        storeActions.setSuctions(savegame.suctions as any);
-        (window as any).suctions = new (window as any).Decimal(String(savegame.suctions));
+        const suctionsValue = this.parseDecimalValue(savegame.suctions);
+        storeActions.setSuctions(suctionsValue);
+        (window as any).suctions = typeof suctionsValue === 'number' 
+          ? new (window as any).Decimal(suctionsValue) 
+          : suctionsValue;
       }
 
-      // Load SPD values to preserve extreme values
+      // Load SPD values to preserve extreme values - CRITICAL: Use parseDecimalValue to preserve precision
       if (typeof savegame.spd !== 'undefined') {
-        storeActions.setSPD(savegame.spd as any);
-        (window as any).spd = new (window as any).Decimal(String(savegame.spd));
+        const spdValue = this.parseDecimalValue(savegame.spd);
+        storeActions.setSPD(spdValue);
+        // Ensure window value is always a Decimal, preserving extreme values
+        (window as any).spd = typeof spdValue === 'number' 
+          ? new (window as any).Decimal(spdValue) 
+          : spdValue;
       }
 
       if (typeof savegame.strawSPD !== 'undefined') {
-        storeActions.setStrawSPD(savegame.strawSPD as any);
-        (window as any).strawSPD = new (window as any).Decimal(String(savegame.strawSPD));
+        const strawSPDValue = this.parseDecimalValue(savegame.strawSPD);
+        storeActions.setStrawSPD(strawSPDValue);
+        // Ensure window value is always a Decimal, preserving extreme values
+        (window as any).strawSPD = typeof strawSPDValue === 'number' 
+          ? new (window as any).Decimal(strawSPDValue) 
+          : strawSPDValue;
       }
 
       if (typeof savegame.cupSPD !== 'undefined') {
-        storeActions.setCupSPD(savegame.cupSPD as any);
-        (window as any).cupSPD = new (window as any).Decimal(String(savegame.cupSPD));
+        const cupSPDValue = this.parseDecimalValue(savegame.cupSPD);
+        storeActions.setCupSPD(cupSPDValue);
+        // Ensure window value is always a Decimal, preserving extreme values
+        (window as any).cupSPD = typeof cupSPDValue === 'number' 
+          ? new (window as any).Decimal(cupSPDValue) 
+          : cupSPDValue;
       }
     } catch (error) {
       console.warn('Failed to load basic resources:', error);
@@ -126,18 +150,27 @@ export class SaveGameLoader {
   private loadUpgradeLevels(savegame: SaveGameData): void {
     try {
       if (typeof savegame.fasterDrinks !== 'undefined') {
-        storeActions.setFasterDrinks(savegame.fasterDrinks as any);
-        (window as any).fasterDrinks = new (window as any).Decimal(String(savegame.fasterDrinks));
+        const fasterDrinksValue = this.parseDecimalValue(savegame.fasterDrinks);
+        storeActions.setFasterDrinks(fasterDrinksValue);
+        (window as any).fasterDrinks = typeof fasterDrinksValue === 'number' 
+          ? new (window as any).Decimal(fasterDrinksValue) 
+          : fasterDrinksValue;
       }
 
       if (typeof savegame.widerStraws !== 'undefined') {
-        storeActions.setWiderStraws(savegame.widerStraws as any);
-        (window as any).widerStraws = new (window as any).Decimal(String(savegame.widerStraws));
+        const widerStrawsValue = this.parseDecimalValue(savegame.widerStraws);
+        storeActions.setWiderStraws(widerStrawsValue);
+        (window as any).widerStraws = typeof widerStrawsValue === 'number' 
+          ? new (window as any).Decimal(widerStrawsValue) 
+          : widerStrawsValue;
       }
 
       if (typeof savegame.betterCups !== 'undefined') {
-        storeActions.setBetterCups(savegame.betterCups as any);
-        (window as any).betterCups = new (window as any).Decimal(String(savegame.betterCups));
+        const betterCupsValue = this.parseDecimalValue(savegame.betterCups);
+        storeActions.setBetterCups(betterCupsValue);
+        (window as any).betterCups = typeof betterCupsValue === 'number' 
+          ? new (window as any).Decimal(betterCupsValue) 
+          : betterCupsValue;
       }
     } catch (error) {
       console.warn('Failed to load upgrade levels:', error);
@@ -152,19 +185,28 @@ export class SaveGameLoader {
       if (typeof savegame.criticalClickChance !== 'undefined') {
         const chanceValue = this.parseDecimalValue(savegame.criticalClickChance, 0.001);
         storeActions.setCriticalClickChance(chanceValue);
-        (window as any).criticalClickChance = new (window as any).Decimal(chanceValue);
+        // Ensure window value is always a Decimal
+        (window as any).criticalClickChance = typeof chanceValue === 'number' 
+          ? new (window as any).Decimal(chanceValue) 
+          : chanceValue;
       }
 
       if (typeof savegame.criticalClickMultiplier !== 'undefined') {
         const multiplierValue = this.parseDecimalValue(savegame.criticalClickMultiplier, 5);
         storeActions.setCriticalClickMultiplier(multiplierValue);
-        (window as any).criticalClickMultiplier = new (window as any).Decimal(multiplierValue);
+        // Ensure window value is always a Decimal
+        (window as any).criticalClickMultiplier = typeof multiplierValue === 'number' 
+          ? new (window as any).Decimal(multiplierValue) 
+          : multiplierValue;
       }
 
       if (typeof savegame.criticalClicks !== 'undefined') {
         const criticalClicksValue = this.parseDecimalValue(savegame.criticalClicks);
         storeActions.setCriticalClicks(criticalClicksValue);
-        (window as any).criticalClicks = new (window as any).Decimal(criticalClicksValue);
+        // Ensure window value is always a Decimal
+        (window as any).criticalClicks = typeof criticalClicksValue === 'number' 
+          ? new (window as any).Decimal(criticalClicksValue) 
+          : criticalClicksValue;
       }
 
       if (typeof savegame.suctionClickBonus !== 'undefined') {
@@ -182,12 +224,14 @@ export class SaveGameLoader {
   private loadLevelAndProgress(savegame: SaveGameData): void {
     try {
       if (typeof savegame.level !== 'undefined') {
-        const levelValue = Math.max(1, this.parseDecimalValue(savegame.level, 1));
-        storeActions.setLevel(levelValue);
-        (window as any).level = new (window as any).Decimal(levelValue);
+        const levelValue = this.parseDecimalValue(savegame.level, 1);
+        // Level should always be at least 1 and convert to number for compatibility
+        const levelNum = typeof levelValue === 'number' ? Math.max(1, levelValue) : Math.max(1, levelValue.toNumber());
+        storeActions.setLevel(levelNum);
+        (window as any).level = new (window as any).Decimal(levelNum);
 
         try {
-          (window as any).App?.stateBridge?.setLevel(levelValue);
+          (window as any).App?.stateBridge?.setLevel(levelNum);
         } catch (error) {
           console.warn('Failed to set level via bridge:', error);
         }
@@ -209,17 +253,23 @@ export class SaveGameLoader {
     try {
       if (typeof savegame.gameStartDate !== 'undefined') {
         const gameStartDateValue = this.parseDecimalValue(savegame.gameStartDate);
-        storeActions.setSessionStartTime(gameStartDateValue);
+        // Convert to number for timing compatibility
+        const dateNum = typeof gameStartDateValue === 'number' ? gameStartDateValue : gameStartDateValue.toNumber();
+        storeActions.setSessionStartTime(dateNum);
       }
 
       if (typeof savegame.lastClickTime !== 'undefined') {
         const lastClickTimeValue = this.parseDecimalValue(savegame.lastClickTime);
-        storeActions.setState({ lastClickTime: lastClickTimeValue });
+        // Convert to number for timing compatibility
+        const timeNum = typeof lastClickTimeValue === 'number' ? lastClickTimeValue : lastClickTimeValue.toNumber();
+        storeActions.setState({ lastClickTime: timeNum });
       }
 
       if (typeof savegame.totalPlayTime !== 'undefined') {
         const totalPlayTimeValue = this.parseDecimalValue(savegame.totalPlayTime);
-        storeActions.setTotalPlayTime(totalPlayTimeValue);
+        // Convert to number for timing compatibility
+        const playTimeNum = typeof totalPlayTimeValue === 'number' ? totalPlayTimeValue : totalPlayTimeValue.toNumber();
+        storeActions.setTotalPlayTime(playTimeNum);
       }
     } catch (error) {
       console.warn('Failed to load timing data:', error);
@@ -228,23 +278,40 @@ export class SaveGameLoader {
 
   /**
    * Parse decimal value with fallback - handles Decimal and Decimal objects
+   * CRITICAL: This function should NEVER truncate extreme values - preserve them as Decimals
    */
-  private parseDecimalValue(value: any, defaultValue: number = 0): number {
+  private parseDecimalValue(value: any, defaultValue: number = 0): any {
     if (value === null || value === undefined) return defaultValue;
 
-    if (typeof value === 'number') return value;
-    if (typeof value === 'string') return parseFloat(value) || defaultValue;
+    // For regular numbers within safe range, return as number
+    if (typeof value === 'number') {
+      if (isFinite(value) && Math.abs(value) < 1e15) {
+        return value;
+      }
+      // For extreme numbers, convert to Decimal to preserve precision
+      return new (window as any).Decimal(value);
+    }
+
+    // For strings, try to parse but preserve extreme values as Decimal
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value);
+      if (isNaN(parsed)) return defaultValue;
+      if (isFinite(parsed) && Math.abs(parsed) < 1e15) {
+        return parsed;
+      }
+      // For extreme string values, convert to Decimal
+      return new (window as any).Decimal(value);
+    }
 
     // Handle objects with toNumber method (Decimal.js, Decimal)
     if (value && typeof value.toNumber === 'function') {
       try {
-        // Preserve extreme values - only convert if within safe range
         const num = value.toNumber();
         if (isFinite(num) && Math.abs(num) < 1e15) {
           return num;
         }
-        // For extreme values, return default to prevent precision loss
-        return defaultValue;
+        // CRITICAL FIX: For extreme values, return the Decimal object itself, don't truncate!
+        return value;
       } catch (error) {
         console.warn('Failed to get number from object:', error);
         return defaultValue;
@@ -254,19 +321,31 @@ export class SaveGameLoader {
     // Handle serialized Decimal objects (might have _value property)
     if (value && typeof value._value !== 'undefined') {
       const num = Number(value._value);
-      return isFinite(num) && Math.abs(num) < 1e15 ? num : defaultValue;
+      if (isFinite(num) && Math.abs(num) < 1e15) {
+        return num;
+      }
+      // For extreme values, reconstruct as Decimal
+      return new (window as any).Decimal(value._value);
     }
 
     // Handle objects with value property (alternative serialization format)
     if (value && typeof value.value !== 'undefined') {
       const num = Number(value.value);
-      return isFinite(num) && Math.abs(num) < 1e15 ? num : defaultValue;
+      if (isFinite(num) && Math.abs(num) < 1e15) {
+        return num;
+      }
+      // For extreme values, reconstruct as Decimal
+      return new (window as any).Decimal(value.value);
     }
 
     // Handle arrays (some serialization might convert to arrays)
     if (Array.isArray(value) && value.length > 0) {
       const num = Number(value[0]);
-      return isFinite(num) && Math.abs(num) < 1e15 ? num : defaultValue;
+      if (isFinite(num) && Math.abs(num) < 1e15) {
+        return num;
+      }
+      // For extreme values, reconstruct as Decimal
+      return new (window as any).Decimal(value[0]);
     }
 
     return defaultValue;
