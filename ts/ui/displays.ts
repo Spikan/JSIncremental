@@ -181,7 +181,8 @@ export function updateDrinkSpeedDisplay(): void {
     }
     if (drinkSpeedBonusCompact && state) {
       const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
-      const currMs = Number(state.drinkRate || baseMs) || baseMs;
+      const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || baseMs);
+      const currMs = typeof drinkRateMs === 'number' ? drinkRateMs : (Math.abs(drinkRateMs.toNumber()) < 1e15 ? drinkRateMs.toNumber() : baseMs);
       const bonusPct = Math.max(0, (1 - currMs / baseMs) * 100);
       drinkSpeedBonusCompact.textContent = `${Math.round(bonusPct)}%`;
     }
@@ -234,7 +235,10 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
   try {
     const state = useGameStore.getState();
     if (state) {
-      if (currentProgress == null) currentProgress = Number(state.drinkProgress || 0);
+      if (currentProgress == null) {
+        const progress = safeToNumberOrDecimal(state.drinkProgress || 0);
+        currentProgress = typeof progress === 'number' ? progress : (Math.abs(progress.toNumber()) < 1e15 ? progress.toNumber() : 0);
+      }
       if (currentDrinkRate == null) currentDrinkRate = safeToNumberOrDecimal(state.drinkRate || 0);
     }
   } catch (error) {
@@ -380,7 +384,8 @@ export function updateCompactDrinkSpeedDisplays(): void {
     }
     if (drinkSpeedBonusCompact && state) {
       const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
-      const currMs = Number(state.drinkRate || baseMs) || baseMs;
+      const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || baseMs);
+      const currMs = typeof drinkRateMs === 'number' ? drinkRateMs : (Math.abs(drinkRateMs.toNumber()) < 1e15 ? drinkRateMs.toNumber() : baseMs);
       const bonusPct = Math.max(0, (1 - currMs / baseMs) * 100);
       drinkSpeedBonusCompact.textContent = `${Math.round(bonusPct)}%`;
     }
