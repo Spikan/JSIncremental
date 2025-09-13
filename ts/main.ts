@@ -247,18 +247,18 @@ function initGame() {
       strawSPD = new Decimal(strawSPDValue);
       cupSPD = new Decimal(cupSPDValue);
       spd = new Decimal(spdValue);
-      
+
       // CRITICAL FIX: Update window globals and store with recalculated SPD values
       (window as any).strawSPD = strawSPD;
       (window as any).cupSPD = cupSPD;
       (window as any).spd = spd;
-      
+
       // Update Zustand store with recalculated SPD values
       try {
         (window as any).App?.state?.setState?.({
           strawSPD: strawSPD,
           cupSPD: cupSPD,
-          spd: spd
+          spd: spd,
         });
       } catch (error) {
         console.warn('Failed to update store with recalculated SPD values:', error);

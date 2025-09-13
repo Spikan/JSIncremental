@@ -1,97 +1,85 @@
 import { defineConfig } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 
+// Helper function to get base path for deployment
+function getBasePath(): string {
+  return (
+    (process.env as any).VITE_BASE_PATH ||
+    ((process.env as any).GITHUB_REPOSITORY
+      ? `/${String((process.env as any).GITHUB_REPOSITORY).split('/')[1]}/`
+      : '/')
+  );
+}
+
+// Helper function to create manual chunks configuration
+function createManualChunks(id: string): string {
+  // Vendor libraries
+  if (id.includes('node_modules')) {
+    if (id.includes('zustand')) return 'vendor-zustand';
+    if (id.includes('zod')) return 'vendor-zod';
+    return 'vendor';
+  }
+
+  // Core game modules
+  if (id.includes('/core/state/') || id.includes('/core/rules/') || id.includes('/core/numbers/')) {
+    return 'game-core';
+  }
+
+  // UI modules
+  if (id.includes('/ui/') || id.includes('/services/')) {
+    return 'game-ui';
+  }
+
+  // Game systems
+  if (id.includes('/core/systems/') || id.includes('feature-unlocks') || id.includes('god.ts')) {
+    return 'game-systems';
+  }
+
+  // Default chunk
+  return 'index';
+}
+
+// Helper function to create asset file names
+function createAssetFileNames(assetInfo: any): string {
+  const info = assetInfo.name?.split('.') ?? [];
+  const ext = info[info.length - 1];
+  if (/\.(css)$/.test(assetInfo.name ?? '')) {
+    return `assets/index-[hash].${ext}`;
+  }
+  if (/\.(png|jpe?g|svg|gif|webp)$/.test(assetInfo.name ?? '')) {
+    return `assets/[name]-[hash].${ext}`;
+  }
+  if (/\.(json)$/.test(assetInfo.name ?? '')) {
+    return `assets/[name]-[hash].${ext}`;
+  }
+  return `assets/[name]-[hash].${ext}`;
+}
+
 export default defineConfig(({ mode }) => {
   const isAnalyze = mode === 'analyze';
+
   return {
-    // Base path for assets. On GitHub Pages it must be '/<repo>/' so dynamic imports resolve.
-    // Priority: explicitly provided VITE_BASE_PATH -> derive from GITHUB_REPOSITORY -> '/'
-    base:
-      (process.env as any).VITE_BASE_PATH ||
-      ((process.env as any).GITHUB_REPOSITORY
-        ? `/${String((process.env as any).GITHUB_REPOSITORY).split('/')[1]}/`
-        : '/'),
+    base: getBasePath(),
 
     build: {
       target: 'esnext',
-
-      // Enable source maps for better debugging
-      sourcemap: isAnalyze ? true : false, // Disable for production to reduce size
-
-      // Optimize minification
+      sourcemap: isAnalyze ? true : false,
       minify: isAnalyze ? false : 'terser',
       terserOptions: {
         compress: {
-          drop_console: isAnalyze ? false : true, // Remove console.log in production
+          drop_console: isAnalyze ? false : true,
           drop_debugger: true,
           pure_funcs: ['console.log', 'console.info', 'console.debug'] as string[],
         },
       },
-
-      // Enable compression
       reportCompressedSize: true,
-
-      // Optimize CSS
       cssMinify: true,
-
-      // Optimize chunk splitting for better caching
       rollupOptions: {
         output: {
-          // Split vendor libraries for better caching
-          manualChunks: (id: string) => {
-            // Vendor libraries
-            if (id.includes('node_modules')) {
-              if (id.includes('zustand')) return 'vendor-zustand';
-              if (id.includes('zod')) return 'vendor-zod';
-              return 'vendor';
-            }
-
-            // Core game modules
-            if (
-              id.includes('/core/state/') ||
-              id.includes('/core/rules/') ||
-              id.includes('/core/numbers/')
-            ) {
-              return 'game-core';
-            }
-
-            // UI modules
-            if (id.includes('/ui/') || id.includes('/services/')) {
-              return 'game-ui';
-            }
-
-            // Game systems
-            if (
-              id.includes('/core/systems/') ||
-              id.includes('feature-unlocks') ||
-              id.includes('god.ts')
-            ) {
-              return 'game-systems';
-            }
-
-            // Default chunk
-            return 'index';
-          },
-
-          // Optimize asset naming
-          assetFileNames: assetInfo => {
-            const info = assetInfo.name?.split('.') ?? [];
-            const ext = info[info.length - 1];
-            if (/\.(css)$/.test(assetInfo.name ?? '')) {
-              return `assets/index-[hash].${ext}`;
-            }
-            if (/\.(png|jpe?g|svg|gif|webp)$/.test(assetInfo.name ?? '')) {
-              return `assets/[name]-[hash].${ext}`;
-            }
-            if (/\.(json)$/.test(assetInfo.name ?? '')) {
-              return `assets/[name]-[hash].${ext}`;
-            }
-            return `assets/[name]-[hash].${ext}`;
-          },
-
+          manualChunks: createManualChunks,
+          assetFileNames: createAssetFileNames,
           chunkFileNames: 'assets/[name]-[hash].js',
         },
-
         plugins: [
           visualizer({
             filename: 'dist/stats.html',
@@ -105,19 +93,13 @@ export default defineConfig(({ mode }) => {
 
     server: {
       port: 5173,
-
-      // Enable compression for better development performance
       fs: {
-        // Allow serving files from one level up to find word_bank.json
         allow: ['..'] as string[],
       },
     },
 
-    // Optimize dependencies
     optimizeDeps: {
       include: ['zustand', 'zod'] as string[],
-
-      // Exclude large dependencies that should be bundled
       exclude: [] as string[],
     },
   } as const;
