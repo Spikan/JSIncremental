@@ -3,10 +3,31 @@ import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
 import { useGameStore } from '../core/state/zustand-store';
 import { Decimal } from '../core/numbers';
 import { safeToNumberOrDecimal } from '../core/numbers/safe-conversion';
+import subscriptionManager from './subscription-manager';
+import debounceManager from './debounce-utils';
 
-// Store subscription references to avoid multiple subscriptions
-let topSipsPerDrinkSubscription: (() => void) | null = null;
-let topSipsPerSecondSubscription: (() => void) | null = null;
+// Subscription keys for tracking
+const SUBSCRIPTION_KEYS = {
+  TOP_SIPS_PER_DRINK: 'topSipsPerDrink',
+  TOP_SIPS_PER_SECOND: 'topSipsPerSecond',
+  TOP_SIP_COUNTER: 'topSipCounter',
+} as const;
+
+// Debounce keys for performance optimization
+const DEBOUNCE_KEYS = {
+  UPDATE_ALL_DISPLAYS: 'updateAllDisplays',
+  UPDATE_AFFORDABILITY: 'updateAffordability',
+  UPDATE_PURCHASED_COUNTS: 'updatePurchasedCounts',
+  UPDATE_STATS: 'updateStats',
+} as const;
+
+// Performance-optimized update intervals (ms)
+const UPDATE_INTERVALS = {
+  FAST: 16, // ~60fps for critical updates
+  NORMAL: 100, // 10fps for normal updates
+  SLOW: 250, // 4fps for expensive operations
+  VERY_SLOW: 500, // 2fps for very expensive operations
+} as const;
 
 // Optimized display update functions using subscribeWithSelector
 export function updateTopSipsPerDrink(): void {
@@ -15,12 +36,12 @@ export function updateTopSipsPerDrink(): void {
 
   // Check if DOM_CACHE is ready
   const domCache = (window as any).DOM_CACHE;
-  if (!domCache || !domCache.isReady || !domCache.isReady()) {
+  if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
     console.log('DEBUG: updateTopSipsPerDrink - DOM_CACHE not ready, skipping update');
     return;
   }
 
-  const topSipsPerDrinkElement: any =
+  const topSipsPerDrinkElement: HTMLElement | null =
     domCache.topSipsPerDrink || document.getElementById('topSipsPerDrink');
 
   console.log('🔧 UPDATE TOP SIPS PER DRINK: Element found =', !!topSipsPerDrinkElement);
@@ -33,11 +54,9 @@ export function updateTopSipsPerDrink(): void {
   }
 
   // Clean up existing subscription if any
-  if (topSipsPerDrinkSubscription) {
+  if (subscriptionManager.has(SUBSCRIPTION_KEYS.TOP_SIPS_PER_DRINK)) {
     console.log('🔧 UPDATE TOP SIPS PER DRINK: Cleaning up existing subscription');
-    // Clean up existing subscription
-    topSipsPerDrinkSubscription();
-    topSipsPerDrinkSubscription = null;
+    subscriptionManager.unregister(SUBSCRIPTION_KEYS.TOP_SIPS_PER_DRINK);
   }
 
   try {
@@ -61,12 +80,12 @@ export function updateTopSipsPerSecond(): void {
 
   // Check if DOM_CACHE is ready
   const domCache = (window as any).DOM_CACHE;
-  if (!domCache || !domCache.isReady()) {
+  if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
     console.log('DEBUG: updateTopSipsPerSecond - DOM_CACHE not ready, skipping update');
     return;
   }
 
-  const topSipsPerSecondElement: any =
+  const topSipsPerSecondElement: HTMLElement | null =
     domCache.topSipsPerSecond || document.getElementById('topSipsPerSecond');
 
   console.log('🔧 UPDATE TOP SIPS PER SECOND: Element found =', !!topSipsPerSecondElement);
@@ -79,11 +98,9 @@ export function updateTopSipsPerSecond(): void {
   }
 
   // Clean up existing subscription if any
-  if (topSipsPerSecondSubscription) {
+  if (subscriptionManager.has(SUBSCRIPTION_KEYS.TOP_SIPS_PER_SECOND)) {
     console.log('🔧 UPDATE TOP SIPS PER SECOND: Cleaning up existing subscription');
-    // Clean up existing subscription
-    topSipsPerSecondSubscription();
-    topSipsPerSecondSubscription = null;
+    subscriptionManager.unregister(SUBSCRIPTION_KEYS.TOP_SIPS_PER_SECOND);
   }
 
   try {
@@ -289,7 +306,7 @@ export function updateTopSipCounter(): void {
 
   // Check if DOM_CACHE is ready
   const domCache = (window as any).DOM_CACHE;
-  if (!domCache || !domCache.isReady()) {
+  if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
     console.log('DEBUG: updateTopSipCounter - DOM_CACHE not ready, skipping update');
     return;
   }
@@ -657,6 +674,92 @@ if (typeof window !== 'undefined') {
   (window as any).testEventSystem = testEventSystem;
   (window as any).testSodaClick = testSodaClick;
   (window as any).testSodaButtonClick = testSodaButtonClick;
+}
+
+// Performance-optimized batch update functions
+/**
+ * Debounced version of updateAllDisplays for better performance
+ */
+export const updateAllDisplaysOptimized = debounceManager.debounce(
+  DEBOUNCE_KEYS.UPDATE_ALL_DISPLAYS,
+  () => {
+    try {
+      updateTopSipCounter();
+      updateTopSipsPerDrink();
+      updateTopSipsPerSecond();
+    } catch (error) {
+      console.warn('Error in optimized display update:', error);
+    }
+  },
+  UPDATE_INTERVALS.NORMAL,
+  { trailing: true, maxWait: UPDATE_INTERVALS.SLOW }
+);
+
+/**
+ * Throttled version of affordability checking for better performance
+ */
+export const checkUpgradeAffordabilityOptimized = debounceManager.throttle(
+  DEBOUNCE_KEYS.UPDATE_AFFORDABILITY,
+  () => {
+    try {
+      // Import and call the actual affordability check
+      import('./affordability').then(({ checkUpgradeAffordability }) => {
+        checkUpgradeAffordability();
+      });
+    } catch (error) {
+      console.warn('Error in optimized affordability check:', error);
+    }
+  },
+  UPDATE_INTERVALS.NORMAL,
+  { leading: true, trailing: true }
+);
+
+/**
+ * Debounced version of updatePurchasedCounts for better performance
+ */
+export const updatePurchasedCountsOptimized = debounceManager.debounce(
+  DEBOUNCE_KEYS.UPDATE_PURCHASED_COUNTS,
+  () => {
+    try {
+      // Import and call the actual stats update
+      import('./stats').then(({ updatePurchasedCounts }) => {
+        updatePurchasedCounts();
+      });
+    } catch (error) {
+      console.warn('Error in optimized purchased counts update:', error);
+    }
+  },
+  UPDATE_INTERVALS.SLOW,
+  { trailing: true, maxWait: UPDATE_INTERVALS.VERY_SLOW }
+);
+
+/**
+ * Clean up all display subscriptions and debounced functions
+ * Call this when the UI is being destroyed or reset
+ */
+export function cleanupDisplaySubscriptions(): void {
+  console.log('🧹 Cleaning up all display subscriptions and debounced functions');
+
+  // Clean up all display-related subscriptions
+  Object.values(SUBSCRIPTION_KEYS).forEach(key => {
+    if (subscriptionManager.has(key)) {
+      subscriptionManager.unregister(key);
+    }
+  });
+
+  // Clean up all debounced functions
+  Object.values(DEBOUNCE_KEYS).forEach(key => {
+    if (debounceManager.has(key)) {
+      debounceManager.cancel(key);
+    }
+  });
+
+  // Log cleanup stats
+  const subscriptionStats = subscriptionManager.getStats();
+  const debounceKeys = debounceManager.getKeys();
+  console.log(
+    `🧹 Display cleanup complete. Remaining subscriptions: ${subscriptionStats.count}, debounced functions: ${debounceKeys.length}`
+  );
 }
 
 export { updateCostDisplay, updateButtonState };

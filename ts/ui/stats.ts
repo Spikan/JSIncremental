@@ -256,21 +256,20 @@ export function updateAchievementStats(): void {
 export function updatePurchasedCounts(): void {
   // Reduce console logging frequency to optimize memory usage
   const shouldLog = Math.random() < 0.1; // Only log 10% of the time
-  if (shouldLog) if (shouldLog) console.log('📊 updatePurchasedCounts() called');
+  if (shouldLog) console.log('📊 updatePurchasedCounts() called');
 
   if (typeof window === 'undefined') return;
 
   const state = (window as any).App?.state?.getState?.();
   if (!state) {
-    if (shouldLog) if (shouldLog) console.log('📊 No state available');
+    if (shouldLog) console.log('📊 No state available');
     return;
   }
-  if (shouldLog)
-    if (shouldLog) console.log('📊 Current state:', { straws: state.straws, cups: state.cups });
+  if (shouldLog) console.log('📊 Current state:', { straws: state.straws, cups: state.cups });
 
   // Check DOM_CACHE availability
   if (!(window as any).DOM_CACHE) {
-    if (shouldLog) if (shouldLog) console.log('📊 DOM_CACHE not available');
+    if (shouldLog) console.log('📊 DOM_CACHE not available');
     return;
   }
 
@@ -279,27 +278,24 @@ export function updatePurchasedCounts(): void {
     | HTMLElement
     | undefined;
   if (shouldLog)
-    if (shouldLog)
-      console.log(
-        '🔍 strawsPurchasedElement:',
-        strawsPurchasedElement,
-        'exists:',
-        !!strawsPurchasedElement
-      );
+    console.log(
+      '🔍 strawsPurchasedElement:',
+      strawsPurchasedElement,
+      'exists:',
+      !!strawsPurchasedElement
+    );
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
-    if (shouldLog)
-      if (shouldLog) console.log('🔍 Raw straws value:', straws, 'type:', typeof straws);
+    if (shouldLog) console.log('🔍 Raw straws value:', straws, 'type:', typeof straws);
     const strawsValue = typeof straws === 'object' && straws.toString ? straws.toString() : straws;
-    if (shouldLog) if (shouldLog) console.log('🔍 Processed straws value:', strawsValue);
+    if (shouldLog) console.log('🔍 Processed straws value:', strawsValue);
     const formattedStraws = formatNumber(strawsValue);
-    if (shouldLog) if (shouldLog) console.log('🔍 Formatted straws:', formattedStraws);
+    if (shouldLog) console.log('🔍 Formatted straws:', formattedStraws);
     strawsPurchasedElement.textContent = formattedStraws;
     if (shouldLog)
-      if (shouldLog)
-        console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
+      console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
   } else {
-    if (shouldLog) if (shouldLog) console.log('❌ strawsPurchased element not found');
+    if (shouldLog) console.log('❌ strawsPurchased element not found');
   }
 
   // Update cups purchased count

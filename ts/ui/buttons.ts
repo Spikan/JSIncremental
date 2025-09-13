@@ -253,14 +253,14 @@ const BUTTON_CONFIG: {
 const POINTER_SUPPRESS_MS = 300; // Reduced from 500ms for better responsiveness
 const MOVEMENT_THRESHOLD = 15; // Increased from 8px for better tolerance
 
-function markPointerHandled(element: any): void {
+function markPointerHandled(element: HTMLElement): void {
   try {
-    element.__lastPointerTs = Date.now();
+    (element as any).__lastPointerTs = Date.now();
   } catch (error) {
     console.warn('Failed to mark pointer as handled:', error);
   }
 }
-function shouldSuppressClick(element: any): boolean {
+function shouldSuppressClick(element: HTMLElement): boolean {
   try {
     const last = Number((element && element.__lastPointerTs) || 0);
     return Date.now() - last < POINTER_SUPPRESS_MS;
@@ -270,7 +270,7 @@ function shouldSuppressClick(element: any): boolean {
   }
 }
 
-function handleButtonClick(event: any, button: any, actionName: string): void {
+function handleButtonClick(event: Event, button: HTMLElement, actionName: string): void {
   event.preventDefault();
   event.stopPropagation();
   const action = BUTTON_CONFIG.actions[actionName];
@@ -584,7 +584,8 @@ function setupSpecialButtonHandlers(): void {
             sy = e.touches[0].clientY || 0;
 
             // Store scroll position for scroll detection
-            (sodaButton as any).__touchStartScrollY = window.scrollY;
+            (sodaButton as any).__touchStartScrollY =
+              typeof window !== 'undefined' ? window.scrollY : 0;
 
             // Visual feedback on touch start
             try {
@@ -612,8 +613,9 @@ function setupSpecialButtonHandlers(): void {
             return;
           }
           // Check if this was likely a scroll vs a tap
+          const currentScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
           const scrollDelta = Math.abs(
-            window.scrollY - (sodaButton.__touchStartScrollY || window.scrollY)
+            currentScrollY - (sodaButton.__touchStartScrollY || currentScrollY)
           );
           const isScroll =
             mobileInputHandler.isActive() &&

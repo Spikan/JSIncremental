@@ -41,8 +41,10 @@ try {
 // Diagnostics helper (no-op in dev)
 function __pushDiag(marker: any): void {
   try {
-    (window as any).__diag = Array.isArray((window as any).__diag) ? (window as any).__diag : [];
-    (window as any).__diag.push(marker);
+    if (typeof window !== 'undefined') {
+      (window as any).__diag = Array.isArray((window as any).__diag) ? (window as any).__diag : [];
+      (window as any).__diag.push(marker);
+    }
   } catch {}
 }
 
@@ -58,31 +60,34 @@ try {
 console.log('🔧 Initializing Zustand store...');
 const zustandStore = useGameStore;
 
-(window as any).App = {
-  state: {
-    ...zustandStore,
-    actions: zustandStore.getState().actions, // Add actions for direct access
-  }, // Consolidated Zustand store with actions
-  storage,
-  events: eventBus,
-  EVENT_NAMES,
-  rules: { clicks: {}, purchases: {}, economy: {} },
-  systems: {
-    resources: {},
-    purchases: {},
-    clicks: {},
-    autosave: {},
-    save: {},
-    options: {},
-    loop: {},
-    audio: { button: {} },
-    gameInit: {},
-    drink: {},
-  },
-  ui: {},
-  data: {},
-  performance: performanceMonitor, // Performance monitoring
-};
+// Initialize App object only in browser environment
+if (typeof window !== 'undefined') {
+  (window as any).App = {
+    state: {
+      ...zustandStore,
+      actions: zustandStore.getState().actions, // Add actions for direct access
+    }, // Consolidated Zustand store with actions
+    storage,
+    events: eventBus,
+    EVENT_NAMES,
+    rules: { clicks: {}, purchases: {}, economy: {} },
+    systems: {
+      resources: {},
+      purchases: {},
+      clicks: {},
+      autosave: {},
+      save: {},
+      options: {},
+      loop: {},
+      audio: { button: {} },
+      gameInit: {},
+      drink: {},
+    },
+    ui: {},
+    data: {},
+    performance: performanceMonitor, // Performance monitoring
+  };
+}
 
 __pushDiag({ type: 'index', stage: 'app-created' });
 

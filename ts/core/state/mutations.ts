@@ -6,7 +6,7 @@ import { toDecimal, add, subtract, multiply } from '../numbers/migration-utils';
 import { DecimalType } from '../numbers/decimal-utils';
 
 // Type for values that can be Decimal or converted to Decimal
-export type NumericValue = number | string | DecimalType | any;
+export type NumericValue = number | string | DecimalType;
 
 /**
  * Add sips to current amount - returns Decimal for unlimited scaling

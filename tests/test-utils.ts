@@ -372,6 +372,10 @@ export const mockDOMCache = {
   init: () => {},
   get: (id: string) => ({ textContent: '0', innerHTML: '0', addEventListener: () => {} }),
   isReady: () => true, // ✅ This is the key fix!
+  // Add function property for tests that check typeof
+  isReadyFunction() {
+    return true;
+  },
 };
 
 /**
@@ -440,6 +444,14 @@ export function setupTestEnvironment() {
     }
     // Ensure DOM_CACHE is available on window
     (window as any).DOM_CACHE = mockDOMCache; // ✅ Add mock DOM_CACHE
+
+    // Ensure addEventListener exists
+    if (!window.addEventListener) {
+      (window as any).addEventListener = () => {};
+    }
+    if (!window.removeEventListener) {
+      (window as any).removeEventListener = () => {};
+    }
   }
 
   if (typeof document === 'undefined') {
@@ -462,6 +474,12 @@ export function setupTestEnvironment() {
   if (typeof requestAnimationFrame === 'undefined') {
     (global as any).requestAnimationFrame = (callback: Function) => {
       return setTimeout(callback, 16); // 60fps equivalent
+    };
+  }
+
+  if (typeof cancelAnimationFrame === 'undefined') {
+    (global as any).cancelAnimationFrame = (id: any) => {
+      clearTimeout(id);
     };
   }
 

@@ -554,6 +554,10 @@ function sanitizeDecimal(value: DecimalType, fallback: DecimalType): DecimalType
 // Function to validate and handle extreme values robustly
 export function validateExtremeValues(): void {
   try {
+    // Guard against Node.js environment
+    if (typeof window === 'undefined') {
+      return;
+    }
     const rawState = (window as any).App?.state?.getState?.() || {};
 
     // Log extreme values for debugging and monitoring
@@ -586,6 +590,10 @@ export function validateExtremeValues(): void {
 
 function getAppState(): any {
   try {
+    // Guard against Node.js environment
+    if (typeof window === 'undefined') {
+      return {};
+    }
     const rawState = (window as any).App?.state?.getState?.() || {};
 
     // Log extreme values for debugging (preserve the actual values)

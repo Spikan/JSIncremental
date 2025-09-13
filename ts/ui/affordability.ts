@@ -8,6 +8,7 @@
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { updateButtonState, updateCostDisplay } from './utils';
 import { toDecimal, gte } from '../core/numbers/migration-utils';
+import { NumericValue, CostResult } from '../types/app-types';
 
 // Direct break_eternity.js Decimal access
 const Decimal = (globalThis as any).Decimal;
@@ -22,7 +23,7 @@ export function checkUpgradeAffordability(): void {
   const currentSipsLarge = rawSipsLarge;
 
   // Function to check affordability using Decimal comparison
-  const canAfford = (cost: any): boolean => {
+  const canAfford = (cost: NumericValue): boolean => {
     const costLarge = toDecimal(cost);
     const effectiveSips = currentSipsLarge;
     return gte(effectiveSips, costLarge);
@@ -72,9 +73,9 @@ export function updateShopButtonStates(): void {
 }
 
 // Direct cost calculation using break_eternity.js - no safety nets
-function calculateAllCosts(): any {
+function calculateAllCosts(): CostResult {
   const { upgrades: dataUp, config } = getUpgradesAndConfig();
-  const costs: any = {};
+  const costs = {} as CostResult;
 
   // Direct Decimal operations - break_eternity.js handles all edge cases
   const strawBaseCost = toDecimal(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
