@@ -6,6 +6,8 @@ import { isDecimal, DecimalType } from './decimal-utils';
 /**
  * Safely converts a Decimal to a JavaScript number
  * Returns fallback value if conversion would lose precision
+ * WARNING: This function should only be used for values known to be within safe range
+ * For extreme values, use safeToString() or keep as Decimal
  */
 export function safeToNumber(decimal: DecimalType, fallback: number = 0): number {
   if (!isDecimal(decimal)) {
@@ -22,10 +24,12 @@ export function safeToNumber(decimal: DecimalType, fallback: number = 0): number
 
   try {
     const num = decimal.toNumber();
-    // Only return the number if it's finite, within safe range, and not too small
-    if (isFinite(num) && num < 1e308 && Math.abs(num) > 1e-100) {
+    // Only return the number if it's finite and within JavaScript's safe range
+    // This is much more conservative - only convert if we're sure it's safe
+    if (isFinite(num) && Math.abs(num) < 1e15 && Math.abs(num) > 1e-15) {
       return num;
     }
+    // For extreme values, return fallback to prevent precision loss
     return fallback;
   } catch {
     return fallback;
@@ -46,6 +50,36 @@ export function safeToString(decimal: DecimalType): string {
     return decimal.toString();
   } catch {
     return '0';
+  }
+}
+
+/**
+ * Safely converts a value to a number, preserving extreme values as Decimals
+ * Returns the original Decimal if it's extreme, otherwise converts to number
+ */
+export function safeToNumberOrDecimal(value: any): number | DecimalType {
+  if (!isDecimal(value)) {
+    // Handle non-Decimal inputs
+    if (typeof value === 'number') {
+      return isFinite(value) ? value : 0;
+    }
+    if (typeof value === 'string') {
+      const num = parseFloat(value);
+      return isFinite(num) ? num : 0;
+    }
+    return 0;
+  }
+
+  try {
+    const num = value.toNumber();
+    // If the number is within safe range, return it
+    if (isFinite(num) && Math.abs(num) < 1e15 && Math.abs(num) > 1e-15) {
+      return num;
+    }
+    // For extreme values, return the original Decimal to preserve precision
+    return value;
+  } catch {
+    return value; // Return original Decimal if conversion fails
   }
 }
 

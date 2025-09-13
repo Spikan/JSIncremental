@@ -10,6 +10,7 @@ import {
   computeTotalSPD,
   computeTotalSipsPerDrink,
 } from '../ts/core/rules/economy';
+import { safeToNumberOrDecimal, safeToString } from '../ts/core/numbers/safe-conversion';
 
 // Mock computeCost function since it's not exported from the actual module
 const computeCost = (baseCost: number, scaling: number, owned: number): number => {
@@ -27,6 +28,21 @@ const mockGameConfig = {
     levelUp: { baseCost: 3000, scaling: 1.15, reward: 1.5 },
   },
 };
+
+// Helper function to safely convert values for test comparisons
+function safeConvertForTest(value: any): number {
+  const converted = safeToNumberOrDecimal(value);
+  if (typeof converted === 'number') {
+    return converted;
+  }
+  // For Decimal objects, try to convert to number if it's safe
+  try {
+    const num = converted.toNumber();
+    return isFinite(num) ? num : 0;
+  } catch {
+    return 0;
+  }
+}
 
 describe('User Journey Testing', () => {
   beforeEach(() => {
@@ -70,14 +86,14 @@ describe('User Journey Testing', () => {
             criticalMultiplier: 5,
           });
 
-          gameState.sips += Number(result.gained);
+          gameState.sips += safeConvertForTest(result.gained);
           gameState.totalClicks++;
-          gameState.totalSipsEarned += Number(result.gained);
+          gameState.totalSipsEarned += safeConvertForTest(result.gained);
 
           actions.push({
             type: 'click',
             time: second,
-            sipsGained: Number(result.gained),
+            sipsGained: safeConvertForTest(result.gained),
             critical: result.critical,
           });
         }
@@ -201,22 +217,10 @@ describe('User Journey Testing', () => {
       }
 
       // Should have made good progress
-      expect(
-        gameState.straws && typeof gameState.straws.toNumber === 'function'
-          ? gameState.straws.toNumber()
-          : Number(gameState.straws)
-      ).toBeGreaterThan(5);
-      expect(
-        gameState.cups && typeof gameState.cups.toNumber === 'function'
-          ? gameState.cups.toNumber()
-          : Number(gameState.cups)
-      ).toBeGreaterThan(2);
-      expect(
-        gameState.suctions && typeof gameState.suctions.toNumber === 'function'
-          ? gameState.suctions.toNumber()
-          : Number(gameState.suctions)
-      ).toBeGreaterThan(0);
-      expect(gameState.sips).toBeGreaterThan(1000);
+      expect(safeConvertForTest(gameState.straws)).toBeGreaterThan(5);
+      expect(safeConvertForTest(gameState.cups)).toBeGreaterThan(2);
+      expect(safeConvertForTest(gameState.suctions)).toBeGreaterThan(0);
+      expect(safeConvertForTest(gameState.sips)).toBeGreaterThan(1000);
       expect(gameState.totalClicks).toBeGreaterThan(3000);
     });
 
@@ -274,23 +278,11 @@ describe('User Journey Testing', () => {
         }
 
         // Each strategy should result in different resource distributions
-        const strawsNum =
-          gameState.straws && typeof gameState.straws.toNumber === 'function'
-            ? gameState.straws.toNumber()
-            : Number(gameState.straws);
-        const cupsNum =
-          gameState.cups && typeof gameState.cups.toNumber === 'function'
-            ? gameState.cups.toNumber()
-            : Number(gameState.cups);
-        const suctionsNum =
-          gameState.suctions && typeof gameState.suctions.toNumber === 'function'
-            ? gameState.suctions.toNumber()
-            : Number(gameState.suctions);
+        const strawsNum = safeConvertForTest(gameState.straws);
+        const cupsNum = safeConvertForTest(gameState.cups);
+        const suctionsNum = safeConvertForTest(gameState.suctions);
         expect(strawsNum + cupsNum + suctionsNum).toBeGreaterThan(5);
-        const sipsNum =
-          gameState.sips && typeof gameState.sips.toNumber === 'function'
-            ? gameState.sips.toNumber()
-            : Number(gameState.sips);
+        const sipsNum = safeConvertForTest(gameState.sips);
         expect(sipsNum).toBeGreaterThan(1000);
       });
     });
@@ -354,16 +346,13 @@ describe('User Journey Testing', () => {
 
         if (result.critical) {
           criticalHits++;
-          gameState.totalSipsEarned += Number(result.gained);
+          gameState.totalSipsEarned += safeConvertForTest(result.gained);
         }
       }
 
       // Should get more critical hits with higher chance
       expect(criticalHits).toBeGreaterThan(0);
-      const totalSipsNum =
-        gameState.totalSipsEarned && typeof gameState.totalSipsEarned.toNumber === 'function'
-          ? gameState.totalSipsEarned.toNumber()
-          : Number(gameState.totalSipsEarned);
+      const totalSipsNum = safeConvertForTest(gameState.totalSipsEarned);
       expect(totalSipsNum).toBeGreaterThan(criticalHits * 5);
     });
   });
@@ -401,20 +390,10 @@ describe('User Journey Testing', () => {
       const sipsPerDrink = computeTotalSipsPerDrink(1, totalSPD);
 
       // Should handle large-scale production
-      const strawSPDNum =
-        strawSPD && typeof strawSPD.toNumber === 'function'
-          ? strawSPD.toNumber()
-          : Number(strawSPD);
-      const cupSPDNum =
-        cupSPD && typeof cupSPD.toNumber === 'function' ? cupSPD.toNumber() : Number(cupSPD);
-      const totalSPDNum =
-        totalSPD && typeof totalSPD.toNumber === 'function'
-          ? totalSPD.toNumber()
-          : Number(totalSPD);
-      const sipsPerDrinkNum =
-        sipsPerDrink && typeof sipsPerDrink.toNumber === 'function'
-          ? sipsPerDrink.toNumber()
-          : Number(sipsPerDrink);
+      const strawSPDNum = safeConvertForTest(strawSPD);
+      const cupSPDNum = safeConvertForTest(cupSPD);
+      const totalSPDNum = safeConvertForTest(totalSPD);
+      const sipsPerDrinkNum = safeConvertForTest(sipsPerDrink);
 
       expect(strawSPDNum).toBeGreaterThan(100);
       expect(cupSPDNum).toBeGreaterThan(200);
@@ -546,11 +525,7 @@ describe('User Journey Testing', () => {
       // Test operations on large state
       const strawSPD = computeStrawSPD(largeGameState.straws, 0.6, 1000, 2.0);
       const cupSPD = computeCupSPD(largeGameState.cups, 1.2, 500, 2.0);
-      const sps =
-        (strawSPD && typeof strawSPD.toNumber === 'function'
-          ? strawSPD.toNumber()
-          : Number(strawSPD)) +
-        (cupSPD && typeof cupSPD.toNumber === 'function' ? cupSPD.toNumber() : Number(cupSPD));
+      const sps = safeConvertForTest(strawSPD) + safeConvertForTest(cupSPD);
 
       const endTime = performance.now();
       const duration = endTime - startTime;
