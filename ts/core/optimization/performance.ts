@@ -220,7 +220,7 @@ export function optimizedSynergyCalculation(
   const synergyBonus = strawsDec.mul(cupsDec).div(1000);
   // Use Math.min since our MockDecimal doesn't have min method
   const cappedBonus = Math.min(
-    Math.abs(synergyBonus.toNumber()) < 1e15 ? synergyBonus.toNumber() : 0, 
+    Math.abs(synergyBonus.toNumber()) < 1e15 ? synergyBonus.toNumber() : 0,
     0.5
   );
   const synergyMultiplier = new Decimal(1).add(cappedBonus);
