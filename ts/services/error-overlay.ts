@@ -71,6 +71,9 @@ class ErrorReporter {
   }
 
   private initializeErrorHandling(): void {
+    // Only initialize in browser environment
+    if (typeof window === 'undefined') return;
+
     // Global error handler
     window.addEventListener('error', event => {
       this.handleGlobalError(event);
@@ -374,8 +377,26 @@ class ErrorReporter {
 
 // ErrorReporter class already exported above
 
-// Initialize error reporter
-export const errorReporter = new ErrorReporter();
+// Initialize error reporter lazily to avoid issues in test environments
+let _errorReporter: ErrorReporter | null = null;
+
+export function getErrorReporter(): ErrorReporter {
+  if (!_errorReporter) {
+    _errorReporter = new ErrorReporter();
+  }
+  return _errorReporter;
+}
+
+// For backward compatibility, export a getter that returns the lazy instance
+export const errorReporter = new Proxy({} as ErrorReporter, {
+  get(_target, prop) {
+    return getErrorReporter()[prop as keyof ErrorReporter];
+  },
+  set(_target, prop, value) {
+    (getErrorReporter() as any)[prop] = value;
+    return true;
+  },
+});
 
 // Make it globally available
 if (typeof window !== 'undefined') {
@@ -383,7 +404,10 @@ if (typeof window !== 'undefined') {
 }
 
 (function attachErrorOverlay(): void {
+  if (typeof window === 'undefined') return;
   if (window.__ERROR_OVERLAY_ATTACHED__) return;
+  // Skip in test environments
+  if ((window as any).__TEST_ENV__) return;
   window.__ERROR_OVERLAY_ATTACHED__ = true;
 
   const overlay = document.createElement('div');

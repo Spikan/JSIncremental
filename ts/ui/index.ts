@@ -14,6 +14,41 @@ import subscriptionManager from './subscription-manager';
 export { displays, stats, feedback, affordability, buttons };
 export { labels };
 
+// Simple error severity levels
+enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+// Helper function to report UI errors with proper categorization
+function reportUIError(
+  error: any,
+  context: string,
+  severity: ErrorSeverity = ErrorSeverity.MEDIUM
+): void {
+  try {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const timestamp = new Date().toISOString();
+
+    // Log error with context
+    console.error(`🚨 [UI-${severity.toUpperCase()}] ${context}: ${errorMessage}`, {
+      timestamp,
+      context,
+      severity,
+      stackTrace: error instanceof Error ? error.stack : undefined,
+    });
+
+    // In production, you could send this to an error tracking service
+    // For now, we'll just log it with proper categorization
+  } catch (reportingError) {
+    // Fallback to console if error reporting fails
+    console.error('Failed to report UI error:', reportingError);
+    console.error('Original error:', error);
+  }
+}
+
 // Convenience functions using consolidated utilities
 export const updateCostDisplay = utils.updateCostDisplay;
 export const updateButtonState = utils.updateButtonState;
@@ -56,22 +91,30 @@ export const setMusicStatusText = labels.setMusicStatusText;
 export function initializeUI(): void {
   if ((window as any).__UI_WIRED__) return;
   (window as any).__UI_WIRED__ = true;
-  // UI system initializing
-  buttons.initButtonSystem();
 
-  // Initialize mobile navigation features
-  initializeMobileNavigation();
+  try {
+    // Initialize error boundaries first
+    initializeErrorBoundaries();
+
+    // UI system initializing
+    buttons.initButtonSystem();
+
+    // Initialize mobile navigation features
+    initializeMobileNavigation();
+  } catch (error) {
+    reportUIError(error, 'initialize_ui_main', ErrorSeverity.CRITICAL);
+  }
 
   // Sync options UI on init
   try {
     updateAutosaveStatus();
   } catch (error) {
-    console.warn('Failed to update autosave status on init:', error);
+    reportUIError(error, 'update_autosave_status_init', ErrorSeverity.LOW);
   }
   try {
     (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
   } catch (error) {
-    console.warn('Failed to update button sounds toggle on init:', error);
+    reportUIError(error, 'update_button_sounds_toggle_init', ErrorSeverity.LOW);
   }
   // Check event system availability
 
@@ -354,7 +397,7 @@ export function switchTab(tabName: string, event: any): void {
     try {
       updateAllStats();
     } catch (error) {
-      console.warn('Failed to update stats tab:', error);
+      reportUIError(error, 'update_stats_tab', ErrorSeverity.MEDIUM);
     }
   }
   if (tabName === 'unlocks') {
@@ -362,7 +405,7 @@ export function switchTab(tabName: string, event: any): void {
       const sys = (window as any).App?.systems?.unlocks;
       if (sys?.updateUnlocksTab) sys.updateUnlocksTab();
     } catch (error) {
-      console.warn('Failed to update unlocks tab:', error);
+      reportUIError(error, 'update_unlocks_tab', ErrorSeverity.MEDIUM);
     }
   }
 }
@@ -374,6 +417,84 @@ function isMobileDevice(): boolean {
     'ontouchstart' in window ||
     navigator.maxTouchPoints > 0
   );
+}
+
+// Error Boundary Wrapper for Critical UI Operations
+export function withErrorBoundary<T extends (...args: any[]) => any>(
+  fn: T,
+  context: string,
+  severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+  fallback?: () => void
+): T {
+  return ((...args: Parameters<T>) => {
+    try {
+      return fn(...args);
+    } catch (error) {
+      reportUIError(error, context, severity);
+
+      // Execute fallback if provided
+      if (fallback) {
+        try {
+          fallback();
+        } catch (fallbackError) {
+          reportUIError(fallbackError, `${context}_fallback`, ErrorSeverity.HIGH);
+        }
+      }
+
+      // Return undefined for functions that should return values
+      return undefined;
+    }
+  }) as T;
+}
+
+// Critical UI Operations with Error Boundaries
+export const safeUpdateAllDisplays = withErrorBoundary(
+  updateAllDisplays,
+  'update_all_displays',
+  ErrorSeverity.HIGH,
+  () => {
+    // Fallback: try to update basic displays only
+    try {
+      displays.updateTopSipsPerDrink();
+      displays.updateTopSipsPerSecond();
+      displays.updateDrinkSpeedDisplay();
+    } catch (fallbackError) {
+      reportUIError(fallbackError, 'basic_display_fallback', ErrorSeverity.CRITICAL);
+    }
+  }
+);
+
+export const safeSwitchTab = withErrorBoundary(
+  switchTab,
+  'switch_tab',
+  ErrorSeverity.MEDIUM,
+  () => {
+    // Fallback: show soda tab
+    try {
+      const sodaTab = document.querySelector('.tab-content[id="sodaTab"]');
+      const otherTabs = document.querySelectorAll('.tab-content:not(#sodaTab)');
+
+      if (sodaTab) {
+        sodaTab.classList.add('active');
+        otherTabs.forEach(tab => tab.classList.remove('active'));
+      }
+    } catch (fallbackError) {
+      reportUIError(fallbackError, 'switch_tab_fallback', ErrorSeverity.HIGH);
+    }
+  }
+);
+
+// Initialize error boundaries for critical operations
+export function initializeErrorBoundaries(): void {
+  try {
+    // Wrap critical global functions with error boundaries
+    if (typeof window !== 'undefined') {
+      (window as any).safeUpdateAllDisplays = safeUpdateAllDisplays;
+      (window as any).safeSwitchTab = safeSwitchTab;
+    }
+  } catch (error) {
+    reportUIError(error, 'initialize_error_boundaries', ErrorSeverity.HIGH);
+  }
 }
 
 // Helper function to trigger haptic feedback

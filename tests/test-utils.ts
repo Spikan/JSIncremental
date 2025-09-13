@@ -456,7 +456,22 @@ export function setupTestEnvironment() {
 
   if (typeof document === 'undefined') {
     (global as any).document = {
-      createElement: () => ({}),
+      createElement: (tagName: string) => ({
+        id: '',
+        style: {},
+        textContent: '',
+        innerHTML: '',
+        setAttribute: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        appendChild: () => {},
+        classList: {
+          add: () => {},
+          remove: () => {},
+          contains: () => false,
+        },
+        getBoundingClientRect: () => ({ left: 0, top: 0, width: 0, height: 0 }),
+      }),
       body: { appendChild: () => {} },
       getElementById: () => ({}),
       querySelector: () => ({}),
