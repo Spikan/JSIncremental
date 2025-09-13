@@ -84,6 +84,8 @@ describe('UI System', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    // Reset UI wired flag to allow re-initialization
+    (global as any).window.__UI_WIRED__ = false;
     ui = await import('../ts/ui/index.ts');
   });
 

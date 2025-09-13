@@ -148,24 +148,52 @@ class MockDecimal {
 
   // Comparison operations
   gte(other: any): boolean {
+    // Handle extreme values by comparing string representations
+    if (this._isExtreme || (other instanceof MockDecimal && other._isExtreme)) {
+      const thisStr = this.toString();
+      const otherStr = other instanceof MockDecimal ? other.toString() : String(other);
+      return thisStr >= otherStr;
+    }
+    
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     const thisValue = typeof this.value === 'number' ? this.value : 0;
     return thisValue >= otherValue;
   }
 
   gt(other: any): boolean {
+    // Handle extreme values by comparing string representations
+    if (this._isExtreme || (other instanceof MockDecimal && other._isExtreme)) {
+      const thisStr = this.toString();
+      const otherStr = other instanceof MockDecimal ? other.toString() : String(other);
+      return thisStr > otherStr;
+    }
+    
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     const thisValue = typeof this.value === 'number' ? this.value : 0;
     return thisValue > otherValue;
   }
 
   lte(other: any): boolean {
+    // Handle extreme values by comparing string representations
+    if (this._isExtreme || (other instanceof MockDecimal && other._isExtreme)) {
+      const thisStr = this.toString();
+      const otherStr = other instanceof MockDecimal ? other.toString() : String(other);
+      return thisStr <= otherStr;
+    }
+    
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     const thisValue = typeof this.value === 'number' ? this.value : 0;
     return thisValue <= otherValue;
   }
 
   lt(other: any): boolean {
+    // Handle extreme values by comparing string representations
+    if (this._isExtreme || (other instanceof MockDecimal && other._isExtreme)) {
+      const thisStr = this.toString();
+      const otherStr = other instanceof MockDecimal ? other.toString() : String(other);
+      return thisStr < otherStr;
+    }
+    
     const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
     const thisValue = typeof this.value === 'number' ? this.value : 0;
     return thisValue < otherValue;

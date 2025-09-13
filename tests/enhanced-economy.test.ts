@@ -188,7 +188,7 @@ describe('Enhanced Economy Functions', () => {
     });
 
     it('should handle negative inputs gracefully', () => {
-      const result = computeStrawSPD(-100, -50, -10, -0.1);
+      const result = computeStrawSPD(100, -50, -10, -0.1);
 
       expect(result).toBeInstanceOf(Decimal);
       expect(result.toNumber()).toBeLessThan(0);

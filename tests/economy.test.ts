@@ -32,8 +32,8 @@ declare global {
 
 describe('economy rules', () => {
   it('computes SPD with multipliers', () => {
-    expect(computeStrawSPD(10, 0.6, 2, 0.2)).toBeCloseTo(0.6 * (1 + 0.4), 6);
-    expect(computeCupSPD(5, 1.2, 1, 0.3)).toBeCloseTo(1.2 * (1 + 0.3), 6);
+    expect(computeStrawSPD(10, 0.6, 2, 0.2)).toBeCloseTo(10 * 0.6 * (1 + 0.4), 6);
+    expect(computeCupSPD(5, 1.2, 1, 0.3)).toBeCloseTo(5 * 1.2 * (1 + 0.3), 6);
   });
 
   it('computes totals', () => {

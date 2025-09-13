@@ -13,20 +13,21 @@ import { pow, DecimalType } from '../numbers/migration-utils';
 // No artificial configuration needed - break_eternity.js handles all scaling naturally
 
 export function computeStrawSPD(
-  _straws: number | string | DecimalType, // unused - artificial caps removed
+  straws: number | string | DecimalType,
   baseSPD: number | string | DecimalType,
   widerStrawsCount: number | string | DecimalType,
   widerMultiplierPerLevel: number | string | DecimalType = 0
 ): DecimalType {
   const baseValue = new Decimal(baseSPD);
+  const strawsCount = new Decimal(straws);
 
   // Basic wider straws multiplier
   const upgradeMultiplier = new Decimal(1).add(
     new Decimal(widerStrawsCount).mul(new Decimal(widerMultiplierPerLevel))
   );
 
-  // Calculate base production
-  let totalSPD = baseValue.mul(upgradeMultiplier);
+  // Calculate base production: baseSPD * straws * upgradeMultiplier
+  let totalSPD = baseValue.mul(strawsCount).mul(upgradeMultiplier);
 
   // NO artificial soft caps - break_eternity.js handles all scaling naturally
 
@@ -36,20 +37,21 @@ export function computeStrawSPD(
 }
 
 export function computeCupSPD(
-  _cups: number | string | DecimalType, // unused - artificial caps removed
+  cups: number | string | DecimalType,
   baseSPD: number | string | DecimalType,
   betterCupsCount: number | string | DecimalType,
   betterMultiplierPerLevel: number | string | DecimalType = 0
 ): DecimalType {
   const baseValue = new Decimal(baseSPD);
+  const cupsCount = new Decimal(cups);
 
   // Basic better cups multiplier
   const upgradeMultiplier = new Decimal(1).add(
     new Decimal(betterCupsCount).mul(new Decimal(betterMultiplierPerLevel))
   );
 
-  // Calculate base production
-  let totalSPD = baseValue.mul(upgradeMultiplier);
+  // Calculate base production: baseSPD * cups * upgradeMultiplier
+  let totalSPD = baseValue.mul(cupsCount).mul(upgradeMultiplier);
 
   // NO artificial soft caps - break_eternity.js handles all scaling naturally
 
