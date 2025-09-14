@@ -260,6 +260,25 @@ export function updateEnhancementValues(): void {
   const state = (window as any).App?.state?.getState?.();
   if (!state) return;
 
+  // Update base production values to show what you actually get
+  const strawSPDElement = (window as any).DOM_CACHE?.strawSPD as HTMLElement | undefined;
+  if (strawSPDElement) {
+    const straws = state.straws || 0;
+    const strawsLarge = toDecimal(straws);
+    const baseSPD = 2.0; // From upgrades.json
+    const totalProduction = strawsLarge.mul(baseSPD);
+    strawSPDElement.textContent = formatNumber(totalProduction.toString());
+  }
+
+  const cupSPDElement = (window as any).DOM_CACHE?.cupSPD as HTMLElement | undefined;
+  if (cupSPDElement) {
+    const cups = state.cups || 0;
+    const cupsLarge = toDecimal(cups);
+    const baseSPD = 5.0; // From upgrades.json
+    const totalProduction = cupsLarge.mul(baseSPD);
+    cupSPDElement.textContent = formatNumber(totalProduction.toString());
+  }
+
   // Update Wider Straws enhancement display
   const widerStrawsSPDElement = (window as any).DOM_CACHE?.widerStrawsSPD as
     | HTMLElement
@@ -271,6 +290,16 @@ export function updateEnhancementValues(): void {
     const multiplierPerLevel = 0.2; // From upgrades.json
     const enhancementMultiplier = toDecimal(1).add(widerStrawsLarge.mul(multiplierPerLevel));
     const enhancementPercent = enhancementMultiplier.sub(1).mul(100);
+
+    // Debug logging
+    console.log('🔍 Wider Straws Debug:', {
+      widerStraws,
+      widerStrawsLarge: widerStrawsLarge.toString(),
+      enhancementMultiplier: enhancementMultiplier.toString(),
+      enhancementPercent: enhancementPercent.toString(),
+      formatted: formatNumber(enhancementPercent.toString()),
+    });
+
     widerStrawsSPDElement.textContent = `+${formatNumber(enhancementPercent.toString())}%`;
   }
 
@@ -283,6 +312,16 @@ export function updateEnhancementValues(): void {
     const multiplierPerLevel = 0.3; // From upgrades.json
     const enhancementMultiplier = toDecimal(1).add(betterCupsLarge.mul(multiplierPerLevel));
     const enhancementPercent = enhancementMultiplier.sub(1).mul(100);
+
+    // Debug logging
+    console.log('🔍 Better Cups Debug:', {
+      betterCups,
+      betterCupsLarge: betterCupsLarge.toString(),
+      enhancementMultiplier: enhancementMultiplier.toString(),
+      enhancementPercent: enhancementPercent.toString(),
+      formatted: formatNumber(enhancementPercent.toString()),
+    });
+
     betterCupsSPDElement.textContent = `+${formatNumber(enhancementPercent.toString())}%`;
   }
 }
