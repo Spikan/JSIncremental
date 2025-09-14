@@ -161,8 +161,9 @@ export function updateEconomyStats(): void {
 
 // Update shop-related statistics
 export function updateShopStats(): void {
+  console.log('🔍 updateShopStats: Function called');
   // Reduce logging frequency for memory optimization
-  const shouldLog = Math.random() < 0.05; // Only log 5% of the time
+  const shouldLog = Math.random() < 0.1; // Log 10% of the time for debugging
   if (shouldLog) console.log('📊 updateShopStats() called');
 
   // Debug: Log current state values
@@ -252,6 +253,7 @@ export function updateAchievementStats(): void {
   updatePurchasedCounts();
 
   // Update enhancement values for upgrade displays
+  console.log('🔍 updateShopStats: About to call updateEnhancementValues');
   updateEnhancementValues();
 }
 
