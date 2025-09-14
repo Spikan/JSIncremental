@@ -519,7 +519,7 @@ export function initializeUI(): void {
 
     // Initialize authentic SDP experience
     initializeAuthenticSDP();
-    
+
     // Initialize 3D soda button
     initializeSoda3D();
   } catch (error) {

@@ -6843,6 +6843,30 @@ p {
   transition: all 0.2s ease;
   filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.3));
   border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Fallback image styling */
+.soda-button .soda-fallback {
+  border-radius: 20px;
+  transition: opacity 0.3s ease;
+}
+
+/* Hide fallback when 3D model loads */
+.soda-button.has-3d-model .soda-fallback {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 3D canvas styling */
+.soda-button canvas {
+  border-radius: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .soda-button:hover {

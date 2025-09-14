@@ -470,14 +470,23 @@
           <div class="primary-action-area">
             <div class="soda-clicking-section">
               <div class="soda-container">
-                <img
-                  src="images/regSoda.png"
+                <div
                   id="sodaButton"
                   data-action="sodaClick"
                   data-args="1"
-                  alt="a picture of soda for you to click"
                   class="soda-button"
-                />
+                  role="button"
+                  tabindex="0"
+                  aria-label="Click to drink soda"
+                >
+                  <!-- 3D model will be inserted here, fallback image for loading -->
+                  <img
+                    src="images/regSoda.png"
+                    alt="a picture of soda for you to click"
+                    class="soda-fallback"
+                    style="width: 200px; height: 200px; object-fit: contain;"
+                  />
+                </div>
                 <div class="click-indicator" id="clickIndicator">
                   <div class="click-ripple"></div>
                 </div>

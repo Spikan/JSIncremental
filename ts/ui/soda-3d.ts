@@ -93,19 +93,19 @@ export class Soda3DButton {
       // Configure model
       if (this.model) {
         this.model.traverse(child => {
-        if (child instanceof THREE.Mesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
+          if (child instanceof THREE.Mesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
 
-          // Enhance materials for better appearance
-          if (child.material) {
-            if (Array.isArray(child.material)) {
-              child.material.forEach(mat => this.enhanceMaterial(mat));
-            } else {
-              this.enhanceMaterial(child.material);
+            // Enhance materials for better appearance
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach(mat => this.enhanceMaterial(mat));
+              } else {
+                this.enhanceMaterial(child.material);
+              }
             }
           }
-        }
         });
 
         // Center and scale the model
@@ -121,12 +121,17 @@ export class Soda3DButton {
         const scale = 2 / maxDimension;
         this.model.scale.setScalar(scale);
 
-        this.scene.add(this.model);
+      this.scene.add(this.model);
       }
       this.isLoaded = true;
-
+      
+      // Mark container as having 3D model
+      if (this.container) {
+        this.container.classList.add('has-3d-model');
+      }
+      
       console.log('✅ 3D soda model loaded successfully');
-
+      
       // Start animation loop
       this.animate();
     } catch (error) {
@@ -160,8 +165,14 @@ export class Soda3DButton {
 
     this.scene.add(this.model);
     this.isLoaded = true;
+    
+    // Mark container as having 3D model
+    if (this.container) {
+      this.container.classList.add('has-3d-model');
+    }
+    
     this.animate();
-
+    
     console.log('🔄 Using fallback 3D model');
   }
 
@@ -190,10 +201,15 @@ export class Soda3DButton {
   public mount(container: HTMLElement): void {
     this.container = container;
     container.appendChild(this.renderer.domElement);
-
+    
     // Add interaction handlers
     this.setupInteraction();
-
+    
+    // Mark container as having 3D model when loaded
+    if (this.isLoaded) {
+      container.classList.add('has-3d-model');
+    }
+    
     console.log('🎮 3D soda button mounted');
   }
 
@@ -318,23 +334,19 @@ export function createSoda3DButton(containerSelector: string): Soda3DButton {
 let globalSoda3D: Soda3DButton | null = null;
 
 export function initializeSoda3D(): void {
+  console.log('🎮 Initializing 3D soda button...');
+  
   const container = document.getElementById('sodaButton');
   if (!container) {
     console.error('❌ Soda button container not found');
     return;
   }
 
-  // Clear existing content
-  container.innerHTML = '';
-  container.style.cssText = `
-    width: 200px;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-  `;
+  console.log('📦 Found soda button container:', container);
 
+  // Don't clear all content, just prepare for 3D
+  // The fallback image should remain until 3D loads
+  
   // Create and mount 3D button
   globalSoda3D = createSoda3DButton('#sodaButton');
   globalSoda3D.mount(container);
@@ -346,6 +358,9 @@ export function initializeSoda3D(): void {
       const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
       if (typeof handleSodaClick === 'function') {
         handleSodaClick(1);
+        console.log('🥤 3D soda click triggered!');
+      } else {
+        console.warn('⚠️ Soda click handler not found');
       }
     } catch (error) {
       console.warn('Failed to call soda click handler:', error);
@@ -354,7 +369,7 @@ export function initializeSoda3D(): void {
 
   // Make globally accessible for debugging
   (window as any).soda3D = globalSoda3D;
-
+  
   console.log('✅ 3D soda button initialized');
 }
 
