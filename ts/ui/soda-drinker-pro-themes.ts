@@ -147,13 +147,19 @@ export function getThemeForLevel(level: number): ThemeData {
 export function applyThemeToBackground(level: number): void {
   const theme = getThemeForLevel(level);
 
-  // Apply background gradient
-  document.body.style.background = theme.backgroundGradient;
+  console.log(`🎨 Applying theme for level ${level}:`, theme);
+  console.log('🎨 Current body background before:', document.body.style.background);
+
+  // Apply background gradient (with !important to override CSS)
+  document.body.style.setProperty('background', theme.backgroundGradient, 'important');
 
   // Add theme class for additional styling
   document.body.className = document.body.className
     .replace(/theme-\w+/g, '') // Remove existing theme classes
     .concat(` theme-${theme.mood}`);
+
+  console.log('🎨 New body background after:', document.body.style.background);
+  console.log('🎨 New body classes:', document.body.className);
 }
 
 /**
@@ -161,6 +167,8 @@ export function applyThemeToBackground(level: number): void {
  */
 export function showLocationFlavorText(level: number): void {
   const theme = getThemeForLevel(level);
+
+  console.log(`🍃 Showing flavor text for level ${level}:`, theme.flavorText);
 
   // Find or create flavor text element
   let flavorElement = document.querySelector('.location-flavor-text') as HTMLElement;
@@ -327,12 +335,13 @@ export function initializeSodaDrinkerProThemes(): void {
 
   // Apply initial theme
   const state = useGameStore.getState();
-  const initialLevel = typeof state.level === 'number' 
-    ? state.level 
-    : state.level && typeof state.level.toNumber === 'function' 
-      ? state.level.toNumber() 
-      : Number(state.level || 1);
-  
+  const initialLevel =
+    typeof state.level === 'number'
+      ? state.level
+      : state.level && typeof state.level.toNumber === 'function'
+        ? state.level.toNumber()
+        : Number(state.level || 1);
+
   console.log('🥤 Applying initial theme for level:', initialLevel);
   applyThemeToBackground(initialLevel);
   showLocationFlavorText(initialLevel);
@@ -342,12 +351,13 @@ export function initializeSodaDrinkerProThemes(): void {
     state => state.level,
     level => {
       // Convert level to number if it's a Decimal
-      const levelNum = typeof level === 'number' 
-        ? level 
-        : level && typeof level.toNumber === 'function' 
-          ? level.toNumber() 
-          : Number(level || 1);
-      
+      const levelNum =
+        typeof level === 'number'
+          ? level
+          : level && typeof level.toNumber === 'function'
+            ? level.toNumber()
+            : Number(level || 1);
+
       console.log('🥤 Level changed, applying theme for level:', levelNum);
       applyThemeToBackground(levelNum);
       showLocationFlavorText(levelNum);
