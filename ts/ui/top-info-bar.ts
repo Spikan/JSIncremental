@@ -24,7 +24,7 @@ export class TopInfoBar {
 
   public initializeElements(): void {
     // Look for the currency display container in the new layout
-    this.container = document.querySelector('.currency-display') as HTMLElement;
+    this.container = document.querySelector('.currency-display-compact') as HTMLElement;
     this.levelDiv = document.querySelector('.level-display') as HTMLElement;
 
     // The stats container is the currency display itself

@@ -78,6 +78,14 @@
                   game.style.visibility = 'visible';
                   game.style.opacity = '1';
                   game.classList && game.classList.add('active');
+
+                  // Reinitialize DOM cache now that game content is visible
+                  if (window.DOM_CACHE && typeof window.DOM_CACHE.init === 'function') {
+                    console.log(
+                      '🔄 Reinitializing DOM cache after game content becomes visible (HTML)'
+                    );
+                    window.DOM_CACHE.init();
+                  }
                 } catch {}
                 // After showing the game, try to initialize and start loop when available
                 try {
@@ -316,72 +324,62 @@
             <div class="level-number">Level <span id="levelNumber">1</span></div>
             <div class="level-text" id="levelText">On a Blue Background</div>
           </div>
-          <button class="level-up-btn-header disabled" data-action="levelUp">
-            <div class="level-up-icon">⭐</div>
-            <div class="level-up-details">
-              <div class="level-up-cost">
-                <span id="levelCost" class="cost-number">3000</span>
-                <span class="cost-currency">Sips</span>
+          <div class="level-actions">
+            <button class="level-up-btn-header disabled" data-action="levelUp">
+              <div class="level-up-icon">⭐</div>
+              <div class="level-up-details">
+                <div class="level-up-cost">
+                  <span id="levelCost" class="cost-number">3000</span>
+                  <span class="cost-currency">Sips</span>
+                </div>
+                <div class="level-up-label">Level Up</div>
               </div>
-              <div class="level-up-label">Level Up</div>
-            </div>
-          </button>
+            </button>
+            <button class="settings-cogwheel" data-action="openSettings" aria-label="Open Settings">
+              <span class="cogwheel-icon">⚙️</span>
+            </button>
+          </div>
         </div>
 
         <div class="header-main-content">
-          <div class="currency-display">
-            <div class="currency-item primary">
+          <div class="currency-display-compact">
+            <div class="currency-primary">
               <div class="currency-icon">💧</div>
-              <div class="currency-info">
-                <div class="currency-label">Total Sips</div>
-                <div class="currency-value" id="topSipValue">0</div>
-              </div>
+              <div class="currency-value" id="topSipValue">0</div>
+              <div class="currency-label">Sips</div>
             </div>
-            <div class="currency-divider"></div>
-            <div class="currency-item">
-              <div class="currency-info">
-                <div class="currency-label">Per Drink</div>
-                <div class="currency-value" id="topSipsPerDrink">1</div>
+            <div class="currency-secondary">
+              <div class="currency-item-compact">
+                <span class="currency-label-small">Per Drink:</span>
+                <span class="currency-value-small" id="topSipsPerDrink">1</span>
               </div>
-            </div>
-            <div class="currency-divider"></div>
-            <div class="currency-item">
-              <div class="currency-info">
-                <div class="currency-label">Per Second</div>
-                <div class="currency-value" id="topSipsPerSecond">1</div>
+              <div class="currency-item-compact">
+                <span class="currency-label-small">Per Sec:</span>
+                <span class="currency-value-small" id="topSipsPerSecond">1</span>
               </div>
             </div>
           </div>
 
-          <!-- Drink Progress Bar in Header -->
-          <div class="header-drink-progress">
-            <div class="drink-progress-info">
-              <span class="drink-label">Next Drink:</span>
-              <span class="drink-countdown" id="drinkCountdown">5.0s</span>
-            </div>
-            <div class="drink-progress-bar">
-              <div class="drink-progress-fill" id="drinkProgressFill"></div>
-            </div>
-            <!-- Faster Drinks Button -->
-            <div class="faster-drinks-container">
-              <button class="faster-drinks-btn" data-action="buyFasterDrinks">
-                <div class="faster-drinks-icon">⚡</div>
-                <div class="faster-drinks-info">
-                  <div class="faster-drinks-name">Faster Drinks</div>
-                  <div class="faster-drinks-cost"><span id="fasterDrinksCost">80</span> Sips</div>
-                </div>
-                <div class="faster-drinks-effect">
-                  Speed: <span id="currentDrinkSpeed">5.00s</span>
-                </div>
+          <!-- Compact Drink Progress Bar -->
+          <div class="header-drink-progress-compact">
+            <div class="drink-progress-row">
+              <div class="drink-progress-info-compact">
+                <span class="drink-label-small">Next:</span>
+                <span class="drink-countdown" id="drinkCountdown">5.0s</span>
+              </div>
+              <div class="drink-progress-bar-compact">
+                <div class="drink-progress-fill" id="drinkProgressFill"></div>
+              </div>
+              <button
+                class="faster-drinks-btn-compact"
+                data-action="buyFasterDrinks"
+                title="Faster Drinks"
+              >
+                <span class="faster-drinks-icon">⚡</span>
+                <span class="faster-drinks-speed" id="currentDrinkSpeed">5.00s</span>
               </button>
             </div>
           </div>
-        </div>
-
-        <div class="header-actions">
-          <button class="settings-cogwheel" data-action="openSettings" aria-label="Open Settings">
-            <span class="cogwheel-icon">⚙️</span>
-          </button>
         </div>
 
         <div class="game-title">

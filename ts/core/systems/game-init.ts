@@ -199,6 +199,12 @@ export function startGameCore(): void {
         (gameContent as HTMLElement).style.visibility = 'visible';
         (gameContent as HTMLElement).style.opacity = '1';
         gameContent.classList?.add('active');
+
+        // Reinitialize DOM cache now that game content is visible
+        if ((window as any).DOM_CACHE && typeof (window as any).DOM_CACHE.init === 'function') {
+          console.log('🔄 Reinitializing DOM cache after game content becomes visible');
+          (window as any).DOM_CACHE.init();
+        }
       } catch {}
       // Initialize game
       try {

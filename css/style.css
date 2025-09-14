@@ -2813,8 +2813,7 @@ button:focus,
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .tab-btn::before,
-  .upgrade-btn::before,
-  .currency-item::before {
+  .upgrade-btn::before {
     animation: none;
     transition: none;
   }
@@ -7084,11 +7083,11 @@ button {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(0, 23, 137, 0.4));
   backdrop-filter: blur(15px);
   border-bottom: 3px solid rgba(255, 61, 2, 0.4);
-  padding: 1.25rem 1.5rem;
+  padding: 0.875rem 1.25rem;
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 2rem;
+  gap: 1.25rem;
   box-shadow:
     0 4px 20px rgba(0, 0, 0, 0.5),
     0 1px 3px rgba(255, 61, 2, 0.2);
@@ -7096,22 +7095,29 @@ button {
   top: 0;
   z-index: 100;
   /* Enhanced visual separation */
-  border-radius: 0 0 16px 16px;
-  margin-bottom: 1rem;
+  border-radius: 0 0 12px 12px;
+  margin-bottom: 0.75rem;
+  min-height: 90px;
 }
 
 /* Level Indicator */
 .level-indicator {
   background: linear-gradient(135deg, #ff3d02, #ff6b35);
-  padding: 0.75rem 1.25rem;
-  border-radius: 25px;
+  padding: 0.625rem 1rem;
+  border-radius: 20px;
   text-align: center;
-  min-width: 300px;
+  min-width: 280px;
   box-shadow: 0 4px 15px rgba(255, 61, 2, 0.4);
   border: 2px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.875rem;
+}
+
+.level-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .level-info {
@@ -7352,13 +7358,6 @@ button {
   align-items: center;
 }
 
-/* Header Actions Container */
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 /* Settings Cogwheel Button */
 .settings-cogwheel {
   background: rgba(255, 255, 255, 0.1);
@@ -7399,115 +7398,70 @@ button {
   filter: drop-shadow(0 2px 8px rgba(255, 61, 2, 0.4));
 }
 
-/* Currency Display */
-.currency-display {
+/* Compact Currency Display */
+.currency-display-compact {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   justify-content: center;
   width: 100%;
+  padding: 0.4rem 0.875rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.currency-item {
+.currency-primary {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: all 0.3s ease;
-  min-width: 140px;
-  justify-content: center;
-  /* Enhanced visual feedback */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  position: relative;
-  overflow: hidden;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: linear-gradient(135deg, rgba(0, 179, 107, 0.2), rgba(0, 23, 137, 0.3));
+  border-radius: 5px;
+  border: 1px solid rgba(0, 179, 107, 0.4);
 }
 
-.currency-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.6s ease;
+.currency-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.currency-item:hover::before {
-  left: 100%;
-}
-
-.currency-item:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.currency-item.primary {
-  background: rgba(0, 179, 107, 0.15);
-  border-color: rgba(0, 179, 107, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 179, 107, 0.2);
-}
-
-.currency-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-1px);
-}
-
-.currency-item.primary:hover {
-  background: rgba(0, 179, 107, 0.2);
-  box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3);
+.currency-item-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
 }
 
 .currency-icon {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-.currency-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.currency-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .currency-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.currency-label-small {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.currency-value-small {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.85);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-  /* Enhanced readability */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-  line-height: 1.2;
-}
-
-.currency-value {
-  font-size: 1.3rem;
-  font-weight: 800;
+  font-weight: 600;
   color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-  font-family: 'Courier New', monospace;
-  /* Better number formatting */
-  letter-spacing: 0.5px;
-  line-height: 1.1;
-  /* Subtle glow for important numbers */
-  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.1));
-}
-
-.currency-item.primary .currency-value {
-  color: #10b981;
-  text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
-}
-
-.currency-divider {
-  width: 1px;
-  height: 30px;
-  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.3), transparent);
 }
 
 /* Game Title */
@@ -7533,15 +7487,96 @@ button {
   letter-spacing: 2px;
 }
 
-/* Header Drink Progress Bar */
-.header-drink-progress {
+/* Compact Header Drink Progress Bar */
+.header-drink-progress-compact {
   background: rgba(0, 0, 0, 0.3);
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
   border: 1px solid rgba(0, 179, 107, 0.3);
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.drink-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.drink-progress-info-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 60px;
+}
+
+.drink-label-small {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.drink-progress-bar-compact {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.drink-progress-bar-compact .drink-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.drink-progress-bar-compact .drink-progress-fill.nearly-complete {
+  background: linear-gradient(90deg, #ff8e53, #ff6b6b);
+}
+
+.drink-progress-bar-compact .drink-progress-fill.complete {
+  background: linear-gradient(90deg, #ff3d02, #ff6b6b);
+  animation: drinkComplete 0.5s ease;
+}
+
+.faster-drinks-btn-compact {
+  background: rgba(255, 193, 7, 0.2);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+  justify-content: center;
+}
+
+.faster-drinks-btn-compact:hover {
+  background: rgba(255, 193, 7, 0.3);
+  border-color: rgba(255, 193, 7, 0.6);
+  transform: translateY(-1px);
+}
+
+.faster-drinks-btn-compact:active {
+  transform: translateY(0);
+}
+
+.faster-drinks-icon {
+  font-size: 0.9rem;
+}
+
+.faster-drinks-speed {
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 .drink-progress-info {
@@ -7601,17 +7636,11 @@ button {
 @media (max-width: 768px) {
   .game-header {
     grid-template-columns: 1fr;
-    gap: 0.5rem;
+    gap: 0.4rem;
     text-align: center;
-    padding: 0.75rem 1rem;
+    padding: 0.625rem 0.875rem;
     /* Much more compact mobile header */
     min-height: auto;
-  }
-
-  .header-actions {
-    order: 3;
-    justify-content: center;
-    margin-top: 0.5rem;
   }
 
   .settings-cogwheel {
@@ -7629,6 +7658,12 @@ button {
     flex-direction: column;
     gap: 0.5rem;
     min-width: auto;
+  }
+
+  .level-actions {
+    flex-direction: row;
+    gap: 0.75rem;
+    justify-content: center;
   }
 
   .level-up-btn-header {
@@ -7663,43 +7698,56 @@ button {
     order: 2;
   }
 
-  .currency-display {
-    gap: 0.75rem;
-    flex-wrap: nowrap;
-    justify-content: center;
-    /* Compact single row layout */
+  .currency-display-compact {
+    gap: 1rem;
+    padding: 0.4rem 0.75rem;
     flex-direction: row;
   }
 
-  .currency-item {
-    min-width: auto;
-    padding: 0.5rem 0.75rem;
-    /* Smaller currency items */
-    font-size: 0.85rem;
-    flex: 1;
-    justify-content: center;
+  .currency-primary {
+    padding: 0.4rem 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .currency-secondary {
+    gap: 0.2rem;
+  }
+
+  .currency-item-compact {
+    font-size: 0.8rem;
+    gap: 0.4rem;
   }
 
   .currency-icon {
-    font-size: 1.2rem;
-    margin-right: 0.25rem;
+    font-size: 1.1rem;
   }
 
   .currency-value {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 1rem;
   }
 
-  .currency-divider {
-    display: none;
+  .currency-value-small {
+    font-size: 0.75rem;
   }
 
-  .header-drink-progress {
+  .header-drink-progress-compact {
     max-width: 100%;
-    padding: 0.5rem;
+    padding: 0.4rem 0.5rem;
     order: 3;
-    /* Compact drink progress */
     margin-top: 0.5rem;
+  }
+
+  .drink-progress-row {
+    gap: 0.5rem;
+  }
+
+  .drink-progress-info-compact {
+    min-width: 50px;
+  }
+
+  .faster-drinks-btn-compact {
+    min-width: 70px;
+    padding: 0.3rem 0.5rem;
   }
 
   .drink-progress-info {
@@ -7724,8 +7772,8 @@ button {
 @media (max-width: 480px) {
   /* Ultra-compact header for small mobile screens */
   .game-header {
-    padding: 0.5rem 0.75rem;
-    gap: 0.25rem;
+    padding: 0.4rem 0.625rem;
+    gap: 0.2rem;
   }
 
   .level-indicator {
@@ -7781,13 +7829,13 @@ button {
     font-size: 0.7rem;
   }
 
-  .currency-display {
+  .currency-display-compact {
     flex-direction: row;
     gap: 0.5rem;
     flex-wrap: wrap;
   }
 
-  .currency-item {
+  .currency-item-compact {
     flex: 1;
     min-width: 80px;
     padding: 0.4rem 0.5rem;
@@ -7848,28 +7896,54 @@ button {
     font-size: 0.65rem;
   }
 
-  .game-header.ultra-compact .currency-display {
-    gap: 0.4rem;
+  .game-header.ultra-compact .currency-display-compact {
+    gap: 0.5rem;
+    padding: 0.3rem 0.5rem;
   }
 
-  .game-header.ultra-compact .currency-item {
-    padding: 0.3rem 0.4rem;
-    font-size: 0.75rem;
-    min-width: 70px;
+  .game-header.ultra-compact .currency-primary {
+    padding: 0.3rem 0.5rem;
+    gap: 0.3rem;
+  }
+
+  .game-header.ultra-compact .currency-secondary {
+    gap: 0.15rem;
+  }
+
+  .game-header.ultra-compact .currency-item-compact {
+    font-size: 0.7rem;
+    gap: 0.3rem;
   }
 
   .game-header.ultra-compact .currency-icon {
     font-size: 0.9rem;
-    margin-right: 0.15rem;
   }
 
   .game-header.ultra-compact .currency-value {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 
-  .game-header.ultra-compact .header-drink-progress {
-    padding: 0.3rem;
+  .game-header.ultra-compact .currency-value-small {
+    font-size: 0.7rem;
+  }
+
+  .game-header.ultra-compact .header-drink-progress-compact {
+    padding: 0.3rem 0.4rem;
     margin-top: 0.2rem;
+  }
+
+  .game-header.ultra-compact .drink-progress-row {
+    gap: 0.4rem;
+  }
+
+  .game-header.ultra-compact .drink-progress-info-compact {
+    min-width: 45px;
+  }
+
+  .game-header.ultra-compact .faster-drinks-btn-compact {
+    min-width: 60px;
+    padding: 0.25rem 0.4rem;
+    font-size: 0.7rem;
   }
 
   .game-header.ultra-compact .drink-progress-info {

@@ -164,7 +164,13 @@ const DOM_CACHE: {
     return document.getElementById(_id);
   },
   isReady() {
-    return !!(this.sodaButton && this.shopDiv);
+    return !!(
+      this.sodaButton &&
+      this.shopDiv &&
+      this.topSipValue &&
+      this.topSipsPerDrink &&
+      this.topSipsPerSecond
+    );
   },
 };
 

@@ -309,6 +309,12 @@ function initGame() {
     if (splashScreen && gameContent) {
       splashScreen.style.display = 'none';
       gameContent.style.display = 'block';
+
+      // Reinitialize DOM cache now that game content is visible
+      if ((window as any).DOM_CACHE && typeof (window as any).DOM_CACHE.init === 'function') {
+        console.log('🔄 Reinitializing DOM cache after game content becomes visible (main.ts)');
+        (window as any).DOM_CACHE.init();
+      }
     }
   }
 }

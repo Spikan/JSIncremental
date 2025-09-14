@@ -134,7 +134,7 @@ export function updateTopSipsPerDrink(): void {
       topSipsPerDrinkElement.innerHTML = formatted;
     }
   } catch (error) {
-    // Error handling - logging removed for production
+    console.warn('Failed to update topSipsPerDrink:', error);
   }
 }
 
