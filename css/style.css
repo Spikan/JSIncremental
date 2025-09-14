@@ -7657,21 +7657,21 @@ p {
     max-width: none; /* Remove max-width constraint */
     width: auto; /* Allow container to size to content */
     min-width: 320px; /* Ensure minimum width for button */
-    min-height: 560px; /* Ensure minimum height for button */
+    min-height: 420px; /* Ensure minimum height for button */
     height: auto; /* Allow container to size to content height */
     align-items: flex-start; /* Align to top instead of center */
   }
 
   .soda-button {
     width: 320px !important; /* Slightly wider for larger model */
-    height: 560px !important; /* Taller to accommodate larger model and prevent clipping */
+    height: 420px !important; /* Tighter height for more compact feel */
     padding: 20px !important; /* Restore padding for desktop */
     flex-shrink: 0; /* Prevent button from shrinking */
   }
 
   .click-indicator {
     width: 340px; /* Match new button width */
-    height: 580px; /* Match new button height */
+    height: 440px; /* Match new button height */
   }
 
   /* Desktop-specific 3D canvas styling */

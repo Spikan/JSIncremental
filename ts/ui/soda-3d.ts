@@ -152,7 +152,7 @@ export class Soda3DButton {
     } else {
       // Desktop: Position camera to center the model properly in the taller container
       this.camera.position.set(0, 0.4, 4.0);
-      this.camera.lookAt(0, 0.2, 0);
+      this.camera.lookAt(0, 0.0, 0);
     }
 
     // Set up renderer with mobile optimizations - use rectangular dimensions
@@ -245,8 +245,8 @@ export class Soda3DButton {
           // Mobile: Move model down to fit within container
           this.model.position.y -= 0.6;
         } else {
-          // Desktop: Center model in the taller container - adjust for higher camera
-          this.model.position.y -= 0.6;
+          // Desktop: Move model down a bit more for perfect centering
+          this.model.position.y -= 1.4;
         }
         this.centerPosition.copy(this.model.position);
 
@@ -256,8 +256,8 @@ export class Soda3DButton {
           // Mobile: Scale to fit within container with some margin
           this.baseScale = 3.2 / maxDimension;
         } else {
-          // Desktop: Much larger scale for better prominence and presence
-          this.baseScale = 4.2 / maxDimension;
+          // Desktop: Even larger scale to fill tighter canvas better
+          this.baseScale = 4.8 / maxDimension;
         }
         this.model.scale.setScalar(this.baseScale);
 
@@ -307,7 +307,7 @@ export class Soda3DButton {
     if (this.isMobile) {
       this.model.position.y = -0.6; // Mobile positioning
     } else {
-      this.model.position.y = -0.6; // Desktop positioning - centered in taller container
+      this.model.position.y = -1.4; // Desktop positioning - perfect centering
     }
     this.centerPosition.copy(this.model.position);
 
@@ -490,7 +490,7 @@ export class Soda3DButton {
       if (this.isMobile) {
         this.model.position.y -= 0.6;
       } else {
-        this.model.position.y -= 0.6;
+        this.model.position.y -= 1.4;
       }
 
       this.centerPosition.copy(this.model.position);
@@ -550,9 +550,9 @@ export function createSoda3DButton(containerSelector: string): Soda3DButton {
     width = 220;
     height = 310;
   } else {
-    // Desktop: 320x560
+    // Desktop: 320x420 (tighter canvas for more compact feel)
     width = 320;
-    height = 560;
+    height = 420;
   }
 
   const config: Soda3DConfig = {
