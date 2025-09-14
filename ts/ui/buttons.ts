@@ -626,7 +626,7 @@ function setupSpecialButtonHandlers(): void {
     return new Promise((resolve, reject) => {
       let attempts = 0;
       const maxAttempts = 50; // 5 seconds max
-      
+
       const checkClicksSystem = () => {
         attempts++;
         console.warn(`🔄 CHECKING CLICKS SYSTEM (attempt ${attempts}/${maxAttempts}):`, {
@@ -682,12 +682,15 @@ function setupSpecialButtonHandlers(): void {
   // Setup soda button with clicks system check
   const setupSodaButton = async () => {
     console.warn('🚀 SETUP SODA BUTTON CALLED!', { timestamp: Date.now() });
+    
+    // Try to load clicks system, but don't fail if it's not ready
     try {
       await ensureClicksSystemLoaded();
       console.warn('✅ CLICKS SYSTEM LOADED!', { timestamp: Date.now() });
     } catch (error) {
-      console.warn('❌ FAILED TO LOAD CLICKS SYSTEM:', error);
-      return;
+      console.warn('⚠️ CLICKS SYSTEM NOT READY, SETTING UP BUTTON ANYWAY:', error);
+      // Continue with button setup even if clicks system isn't ready
+      // The button will work once the system loads
     }
     const sodaDomCacheBtn = domQuery.getById('sodaButton');
     const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
