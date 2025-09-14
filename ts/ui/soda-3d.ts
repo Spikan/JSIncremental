@@ -53,7 +53,7 @@ export class Soda3DButton {
       const width = this.config.width || this.config.size;
       const height = this.config.height || this.config.size;
       const aspectRatio = width / height;
-      this.camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
+      this.camera = new THREE.PerspectiveCamera(80, aspectRatio, 0.1, 1000); // Wide enough FOV to show full model
 
       // Mobile-optimized renderer settings
       this.renderer = new THREE.WebGLRenderer({
@@ -122,9 +122,9 @@ export class Soda3DButton {
   }
 
   private setupScene(): void {
-    // Set up camera position - positioned higher and looking down to prevent top cut-off
-    this.camera.position.set(0, 0.6, 3);
-    this.camera.lookAt(0, -0.3, 0); // Look more downward
+    // Set up camera position - closer but with wide FOV to show full model
+    this.camera.position.set(0, 0.3, 3.2); // Closer than before but not too close
+    this.camera.lookAt(0, -0.1, 0); // Look slightly down at model center
 
     // Set up renderer with mobile optimizations - use rectangular dimensions
     const width = this.config.width || this.config.size;
@@ -210,14 +210,14 @@ export class Soda3DButton {
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
 
-        // Center the model and position it lower to prevent top cut-off
+        // Center the model and position it slightly lower
         this.model.position.sub(center);
-        this.model.position.y -= 0.4; // Move model down more aggressively
+        this.model.position.y -= 0.1; // Move model down just a bit
         this.centerPosition.copy(this.model.position);
 
-        // Scale to fit nicely in view - balanced size to prevent cut-off
+        // Scale to fit nicely in view - balanced size
         const maxDimension = Math.max(size.x, size.y, size.z);
-        this.baseScale = 3.0 / maxDimension; // Reduced from 3.5 to 3.0 to prevent top cut-off
+        this.baseScale = 2.8 / maxDimension; // Good balance between size and fit
         this.model.scale.setScalar(this.baseScale);
 
         this.scene.add(this.model);
@@ -263,7 +263,7 @@ export class Soda3DButton {
     this.model.add(cylinder);
 
     // Position fallback model lower to match main model positioning
-    this.model.position.y = -0.4;
+    this.model.position.y = -0.1;
     this.centerPosition.copy(this.model.position);
 
     this.scene.add(this.model);
