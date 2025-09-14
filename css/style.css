@@ -7654,14 +7654,14 @@ p {
 /* Desktop-specific soda button sizing - must come last to override mobile styles */
 @media (min-width: 769px) {
   .soda-button {
-    width: 300px;
-    height: 520px; /* Increased from 480px to 520px - even taller to eliminate cut-off */
+    width: 320px; /* Slightly wider for larger model */
+    height: 560px; /* Taller to accommodate larger model and prevent clipping */
     padding: 20px; /* Restore padding for desktop */
   }
 
   .click-indicator {
-    width: 320px;
-    height: 540px; /* Increased from 500px to 540px - match desktop soda button height */
+    width: 340px; /* Match new button width */
+    height: 580px; /* Match new button height */
   }
 
   /* Desktop-specific 3D canvas styling */

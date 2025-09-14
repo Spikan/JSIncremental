@@ -144,14 +144,14 @@ export class Soda3DButton {
   }
 
   private setupScene(): void {
-    // Set up camera position - responsive for mobile vs desktop
+    // Set up camera position - responsive for mobile vs desktop with more room
     if (this.isMobile) {
       // Mobile: Lower camera position to prevent top clipping
       this.camera.position.set(0, 0.2, 3.0);
       this.camera.lookAt(0, -0.6, 0);
     } else {
-      // Desktop: Higher camera position for better model visibility
-      this.camera.position.set(0, 0.6, 3.5);
+      // Desktop: Higher camera position with more distance for larger model
+      this.camera.position.set(0, 0.8, 4.0);
       this.camera.lookAt(0, 0, 0);
     }
 
@@ -250,14 +250,14 @@ export class Soda3DButton {
         }
         this.centerPosition.copy(this.model.position);
 
-        // Scale to fit nicely in view - responsive scaling
+        // Scale to fit nicely in view - responsive scaling with larger models
         const maxDimension = Math.max(size.x, size.y, size.z);
         if (this.isMobile) {
-          // Mobile: Smaller scale to fit within container
-          this.baseScale = 2.8 / maxDimension;
+          // Mobile: Scale to fit within container with some margin
+          this.baseScale = 3.2 / maxDimension;
         } else {
-          // Desktop: Larger scale for better prominence
-          this.baseScale = 3.5 / maxDimension;
+          // Desktop: Much larger scale for better prominence and presence
+          this.baseScale = 4.2 / maxDimension;
         }
         this.model.scale.setScalar(this.baseScale);
 
@@ -334,15 +334,24 @@ export class Soda3DButton {
 
     this.model.rotation.y += currentSpeed;
 
-    // Click animation (bounce effect)
+    // Click animation (bounce effect) - improved to prevent clipping
     if (this.isAnimating) {
       const time = Date.now() * 0.01;
-      const bounce = Math.sin(time) * 0.05; // Reduced bounce intensity
+      const bounce = Math.sin(time) * 0.03; // Further reduced bounce intensity
       this.model.position.copy(this.centerPosition);
-      // Constrain bounce to stay within container bounds
-      this.model.position.y += Math.max(-0.05, Math.min(0.05, bounce));
-      // Maintain the larger base scale during animation with reduced intensity
-      this.model.scale.setScalar(this.baseScale * (1 + Math.sin(time) * 0.02));
+
+      // Calculate safe bounce range based on container size and model scale
+      const containerHeight = this.config.height || this.config.size;
+      const modelHeight = this.baseScale * 2; // Approximate model height
+      const maxBounceUp = Math.min(0.02, (containerHeight * 0.1) / modelHeight);
+      const maxBounceDown = Math.min(0.02, (containerHeight * 0.1) / modelHeight);
+
+      // Constrain bounce to stay within safe bounds
+      this.model.position.y += Math.max(-maxBounceDown, Math.min(maxBounceUp, bounce));
+
+      // Scale animation with reduced intensity to prevent clipping
+      const scaleBounce = Math.sin(time) * 0.01; // Very small scale bounce
+      this.model.scale.setScalar(this.baseScale * (1 + scaleBounce));
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -504,12 +513,31 @@ export class Soda3DButton {
 
 // Factory function for easy initialization
 export function createSoda3DButton(containerSelector: string): Soda3DButton {
+  // Detect screen size for responsive sizing
+  const isSmallMobile = window.innerWidth <= 480;
+  const isMobile = window.innerWidth <= 768;
+  
+  let width, height;
+  if (isSmallMobile) {
+    // Small mobile: 200x290
+    width = 200;
+    height = 290;
+  } else if (isMobile) {
+    // Regular mobile: 220x310
+    width = 220;
+    height = 310;
+  } else {
+    // Desktop: 320x560
+    width = 320;
+    height = 560;
+  }
+  
   const config: Soda3DConfig = {
     containerSelector,
     modelPath: sodaModelUrl,
-    size: 300,
-    width: 300,
-    height: 520 /* Increased from 480 to 520 to match CSS container height */,
+    size: width, // Use width as base size
+    width: width, // Match container width exactly
+    height: height, // Match container height exactly
     rotationSpeed: 0.01,
     hoverSpeedMultiplier: 3,
     clickAnimationDuration: 500,
