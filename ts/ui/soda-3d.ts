@@ -25,6 +25,7 @@ export class Soda3DButton {
   private clickAnimationDuration: number;
   private animationId: number | null = null;
   private clickHandlers: (() => void)[] = [];
+  private baseScale = 1; // Store the calculated base scale
 
   constructor(private config: Soda3DConfig) {
     this.rotationSpeed = config.rotationSpeed;
@@ -116,10 +117,10 @@ export class Soda3DButton {
         // Center the model
         this.model.position.sub(center);
 
-        // Scale to fit nicely in view
+        // Scale to fit nicely in view - increased size for better visibility
         const maxDimension = Math.max(size.x, size.y, size.z);
-        const scale = 2 / maxDimension;
-        this.model.scale.setScalar(scale);
+        this.baseScale = 3.5 / maxDimension; // Increased from 2 to 3.5 for larger model
+        this.model.scale.setScalar(this.baseScale);
 
         this.scene.add(this.model);
       }
@@ -191,7 +192,8 @@ export class Soda3DButton {
       const time = Date.now() * 0.01;
       const bounce = Math.sin(time) * 0.1;
       this.model.position.y = bounce;
-      this.model.scale.setScalar(1 + Math.sin(time) * 0.05);
+      // Maintain the larger base scale during animation
+      this.model.scale.setScalar(this.baseScale * (1 + Math.sin(time) * 0.05));
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -268,7 +270,7 @@ export class Soda3DButton {
     setTimeout(() => {
       if (this.model) {
         this.model.position.y = 0;
-        this.model.scale.setScalar(1);
+        this.model.scale.setScalar(this.baseScale); // Reset to base scale, not 1
       }
       this.isAnimating = false;
     }, this.clickAnimationDuration);
