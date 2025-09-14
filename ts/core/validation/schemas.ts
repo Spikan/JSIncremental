@@ -1,5 +1,7 @@
 // TypeScript port of validation schemas with a safe Zod fallback
 
+import { toDecimal } from '../numbers/migration-utils';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const z: any =
   (typeof window !== 'undefined' && (window as any).Zod) ||
@@ -93,8 +95,8 @@ export const UpgradesSchema = z.object({
 export type GameSave = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sips: any;
-  straws: number | string;
-  cups: number | string;
+  straws: number | string | any; // any to allow Decimal objects
+  cups: number | string | any; // any to allow Decimal objects
   widerStraws: any;
   betterCups: any;
   suctions: any;
@@ -112,16 +114,16 @@ export type GameSave = {
   totalPlayTime?: number;
   totalClicks?: number;
   totalSips?: any;
-  level?: number | string;
+  level?: number | string | any; // any to allow Decimal objects
 };
 export const GameSaveSchema = z.object({
   sips: z.any(),
   straws: z
     .union([z.number().min(0), z.string()])
-    .transform((val: number | string) => (typeof val === 'string' ? parseFloat(val) || 0 : val)),
+    .transform((val: number | string) => (typeof val === 'string' ? toDecimal(val) : val)),
   cups: z
     .union([z.number().min(0), z.string()])
-    .transform((val: number | string) => (typeof val === 'string' ? parseFloat(val) || 0 : val)),
+    .transform((val: number | string) => (typeof val === 'string' ? toDecimal(val) : val)),
   widerStraws: z.any(),
   betterCups: z.any(),
   suctions: z.any(),
@@ -141,7 +143,7 @@ export const GameSaveSchema = z.object({
   totalSips: z.any().optional(),
   level: z
     .union([z.number().min(1), z.string()])
-    .transform((val: number | string) => (typeof val === 'string' ? parseInt(val) || 1 : val))
+    .transform((val: number | string) => (typeof val === 'string' ? toDecimal(val) : val))
     .optional(),
 });
 
