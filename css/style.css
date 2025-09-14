@@ -3153,9 +3153,9 @@ h3 {
   padding: 0.875rem 1.25rem;
   font-size: 0.95rem;
   font-weight: bold;
-  border: 2px solid #ff3d02;
-  background: linear-gradient(135deg, #001789, #001f5e);
-  color: #ff3d02;
+  border: 2px solid var(--primary-green);
+  background-color: var(--primary-blue);
+  color: var(--neutral-white);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -3181,11 +3181,6 @@ h3 {
   left: 100%;
 }
 
-.upgrade-btn:hover:not(.affordable):not(.disabled) {
-  background-color: #ff3d02;
-  color: #001789;
-  transform: scale(1.02);
-}
 
 .upgrade-btn:active {
   transform: scale(0.98);
@@ -7245,11 +7240,11 @@ p {
 }
 
 .upgrade-btn {
-  background: linear-gradient(135deg, #2a5298, #1e3a8a);
-  border: 2px solid transparent;
+  background-color: var(--primary-blue);
+  border: 2px solid var(--primary-green);
   border-radius: 12px;
   padding: 0.875rem 1.5rem;
-  color: white;
+  color: var(--neutral-white);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -7278,10 +7273,11 @@ p {
   left: 100%;
 }
 
-.upgrade-btn:hover {
+.upgrade-btn:hover:not(.affordable):not(.disabled) {
+  background-color: var(--primary-blue-dark);
+  color: var(--neutral-white) !important;
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #3b5fb8, #2a4a9a);
+  box-shadow: var(--btn-shadow-md);
 }
 
 .upgrade-btn.affordable {
@@ -7296,9 +7292,11 @@ p {
 }
 
 .upgrade-btn:hover.affordable {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
-  background: linear-gradient(135deg, #10b981, #059669);
+  background-color: var(--primary-blue) !important;
+  color: var(--neutral-white) !important;
+  border-color: var(--primary-green) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 179, 107, 0.5);
 }
 
 /* Enhanced disabled state with better visual feedback */
