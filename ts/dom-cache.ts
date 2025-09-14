@@ -115,7 +115,7 @@ const DOM_CACHE: {
     this.musicStatus = document.getElementById('musicStatus');
     this.musicStreamSelect = document.getElementById('musicStreamSelect');
     this.currentStreamInfo = document.getElementById('currentStreamInfo');
-    this.shopDiv = document.getElementById('shopDiv');
+    this.shopDiv = document.getElementById('shopTab');
     this.widerStraws = document.getElementById('widerStraws');
     this.betterCups = document.getElementById('betterCups');
     this.widerStrawsSPD = document.getElementById('widerStrawsSPD');

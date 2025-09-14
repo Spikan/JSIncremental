@@ -367,8 +367,6 @@ export function updateTopSipCounter(): void {
 
   const topSipElement = domCache.topSipValue || document.getElementById('topSipValue');
 
-  // Silent updates unless there's an issue
-
   if (topSipElement) {
     try {
       const state = useGameStore.getState();
@@ -379,8 +377,6 @@ export function updateTopSipCounter(): void {
     } catch (error) {
       console.warn('Failed to update display:', error);
     }
-  } else {
-    console.error('DEBUG: updateTopSipCounter - topSipElement not found!');
   }
 }
 

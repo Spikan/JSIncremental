@@ -240,9 +240,14 @@ export function startGameCore(): void {
             },
             updateUI: () => {
               try {
-                w.App?.ui?.updateTopInfoBar?.();
+                // Update individual header elements instead of the problematic updateTopInfoBar
+                w.App?.ui?.updateTopSipCounter?.();
+                w.App?.ui?.updateTopSipsPerDrink?.();
+                w.App?.ui?.updateTopSipsPerSecond?.();
                 w.App?.ui?.updateEnhancedProgressBars?.();
-              } catch {}
+              } catch (error) {
+                console.error('❌ updateUI error (game-init):', error);
+              }
             },
             updatePlayTime: () => {
               try {

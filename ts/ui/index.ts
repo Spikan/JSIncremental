@@ -18,6 +18,7 @@ import * as utils from './utils';
 import * as buttons from './buttons';
 import subscriptionManager from './subscription-manager';
 import { topInfoBar, TopInfoBarData } from './top-info-bar';
+import { useGameStore } from '../core/state/zustand-store';
 import { navigationManager, NavigationTab } from './navigation';
 import { drinkProgressBar, levelProgressBar, ProgressBarData } from './progress-bar';
 import { visualFeedback } from './visual-feedback';
@@ -112,23 +113,6 @@ export function initializeEnhancedNavigation(): void {
 export function setupDirectSodaClickHandler(): void {
   console.log('🔧 Setting up direct soda click handler...');
 
-  // Fix the soda button click by adding a direct handler
-  const sodaButton = document.getElementById('sodaButton');
-  if (sodaButton) {
-    console.log('🔧 Adding direct click handler to soda button');
-    sodaButton.addEventListener('click', async () => {
-      console.log('🍹 Direct soda click triggered!');
-      try {
-        const { handleSodaClick } = await import('../core/systems/clicks-system.ts');
-        await handleSodaClick(1);
-        console.log('🍹 Direct soda click successful!');
-      } catch (error) {
-        console.error('🍹 Direct soda click failed:', error);
-      }
-    });
-    console.log('✅ Direct soda click handler added successfully');
-  }
-
   // Set up debounced monitoring for top bar updates
   let lastValues = { sips: null, spd: null, level: null };
   let updateTimeout: number | null = null;
@@ -222,6 +206,46 @@ export function setupDirectSodaClickHandler(): void {
   };
 
   console.log('🧪 Added testSodaClick() function to window for debugging');
+
+  // Add debug function to manually test header updates
+  (window as any).testHeaderUpdates = () => {
+    console.log('🧪 Testing header updates manually...');
+    try {
+      const state = useGameStore.getState();
+      console.log('🧪 Current state:', {
+        sips: state.sips.toString(),
+        spd: state.spd.toString(),
+        drinkRate: state.drinkRate,
+      });
+
+      // Test individual update functions
+      console.log('🧪 Calling updateTopSipCounter...');
+      updateTopSipCounter();
+
+      console.log('🧪 Calling updateTopSipsPerDrink...');
+      updateTopSipsPerDrink();
+
+      console.log('🧪 Calling updateTopSipsPerSecond...');
+      updateTopSipsPerSecond();
+
+      // Check if elements exist and their current values
+      const topSipValue = document.getElementById('topSipValue');
+      const topSipsPerDrink = document.getElementById('topSipsPerDrink');
+      const topSipsPerSecond = document.getElementById('topSipsPerSecond');
+
+      console.log('🧪 Element values after manual update:', {
+        topSipValue: topSipValue?.textContent,
+        topSipsPerDrink: topSipsPerDrink?.innerHTML,
+        topSipsPerSecond: topSipsPerSecond?.innerHTML,
+      });
+
+      console.log('🧪 Manual header update test complete!');
+    } catch (error) {
+      console.error('🧪 Manual header update test failed:', error);
+    }
+  };
+
+  console.log('🧪 Added testHeaderUpdates() function to window for debugging');
 }
 
 /**
@@ -372,8 +396,7 @@ export function initializeUI(): void {
     // Initialize mobile navigation features
     initializeMobileNavigation();
 
-    // Set up direct soda click handler as fallback
-    setupDirectSodaClickHandler();
+    // Set up direct soda click handler as fallback - DISABLED (causing double clicks)
   } catch (error) {
     reportUIError(error, 'initialize_ui_main', ErrorSeverity.CRITICAL);
   }

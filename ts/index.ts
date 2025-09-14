@@ -235,6 +235,16 @@ try {
                           w.App?.ui?.updateLastSaveTime?.();
                         } catch {}
                       },
+                      updateUI: () => {
+                        try {
+                          // Update individual header elements
+                          w.App?.ui?.updateTopSipCounter?.();
+                          w.App?.ui?.updateTopSipsPerDrink?.();
+                          w.App?.ui?.updateTopSipsPerSecond?.();
+                        } catch (error) {
+                          console.error('❌ updateUI error:', error);
+                        }
+                      },
                     });
                     booted = true;
                     __pushDiag({ type: 'loop', stage: 'fallback-started' });
@@ -306,6 +316,16 @@ try {
                           try {
                             w.App?.ui?.updateLastSaveTime?.();
                           } catch {}
+                        },
+                        updateUI: () => {
+                          try {
+                            // Update individual header elements
+                            w.App?.ui?.updateTopSipCounter?.();
+                            w.App?.ui?.updateTopSipsPerDrink?.();
+                            w.App?.ui?.updateTopSipsPerSecond?.();
+                          } catch (error) {
+                            console.error('❌ updateUI error (second loop):', error);
+                          }
                         },
                       });
                       booted = true;
