@@ -1,7 +1,7 @@
 // Entry module providing a small public API surface and environment checks (TypeScript)
 
 import { useGameStore } from './core/state/zustand-store.ts';
-import { createEventBus } from './services/event-bus.ts';
+import { optimizedEventBus } from './services/optimized-event-bus.ts';
 import { performanceMonitor } from './services/performance.ts';
 import './config.ts';
 import './core/constants.ts';
@@ -23,10 +23,10 @@ import { AppStorage as storageImpl } from './services/storage.ts';
 import './main.ts';
 
 let storage: any = (typeof window !== 'undefined' && (window as any).storage) || storageImpl;
-const eventBus = createEventBus();
+// Use optimized event bus
 try {
-  (window as any).eventBus = eventBus;
-  (window as any).bus = eventBus;
+  (window as any).eventBus = optimizedEventBus;
+  (window as any).bus = optimizedEventBus;
 } catch (error) {
   console.warn('Failed to expose event bus globally:', error);
 }
@@ -69,7 +69,7 @@ if (typeof window !== 'undefined') {
       actions: zustandStore.getState().actions, // Add actions for direct access
     }, // Consolidated Zustand store with actions
     storage,
-    events: eventBus,
+    events: optimizedEventBus,
     EVENT_NAMES,
     rules: { clicks: {}, purchases: {}, economy: {} },
     systems: {
