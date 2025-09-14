@@ -177,6 +177,7 @@ export function initializeUI(): void {
       updateAllDisplaysOptimized();
       checkUpgradeAffordabilityOptimized();
       updateCriticalClickDisplay();
+      updateShopStats(); // Call updateShopStats to trigger updateEnhancementValues
       updatePurchasedCountsOptimized(); // Use optimized version
       if (
         purchaseData &&
