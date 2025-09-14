@@ -25,6 +25,7 @@ export const FEATURE_UNLOCKS = {
       stats: config.UNLOCKS?.STATS || { sips: 1000, clicks: 60 },
       god: config.UNLOCKS?.GOD || { sips: 5000, clicks: 300 },
       unlocks: config.UNLOCKS?.UNLOCKS_TAB || { sips: 25, clicks: 8 },
+      friends: config.UNLOCKS?.FRIENDS || { sips: 100, clicks: 20 },
     } as UnlockMap;
   },
   init() {
@@ -288,6 +289,12 @@ export const FEATURE_UNLOCKS = {
         name: 'Faster Drinks',
         description: 'Reduces time between automatic drinks',
         category: 'Drinking',
+      },
+      friends: {
+        icon: '👥',
+        name: 'Friends',
+        description: 'Bring a friend to automatically drink some soda!',
+        category: 'Automation',
       },
       straws: {
         icon: '🥤',

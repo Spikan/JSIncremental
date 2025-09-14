@@ -102,6 +102,7 @@ export type GameSave = {
   suctions: any;
   criticalClicks: any;
   fasterDrinks: any;
+  friends: any;
   totalSipsEarned?: any;
   // SPD values for extreme value preservation
   spd?: any;
@@ -129,6 +130,7 @@ export const GameSaveSchema = z.object({
   suctions: z.any(),
   criticalClicks: z.any(),
   fasterDrinks: z.any(),
+  friends: z.any(),
   totalSipsEarned: z.any().optional(),
   // SPD values for extreme value preservation
   spd: z.any().optional(),

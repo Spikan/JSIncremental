@@ -33,5 +33,12 @@
   "criticalClick": {
     "baseCost": 60,
     "scaling": 1.22
+  },
+  "friends": {
+    "baseCost": 100,
+    "scaling": 1.25,
+    "baseInterval": 1000,
+    "efficiency": 0.8,
+    "upgradeBaseCost": 2000
   }
 }
