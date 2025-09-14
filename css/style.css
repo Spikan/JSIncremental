@@ -3910,7 +3910,7 @@ h3 {
 
 /* Locked tab styling */
 .tab-btn.locked {
-  opacity: 0.3;
+  opacity: 0.6;
   cursor: not-allowed;
   position: relative;
 }
@@ -5062,6 +5062,505 @@ button {
   transition:
     all 0.2s ease,
     transform 0.15s ease;
+}
+
+/* ========================================
+   SIMPLIFIED UNLOCKS TAB STYLES
+   ======================================== */
+
+.unlocks-overview {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.unlocks-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.unlocks-progress-header h3 {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.unlocks-progress-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Courier New', monospace;
+}
+
+.unlocked-count {
+  color: #10b981;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.progress-separator {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.total-count {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+}
+
+.progress-percent {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.unlocks-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.unlocks-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #00d97f);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.unlocks-info {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.unlocks-info p {
+  margin: 0 0 0.5rem 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.unlocks-info p:last-child {
+  margin-bottom: 0;
+}
+
+.unlocks-features-list h4 {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.feature-item.unlocked {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.feature-item.locked {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.feature-icon {
+  font-size: 1.2rem;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.feature-name {
+  flex: 1;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.feature-cost {
+  color: #10b981;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+}
+
+/* ========================================
+   UNLOCK PURCHASE SYSTEM STYLES
+   ======================================== */
+
+.unlock-purchase-section {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.unlock-cost {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.cost-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.cost-value {
+  color: #10b981;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.unlock-purchase-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #2a5298, #1e3a8a);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.unlock-purchase-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.unlock-purchase-btn:hover::before {
+  left: 100%;
+}
+
+.unlock-purchase-btn.affordable {
+  background: linear-gradient(135deg, #059669, #047857);
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  animation: affordablePulse 2s ease-in-out infinite;
+}
+
+.unlock-purchase-btn.affordable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.unlock-purchase-btn.disabled {
+  background: linear-gradient(135deg, #555, #333);
+  border-color: #666;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.unlock-purchase-btn.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.unlock-unlocked {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.unlocked-text {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Enhanced unlock item styling */
+.unlock-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.unlock-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.8s ease;
+}
+
+.unlock-item:hover::before {
+  left: 100%;
+}
+
+.unlock-item.unlocked {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.unlock-item.locked {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.unlock-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.unlock-icon {
+  font-size: 2rem;
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+.unlock-info {
+  flex: 1;
+}
+
+.unlock-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.unlock-description {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.unlock-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.requirement {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.requirement.met {
+  color: #10b981;
+}
+
+.requirement:not(.met) {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.requirement-label {
+  font-weight: 500;
+}
+
+.requirement-value {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+/* ========================================
+   BUTTON UNLOCK STATES
+   ======================================== */
+
+/* Tab button unlock cost display */
+.tab-unlock-cost {
+  font-size: 0.75rem;
+  color: #10b981;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  margin-top: 0.25rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Locked tab button styling */
+.tab-btn.locked {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-btn.locked::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.8s ease;
+}
+
+.tab-btn.locked:hover::before {
+  left: 100%;
+}
+
+.tab-btn.locked.affordable {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.2));
+  border-color: rgba(16, 185, 129, 0.6);
+  color: rgba(255, 255, 255, 1);
+  animation: affordablePulse 2s ease-in-out infinite;
+  opacity: 1 !important;
+}
+
+.tab-btn.locked.affordable:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(16, 185, 129, 0.3));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
+}
+
+.tab-btn.unlocked {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Upgrade button unlock states */
+.upgrade-btn.locked {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+
+.upgrade-btn.locked::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.8s ease;
+}
+
+.upgrade-btn.locked:hover::before {
+  left: 100%;
+}
+
+.upgrade-btn.locked.affordable {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+  border-color: rgba(16, 185, 129, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  animation: affordablePulse 2s ease-in-out infinite;
+}
+
+.upgrade-btn.locked.affordable:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.1));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Unlock cost display in upgrade buttons */
+.upgrade-unlock-cost {
+  font-size: 0.85rem;
+  color: #10b981;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  margin-top: 0.25rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Locked upgrade button content layout */
+.upgrade-btn.locked .upgrade-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.upgrade-btn.locked .upgrade-info {
+  text-align: center;
+}
+
+.upgrade-btn.locked .upgrade-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Mobile tab unlock states */
+.mobile-tab-item.locked {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mobile-tab-item.locked.affordable {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  animation: affordablePulse 2s ease-in-out infinite;
+}
+
+.mobile-tab-item.unlocked {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* Mobile tab unlock cost display */
+.mobile-tab-unlock-cost {
+  font-size: 0.7rem;
+  color: #10b981;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  margin-top: 0.2rem;
+  text-align: center;
+  line-height: 1.1;
 }
 
 /* ========================================

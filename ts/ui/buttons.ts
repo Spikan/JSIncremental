@@ -2,7 +2,7 @@
 
 import { mobileInputHandler } from './mobile-input';
 
-type ButtonActionMeta = { func: () => any; type: string; label: string };
+type ButtonActionMeta = { func: (...args: any[]) => any; type: string; label: string };
 type ButtonTypeMeta = {
   audio: 'purchase' | 'click';
   feedback: 'purchase' | 'levelup' | 'info';
@@ -77,6 +77,12 @@ const BUTTON_CONFIG: {
       func: () => (window as any).App?.systems?.purchases?.execute?.levelUp?.(),
       type: 'level-up-btn',
       label: 'Level Up',
+    },
+    purchaseUnlock: {
+      func: (featureName: string) =>
+        (window as any).App?.systems?.unlocks?.purchaseUnlock?.(featureName),
+      type: 'shop-btn',
+      label: 'Purchase Unlock',
     },
     save: {
       func: () => {
@@ -819,6 +825,7 @@ function setupSpecialButtonHandlers(): void {
             'buyFasterDrinks',
             'upgradeFasterDrinks',
             'buyCriticalClick',
+            'purchaseUnlock',
           ]);
           const isPurchase = purchaseActions.has(fnName);
           if (isPurchase) {
@@ -882,7 +889,14 @@ function setupSpecialButtonHandlers(): void {
                   // Error handling - logging removed for production
                 }
               } else {
-                if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) {
+                if (fnName === 'purchaseUnlock' && args.length > 0) {
+                  // Handle unlock purchase with feature name argument
+                  const featureName = args[0];
+                  success = !!(window as any).App?.systems?.unlocks?.purchaseUnlock?.(featureName);
+                } else if (
+                  isPurchase &&
+                  (window as any).App?.systems?.purchases?.execute?.[fnName]
+                ) {
                   success = !!(window as any).App.systems.purchases.execute[fnName]();
                 }
                 try {
@@ -948,14 +962,21 @@ function setupSpecialButtonHandlers(): void {
           el.closest && el.closest('button') ? (el.closest('button') as any) : (el as any);
         if (buttonEl && shouldSuppressClick(buttonEl)) return;
         const action = el.getAttribute('data-action');
+        console.log(`[DEBUG] Button click detected, data-action:`, action);
         if (!action) return;
         const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
+        console.log(`[DEBUG] Parsed fnName: ${fnName}, argStr: ${argStr}`);
         if (!fnName) return;
         const argsAttr = el.getAttribute('data-args') || argStr;
         let args: any[] = [];
         if (argsAttr) {
-          const maybeNum = Number(argsAttr);
-          args = Number.isNaN(maybeNum) ? [argsAttr] : [maybeNum];
+          // For purchaseUnlock, always treat as string
+          if (fnName === 'purchaseUnlock') {
+            args = [argsAttr];
+          } else {
+            const maybeNum = Number(argsAttr);
+            args = Number.isNaN(maybeNum) ? [argsAttr] : [maybeNum];
+          }
         }
         const purchaseActions = new Set([
           'buyStraw',
@@ -968,6 +989,7 @@ function setupSpecialButtonHandlers(): void {
           'buyCriticalClick',
           'buyFriends',
           'upgradeFriends',
+          'purchaseUnlock',
         ]);
         const isPurchase = purchaseActions.has(fnName);
         if (isPurchase) {
@@ -1026,7 +1048,11 @@ function setupSpecialButtonHandlers(): void {
                 // Error handling - logging removed for production
               }
             } else {
-              if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) {
+              if (fnName === 'purchaseUnlock' && args.length > 0) {
+                // Handle unlock purchase with feature name argument
+                const featureName = args[0];
+                success = !!(window as any).App?.systems?.unlocks?.purchaseUnlock?.(featureName);
+              } else if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) {
                 success = !!(window as any).App.systems.purchases.execute[fnName]();
               }
               try {

@@ -15,6 +15,7 @@ import * as unlocksStatic from './feature-unlocks.ts';
 import * as clicksStatic from './core/systems/clicks-system.ts';
 import * as audioButtonStatic from './core/systems/button-audio.ts';
 import * as purchasesStatic from './core/systems/purchases-system.ts';
+import * as unlockPurchasesStatic from './core/systems/unlock-purchases.ts';
 import * as devStatic from './core/systems/dev.ts';
 import * as saveStatic from './core/systems/save-system.ts';
 import * as optionsStatic from './core/systems/options-system.ts';
@@ -74,6 +75,7 @@ if (typeof window !== 'undefined') {
     systems: {
       resources: {},
       purchases: {},
+      unlockPurchases: {},
       clicks: {},
       autosave: {},
       save: {},
@@ -108,6 +110,8 @@ try {
   } catch {}
   // Unlocks
   (window as any).App.systems.unlocks = (unlocksStatic as any)?.FEATURE_UNLOCKS || {};
+  // Unlock Purchases
+  Object.assign((window as any).App.systems.unlockPurchases, unlockPurchasesStatic);
   // Game init
   Object.assign((window as any).App.systems.gameInit, gameInitStatic);
   (window as any).initOnDomReady = (gameInitStatic as any).initOnDomReady;

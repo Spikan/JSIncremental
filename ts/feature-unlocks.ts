@@ -1,14 +1,27 @@
 // Feature unlocks system (TypeScript)
 
+import { unlockPurchases } from './core/systems/unlock-purchases';
+
 type UnlockCondition = { sips: number; clicks: number };
 type UnlockMap = Record<string, UnlockCondition>;
 
 console.log('=== FEATURE-UNLOCKS.TS LOADING ===');
 
+// Expose reset function globally for debugging
+if (typeof window !== 'undefined') {
+  (window as any).resetAllUnlocks = () => {
+    FEATURE_UNLOCKS.resetAllUnlocks();
+  };
+}
+
 export const FEATURE_UNLOCKS = {
   unlockedFeatures: new Set<string>(['soda', 'options', 'dev']),
   devMode: false,
+  _updatingFeatureVisibility: false,
+  _updatingUpgradeVisibility: false,
   get unlockConditions(): UnlockMap {
+    // Legacy threshold-based unlocks - kept for backward compatibility
+    // but no longer used for auto-unlocking
     const data = (window as any).App?.data?.unlocks as UnlockMap | undefined;
     if (data) return data;
     const config: any = (window as any).GAME_CONFIG || {};
@@ -27,22 +40,62 @@ export const FEATURE_UNLOCKS = {
       unlocks: config.UNLOCKS?.UNLOCKS_TAB || { sips: 25, clicks: 8 },
     } as UnlockMap;
   },
+
+  // Get available features for unlock purchase system
+  get availableFeatures(): string[] {
+    const config: any = (window as any).GAME_CONFIG || {};
+    const configKeys = Object.keys(config.UNLOCK_PURCHASES || {});
+
+    // Map config keys to feature names
+    const keyMapping: Record<string, string> = {
+      SUCTION: 'suction',
+      CRITICAL_CLICK: 'criticalClick',
+      FASTER_DRINKS: 'fasterDrinks',
+      STRAWS: 'straws',
+      CUPS: 'cups',
+      WIDER_STRAWS: 'widerStraws',
+      BETTER_CUPS: 'betterCups',
+      LEVEL_UP: 'levelUp',
+      SHOP: 'shop',
+      STATS: 'stats',
+      GOD: 'god',
+      UNLOCKS_TAB: 'unlocks',
+    };
+
+    return configKeys.map(key => keyMapping[key] || key.toLowerCase()).filter(Boolean);
+  },
   init() {
     try {
+      // Load previously unlocked features from storage
       this.loadUnlockedFeatures();
-      // Ensure only default feature is unlocked if saved data is malformed or overly permissive
-      if (
-        !this.unlockedFeatures ||
-        !(this.unlockedFeatures instanceof Set) ||
-        this.unlockedFeatures.size === 0
-      ) {
-        this.unlockedFeatures = new Set<string>(['soda']);
-      }
-      this.updateFeatureVisibility();
-      this.updateUnlocksTab();
-      console.log('FEATURE_UNLOCKS system initialized');
+      console.log('FEATURE_UNLOCKS system initialized with loaded state');
+
+      // Update UI to reflect current unlock state (with delay to ensure DOM is ready)
+      setTimeout(() => {
+        this.updateFeatureVisibility();
+        this.updateUnlocksTab();
+        // Trigger affordability check to ensure buttons are properly marked as affordable
+        try {
+          (window as any).App?.ui?.checkUpgradeAffordability?.();
+        } catch (error) {
+          console.warn('Failed to check upgrade affordability on init:', error);
+        }
+      }, 100);
     } catch (error) {
       console.error('Failed to initialize FEATURE_UNLOCKS system:', error);
+      // Fallback to default state if loading fails
+      this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
+      // Still update UI even with fallback state
+      setTimeout(() => {
+        this.updateFeatureVisibility();
+        this.updateUnlocksTab();
+        // Trigger affordability check to ensure buttons are properly marked as affordable
+        try {
+          (window as any).App?.ui?.checkUpgradeAffordability?.();
+        } catch (error) {
+          console.warn('Failed to check upgrade affordability on init fallback:', error);
+        }
+      }, 100);
     }
   },
   checkUnlocks(sips: any, clicks: number): string[] {
@@ -60,18 +113,9 @@ export const FEATURE_UNLOCKS = {
   checkUnlock(featureName: string): boolean {
     if (this.devMode) return true;
     if (this.unlockedFeatures.has(featureName)) return true;
-    const condition = this.unlockConditions[featureName];
-    if (!condition) return false;
-    const w: any = window as any;
-    const st = w.App?.state?.getState?.() || {};
-    const sipsNum = Number(st.sips ?? 0);
-    const clicksNum = Number(st.totalClicks ?? 0);
-    const sipsMet = sipsNum >= condition.sips;
-    const clicksMet = clicksNum >= condition.clicks;
-    if (sipsMet && clicksMet) {
-      this.unlockFeature(featureName);
-      return true;
-    }
+
+    // Auto-unlock system disabled - only manual purchases unlock features
+    // This method now only checks if a feature is unlocked, doesn't auto-unlock
     return false;
   },
   toggleDevMode(): boolean {
@@ -85,7 +129,11 @@ export const FEATURE_UNLOCKS = {
     return this.devMode;
   },
   unlockFeature(feature: string): boolean {
-    if (this.unlockConditions[feature]) {
+    // Check if feature is available for unlock (either in old conditions or new purchase system)
+    const isInOldSystem = this.unlockConditions[feature];
+    const isInNewSystem = this.availableFeatures.includes(feature);
+
+    if (isInOldSystem || isInNewSystem) {
       this.unlockedFeatures.add(feature);
       this.showUnlockNotification(feature);
       this.updateFeatureVisibility();
@@ -155,13 +203,26 @@ export const FEATURE_UNLOCKS = {
     }
   },
   updateFeatureVisibility() {
+    // Prevent recursive calls that could cause infinite loops
+    if (this._updatingFeatureVisibility) {
+      console.log('[DEBUG] updateFeatureVisibility already running, skipping recursive call');
+      return;
+    }
+    this._updatingFeatureVisibility = true;
+
     try {
       const tabButtons = document.querySelectorAll('.tab-btn');
       tabButtons.forEach((btn: Element) => {
         const dataAction = (btn as HTMLElement).getAttribute('data-action') || '';
         const isSwitch = dataAction.startsWith('switchTab:');
-        const tabName = isSwitch ? dataAction.split(':')[1] : null;
+        const isPurchase = dataAction.startsWith('purchaseUnlock:');
+        const tabName = isSwitch
+          ? dataAction.split(':')[1]
+          : isPurchase
+            ? dataAction.split(':')[1]
+            : null;
         if (!tabName || tabName === 'soda') return;
+
         // Options and Dev are always available; do not gate behind unlocks
         if (tabName === 'options' || tabName === 'dev') {
           (btn as HTMLElement).style.display = 'inline-block';
@@ -172,42 +233,128 @@ export const FEATURE_UNLOCKS = {
           }
           return;
         }
+
         const isUnlocked = this.unlockedFeatures.has(tabName);
-        (btn as HTMLElement).style.display = isUnlocked ? 'inline-block' : 'none';
+        // Always show buttons, but mark them as locked/unlocked
+        (btn as HTMLElement).style.display = 'inline-block';
         try {
           (btn as HTMLElement).classList.toggle('locked', !isUnlocked);
+          (btn as HTMLElement).classList.toggle('unlocked', isUnlocked);
         } catch (error) {
           console.warn('Failed to toggle locked class on button:', error);
+        }
+
+        // Update button content to show unlock cost if locked
+        if (!isUnlocked) {
+          // Always update unlock buttons to refresh affordability state
+          this.updateTabButtonForUnlock(btn as HTMLElement, tabName);
+        } else {
+          this.updateTabButtonForUnlocked(btn as HTMLElement, tabName);
+        }
+      });
+
+      // Also update mobile tab items
+      const mobileTabItems = document.querySelectorAll('.mobile-tab-item');
+      mobileTabItems.forEach((item: Element) => {
+        const dataAction = (item as HTMLElement).getAttribute('data-action') || '';
+        const isSwitch = dataAction.startsWith('switchTab:');
+        const isPurchase = dataAction.startsWith('purchaseUnlock:');
+        const tabName = isSwitch
+          ? dataAction.split(':')[1]
+          : isPurchase
+            ? dataAction.split(':')[1]
+            : null;
+        if (!tabName || tabName === 'soda') return;
+
+        // Options and Dev are always available
+        if (tabName === 'options' || tabName === 'dev') {
+          (item as HTMLElement).classList.remove('locked');
+          return;
+        }
+
+        const isUnlocked = this.unlockedFeatures.has(tabName);
+        (item as HTMLElement).classList.toggle('locked', !isUnlocked);
+        (item as HTMLElement).classList.toggle('unlocked', isUnlocked);
+
+        if (!isUnlocked) {
+          // Always update unlock buttons to refresh affordability state
+          this.updateMobileTabForUnlock(item as HTMLElement, tabName);
+        } else {
+          this.updateMobileTabForUnlocked(item as HTMLElement, tabName);
         }
       });
       this.updateUpgradeVisibility();
     } catch (error) {
       console.warn('Failed to update feature visibility:', error);
+    } finally {
+      this._updatingFeatureVisibility = false;
     }
   },
   updateUpgradeVisibility() {
+    // Prevent recursive calls that could cause infinite loops
+    if (this._updatingUpgradeVisibility) {
+      console.log('[DEBUG] updateUpgradeVisibility already running, skipping recursive call');
+      return;
+    }
+    this._updatingUpgradeVisibility = true;
+
     const qs = (sel: string) => document.querySelector(sel) as HTMLElement | null;
-    const suction = qs('.clicking-upgrade-item:first-child');
-    if (suction) suction.style.display = this.unlockedFeatures.has('suction') ? 'block' : 'none';
-    const critical = qs('.clicking-upgrade-item:last-child');
-    if (critical)
-      critical.style.display = this.unlockedFeatures.has('criticalClick') ? 'block' : 'none';
+
+    console.log('[DEBUG] updateUpgradeVisibility called');
+
+    // Update suction upgrade
+    const suction = qs('.upgrade-card:first-child');
+    console.log('[DEBUG] suction element found:', !!suction);
+    if (suction) {
+      const isUnlocked = this.unlockedFeatures.has('suction');
+      console.log('[DEBUG] suction isUnlocked:', isUnlocked);
+      suction.style.display = 'block';
+      this.updateUpgradeButtonForUnlock(suction, 'suction', isUnlocked);
+    }
+
+    // Update critical click upgrade
+    const critical = qs('.upgrade-card:last-child');
+    console.log('[DEBUG] critical element found:', !!critical);
+    if (critical) {
+      const isUnlocked = this.unlockedFeatures.has('criticalClick');
+      console.log('[DEBUG] critical isUnlocked:', isUnlocked);
+      critical.style.display = 'block';
+      this.updateUpgradeButtonForUnlock(critical, 'criticalClick', isUnlocked);
+    }
+
+    // Update faster drinks upgrade
     const faster = qs('.drink-speed-upgrade-container');
-    if (faster) faster.style.display = this.unlockedFeatures.has('fasterDrinks') ? 'block' : 'none';
+    if (faster) {
+      const isUnlocked = this.unlockedFeatures.has('fasterDrinks');
+      faster.style.display = 'block';
+      this.updateUpgradeButtonForUnlock(faster, 'fasterDrinks', isUnlocked);
+    }
+
+    // Update level up
     const levelUp = document.getElementById('levelUpDiv');
-    if (levelUp)
-      (levelUp as HTMLElement).style.display = this.unlockedFeatures.has('levelUp')
-        ? 'block'
-        : 'none';
+    if (levelUp) {
+      const isUnlocked = this.unlockedFeatures.has('levelUp');
+      (levelUp as HTMLElement).style.display = 'block';
+      this.updateUpgradeButtonForUnlock(levelUp as HTMLElement, 'levelUp', isUnlocked);
+    }
+
+    // Update shop items
     const shopItems = document.querySelectorAll('.shop-item');
     shopItems.forEach((item, index) => {
-      let show = false;
-      if (index === 0) show = this.unlockedFeatures.has('straws');
-      else if (index === 1) show = this.unlockedFeatures.has('widerStraws');
-      else if (index === 2) show = this.unlockedFeatures.has('cups');
-      else if (index === 3) show = this.unlockedFeatures.has('betterCups');
-      (item as HTMLElement).style.display = show ? 'block' : 'none';
+      let featureName = '';
+      if (index === 0) featureName = 'straws';
+      else if (index === 1) featureName = 'widerStraws';
+      else if (index === 2) featureName = 'cups';
+      else if (index === 3) featureName = 'betterCups';
+
+      if (featureName) {
+        const isUnlocked = this.unlockedFeatures.has(featureName);
+        (item as HTMLElement).style.display = 'block';
+        this.updateUpgradeButtonForUnlock(item as HTMLElement, featureName, isUnlocked);
+      }
     });
+
+    this._updatingUpgradeVisibility = false;
   },
   saveUnlockedFeatures() {
     try {
@@ -232,7 +379,16 @@ export const FEATURE_UNLOCKS = {
         const raw = localStorage.getItem('unlockedFeatures');
         if (raw) saved = JSON.parse(raw);
       }
-      if (saved) this.unlockedFeatures = new Set<string>(saved as string[]);
+
+      if (saved && Array.isArray(saved)) {
+        // Load all saved features - they should be valid since they were saved by the system
+        this.unlockedFeatures = new Set<string>(saved);
+        console.log('Loaded unlocked features:', Array.from(this.unlockedFeatures));
+      } else {
+        // Only set default features if no saved data exists
+        this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
+        console.log('No saved features found, using defaults:', Array.from(this.unlockedFeatures));
+      }
     } catch (e) {
       try {
         console.error('Error loading unlocked features:', e);
@@ -253,152 +409,406 @@ export const FEATURE_UNLOCKS = {
     }
     this.updateFeatureVisibility();
   },
+
+  // Reset unlock system to ensure only default features are unlocked
+  resetUnlockSystem() {
+    console.log('Resetting unlock system to default state...');
+    this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
+    this.saveUnlockedFeatures();
+    this.updateFeatureVisibility();
+    this.updateUnlocksTab();
+  },
+
+  // Force reset all unlock data and clear storage
+  forceResetUnlockSystem() {
+    console.log('Force resetting unlock system - clearing all data...');
+    this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
+
+    // Clear all storage
+    try {
+      const app: any = (window as any).App;
+      if (app?.storage?.remove) {
+        app.storage.remove('unlockedFeatures');
+      } else {
+        localStorage.removeItem('unlockedFeatures');
+      }
+    } catch (error) {
+      console.warn('Failed to clear unlock storage:', error);
+    }
+
+    this.saveUnlockedFeatures();
+    this.updateFeatureVisibility();
+    this.updateUnlocksTab();
+  },
+
+  // Global function to reset unlock system (accessible from console)
+  resetAllUnlocks() {
+    console.log('Resetting all unlocks to default state...');
+    this.forceResetUnlockSystem();
+    console.log(
+      'Unlock system reset complete. Only soda, options, and dev tabs should be unlocked.'
+    );
+  },
   checkAllUnlocks() {
-    const w: any = window as any;
-    const st = w.App?.state?.getState?.() || {};
-    if (typeof st.sips === 'undefined' || typeof st.totalClicks === 'undefined') return;
-    Object.keys(this.unlockConditions).forEach(f => this.checkUnlock(f));
+    // Auto-unlock system disabled - only manual purchases unlock features
+    // This function now only updates the UI, doesn't perform auto-unlocks
     this.updateUnlocksTab();
   },
   updateUnlocksTab() {
     const unlocksGrid = document.getElementById('unlocksGrid');
     if (!unlocksGrid) return;
-    const w: any = window as any;
-    const st = w.App?.state?.getState?.() || {};
-    if (typeof st.sips === 'undefined' || typeof st.totalClicks === 'undefined') return;
-    unlocksGrid.innerHTML = '';
-    const featureInfo: Record<
-      string,
-      { icon: string; name: string; description: string; category: string }
-    > = {
-      suction: {
-        icon: '💨',
-        name: 'Suction Upgrade',
-        description: 'Increases sips gained per click',
-        category: 'Clicking',
-      },
-      criticalClick: {
-        icon: '⚡',
-        name: 'Critical Click',
-        description: 'Chance to get bonus sips on clicks',
-        category: 'Clicking',
-      },
-      fasterDrinks: {
-        icon: '⚡',
-        name: 'Faster Drinks',
-        description: 'Reduces time between automatic drinks',
-        category: 'Drinking',
-      },
-      straws: {
-        icon: '🥤',
-        name: 'Straws',
-        description: 'Passive sips production per drink',
-        category: 'Production',
-      },
-      cups: {
-        icon: '☕',
-        name: 'Cups',
-        description: 'More passive sips production per drink',
-        category: 'Production',
-      },
-      widerStraws: {
-        icon: '🥤',
-        name: 'Wider Straws',
-        description: 'Upgrade to increase straw production',
-        category: 'Production',
-      },
-      betterCups: {
-        icon: '☕',
-        name: 'Better Cups',
-        description: 'Upgrade to increase cup production',
-        category: 'Production',
-      },
-      levelUp: {
-        icon: '⭐',
-        name: 'Level Up',
-        description: 'Increase your level for bonus sips',
-        category: 'Progression',
-      },
-      shop: {
-        icon: '🛒',
-        name: 'Shop & Upgrades',
-        description: 'Access the shop to buy upgrades',
-        category: 'Interface',
-      },
-      stats: {
-        icon: '📊',
-        name: 'Statistics',
-        description: 'View your game statistics and progress',
-        category: 'Interface',
-      },
-      god: {
-        icon: '🙏',
-        name: 'Talk to God',
-        description: 'Seek divine wisdom and guidance',
-        category: 'Special',
-      },
-      options: {
-        icon: '⚙️',
-        name: 'Options',
-        description: 'Configure game settings and save/load',
-        category: 'Interface',
-      },
-      unlocks: {
-        icon: '🔓',
-        name: 'Unlocks',
-        description: 'Track your feature unlock progress',
-        category: 'Interface',
-      },
-      dev: {
-        icon: '🛠️',
-        name: 'Developer Tools',
-        description: 'Access developer tools and debugging features',
-        category: 'Development',
-      },
-    };
-    Object.keys(this.unlockConditions).forEach(feature => {
-      const info = featureInfo[feature];
-      const condition = this.unlockConditions[feature];
-      if (!info || !condition) return;
-      const isUnlocked = this.unlockedFeatures.has(feature);
-      const sipsMet = Number(st.sips || 0) >= condition.sips;
-      const clicksMet = Number(st.totalClicks || 0) >= condition.clicks;
-      const el = document.createElement('div');
-      el.className = `unlock-item ${isUnlocked ? 'unlocked' : 'locked'}`;
-      el.innerHTML = `
-        <div class="unlock-status">${isUnlocked ? '🔓' : '🔒'}</div>
-        <div class="unlock-header">
-          <div class="unlock-icon">${info.icon || '❓'}</div>
-          <div class="unlock-info">
-            <div class="unlock-name">${info.name || feature}</div>
-            <div class="unlock-description">${info.description || 'No description available'}</div>
+
+    // Simple progress overview since costs are now on buttons
+    const totalFeatures = this.availableFeatures.length;
+    const unlockedCount = this.unlockedFeatures.size - 3; // Subtract soda, options, dev
+    const progressPercent = Math.round((unlockedCount / totalFeatures) * 100);
+
+    unlocksGrid.innerHTML = `
+      <div class="unlocks-overview">
+        <div class="unlocks-progress-header">
+          <h3>Feature Unlock Progress</h3>
+          <div class="unlocks-progress-stats">
+            <span class="unlocked-count">${unlockedCount}</span>
+            <span class="progress-separator">/</span>
+            <span class="total-count">${totalFeatures}</span>
+            <span class="progress-percent">(${progressPercent}%)</span>
           </div>
         </div>
-        <div class="unlock-requirements">
-          <div class="requirement ${sipsMet ? 'met' : ''}">
-            <span class="requirement-label">Total Sips:</span>
-            <span class="requirement-value">${typeof (window as any).prettify !== 'undefined' ? (window as any).prettify(Number(st.sips || 0)) : String(Number(st.sips || 0))} / ${typeof (window as any).prettify !== 'undefined' ? (window as any).prettify(condition.sips) : String(condition.sips)}</span>
+        
+        <div class="unlocks-progress-bar">
+          <div class="unlocks-progress-fill" style="width: ${progressPercent}%"></div>
+        </div>
+        
+        <div class="unlocks-info">
+          <p>💡 <strong>Tip:</strong> Unlock costs are now shown directly on buttons and tabs!</p>
+          <p>Click any locked feature to see its unlock cost and purchase it.</p>
+        </div>
+        
+        <div class="unlocks-features-list">
+          <h4>Available Features:</h4>
+          <div class="feature-grid">
+            ${this.availableFeatures
+              .map(feature => {
+                const isUnlocked = this.unlockedFeatures.has(feature);
+                const purchaseInfo = this.getUnlockPurchaseInfo(feature);
+                const costText =
+                  typeof (window as any).prettify !== 'undefined'
+                    ? (window as any).prettify(Number(purchaseInfo.cost.toString()))
+                    : purchaseInfo.cost.toString();
+
+                return `
+                  <div class="feature-item ${isUnlocked ? 'unlocked' : 'locked'}">
+                    <span class="feature-icon">${isUnlocked ? '✅' : '🔒'}</span>
+                    <span class="feature-name">${feature}</span>
+                    ${!isUnlocked ? `<span class="feature-cost">${costText} Sips</span>` : ''}
+                  </div>
+                `;
+              })
+              .join('')}
           </div>
-          <div class="requirement ${clicksMet ? 'met' : ''}">
-            <span class="requirement-label">Total Clicks:</span>
-            <span class="requirement-value">${Number(st.totalClicks || 0)} / ${condition.clicks}</span>
-          </div>
-        </div>`;
-      unlocksGrid.appendChild(el);
-    });
+        </div>
+      </div>
+    `;
+
     this.updateUnlocksProgress();
   },
   updateUnlocksProgress() {
     const w: any = window as any;
     const st = w.App?.state?.getState?.() || {};
     if (typeof st.sips === 'undefined' || typeof st.totalClicks === 'undefined') return;
-    const total = Object.keys(this.unlockConditions).length;
-    const unlocked = this.unlockedFeatures.size - 1;
+    const total = this.availableFeatures.length;
+    const unlocked = this.unlockedFeatures.size - 3; // Subtract soda, options, dev
     const pct = (unlocked / total) * 100;
     const progressElement = document.getElementById('unlocksProgress');
     const progressFillElement = document.getElementById('unlocksProgressFill');
     if (progressElement) progressElement.textContent = `${unlocked}/${total}`;
     if (progressFillElement) (progressFillElement as HTMLElement).style.width = `${pct}%`;
+  },
+
+  // New methods for unlock purchase system
+  getUnlockCost(featureName: string) {
+    return unlockPurchases.getCost(featureName);
+  },
+
+  canPurchaseUnlock(featureName: string) {
+    return unlockPurchases.canPurchase(featureName);
+  },
+
+  purchaseUnlock(featureName: string) {
+    return unlockPurchases.execute(featureName);
+  },
+
+  getUnlockPurchaseInfo(featureName: string) {
+    return unlockPurchases.getInfo(featureName);
+  },
+
+  getAllUnlockPurchaseInfo() {
+    return unlockPurchases.getAllInfo();
+  },
+
+  // Check if feature is available for purchase (not unlocked and affordable)
+  isFeatureAvailableForPurchase(featureName: string): boolean {
+    const info = this.getUnlockPurchaseInfo(featureName);
+    return info.canPurchase;
+  },
+
+  // Get all features available for purchase
+  getAvailableFeaturesForPurchase(): string[] {
+    const allInfo = this.getAllUnlockPurchaseInfo();
+    if (!allInfo) return [];
+    return Object.keys(allInfo).filter(feature => allInfo[feature]?.canPurchase);
+  },
+
+  // Update tab button to show unlock cost when locked
+  updateTabButtonForUnlock(button: HTMLElement, tabName: string) {
+    const purchaseInfo = this.getUnlockPurchaseInfo(tabName);
+    const cost = purchaseInfo.cost;
+    const canPurchase = purchaseInfo.canPurchase;
+
+    // Get feature info for display
+    const featureInfo: Record<string, { icon: string; name: string }> = {
+      shop: { icon: '🛒', name: 'Shop & Upgrades' },
+      stats: { icon: '📊', name: 'Statistics' },
+      god: { icon: '🙏', name: 'Talk to God' },
+      unlocks: { icon: '🔓', name: 'Unlocks' },
+    };
+
+    const info = featureInfo[tabName] || { icon: '❓', name: tabName };
+    const costText =
+      typeof (window as any).prettify !== 'undefined'
+        ? (window as any).prettify(Number(cost.toString()))
+        : cost.toString();
+
+    // Update button content
+    button.innerHTML = `
+      <span class="tab-icon">${info.icon}</span>
+      <span class="tab-label">${info.name}</span>
+      <span class="tab-unlock-cost">${costText} Sips</span>
+    `;
+
+    // Update data-action to purchase unlock
+    button.setAttribute('data-action', `purchaseUnlock:${tabName}`);
+
+    // Add appropriate classes
+    button.classList.remove('unlocked');
+    button.classList.add('locked');
+    if (canPurchase) {
+      button.classList.add('affordable');
+    } else {
+      button.classList.remove('affordable');
+    }
+  },
+
+  // Update tab button to show normal unlocked state
+  updateTabButtonForUnlocked(button: HTMLElement, tabName: string) {
+    const featureInfo: Record<string, { icon: string; name: string }> = {
+      shop: { icon: '🛒', name: 'Shop & Upgrades' },
+      stats: { icon: '📊', name: 'Statistics' },
+      god: { icon: '🙏', name: 'Talk to God' },
+      unlocks: { icon: '🔓', name: 'Unlocks' },
+    };
+
+    const info = featureInfo[tabName] || { icon: '❓', name: tabName };
+
+    // Update button content
+    button.innerHTML = `
+      <span class="tab-icon">${info.icon}</span>
+      <span class="tab-label">${info.name}</span>
+    `;
+
+    // Update data-action back to switch tab
+    button.setAttribute('data-action', `switchTab:${tabName}`);
+
+    // Add appropriate classes
+    button.classList.remove('locked', 'affordable');
+    button.classList.add('unlocked');
+  },
+
+  // Update mobile tab to show unlock cost when locked
+  updateMobileTabForUnlock(item: HTMLElement, tabName: string) {
+    const purchaseInfo = this.getUnlockPurchaseInfo(tabName);
+    const cost = purchaseInfo.cost;
+    const canPurchase = purchaseInfo.canPurchase;
+
+    // Get feature info for display
+    const featureInfo: Record<string, { icon: string; name: string }> = {
+      shop: { icon: '🛒', name: 'Shop' },
+      stats: { icon: '📊', name: 'Stats' },
+      god: { icon: '🙏', name: 'God' },
+      unlocks: { icon: '🔓', name: 'Unlocks' },
+    };
+
+    const info = featureInfo[tabName] || { icon: '❓', name: tabName };
+    const costText =
+      typeof (window as any).prettify !== 'undefined'
+        ? (window as any).prettify(Number(cost.toString()))
+        : cost.toString();
+
+    // Update item content
+    item.innerHTML = `
+      <div class="mobile-tab-icon">${info.icon}</div>
+      <div class="mobile-tab-label">${info.name}</div>
+      <div class="mobile-tab-unlock-cost">${costText}</div>
+    `;
+
+    // Update data-action to purchase unlock
+    item.setAttribute('data-action', `purchaseUnlock:${tabName}`);
+
+    // Add appropriate classes
+    item.classList.remove('unlocked');
+    item.classList.add('locked');
+    if (canPurchase) {
+      item.classList.add('affordable');
+    } else {
+      item.classList.remove('affordable');
+    }
+  },
+
+  // Update mobile tab to show normal unlocked state
+  updateMobileTabForUnlocked(item: HTMLElement, tabName: string) {
+    const featureInfo: Record<string, { icon: string; name: string }> = {
+      shop: { icon: '🛒', name: 'Shop' },
+      stats: { icon: '📊', name: 'Stats' },
+      god: { icon: '🙏', name: 'God' },
+      unlocks: { icon: '🔓', name: 'Unlocks' },
+    };
+
+    const info = featureInfo[tabName] || { icon: '❓', name: tabName };
+
+    // Update item content
+    item.innerHTML = `
+      <div class="mobile-tab-icon">${info.icon}</div>
+      <div class="mobile-tab-label">${info.name}</div>
+    `;
+
+    // Update data-action back to switch tab
+    item.setAttribute('data-action', `switchTab:${tabName}`);
+
+    // Add appropriate classes
+    item.classList.remove('locked', 'affordable');
+    item.classList.add('unlocked');
+  },
+
+  // Update upgrade button to show unlock cost when locked
+  updateUpgradeButtonForUnlock(container: HTMLElement, featureName: string, isUnlocked: boolean) {
+    if (isUnlocked) {
+      // Restore normal upgrade functionality
+      this.restoreUpgradeButton(container, featureName);
+      return;
+    }
+
+    const purchaseInfo = this.getUnlockPurchaseInfo(featureName);
+    const cost = purchaseInfo.cost;
+    const canPurchase = purchaseInfo.canPurchase;
+
+    // Get feature info for display
+    const featureInfo: Record<string, { icon: string; name: string }> = {
+      suction: { icon: '💨', name: 'Suction Upgrade' },
+      criticalClick: { icon: '⚡', name: 'Critical Click' },
+      fasterDrinks: { icon: '⚡', name: 'Faster Drinks' },
+      straws: { icon: '🥤', name: 'Straws' },
+      widerStraws: { icon: '🥤', name: 'Wider Straws' },
+      cups: { icon: '☕', name: 'Cups' },
+      betterCups: { icon: '☕', name: 'Better Cups' },
+      levelUp: { icon: '⭐', name: 'Level Up' },
+    };
+
+    const info = featureInfo[featureName] || { icon: '❓', name: featureName };
+    const costText =
+      typeof (window as any).prettify !== 'undefined'
+        ? (window as any).prettify(Number(cost.toString()))
+        : cost.toString();
+
+    // Find the button within the container
+    const button = container.querySelector('button') as HTMLElement;
+    if (!button) return;
+
+    // Update button content to show unlock cost
+    button.innerHTML = `
+      <div class="upgrade-icon">${info.icon}</div>
+      <div class="upgrade-info">
+        <div class="upgrade-name">${info.name}</div>
+        <div class="upgrade-unlock-cost">Unlock: ${costText} Sips</div>
+      </div>
+    `;
+
+    // Update data-action to purchase unlock
+    button.setAttribute('data-action', `purchaseUnlock:${featureName}`);
+    console.log(`[DEBUG] Set data-action for ${featureName}:`, button.getAttribute('data-action'));
+
+    // Add appropriate classes
+    button.classList.remove('affordable');
+    button.classList.add('locked');
+    if (canPurchase) {
+      button.classList.add('affordable');
+    }
+
+    console.log(`[DEBUG] Button classes for ${featureName}:`, button.className);
+    console.log(`[DEBUG] Button canPurchase: ${canPurchase}`);
+
+    // Hide stats/effects when locked
+    const stats = container.querySelector('.upgrade-stats, .upgrade-effect');
+    if (stats) {
+      (stats as HTMLElement).style.display = 'none';
+    }
+  },
+
+  // Restore upgrade button to normal functionality
+  restoreUpgradeButton(container: HTMLElement, featureName: string) {
+    const button = container.querySelector('button') as HTMLElement;
+    if (!button) return;
+
+    // Restore original data-action based on feature
+    const actionMap: Record<string, string> = {
+      suction: 'buySuction',
+      criticalClick: 'buyCriticalClick',
+      fasterDrinks: 'buyFasterDrinks',
+      straws: 'buyStraw',
+      widerStraws: 'buyWiderStraws',
+      cups: 'buyCup',
+      betterCups: 'buyBetterCups',
+      levelUp: 'levelUp',
+    };
+
+    const action = actionMap[featureName];
+    if (action) {
+      button.setAttribute('data-action', action);
+    }
+
+    // Remove lock classes
+    button.classList.remove('locked', 'affordable');
+
+    // Show stats/effects when unlocked
+    const stats = container.querySelector('.upgrade-stats, .upgrade-effect');
+    if (stats) {
+      (stats as HTMLElement).style.display = '';
+    }
+
+    // Restore normal button content structure
+    const costElementId = this.getCostElementId(featureName);
+    button.innerHTML = `<div class="upgrade-cost"><span id="${costElementId}">0</span> Sips</div>`;
+
+    // Trigger UI update to restore normal button content
+    try {
+      (window as any).App?.ui?.updateAllDisplays?.();
+    } catch (error) {
+      console.warn('Failed to update displays after unlock:', error);
+    }
+  },
+
+  // Get the cost element ID for a feature
+  getCostElementId(featureName: string): string {
+    const costElementMap: Record<string, string> = {
+      suction: 'suctionCostCompact',
+      criticalClick: 'criticalClickCostCompact',
+      fasterDrinks: 'fasterDrinksCostCompact',
+      straws: 'strawCost',
+      widerStraws: 'widerStrawsCost',
+      cups: 'cupCost',
+      betterCups: 'betterCupsCost',
+      levelUp: 'levelUpCost',
+    };
+    return costElementMap[featureName] || `${featureName}Cost`;
   },
 };
 

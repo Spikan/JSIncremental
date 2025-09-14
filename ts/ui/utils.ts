@@ -180,6 +180,13 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
   if (typeof window === 'undefined') return;
   const button = findButton(buttonId);
   if (!button || !(button as any).classList) return;
+
+  // Skip buttons that are in unlock mode (have data-action starting with "purchaseUnlock:")
+  const dataAction = (button as HTMLElement).getAttribute('data-action');
+  if (dataAction && dataAction.startsWith('purchaseUnlock:')) {
+    return;
+  }
+
   (button as HTMLButtonElement).disabled = !isAffordable;
   try {
     (button as any).classList.toggle('affordable', isAffordable);

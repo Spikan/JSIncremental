@@ -14,6 +14,27 @@ import { nextStrawCost, nextCupCost } from '../core/rules/purchases';
 // Direct break_eternity.js Decimal access
 const Decimal = (globalThis as any).Decimal;
 
+// Helper function to check if a button is in unlock mode
+function isButtonInUnlockMode(buttonId: string): boolean {
+  const unlockButtons = document.querySelectorAll(`button[data-action*="purchaseUnlock"]`);
+  console.log(`[DEBUG] Checking unlock mode for ${buttonId}:`, {
+    unlockButtonsFound: unlockButtons.length,
+    unlockButtons: Array.from(unlockButtons).map(btn => ({
+      id: btn.id,
+      dataAction: btn.getAttribute('data-action'),
+      classes: btn.className,
+    })),
+  });
+
+  if (unlockButtons.length === 0) return false;
+
+  // Check if this button ID corresponds to an unlock button
+  const unlockButtonIds = ['buySuction', 'buyCriticalClick', 'buyFasterDrinks'];
+  const isUnlockButton = unlockButtonIds.includes(buttonId);
+  console.log(`[DEBUG] ${buttonId} is unlock button: ${isUnlockButton}`);
+  return isUnlockButton;
+}
+
 // Main function to check upgrade affordability and update UI
 export function checkUpgradeAffordability(): void {
   if (typeof window === 'undefined') return;
@@ -32,12 +53,30 @@ export function checkUpgradeAffordability(): void {
 
   const costs = calculateAllCosts();
 
-  // Update button states based on affordability
+  // Update button states based on affordability (skip unlock buttons)
   updateButtonState('buyStraw', canAfford(costs.straw), costs.straw);
   updateButtonState('buyCup', canAfford(costs.cup), costs.cup);
-  updateButtonState('buySuction', canAfford(costs.suction), costs.suction);
-  updateButtonState('buyFasterDrinks', canAfford(costs.fasterDrinks), costs.fasterDrinks);
-  updateButtonState('buyCriticalClick', canAfford(costs.criticalClick), costs.criticalClick);
+
+  // Only update these buttons if they're not in unlock mode
+  if (!isButtonInUnlockMode('buySuction')) {
+    console.log(`[DEBUG] Updating buySuction button`);
+    updateButtonState('buySuction', canAfford(costs.suction), costs.suction);
+  } else {
+    console.log(`[DEBUG] Skipping buySuction button (in unlock mode)`);
+  }
+  if (!isButtonInUnlockMode('buyFasterDrinks')) {
+    console.log(`[DEBUG] Updating buyFasterDrinks button`);
+    updateButtonState('buyFasterDrinks', canAfford(costs.fasterDrinks), costs.fasterDrinks);
+  } else {
+    console.log(`[DEBUG] Skipping buyFasterDrinks button (in unlock mode)`);
+  }
+  if (!isButtonInUnlockMode('buyCriticalClick')) {
+    console.log(`[DEBUG] Updating buyCriticalClick button`);
+    updateButtonState('buyCriticalClick', canAfford(costs.criticalClick), costs.criticalClick);
+  } else {
+    console.log(`[DEBUG] Skipping buyCriticalClick button (in unlock mode)`);
+  }
+
   updateButtonState('buyWiderStraws', canAfford(costs.widerStraws), costs.widerStraws);
   updateButtonState('buyBetterCups', canAfford(costs.betterCups), costs.betterCups);
   updateButtonState('upgradeFasterDrinks', canAfford(costs.fasterDrinksUp), costs.fasterDrinksUp);
@@ -66,6 +105,13 @@ export function checkUpgradeAffordability(): void {
   );
   updateCostDisplay('levelUpCost', costs.levelUp, canAfford(costs.levelUp));
   updateCostDisplay('levelCost', costs.levelUp, canAfford(costs.levelUp));
+
+  // Update unlock feature visibility and affordability
+  try {
+    (window as any).App?.systems?.unlocks?.updateFeatureVisibility?.();
+  } catch (error) {
+    console.warn('Failed to update feature visibility in affordability check:', error);
+  }
 }
 
 // Update shop button states based on current affordability

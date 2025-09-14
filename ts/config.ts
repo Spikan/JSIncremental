@@ -114,6 +114,7 @@ export const config = {
     SODA_CLICK_VOLUME_MAX: 0.5,
   },
   UNLOCKS: {
+    // Legacy threshold-based unlocks (kept for backward compatibility)
     SUCTION: { sips: 25, clicks: 8 },
     CRITICAL_CLICK: { sips: 100, clicks: 20 },
     FASTER_DRINKS: { sips: 200, clicks: 30 },
@@ -126,6 +127,21 @@ export const config = {
     STATS: { sips: 1000, clicks: 60 },
     GOD: { sips: 5000, clicks: 300 },
     UNLOCKS_TAB: { sips: 10, clicks: 5 },
+  },
+  // New unlock purchase costs (one-time purchases)
+  UNLOCK_PURCHASES: {
+    SUCTION: 50,
+    CRITICAL_CLICK: 100,
+    FASTER_DRINKS: 200,
+    STRAWS: 500,
+    CUPS: 1000,
+    WIDER_STRAWS: 2000,
+    BETTER_CUPS: 5000,
+    LEVEL_UP: 10000,
+    SHOP: 300,
+    STATS: 800,
+    GOD: 15000,
+    UNLOCKS_TAB: 25,
   },
   FORMATTING: {
     SMALL_NUMBER_THRESHOLD: 1000,
