@@ -78,19 +78,40 @@ export function applyEnhancedAffordabilityClasses(): void {
 
     const affordabilityState = calculateAffordabilityState(cost);
 
-    // Remove existing affordability classes
-    element.classList.remove('affordable', 'near-affordable', 'unaffordable');
-
-    // Apply new classes
+    // Determine what class should be applied
+    let targetClass = '';
     if (affordabilityState.affordable) {
-      element.classList.add('affordable');
+      targetClass = 'affordable';
     } else if (affordabilityState.nearAffordable) {
-      element.classList.add('near-affordable');
+      targetClass = 'near-affordable';
     } else {
-      element.classList.add('unaffordable');
+      targetClass = 'unaffordable';
     }
 
-    // Add data attributes for tooltip system
+    // Only update classes if they've actually changed
+    const hasAffordable = element.classList.contains('affordable');
+    const hasNearAffordable = element.classList.contains('near-affordable');
+    const hasUnaffordable = element.classList.contains('unaffordable');
+
+    const needsUpdate = 
+      (targetClass === 'affordable' && !hasAffordable) ||
+      (targetClass === 'near-affordable' && !hasNearAffordable) ||
+      (targetClass === 'unaffordable' && !hasUnaffordable) ||
+      (targetClass !== 'affordable' && hasAffordable) ||
+      (targetClass !== 'near-affordable' && hasNearAffordable) ||
+      (targetClass !== 'unaffordable' && hasUnaffordable);
+
+    if (needsUpdate) {
+      // Remove existing affordability classes
+      element.classList.remove('affordable', 'near-affordable', 'unaffordable');
+
+      // Apply new class
+      if (targetClass) {
+        element.classList.add(targetClass);
+      }
+    }
+
+    // Add data attributes for tooltip system (always update these as they change frequently)
     element.setAttribute(
       'data-affordability-percentage',
       affordabilityState.percentageToAfford.toFixed(1)
@@ -283,8 +304,8 @@ export function initializeEnhancedAffordabilitySystem(): void {
   // Initialize purchase success animations
   initializePurchaseSuccessAnimations();
 
-  // Update affordability classes periodically
-  setInterval(applyEnhancedAffordabilityClasses, 1000);
+  // Update affordability classes periodically (reduced frequency to prevent flashing)
+  setInterval(applyEnhancedAffordabilityClasses, 2000);
 
   // Update on state changes
   useGameStore.subscribe(
