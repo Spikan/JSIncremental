@@ -1353,8 +1353,9 @@ export const execute = {
     }
     try {
       w.App?.ui?.updateLevelText?.();
+      w.App?.ui?.updateLevelNumber?.();
     } catch (error) {
-      console.warn('Failed to update level text after level up:', error);
+      console.warn('Failed to update level displays after level up:', error);
     }
     try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
