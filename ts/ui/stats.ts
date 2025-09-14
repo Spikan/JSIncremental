@@ -250,6 +250,41 @@ export function updateAchievementStats(): void {
 
   // Update purchased item counts in shop displays
   updatePurchasedCounts();
+
+  // Update enhancement values for upgrade displays
+  updateEnhancementValues();
+}
+
+// Update enhancement values for upgrade displays
+export function updateEnhancementValues(): void {
+  const state = (window as any).App?.state?.getState?.();
+  if (!state) return;
+
+  // Update Wider Straws enhancement display
+  const widerStrawsSPDElement = (window as any).DOM_CACHE?.widerStrawsSPD as
+    | HTMLElement
+    | undefined;
+  if (widerStrawsSPDElement) {
+    const widerStraws = state.widerStraws || 0;
+    const widerStrawsLarge = toDecimal(widerStraws);
+    // Calculate the actual multiplier effect: 1 + (widerStraws * 0.2)
+    const multiplierPerLevel = 0.2; // From upgrades.json
+    const enhancementMultiplier = toDecimal(1).add(widerStrawsLarge.mul(multiplierPerLevel));
+    const enhancementPercent = enhancementMultiplier.sub(1).mul(100);
+    widerStrawsSPDElement.textContent = `+${formatNumber(enhancementPercent.toString())}%`;
+  }
+
+  // Update Better Cups enhancement display
+  const betterCupsSPDElement = (window as any).DOM_CACHE?.betterCupsSPD as HTMLElement | undefined;
+  if (betterCupsSPDElement) {
+    const betterCups = state.betterCups || 0;
+    const betterCupsLarge = toDecimal(betterCups);
+    // Calculate the actual multiplier effect: 1 + (betterCups * 0.3)
+    const multiplierPerLevel = 0.3; // From upgrades.json
+    const enhancementMultiplier = toDecimal(1).add(betterCupsLarge.mul(multiplierPerLevel));
+    const enhancementPercent = enhancementMultiplier.sub(1).mul(100);
+    betterCupsSPDElement.textContent = `+${formatNumber(enhancementPercent.toString())}%`;
+  }
 }
 
 // Update purchased item counts in shop displays
