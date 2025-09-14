@@ -736,14 +736,44 @@ function initializeSwipeGestures(): void {
     return tabOrder.indexOf(tabId);
   }
 
-  // Switch to tab by index
-  function switchToTabByIndex(index: number): void {
-    if (index < 0 || index >= tabOrder.length) return;
 
-    const tabName = tabOrder[index];
-    if (tabName) {
-      const event = new Event('swipe');
-      switchTab(tabName, event);
+  // Check if a tab is disabled
+  function isTabDisabled(tabName: string): boolean {
+    try {
+      const w = window as any;
+      const state = w.App?.state?.getState?.();
+
+      if (tabName === 'dev') {
+        return !state?.options?.devTabEnabled;
+      }
+      if (tabName === 'god') {
+        return !state?.options?.godTabEnabled;
+      }
+
+      return false; // Other tabs are always enabled
+    } catch {
+      return false;
+    }
+  }
+
+  // Find and switch to the next available tab in the given direction
+  function findAndSwitchToAvailableTab(startIndex: number, direction: number): void {
+    let index = startIndex;
+    const maxAttempts = tabOrder.length;
+    let attempts = 0;
+
+    while (attempts < maxAttempts) {
+      if (index >= 0 && index < tabOrder.length) {
+        const tabName = tabOrder[index];
+        if (tabName && !isTabDisabled(tabName)) {
+          const event = new Event('swipe');
+          switchTab(tabName, event);
+          return;
+        }
+      }
+
+      index += direction;
+      attempts++;
     }
   }
 
@@ -770,11 +800,11 @@ function initializeSwipeGestures(): void {
         // Only process horizontal swipes
         if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
           if (deltaX > 0) {
-            // Swipe right - previous tab
-            switchToTabByIndex(currentTabIndex - 1);
+            // Swipe right - previous available tab
+            findAndSwitchToAvailableTab(currentTabIndex - 1, -1);
           } else {
-            // Swipe left - next tab
-            switchToTabByIndex(currentTabIndex + 1);
+            // Swipe left - next available tab
+            findAndSwitchToAvailableTab(currentTabIndex + 1, 1);
           }
         }
       }

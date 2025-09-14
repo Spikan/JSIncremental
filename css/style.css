@@ -696,6 +696,28 @@ body {
     padding: 1rem 0.75rem;
     margin: 0;
   }
+
+  /* Fix mobile horizontal overflow issues */
+  .splash-start-btn {
+    min-width: 200px !important; /* Reduced from 250px */
+    max-width: 90vw;
+  }
+
+  .tab-btn {
+    min-width: 120px !important; /* Reduced from 160px */
+    padding: 0.75rem 1rem;
+  }
+
+  .upgrade-btn {
+    min-width: 140px !important; /* Reduced from 160px */
+    max-width: 100%;
+  }
+
+  /* Ensure no element exceeds viewport width */
+  * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 /* Enhanced Focus States for Accessibility */
