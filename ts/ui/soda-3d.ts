@@ -480,7 +480,7 @@ export function createSoda3DButton(containerSelector: string): Soda3DButton {
     modelPath: sodaModelUrl,
     size: 300,
     width: 300,
-    height: 380,
+    height: 480, /* Increased from 380 to 480 to match CSS container height */
     rotationSpeed: 0.01,
     hoverSpeedMultiplier: 3,
     clickAnimationDuration: 500,
