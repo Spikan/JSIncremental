@@ -7819,6 +7819,84 @@ button {
   padding: 1.5rem 2rem 2rem;
 }
 
+/* Tab Navigation */
+.settings-modal-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 61, 2, 0.2);
+  margin: 0 2rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+}
+
+.settings-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  font-weight: 500;
+  position: relative;
+}
+
+.settings-tab-btn:hover {
+  background: rgba(255, 61, 2, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.settings-tab-btn.active {
+  background: rgba(255, 61, 2, 0.2);
+  color: #fff;
+  font-weight: 600;
+}
+
+.settings-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 61, 2, 0.8);
+}
+
+.tab-icon {
+  font-size: 1.1rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.tab-label {
+  font-size: 0.9rem;
+}
+
+/* Tab Content */
+.settings-tab-content {
+  display: none;
+  animation: tabFadeIn 0.3s ease-in-out;
+}
+
+.settings-tab-content.active {
+  display: block;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .settings-group {
   margin-bottom: 2rem;
 }
@@ -7901,6 +7979,23 @@ button {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
+
+  .settings-modal-tabs {
+    margin: 0 1.5rem;
+  }
+
+  .settings-tab-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .tab-icon {
+    font-size: 1rem;
+  }
+
+  .tab-label {
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -7927,6 +8022,23 @@ button {
   .settings-btn {
     padding: 0.6rem 0.8rem;
     font-size: 0.85rem;
+  }
+
+  .settings-modal-tabs {
+    margin: 0 1rem;
+  }
+
+  .settings-tab-btn {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.75rem;
+  }
+
+  .tab-icon {
+    font-size: 0.9rem;
+  }
+
+  .tab-label {
+    font-size: 0.75rem;
   }
 }
 

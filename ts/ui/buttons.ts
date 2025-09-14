@@ -323,6 +323,29 @@ const BUTTON_CONFIG: {
       type: 'settings-modal-btn',
       label: 'Close Settings',
     },
+    switchSettingsTab: {
+      func: (tabName: string) => {
+        try {
+          // Remove active class from all tabs and content
+          const allTabs = document.querySelectorAll('.settings-tab-btn');
+          const allContent = document.querySelectorAll('.settings-tab-content');
+
+          allTabs.forEach(tab => tab.classList.remove('active'));
+          allContent.forEach(content => content.classList.remove('active'));
+
+          // Add active class to selected tab and content
+          const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+          const selectedContent = document.getElementById(`${tabName}-tab`);
+
+          if (selectedTab) selectedTab.classList.add('active');
+          if (selectedContent) selectedContent.classList.add('active');
+        } catch (error) {
+          console.warn('Failed to switch settings tab:', error);
+        }
+      },
+      type: 'settings-modal-btn',
+      label: 'Switch Settings Tab',
+    },
   },
 };
 

@@ -579,43 +579,6 @@
               </div>
             </div>
 
-            <!-- Stats Section -->
-            <div class="sidebar-section" data-section="stats">
-              <div class="section-header" data-action="toggleSection:stats">
-                <div class="section-icon">📊</div>
-                <div class="section-info">
-                  <h3 class="section-title">Statistics</h3>
-                  <p class="section-subtitle">Track your progress</p>
-                </div>
-                <div class="section-toggle">▼</div>
-              </div>
-              <div class="section-content">
-                <div class="stats-grid">
-                  <div class="stat-card">
-                    <div class="stat-icon">👆</div>
-                    <div class="stat-content">
-                      <div class="stat-label">Total Clicks</div>
-                      <div class="stat-value" id="totalClicks">0</div>
-                    </div>
-                  </div>
-                  <div class="stat-card">
-                    <div class="stat-icon">⏰</div>
-                    <div class="stat-content">
-                      <div class="stat-label">Play Time</div>
-                      <div class="stat-value" id="totalPlayTime">0:00:00</div>
-                    </div>
-                  </div>
-                  <div class="stat-card">
-                    <div class="stat-icon">💧</div>
-                    <div class="stat-content">
-                      <div class="stat-label">Total Sips</div>
-                      <div class="stat-value" id="totalSipsEarned">0</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- God Section -->
             <div class="sidebar-section" data-section="god">
               <div class="section-header" data-action="toggleSection:god">
@@ -666,7 +629,7 @@
         <div class="settings-modal-header">
           <h2 class="settings-modal-title">
             <span class="settings-icon">⚙️</span>
-            Settings
+            Settings & Statistics
           </h2>
           <button
             class="settings-modal-close"
@@ -677,25 +640,80 @@
           </button>
         </div>
 
+        <!-- Tab Navigation -->
+        <div class="settings-modal-tabs">
+          <button
+            class="settings-tab-btn active"
+            data-tab="settings"
+            data-action="switchSettingsTab"
+            data-args="settings"
+          >
+            <span class="tab-icon">⚙️</span>
+            <span class="tab-label">Settings</span>
+          </button>
+          <button
+            class="settings-tab-btn"
+            data-tab="statistics"
+            data-action="switchSettingsTab"
+            data-args="statistics"
+          >
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">Statistics</span>
+          </button>
+        </div>
+
         <div class="settings-modal-body">
-          <div class="settings-group">
-            <h4 class="settings-group-title">Audio</h4>
-            <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="settings-btn">
-              🔊 Button Sounds ON
-            </button>
+          <!-- Settings Tab Content -->
+          <div class="settings-tab-content active" id="settings-tab">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Audio</h4>
+              <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="settings-btn">
+                🔊 Button Sounds ON
+              </button>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Save & Load</h4>
+              <button data-action="save" class="settings-btn">Save Game</button>
+              <button data-action="delete_save" class="settings-btn">Delete Save</button>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Dev Tools</h4>
+              <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
+                🔧 Dev Tools OFF
+              </button>
+            </div>
           </div>
 
-          <div class="settings-group">
-            <h4 class="settings-group-title">Save & Load</h4>
-            <button data-action="save" class="settings-btn">Save Game</button>
-            <button data-action="delete_save" class="settings-btn">Delete Save</button>
-          </div>
-
-          <div class="settings-group">
-            <h4 class="settings-group-title">Dev Tools</h4>
-            <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
-              🔧 Dev Tools OFF
-            </button>
+          <!-- Statistics Tab Content -->
+          <div class="settings-tab-content" id="statistics-tab">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Game Statistics</h4>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-icon">👆</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Total Clicks</div>
+                    <div class="stat-value" id="totalClicks">0</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon">⏰</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Play Time</div>
+                    <div class="stat-value" id="totalPlayTime">0:00:00</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon">💧</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Total Sips</div>
+                    <div class="stat-value" id="totalSipsEarned">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
