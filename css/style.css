@@ -6837,8 +6837,8 @@ p {
 }
 
 .soda-button {
-  width: 200px;
-  height: 200px;
+  width: 250px;
+  height: 250px;
   cursor: pointer;
   transition: all 0.2s ease;
   filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.3));
@@ -6883,8 +6883,8 @@ p {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 220px;
-  height: 220px;
+  width: 270px;
+  height: 270px;
   pointer-events: none;
   border-radius: 50%;
   opacity: 0;
@@ -7361,13 +7361,13 @@ p {
   }
 
   .soda-button {
-    width: 150px;
-    height: 150px;
+    width: 180px;
+    height: 180px;
   }
 
   .click-indicator {
-    width: 170px;
-    height: 170px;
+    width: 200px;
+    height: 200px;
   }
 
   .soda-stats {

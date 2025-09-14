@@ -1,6 +1,7 @@
 // 3D Soda Button Implementation using Three.js
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import sodaModelUrl from '../../res/Soda.glb?url';
 
 interface Soda3DConfig {
   containerSelector: string;
@@ -93,11 +94,11 @@ export class Soda3DButton {
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      
+
       if (!gl || !(gl instanceof WebGLRenderingContext)) {
         return false;
       }
-      
+
       // Check for required WebGL extensions on mobile
       if (this.isMobile) {
         const requiredExtensions = ['OES_standard_derivatives'];
@@ -107,7 +108,7 @@ export class Soda3DButton {
           }
         }
       }
-      
+
       return true;
     } catch (error) {
       console.error('WebGL support check failed:', error);
@@ -446,8 +447,8 @@ export class Soda3DButton {
 export function createSoda3DButton(containerSelector: string): Soda3DButton {
   const config: Soda3DConfig = {
     containerSelector,
-    modelPath: '/res/Soda.glb',
-    size: 200,
+    modelPath: sodaModelUrl,
+    size: 250,
     rotationSpeed: 0.01,
     hoverSpeedMultiplier: 3,
     clickAnimationDuration: 500,
