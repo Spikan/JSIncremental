@@ -215,9 +215,9 @@ export class Soda3DButton {
         this.model.position.y -= 0.1; // Move model down just a bit
         this.centerPosition.copy(this.model.position);
 
-        // Scale to fit nicely in view - balanced size
+        // Scale to fit nicely in view - larger and more prominent
         const maxDimension = Math.max(size.x, size.y, size.z);
-        this.baseScale = 2.8 / maxDimension; // Good balance between size and fit
+        this.baseScale = 3.2 / maxDimension; // Larger scale for better prominence
         this.model.scale.setScalar(this.baseScale);
 
         this.scene.add(this.model);
@@ -463,7 +463,7 @@ export function createSoda3DButton(containerSelector: string): Soda3DButton {
     modelPath: sodaModelUrl,
     size: 300,
     width: 300,
-    height: 350,
+    height: 380,
     rotationSpeed: 0.01,
     hoverSpeedMultiplier: 3,
     clickAnimationDuration: 500,
