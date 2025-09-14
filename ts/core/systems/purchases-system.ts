@@ -730,7 +730,9 @@ export const execute = {
       console.warn('Failed to update all stats after straw purchase:', error);
     }
     try {
+      console.log('🔍 PURCHASE: About to call updateShopStats for straw');
       w.App?.ui?.updateShopStats?.();
+      console.log('🔍 PURCHASE: updateShopStats called successfully for straw');
       w.App?.ui?.updateAllDisplays?.();
     } catch (error) {
       console.warn('Failed to update shop displays after straw purchase:', error);
