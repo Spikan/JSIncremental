@@ -7285,9 +7285,10 @@ p {
 }
 
 .upgrade-btn.affordable {
-  background: linear-gradient(135deg, #059669, #047857);
-  border-color: #10b981;
-  box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4);
+  background-color: var(--primary-blue) !important;
+  color: var(--neutral-white) !important;
+  border-color: var(--primary-green) !important;
+  box-shadow: 0 3px 12px rgba(0, 179, 107, 0.4);
   /* Enhanced visual feedback for affordable items */
   animation: affordablePulse 2s ease-in-out infinite;
   position: relative;
