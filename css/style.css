@@ -694,6 +694,34 @@ body {
   }
 }
 
+/* Enhanced Focus States for Accessibility */
+button:focus-visible,
+.mobile-tab-item:focus-visible,
+.upgrade-btn:focus-visible,
+.level-up-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 217, 127, 0.6) !important;
+  z-index: 10;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .currency-value {
+    color: #ffffff !important;
+    text-shadow: 2px 2px 0 #000000 !important;
+  }
+  
+  .upgrade-btn.disabled,
+  .upgrade-btn.unaffordable {
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+  }
+  
+  .drink-progress-fill {
+    box-shadow: none !important;
+  }
+}
+
 /* Mobile Tab Touch Feedback */
 .mobile-tab-item:focus {
   outline: 2px solid #00d97f;
@@ -2040,11 +2068,13 @@ button:focus,
 
 .drink-progress-bar {
   width: 100%;
-  height: 12px;
-  background: rgba(0, 23, 137, 0.5);
-  border-radius: 6px;
+  height: 16px; /* Increased from 12px for better visibility */
+  background: rgba(0, 23, 137, 0.7);
+  border-radius: 8px; /* Increased from 6px */
   overflow: hidden;
-  border: 1px solid #00b36b;
+  border: 2px solid #00b36b; /* Increased border width */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
 }
 
 .drink-progress-fill {
@@ -2057,6 +2087,21 @@ button:focus,
   will-change: width;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  /* Enhanced glow effect */
+  box-shadow: 0 0 8px rgba(0, 217, 127, 0.4);
+  position: relative;
+}
+
+/* Add shimmer effect to progress bar */
+.drink-progress-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShimmer 2s ease-in-out infinite;
 }
 
 .drink-progress-fill.nearly-complete {
@@ -6943,9 +6988,28 @@ p {
 }
 
 .level-up-btn.disabled {
-  background: linear-gradient(135deg, #666, #444);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  cursor: not-allowed;
+  background: linear-gradient(135deg, #374151, #1f2937) !important;
+  border-color: #4b5563 !important;
+  color: #9ca3af !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+  position: relative;
+}
+
+.level-up-btn.disabled::after {
+  content: '🔒';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  opacity: 0.7;
+}
+
+.level-up-btn.disabled:hover {
+  transform: none !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
 .cost-display {
@@ -7021,15 +7085,42 @@ p {
 .upgrade-card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 4px solid transparent; /* Added for affordability indicator */
   border-radius: 15px;
   padding: 1.25rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease; /* Increased duration for smoother transitions */
+  position: relative;
 }
 
 .upgrade-card:hover {
   background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateX(2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Affordable upgrade card state */
+.upgrade-card.affordable {
+  border-left-color: #00ff88;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 179, 107, 0.05));
+  transform: translateX(2px);
+}
+
+.upgrade-card.affordable:hover {
+  border-left-color: #00d97f;
+  transform: translateY(-3px) translateX(4px);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.3);
+}
+
+/* Near-affordable upgrade card state */
+.upgrade-card.near-affordable {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(217, 119, 6, 0.05));
+}
+
+/* Unaffordable upgrade card state */
+.upgrade-card.unaffordable {
+  border-left-color: #6b7280;
+  opacity: 0.7;
 }
 
 .upgrade-header {
@@ -7107,12 +7198,72 @@ p {
   box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4);
   /* Enhanced visual feedback for affordable items */
   animation: affordablePulse 2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
 }
 
 .upgrade-btn:hover.affordable {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
   background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Enhanced disabled state with better visual feedback */
+.upgrade-btn.disabled,
+.upgrade-btn.unaffordable {
+  background: linear-gradient(135deg, #374151, #1f2937) !important;
+  border-color: #4b5563 !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+  transform: none !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  position: relative;
+}
+
+.upgrade-btn.disabled::after,
+.upgrade-btn.unaffordable::after {
+  content: '🔒';
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.upgrade-btn.disabled:hover,
+.upgrade-btn.unaffordable:hover {
+  transform: none !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Near-affordable state for better UX */
+.upgrade-btn.near-affordable {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  border-color: #f59e0b;
+  color: #fbbf24;
+  animation: nearAffordablePulse 3s ease-in-out infinite;
+}
+
+.upgrade-btn.near-affordable::after {
+  content: '⏳';
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Animation keyframes for enhanced button states */
+@keyframes nearAffordablePulse {
+  0%, 100% {
+    box-shadow: 0 3px 12px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 3px 12px rgba(245, 158, 11, 0.6);
+  }
 }
 
 /* Subtle pulse animation for affordable items */
