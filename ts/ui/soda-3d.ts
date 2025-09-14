@@ -12,9 +12,9 @@ interface Soda3DConfig {
 }
 
 export class Soda3DButton {
-  private scene: THREE.Scene;
-  private camera: THREE.PerspectiveCamera;
-  private renderer: THREE.WebGLRenderer;
+  private scene!: THREE.Scene;
+  private camera!: THREE.PerspectiveCamera;
+  private renderer!: THREE.WebGLRenderer;
   private model: THREE.Group | null = null;
   private container: HTMLElement | null = null;
   private isLoaded = false;
@@ -27,45 +27,130 @@ export class Soda3DButton {
   private clickHandlers: (() => void)[] = [];
   private baseScale = 1; // Store the calculated base scale
   private centerPosition = new THREE.Vector3(0, 0, 0); // Store the centered position
+  private isMobile = false; // Mobile device detection
 
   constructor(private config: Soda3DConfig) {
     this.rotationSpeed = config.rotationSpeed;
     this.hoverSpeedMultiplier = config.hoverSpeedMultiplier;
     this.clickAnimationDuration = config.clickAnimationDuration;
 
-    // Initialize Three.js scene
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    this.renderer = new THREE.WebGLRenderer({
-      alpha: true,
-      antialias: true,
-      powerPreference: 'high-performance',
-    });
+    // Detect mobile devices
+    this.isMobile = this.detectMobile();
 
-    this.setupScene();
-    this.loadModel();
+    // Check WebGL support before initializing
+    if (!this.checkWebGLSupport()) {
+      console.warn('⚠️ WebGL not supported, using fallback');
+      this.showFallback();
+      return;
+    }
+
+    try {
+      // Initialize Three.js scene with mobile optimizations
+      this.scene = new THREE.Scene();
+      this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+
+      // Mobile-optimized renderer settings
+      this.renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: !this.isMobile, // Disable antialiasing on mobile for performance
+        powerPreference: this.isMobile ? 'low-power' : 'high-performance',
+        precision: this.isMobile ? 'mediump' : 'highp', // Lower precision on mobile
+        stencil: false, // Disable stencil buffer on mobile
+        depth: true,
+      });
+
+      this.setupScene();
+      this.loadModel();
+    } catch (error) {
+      console.error('❌ Failed to initialize 3D renderer:', error);
+      this.showFallback();
+    }
+  }
+
+  private detectMobile(): boolean {
+    // Comprehensive mobile detection
+    const userAgent = navigator.userAgent.toLowerCase();
+    const mobileKeywords = [
+      'android',
+      'webos',
+      'iphone',
+      'ipad',
+      'ipod',
+      'blackberry',
+      'iemobile',
+      'opera mini',
+      'mobile',
+    ];
+
+    const isMobileUA = mobileKeywords.some(keyword => userAgent.includes(keyword));
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = window.innerWidth <= 768;
+
+    return isMobileUA || (isTouchDevice && isSmallScreen);
+  }
+
+  private checkWebGLSupport(): boolean {
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      
+      if (!gl || !(gl instanceof WebGLRenderingContext)) {
+        return false;
+      }
+      
+      // Check for required WebGL extensions on mobile
+      if (this.isMobile) {
+        const requiredExtensions = ['OES_standard_derivatives'];
+        for (const ext of requiredExtensions) {
+          if (!gl.getExtension(ext)) {
+            console.warn(`⚠️ Missing WebGL extension: ${ext}`);
+          }
+        }
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('WebGL support check failed:', error);
+      return false;
+    }
   }
 
   private setupScene(): void {
     // Set up camera position
     this.camera.position.z = 3;
 
-    // Set up renderer
+    // Set up renderer with mobile optimizations
     this.renderer.setSize(this.config.size, this.config.size);
     this.renderer.setClearColor(0x000000, 0); // Transparent background
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // Mobile performance optimizations
+    if (this.isMobile) {
+      // Disable shadows on mobile for better performance
+      this.renderer.shadowMap.enabled = false;
+      // Reduce pixel ratio on mobile for performance
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    } else {
+      // Full quality on desktop
+      this.renderer.shadowMap.enabled = true;
+      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      this.renderer.setPixelRatio(window.devicePixelRatio);
+    }
 
     // Add ambient light
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     this.scene.add(ambientLight);
 
-    // Add directional light with shadows
+    // Add directional light with mobile optimizations
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(5, 5, 5);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
+
+    if (!this.isMobile) {
+      // Only enable shadows on desktop
+      directionalLight.castShadow = true;
+      directionalLight.shadow.mapSize.width = 1024;
+      directionalLight.shadow.mapSize.height = 1024;
+    }
+
     this.scene.add(directionalLight);
 
     // Add point light for nice reflections
@@ -96,8 +181,9 @@ export class Soda3DButton {
       if (this.model) {
         this.model.traverse(child => {
           if (child instanceof THREE.Mesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
+            // Only enable shadows on desktop for performance
+            child.castShadow = !this.isMobile;
+            child.receiveShadow = !this.isMobile;
 
             // Enhance materials for better appearance
             if (child.material) {
@@ -215,7 +301,12 @@ export class Soda3DButton {
       container.classList.add('has-3d-model');
     }
 
-    console.log('🎮 3D soda button mounted');
+    console.log('🎮 3D soda button mounted', {
+      isMobile: this.isMobile,
+      webGLSupported: true,
+      devicePixelRatio: window.devicePixelRatio,
+      touchSupport: 'ontouchstart' in window,
+    });
   }
 
   private setupInteraction(): void {
@@ -223,29 +314,59 @@ export class Soda3DButton {
 
     const canvas = this.renderer.domElement;
 
-    // Hover effects
-    canvas.addEventListener('mouseenter', () => {
-      this.isHovered = true;
-      canvas.style.cursor = 'pointer';
-    });
+    // Desktop hover effects (not applicable on mobile)
+    if (!this.isMobile) {
+      canvas.addEventListener('mouseenter', () => {
+        this.isHovered = true;
+        canvas.style.cursor = 'pointer';
+      });
 
-    canvas.addEventListener('mouseleave', () => {
-      this.isHovered = false;
-      canvas.style.cursor = 'default';
-    });
+      canvas.addEventListener('mouseleave', () => {
+        this.isHovered = false;
+        canvas.style.cursor = 'default';
+      });
+    }
 
-    // Click handling
+    // Universal click/touch handling
     canvas.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
       this.handleClick();
     });
 
-    // Touch handling for mobile
-    canvas.addEventListener('touchstart', event => {
-      event.preventDefault();
-      this.handleClick();
-    });
+    // Mobile-specific touch handling
+    if (this.isMobile) {
+      let touchStartTime = 0;
+
+      canvas.addEventListener(
+        'touchstart',
+        event => {
+          event.preventDefault();
+          touchStartTime = Date.now();
+          canvas.style.opacity = '0.8'; // Visual feedback on touch
+        },
+        { passive: false }
+      );
+
+      canvas.addEventListener(
+        'touchend',
+        event => {
+          event.preventDefault();
+          const touchDuration = Date.now() - touchStartTime;
+          canvas.style.opacity = '1'; // Reset visual feedback
+
+          // Only trigger if it's a quick tap (not a scroll/drag)
+          if (touchDuration < 500) {
+            this.handleClick();
+          }
+        },
+        { passive: false }
+      );
+
+      canvas.addEventListener('touchcancel', () => {
+        canvas.style.opacity = '1'; // Reset visual feedback
+      });
+    }
   }
 
   private handleClick(): void {
