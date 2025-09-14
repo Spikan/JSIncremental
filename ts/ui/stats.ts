@@ -162,9 +162,10 @@ export function updateEconomyStats(): void {
 // Update shop-related statistics
 export function updateShopStats(): void {
   console.log('🔍 updateShopStats: Function called');
-  // Reduce logging frequency for memory optimization
-  const shouldLog = Math.random() < 0.1; // Log 10% of the time for debugging
-  if (shouldLog) console.log('📊 updateShopStats() called');
+  try {
+    // Reduce logging frequency for memory optimization
+    const shouldLog = Math.random() < 0.1; // Log 10% of the time for debugging
+    if (shouldLog) console.log('📊 updateShopStats() called');
 
   // Debug: Log current state values
   const state = (window as any).App?.state?.getState?.();
@@ -224,6 +225,9 @@ export function updateShopStats(): void {
   // Update enhancement values for upgrade displays
   console.log('🔍 updateShopStats: About to call updateEnhancementValues');
   updateEnhancementValues();
+  } catch (error) {
+    console.error('🔍 updateShopStats: Error occurred:', error);
+  }
 }
 
 // Update achievement-related statistics
@@ -255,13 +259,6 @@ export function updateAchievementStats(): void {
     const owned = (window as any).App?.state?.getState?.()?.fasterDrinks || 0;
     fasterDrinksOwnedElement.textContent = formatNumber(owned);
   }
-
-  // Update purchased item counts in shop displays
-  updatePurchasedCounts();
-
-  // Update enhancement values for upgrade displays
-  console.log('🔍 updateShopStats: About to call updateEnhancementValues');
-  updateEnhancementValues();
 }
 
 // Update enhancement values for upgrade displays
