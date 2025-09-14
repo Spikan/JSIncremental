@@ -1346,6 +1346,17 @@ export const execute = {
       console.warn('Failed to update all stats after level up:', error);
     }
     try {
+      w.App?.ui?.updateShopStats?.();
+      w.App?.ui?.updateAllDisplays?.();
+    } catch (error) {
+      console.warn('Failed to update displays after level up:', error);
+    }
+    try {
+      w.App?.ui?.updateLevelText?.();
+    } catch (error) {
+      console.warn('Failed to update level text after level up:', error);
+    }
+    try {
       w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
         item: 'levelUp',
         cost: result.spent,
@@ -1353,6 +1364,16 @@ export const execute = {
       });
     } catch (error) {
       console.warn('Failed to emit purchase event for level up:', error);
+    }
+    try {
+      // Emit specific level up event for theme system and other listeners
+      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.LEVEL_UP, {
+        newLevel: result.level,
+        cost: result.spent,
+        gained: result.sipsGained,
+      });
+    } catch (error) {
+      console.warn('Failed to emit level up event:', error);
     }
     return true;
   },
