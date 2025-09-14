@@ -14,6 +14,8 @@ export type GameOptions = {
     fallbacks: string[];
   };
   devToolsEnabled: boolean;
+  secretsUnlocked: boolean;
+  godTabEnabled: boolean;
 };
 
 export type GameState = {
@@ -115,5 +117,7 @@ export const defaultState: GameState = {
       fallbacks: [],
     },
     devToolsEnabled: false, // Hidden by default
+    secretsUnlocked: false, // Konami code required
+    godTabEnabled: false, // Hidden by default, unlocked via secrets
   },
 };

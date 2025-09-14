@@ -128,21 +128,21 @@ const BUTTON_CONFIG: {
           const state = w.App?.state?.getState?.();
           if (state?.options) {
             const newValue = !state.options.devToolsEnabled;
-            
+
             // Update the state
             w.App?.state?.setState?.({
-              options: { ...state.options, devToolsEnabled: newValue }
+              options: { ...state.options, devToolsEnabled: newValue },
             });
-            
+
             // Save to storage
             w.App?.systems?.options?.saveOptions?.({ ...state.options, devToolsEnabled: newValue });
-            
+
             // Update button text
             const button = document.querySelector('.dev-toggle-btn');
             if (button) {
               button.textContent = `🔧 Dev Tools ${newValue ? 'ON' : 'OFF'}`;
             }
-            
+
             // Refresh navigation to show/hide dev tab
             const navManager = w.App?.ui?.navigationManager || (window as any).navigationManager;
             if (navManager?.refreshNavigation) {
@@ -155,6 +155,41 @@ const BUTTON_CONFIG: {
       },
       type: 'dev-toggle-btn',
       label: 'Toggle Dev Tools',
+    },
+    toggleGodTab: {
+      func: () => {
+        try {
+          const w = window as any;
+          const state = w.App?.state?.getState?.();
+          if (state?.options) {
+            const newValue = !state.options.godTabEnabled;
+
+            // Update the state
+            w.App?.state?.setState?.({
+              options: { ...state.options, godTabEnabled: newValue },
+            });
+
+            // Save to storage
+            w.App?.systems?.options?.saveOptions?.({ ...state.options, godTabEnabled: newValue });
+
+            // Update button text
+            const button = document.querySelector('.god-toggle-btn');
+            if (button) {
+              button.textContent = `🙏 Talk to God ${newValue ? 'ON' : 'OFF'}`;
+            }
+
+            // Refresh navigation to show/hide god tab
+            const navManager = w.App?.ui?.navigationManager || (window as any).navigationManager;
+            if (navManager?.refreshNavigation) {
+              navManager.refreshNavigation();
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to toggle god tab:', e);
+        }
+      },
+      type: 'god-toggle-btn',
+      label: 'Toggle God Tab',
     },
     startGame: {
       func: () => {

@@ -288,6 +288,8 @@ export function initOnDomReady(): void {
               clickSoundsEnabled: true,
               musicEnabled: true,
               devToolsEnabled: false, // Hidden by default
+              secretsUnlocked: false, // Konami code required
+              godTabEnabled: false, // Hidden by default, unlocked via secrets
             } as any;
             const loaded =
               (window as any).App?.systems?.options?.loadOptions?.(defaults) || defaults;

@@ -29,6 +29,7 @@ import {
 import { initializeSodaDrinkerProThemes, addThemeStyles } from './soda-drinker-pro-themes';
 import { initializeAuthenticSDP } from './authentic-sdp';
 import { initializeSoda3D } from './soda-3d';
+import { konamiCodeDetector } from './konami-code';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability, buttons };
@@ -556,6 +557,9 @@ function initializeEnhancedUIComponents(): void {
     // Initialize dev tools button
     initializeDevToolsButton();
 
+    // Initialize secrets system
+    initializeSecretsSystem();
+
     console.log('✅ Enhanced UI components initialized');
   } catch (error) {
     console.warn('Failed to initialize enhanced UI components:', error);
@@ -570,15 +574,52 @@ function initializeDevToolsButton(): void {
     const w = window as any;
     const state = w.App?.state?.getState?.();
     const devToolsEnabled = state?.options?.devToolsEnabled ?? false;
-    
+
     const button = document.querySelector('.dev-toggle-btn');
     if (button) {
       button.textContent = `🔧 Dev Tools ${devToolsEnabled ? 'ON' : 'OFF'}`;
     }
-    
+
     console.log('🔧 Dev tools button initialized:', devToolsEnabled ? 'ON' : 'OFF');
   } catch (error) {
     console.warn('Failed to initialize dev tools button:', error);
+  }
+}
+
+/**
+ * Initialize secrets system and UI
+ */
+function initializeSecretsSystem(): void {
+  try {
+    const w = window as any;
+    const state = w.App?.state?.getState?.();
+    const secretsUnlocked = state?.options?.secretsUnlocked ?? false;
+    const godTabEnabled = state?.options?.godTabEnabled ?? false;
+
+    // Show/hide secrets section based on unlock status
+    const secretsSection = document.querySelector('.secrets-section');
+    if (secretsSection) {
+      if (secretsUnlocked) {
+        secretsSection.classList.remove('hidden');
+      } else {
+        secretsSection.classList.add('hidden');
+      }
+    }
+
+    // Update god toggle button text
+    const godButton = document.querySelector('.god-toggle-btn');
+    if (godButton) {
+      godButton.textContent = `🙏 Talk to God ${godTabEnabled ? 'ON' : 'OFF'}`;
+    }
+
+    // Initialize Konami code detector (it starts listening automatically)
+    // The detector is imported and initialized automatically
+    console.log('🔐 Secrets system initialized. Konami code detector active.');
+    console.log('🔐 Konami detector status:', konamiCodeDetector.isSecretsUnlocked() ? 'UNLOCKED' : 'LOCKED');
+    console.log('🔐 Secrets unlocked:', secretsUnlocked ? 'YES' : 'NO');
+    console.log('🙏 God tab enabled:', godTabEnabled ? 'YES' : 'NO');
+  } catch (error) {
+    console.warn('Failed to initialize secrets system:', error);
   }
 }
 

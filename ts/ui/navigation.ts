@@ -103,7 +103,12 @@ export class NavigationManager {
       if (tab.id === 'dev' && !this.isDevToolsEnabled()) {
         return;
       }
-      
+
+      // Skip god tab if not enabled
+      if (tab.id === 'god' && !this.isGodTabEnabled()) {
+        return;
+      }
+
       const button = this.createDesktopTabButton(tab);
       if (this.desktopNav) {
         this.desktopNav.appendChild(button);
@@ -122,7 +127,12 @@ export class NavigationManager {
       if (tab.id === 'dev' && !this.isDevToolsEnabled()) {
         return;
       }
-      
+
+      // Skip god tab if not enabled
+      if (tab.id === 'god' && !this.isGodTabEnabled()) {
+        return;
+      }
+
       const tabItem = this.createMobileTabItem(tab);
       if (this.mobileNav) {
         this.mobileNav.appendChild(tabItem);
@@ -208,13 +218,27 @@ export class NavigationManager {
     }
   }
 
+  private isGodTabEnabled(): boolean {
+    try {
+      const w = window as any;
+      return w.App?.state?.getState?.()?.options?.godTabEnabled ?? false;
+    } catch {
+      return false;
+    }
+  }
+
   public refreshNavigation(): void {
     // If currently on dev tab and it gets disabled, switch to soda tab
     if (this.currentTab === 'dev' && !this.isDevToolsEnabled()) {
       this.switchTab('soda');
     }
-    
-    // Recreate navigation to show/hide dev tab
+
+    // If currently on god tab and it gets disabled, switch to soda tab
+    if (this.currentTab === 'god' && !this.isGodTabEnabled()) {
+      this.switchTab('soda');
+    }
+
+    // Recreate navigation to show/hide tabs
     this.createDesktopNavigation();
     this.createMobileNavigation();
   }

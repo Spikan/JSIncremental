@@ -137,6 +137,8 @@ const defaultState: GameState = {
       fallbacks: ['local'],
     },
     devToolsEnabled: false, // Hidden by default
+    secretsUnlocked: false, // Konami code required
+    godTabEnabled: false, // Hidden by default, unlocked via secrets
   },
 };
 

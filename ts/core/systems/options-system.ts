@@ -9,6 +9,8 @@ export type GameOptions = {
   musicEnabled: boolean;
   musicStreamPreferences?: any;
   devToolsEnabled: boolean; // Show/hide dev tools tab
+  secretsUnlocked: boolean; // Konami code unlocked secrets
+  godTabEnabled: boolean; // Show/hide god tab (unlocked via secrets)
 };
 
 export function loadOptions(defaults: GameOptions): GameOptions {

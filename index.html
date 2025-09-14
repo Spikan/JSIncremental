@@ -812,14 +812,35 @@
           <div class="options-section">
             <h3>🔧 Developer Options</h3>
             <div class="dev-controls">
-              <button
-                id="devToolsToggle"
-                data-action="toggleDevTools"
-                class="dev-toggle-btn"
-              >
+              <button id="devToolsToggle" data-action="toggleDevTools" class="dev-toggle-btn">
                 🔧 Dev Tools OFF
               </button>
               <p class="dev-description">Show or hide the developer tools tab</p>
+            </div>
+          </div>
+
+          <div class="options-section secrets-section hidden">
+            <h3>🔐 Secrets</h3>
+            <div class="secrets-controls">
+              <div class="konami-code-display">
+                <div class="konami-arrows">
+                  <span class="arrow">↑</span>
+                  <span class="arrow">↑</span>
+                  <span class="arrow">↓</span>
+                  <span class="arrow">↓</span>
+                  <span class="arrow">←</span>
+                  <span class="arrow">→</span>
+                  <span class="arrow">←</span>
+                  <span class="arrow">→</span>
+                  <span class="key">B</span>
+                  <span class="key">A</span>
+                </div>
+                <p class="secrets-description">The ancient code has been entered...</p>
+              </div>
+              <button id="godToggle" data-action="toggleGodTab" class="god-toggle-btn">
+                🙏 Talk to God ON
+              </button>
+              <p class="god-description">Enable or disable the mystical god tab</p>
             </div>
           </div>
 
