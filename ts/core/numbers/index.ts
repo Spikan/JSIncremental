@@ -53,12 +53,7 @@ import {
   isLargeNumber,
 } from './migration-utils';
 
-// Import additional functions from large-number.ts
-import {
-  toNumber,
-  formatLargeNumber,
-  toLargeNumber as toLargeNumberFromLargeNumber,
-} from './large-number';
+// large-number.ts removed - functions not used
 
 // Import safe conversion utilities
 import {
@@ -189,12 +184,7 @@ export const Numbers = {
   performanceDashboard,
 
   // Legacy aliases
-  toLargeNumber: toLargeNumberFromLargeNumber, // Use the one from large-number.ts
   isLargeNumber,
-
-  // Additional utility functions
-  toNumber,
-  formatLargeNumber,
 };
 
 // Make available globally for backward compatibility

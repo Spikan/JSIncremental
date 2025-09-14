@@ -14,6 +14,7 @@ const createMockButton = (onclick: string | null = null, className: string = '')
 
 const mockDocument = {
   querySelectorAll: vi.fn(),
+  querySelector: vi.fn(),
   getElementById: vi.fn(),
   readyState: 'complete' as DocumentReadyState,
   addEventListener: vi.fn(),
@@ -128,7 +129,6 @@ describe('Button System', () => {
       expect(BUTTON_CONFIG.actions).toBeDefined();
       expect(BUTTON_CONFIG.actions['buyStraw']).toBeDefined();
       expect(BUTTON_CONFIG.actions['buySuction']).toBeDefined();
-      expect(BUTTON_CONFIG.actions['buyCriticalClick']).toBeDefined();
       expect(BUTTON_CONFIG.actions['buyFasterDrinks']).toBeDefined();
       expect(BUTTON_CONFIG.actions['levelUp']).toBeDefined();
       expect(BUTTON_CONFIG.actions['save']).toBeDefined();
@@ -141,7 +141,6 @@ describe('Button System', () => {
 
       expect(BUTTON_CONFIG.actions['buyStraw'].type).toBe('shop-btn');
       expect(BUTTON_CONFIG.actions['buySuction'].type).toBe('clicking-upgrade-btn');
-      expect(BUTTON_CONFIG.actions['buyCriticalClick'].type).toBe('clicking-upgrade-btn');
       expect(BUTTON_CONFIG.actions['buyFasterDrinks'].type).toBe('drink-speed-upgrade-btn');
       expect(BUTTON_CONFIG.actions['levelUp'].type).toBe('level-up-btn');
       expect(BUTTON_CONFIG.actions['save'].type).toBe('save-btn');

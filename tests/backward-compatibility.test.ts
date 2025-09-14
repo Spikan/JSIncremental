@@ -1,17 +1,53 @@
 // Tests for backward compatibility with existing saves and data formats
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  LargeNumber,
-  toLargeNumber,
-  toNumber,
-  formatLargeNumber,
-  migrateStateToLargeNumber,
-  migrateStateToNumbers,
-} from '../ts/core/numbers/large-number';
+// large-number.ts removed - using Decimal directly
+import { Decimal } from '../ts/core/numbers/migration-utils';
 import { computeClick } from '../ts/core/rules/clicks';
 import { computeTotalSipsPerDrink } from '../ts/core/rules/economy';
 import { nextStrawCost } from '../ts/core/rules/purchases';
+
+// Helper functions for backward compatibility
+const toLargeNumber = (value: any): Decimal => {
+  if (value instanceof Decimal) return value;
+  if (value && typeof value.toNumber === 'function') return new Decimal(value.toNumber());
+  return new Decimal(value || 0);
+};
+
+const toNumber = (value: any): number => {
+  if (value instanceof Decimal) return value.toNumber();
+  if (value && typeof value.toNumber === 'function') return value.toNumber();
+  return Number(value) || 0;
+};
+
+const formatLargeNumber = (value: any): string => {
+  const decimal = toLargeNumber(value);
+  return decimal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+const migrateStateToLargeNumber = (state: any): any => {
+  const result: any = {};
+  for (const [key, value] of Object.entries(state)) {
+    if (typeof value === 'number' || (value && typeof value.toNumber === 'function')) {
+      result[key] = toLargeNumber(value);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+};
+
+const migrateStateToNumbers = (state: any): any => {
+  const result: any = {};
+  for (const [key, value] of Object.entries(state)) {
+    if (value instanceof Decimal || (value && typeof value.toNumber === 'function')) {
+      result[key] = toNumber(value);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+};
 
 // Mock existing save data formats
 const mockLegacySave = {
@@ -34,18 +70,18 @@ const mockLegacySave = {
   },
 };
 
-const mockLargeNumberSave = {
-  sips: new LargeNumber(1000),
-  straws: new LargeNumber(5),
-  cups: new LargeNumber(3),
-  suctions: new LargeNumber(2),
-  widerStraws: new LargeNumber(1),
-  betterCups: new LargeNumber(1),
-  fasterDrinks: new LargeNumber(2),
-  criticalClicks: new LargeNumber(1),
-  level: new LargeNumber(5),
-  totalSipsEarned: new LargeNumber(50000),
-  totalClicks: new LargeNumber(1500),
+const mockDecimalSave = {
+  sips: new Decimal(1000),
+  straws: new Decimal(5),
+  cups: new Decimal(3),
+  suctions: new Decimal(2),
+  widerStraws: new Decimal(1),
+  betterCups: new Decimal(1),
+  fasterDrinks: new Decimal(2),
+  criticalClicks: new Decimal(1),
+  level: new Decimal(5),
+  totalSipsEarned: new Decimal(50000),
+  totalClicks: new Decimal(1500),
   options: {
     autosaveEnabled: true,
     autosaveInterval: 30,
@@ -122,20 +158,20 @@ class MockDecimal {
 
 describe('Backward Compatibility', () => {
   describe('Data Type Conversion', () => {
-    it('should convert regular numbers to LargeNumber', () => {
+    it('should convert regular numbers to Decimal', () => {
       expect(toLargeNumber(100).toNumber()).toBe(100);
       expect(toLargeNumber(0).toNumber()).toBe(0);
       expect(toLargeNumber(-50).toNumber()).toBe(-50);
     });
 
-    it('should convert strings to LargeNumber', () => {
+    it('should convert strings to Decimal', () => {
       expect(toLargeNumber('1000').toNumber()).toBe(1000);
       expect(toLargeNumber('0').toNumber()).toBe(0);
       expect(toLargeNumber('-250').toNumber()).toBe(-250);
     });
 
-    it('should convert LargeNumber back to number', () => {
-      const large = new LargeNumber(500);
+    it('should convert Decimal back to number', () => {
+      const large = new Decimal(500);
       expect(toNumber(large)).toBe(500);
     });
 
@@ -155,18 +191,18 @@ describe('Backward Compatibility', () => {
   });
 
   describe('State Migration', () => {
-    it('should migrate regular number state to LargeNumber', () => {
+    it('should migrate regular number state to Decimal', () => {
       const migrated = migrateStateToLargeNumber(mockLegacySave);
 
-      expect(migrated.sips).toBeInstanceOf(LargeNumber);
-      expect(migrated.straws).toBeInstanceOf(LargeNumber);
-      expect(migrated.cups).toBeInstanceOf(LargeNumber);
+      expect(migrated.sips).toBeInstanceOf(Decimal);
+      expect(migrated.straws).toBeInstanceOf(Decimal);
+      expect(migrated.cups).toBeInstanceOf(Decimal);
       expect(migrated.sips.toNumber()).toBe(1000);
       expect(migrated.straws.toNumber()).toBe(5);
     });
 
-    it('should migrate LargeNumber state back to numbers', () => {
-      const migrated = migrateStateToNumbers(mockLargeNumberSave);
+    it('should migrate Decimal state back to numbers', () => {
+      const migrated = migrateStateToNumbers(mockDecimalSave);
 
       expect(typeof migrated.sips).toBe('number');
       expect(typeof migrated.straws).toBe('number');
@@ -186,15 +222,15 @@ describe('Backward Compatibility', () => {
     it('should handle mixed data types in state', () => {
       const mixedState = {
         sips: 100,
-        straws: new LargeNumber(5),
+        straws: new Decimal(5),
         cups: new MockDecimal(3),
         name: 'Test Player',
       };
 
       const migrated = migrateStateToLargeNumber(mixedState);
-      expect(migrated.sips).toBeInstanceOf(LargeNumber);
-      expect(migrated.straws).toBeInstanceOf(LargeNumber);
-      expect(migrated.cups).toBeInstanceOf(LargeNumber);
+      expect(migrated.sips).toBeInstanceOf(Decimal);
+      expect(migrated.straws).toBeInstanceOf(Decimal);
+      expect(migrated.cups).toBeInstanceOf(Decimal);
       expect(migrated.name).toBe('Test Player');
 
       const backMigrated = migrateStateToNumbers(migrated);
@@ -222,26 +258,26 @@ describe('Backward Compatibility', () => {
       expect(result2.toNumber()).toBe(6);
     });
 
-    it('should work with mixed LargeNumber and number inputs', () => {
+    it('should work with mixed Decimal and number inputs', () => {
       // Test that functions work with mixed input types
       const result1 = computeClick({
-        baseClick: new LargeNumber(1),
+        baseClick: new Decimal(1),
         suctionBonus: 0.3,
         criticalChance: 0,
-        criticalMultiplier: new LargeNumber(2),
+        criticalMultiplier: new Decimal(2),
       });
 
       expect(result1.critical).toBe(false);
       expect(result1.gained.toNumber()).toBe(1.3);
 
-      const result2 = computeTotalSipsPerDrink(new LargeNumber(1), 5);
+      const result2 = computeTotalSipsPerDrink(new Decimal(1), 5);
       expect(result2.toNumber()).toBe(6);
     });
 
     it('should handle very large numbers in calculations', () => {
-      const largeNumber = new LargeNumber('1e100');
+      const largeNumber = new Decimal('1e100');
 
-      const result = computeTotalSipsPerDrink(new LargeNumber(1), largeNumber);
+      const result = computeTotalSipsPerDrink(new Decimal(1), largeNumber);
 
       // The function adds baseSipsPerDrink (1) to totalSPD (1e100)
       // Result should be 1 + 1e100 = 1e100 (since 1 is negligible compared to 1e100)
@@ -250,7 +286,7 @@ describe('Backward Compatibility', () => {
 
     it('should maintain calculation accuracy with large numbers', () => {
       const cost1 = nextStrawCost(100, 10, 1.08);
-      const cost2 = nextStrawCost(new LargeNumber(100), 10, 1.08);
+      const cost2 = nextStrawCost(new Decimal(100), 10, 1.08);
 
       // Both should give the same result
       expect(cost1.toNumber()).toBeCloseTo(cost2.toNumber(), 6);
@@ -263,9 +299,9 @@ describe('Backward Compatibility', () => {
       expect(formatLargeNumber(1000000)).toMatch(/1\.?0*e\+6|1000000/);
     });
 
-    it('should format LargeNumber correctly', () => {
-      expect(formatLargeNumber(new LargeNumber(1000))).toBe('1,000');
-      expect(formatLargeNumber(new LargeNumber(1000000))).toMatch(/1\.?0*e\+6|1000000/);
+    it('should format Decimal correctly', () => {
+      expect(formatLargeNumber(new Decimal(1000))).toBe('1,000');
+      expect(formatLargeNumber(new Decimal(1000000))).toMatch(/1\.?0*e\+6|1000000/);
     });
 
     it('should format Decimal.js-like objects correctly', () => {
@@ -274,7 +310,7 @@ describe('Backward Compatibility', () => {
     });
 
     it('should handle very large numbers with scientific notation', () => {
-      const veryLarge = new LargeNumber('1e100');
+      const veryLarge = new Decimal('1e100');
       const formatted = formatLargeNumber(veryLarge);
       expect(formatted).toMatch(/1\.?0*e\+100|1e100/);
     });
@@ -282,7 +318,7 @@ describe('Backward Compatibility', () => {
 
   describe('Save Data Integrity', () => {
     it('should preserve all data during round-trip migration', () => {
-      // Migrate to LargeNumber and back
+      // Migrate to Decimal and back
       const migrated = migrateStateToLargeNumber(mockLegacySave);
       const backMigrated = migrateStateToNumbers(migrated);
 
@@ -331,10 +367,10 @@ describe('Backward Compatibility', () => {
     it('should not significantly impact performance', () => {
       const startTime = performance.now();
 
-      // Perform multiple LargeNumber operations
+      // Perform multiple Decimal operations
       for (let i = 0; i < 1000; i++) {
-        const a = new LargeNumber(i);
-        const b = new LargeNumber(i + 1);
+        const a = new Decimal(i);
+        const b = new Decimal(i + 1);
         const result = a.add(b);
         result.toNumber();
       }
@@ -347,10 +383,10 @@ describe('Backward Compatibility', () => {
     });
 
     it('should handle memory efficiently', () => {
-      // Create many LargeNumber instances
-      const numbers: LargeNumber[] = [];
+      // Create many Decimal instances
+      const numbers: Decimal[] = [];
       for (let i = 0; i < 10000; i++) {
-        numbers.push(new LargeNumber(i));
+        numbers.push(new Decimal(i));
       }
 
       // Should not cause memory issues

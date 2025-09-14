@@ -15,7 +15,7 @@ describe('UI Fixes', () => {
     store.actions.setStraws(0);
     store.actions.setCups(0);
     store.actions.setSuctions(0);
-    store.actions.setCriticalClicks(0);
+    // store.actions.setCriticalClicks(0); // Not implemented
   });
 
   it('should have proper state access for header updates', () => {

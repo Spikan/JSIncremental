@@ -13,8 +13,7 @@
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types
 
-// Import test utilities for debugging extreme values
-import './core/numbers/test-large-number';
+// Test utilities removed - no longer needed
 
 // These are used in the game configuration
 const BAL = (GC && GC.BALANCE) || {};
@@ -319,10 +318,7 @@ function initGame() {
   }
 }
 
-// Legacy function for backward compatibility (exported but not used in main flow)
-export function setupMobileTouchHandling() {
-  mobileInputHandler.initialize();
-}
+// Legacy function removed - duplicate of mobile-input.ts version
 
 function startGame() {
   try {
