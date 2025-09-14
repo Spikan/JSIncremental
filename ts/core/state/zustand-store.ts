@@ -67,7 +67,6 @@ interface GameStore extends GameState {
     // Upgrade counters
     setFasterDrinksUpCounter: (_count: number) => void;
     setCriticalClickUpCounter: (_count: number) => void;
-    setFriendsUpCounter: (_count: number) => void;
 
     // Level management
     setLevel: (_level: number) => void;
@@ -95,7 +94,6 @@ const defaultState: GameState = {
   betterCups: toDecimal(0),
   fasterDrinks: toDecimal(0),
   criticalClicks: toDecimal(0),
-  friends: toDecimal(0),
   level: toDecimal(1),
 
   // Production stats
@@ -127,7 +125,6 @@ const defaultState: GameState = {
   // Upgrade counters
   fasterDrinksUpCounter: toDecimal(0),
   criticalClickUpCounter: toDecimal(0),
-  friendsUpCounter: toDecimal(0),
 
   // Options
   options: {
@@ -214,7 +211,6 @@ export const useGameStore = create<GameStore>()(
             set({ fasterDrinksUpCounter: toDecimal(_count) }),
           setCriticalClickUpCounter: (_count: any) =>
             set({ criticalClickUpCounter: toDecimal(_count) }),
-          setFriendsUpCounter: (_count: any) => set({ friendsUpCounter: toDecimal(_count) }),
 
           // Level management
           setLevel: (_level: any) => set({ level: toDecimal(_level) }),
@@ -270,7 +266,6 @@ export const useGameStore = create<GameStore>()(
           suctionClickBonus: state.suctionClickBonus,
           fasterDrinksUpCounter: state.fasterDrinksUpCounter,
           criticalClickUpCounter: state.criticalClickUpCounter,
-          friendsUpCounter: state.friendsUpCounter,
           options: state.options,
         }),
         // @ts-expect-error: custom persist options supported by our setup

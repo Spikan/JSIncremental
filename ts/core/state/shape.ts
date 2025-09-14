@@ -25,7 +25,6 @@ export type GameState = {
   betterCups: NumericValue;
   fasterDrinks: NumericValue;
   criticalClicks: NumericValue;
-  friends: NumericValue;
   level: NumericValue;
 
   // Production stats (support Decimal for high production rates)
@@ -57,7 +56,6 @@ export type GameState = {
   // Upgrade counters
   fasterDrinksUpCounter: NumericValue;
   criticalClickUpCounter: NumericValue;
-  friendsUpCounter: NumericValue;
 
   // Options
   options: GameOptions;
@@ -73,7 +71,6 @@ export const defaultState: GameState = {
   betterCups: new Decimal(0),
   fasterDrinks: new Decimal(0),
   criticalClicks: new Decimal(0),
-  friends: new Decimal(0),
   level: new Decimal(1),
 
   // Production stats (using Decimal for high production rates)
@@ -105,7 +102,6 @@ export const defaultState: GameState = {
   // Upgrade counters
   fasterDrinksUpCounter: new Decimal(0),
   criticalClickUpCounter: new Decimal(0),
-  friendsUpCounter: new Decimal(0),
 
   // Options
   options: {

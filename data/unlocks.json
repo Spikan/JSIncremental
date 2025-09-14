@@ -1,15 +1,14 @@
 {
-  "suction": { "sips": 25, "clicks": 8 },
-  "criticalClick": { "sips": 100, "clicks": 20 },
-  "fasterDrinks": { "sips": 200, "clicks": 30 },
-  "straws": { "sips": 500, "clicks": 50 },
-  "cups": { "sips": 1000, "clicks": 80 },
-  "widerStraws": { "sips": 2000, "clicks": 120 },
-  "betterCups": { "sips": 5000, "clicks": 200 },
-  "levelUp": { "sips": 3000, "clicks": 150 },
-  "shop": { "sips": 500, "clicks": 30 },
-  "stats": { "sips": 1000, "clicks": 60 },
+  "suction": { "sips": 10, "clicks": 5 },
+  "straws": { "sips": 25, "clicks": 10 },
+  "criticalClick": { "sips": 50, "clicks": 15 },
+  "cups": { "sips": 100, "clicks": 25 },
+  "fasterDrinks": { "sips": 200, "clicks": 40 },
+  "widerStraws": { "sips": 500, "clicks": 60 },
+  "betterCups": { "sips": 1000, "clicks": 100 },
+  "levelUp": { "sips": 2000, "clicks": 150 },
+  "shop": { "sips": 100, "clicks": 20 },
+  "stats": { "sips": 500, "clicks": 50 },
   "god": { "sips": 5000, "clicks": 300 },
-  "unlocks": { "sips": 25, "clicks": 8 },
-  "friends": { "sips": 100, "clicks": 20 }
+  "unlocks": { "sips": 10, "clicks": 5 }
 }
