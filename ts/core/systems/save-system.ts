@@ -30,7 +30,6 @@ export function performSaveSnapshot(): any {
       widerStraws: String(w.widerStraws || 0),
       betterCups: String(w.betterCups || 0),
       suctions: String(w.suctions || 0),
-      criticalClicks: String(w.criticalClicks || 0),
       fasterDrinks: String(w.fasterDrinks || 0),
       totalSipsEarned: String(w.totalSipsEarned || 0),
       // Save SPD values to preserve extreme values
@@ -127,15 +126,6 @@ export function resetGameState() {
     // Initialize upgrade variables exactly like initGame
     const fasterDrinks = new Decimal(0);
     w.fasterDrinks = fasterDrinks;
-    const fasterDrinksUpCounter = new Decimal(1);
-    w.fasterDrinksUpCounter = fasterDrinksUpCounter;
-
-    const criticalClickChance = new Decimal(BAL.CRITICAL_CLICK_BASE_CHANCE || 0.01);
-    w.criticalClickChance = criticalClickChance;
-    const criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER || 10);
-    w.criticalClickMultiplier = criticalClickMultiplier;
-    const criticalClicks = new Decimal(0);
-    const criticalClickUpCounter = new Decimal(1);
 
     // Set up session timing exactly like initGame
     const gameStartTime = Date.now();
@@ -217,7 +207,6 @@ export function resetGameState() {
         widerStraws: widerStraws,
         betterCups: betterCups,
         fasterDrinks: fasterDrinks,
-        criticalClicks: criticalClicks,
         level: level,
         spd: spd,
         strawSPD: strawSPD,
@@ -234,11 +223,7 @@ export function resetGameState() {
         currentClickStreak: 0,
         bestClickStreak: 0,
         // Preserve extreme values for click bonuses and counters
-        criticalClickChance: criticalClickChance,
-        criticalClickMultiplier: criticalClickMultiplier,
         suctionClickBonus: suctionClickBonus,
-        fasterDrinksUpCounter: fasterDrinksUpCounter,
-        criticalClickUpCounter: criticalClickUpCounter,
       });
     } catch (error) {
       console.warn('Failed to seed App.state:', error);

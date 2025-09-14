@@ -51,6 +51,42 @@ export function nextCupCost(
   return milestoneCost.multiply(withinMilestoneCost).div(base);
 }
 
+export function nextWiderStrawsCost(
+  widerStrawsCount: number | string | DecimalType,
+  baseCost: number | string | DecimalType,
+  scaling: number | string | DecimalType
+): DecimalType {
+  const base = new Decimal(baseCost);
+  const scale = new Decimal(scaling);
+  const count = new Decimal(widerStrawsCount);
+
+  // Use the same milestone system as straws and cups
+  const milestone = new Decimal(25);
+  const milestoneCost = base.multiply(scale.pow(milestone));
+  const withinMilestone = count.mod(milestone);
+  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
+
+  return milestoneCost.multiply(withinMilestoneCost).div(base);
+}
+
+export function nextBetterCupsCost(
+  betterCupsCount: number | string | DecimalType,
+  baseCost: number | string | DecimalType,
+  scaling: number | string | DecimalType
+): DecimalType {
+  const base = new Decimal(baseCost);
+  const scale = new Decimal(scaling);
+  const count = new Decimal(betterCupsCount);
+
+  // Use the same milestone system as straws and cups
+  const milestone = new Decimal(25);
+  const milestoneCost = base.multiply(scale.pow(milestone));
+  const withinMilestone = count.mod(milestone);
+  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
+
+  return milestoneCost.multiply(withinMilestoneCost).div(base);
+}
+
 // Legacy functions for backward compatibility
 export function nextStrawCostLegacy(
   strawCount: number | string,

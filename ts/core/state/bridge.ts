@@ -242,9 +242,7 @@ export function createStateBridge(app: AppLike) {
             (seed as any)[seedKey] = toDecimalValue(value);
           } else if (
             typeof seedKey === 'string' &&
-            (seedKey === 'criticalClickChance' ||
-              seedKey === 'currentClickStreak' ||
-              seedKey === 'bestClickStreak')
+            (seedKey === 'currentClickStreak' || seedKey === 'bestClickStreak')
           ) {
             // These remain as numbers - use safe conversion
             const decimalValue = toDecimal(value);
@@ -271,12 +269,7 @@ export function createStateBridge(app: AppLike) {
       setSeedIfExists('widerStraws', 'widerStraws');
       setSeedIfExists('betterCups', 'betterCups');
       setSeedIfExists('fasterDrinks', 'fasterDrinks');
-      setSeedIfExists('criticalClicks', 'criticalClicks');
-      setSeedIfExists('criticalClickChance', 'criticalClickChance');
-      setSeedIfExists('criticalClickMultiplier', 'criticalClickMultiplier');
       setSeedIfExists('suctionClickBonus', 'suctionClickBonus');
-      setSeedIfExists('fasterDrinksUpCounter', 'fasterDrinksUpCounter');
-      setSeedIfExists('criticalClickUpCounter', 'criticalClickUpCounter');
       setSeedIfExists('spd', 'spd');
       // Apply seed values using individual actions
       if (seed.drinkRate !== undefined) app.state.actions?.setDrinkRate?.(seed.drinkRate);
@@ -292,18 +285,8 @@ export function createStateBridge(app: AppLike) {
       if (seed.widerStraws !== undefined) app.state.actions?.setWiderStraws?.(seed.widerStraws);
       if (seed.betterCups !== undefined) app.state.actions?.setBetterCups?.(seed.betterCups);
       if (seed.fasterDrinks !== undefined) app.state.actions?.setFasterDrinks?.(seed.fasterDrinks);
-      if (seed.criticalClicks !== undefined)
-        app.state.actions?.setCriticalClicks?.(seed.criticalClicks);
-      if (seed.criticalClickChance !== undefined)
-        app.state.actions?.setCriticalClickChance?.(seed.criticalClickChance);
-      if (seed.criticalClickMultiplier !== undefined)
-        app.state.actions?.setCriticalClickMultiplier?.(seed.criticalClickMultiplier);
       if (seed.suctionClickBonus !== undefined)
         app.state.actions?.setSuctionClickBonus?.(seed.suctionClickBonus);
-      if (seed.fasterDrinksUpCounter !== undefined)
-        app.state.actions?.setFasterDrinksUpCounter?.(seed.fasterDrinksUpCounter);
-      if (seed.criticalClickUpCounter !== undefined)
-        app.state.actions?.setCriticalClickUpCounter?.(seed.criticalClickUpCounter);
       if (seed.spd !== undefined) app.state.actions?.setSPD?.(seed.spd);
     } catch (error) {
       console.warn('State bridge operation failed:', error);

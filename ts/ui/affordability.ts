@@ -9,10 +9,15 @@ import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { updateButtonState, updateCostDisplay } from './utils';
 import { toDecimal, gte } from '../core/numbers/migration-utils';
 import { NumericValue, CostResult } from '../types/app-types';
-import { nextStrawCost, nextCupCost } from '../core/rules/purchases';
+import {
+  nextStrawCost,
+  nextCupCost,
+  nextWiderStrawsCost,
+  nextBetterCupsCost,
+} from '../core/rules/purchases';
 
 // Direct break_eternity.js Decimal access (consistent with core systems)
-const Decimal = (globalThis as any).Decimal;
+// const Decimal = (globalThis as any).Decimal; // Not used in this file
 
 // Helper function to check if a button is in unlock mode
 function isButtonInUnlockMode(buttonId: string): boolean {
@@ -70,16 +75,9 @@ export function checkUpgradeAffordability(): void {
   } else {
     console.log(`[DEBUG] Skipping buyFasterDrinks button (in unlock mode)`);
   }
-  if (!isButtonInUnlockMode('buyCriticalClick')) {
-    console.log(`[DEBUG] Updating buyCriticalClick button`);
-    updateButtonState('buyCriticalClick', canAfford(costs.criticalClick), costs.criticalClick);
-  } else {
-    console.log(`[DEBUG] Skipping buyCriticalClick button (in unlock mode)`);
-  }
 
   updateButtonState('buyWiderStraws', canAfford(costs.widerStraws), costs.widerStraws);
   updateButtonState('buyBetterCups', canAfford(costs.betterCups), costs.betterCups);
-  updateButtonState('upgradeFasterDrinks', canAfford(costs.fasterDrinksUp), costs.fasterDrinksUp);
   updateButtonState('levelUp', canAfford(costs.levelUp), costs.levelUp);
 
   // Cost displays
@@ -89,20 +87,8 @@ export function checkUpgradeAffordability(): void {
   updateCostDisplay('suctionCostCompact', costs.suction, canAfford(costs.suction));
   updateCostDisplay('fasterDrinksCost', costs.fasterDrinks, canAfford(costs.fasterDrinks));
   updateCostDisplay('fasterDrinksCostCompact', costs.fasterDrinks, canAfford(costs.fasterDrinks));
-  updateCostDisplay('criticalClickCost', costs.criticalClick, canAfford(costs.criticalClick));
-  updateCostDisplay(
-    'criticalClickCostCompact',
-    costs.criticalClick,
-    canAfford(costs.criticalClick)
-  );
   updateCostDisplay('widerStrawsCost', costs.widerStraws, canAfford(costs.widerStraws));
   updateCostDisplay('betterCupsCost', costs.betterCups, canAfford(costs.betterCups));
-  updateCostDisplay('fasterDrinksUpCost', costs.fasterDrinksUp, canAfford(costs.fasterDrinksUp));
-  updateCostDisplay(
-    'fasterDrinksUpCostCompact',
-    costs.fasterDrinksUp,
-    canAfford(costs.fasterDrinksUp)
-  );
   updateCostDisplay('levelUpCost', costs.levelUp, canAfford(costs.levelUp));
   updateCostDisplay('levelCost', costs.levelUp, canAfford(costs.levelUp));
 
@@ -149,38 +135,27 @@ function calculateAllCosts(): CostResult {
   const fasterDrinksCount = toDecimal((window as any).App?.state?.getState?.()?.fasterDrinks || 0);
   costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksCount));
 
-  const criticalClickBaseCost = toDecimal(
-    dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST ?? 60
-  );
-  const criticalClickScaling = toDecimal(
-    dataUp?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING ?? 1.12
-  );
-  const criticalClickCount = toDecimal(
-    (window as any).App?.state?.getState?.()?.criticalClicks || 0
-  );
-  costs.criticalClick = criticalClickBaseCost.multiply(
-    criticalClickScaling.pow(criticalClickCount)
-  );
-
   const widerStrawsBaseCost = toDecimal(
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
   );
+  const widerStrawsScaling = toDecimal(
+    dataUp?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING ?? 1.2
+  );
   const widerStrawsCount = toDecimal((window as any).App?.state?.getState?.()?.widerStraws || 0);
-  costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(new Decimal(1)));
+  costs.widerStraws = nextWiderStrawsCost(
+    widerStrawsCount,
+    widerStrawsBaseCost,
+    widerStrawsScaling
+  );
 
   const betterCupsBaseCost = toDecimal(
     dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400
   );
+  const betterCupsScaling = toDecimal(
+    dataUp?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.25
+  );
   const betterCupsCount = toDecimal((window as any).App?.state?.getState?.()?.betterCups || 0);
-  costs.betterCups = betterCupsBaseCost.multiply(betterCupsCount.add(new Decimal(1)));
-
-  const fasterDrinksUpBaseCost = toDecimal(
-    dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 1500
-  );
-  const fasterDrinksUpCount = toDecimal(
-    (window as any).App?.state?.getState?.()?.fasterDrinksUpCounter || 0
-  );
-  costs.fasterDrinksUp = fasterDrinksUpBaseCost.multiply(fasterDrinksUpCount);
+  costs.betterCups = nextBetterCupsCost(betterCupsCount, betterCupsBaseCost, betterCupsScaling);
 
   const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
   const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);

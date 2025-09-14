@@ -182,34 +182,6 @@ export class SaveGameLoader {
    */
   private loadCriticalClickSystem(savegame: SaveGameData): void {
     try {
-      if (typeof savegame.criticalClickChance !== 'undefined') {
-        const chanceValue = this.parseDecimalValue(savegame.criticalClickChance, 0.001);
-        getStoreActions().setCriticalClickChance(chanceValue);
-        // Ensure window value is always a Decimal
-        (window as any).criticalClickChance =
-          typeof chanceValue === 'number' ? new (window as any).Decimal(chanceValue) : chanceValue;
-      }
-
-      if (typeof savegame.criticalClickMultiplier !== 'undefined') {
-        const multiplierValue = this.parseDecimalValue(savegame.criticalClickMultiplier, 5);
-        getStoreActions().setCriticalClickMultiplier(multiplierValue);
-        // Ensure window value is always a Decimal
-        (window as any).criticalClickMultiplier =
-          typeof multiplierValue === 'number'
-            ? new (window as any).Decimal(multiplierValue)
-            : multiplierValue;
-      }
-
-      if (typeof savegame.criticalClicks !== 'undefined') {
-        const criticalClicksValue = this.parseDecimalValue(savegame.criticalClicks);
-        getStoreActions().setCriticalClicks(criticalClicksValue);
-        // Ensure window value is always a Decimal
-        (window as any).criticalClicks =
-          typeof criticalClicksValue === 'number'
-            ? new (window as any).Decimal(criticalClicksValue)
-            : criticalClicksValue;
-      }
-
       if (typeof savegame.suctionClickBonus !== 'undefined') {
         const bonusValue = this.parseDecimalValue(savegame.suctionClickBonus);
         getStoreActions().setSuctionClickBonus(bonusValue);

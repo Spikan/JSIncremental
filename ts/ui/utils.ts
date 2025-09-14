@@ -223,12 +223,8 @@ function updateCompactButtonVariants(buttonId: string, isAffordable: boolean): v
   if (buttonId === 'buySuction' || buttonId === 'upgradeSuction') {
     compactSelector =
       '.clicking-upgrade-btn[data-action="buySuction"], .clicking-upgrade-btn[data-action="upgradeSuction"]';
-  } else if (buttonId === 'buyCriticalClick' || buttonId === 'upgradeCriticalClick') {
-    compactSelector =
-      '.clicking-upgrade-btn[data-action="buyCriticalClick"], .clicking-upgrade-btn[data-action="upgradeCriticalClick"]';
-  } else if (buttonId === 'buyFasterDrinks' || buttonId === 'upgradeFasterDrinks') {
-    compactSelector =
-      '.drink-speed-upgrade-btn[data-action="buyFasterDrinks"], .drink-speed-upgrade-btn[data-action="upgradeFasterDrinks"]';
+  } else if (buttonId === 'buyFasterDrinks') {
+    compactSelector = '.drink-speed-upgrade-btn[data-action="buyFasterDrinks"]';
   }
   if (!compactSelector) return;
   try {

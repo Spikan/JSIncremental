@@ -8,7 +8,12 @@ import { updateLastSaveTime, updatePurchasedCounts } from './stats';
 import { checkUpgradeAffordability } from './affordability';
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { toDecimal } from '../core/numbers/migration-utils';
-import { nextStrawCost, nextCupCost } from '../core/rules/purchases';
+import {
+  nextStrawCost,
+  nextCupCost,
+  nextWiderStrawsCost,
+  nextBetterCupsCost,
+} from '../core/rules/purchases';
 
 // Direct break_eternity.js Decimal access (consistent with core systems)
 const Decimal = (globalThis as any).Decimal;
@@ -43,34 +48,27 @@ function calculateAllCosts(): any {
   const fasterDrinksCount = toDecimal(useGameStore.getState()?.fasterDrinks || 0);
   costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksCount));
 
-  const criticalClickBaseCost = toDecimal(
-    dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST ?? 60
-  );
-  const criticalClickScaling = toDecimal(
-    dataUp?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING ?? 1.12
-  );
-  const criticalClickCount = toDecimal(useGameStore.getState()?.criticalClicks || 0);
-  costs.criticalClick = criticalClickBaseCost.multiply(
-    criticalClickScaling.pow(criticalClickCount)
-  );
-
   const widerStrawsBaseCost = toDecimal(
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
   );
+  const widerStrawsScaling = toDecimal(
+    dataUp?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING ?? 1.2
+  );
   const widerStrawsCount = toDecimal(useGameStore.getState()?.widerStraws || 0);
-  costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(new Decimal(1)));
+  costs.widerStraws = nextWiderStrawsCost(
+    widerStrawsCount,
+    widerStrawsBaseCost,
+    widerStrawsScaling
+  );
 
   const betterCupsBaseCost = toDecimal(
     dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400
   );
-  const betterCupsCount = toDecimal(useGameStore.getState()?.betterCups || 0);
-  costs.betterCups = betterCupsBaseCost.multiply(betterCupsCount.add(new Decimal(1)));
-
-  const fasterDrinksUpBaseCost = toDecimal(
-    dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 1500
+  const betterCupsScaling = toDecimal(
+    dataUp?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.25
   );
-  const fasterDrinksUpCount = toDecimal(useGameStore.getState()?.fasterDrinksUpCounter || 0);
-  costs.fasterDrinksUp = fasterDrinksUpBaseCost.multiply(fasterDrinksUpCount);
+  const betterCupsCount = toDecimal(useGameStore.getState()?.betterCups || 0);
+  costs.betterCups = nextBetterCupsCost(betterCupsCount, betterCupsBaseCost, betterCupsScaling);
 
   const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
   const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);
@@ -201,49 +199,6 @@ export function updateTopSipsPerSecond(): void {
   }
 }
 
-export function updateCriticalClickDisplay(): void {
-  if (typeof window === 'undefined') return;
-  const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
-  const criticalChanceElement = document.getElementById('criticalChance');
-
-  try {
-    // Subscribe to critical click chance changes only
-    useGameStore.subscribe(
-      state => state.criticalClickChance,
-      chance => {
-        const numericChance = Number(chance ?? NaN);
-        const formattedChance = !Number.isNaN(numericChance)
-          ? `${(numericChance * 100).toFixed(1)}%`
-          : '0.0%';
-
-        // Update compact display (existing)
-        if (criticalClickChanceCompact) {
-          criticalClickChanceCompact.textContent = formattedChance;
-        }
-
-        // Update new main UI display
-        if (criticalChanceElement) {
-          criticalChanceElement.textContent = formattedChance;
-        }
-      },
-      { fireImmediately: true }
-    );
-  } catch (error) {
-    console.warn('Failed to update critical click display:', error);
-    // Fallback: update once
-    const state = useGameStore.getState();
-    const chance = Number(state.criticalClickChance ?? NaN);
-    const formattedChance = !Number.isNaN(chance) ? `${(chance * 100).toFixed(1)}%` : '0.0%';
-
-    if (criticalClickChanceCompact) {
-      criticalClickChanceCompact.textContent = formattedChance;
-    }
-    if (criticalChanceElement) {
-      criticalChanceElement.textContent = formattedChance;
-    }
-  }
-}
-
 export function updateClickValueDisplay(): void {
   if (typeof window === 'undefined') return;
   const clickValueElement = document.getElementById('clickValue');
@@ -310,10 +265,11 @@ export function updateProductionSummary(): void {
 export function updateDrinkSpeedDisplay(): void {
   if (typeof window === 'undefined') return;
   const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
+  const currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
   const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
   try {
     const state = useGameStore.getState();
-    if (currentDrinkSpeedCompact && state) {
+    if ((currentDrinkSpeedCompact || currentDrinkSpeed) && state) {
       const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
       const drinkRateMsNum =
         typeof drinkRateMs === 'number'
@@ -322,7 +278,14 @@ export function updateDrinkSpeedDisplay(): void {
             ? drinkRateMs.toNumber()
             : 1000;
       const drinkRateSeconds = drinkRateMsNum / 1000;
-      currentDrinkSpeedCompact.textContent = `${formatNumber(drinkRateSeconds)}s`;
+      const formattedTime = `${formatNumber(drinkRateSeconds)}s`;
+
+      if (currentDrinkSpeedCompact) {
+        currentDrinkSpeedCompact.textContent = formattedTime;
+      }
+      if (currentDrinkSpeed) {
+        currentDrinkSpeed.textContent = formattedTime;
+      }
     }
     if (drinkSpeedBonusCompact && state) {
       const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
@@ -517,10 +480,11 @@ export function updateDrinkRate(): void {
 export function updateCompactDrinkSpeedDisplays(): void {
   if (typeof window === 'undefined') return;
   const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
+  const currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
   const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
   try {
     const state = useGameStore.getState();
-    if (currentDrinkSpeedCompact && state) {
+    if ((currentDrinkSpeedCompact || currentDrinkSpeed) && state) {
       const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
       const drinkRateMsNum =
         typeof drinkRateMs === 'number'
@@ -529,7 +493,14 @@ export function updateCompactDrinkSpeedDisplays(): void {
             ? drinkRateMs.toNumber()
             : 1000;
       const drinkRateSeconds = drinkRateMsNum / 1000;
-      currentDrinkSpeedCompact.textContent = `${formatNumber(drinkRateSeconds)}s`;
+      const formattedTime = `${formatNumber(drinkRateSeconds)}s`;
+
+      if (currentDrinkSpeedCompact) {
+        currentDrinkSpeedCompact.textContent = formattedTime;
+      }
+      if (currentDrinkSpeed) {
+        currentDrinkSpeed.textContent = formattedTime;
+      }
     }
     if (drinkSpeedBonusCompact && state) {
       const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
@@ -818,13 +789,6 @@ function updateClickUpgradeDisplays(state: any): void {
 
   updateCostDisplay('suctionCostCompact', costs.suction, canAffordSuction);
   updateStatDisplay('suctionClickBonusCompact', suctionBonus.toFixed(1));
-
-  // Critical Click upgrade
-  const criticalClickChance = state.criticalClickChance || 0;
-  const canAffordCriticalClick = state.sips >= costs.criticalClick;
-
-  updateCostDisplay('criticalClickCostCompact', costs.criticalClick, canAffordCriticalClick);
-  updateStatDisplay('criticalClickChanceCompact', criticalClickChance.toFixed(1));
 }
 
 /**
@@ -838,14 +802,11 @@ function updateDrinkSpeedUpgradeDisplays(state: any): void {
   const canAffordFasterDrinks = state.sips >= costs.fasterDrinks;
 
   updateCostDisplay('fasterDrinksCostCompact', costs.fasterDrinks, canAffordFasterDrinks);
+  updateCostDisplay('fasterDrinksCost', costs.fasterDrinks, canAffordFasterDrinks);
   updateStatDisplay('currentDrinkSpeedCompact', (currentDrinkSpeed / 1000).toFixed(2) + 's');
 
-  // Upgrade Faster Drinks
-  const drinkSpeedBonus = state.drinkSpeedBonus || 0;
-  const canAffordFasterDrinksUp = state.sips >= costs.fasterDrinksUp;
-
-  updateCostDisplay('fasterDrinksUpCostCompact', costs.fasterDrinksUp, canAffordFasterDrinksUp);
-  updateStatDisplay('drinkSpeedBonusCompact', drinkSpeedBonus.toFixed(0));
+  // Update the new faster drinks button display
+  updateStatDisplay('currentDrinkSpeed', (currentDrinkSpeed / 1000).toFixed(2) + 's');
 }
 
 /**
@@ -932,13 +893,11 @@ function updateProductionSummaryDisplay(state: any): void {
  * Update soda stats display
  */
 function updateSodaStats(state: any): void {
-  // Update click value
-  const clickValue = state.clickValue || 1;
-  updateStatDisplay('clickValue', clickValue);
-
-  // Update critical chance
-  const criticalChance = state.criticalClickChance || 0;
-  updateStatDisplay('criticalChance', criticalChance.toFixed(1) + '%');
+  // Update click value - calculate total click value (base + suction bonuses)
+  let baseClickValue = 1;
+  const suctionBonus = Number(state.suctionClickBonus || 0);
+  const totalClickValue = baseClickValue + suctionBonus;
+  updateStatDisplay('clickValue', totalClickValue.toFixed(1));
 }
 
 /**

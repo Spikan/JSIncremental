@@ -33,8 +33,6 @@ interface GameStore extends GameState {
     setBetterCups: (_amount: any) => void;
     addFasterDrinks: (_amount: any) => void;
     setFasterDrinks: (_amount: any) => void;
-    addCriticalClicks: (_amount: any) => void;
-    setCriticalClicks: (_amount: any) => void;
 
     // Production stats (support Decimal for high production rates)
     setStrawSPD: (_spd: any) => void;
@@ -59,14 +57,8 @@ interface GameStore extends GameState {
     setCurrentClickStreak: (_streak: number) => void;
     setBestClickStreak: (_streak: number) => void;
 
-    // Click/crit systems
-    setCriticalClickChance: (_chance: number) => void;
-    setCriticalClickMultiplier: (_multiplier: number) => void;
+    // Click systems
     setSuctionClickBonus: (_bonus: number) => void;
-
-    // Upgrade counters
-    setFasterDrinksUpCounter: (_count: number) => void;
-    setCriticalClickUpCounter: (_count: number) => void;
 
     // Level management
     setLevel: (_level: number) => void;
@@ -93,7 +85,6 @@ const defaultState: GameState = {
   widerStraws: toDecimal(0),
   betterCups: toDecimal(0),
   fasterDrinks: toDecimal(0),
-  criticalClicks: toDecimal(0),
   level: toDecimal(1),
 
   // Production stats
@@ -117,14 +108,8 @@ const defaultState: GameState = {
   currentClickStreak: 0,
   bestClickStreak: 0,
 
-  // Click/crit systems
-  criticalClickChance: toDecimal(0),
-  criticalClickMultiplier: toDecimal(0),
+  // Click systems
   suctionClickBonus: toDecimal(0),
-
-  // Upgrade counters
-  fasterDrinksUpCounter: toDecimal(0),
-  criticalClickUpCounter: toDecimal(0),
 
   // Options
   options: {
@@ -172,9 +157,6 @@ export const useGameStore = create<GameStore>()(
           addFasterDrinks: amount =>
             set(state => ({ fasterDrinks: add(state.fasterDrinks, amount) })),
           setFasterDrinks: amount => set({ fasterDrinks: toDecimal(amount) }),
-          addCriticalClicks: amount =>
-            set(state => ({ criticalClicks: add(state.criticalClicks, amount) })),
-          setCriticalClicks: amount => set({ criticalClicks: toDecimal(amount) }),
 
           // Production stats
           setStrawSPD: spd => set({ strawSPD: toDecimal(spd) }),
@@ -203,17 +185,8 @@ export const useGameStore = create<GameStore>()(
               bestClickStreak: Math.max(state.bestClickStreak, streak),
             })),
 
-          // Click/crit systems
-          setCriticalClickChance: (_chance: number) => set({ criticalClickChance: _chance }),
-          setCriticalClickMultiplier: (_multiplier: any) =>
-            set({ criticalClickMultiplier: toDecimal(_multiplier) }),
+          // Click systems
           setSuctionClickBonus: (_bonus: any) => set({ suctionClickBonus: toDecimal(_bonus) }),
-
-          // Upgrade counters
-          setFasterDrinksUpCounter: (_count: any) =>
-            set({ fasterDrinksUpCounter: toDecimal(_count) }),
-          setCriticalClickUpCounter: (_count: any) =>
-            set({ criticalClickUpCounter: toDecimal(_count) }),
 
           // Level management
           setLevel: (_level: any) => set({ level: toDecimal(_level) }),
@@ -247,7 +220,6 @@ export const useGameStore = create<GameStore>()(
           widerStraws: state.widerStraws,
           betterCups: state.betterCups,
           fasterDrinks: state.fasterDrinks,
-          criticalClicks: state.criticalClicks,
           level: state.level,
           spd: state.spd,
           strawSPD: state.strawSPD,
@@ -264,11 +236,7 @@ export const useGameStore = create<GameStore>()(
           highestSipsPerSecond: state.highestSipsPerSecond,
           currentClickStreak: state.currentClickStreak,
           bestClickStreak: state.bestClickStreak,
-          criticalClickChance: state.criticalClickChance,
-          criticalClickMultiplier: state.criticalClickMultiplier,
           suctionClickBonus: state.suctionClickBonus,
-          fasterDrinksUpCounter: state.fasterDrinksUpCounter,
-          criticalClickUpCounter: state.criticalClickUpCounter,
           options: state.options,
         }),
         // @ts-expect-error: custom persist options supported by our setup
@@ -373,12 +341,6 @@ export const useFasterDrinks = createSelector(
   'fasterDrinks'
 );
 
-export const useCriticalClicks = createSelector(
-  state => state.criticalClicks?.toString() || '0',
-  '0',
-  'criticalClicks'
-);
-
 export const useLevel = createSelector(state => state.level?.toString() || '1', '1', 'level');
 
 // Production and performance selectors - convert Decimal to numbers for UI display
@@ -400,18 +362,6 @@ export const useDrinkProgress = createSelector(state => state.drinkProgress, 0, 
 export const useLastDrinkTime = createSelector(state => state.lastDrinkTime, 0, 'lastDrinkTime');
 
 // Click system selectors - convert Decimal to numbers for UI display
-export const useCriticalClickChance = createSelector(
-  state => state.criticalClickChance,
-  0,
-  'criticalClickChance'
-);
-
-export const useCriticalClickMultiplier = createSelector(
-  state => state.criticalClickMultiplier?.toString() || '0',
-  '0',
-  'criticalClickMultiplier'
-);
-
 export const useSuctionClickBonus = createSelector(
   state => state.suctionClickBonus?.toString() || '0',
   '0',
@@ -506,21 +456,15 @@ export const useProductionStats = () => {
 
 export const useClickStats = () => {
   const totalClicks = useTotalClicks();
-  const criticalClickChance = useCriticalClickChance();
-  const criticalClickMultiplier = useCriticalClickMultiplier();
   const suctionClickBonus = useSuctionClickBonus();
 
   return useMemo(
     () => ({
       totalClicks,
-      criticalClickChance,
-      criticalClickMultiplier,
       suctionClickBonus,
-      effectiveMultiplier: (state: GameStore) =>
-        state.criticalClickMultiplier?.add(state.suctionClickBonus || new Decimal(0)).toString() ||
-        '0',
+      effectiveMultiplier: (state: GameStore) => state.suctionClickBonus?.toString() || '0',
     }),
-    [totalClicks, criticalClickChance, criticalClickMultiplier, suctionClickBonus]
+    [totalClicks, suctionClickBonus]
   );
 };
 

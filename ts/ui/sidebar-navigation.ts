@@ -26,18 +26,11 @@ export class SidebarNavigationManager {
   private initializeSections(): void {
     const sectionData: SidebarSection[] = [
       {
-        id: 'upgrades',
-        title: 'Upgrades',
-        subtitle: 'Enhance your power',
-        icon: '⚡',
-        expanded: true, // Start with upgrades expanded
-      },
-      {
         id: 'shop',
         title: 'Shop',
         subtitle: 'Production buildings',
         icon: '🛒',
-        expanded: false,
+        expanded: true, // Start with shop expanded since upgrades is removed
       },
       {
         id: 'stats',

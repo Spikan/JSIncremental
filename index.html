@@ -350,6 +350,19 @@
             <div class="drink-progress-bar">
               <div class="drink-progress-fill" id="drinkProgressFill"></div>
             </div>
+            <!-- Faster Drinks Button -->
+            <div class="faster-drinks-container">
+              <button class="faster-drinks-btn" data-action="buyFasterDrinks">
+                <div class="faster-drinks-icon">⚡</div>
+                <div class="faster-drinks-info">
+                  <div class="faster-drinks-name">Faster Drinks</div>
+                  <div class="faster-drinks-cost"><span id="fasterDrinksCost">80</span> Sips</div>
+                </div>
+                <div class="faster-drinks-effect">
+                  Speed: <span id="currentDrinkSpeed">5.00s</span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -388,16 +401,24 @@
               </div>
             </div>
 
-            <!-- Soda Stats -->
-            <div class="soda-stats">
-              <div class="stat-item">
-                <span class="stat-label">Click Value</span>
-                <span class="stat-value" id="clickValue">1</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Critical Chance</span>
-                <span class="stat-value" id="criticalChance">0%</span>
-              </div>
+            <!-- Suction Button with Click Power Display -->
+            <div class="suction-button-container">
+              <button class="suction-btn" data-action="buySuction">
+                <div class="suction-icon">💨</div>
+                <div class="suction-info">
+                  <div class="suction-name">Suction</div>
+                  <div class="suction-cost"><span id="suctionCost">40</span> Sips</div>
+                </div>
+                <div class="suction-effect">
+                  <div class="click-power-display">
+                    <span class="click-power-label">Click Power:</span>
+                    <span class="click-power-value" id="clickValue">1.0</span>
+                  </div>
+                  <div class="suction-bonus">
+                    +<span id="suctionClickBonus">1.0</span> per click
+                  </div>
+                </div>
+              </button>
             </div>
           </div>
 
@@ -461,109 +482,6 @@
 
           <!-- Sidebar Content -->
           <div class="sidebar-content">
-            <!-- Upgrades Section -->
-            <div class="sidebar-section" data-section="upgrades">
-              <div class="section-header" data-action="toggleSection:upgrades">
-                <div class="section-icon">⚡</div>
-                <div class="section-info">
-                  <h3 class="section-title">Upgrades</h3>
-                  <p class="section-subtitle">Enhance your power</p>
-                </div>
-                <div class="section-toggle">▼</div>
-              </div>
-              <div class="section-content">
-                <!-- Click Upgrades -->
-                <div class="upgrade-group">
-                  <h4 class="upgrade-group-title">Click Upgrades</h4>
-                  <div class="upgrade-cards">
-                    <div class="upgrade-card">
-                      <div class="upgrade-header">
-                        <div class="upgrade-icon">💨</div>
-                        <div class="upgrade-info">
-                          <h4 class="upgrade-name">Suction</h4>
-                          <p class="upgrade-description">Increase click power</p>
-                        </div>
-                      </div>
-                      <button class="upgrade-btn" data-action="buySuction">
-                        <div class="upgrade-cost"><span id="suctionCostCompact">40</span> Sips</div>
-                      </button>
-                      <div class="upgrade-stats">
-                        <div class="upgrade-effect">
-                          +<span id="suctionClickBonusCompact">1.0</span> per click
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="upgrade-card">
-                      <div class="upgrade-header">
-                        <div class="upgrade-icon">⚡</div>
-                        <div class="upgrade-info">
-                          <h4 class="upgrade-name">Critical Click</h4>
-                          <p class="upgrade-description">Chance for bonus clicks</p>
-                        </div>
-                      </div>
-                      <button class="upgrade-btn" data-action="buyCriticalClick">
-                        <div class="upgrade-cost">
-                          <span id="criticalClickCostCompact">60</span> Sips
-                        </div>
-                      </button>
-                      <div class="upgrade-stats">
-                        <div class="upgrade-effect">
-                          <span id="criticalClickChanceCompact">0.1</span>% chance
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Drink Speed Upgrades -->
-                <div class="upgrade-group">
-                  <h4 class="upgrade-group-title">Drink Speed Upgrades</h4>
-                  <div class="upgrade-cards">
-                    <div class="upgrade-card">
-                      <div class="upgrade-header">
-                        <div class="upgrade-icon">⚡</div>
-                        <div class="upgrade-info">
-                          <h4 class="upgrade-name">Faster Drinks</h4>
-                          <p class="upgrade-description">Reduce drink time</p>
-                        </div>
-                      </div>
-                      <button class="upgrade-btn" data-action="buyFasterDrinks">
-                        <div class="upgrade-cost">
-                          <span id="fasterDrinksCostCompact">80</span> Sips
-                        </div>
-                      </button>
-                      <div class="upgrade-stats">
-                        <div class="upgrade-effect">
-                          Speed: <span id="currentDrinkSpeedCompact">5.00s</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="upgrade-card">
-                      <div class="upgrade-header">
-                        <div class="upgrade-icon">🔧</div>
-                        <div class="upgrade-info">
-                          <h4 class="upgrade-name">Upgrade Faster Drinks</h4>
-                          <p class="upgrade-description">Enhance drink speed bonus</p>
-                        </div>
-                      </div>
-                      <button class="upgrade-btn" data-action="upgradeFasterDrinks">
-                        <div class="upgrade-cost">
-                          <span id="fasterDrinksUpCostCompact">1500</span> Sips
-                        </div>
-                      </button>
-                      <div class="upgrade-stats">
-                        <div class="upgrade-effect">
-                          Bonus: <span id="drinkSpeedBonusCompact">0%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- Shop Section -->
             <div class="sidebar-section" data-section="shop">
               <div class="section-header" data-action="toggleSection:shop">

@@ -325,7 +325,6 @@ export const updateCostDisplay = utils.updateCostDisplay;
 export const updateButtonState = utils.updateButtonState;
 export const updateTopSipsPerDrink = displays.updateTopSipsPerDrink;
 export const updateTopSipsPerSecond = displays.updateTopSipsPerSecond;
-export const updateCriticalClickDisplay = displays.updateCriticalClickDisplay;
 export const updateClickValueDisplay = displays.updateClickValueDisplay;
 export const updateProductionSummary = displays.updateProductionSummary;
 export const updateDrinkSpeedDisplay = displays.updateDrinkSpeedDisplay;
@@ -425,7 +424,6 @@ export function initializeUI(): void {
       updateClickValueDisplay();
       updateProductionSummary();
       checkUpgradeAffordabilityOptimized();
-      updateCriticalClickDisplay();
       updateShopStats(); // Call updateShopStats to trigger updateEnhancementValues
       updatePurchasedCountsOptimized(); // Use optimized version
 
@@ -496,6 +494,14 @@ export function initializeUI(): void {
       console.log('✅ 3D soda button initialization completed');
     } catch (error) {
       console.error('❌ 3D soda button initialization failed:', error);
+    }
+
+    // Initialize displays
+    try {
+      updateDrinkSpeedDisplayOptimized();
+      updateClickValueDisplay();
+    } catch (error) {
+      console.warn('Failed to initialize displays:', error);
     }
 
     // Run layout validation
@@ -651,7 +657,6 @@ export function updateAllDisplays(): void {
 
   // Use optimized batch update for better performance
   updateAllDisplaysOptimized();
-  updateCriticalClickDisplay();
   updateClickValueDisplay();
   updateProductionSummary();
   updateDrinkSpeedDisplayOptimized();

@@ -120,36 +120,6 @@ export async function handleSodaClick(multiplier: number = 1) {
       console.warn('Failed to set sips in state:', error);
     }
 
-    // Critical check using state-first with Decimal support
-    const criticalChance = Number(state.criticalClickChance ?? w.criticalClickChance ?? 0);
-    if (Math.random() < criticalChance) {
-      const criticalMultiplier = toDecimal(
-        state.criticalClickMultiplier ?? w.criticalClickMultiplier ?? 5
-      );
-
-      // Calculate critical bonus: totalClickValue * (criticalMultiplier - 1)
-      const criticalBonus = totalClickValue.multiply(criticalMultiplier.subtract(new Decimal(1)));
-
-      // Add critical bonus to sips
-      const currentSips = toDecimal(w.sips || 0);
-      w.sips = currentSips.add(criticalBonus);
-
-      // Update state keeping Decimal
-      try {
-        w.App?.state?.actions?.setSips?.(w.sips);
-      } catch (error) {
-        console.warn('Failed to set sips in state after critical click:', error);
-      }
-      try {
-        w.App?.events?.emit?.(w.App?.EVENT_NAMES?.CLICK?.CRITICAL, {
-          // Preserve extreme values - use safe conversion
-          bonus: criticalBonus,
-        });
-      } catch (error) {
-        console.warn('Failed to emit critical click event:', error);
-      }
-    }
-
     // Emit soda click and sync totals with Decimal support
     try {
       console.log('DEBUG: Emitting CLICK.SODA event with data:', {

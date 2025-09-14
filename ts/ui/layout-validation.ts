@@ -153,9 +153,7 @@ export function validateGameFunctionality(): boolean {
   // Test upgrade elements exist
   const upgradeElements = [
     'suctionCostCompact',
-    'criticalClickCostCompact',
     'fasterDrinksCostCompact',
-    'fasterDrinksUpCostCompact',
     'strawCost',
     'cupCost',
     'widerStrawsCost',
@@ -172,11 +170,8 @@ export function validateGameFunctionality(): boolean {
   // Test stat elements exist
   const statElements = [
     'clickValue',
-    'criticalChance',
     'suctionClickBonusCompact',
-    'criticalClickChanceCompact',
     'currentDrinkSpeedCompact',
-    'drinkSpeedBonusCompact',
     'straws',
     'cups',
     'widerStraws',

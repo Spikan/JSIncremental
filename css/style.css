@@ -8714,3 +8714,211 @@ p {
     font-size: 1rem;
   }
 }
+
+/* New Small Button Styles */
+.suction-button-container {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.suction-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  border: 2px solid #2c5aa0;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Gill Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+}
+
+.suction-btn:hover {
+  background: linear-gradient(135deg, #5ba0f2, #4a8acd);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.suction-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.suction-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #666, #555);
+  border-color: #444;
+}
+
+.suction-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.suction-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.suction-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.suction-cost {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.suction-effect {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.click-power-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 0.3rem;
+}
+
+.click-power-label {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.click-power-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #4a90e2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.suction-bonus {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.faster-drinks-container {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.faster-drinks-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  border: 2px solid #d63031;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Gill Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-size: 0.85rem;
+}
+
+.faster-drinks-btn:hover {
+  background: linear-gradient(135deg, #ff7b7b, #ff6a6a);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.faster-drinks-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.faster-drinks-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #666, #555);
+  border-color: #444;
+}
+
+.faster-drinks-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.faster-drinks-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.faster-drinks-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.1rem;
+}
+
+.faster-drinks-cost {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.faster-drinks-effect {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  text-align: right;
+}
+
+/* Mobile responsiveness for new buttons */
+@media (max-width: 768px) {
+  .suction-btn {
+    min-width: 180px;
+    padding: 0.6rem 0.8rem;
+    gap: 0.6rem;
+  }
+
+  .faster-drinks-btn {
+    padding: 0.4rem 0.6rem;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .suction-icon {
+    font-size: 1.3rem;
+  }
+
+  .faster-drinks-icon {
+    font-size: 1.1rem;
+  }
+
+  .click-power-display {
+    margin-bottom: 0.2rem;
+  }
+
+  .click-power-label {
+    font-size: 0.65rem;
+  }
+
+  .click-power-value {
+    font-size: 0.85rem;
+  }
+
+  .suction-bonus {
+    font-size: 0.7rem;
+  }
+}

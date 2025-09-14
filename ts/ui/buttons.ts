@@ -58,20 +58,10 @@ const BUTTON_CONFIG: {
       type: 'clicking-upgrade-btn',
       label: 'Buy Suction',
     },
-    buyCriticalClick: {
-      func: () => (window as any).App?.systems?.purchases?.execute?.buyCriticalClick?.(),
-      type: 'clicking-upgrade-btn',
-      label: 'Buy Critical Click',
-    },
     buyFasterDrinks: {
       func: () => (window as any).App?.systems?.purchases?.execute?.buyFasterDrinks?.(),
       type: 'drink-speed-upgrade-btn',
       label: 'Buy Faster Drinks',
-    },
-    upgradeFasterDrinks: {
-      func: () => (window as any).App?.systems?.purchases?.execute?.upgradeFasterDrinks?.(),
-      type: 'drink-speed-upgrade-btn',
-      label: 'Upgrade Faster Drinks',
     },
     levelUp: {
       func: () => (window as any).App?.systems?.purchases?.execute?.levelUp?.(),
@@ -893,8 +883,6 @@ function setupSpecialButtonHandlers(): void {
             'buyBetterCups',
             'buySuction',
             'buyFasterDrinks',
-            'upgradeFasterDrinks',
-            'buyCriticalClick',
             'purchaseUnlock',
           ]);
           const isPurchase = purchaseActions.has(fnName);
@@ -1055,8 +1043,6 @@ function setupSpecialButtonHandlers(): void {
           'buyBetterCups',
           'buySuction',
           'buyFasterDrinks',
-          'upgradeFasterDrinks',
-          'buyCriticalClick',
           'buyFriends',
           'upgradeFriends',
           'purchaseUnlock',

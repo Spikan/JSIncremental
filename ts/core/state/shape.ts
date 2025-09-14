@@ -27,7 +27,6 @@ export type GameState = {
   widerStraws: NumericValue;
   betterCups: NumericValue;
   fasterDrinks: NumericValue;
-  criticalClicks: NumericValue;
   level: NumericValue;
 
   // Production stats (support Decimal for high production rates)
@@ -51,14 +50,8 @@ export type GameState = {
   currentClickStreak: number;
   bestClickStreak: number;
 
-  // Click/crit systems (migrate from globals)
-  criticalClickChance: NumericValue;
-  criticalClickMultiplier: NumericValue;
+  // Click systems (migrate from globals)
   suctionClickBonus: NumericValue;
-
-  // Upgrade counters
-  fasterDrinksUpCounter: NumericValue;
-  criticalClickUpCounter: NumericValue;
 
   // Options
   options: GameOptions;
@@ -73,7 +66,6 @@ export const defaultState: GameState = {
   widerStraws: new Decimal(0),
   betterCups: new Decimal(0),
   fasterDrinks: new Decimal(0),
-  criticalClicks: new Decimal(0),
   level: new Decimal(1),
 
   // Production stats (using Decimal for high production rates)
@@ -97,14 +89,8 @@ export const defaultState: GameState = {
   currentClickStreak: 0,
   bestClickStreak: 0,
 
-  // Click/crit systems
-  criticalClickChance: 0,
-  criticalClickMultiplier: new Decimal(0),
+  // Click systems
   suctionClickBonus: new Decimal(0),
-
-  // Upgrade counters
-  fasterDrinksUpCounter: new Decimal(0),
-  criticalClickUpCounter: new Decimal(0),
 
   // Options
   options: {
