@@ -340,23 +340,25 @@ body {
   align-items: center;
   gap: 0.75rem;
   min-width: 160px;
-  min-height: 48px;
-  padding: 0.75rem 1.25rem;
+  min-height: 52px;
+  padding: 0.875rem 1.5rem;
   font-size: 1rem;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
-  backdrop-filter: blur(10px);
+  /* Enhanced idle game UX */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  user-select: none;
-  text-decoration: none;
+  letter-spacing: 0.3px;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
+  user-select: none;
+  text-decoration: none;
 }
 
 .tab-icon {
@@ -393,19 +395,21 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 4px;
-  min-width: 48px;
-  min-height: 48px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  padding: 10px 6px;
+  min-width: 52px;
+  min-height: 52px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
   cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  /* Enhanced idle game UX */
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .mobile-tab-icon {
@@ -429,25 +433,30 @@ body {
 /* Mobile Tab Active State */
 .mobile-tab-item.active {
   color: #ffffff;
-  background: rgba(0, 179, 107, 0.2);
+  background: linear-gradient(135deg, rgba(0, 179, 107, 0.25), rgba(0, 179, 107, 0.15));
+  border-color: rgba(0, 179, 107, 0.4);
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3);
 }
 
 .mobile-tab-item.active .mobile-tab-icon {
-  transform: scale(1.1);
-  filter: drop-shadow(0 2px 4px rgba(0, 179, 107, 0.5));
+  transform: scale(1.15);
+  filter: drop-shadow(0 2px 6px rgba(0, 179, 107, 0.6));
 }
 
 .mobile-tab-item.active .mobile-tab-label {
   color: #00d97f;
-  font-weight: bold;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile Tab Hover Effects */
 .mobile-tab-item:hover:not(.active) {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(0, 179, 107, 0.1);
-  transform: scale(1.02);
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(0, 179, 107, 0.12);
+  border-color: rgba(0, 179, 107, 0.2);
+  transform: scale(1.03);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
 .mobile-tab-item:active {
@@ -1648,13 +1657,45 @@ button:active,
   transition: all 0.1s ease;
 }
 
-/* Focus States for Accessibility */
+/* Enhanced Focus States for Accessibility */
 button:focus,
 .shop-btn:focus,
 .tab-btn:focus,
 .mobile-tab-item:focus {
-  outline: 2px solid #00d97f;
-  outline-offset: 2px;
+  outline: 3px solid #00d97f;
+  outline-offset: 3px;
+  /* Enhanced focus visibility */
+  box-shadow: 0 0 0 3px rgba(0, 217, 127, 0.3);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .currency-value {
+    color: #ffffff;
+    text-shadow: 0 0 0 transparent;
+  }
+
+  .tab-btn {
+    border-width: 3px;
+  }
+
+  .upgrade-btn {
+    border-width: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .tab-btn::before,
+  .upgrade-btn::before,
+  .currency-item::before {
+    animation: none;
+    transition: none;
+  }
+
+  .upgrade-btn.affordable {
+    animation: none;
+  }
 }
 
 /* Loading States */
@@ -4440,19 +4481,50 @@ button:focus {
    ======================================== */
 
 /* Desktop Tab Button Hover States */
+.tab-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.tab-btn:hover::before {
+  left: 100%;
+}
+
 .tab-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  color: #ffffff;
 }
 
 .tab-btn.active {
-  background: rgba(255, 255, 255, 0.25);
+  background: linear-gradient(135deg, rgba(0, 179, 107, 0.2), rgba(0, 179, 107, 0.1));
   color: #ffffff;
   border-color: #00b36b;
-  box-shadow: 0 4px 16px rgba(0, 179, 107, 0.3);
-  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 179, 107, 0.4);
+  font-weight: 700;
+  /* Enhanced active state */
+  transform: translateY(-1px);
+  position: relative;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(90deg, #00b36b, #00d97f);
+  border-radius: 2px;
 }
 
 .tab-btn:active {
@@ -5001,18 +5073,23 @@ button {
    ======================================== */
 
 .game-header {
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 23, 137, 0.3));
-  backdrop-filter: blur(10px);
-  border-bottom: 2px solid rgba(255, 61, 2, 0.3);
-  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(0, 23, 137, 0.4));
+  backdrop-filter: blur(15px);
+  border-bottom: 3px solid rgba(255, 61, 2, 0.4);
+  padding: 1.25rem 1.5rem;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 1px 3px rgba(255, 61, 2, 0.2);
   position: sticky;
   top: 0;
   z-index: 100;
+  /* Enhanced visual separation */
+  border-radius: 0 0 16px 16px;
+  margin-bottom: 1rem;
 }
 
 /* Level Indicator */
@@ -5041,24 +5118,61 @@ button {
   font-weight: 500;
 }
 
+/* Header Main Content Container */
+.header-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  align-items: center;
+}
+
 /* Currency Display */
 .currency-display {
   display: flex;
   align-items: center;
   gap: 1.5rem;
   justify-content: center;
-  flex: 1;
+  width: 100%;
 }
 
 .currency-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+  min-width: 140px;
+  justify-content: center;
+  /* Enhanced visual feedback */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.currency-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.currency-item:hover::before {
+  left: 100%;
+}
+
+.currency-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .currency-item.primary {
@@ -5089,20 +5203,28 @@ button {
 }
 
 .currency-label {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
-  margin-bottom: 0.1rem;
+  letter-spacing: 0.8px;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  /* Enhanced readability */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  line-height: 1.2;
 }
 
 .currency-value {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 800;
   color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
   font-family: 'Courier New', monospace;
+  /* Better number formatting */
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  /* Subtle glow for important numbers */
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.1));
 }
 
 .currency-item.primary .currency-value {
@@ -5139,6 +5261,78 @@ button {
   letter-spacing: 2px;
 }
 
+/* Header Drink Progress Bar */
+.header-drink-progress {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(0, 179, 107, 0.3);
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.drink-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.drink-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.drink-countdown {
+  color: #10b981;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+}
+
+.drink-countdown.countdown-warning {
+  color: #ff3d02;
+  font-weight: bold;
+  animation: countdownPulse 0.5s ease-in-out infinite alternate;
+}
+
+.header-drink-progress .drink-progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.header-drink-progress .drink-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.header-drink-progress .drink-progress-fill.nearly-complete {
+  background: linear-gradient(90deg, #ff8e53, #ff6b6b);
+}
+
+.header-drink-progress .drink-progress-fill.complete {
+  background: linear-gradient(90deg, #ff3d02, #ff6b6b);
+  animation: drinkComplete 0.5s ease;
+}
+
+/* Drink Speed Upgrade Section */
+.drink-speed-upgrade-section {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 1rem auto;
+  max-width: 800px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .game-header {
@@ -5146,6 +5340,10 @@ button {
     gap: 1rem;
     text-align: center;
     padding: 1rem;
+  }
+
+  .header-main-content {
+    gap: 0.75rem;
   }
 
   .currency-display {
@@ -5162,6 +5360,19 @@ button {
 
   .currency-divider {
     display: none;
+  }
+
+  .header-drink-progress {
+    max-width: 100%;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .drink-progress-info {
+    font-size: 0.85rem;
+  }
+
+  .drink-countdown {
+    font-size: 0.9rem;
   }
 
   .level-indicator,
@@ -5652,25 +5863,66 @@ p {
 .upgrade-btn {
   background: linear-gradient(135deg, #2a5298, #1e3a8a);
   border: 2px solid transparent;
-  border-radius: 10px;
-  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  padding: 0.875rem 1.5rem;
   color: white;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   width: 100%;
   margin-bottom: 0.75rem;
+  /* Enhanced idle game UX */
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.upgrade-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.upgrade-btn:hover::before {
+  left: 100%;
+}
+
+.upgrade-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #3b5fb8, #2a4a9a);
 }
 
 .upgrade-btn.affordable {
   background: linear-gradient(135deg, #059669, #047857);
   border-color: #10b981;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4);
+  /* Enhanced visual feedback for affordable items */
+  animation: affordablePulse 2s ease-in-out infinite;
 }
 
 .upgrade-btn:hover.affordable {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Subtle pulse animation for affordable items */
+@keyframes affordablePulse {
+  0%,
+  100% {
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.6);
+  }
 }
 
 .upgrade-cost {

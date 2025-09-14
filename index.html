@@ -316,26 +316,39 @@
           <div class="level-text" id="levelText">On a Blue Background</div>
         </div>
 
-        <div class="currency-display">
-          <div class="currency-item primary">
-            <div class="currency-icon">💧</div>
-            <div class="currency-info">
-              <div class="currency-label">Total Sips</div>
-              <div class="currency-value" id="topSipValue">0</div>
+        <div class="header-main-content">
+          <div class="currency-display">
+            <div class="currency-item primary">
+              <div class="currency-icon">💧</div>
+              <div class="currency-info">
+                <div class="currency-label">Total Sips</div>
+                <div class="currency-value" id="topSipValue">0</div>
+              </div>
+            </div>
+            <div class="currency-divider"></div>
+            <div class="currency-item">
+              <div class="currency-info">
+                <div class="currency-label">Per Drink</div>
+                <div class="currency-value" id="topSipsPerDrink">1</div>
+              </div>
+            </div>
+            <div class="currency-divider"></div>
+            <div class="currency-item">
+              <div class="currency-info">
+                <div class="currency-label">Per Second</div>
+                <div class="currency-value" id="topSipsPerSecond">1</div>
+              </div>
             </div>
           </div>
-          <div class="currency-divider"></div>
-          <div class="currency-item">
-            <div class="currency-info">
-              <div class="currency-label">Per Drink</div>
-              <div class="currency-value" id="topSipsPerDrink">1</div>
+
+          <!-- Drink Progress Bar in Header -->
+          <div class="header-drink-progress">
+            <div class="drink-progress-info">
+              <span class="drink-label">Next Drink:</span>
+              <span class="drink-countdown" id="drinkCountdown">5.0s</span>
             </div>
-          </div>
-          <div class="currency-divider"></div>
-          <div class="currency-item">
-            <div class="currency-info">
-              <div class="currency-label">Per Second</div>
-              <div class="currency-value" id="topSipsPerSecond">1</div>
+            <div class="drink-progress-bar">
+              <div class="drink-progress-fill" id="drinkProgressFill"></div>
             </div>
           </div>
         </div>
@@ -452,16 +465,8 @@
         </div>
       </div>
 
-      <!-- Drink Progress Bar - Moved to Header -->
-      <div class="drink-progress-container">
-        <div class="drink-info">
-          <span class="drink-label">Next Drink:</span>
-          <span class="drink-countdown" id="drinkCountdown">5.0s</span>
-        </div>
-        <div class="drink-progress-bar">
-          <div class="drink-progress-fill" id="drinkProgressFill"></div>
-        </div>
-        <!-- Drink Speed Upgrade Button - Compact layout below progress bar -->
+      <!-- Drink Speed Upgrade Section - Moved from progress bar area -->
+      <div class="drink-speed-upgrade-section">
         <div class="drink-speed-upgrade-container">
           <div class="drink-speed-relationship-indicator">
             <span class="relationship-icon">⚡</span>
@@ -515,17 +520,6 @@
               </div>
 
               <div class="soda-info">
-                <!-- Drink Progress Bar -->
-                <div class="drink-progress-container">
-                  <div class="drink-info">
-                    <span class="drink-label">Next Drink:</span>
-                    <span class="drink-countdown" id="drinkCountdown">5.0s</span>
-                  </div>
-                  <div class="drink-progress-bar">
-                    <div class="drink-progress-fill" id="drinkProgressFill"></div>
-                  </div>
-                </div>
-
                 <div class="soda-stats">
                   <div class="stat-item">
                     <span class="stat-label">Click Value</span>
