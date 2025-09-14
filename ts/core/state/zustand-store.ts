@@ -538,7 +538,7 @@ export const useSubscribeToSPD = (callback: (spd: number) => void) => {
 };
 
 // Export store actions for direct access (useful in tests and non-React contexts)
-export const storeActions = useGameStore.getState().actions;
+export const getStoreActions = () => useGameStore.getState().actions;
 
 // Export for legacy window access
 try {

@@ -1,7 +1,7 @@
 // Save Game Loading System
 // Handles loading and restoring game state from save data
 
-import { storeActions } from '../state/zustand-store';
+import { getStoreActions } from '../state/zustand-store';
 // DecimalOps removed - no longer using toSafeNumber
 
 export interface SaveGameData {
@@ -82,28 +82,28 @@ export class SaveGameLoader {
       if (typeof savegame.sips !== 'undefined') {
         // Use parseDecimalValue to preserve extreme values
         const sipsValue = this.parseDecimalValue(savegame.sips);
-        storeActions.setSips(sipsValue);
+        getStoreActions().setSips(sipsValue);
         (window as any).sips =
           typeof sipsValue === 'number' ? new (window as any).Decimal(sipsValue) : sipsValue;
       }
 
       if (typeof savegame.straws !== 'undefined') {
         const strawsValue = this.parseDecimalValue(savegame.straws);
-        storeActions.setStraws(strawsValue);
+        getStoreActions().setStraws(strawsValue);
         (window as any).straws =
           typeof strawsValue === 'number' ? new (window as any).Decimal(strawsValue) : strawsValue;
       }
 
       if (typeof savegame.cups !== 'undefined') {
         const cupsValue = this.parseDecimalValue(savegame.cups);
-        storeActions.setCups(cupsValue);
+        getStoreActions().setCups(cupsValue);
         (window as any).cups =
           typeof cupsValue === 'number' ? new (window as any).Decimal(cupsValue) : cupsValue;
       }
 
       if (typeof savegame.suctions !== 'undefined') {
         const suctionsValue = this.parseDecimalValue(savegame.suctions);
-        storeActions.setSuctions(suctionsValue);
+        getStoreActions().setSuctions(suctionsValue);
         (window as any).suctions =
           typeof suctionsValue === 'number'
             ? new (window as any).Decimal(suctionsValue)
@@ -113,7 +113,7 @@ export class SaveGameLoader {
       // Load SPD values to preserve extreme values - CRITICAL: Use parseDecimalValue to preserve precision
       if (typeof savegame.spd !== 'undefined') {
         const spdValue = this.parseDecimalValue(savegame.spd);
-        storeActions.setSPD(spdValue);
+        getStoreActions().setSPD(spdValue);
         // Ensure window value is always a Decimal, preserving extreme values
         (window as any).spd =
           typeof spdValue === 'number' ? new (window as any).Decimal(spdValue) : spdValue;
@@ -121,7 +121,7 @@ export class SaveGameLoader {
 
       if (typeof savegame.strawSPD !== 'undefined') {
         const strawSPDValue = this.parseDecimalValue(savegame.strawSPD);
-        storeActions.setStrawSPD(strawSPDValue);
+        getStoreActions().setStrawSPD(strawSPDValue);
         // Ensure window value is always a Decimal, preserving extreme values
         (window as any).strawSPD =
           typeof strawSPDValue === 'number'
@@ -131,7 +131,7 @@ export class SaveGameLoader {
 
       if (typeof savegame.cupSPD !== 'undefined') {
         const cupSPDValue = this.parseDecimalValue(savegame.cupSPD);
-        storeActions.setCupSPD(cupSPDValue);
+        getStoreActions().setCupSPD(cupSPDValue);
         // Ensure window value is always a Decimal, preserving extreme values
         (window as any).cupSPD =
           typeof cupSPDValue === 'number' ? new (window as any).Decimal(cupSPDValue) : cupSPDValue;
@@ -148,7 +148,7 @@ export class SaveGameLoader {
     try {
       if (typeof savegame.fasterDrinks !== 'undefined') {
         const fasterDrinksValue = this.parseDecimalValue(savegame.fasterDrinks);
-        storeActions.setFasterDrinks(fasterDrinksValue);
+        getStoreActions().setFasterDrinks(fasterDrinksValue);
         (window as any).fasterDrinks =
           typeof fasterDrinksValue === 'number'
             ? new (window as any).Decimal(fasterDrinksValue)
@@ -157,7 +157,7 @@ export class SaveGameLoader {
 
       if (typeof savegame.widerStraws !== 'undefined') {
         const widerStrawsValue = this.parseDecimalValue(savegame.widerStraws);
-        storeActions.setWiderStraws(widerStrawsValue);
+        getStoreActions().setWiderStraws(widerStrawsValue);
         (window as any).widerStraws =
           typeof widerStrawsValue === 'number'
             ? new (window as any).Decimal(widerStrawsValue)
@@ -166,7 +166,7 @@ export class SaveGameLoader {
 
       if (typeof savegame.betterCups !== 'undefined') {
         const betterCupsValue = this.parseDecimalValue(savegame.betterCups);
-        storeActions.setBetterCups(betterCupsValue);
+        getStoreActions().setBetterCups(betterCupsValue);
         (window as any).betterCups =
           typeof betterCupsValue === 'number'
             ? new (window as any).Decimal(betterCupsValue)
@@ -184,7 +184,7 @@ export class SaveGameLoader {
     try {
       if (typeof savegame.criticalClickChance !== 'undefined') {
         const chanceValue = this.parseDecimalValue(savegame.criticalClickChance, 0.001);
-        storeActions.setCriticalClickChance(chanceValue);
+        getStoreActions().setCriticalClickChance(chanceValue);
         // Ensure window value is always a Decimal
         (window as any).criticalClickChance =
           typeof chanceValue === 'number' ? new (window as any).Decimal(chanceValue) : chanceValue;
@@ -192,7 +192,7 @@ export class SaveGameLoader {
 
       if (typeof savegame.criticalClickMultiplier !== 'undefined') {
         const multiplierValue = this.parseDecimalValue(savegame.criticalClickMultiplier, 5);
-        storeActions.setCriticalClickMultiplier(multiplierValue);
+        getStoreActions().setCriticalClickMultiplier(multiplierValue);
         // Ensure window value is always a Decimal
         (window as any).criticalClickMultiplier =
           typeof multiplierValue === 'number'
@@ -202,7 +202,7 @@ export class SaveGameLoader {
 
       if (typeof savegame.criticalClicks !== 'undefined') {
         const criticalClicksValue = this.parseDecimalValue(savegame.criticalClicks);
-        storeActions.setCriticalClicks(criticalClicksValue);
+        getStoreActions().setCriticalClicks(criticalClicksValue);
         // Ensure window value is always a Decimal
         (window as any).criticalClicks =
           typeof criticalClicksValue === 'number'
@@ -212,7 +212,7 @@ export class SaveGameLoader {
 
       if (typeof savegame.suctionClickBonus !== 'undefined') {
         const bonusValue = this.parseDecimalValue(savegame.suctionClickBonus);
-        storeActions.setSuctionClickBonus(bonusValue);
+        getStoreActions().setSuctionClickBonus(bonusValue);
       }
     } catch (error) {
       console.warn('Failed to load critical click system:', error);
@@ -231,7 +231,7 @@ export class SaveGameLoader {
           typeof levelValue === 'number'
             ? Math.max(1, levelValue)
             : Math.max(1, levelValue.toNumber());
-        storeActions.setLevel(levelNum);
+        getStoreActions().setLevel(levelNum);
         (window as any).level = new (window as any).Decimal(levelNum);
 
         try {
@@ -243,7 +243,7 @@ export class SaveGameLoader {
 
       if (typeof savegame.totalClicks !== 'undefined') {
         const totalClicksValue = this.parseDecimalValue(savegame.totalClicks);
-        storeActions.setTotalClicks(totalClicksValue);
+        getStoreActions().setTotalClicks(totalClicksValue);
       }
     } catch (error) {
       console.warn('Failed to load level and progress:', error);
@@ -262,7 +262,7 @@ export class SaveGameLoader {
           typeof gameStartDateValue === 'number'
             ? gameStartDateValue
             : gameStartDateValue.toNumber();
-        storeActions.setSessionStartTime(dateNum);
+        getStoreActions().setSessionStartTime(dateNum);
       }
 
       if (typeof savegame.lastClickTime !== 'undefined') {
@@ -272,7 +272,7 @@ export class SaveGameLoader {
           typeof lastClickTimeValue === 'number'
             ? lastClickTimeValue
             : lastClickTimeValue.toNumber();
-        storeActions.setState({ lastClickTime: timeNum });
+        getStoreActions().setState({ lastClickTime: timeNum });
       }
 
       if (typeof savegame.totalPlayTime !== 'undefined') {
@@ -282,7 +282,7 @@ export class SaveGameLoader {
           typeof totalPlayTimeValue === 'number'
             ? totalPlayTimeValue
             : totalPlayTimeValue.toNumber();
-        storeActions.setTotalPlayTime(playTimeNum);
+        getStoreActions().setTotalPlayTime(playTimeNum);
       }
     } catch (error) {
       console.warn('Failed to load timing data:', error);

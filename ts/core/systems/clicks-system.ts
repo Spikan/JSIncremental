@@ -100,7 +100,8 @@ export async function handleSodaClick(multiplier: number = 1) {
         );
         // Try direct store access as fallback
         try {
-          const { storeActions } = await import('../state/zustand-store.ts');
+          const { getStoreActions } = await import('../state/zustand-store.ts');
+          const storeActions = getStoreActions();
           if (storeActions?.setSips) {
             console.log('🍹 Calling setSips via storeActions with:', w.sips);
             storeActions.setSips(w.sips);
