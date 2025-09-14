@@ -347,8 +347,8 @@ export class Soda3DButton {
   }
 }
 
-// Export default configuration
-export const defaultSoda3DConfig: Soda3DConfig = {
+// Export default configuration - use function to avoid hoisting issues
+export const getDefaultSoda3DConfig = (): Soda3DConfig => ({
   containerSelector: '#sodaButton',
   modelPath: sodaModelUrl || FALLBACK_MODEL_PATH, // Use Vite-processed asset URL with fallback
   size: 200,
@@ -357,10 +357,39 @@ export const defaultSoda3DConfig: Soda3DConfig = {
   rotationSpeed: 1.0,
   hoverSpeedMultiplier: 2.0,
   clickAnimationDuration: 200,
+});
+
+// Keep the old export for backward compatibility - but delay initialization
+export const defaultSoda3DConfig = {
+  get containerSelector() {
+    return getDefaultSoda3DConfig().containerSelector;
+  },
+  get modelPath() {
+    return getDefaultSoda3DConfig().modelPath;
+  },
+  get size() {
+    return getDefaultSoda3DConfig().size;
+  },
+  get width() {
+    return getDefaultSoda3DConfig().width;
+  },
+  get height() {
+    return getDefaultSoda3DConfig().height;
+  },
+  get rotationSpeed() {
+    return getDefaultSoda3DConfig().rotationSpeed;
+  },
+  get hoverSpeedMultiplier() {
+    return getDefaultSoda3DConfig().hoverSpeedMultiplier;
+  },
+  get clickAnimationDuration() {
+    return getDefaultSoda3DConfig().clickAnimationDuration;
+  },
 };
 
 // Export factory function for easy initialization
 export function createSoda3DButton(config: Partial<Soda3DConfig> = {}): Soda3DButton {
-  const finalConfig = { ...defaultSoda3DConfig, ...config };
+  const baseConfig = getDefaultSoda3DConfig();
+  const finalConfig = { ...baseConfig, ...config };
   return new Soda3DButton(finalConfig);
 }
