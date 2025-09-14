@@ -7658,6 +7658,9 @@ p {
     max-width: none; /* Remove max-width constraint */
     width: auto; /* Allow container to size to content */
     min-width: 320px; /* Ensure minimum width for button */
+    min-height: 560px; /* Ensure minimum height for button */
+    height: auto; /* Allow container to size to content height */
+    align-items: flex-start; /* Align to top instead of center */
   }
 
   .soda-button {
