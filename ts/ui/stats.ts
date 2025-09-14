@@ -424,15 +424,15 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (totalWiderStrawsSPDElement) {
     const widerStraws = state.widerStraws || 0;
-    const widerStrawsValue =
-      typeof widerStraws === 'object' && widerStraws.toString
-        ? widerStraws.toString()
-        : widerStraws;
-    totalWiderStrawsSPDElement.textContent = formatNumber(widerStrawsValue * 0.6); // Base multiplier
+    const widerStrawsSPD = state.widerStrawsSPD || 0;
+    const widerStrawsLarge = toDecimal(widerStraws);
+    const widerStrawsSPDLarge = toDecimal(widerStrawsSPD);
+    const totalWiderStrawsProduction = widerStrawsLarge.multiply(widerStrawsSPDLarge);
+    totalWiderStrawsSPDElement.textContent = formatNumber(totalWiderStrawsProduction.toString());
     if (shouldLog)
       console.log(
         '✅ Updated totalWiderStrawsSPD:',
-        widerStrawsValue * 0.6,
+        totalWiderStrawsProduction.toString(),
         'element:',
         totalWiderStrawsSPDElement
       );
@@ -462,13 +462,15 @@ export function updatePurchasedCounts(): void {
     | undefined;
   if (totalBetterCupsSPDElement) {
     const betterCups = state.betterCups || 0;
-    const betterCupsValue =
-      typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
-    totalBetterCupsSPDElement.textContent = formatNumber(betterCupsValue * 1.2); // Base multiplier
+    const betterCupsSPD = state.betterCupsSPD || 0;
+    const betterCupsLarge = toDecimal(betterCups);
+    const betterCupsSPDLarge = toDecimal(betterCupsSPD);
+    const totalBetterCupsProduction = betterCupsLarge.multiply(betterCupsSPDLarge);
+    totalBetterCupsSPDElement.textContent = formatNumber(totalBetterCupsProduction.toString());
     if (shouldLog)
       console.log(
         '✅ Updated totalBetterCupsSPD:',
-        betterCupsValue * 1.2,
+        totalBetterCupsProduction.toString(),
         'element:',
         totalBetterCupsSPDElement
       );
