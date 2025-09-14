@@ -45,21 +45,21 @@ interface Soda3DConfig {
   height?: number;
   rotationSpeed: number;
   hoverSpeedMultiplier: number;
-  clickAnimationDuration: number;
+  // clickAnimationDuration removed
 }
 
 export class Soda3DButton {
   private modelViewer!: ModelViewerElement;
   private container: HTMLElement | null = null;
   private isLoaded = false;
-  private clickAnimationDuration: number;
+  // clickAnimationDuration removed - no longer needed
   private clickHandlers: (() => void)[] = [];
   private rotationAngle = 0;
   private rotationSpeed = 0.5; // degrees per frame
   private animationId: number | null = null;
 
   constructor(private config: Soda3DConfig) {
-    this.clickAnimationDuration = config.clickAnimationDuration;
+    // clickAnimationDuration removed
 
     // Initialize the 3D model
     this.initializeModel();
@@ -178,10 +178,11 @@ export class Soda3DButton {
       this.showFallback();
     });
 
-    // Click events
-    this.modelViewer.addEventListener('click', () => {
-      this.handleClick();
-    });
+    // Click events - DISABLED to prevent double clicks
+    // The parent button will handle clicks, not the 3D model
+    // this.modelViewer.addEventListener('click', () => {
+    //   this.handleClick();
+    // });
 
     // Hover effects - speed up rotation on hover
     this.modelViewer.addEventListener('mouseenter', () => {
@@ -222,40 +223,7 @@ export class Soda3DButton {
     }
   }
 
-  private async handleClick() {
-    if (!this.isLoaded) return;
-
-    // Click animation
-    // Scale down slightly
-    this.modelViewer.style.transform = 'scale(0.95)';
-    this.modelViewer.style.transition = `transform ${this.clickAnimationDuration}ms ease`;
-
-    // Reset after animation
-    setTimeout(() => {
-      this.modelViewer.style.transform = 'scale(1)';
-      setTimeout(() => {
-        this.modelViewer.style.transition = '';
-      }, this.clickAnimationDuration);
-    }, this.clickAnimationDuration / 2);
-
-    // Call the game's soda click handler
-    try {
-      const { handleSodaClick } = await import('../core/systems/clicks-system');
-      await handleSodaClick(1);
-      console.log('🍺 3D Soda clicked - game logic triggered!');
-    } catch (error) {
-      console.error('❌ Failed to trigger soda click in game:', error);
-    }
-
-    // Trigger additional click handlers
-    this.clickHandlers.forEach(handler => {
-      try {
-        handler();
-      } catch (error) {
-        console.warn('Click handler error:', error);
-      }
-    });
-  }
+  // handleClick method removed - button events handle clicks now
 
   private showFallback() {
     if (!this.container) return;
@@ -356,7 +324,7 @@ export const getDefaultSoda3DConfig = (): Soda3DConfig => ({
   height: 200,
   rotationSpeed: 1.0,
   hoverSpeedMultiplier: 2.0,
-  clickAnimationDuration: 200,
+  // clickAnimationDuration removed
 });
 
 // Keep the old export for backward compatibility - but delay initialization
@@ -382,9 +350,7 @@ export const defaultSoda3DConfig = {
   get hoverSpeedMultiplier() {
     return getDefaultSoda3DConfig().hoverSpeedMultiplier;
   },
-  get clickAnimationDuration() {
-    return getDefaultSoda3DConfig().clickAnimationDuration;
-  },
+  // clickAnimationDuration removed
 };
 
 // Export factory function for easy initialization

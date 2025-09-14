@@ -544,7 +544,7 @@ export function initializeUI(): void {
         size: 200,
         rotationSpeed: 1.0,
         hoverSpeedMultiplier: 2.0,
-        clickAnimationDuration: 200,
+        // clickAnimationDuration removed
       });
 
       // Click handler is now built into the 3D button

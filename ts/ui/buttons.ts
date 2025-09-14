@@ -698,7 +698,7 @@ function setupSpecialButtonHandlers(): void {
     if (sodaButton && (sodaButton as any).addEventListener) {
       // Flag to prevent double clicks from touch + click events
       let touchHandled = false;
-      
+
       if ((window as any).PointerEvent) {
         let active = false;
         let moved = false;
@@ -922,7 +922,7 @@ function setupSpecialButtonHandlers(): void {
         if (shouldSuppressClick(sodaButton)) {
           return;
         }
-        
+
         // Prevent double clicks from touch + click events
         if (touchHandled) {
           touchHandled = false; // Reset for next interaction
