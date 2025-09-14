@@ -309,53 +309,54 @@
 
     <!-- Main Game Content -->
     <div id="gameContent" class="game-content mobile-content-padding" style="display: none">
-      <!-- Simplified Game Header -->
+      <!-- Consolidated Game Header -->
       <div class="game-header">
-        <!-- Primary Focus: Total Sips -->
-        <div class="header-primary">
-          <div class="currency-main">
-            <div class="currency-icon">💧</div>
-            <div class="currency-info">
-              <div class="currency-label">Total Sips</div>
-              <div class="currency-value" id="topSipValue">0</div>
-            </div>
-          </div>
-
-          <!-- Level indicator (compact) -->
-          <div class="level-compact">
-            <span class="level-number">L<span id="levelNumber">1</span></span>
-          </div>
+        <div class="level-indicator">
+          <div class="level-number">Level <span id="levelNumber">1</span></div>
+          <div class="level-text" id="levelText">On a Blue Background</div>
         </div>
 
-        <!-- Secondary Stats (Collapsible) -->
-        <div class="header-secondary" id="headerSecondary">
-          <div class="secondary-stats">
-            <div class="stat-item">
-              <span class="stat-label">Per Drink</span>
-              <span class="stat-value" id="topSipsPerDrink">1</span>
+        <div class="header-main-content">
+          <div class="currency-display">
+            <div class="currency-item primary">
+              <div class="currency-icon">💧</div>
+              <div class="currency-info">
+                <div class="currency-label">Total Sips</div>
+                <div class="currency-value" id="topSipValue">0</div>
+              </div>
             </div>
-            <div class="stat-item">
-              <span class="stat-label">Per Second</span>
-              <span class="stat-value" id="topSipsPerSecond">1</span>
+            <div class="currency-divider"></div>
+            <div class="currency-item">
+              <div class="currency-info">
+                <div class="currency-label">Per Drink</div>
+                <div class="currency-value" id="topSipsPerDrink">1</div>
+              </div>
             </div>
-            <div class="stat-item">
-              <span class="stat-label">Next Drink</span>
-              <span class="stat-value" id="drinkCountdown">5.0s</span>
+            <div class="currency-divider"></div>
+            <div class="currency-item">
+              <div class="currency-info">
+                <div class="currency-label">Per Second</div>
+                <div class="currency-value" id="topSipsPerSecond">1</div>
+              </div>
             </div>
           </div>
 
-          <!-- Drink Progress Bar -->
-          <div class="drink-progress-compact">
+          <!-- Drink Progress Bar in Header -->
+          <div class="header-drink-progress">
+            <div class="drink-progress-info">
+              <span class="drink-label">Next Drink:</span>
+              <span class="drink-countdown" id="drinkCountdown">5.0s</span>
+            </div>
             <div class="drink-progress-bar">
               <div class="drink-progress-fill" id="drinkProgressFill"></div>
             </div>
           </div>
         </div>
 
-        <!-- Toggle Button for Secondary Stats -->
-        <button class="header-toggle" id="headerToggle" aria-label="Toggle stats">
-          <span class="toggle-icon">▼</span>
-        </button>
+        <div class="game-title">
+          <div class="title-main">SODA CLICKER</div>
+          <div class="title-sub">PRO</div>
+        </div>
       </div>
 
       <!-- Desktop Tab Navigation -->
@@ -435,7 +436,7 @@
       </div>
 
       <!-- More Options Modal for Mobile -->
-      <div id="moreOptionsModal" class="more-options-modal" style="display: none">
+      <div id="moreOptionsModal" class="more-options-modal" style="display: none;">
         <div class="more-options-content">
           <div class="more-options-header">
             <h3>More Options</h3>
