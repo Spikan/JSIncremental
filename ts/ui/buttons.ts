@@ -632,13 +632,9 @@ function setupSpecialButtonHandlers(): void {
         }
 
         const hasClicksSystem = (window as any).App?.systems?.clicks?.handleSodaClick;
-        const hasDomCache = (window as any).DOM_CACHE;
-        const isDomCacheReady =
-          hasDomCache && (window as any).DOM_CACHE.isReady
-            ? (window as any).DOM_CACHE.isReady()
-            : !!hasDomCache;
+        const isDomReady = domQuery.exists('#sodaButton') && domQuery.exists('#shopTab');
 
-        if (hasClicksSystem && isDomCacheReady) {
+        if (hasClicksSystem && isDomReady) {
           resolve();
         } else {
           setTimeout(checkClicksSystem, 100);
@@ -970,8 +966,8 @@ function setupSpecialButtonHandlers(): void {
     console.log('handleSodaClick available:', typeof handleSodaClick === 'function');
 
     console.log(
-      'DOM cache ready:',
-      !!domQuery.getById('isReady') && (window as any).DOM_CACHE.isReady()
+      'DOM elements ready:',
+      domQuery.exists('#sodaButton') && domQuery.exists('#shopTab')
     );
     console.log('=== END SODA BUTTON DEBUG ===');
   };

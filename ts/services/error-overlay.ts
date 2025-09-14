@@ -272,9 +272,9 @@ class ErrorReporter {
           // Try to reset UI state
           if (error.message.includes('DOM') || error.message.includes('element')) {
             recoveryAction = 'reset_ui_state';
-            // Clear DOM cache
-            if ((window as any).DOM_CACHE) {
-              (window as any).DOM_CACHE = {};
+            // Clear DOM query cache
+            if ((window as any).domQuery) {
+              (window as any).domQuery.clearCache();
             }
             recoverySuccessful = true;
           }

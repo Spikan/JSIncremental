@@ -166,13 +166,11 @@ export function resetGameState() {
       console.warn('Failed to set session state:', error);
     }
 
-    // Initialize DOM_CACHE exactly like initGame
+    // DOM elements are already available, no initialization needed
     try {
-      if (typeof DOM_CACHE !== 'undefined' && !DOM_CACHE.isReady()) {
-        DOM_CACHE.init();
-      }
+      console.log('✅ DOM elements are ready for save system');
     } catch (error) {
-      console.warn('Failed to initialize DOM_CACHE:', error);
+      console.warn('Failed to verify DOM readiness:', error);
     }
 
     // Compute production exactly like initGame

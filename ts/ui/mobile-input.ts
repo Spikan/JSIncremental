@@ -2,6 +2,7 @@
 // Handles mobile-specific touch and input optimizations
 
 import subscriptionManager from './subscription-manager';
+import { domQuery } from '../services/dom-query';
 
 export interface TouchValidationConfig {
   movementThreshold: number; // Pixels of movement allowed before canceling
@@ -348,11 +349,11 @@ export class MobileInputHandler {
    * Get the soda button element
    */
   private getSodaButton(): Element | null {
-    if (typeof window === 'undefined' || typeof DOM_CACHE === 'undefined') {
+    if (typeof window === 'undefined') {
       return document.getElementById('sodaButton');
     }
 
-    return DOM_CACHE['sodaButton'] || document.getElementById('sodaButton');
+    return domQuery.getById('sodaButton') || document.getElementById('sodaButton');
   }
 
   /**

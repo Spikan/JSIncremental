@@ -14,7 +14,7 @@ import { domQuery } from './services/dom-query';
 import { timerManager } from './services/timer-manager';
 
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
-// DOM_CACHE and Decimal are declared in global types
+// Decimal is declared in global types
 
 // Test utilities removed - no longer needed
 
@@ -28,18 +28,17 @@ if (BAL && TIMING && LIMITS) {
   // Configuration loaded successfully
 }
 
-(function ensureDomCacheReady() {
+(function ensureDomReady() {
   try {
-    if (typeof DOM_CACHE === 'undefined') {
-      console.error('DOM_CACHE not loaded. Please ensure dom-cache.ts is loaded before main.ts');
+    if (typeof document === 'undefined') {
+      console.error('Document not available. Please ensure DOM is loaded before main.ts');
       return;
     }
-    if (!DOM_CACHE.isReady()) {
-      console.warn('DOM_CACHE not ready, initializing...');
-      DOM_CACHE.init();
+    if (document.readyState === 'loading') {
+      console.warn('DOM still loading, waiting for DOMContentLoaded...');
     }
   } catch (error) {
-    console.warn('Failed to ensure DOM_CACHE readiness:', error);
+    console.warn('Failed to check DOM readiness:', error);
   }
 })();
 
@@ -61,9 +60,9 @@ function initGame() {
       timerManager.setTimeout(initGame, 100, 'Retry initGame - unlocks system');
       return;
     }
-    if (typeof DOM_CACHE === 'undefined') {
-      console.log('⏳ Waiting for DOM_CACHE to load...');
-      timerManager.setTimeout(initGame, 100, 'Retry initGame - unlocks system');
+    if (typeof document === 'undefined' || !domQuery.exists('#sodaButton')) {
+      console.log('⏳ Waiting for DOM elements to load...');
+      timerManager.setTimeout(initGame, 100, 'Retry initGame - DOM not ready');
       return;
     }
     if (!GC || (typeof GC === 'object' && Object.keys(GC).length === 0)) {
@@ -162,9 +161,10 @@ function initGame() {
     }
 
     try {
-      DOM_CACHE.init();
+      // DOM is already ready, no initialization needed
+      console.log('✅ DOM elements are ready');
     } catch (error) {
-      console.warn('Failed to initialize DOM_CACHE:', error);
+      console.warn('Failed to verify DOM readiness:', error);
     }
 
     // Load save using modular system
@@ -281,7 +281,7 @@ function initGame() {
         !domQuery.exists('#shopTab') ||
         !domQuery.exists('#topSipValue')
       ) {
-        // Waiting for DOM_CACHE
+        // Waiting for DOM elements
         timerManager.setTimeout(
           updateDisplaysWhenReady,
           100,
@@ -289,7 +289,7 @@ function initGame() {
         );
         return;
       }
-      // DOM_CACHE ready, updating displays
+      // DOM elements ready, updating displays
       (window as any).App?.ui?.updateTopSipsPerDrink?.();
       (window as any).App?.ui?.updateTopSipsPerSecond?.();
     };
@@ -320,11 +320,8 @@ function initGame() {
       splashScreen.style.display = 'none';
       gameContent.style.display = 'block';
 
-      // Reinitialize DOM cache now that game content is visible
-      if ((window as any).DOM_CACHE && typeof (window as any).DOM_CACHE.init === 'function') {
-        console.log('🔄 Reinitializing DOM cache after game content becomes visible (main.ts)');
-        (window as any).DOM_CACHE.init();
-      }
+      // DOM elements are already available, no reinitialization needed
+      console.log('🔄 Game content is visible, DOM elements are ready');
     }
   }
 }

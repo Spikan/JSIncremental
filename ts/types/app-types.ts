@@ -432,7 +432,6 @@ export interface PurchaseEventData {
 declare global {
   interface Window {
     App: AppObject;
-    DOM_CACHE: DOMCache;
     EVENT_NAMES: EventNames;
     Decimal: typeof import('../core/numbers/decimal').Decimal;
     subscriptionManager: any;

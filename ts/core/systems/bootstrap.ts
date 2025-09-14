@@ -3,7 +3,7 @@
 
 interface DependencyStatus {
   UNLOCKS_SYSTEM: boolean;
-  DOM_CACHE: boolean;
+  DOM_READY: boolean;
   GAME_CONFIG: boolean;
   Decimal: boolean;
   App: boolean;
@@ -44,7 +44,7 @@ export class BootstrapSystem {
   public getDependencyStatus(): DependencyStatus {
     return {
       UNLOCKS_SYSTEM: !!(window as any).App?.systems?.unlocks,
-      DOM_CACHE: typeof DOM_CACHE !== 'undefined',
+      DOM_READY: typeof document !== 'undefined' && document.readyState !== 'loading',
       GAME_CONFIG: !!this.getGameConfig() && Object.keys(this.getGameConfig()).length > 0,
       Decimal: typeof Decimal !== 'undefined',
       App: typeof (window as any).App !== 'undefined',

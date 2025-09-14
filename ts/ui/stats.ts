@@ -184,7 +184,7 @@ export function updateShopStats(): void {
         console.log('🔍 updateShopStats: Straws value =', v, 'formatted =', formatNumber(v));
       strawsPurchasedElement.textContent = formatNumber(v);
     } else {
-      console.warn('🚫 updateShopStats: strawsPurchasedElement not found in DOM_CACHE');
+      console.warn('🚫 updateShopStats: strawsPurchasedElement not found');
     }
     // Cups purchased
     const cupsPurchasedElement = domQuery.getById('cupsPurchased') as HTMLElement | undefined;
@@ -194,7 +194,7 @@ export function updateShopStats(): void {
         console.log('🔍 updateShopStats: Cups value =', v, 'formatted =', formatNumber(v));
       cupsPurchasedElement.textContent = formatNumber(v);
     } else {
-      console.warn('🚫 updateShopStats: cupsPurchasedElement not found in DOM_CACHE');
+      console.warn('🚫 updateShopStats: cupsPurchasedElement not found');
     }
     // Suctions purchased
     const suctionsPurchasedElement = domQuery.getById('suctionsPurchased') as
@@ -291,7 +291,7 @@ export function updateEnhancementValues(): void {
     });
     strawSPDElement.textContent = formatNumber(actualStrawSPD.toString());
   } else {
-    console.log('🔍 strawSPDElement not found in DOM_CACHE');
+    console.log('🔍 strawSPDElement not found');
   }
 
   const cupSPDElement = domQuery.getById('cupSPD') as HTMLElement | undefined;
@@ -315,7 +315,7 @@ export function updateEnhancementValues(): void {
     });
     cupSPDElement.textContent = formatNumber(actualCupSPD.toString());
   } else {
-    console.log('🔍 cupSPDElement not found in DOM_CACHE');
+    console.log('🔍 cupSPDElement not found');
   }
 
   // Update Wider Straws enhancement display
@@ -360,9 +360,9 @@ export function updatePurchasedCounts(): void {
   }
   if (shouldLog) console.log('📊 Current state:', { straws: state.straws, cups: state.cups });
 
-  // Check DOM_CACHE availability
-  if (!(window as any).DOM_CACHE) {
-    if (shouldLog) console.log('📊 DOM_CACHE not available');
+  // Check DOM availability
+  if (typeof document === 'undefined') {
+    if (shouldLog) console.log('📊 Document not available');
     return;
   }
 
