@@ -717,37 +717,12 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Sidebar Content */
+/* Sidebar Content - Direct Upgrade Cards */
 .sidebar-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-/* Sidebar Section - Removed as shop is now direct content */
-
-/* Upgrade Groups */
-.upgrade-group {
   padding: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.upgrade-group:last-child {
-  border-bottom: none;
-}
-
-.upgrade-group-title {
-  margin: 0 0 1rem 0;
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-}
-
-.upgrade-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
 }
 
 .upgrade-card {
@@ -1128,10 +1103,6 @@ body {
   }
 
   /* Section header styles removed - no longer needed */
-
-  .upgrade-group {
-    padding: 0.75rem;
-  }
 
   .settings-group {
     padding: 0.75rem;
@@ -2601,43 +2572,6 @@ button:focus-visible,
   gap: 2rem;
 }
 
-.upgrade-group {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.upgrade-group-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.upgrade-group-icon {
-  font-size: 2rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.upgrade-group-title {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.upgrade-group-description {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
 /* Shop Item Improvements */
 .shop-item {
   background: rgba(255, 255, 255, 0.05);
@@ -3844,43 +3778,6 @@ h3 {
   backdrop-filter: blur(5px);
   z-index: 10;
   white-space: nowrap;
-}
-
-/* Upgrade Grouping */
-.upgrade-group {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  backdrop-filter: blur(5px);
-}
-
-.upgrade-group-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.upgrade-group-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0;
-}
-
-.upgrade-group-icon {
-  font-size: 1.5rem;
-}
-
-.upgrade-group-description {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-  margin: 0.5rem 0 0 0;
-  font-style: italic;
 }
 
 .shop-item::before {
