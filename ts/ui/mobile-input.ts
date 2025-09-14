@@ -44,6 +44,7 @@ export class MobileInputHandler {
     this.setupTouchHandling();
     this.setupContextMenuPrevention();
     this.setupMoreOptionsModal();
+    this.setupHeaderToggle();
     this.isInitialized = true;
   }
 
@@ -367,6 +368,54 @@ export class MobileInputHandler {
    */
   private hasEventListenerSupport(element: Element): boolean {
     return 'addEventListener' in element;
+  }
+
+  /**
+   * Setup header toggle functionality
+   */
+  private setupHeaderToggle(): void {
+    const toggleBtn = document.getElementById('headerToggle');
+    const secondarySection = document.getElementById('headerSecondary');
+
+    if (!toggleBtn || !secondarySection) {
+      console.warn('Header toggle elements not found');
+      return;
+    }
+
+    // Initialize as collapsed on mobile
+    if (window.innerWidth <= 768) {
+      secondarySection.classList.add('collapsed');
+      toggleBtn.classList.add('collapsed');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      this.toggleHeaderSecondary();
+    });
+  }
+
+  /**
+   * Toggle the secondary header section
+   */
+  private toggleHeaderSecondary(): void {
+    const toggleBtn = document.getElementById('headerToggle');
+    const secondarySection = document.getElementById('headerSecondary');
+
+    if (!toggleBtn || !secondarySection) {
+      return;
+    }
+
+    const isCollapsed = secondarySection.classList.contains('collapsed');
+
+    if (isCollapsed) {
+      secondarySection.classList.remove('collapsed');
+      toggleBtn.classList.remove('collapsed');
+    } else {
+      secondarySection.classList.add('collapsed');
+      toggleBtn.classList.add('collapsed');
+    }
+
+    // Trigger haptic feedback
+    this.triggerHapticFeedback();
   }
 
   /**
