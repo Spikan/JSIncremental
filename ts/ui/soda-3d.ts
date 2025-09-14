@@ -245,8 +245,8 @@ export class Soda3DButton {
           // Mobile: Move model down to fit within container
           this.model.position.y -= 0.6;
         } else {
-          // Desktop: Center model in the taller container
-          this.model.position.y -= 0.4;
+          // Desktop: Center model in the taller container - move down more
+          this.model.position.y -= 0.8;
         }
         this.centerPosition.copy(this.model.position);
 
@@ -307,7 +307,7 @@ export class Soda3DButton {
     if (this.isMobile) {
       this.model.position.y = -0.6; // Mobile positioning
     } else {
-      this.model.position.y = -0.4; // Desktop positioning - centered in taller container
+      this.model.position.y = -0.8; // Desktop positioning - centered in taller container
     }
     this.centerPosition.copy(this.model.position);
 
@@ -475,6 +475,26 @@ export class Soda3DButton {
 
   public setRotationSpeed(speed: number): void {
     this.rotationSpeed = speed;
+  }
+
+  public updateModelPosition(): void {
+    if (this.model) {
+      // Recalculate and apply positioning
+      const box = new THREE.Box3().setFromObject(this.model);
+      const center = box.getCenter(new THREE.Vector3());
+
+      // Reset to original position first
+      this.model.position.add(center);
+
+      // Apply responsive positioning
+      if (this.isMobile) {
+        this.model.position.y -= 0.6;
+      } else {
+        this.model.position.y -= 0.8;
+      }
+
+      this.centerPosition.copy(this.model.position);
+    }
   }
 
   public resize(size: number): void {
