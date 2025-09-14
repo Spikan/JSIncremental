@@ -1,7 +1,16 @@
 // Enhanced Affordability System
 // Provides intelligent visual feedback and tooltips for upgrade affordability
 
-import { useGameStore } from '../core/state/zustand-store';
+// Safe store access to avoid initialization order issues
+function getGameStore() {
+  try {
+    const { useGameStore } = require('../core/state/zustand-store');
+    return useGameStore;
+  } catch (error) {
+    console.warn('Failed to access game store:', error);
+    return null;
+  }
+}
 
 export interface AffordabilityState {
   affordable: boolean;
@@ -15,7 +24,9 @@ export interface AffordabilityState {
  * Calculate affordability state for a given cost
  */
 export function calculateAffordabilityState(cost: number | any): AffordabilityState {
-  const state = useGameStore.getState();
+  const store = getGameStore();
+  if (!store) return { affordable: false, nearAffordable: false, unaffordable: true, percentageToAfford: 0, timeToAfford: undefined };
+  const state = store.getState();
   const currentSips = state.sips;
 
   // Convert to numbers for calculation - use safe conversion for Decimal types
@@ -287,14 +298,17 @@ export function initializeEnhancedAffordabilitySystem(): void {
   setInterval(applyEnhancedAffordabilityClasses, 1000);
 
   // Update on state changes
-  useGameStore.subscribe(
-    state => ({ sips: state.sips, spd: state.spd }),
-    () => {
-      // Debounce the updates
-      setTimeout(applyEnhancedAffordabilityClasses, 100);
-    },
-    { fireImmediately: false }
-  );
+  const store = getGameStore();
+  if (store) {
+    store.subscribe(
+      (state: any) => ({ sips: state.sips, spd: state.spd }),
+      () => {
+        // Debounce the updates
+        setTimeout(applyEnhancedAffordabilityClasses, 100);
+      },
+      { fireImmediately: false }
+    );
+  }
 
   console.log('✅ Enhanced affordability system initialized');
 }

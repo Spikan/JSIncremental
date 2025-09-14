@@ -1,7 +1,16 @@
 // Soda Drinker Pro Thematic Enhancement System
 // Adds absurd, minimalist charm inspired by the original game
 
-import { useGameStore } from '../core/state/zustand-store';
+// Safe store access to avoid initialization order issues
+function getGameStore() {
+  try {
+    const { useGameStore } = require('../core/state/zustand-store');
+    return useGameStore;
+  } catch (error) {
+    console.warn('Failed to access game store:', error);
+    return null;
+  }
+}
 
 export interface ThemeData {
   backgroundGradient: string;
@@ -347,7 +356,9 @@ export function initializeSodaDrinkerProThemes(): void {
   console.log('🥤 Initializing Soda Drinker Pro theme system...');
 
   // Apply initial theme
-  const state = useGameStore.getState();
+  const store = getGameStore();
+  if (!store) return;
+  const state = store.getState();
   const initialLevel =
     typeof state.level === 'number'
       ? state.level
@@ -360,23 +371,25 @@ export function initializeSodaDrinkerProThemes(): void {
   showLocationFlavorText(initialLevel);
 
   // Listen for level changes
-  useGameStore.subscribe(
-    state => state.level,
-    level => {
-      // Convert level to number if it's a Decimal
-      const levelNum =
-        typeof level === 'number'
-          ? level
-          : level && typeof level.toNumber === 'function'
-            ? level.toNumber()
-            : Number(level || 1);
+  if (store) {
+    store.subscribe(
+      (state: any) => state.level,
+      (level: any) => {
+        // Convert level to number if it's a Decimal
+        const levelNum =
+          typeof level === 'number'
+            ? level
+            : level && typeof level.toNumber === 'function'
+              ? level.toNumber()
+              : Number(level || 1);
 
-      console.log('🥤 Level changed, applying theme for level:', levelNum);
-      applyThemeToBackground(levelNum);
-      showLocationFlavorText(levelNum);
-    },
-    { fireImmediately: false }
-  );
+        console.log('🥤 Level changed, applying theme for level:', levelNum);
+        applyThemeToBackground(levelNum);
+        showLocationFlavorText(levelNum);
+      },
+      { fireImmediately: false }
+    );
+  }
 
   // Show random absurd notifications occasionally
   const showRandomNotification = () => {

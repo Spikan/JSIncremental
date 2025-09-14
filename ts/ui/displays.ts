@@ -1,12 +1,22 @@
 // UI Display Updates (TypeScript)
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
-import { useGameStore } from '../core/state/zustand-store';
 import { Decimal } from '../core/numbers';
 import { safeToNumberOrDecimal } from '../core/numbers/safe-conversion';
 import subscriptionManager from './subscription-manager';
 import debounceManager from './debounce-utils';
 import { updateLastSaveTime, updatePurchasedCounts } from './stats';
 import { checkUpgradeAffordability } from './affordability';
+
+// Safe store access to avoid initialization order issues
+function getGameStore() {
+  try {
+    const { useGameStore } = require('../core/state/zustand-store');
+    return useGameStore;
+  } catch (error) {
+    console.warn('Failed to access game store:', error);
+    return null;
+  }
+}
 
 // Subscription keys for tracking
 const SUBSCRIPTION_KEYS = {
@@ -58,7 +68,9 @@ export function updateTopSipsPerDrink(): void {
 
   try {
     // Get current state and update immediately
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     if (state && state.spd !== undefined) {
       const formatted = formatNumber(state.spd);
       topSipsPerDrinkElement.innerHTML = formatted;
@@ -91,7 +103,9 @@ export function updateTopSipsPerSecond(): void {
 
   try {
     // Get current state and update immediately
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     if (state && state.spd !== undefined && state.drinkRate !== undefined) {
       // Handle Decimal for spd and do division properly
       const sipsPerDrinkLarge =
@@ -136,9 +150,11 @@ export function updateCriticalClickDisplay(): void {
 
   try {
     // Subscribe to critical click chance changes only
-    useGameStore.subscribe(
-      state => state.criticalClickChance,
-      chance => {
+    const store = getGameStore();
+    if (!store) return;
+    store.subscribe(
+      (state: any) => state.criticalClickChance,
+      (chance: any) => {
         const numericChance = Number(chance ?? NaN);
         const formattedChance = !Number.isNaN(numericChance)
           ? `${(numericChance * 100).toFixed(1)}%`
@@ -159,7 +175,9 @@ export function updateCriticalClickDisplay(): void {
   } catch (error) {
     console.warn('Failed to update critical click display:', error);
     // Fallback: update once
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     const chance = Number(state.criticalClickChance ?? NaN);
     const formattedChance = !Number.isNaN(chance) ? `${(chance * 100).toFixed(1)}%` : '0.0%';
 
@@ -240,7 +258,9 @@ export function updateDrinkSpeedDisplay(): void {
   const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
   const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
   try {
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     if (currentDrinkSpeedCompact && state) {
       const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
       const drinkRateMsNum =
@@ -275,7 +295,9 @@ export function updateAutosaveStatus(): void {
   const checkbox = document.getElementById('autosaveToggle') as HTMLInputElement | null;
   const select = document.getElementById('autosaveInterval') as HTMLSelectElement | null;
   try {
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     const opts = state.options;
     if (status && opts) {
       if (opts.autosaveEnabled) {
@@ -311,7 +333,9 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
   let currentProgress = typeof progress === 'number' ? progress : undefined;
   let currentDrinkRate = typeof drinkRate === 'number' ? drinkRate : undefined;
   try {
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     if (state) {
       if (currentProgress == null) {
         const progress = safeToNumberOrDecimal(state.drinkProgress || 0);
@@ -369,7 +393,9 @@ export function updateTopSipCounter(): void {
 
   if (topSipElement) {
     try {
-      const state = useGameStore.getState();
+      const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
       // Use state.sips directly - formatNumber will handle Decimal properly
       const formatted = formatNumber(state.sips);
       // Silent update - no visual feedback needed
@@ -385,7 +411,9 @@ export function updateLevelNumber(): void {
   const levelEl: any = (window as any).DOM_CACHE?.levelNumber;
   if (levelEl) {
     try {
-      const state = useGameStore.getState();
+      const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
       const level = safeToNumberOrDecimal(state.level || 1);
       const levelNum =
         typeof level === 'number'
@@ -405,7 +433,9 @@ export function updateLevelText(): void {
   const levelTextEl: any = (window as any).DOM_CACHE?.levelText;
   if (levelTextEl) {
     try {
-      const state = useGameStore.getState();
+      const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
       const level = safeToNumberOrDecimal(state.level || 1);
       const levelNum =
         typeof level === 'number'
@@ -425,7 +455,9 @@ export function updateDrinkRate(): void {
   if (typeof window === 'undefined') return;
   const drinkRateElement = document.getElementById('drinkRate');
   try {
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     if (drinkRateElement && state) {
       const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
       const drinkRateMsNum =
@@ -447,7 +479,9 @@ export function updateCompactDrinkSpeedDisplays(): void {
   const currentDrinkSpeedCompact = document.getElementById('currentDrinkSpeedCompact');
   const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
   try {
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     if (currentDrinkSpeedCompact && state) {
       const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
       const drinkRateMsNum =
@@ -477,7 +511,9 @@ export function updateCompactDrinkSpeedDisplays(): void {
   const compactDisplays = document.querySelectorAll('[id*="Compact"]');
   compactDisplays.forEach(display => {
     try {
-      const state = useGameStore.getState();
+      const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
       if ((display as HTMLElement).id.includes('DrinkSpeed') && state) {
         const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
         const drinkRateMsNum =
@@ -544,7 +580,9 @@ export function testStateChangesAndUpdates(): void {
   console.log('=== TESTING STATE CHANGES AND UPDATES ===');
 
   try {
-    const state = useGameStore.getState();
+    const store = getGameStore();
+    if (!store) return;
+    const state = store.getState();
     console.log('Initial state:', {
       sips: state.sips,
       spd: state.spd,
@@ -557,7 +595,9 @@ export function testStateChangesAndUpdates(): void {
 
     // Wait a bit and check state again
     setTimeout(() => {
-      const newState = useGameStore.getState();
+      const store = getGameStore();
+      if (!store) return;
+      const newState = store.getState();
       console.log('State after adding 10 sips:', {
         sips: newState.sips,
         spd: newState.spd,
@@ -580,7 +620,9 @@ export function testStateChangesAndUpdates(): void {
       state.actions.setSPD(5);
 
       setTimeout(() => {
-        const finalState = useGameStore.getState();
+        const store = getGameStore();
+        if (!store) return;
+        const finalState = store.getState();
         console.log('Final state after SPD change:', {
           sips: finalState.sips,
           spd: finalState.spd,
