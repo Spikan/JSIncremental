@@ -18,16 +18,7 @@ import * as utils from './utils';
 import * as buttons from './buttons';
 import subscriptionManager from './subscription-manager';
 import { topInfoBar, TopInfoBarData } from './top-info-bar';
-// Safe store access to avoid initialization order issues
-function getGameStore() {
-  try {
-    const { useGameStore } = require('../core/state/zustand-store');
-    return useGameStore;
-  } catch (error) {
-    console.warn('Failed to access game store:', error);
-    return null;
-  }
-}
+import { useGameStore } from '../core/state/zustand-store';
 import { navigationManager, NavigationTab } from './navigation';
 import { drinkProgressBar, levelProgressBar, ProgressBarData } from './progress-bar';
 import { visualFeedback } from './visual-feedback';
@@ -228,9 +219,7 @@ export function setupDirectSodaClickHandler(): void {
   (window as any).testHeaderUpdates = () => {
     console.log('🧪 Testing header updates manually...');
     try {
-      const store = getGameStore();
-      if (!store) return;
-      const state = store.getState();
+      const state = useGameStore.getState();
       console.log('🧪 Current state:', {
         sips: state.sips.toString(),
         spd: state.spd.toString(),
@@ -626,10 +615,7 @@ function initializeSecretsSystem(): void {
     // Initialize Konami code detector (it starts listening automatically)
     // The detector is imported and initialized automatically
     console.log('🔐 Secrets system initialized. Konami code detector active.');
-    console.log(
-      '🔐 Konami detector status:',
-      konamiCodeDetector.isSecretsUnlocked() ? 'UNLOCKED' : 'LOCKED'
-    );
+    console.log('🔐 Konami detector status:', konamiCodeDetector.isSecretsUnlocked() ? 'UNLOCKED' : 'LOCKED');
     console.log('🔐 Secrets unlocked:', secretsUnlocked ? 'YES' : 'NO');
     console.log('🙏 God tab enabled:', godTabEnabled ? 'YES' : 'NO');
   } catch (error) {
