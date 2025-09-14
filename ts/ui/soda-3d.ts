@@ -26,6 +26,7 @@ export class Soda3DButton {
   private animationId: number | null = null;
   private clickHandlers: (() => void)[] = [];
   private baseScale = 1; // Store the calculated base scale
+  private centerPosition = new THREE.Vector3(0, 0, 0); // Store the centered position
 
   constructor(private config: Soda3DConfig) {
     this.rotationSpeed = config.rotationSpeed;
@@ -114,8 +115,9 @@ export class Soda3DButton {
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
 
-        // Center the model
+        // Center the model and store the centered position
         this.model.position.sub(center);
+        this.centerPosition.copy(this.model.position);
 
         // Scale to fit nicely in view - increased size for better visibility
         const maxDimension = Math.max(size.x, size.y, size.z);
@@ -191,7 +193,8 @@ export class Soda3DButton {
     if (this.isAnimating) {
       const time = Date.now() * 0.01;
       const bounce = Math.sin(time) * 0.1;
-      this.model.position.y = bounce;
+      this.model.position.copy(this.centerPosition);
+      this.model.position.y += bounce; // Add bounce to the centered Y position
       // Maintain the larger base scale during animation
       this.model.scale.setScalar(this.baseScale * (1 + Math.sin(time) * 0.05));
     }
@@ -269,7 +272,7 @@ export class Soda3DButton {
     // Reset position and scale after animation
     setTimeout(() => {
       if (this.model) {
-        this.model.position.y = 0;
+        this.model.position.copy(this.centerPosition); // Reset to centered position
         this.model.scale.setScalar(this.baseScale); // Reset to base scale, not 1
       }
       this.isAnimating = false;
