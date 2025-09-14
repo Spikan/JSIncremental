@@ -413,6 +413,141 @@ export const useActions = () => {
   return useGameStore(state => state.actions);
 };
 
+// Composite selectors for commonly accessed data combinations
+export const useGameData = createSelector(
+  state => ({
+    sips: state.sips,
+    spd: state.spd,
+    level: state.level,
+    drinkRate: state.drinkRate,
+    drinkProgress: state.drinkProgress,
+    lastDrinkTime: state.lastDrinkTime,
+  }),
+  {
+    sips: null,
+    spd: null,
+    level: 1,
+    drinkRate: 1000,
+    drinkProgress: 0,
+    lastDrinkTime: 0,
+  },
+  'gameData'
+);
+
+export const useResourceCounts = createSelector(
+  state => ({
+    straws: state.straws,
+    cups: state.cups,
+    suctions: state.suctions,
+    widerStraws: state.widerStraws,
+    betterCups: state.betterCups,
+    fasterDrinks: state.fasterDrinks,
+  }),
+  {
+    straws: null,
+    cups: null,
+    suctions: null,
+    widerStraws: null,
+    betterCups: null,
+    fasterDrinks: null,
+  },
+  'resourceCounts'
+);
+
+export const useProductionData = createSelector(
+  state => ({
+    spd: state.spd,
+    strawSPD: state.strawSPD,
+    cupSPD: state.cupSPD,
+    drinkRate: state.drinkRate,
+    drinkProgress: state.drinkProgress,
+  }),
+  {
+    spd: null,
+    strawSPD: null,
+    cupSPD: null,
+    drinkRate: 1000,
+    drinkProgress: 0,
+  },
+  'productionData'
+);
+
+export const useOptionsData = createSelector(
+  state => state.options,
+  defaultState.options,
+  'optionsData'
+);
+
+// Optimized selectors for UI updates (non-React contexts)
+export const getGameData = () => {
+  const state = useGameStore.getState();
+  return {
+    sips: state.sips,
+    spd: state.spd,
+    level: state.level,
+    drinkRate: state.drinkRate,
+    drinkProgress: state.drinkProgress,
+    lastDrinkTime: state.lastDrinkTime,
+  };
+};
+
+export const getResourceCounts = () => {
+  const state = useGameStore.getState();
+  return {
+    straws: state.straws,
+    cups: state.cups,
+    suctions: state.suctions,
+    widerStraws: state.widerStraws,
+    betterCups: state.betterCups,
+    fasterDrinks: state.fasterDrinks,
+  };
+};
+
+export const getProductionData = () => {
+  const state = useGameStore.getState();
+  return {
+    spd: state.spd,
+    strawSPD: state.strawSPD,
+    cupSPD: state.cupSPD,
+    drinkRate: state.drinkRate,
+    drinkProgress: state.drinkProgress,
+  };
+};
+
+export const getOptionsData = () => {
+  const state = useGameStore.getState();
+  return state.options;
+};
+
+// Memoized selectors for expensive calculations
+export const getCostCalculationData = () => {
+  const state = useGameStore.getState();
+  return {
+    straws: state.straws,
+    cups: state.cups,
+    suctions: state.suctions,
+    widerStraws: state.widerStraws,
+    betterCups: state.betterCups,
+    fasterDrinks: state.fasterDrinks,
+    level: state.level,
+  };
+};
+
+export const getDisplayData = () => {
+  const state = useGameStore.getState();
+  return {
+    sips: state.sips,
+    spd: state.spd,
+    level: state.level,
+    drinkRate: state.drinkRate,
+    drinkProgress: state.drinkProgress,
+    totalClicks: state.totalClicks,
+    totalSipsEarned: state.totalSipsEarned,
+    suctionClickBonus: state.suctionClickBonus,
+    options: state.options,
+  };
+};
+
 // Computed selectors for derived state
 export const useTotalResources = () => {
   const sips = useSips();

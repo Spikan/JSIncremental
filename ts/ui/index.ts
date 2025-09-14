@@ -22,7 +22,7 @@ import * as utils from './utils';
 import * as buttons from './buttons';
 // import subscriptionManager from './subscription-manager'; // Not needed for sidebar navigation
 import { topInfoBar, TopInfoBarData } from './top-info-bar';
-import { useGameStore } from '../core/state/zustand-store';
+import { getGameData, getOptionsData } from '../core/state/zustand-store';
 import { sidebarNavigation } from './sidebar-navigation';
 import { drinkProgressBar, levelProgressBar, ProgressBarData } from './progress-bar';
 import { visualFeedback } from './visual-feedback';
@@ -58,16 +58,16 @@ export {
  */
 export function updateTopInfoBar(): void {
   try {
-    const state = useGameStore.getState();
-    if (!state) {
+    const gameData = getGameData();
+    if (!gameData) {
       logger.warn('No state available for top info bar update');
       return;
     }
 
     const data: TopInfoBarData = {
-      level: state.level || 1,
-      totalSips: state.sips || 0,
-      perDrink: state.spd || 0,
+      level: gameData.level || 1,
+      totalSips: gameData.sips || 0,
+      perDrink: gameData.spd || 0,
       title: 'Soda Drinker', // Title is not in the state, use default
     };
 
@@ -117,11 +117,11 @@ export function setupDirectSodaClickHandler(): () => void {
 
   const checkForValueChanges = () => {
     try {
-      const state = useGameStore.getState();
-      if (state) {
-        const currentSips = state.sips;
-        const currentSPD = state.spd;
-        const currentLevel = state.level;
+      const gameData = getGameData();
+      if (gameData) {
+        const currentSips = gameData.sips;
+        const currentSPD = gameData.spd;
+        const currentLevel = gameData.level;
 
         // Check if any relevant values have changed
         if (
@@ -216,11 +216,11 @@ export function setupDirectSodaClickHandler(): () => void {
   (window as any).testHeaderUpdates = () => {
     logger.debug('Testing header updates manually...');
     try {
-      const state = useGameStore.getState();
+      const gameData = getGameData();
       logger.debug('Current state:', {
-        sips: state.sips.toString(),
-        spd: state.spd.toString(),
-        drinkRate: state.drinkRate,
+        sips: gameData.sips.toString(),
+        spd: gameData.spd.toString(),
+        drinkRate: gameData.drinkRate,
       });
 
       // Test individual update functions
@@ -262,14 +262,14 @@ export function setupDirectSodaClickHandler(): () => void {
  */
 export function updateEnhancedProgressBars(): void {
   try {
-    const state = useGameStore.getState();
-    if (!state) return;
+    const gameData = getGameData();
+    if (!gameData) return;
 
     // Update drink progress bar
     const drinkData: ProgressBarData = {
-      progress: state.drinkProgress || 0,
+      progress: gameData.drinkProgress || 0,
       total: 100,
-      rate: state.drinkRate || 0,
+      rate: gameData.drinkRate || 0,
       label: 'Drink Progress',
       showTimeRemaining: true,
       showPercentage: true,
@@ -611,8 +611,8 @@ function initializeEnhancedUIComponents(): void {
  */
 function initializeDevToolsButton(): void {
   try {
-    const state = useGameStore.getState();
-    const devToolsEnabled = state?.options?.devToolsEnabled ?? false;
+    const optionsData = getOptionsData();
+    const devToolsEnabled = optionsData?.devToolsEnabled ?? false;
 
     const button = document.querySelector('.dev-toggle-btn');
     if (button) {
@@ -630,9 +630,9 @@ function initializeDevToolsButton(): void {
  */
 function initializeSecretsSystem(): void {
   try {
-    const state = useGameStore.getState();
-    const secretsUnlocked = state?.options?.secretsUnlocked ?? false;
-    const godTabEnabled = state?.options?.godTabEnabled ?? false;
+    const optionsData = getOptionsData();
+    const secretsUnlocked = optionsData?.secretsUnlocked ?? false;
+    const godTabEnabled = optionsData?.godTabEnabled ?? false;
 
     // Show/hide secrets section based on unlock status
     const secretsSection = document.querySelector('.secrets-section');

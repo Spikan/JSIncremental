@@ -1,6 +1,6 @@
 // UI Display Updates (TypeScript)
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
-import { useGameStore } from '../core/state/zustand-store';
+import { getCostCalculationData, getDisplayData } from '../core/state/zustand-store';
 import { safeToNumberOrDecimal } from '../core/numbers/safe-conversion';
 import subscriptionManager from './subscription-manager';
 import debounceManager from './debounce-utils';
@@ -26,20 +26,23 @@ function calculateAllCosts(): any {
   const { upgrades: dataUp, config } = getUpgradesAndConfig();
   const costs = {} as any;
 
+  // Get all resource counts in one optimized call
+  const resourceData = getCostCalculationData();
+
   // Use the new improved cost calculation functions
   const strawBaseCost = toDecimal(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
   const strawScaling = toDecimal(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
-  const strawCount = toDecimal(useGameStore.getState()?.straws || 0);
+  const strawCount = toDecimal(resourceData.straws || 0);
   costs.straw = nextStrawCost(strawCount, strawBaseCost, strawScaling);
 
   const cupBaseCost = toDecimal(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
   const cupScaling = toDecimal(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
-  const cupCount = toDecimal(useGameStore.getState()?.cups || 0);
+  const cupCount = toDecimal(resourceData.cups || 0);
   costs.cup = nextCupCost(cupCount, cupBaseCost, cupScaling);
 
   const suctionBaseCost = toDecimal(dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40);
   const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
-  const suctionCount = toDecimal(useGameStore.getState()?.suctions || 0);
+  const suctionCount = toDecimal(resourceData.suctions || 0);
   costs.suction = suctionBaseCost.multiply(suctionScaling.pow(suctionCount));
 
   const fasterDrinksBaseCost = toDecimal(
@@ -48,7 +51,7 @@ function calculateAllCosts(): any {
   const fasterDrinksScaling = toDecimal(
     dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.1
   );
-  const fasterDrinksCount = toDecimal(useGameStore.getState()?.fasterDrinks || 0);
+  const fasterDrinksCount = toDecimal(resourceData.fasterDrinks || 0);
   costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksCount));
 
   const widerStrawsBaseCost = toDecimal(
@@ -57,7 +60,7 @@ function calculateAllCosts(): any {
   const widerStrawsScaling = toDecimal(
     dataUp?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING ?? 1.2
   );
-  const widerStrawsCount = toDecimal(useGameStore.getState()?.widerStraws || 0);
+  const widerStrawsCount = toDecimal(resourceData.widerStraws || 0);
   costs.widerStraws = nextWiderStrawsCost(
     widerStrawsCount,
     widerStrawsBaseCost,
@@ -70,12 +73,12 @@ function calculateAllCosts(): any {
   const betterCupsScaling = toDecimal(
     dataUp?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.25
   );
-  const betterCupsCount = toDecimal(useGameStore.getState()?.betterCups || 0);
+  const betterCupsCount = toDecimal(resourceData.betterCups || 0);
   costs.betterCups = nextBetterCupsCost(betterCupsCount, betterCupsBaseCost, betterCupsScaling);
 
   const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
   const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);
-  const levelCount = toDecimal(useGameStore.getState()?.level || 1);
+  const levelCount = toDecimal(resourceData.level || 1);
   costs.levelUp = levelUpBaseCost.multiply(levelUpScaling.pow(levelCount));
 
   return costs;
@@ -133,9 +136,9 @@ export function updateTopSipsPerDrink(): void {
 
   try {
     // Get current state and update immediately
-    const state = useGameStore.getState();
-    if (state && state.spd !== undefined) {
-      const formatted = formatNumber(state.spd);
+    const displayData = getDisplayData();
+    if (displayData && displayData.spd !== undefined) {
+      const formatted = formatNumber(displayData.spd);
       topSipsPerDrinkElement.innerHTML = formatted;
     }
   } catch (error) {
@@ -168,12 +171,12 @@ export function updateTopSipsPerSecond(): void {
 
   try {
     // Get current state and update immediately
-    const state = useGameStore.getState();
-    if (state && state.spd !== undefined && state.drinkRate !== undefined) {
+    const displayData = getDisplayData();
+    if (displayData && displayData.spd !== undefined && displayData.drinkRate !== undefined) {
       // Handle Decimal for spd and do division properly
       const sipsPerDrinkLarge =
-        state.spd && typeof state.spd.toNumber === 'function' ? state.spd : null;
-      const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
+        displayData.spd && typeof displayData.spd.toNumber === 'function' ? displayData.spd : null;
+      const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || 0);
       const drinkRateMsNum =
         typeof drinkRateMs === 'number'
           ? drinkRateMs
@@ -189,7 +192,7 @@ export function updateTopSipsPerSecond(): void {
         sipsPerSecond = sipsPerDrinkLarge.divide(drinkRateSecondsLarge);
       } else {
         // Fallback for non-Decimal values - use safe conversion
-        const sipsPerDrink = safeToNumberOrDecimal(state.spd || 0);
+        const sipsPerDrink = safeToNumberOrDecimal(displayData.spd || 0);
         sipsPerSecond =
           (typeof sipsPerDrink === 'number'
             ? sipsPerDrink
@@ -214,11 +217,11 @@ export function updateClickValueDisplay(): void {
 
   try {
     // Get current click value from game state
-    const state = (window as any).App?.state?.getState?.();
-    if (state) {
+    const displayData = getDisplayData();
+    if (displayData) {
       // Calculate total click value (base + suction bonuses)
       let baseClickValue = 1;
-      const suctionBonus = Number(state.suctionClickBonus || 0);
+      const suctionBonus = Number(displayData.suctionClickBonus || 0);
       const totalClickValue = baseClickValue + suctionBonus;
 
       clickValueElement.textContent = totalClickValue.toFixed(1);
@@ -275,9 +278,9 @@ export function updateDrinkSpeedDisplay(): void {
   const currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
   const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
   try {
-    const state = useGameStore.getState();
-    if ((currentDrinkSpeedCompact || currentDrinkSpeed) && state) {
-      const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
+    const displayData = getDisplayData();
+    if ((currentDrinkSpeedCompact || currentDrinkSpeed) && displayData) {
+      const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || 0);
       const drinkRateMsNum =
         typeof drinkRateMs === 'number'
           ? drinkRateMs
@@ -294,9 +297,9 @@ export function updateDrinkSpeedDisplay(): void {
         currentDrinkSpeed.textContent = formattedTime;
       }
     }
-    if (drinkSpeedBonusCompact && state) {
+    if (drinkSpeedBonusCompact && displayData) {
       const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
-      const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || baseMs);
+      const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || baseMs);
       const currMs =
         typeof drinkRateMs === 'number'
           ? drinkRateMs
@@ -317,8 +320,8 @@ export function updateAutosaveStatus(): void {
   const checkbox = document.getElementById('autosaveToggle') as HTMLInputElement | null;
   const select = document.getElementById('autosaveInterval') as HTMLSelectElement | null;
   try {
-    const state = useGameStore.getState();
-    const opts = state.options;
+    const displayData = getDisplayData();
+    const opts = displayData.options;
     if (status && opts) {
       if (opts.autosaveEnabled) {
         status.textContent = `Autosave: ON (${opts.autosaveInterval}s)`;
@@ -353,10 +356,10 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
   let currentProgress = typeof progress === 'number' ? progress : undefined;
   let currentDrinkRate = typeof drinkRate === 'number' ? drinkRate : undefined;
   try {
-    const state = useGameStore.getState();
-    if (state) {
+    const displayData = getDisplayData();
+    if (displayData) {
       if (currentProgress == null) {
-        const progress = safeToNumberOrDecimal(state.drinkProgress || 0);
+        const progress = safeToNumberOrDecimal(displayData.drinkProgress || 0);
         currentProgress =
           typeof progress === 'number'
             ? progress
@@ -364,7 +367,8 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
               ? progress.toNumber()
               : 0;
       }
-      if (currentDrinkRate == null) currentDrinkRate = safeToNumberOrDecimal(state.drinkRate || 0);
+      if (currentDrinkRate == null)
+        currentDrinkRate = safeToNumberOrDecimal(displayData.drinkRate || 0);
     }
   } catch (error) {
     console.warn('Failed to update display:', error);
@@ -412,9 +416,9 @@ export function updateTopSipCounter(): void {
 
   if (topSipElement) {
     try {
-      const state = useGameStore.getState();
-      // Use state.sips directly - formatNumber will handle Decimal properly
-      const formatted = formatNumber(state.sips);
+      const displayData = getDisplayData();
+      // Use displayData.sips directly - formatNumber will handle Decimal properly
+      const formatted = formatNumber(displayData.sips);
       // Silent update - no visual feedback needed
       (topSipElement as HTMLElement).textContent = formatted;
     } catch (error) {
@@ -428,8 +432,8 @@ export function updateLevelNumber(): void {
   const levelEl: any = domQuery.getById('levelNumber');
   if (levelEl) {
     try {
-      const state = useGameStore.getState();
-      const level = safeToNumberOrDecimal(state.level || 1);
+      const displayData = getDisplayData();
+      const level = safeToNumberOrDecimal(displayData.level || 1);
       const levelNum =
         typeof level === 'number'
           ? level
@@ -448,8 +452,8 @@ export function updateLevelText(): void {
   const levelTextEl: any = domQuery.getById('levelText');
   if (levelTextEl) {
     try {
-      const state = useGameStore.getState();
-      const level = safeToNumberOrDecimal(state.level || 1);
+      const displayData = getDisplayData();
+      const level = safeToNumberOrDecimal(displayData.level || 1);
       const levelNum =
         typeof level === 'number'
           ? level
@@ -468,9 +472,9 @@ export function updateDrinkRate(): void {
   if (typeof window === 'undefined') return;
   const drinkRateElement = document.getElementById('drinkRate');
   try {
-    const state = useGameStore.getState();
-    if (drinkRateElement && state) {
-      const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
+    const displayData = getDisplayData();
+    if (drinkRateElement && displayData) {
+      const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || 0);
       const drinkRateMsNum =
         typeof drinkRateMs === 'number'
           ? drinkRateMs
@@ -491,9 +495,9 @@ export function updateCompactDrinkSpeedDisplays(): void {
   const currentDrinkSpeed = document.getElementById('currentDrinkSpeed');
   const drinkSpeedBonusCompact = document.getElementById('drinkSpeedBonusCompact');
   try {
-    const state = useGameStore.getState();
-    if ((currentDrinkSpeedCompact || currentDrinkSpeed) && state) {
-      const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
+    const displayData = getDisplayData();
+    if ((currentDrinkSpeedCompact || currentDrinkSpeed) && displayData) {
+      const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || 0);
       const drinkRateMsNum =
         typeof drinkRateMs === 'number'
           ? drinkRateMs
@@ -510,9 +514,9 @@ export function updateCompactDrinkSpeedDisplays(): void {
         currentDrinkSpeed.textContent = formattedTime;
       }
     }
-    if (drinkSpeedBonusCompact && state) {
+    if (drinkSpeedBonusCompact && displayData) {
       const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
-      const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || baseMs);
+      const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || baseMs);
       const currMs =
         typeof drinkRateMs === 'number'
           ? drinkRateMs
@@ -528,9 +532,9 @@ export function updateCompactDrinkSpeedDisplays(): void {
   const compactDisplays = document.querySelectorAll('[id*="Compact"]');
   compactDisplays.forEach(display => {
     try {
-      const state = useGameStore.getState();
-      if ((display as HTMLElement).id.includes('DrinkSpeed') && state) {
-        const drinkRateMs = safeToNumberOrDecimal(state.drinkRate || 0);
+      const displayData = getDisplayData();
+      if ((display as HTMLElement).id.includes('DrinkSpeed') && displayData) {
+        const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || 0);
         const drinkRateMsNum =
           typeof drinkRateMs === 'number'
             ? drinkRateMs
@@ -623,29 +627,29 @@ export const updateAllDisplaysOptimized = () => {
  */
 function updateUpgradeDisplays(): void {
   try {
-    const state = useGameStore.getState();
-    if (!state) {
+    const displayData = getDisplayData();
+    if (!displayData) {
       console.warn('No state available for upgrade displays update');
       return;
     }
 
     // Update click upgrades
-    updateClickUpgradeDisplays(state);
+    updateClickUpgradeDisplays(displayData);
 
     // Update drink speed upgrades
-    updateDrinkSpeedUpgradeDisplays(state);
+    updateDrinkSpeedUpgradeDisplays(displayData);
 
     // Update production buildings
-    updateProductionBuildingDisplays(state);
+    updateProductionBuildingDisplays(displayData);
 
     // Update level up display
-    updateLevelUpDisplay(state);
+    updateLevelUpDisplay(displayData);
 
     // Update production summary
-    updateProductionSummaryDisplay(state);
+    updateProductionSummaryDisplay(displayData);
 
     // Update soda stats
-    updateSodaStats(state);
+    updateSodaStats(displayData);
   } catch (error) {
     console.warn('Error updating upgrade displays:', error);
   }
