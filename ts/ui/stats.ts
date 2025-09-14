@@ -217,6 +217,13 @@ export function updateShopStats(): void {
     const v = (window as any).App?.state?.getState?.()?.criticalClicks || 0;
     criticalClicksPurchasedElement.textContent = formatNumber(v);
   }
+
+  // Update purchased item counts in shop displays
+  updatePurchasedCounts();
+
+  // Update enhancement values for upgrade displays
+  console.log('🔍 updateShopStats: About to call updateEnhancementValues');
+  updateEnhancementValues();
 }
 
 // Update achievement-related statistics
