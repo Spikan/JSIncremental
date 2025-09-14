@@ -497,19 +497,44 @@ export function updateCompactDrinkSpeedDisplays(): void {
 
 function getLevelText(level: number): string {
   const levelTexts = [
-    'On a Blue Background',
-    'With a Straw',
-    'In a Cup',
-    'With Suction',
-    'Faster Drinking',
-    'Critical Hits',
-    'Advanced Upgrades',
-    'Master Soda Drinker',
-    'Soda Legend',
-    'Ultimate Soda Master',
+    'On a Blue Background', // Classic SDP reference
+    'In a Parking Lot (Mostly Empty)',
+    'At a Bus Stop (No Bus in Sight)',
+    'In Your Kitchen (Faucet Drips)',
+    'On a Park Bench (Bird Watches)',
+    'In a Grocery Store (Fluorescents Hum)',
+    'At the DMV (Line Hasn\'t Moved)',
+    'In Your Car (Radio Static)',
+    'On a Rooftop (Wind Blows)',
+    'In an Empty Office (5:47 PM)',
+    'At a Laundromat (Spin Cycle)',
+    'In a Hotel Room (Ice Machine Distant)',
+    'On a Beach (Seagull Cries Once)',
+    'In a Library (Someone Coughs)',
+    'At a Gas Station (Pump #3 Out of Order)',
+    'In an Elevator (Going to Floor 4)',
+    'On a Balcony (Neighbor\'s TV Audible)',
+    'In a Waiting Room (Magazine from 2019)',
+    'At a Food Court (Closed Except Subway)',
+    'In Your Backyard (Sprinkler Broken)',
+    'On a Fire Escape (Pigeon Nests)',
+    'In a Bathroom Stall (Door Won\'t Lock)',
+    'At a Train Platform (Next Train: 47 Minutes)',
+    'In a Stairwell (Echo of Footsteps)',
+    'On a Sidewalk (Crack Grows Wider)',
+    'In a Basement (Furnace Kicks On)',
+    'At a Vending Machine (Exact Change Only)',
+    'In an Attic (Dust Particles Float)',
+    'On a Bridge (One Car Passes)',
+    'In a Bedroom (Spider Under Bed)',
+    'At a Waterslide Park (Closed for Season)',
+    'In a 24-Hour Diner (Coffee Cold)',
+    'At a Rest Stop (Truckers Sleep)',
+    'In a Pharmacy (Prescription Ready)',
+    'Nowhere in Particular',
   ];
   const index = Math.min(Math.floor(level - 1), levelTexts.length - 1);
-  return levelTexts[index] || levelTexts[levelTexts.length - 1] || 'Unknown Level';
+  return levelTexts[index] || levelTexts[levelTexts.length - 1] || 'Somewhere';
 }
 
 // Debug functions removed for production

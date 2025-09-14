@@ -22,7 +22,12 @@ import { useGameStore } from '../core/state/zustand-store';
 import { navigationManager, NavigationTab } from './navigation';
 import { drinkProgressBar, levelProgressBar, ProgressBarData } from './progress-bar';
 import { visualFeedback } from './visual-feedback';
-import { initializeEnhancedAffordabilitySystem, addPurchaseSuccessAnimation } from './enhanced-affordability';
+import {
+  initializeEnhancedAffordabilitySystem,
+  addPurchaseSuccessAnimation,
+} from './enhanced-affordability';
+import { initializeSodaDrinkerProThemes, addThemeStyles } from './soda-drinker-pro-themes';
+import { initializeAuthenticSDP } from './authentic-sdp';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability, buttons };
@@ -503,9 +508,16 @@ export function initializeUI(): void {
   // Initialize enhanced UI components
   try {
     initializeEnhancedUIComponents();
-    
+
     // Initialize enhanced affordability system
     initializeEnhancedAffordabilitySystem();
+
+    // Initialize Soda Drinker Pro theme system
+    addThemeStyles();
+    initializeSodaDrinkerProThemes();
+    
+    // Initialize authentic SDP experience
+    initializeAuthenticSDP();
   } catch (error) {
     reportUIError(error, 'initialize_enhanced_ui', ErrorSeverity.MEDIUM);
   }
