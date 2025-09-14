@@ -4,6 +4,9 @@
 // Import the 3D model asset so Vite can process it
 import sodaModelUrl from '../../res/Soda.glb?url';
 
+// Fallback path for production compatibility
+const FALLBACK_MODEL_PATH = './res/Soda.glb';
+
 // ModelViewerElement will be available globally from the CDN script
 declare global {
   interface ModelViewerElement extends HTMLElement {
@@ -194,6 +197,8 @@ export class Soda3DButton {
     try {
       console.log('🔄 Starting model load process...');
       console.log('📍 Model path:', this.config.modelPath);
+      console.log('📍 Imported URL:', sodaModelUrl);
+      console.log('📍 Fallback path:', FALLBACK_MODEL_PATH);
       console.log('🔍 Model viewer element:', this.modelViewer);
 
       // Test if model file exists
@@ -345,7 +350,7 @@ export class Soda3DButton {
 // Export default configuration
 export const defaultSoda3DConfig: Soda3DConfig = {
   containerSelector: '#sodaButton',
-  modelPath: sodaModelUrl, // Use Vite-processed asset URL
+  modelPath: sodaModelUrl || FALLBACK_MODEL_PATH, // Use Vite-processed asset URL with fallback
   size: 200,
   width: 200,
   height: 200,
