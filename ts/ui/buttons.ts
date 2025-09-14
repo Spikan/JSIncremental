@@ -629,16 +629,14 @@ function setupSpecialButtonHandlers(): void {
 
       const checkClicksSystem = () => {
         attempts++;
-        console.warn(`🔄 CHECKING CLICKS SYSTEM (attempt ${attempts}/${maxAttempts}):`, {
-          hasWindow: typeof window !== 'undefined',
-          hasApp: !!(window as any).App,
-          hasSystems: !!(window as any).App?.systems,
-          hasClicks: !!(window as any).App?.systems?.clicks,
-          hasHandleSodaClick: !!(window as any).App?.systems?.clicks?.handleSodaClick,
-          sodaButtonExists: domQuery.exists('#sodaButton'),
-          shopTabExists: domQuery.exists('#shopTab'),
-          timestamp: Date.now(),
-        });
+        // Only log every 10th attempt to reduce spam
+        if (attempts % 10 === 1 || attempts <= 3) {
+          console.warn(`🔄 CHECKING CLICKS SYSTEM (attempt ${attempts}/${maxAttempts}):`, {
+            hasClicks: !!(window as any).App?.systems?.clicks?.handleSodaClick,
+            sodaButtonExists: domQuery.exists('#sodaButton'),
+            timestamp: Date.now(),
+          });
+        }
 
         // Check if we're in a test environment and window is not available
         if (typeof window === 'undefined') {
@@ -648,7 +646,7 @@ function setupSpecialButtonHandlers(): void {
         }
 
         const hasClicksSystem = (window as any).App?.systems?.clicks?.handleSodaClick;
-        const isDomReady = domQuery.exists('#sodaButton') && domQuery.exists('#shopTab');
+        const isDomReady = domQuery.exists('#sodaButton'); // Only need soda button for soda button setup
 
         if (hasClicksSystem && isDomReady) {
           console.warn('✅ CLICKS SYSTEM AND DOM READY!');
@@ -681,39 +679,26 @@ function setupSpecialButtonHandlers(): void {
   });
   // Setup soda button with clicks system check
   const setupSodaButton = async () => {
-    console.warn('🚀 SETUP SODA BUTTON CALLED!', { timestamp: Date.now() });
-    
     // Try to load clicks system, but don't fail if it's not ready
     try {
       await ensureClicksSystemLoaded();
-      console.warn('✅ CLICKS SYSTEM LOADED!', { timestamp: Date.now() });
     } catch (error) {
-      console.warn('⚠️ CLICKS SYSTEM NOT READY, SETTING UP BUTTON ANYWAY:', error);
+      console.warn('⚠️ CLICKS SYSTEM NOT READY, SETTING UP BUTTON ANYWAY');
       // Continue with button setup even if clicks system isn't ready
       // The button will work once the system loads
     }
     const sodaDomCacheBtn = domQuery.getById('sodaButton');
     const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
 
-    console.warn('🔍 SODA BUTTON SEARCH:', {
-      fromDomCache: !!sodaDomCacheBtn,
-      fromDocument: !!document.getElementById('sodaButton'),
-      finalButton: !!sodaButton,
-      buttonId: sodaButton?.id,
-      timestamp: Date.now(),
-    });
-
-    // Debug: Check if clicks system is available
-    const clicksSystem = (window as any).App?.systems?.clicks;
-    console.warn('🔍 CLICKS SYSTEM DEBUG:', {
-      hasApp: !!(window as any).App,
-      hasSystems: !!(window as any).App?.systems,
-      hasClicks: !!(window as any).App?.systems?.clicks,
-      hasHandleSodaClick: !!(window as any).App?.systems?.clicks?.handleSodaClick,
-      clicksSystemType: typeof clicksSystem,
-      handleSodaClickType: typeof clicksSystem?.handleSodaClick,
-    });
+    // Only log if button not found
+    if (!sodaButton) {
+      console.warn('❌ SODA BUTTON NOT FOUND!');
+      return;
+    }
     if (sodaButton && (sodaButton as any).addEventListener) {
+      // Flag to prevent double clicks from touch + click events
+      let touchHandled = false;
+      
       if ((window as any).PointerEvent) {
         let active = false;
         let moved = false;
@@ -726,6 +711,10 @@ function setupSpecialButtonHandlers(): void {
           if (sodaButton) {
             (sodaButton as any).__touchStartScrollY = undefined;
           }
+          // Reset touch handled flag after a short delay
+          setTimeout(() => {
+            touchHandled = false;
+          }, 100);
         };
         sodaButton.addEventListener('pointerdown', (e: any) => {
           if (!e || e.pointerType === 'mouse') return;
@@ -772,6 +761,7 @@ function setupSpecialButtonHandlers(): void {
 
           if (!moved && !isScroll) {
             markPointerHandled(sodaButton);
+            touchHandled = true; // Mark that touch handled the click
 
             // Remove visual feedback (was added on press)
             try {
@@ -824,6 +814,10 @@ function setupSpecialButtonHandlers(): void {
           if (sodaButton) {
             (sodaButton as any).__touchStartScrollY = undefined;
           }
+          // Reset touch handled flag after a short delay
+          setTimeout(() => {
+            touchHandled = false;
+          }, 100);
         };
         sodaButton.addEventListener(
           'touchstart',
@@ -880,6 +874,7 @@ function setupSpecialButtonHandlers(): void {
 
           if (!moved && !isScroll) {
             markPointerHandled(sodaButton);
+            touchHandled = true; // Mark that touch handled the click
 
             // Remove visual feedback (was added on touch start)
             try {
@@ -923,16 +918,14 @@ function setupSpecialButtonHandlers(): void {
       }
 
       // Standard click event handler
-      sodaButton.addEventListener('click', (e: any) => {
-        console.warn('🔥 SODA BUTTON STANDARD CLICK EVENT FIRED!', {
-          shouldSuppress: shouldSuppressClick(sodaButton),
-          buttonId: e?.target?.id,
-          timestamp: Date.now(),
-          eventType: e?.type,
-        });
-
+      sodaButton.addEventListener('click', () => {
         if (shouldSuppressClick(sodaButton)) {
-          console.warn('🔥 Soda button click suppressed');
+          return;
+        }
+        
+        // Prevent double clicks from touch + click events
+        if (touchHandled) {
+          touchHandled = false; // Reset for next interaction
           return;
         }
         try {
@@ -949,23 +942,9 @@ function setupSpecialButtonHandlers(): void {
         }
         try {
           // Button click handling
-          console.warn('🔥 SODA CLICK HANDLER EXECUTING:', {
-            timestamp: Date.now(),
-            hasApp: !!(window as any).App,
-            hasSystems: !!(window as any).App?.systems,
-            hasClicks: !!(window as any).App?.systems?.clicks,
-          });
-
-          // Try multiple ways to call the function
           const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
-          console.warn('🔥 HANDLE SODA CLICK FUNCTION:', {
-            found: !!handleSodaClick,
-            type: typeof handleSodaClick,
-            isFunction: typeof handleSodaClick === 'function',
-          });
 
           if (typeof handleSodaClick === 'function') {
-            console.warn('🔥 CALLING HANDLE SODA CLICK...');
             // Calling handleSodaClick function directly
             handleSodaClick(1).catch((error: any) => {
               console.warn('Failed to handle soda click:', error);
@@ -993,16 +972,10 @@ function setupSpecialButtonHandlers(): void {
         }
       });
     }
-    console.log('🚀 SODA BUTTON SETUP COMPLETE:', {
-      buttonFound: !!sodaButton,
-      buttonId: sodaButton?.id,
-      hasAddEventListener: typeof sodaButton?.addEventListener === 'function',
-      timestamp: Date.now(),
-    });
+    // Soda button setup complete
   };
 
   // Call the async setup function
-  console.warn('🎯 CALLING SETUP SODA BUTTON...', { timestamp: Date.now() });
   setupSodaButton().catch(error => {
     console.warn('❌ FAILED TO SETUP SODA BUTTON:', error);
   });
