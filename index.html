@@ -445,39 +445,6 @@
         </div>
       </div>
 
-      <!-- Drink Speed Upgrade Section - Moved from progress bar area -->
-      <div class="drink-speed-upgrade-section">
-        <div class="drink-speed-upgrade-container">
-          <div class="drink-speed-relationship-indicator">
-            <span class="relationship-icon">⚡</span>
-            <span class="relationship-text">Enhances: Drink Speed</span>
-          </div>
-          <button class="drink-speed-upgrade-btn" data-action="buyFasterDrinks">
-            <div class="drink-speed-upgrade-icon">⚡</div>
-            <div class="drink-speed-upgrade-info">
-              <div class="drink-speed-upgrade-name">Faster Drinks</div>
-              <div class="drink-speed-upgrade-cost">
-                <span id="fasterDrinksCostCompact">80</span> Sips
-              </div>
-            </div>
-          </button>
-          <div class="drink-speed-upgrade-stats">
-            <span class="drink-speed-stat"
-              >Speed: <span id="currentDrinkSpeedCompact">5.00s</span></span
-            >
-            <span class="drink-speed-stat">Bonus: <span id="drinkSpeedBonusCompact">0%</span></span>
-          </div>
-          <button class="drink-speed-upgrade-btn upgrade" data-action="upgradeFasterDrinks">
-            <div class="drink-speed-upgrade-icon">🔧</div>
-            <div class="drink-speed-upgrade-info">
-              <div class="drink-speed-upgrade-name">Upgrade Faster Drinks</div>
-              <div class="drink-speed-upgrade-cost">
-                <span id="fasterDrinksUpCostCompact">1500</span> Sips
-              </div>
-            </div>
-          </button>
-        </div>
-      </div>
 
       <!-- Soda Clicking Tab -->
       <div id="sodaTab" class="tab-content active">
@@ -573,6 +540,52 @@
                 <div class="upgrade-stats">
                   <div class="upgrade-effect">
                     <span id="criticalClickChanceCompact">0.1</span>% chance
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Drink Speed Upgrades Sidebar -->
+          <div class="upgrades-sidebar">
+            <div class="sidebar-header">
+              <h3 class="sidebar-title">Drink Speed Upgrades</h3>
+              <p class="sidebar-subtitle">Enhance your drinking speed</p>
+            </div>
+
+            <div class="upgrade-cards">
+              <div class="upgrade-card">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">⚡</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Faster Drinks</h4>
+                    <p class="upgrade-description">Reduce drink time</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="buyFasterDrinks">
+                  <div class="upgrade-cost"><span id="fasterDrinksCostCompact">80</span> Sips</div>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-effect">
+                    Speed: <span id="currentDrinkSpeedCompact">5.00s</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="upgrade-card">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">🔧</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Upgrade Faster Drinks</h4>
+                    <p class="upgrade-description">Enhance drink speed bonus</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="upgradeFasterDrinks">
+                  <div class="upgrade-cost"><span id="fasterDrinksUpCostCompact">1500</span> Sips</div>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-effect">
+                    Bonus: <span id="drinkSpeedBonusCompact">0%</span>
                   </div>
                 </div>
               </div>

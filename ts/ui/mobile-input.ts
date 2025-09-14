@@ -79,11 +79,11 @@ export class MobileInputHandler {
     } catch (error) {
       console.warn('Failed to set mobile touch styles:', error);
     }
-    
+
     // Apply ultra-compact header on mobile
     this.applyUltraCompactHeader();
   }
-  
+
   /**
    * Apply ultra-compact header styling on mobile devices
    */
