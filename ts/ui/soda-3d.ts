@@ -5,20 +5,25 @@ import sodaModelUrl from '../../res/Soda.glb?url';
 
 console.log('🔍 Soda model URL resolved to:', sodaModelUrl);
 
-// Test if we can fetch the model file
-fetch(sodaModelUrl)
-  .then(response => {
-    console.log('🌐 Fetch test - Response status:', response.status);
-    console.log('🌐 Fetch test - Content type:', response.headers.get('content-type'));
-    console.log('🌐 Fetch test - Response OK:', response.ok);
-    return response.arrayBuffer();
-  })
-  .then(buffer => {
-    console.log('📦 Fetch test - Buffer size:', buffer.byteLength, 'bytes');
-  })
-  .catch(error => {
-    console.error('❌ Fetch test failed:', error);
-  });
+// Test if we can fetch the model file (moved inside function to avoid circular dependency)
+function testModelFetch() {
+  fetch(sodaModelUrl)
+    .then(response => {
+      console.log('🌐 Fetch test - Response status:', response.status);
+      console.log('🌐 Fetch test - Content type:', response.headers.get('content-type'));
+      console.log('🌐 Fetch test - Response OK:', response.ok);
+      return response.arrayBuffer();
+    })
+    .then(buffer => {
+      console.log('📦 Fetch test - Buffer size:', buffer.byteLength, 'bytes');
+    })
+    .catch(error => {
+      console.error('❌ Fetch test failed:', error);
+    });
+}
+
+// Call the test function after a short delay to avoid circular dependency issues
+setTimeout(testModelFetch, 100);
 
 interface Soda3DConfig {
   containerSelector: string;

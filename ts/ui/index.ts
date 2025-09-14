@@ -736,7 +736,6 @@ function initializeSwipeGestures(): void {
     return tabOrder.indexOf(tabId);
   }
 
-
   // Check if a tab is disabled
   function isTabDisabled(tabName: string): boolean {
     try {
