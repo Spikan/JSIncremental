@@ -515,7 +515,7 @@ export function initializeUI(): void {
     // Initialize Soda Drinker Pro theme system
     addThemeStyles();
     initializeSodaDrinkerProThemes();
-    
+
     // Initialize authentic SDP experience
     initializeAuthenticSDP();
   } catch (error) {

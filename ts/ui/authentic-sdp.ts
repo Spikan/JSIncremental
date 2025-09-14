@@ -28,8 +28,9 @@ export function showEnvironmentalObservation(): void {
     'The refrigerator cycles on.',
   ];
 
-  const observation = observations[Math.floor(Math.random() * observations.length)] ?? 'Something happened.';
-  
+  const observation =
+    observations[Math.floor(Math.random() * observations.length)] ?? 'Something happened.';
+
   // Create a simple, unobtrusive notification
   const notification = document.createElement('div');
   notification.textContent = observation;
@@ -83,7 +84,7 @@ export function addEnvironmentalSound(): void {
   ];
 
   const sound = sounds[Math.floor(Math.random() * sounds.length)] ?? '*silence*';
-  
+
   // Show sound as subtle text in corner
   const soundElement = document.createElement('div');
   soundElement.textContent = sound;
@@ -129,7 +130,7 @@ export function addClickableEasterEgg(): void {
 
   const egg = easterEggs[Math.floor(Math.random() * easterEggs.length)];
   if (!egg) return;
-  
+
   const element = document.createElement('div');
   element.className = 'sdp-easter-egg';
   element.textContent = egg.text;
@@ -197,18 +198,39 @@ export function addClickableEasterEgg(): void {
  */
 export function checkMundaneAchievements(): void {
   const achievements = [
-    { id: 'clicked_10', trigger: 'clicks', count: 10, text: 'Clicked 10 Times: You clicked. The number increased.' },
-    { id: 'level_2', trigger: 'level', count: 2, text: 'Reached Level 2: You are now at level 2. This is different from level 1.' },
-    { id: 'waited_30s', trigger: 'time', count: 30000, text: 'Waited 30 Seconds: Time passed. You observed it.' },
-    { id: 'sips_100', trigger: 'sips', count: 100, text: 'Accumulated 100 Sips: The counter displays a larger number now.' },
+    {
+      id: 'clicked_10',
+      trigger: 'clicks',
+      count: 10,
+      text: 'Clicked 10 Times: You clicked. The number increased.',
+    },
+    {
+      id: 'level_2',
+      trigger: 'level',
+      count: 2,
+      text: 'Reached Level 2: You are now at level 2. This is different from level 1.',
+    },
+    {
+      id: 'waited_30s',
+      trigger: 'time',
+      count: 30000,
+      text: 'Waited 30 Seconds: Time passed. You observed it.',
+    },
+    {
+      id: 'sips_100',
+      trigger: 'sips',
+      count: 100,
+      text: 'Accumulated 100 Sips: The counter displays a larger number now.',
+    },
   ];
 
   // Simple achievement checking (would need to be integrated with game state)
   // For now, just show random achievement occasionally
-  if (Math.random() < 0.05) { // 5% chance
+  if (Math.random() < 0.05) {
+    // 5% chance
     const achievement = achievements[Math.floor(Math.random() * achievements.length)];
     if (!achievement) return;
-    
+
     const achievementElement = document.createElement('div');
     achievementElement.textContent = achievement.text;
     achievementElement.style.cssText = `
@@ -252,7 +274,8 @@ export function initializeAuthenticSDP(): void {
 
   // Environmental sounds every 20-60 seconds
   const playSound = () => {
-    if (Math.random() < 0.3) { // 30% chance
+    if (Math.random() < 0.3) {
+      // 30% chance
       addEnvironmentalSound();
     }
     setTimeout(playSound, 20000 + Math.random() * 40000);
@@ -261,7 +284,8 @@ export function initializeAuthenticSDP(): void {
 
   // Easter eggs every 2-5 minutes
   const addEgg = () => {
-    if (Math.random() < 0.4) { // 40% chance
+    if (Math.random() < 0.4) {
+      // 40% chance
       addClickableEasterEgg();
     }
     setTimeout(addEgg, 120000 + Math.random() * 180000);

@@ -160,15 +160,15 @@ export function getAbsurdUpgradeName(baseUpgrade: string, level: number): Absurd
   const index = Math.min(level - 1, upgrades.length - 1);
   const selectedUpgrade = upgrades[index];
   if (selectedUpgrade) return selectedUpgrade;
-  
+
   const fallbackUpgrade = upgrades[upgrades.length - 1];
   if (fallbackUpgrade) return fallbackUpgrade;
-  
+
   // Ultimate fallback
   return {
     name: baseUpgrade,
     description: 'It does what it does.',
-    flavorText: 'The upgrade upgrades upgradingly.'
+    flavorText: 'The upgrade upgrades upgradingly.',
   };
 }
 
@@ -223,8 +223,10 @@ export function getAbsurdMilestone(type: string, value: number): string {
   };
 
   const messages = milestones[type] ?? ['You have achieved ${value} of something.'];
-  const randomMessage = messages[Math.floor(Math.random() * messages.length)] ?? 'You have achieved ${value} of something.';
-  
+  const randomMessage =
+    messages[Math.floor(Math.random() * messages.length)] ??
+    'You have achieved ${value} of something.';
+
   return randomMessage.replace('${value}', value.toLocaleString());
 }
 
