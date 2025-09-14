@@ -183,8 +183,9 @@ function calculateAllCosts(): CostResult {
   costs.fasterDrinksUp = fasterDrinksUpBaseCost.multiply(fasterDrinksUpCount);
 
   const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
-  const levelCount = toDecimal((window as any).App?.state?.getState?.()?.level || 0);
-  costs.levelUp = levelUpBaseCost.multiply(levelCount);
+  const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);
+  const levelCount = toDecimal((window as any).App?.state?.getState?.()?.level || 1);
+  costs.levelUp = levelUpBaseCost.multiply(levelUpScaling.pow(levelCount));
 
   return costs;
 }
