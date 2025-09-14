@@ -4,6 +4,7 @@
 // Import consolidated utilities
 import { formatNumber } from './utils';
 import { toDecimal } from '../core/numbers';
+import { computeStrawSPD, computeCupSPD } from '../core/rules/economy';
 
 // Update play time display
 export function updatePlayTime(): void {
@@ -284,16 +285,27 @@ export function updateEnhancementValues(): void {
   console.log('🔍 strawSPDElement found:', !!strawSPDElement);
   if (strawSPDElement) {
     const straws = state.straws || 0;
-    const strawsLarge = toDecimal(straws);
+    const widerStraws = state.widerStraws || 0;
     const baseSPD = 2.0; // From upgrades.json
-    const totalProduction = strawsLarge.mul(baseSPD);
-    console.log('🔍 Straw production calculation:', {
+    const widerMultiplierPerLevel = 0.5; // From upgrades.json
+    
+    // Use actual game logic with all bonuses
+    const actualStrawSPD = computeStrawSPD(
+      straws, 
+      baseSPD, 
+      widerStraws, 
+      widerMultiplierPerLevel
+    );
+    
+    console.log('🔍 Straw production calculation (with bonuses):', {
       straws,
+      widerStraws,
       baseSPD,
-      totalProduction: totalProduction.toString(),
-      formatted: formatNumber(totalProduction.toString()),
+      widerMultiplierPerLevel,
+      actualStrawSPD: actualStrawSPD.toString(),
+      formatted: formatNumber(actualStrawSPD.toString()),
     });
-    strawSPDElement.textContent = formatNumber(totalProduction.toString());
+    strawSPDElement.textContent = formatNumber(actualStrawSPD.toString());
   } else {
     console.log('🔍 strawSPDElement not found in DOM_CACHE');
   }
@@ -302,16 +314,27 @@ export function updateEnhancementValues(): void {
   console.log('🔍 cupSPDElement found:', !!cupSPDElement);
   if (cupSPDElement) {
     const cups = state.cups || 0;
-    const cupsLarge = toDecimal(cups);
+    const betterCups = state.betterCups || 0;
     const baseSPD = 5.0; // From upgrades.json
-    const totalProduction = cupsLarge.mul(baseSPD);
-    console.log('🔍 Cup production calculation:', {
+    const betterMultiplierPerLevel = 1.0; // From upgrades.json
+    
+    // Use actual game logic with all bonuses
+    const actualCupSPD = computeCupSPD(
+      cups, 
+      baseSPD, 
+      betterCups, 
+      betterMultiplierPerLevel
+    );
+    
+    console.log('🔍 Cup production calculation (with bonuses):', {
       cups,
+      betterCups,
       baseSPD,
-      totalProduction: totalProduction.toString(),
-      formatted: formatNumber(totalProduction.toString()),
+      betterMultiplierPerLevel,
+      actualCupSPD: actualCupSPD.toString(),
+      formatted: formatNumber(actualCupSPD.toString()),
     });
-    cupSPDElement.textContent = formatNumber(totalProduction.toString());
+    cupSPDElement.textContent = formatNumber(actualCupSPD.toString());
   } else {
     console.log('🔍 cupSPDElement not found in DOM_CACHE');
   }
