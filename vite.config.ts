@@ -17,7 +17,6 @@ function createManualChunks(id: string): string {
   if (id.includes('node_modules')) {
     if (id.includes('zustand')) return 'vendor-zustand';
     if (id.includes('zod')) return 'vendor-zod';
-    if (id.includes('three')) return 'vendor-three';
     return 'vendor';
   }
 
@@ -103,8 +102,8 @@ export default defineConfig(({ mode }) => {
     },
 
     optimizeDeps: {
-      include: ['zustand', 'zod', 'three'] as string[],
-      exclude: [] as string[],
+      include: ['zustand', 'zod'] as string[],
+      exclude: ['@google/model-viewer'] as string[],
     },
   } as const;
 });

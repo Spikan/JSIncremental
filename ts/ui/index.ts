@@ -28,7 +28,7 @@ import {
 } from './enhanced-affordability';
 import { initializeSodaDrinkerProThemes, addThemeStyles } from './soda-drinker-pro-themes';
 import { initializeAuthenticSDP } from './authentic-sdp';
-import { initializeSoda3D } from './soda-3d';
+import { createSoda3DButton } from './soda-3d-lightweight';
 import { konamiCodeDetector } from './konami-code';
 // import { runFullLayoutValidation } from './layout-validation'; // Disabled - sections removed
 
@@ -499,13 +499,22 @@ export function initializeUI(): void {
     // Initialize authentic SDP experience
     initializeAuthenticSDP();
 
-    // Initialize 3D soda button
-    console.log('🎮 About to initialize 3D soda button...');
+    // Initialize lightweight 3D soda button
     try {
-      initializeSoda3D();
-      console.log('✅ 3D soda button initialization completed');
+      const soda3D = createSoda3DButton({
+        containerSelector: '#sodaButton',
+        size: 200,
+        rotationSpeed: 1.0,
+        hoverSpeedMultiplier: 2.0,
+        clickAnimationDuration: 200,
+      });
+      
+      // Click handler is now built into the 3D button
+      // No need to add additional handlers
+      
+      console.log('✅ Lightweight 3D soda button initialized');
     } catch (error) {
-      console.error('❌ 3D soda button initialization failed:', error);
+      console.error('❌ Failed to initialize 3D soda button:', error);
     }
 
     // Initialize displays
