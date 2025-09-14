@@ -150,9 +150,9 @@ export class Soda3DButton {
       this.camera.position.set(0, 0.2, 3.0);
       this.camera.lookAt(0, -0.6, 0);
     } else {
-      // Desktop: Higher camera position with more distance for larger model
-      this.camera.position.set(0, 0.8, 4.0);
-      this.camera.lookAt(0, 0, 0);
+      // Desktop: Position camera to center the model properly in the taller container
+      this.camera.position.set(0, 0.2, 4.0);
+      this.camera.lookAt(0, -0.2, 0);
     }
 
     // Set up renderer with mobile optimizations - use rectangular dimensions
@@ -245,8 +245,8 @@ export class Soda3DButton {
           // Mobile: Move model down to fit within container
           this.model.position.y -= 0.6;
         } else {
-          // Desktop: Center model properly for better visibility
-          this.model.position.y -= 0.2;
+          // Desktop: Center model in the taller container
+          this.model.position.y -= 0.4;
         }
         this.centerPosition.copy(this.model.position);
 
@@ -307,7 +307,7 @@ export class Soda3DButton {
     if (this.isMobile) {
       this.model.position.y = -0.6; // Mobile positioning
     } else {
-      this.model.position.y = -0.2; // Desktop positioning
+      this.model.position.y = -0.4; // Desktop positioning - centered in taller container
     }
     this.centerPosition.copy(this.model.position);
 
