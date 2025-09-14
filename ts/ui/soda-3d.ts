@@ -144,9 +144,16 @@ export class Soda3DButton {
   }
 
   private setupScene(): void {
-    // Set up camera position - adjusted for better container fit
-    this.camera.position.set(0, 0.2, 3.0); // Lower camera position to prevent top clipping
-    this.camera.lookAt(0, -0.6, 0); // Look way down to keep model in lower part of container
+    // Set up camera position - responsive for mobile vs desktop
+    if (this.isMobile) {
+      // Mobile: Lower camera position to prevent top clipping
+      this.camera.position.set(0, 0.2, 3.0);
+      this.camera.lookAt(0, -0.6, 0);
+    } else {
+      // Desktop: Higher camera position for better model visibility
+      this.camera.position.set(0, 0.6, 3.5);
+      this.camera.lookAt(0, 0, 0);
+    }
 
     // Set up renderer with mobile optimizations - use rectangular dimensions
     const width = this.config.width || this.config.size;
@@ -232,14 +239,26 @@ export class Soda3DButton {
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
 
-        // Center the model and position it to fit within container bounds
+        // Center the model and position it responsively
         this.model.position.sub(center);
-        this.model.position.y -= 0.6; // Move model down to fit within container
+        if (this.isMobile) {
+          // Mobile: Move model down to fit within container
+          this.model.position.y -= 0.6;
+        } else {
+          // Desktop: Center model properly for better visibility
+          this.model.position.y -= 0.2;
+        }
         this.centerPosition.copy(this.model.position);
 
-        // Scale to fit nicely in view - larger and more prominent
+        // Scale to fit nicely in view - responsive scaling
         const maxDimension = Math.max(size.x, size.y, size.z);
-        this.baseScale = 3.2 / maxDimension; // Larger scale for better prominence
+        if (this.isMobile) {
+          // Mobile: Smaller scale to fit within container
+          this.baseScale = 2.8 / maxDimension;
+        } else {
+          // Desktop: Larger scale for better prominence
+          this.baseScale = 3.5 / maxDimension;
+        }
         this.model.scale.setScalar(this.baseScale);
 
         this.scene.add(this.model);
@@ -284,8 +303,12 @@ export class Soda3DButton {
     cylinder.receiveShadow = true;
     this.model.add(cylinder);
 
-    // Position fallback model to match main model positioning
-    this.model.position.y = -0.6; // Match the main model's positioning
+    // Position fallback model responsively to match main model positioning
+    if (this.isMobile) {
+      this.model.position.y = -0.6; // Mobile positioning
+    } else {
+      this.model.position.y = -0.2; // Desktop positioning
+    }
     this.centerPosition.copy(this.model.position);
 
     this.scene.add(this.model);

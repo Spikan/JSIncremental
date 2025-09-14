@@ -7656,11 +7656,23 @@ p {
   .soda-button {
     width: 300px;
     height: 520px; /* Increased from 480px to 520px - even taller to eliminate cut-off */
+    padding: 20px; /* Restore padding for desktop */
   }
 
   .click-indicator {
     width: 320px;
     height: 540px; /* Increased from 500px to 540px - match desktop soda button height */
+  }
+
+  /* Desktop-specific 3D canvas styling */
+  .soda-button canvas {
+    border-radius: 20px;
+    position: absolute;
+    top: 20px; /* Account for container padding */
+    left: 0;
+    width: 100% !important;
+    height: calc(100% - 40px) !important; /* Account for padding */
+    object-fit: contain;
   }
 }
 
