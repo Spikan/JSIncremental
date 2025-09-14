@@ -132,20 +132,26 @@ export function updateTopSipsPerSecond(): void {
 export function updateCriticalClickDisplay(): void {
   if (typeof window === 'undefined') return;
   const criticalClickChanceCompact = document.getElementById('criticalClickChanceCompact');
-
-  if (!criticalClickChanceCompact) return;
+  const criticalChanceElement = document.getElementById('criticalChance');
 
   try {
     // Subscribe to critical click chance changes only
     useGameStore.subscribe(
       state => state.criticalClickChance,
       chance => {
+        const numericChance = Number(chance ?? NaN);
+        const formattedChance = !Number.isNaN(numericChance)
+          ? `${(numericChance * 100).toFixed(1)}%`
+          : '0.0%';
+
+        // Update compact display (existing)
         if (criticalClickChanceCompact) {
-          // criticalClickChance should remain a regular number, not Decimal
-          const numericChance = Number(chance ?? NaN);
-          if (!Number.isNaN(numericChance)) {
-            criticalClickChanceCompact.textContent = `${(numericChance * 100).toFixed(1)}%`;
-          }
+          criticalClickChanceCompact.textContent = formattedChance;
+        }
+
+        // Update new main UI display
+        if (criticalChanceElement) {
+          criticalChanceElement.textContent = formattedChance;
         }
       },
       { fireImmediately: true }
@@ -154,11 +160,78 @@ export function updateCriticalClickDisplay(): void {
     console.warn('Failed to update critical click display:', error);
     // Fallback: update once
     const state = useGameStore.getState();
-    // criticalClickChance should remain a regular number, not Decimal
     const chance = Number(state.criticalClickChance ?? NaN);
-    if (!Number.isNaN(chance)) {
-      criticalClickChanceCompact.textContent = `${(chance * 100).toFixed(1)}%`;
+    const formattedChance = !Number.isNaN(chance) ? `${(chance * 100).toFixed(1)}%` : '0.0%';
+
+    if (criticalClickChanceCompact) {
+      criticalClickChanceCompact.textContent = formattedChance;
     }
+    if (criticalChanceElement) {
+      criticalChanceElement.textContent = formattedChance;
+    }
+  }
+}
+
+export function updateClickValueDisplay(): void {
+  if (typeof window === 'undefined') return;
+  const clickValueElement = document.getElementById('clickValue');
+
+  if (!clickValueElement) return;
+
+  try {
+    // Get current click value from game state
+    const state = (window as any).App?.state?.getState?.();
+    if (state) {
+      // Calculate total click value (base + suction bonuses)
+      let baseClickValue = 1;
+      const suctionBonus = Number(state.suctionClickBonus || 0);
+      const totalClickValue = baseClickValue + suctionBonus;
+
+      clickValueElement.textContent = totalClickValue.toFixed(1);
+    }
+  } catch (error) {
+    console.warn('Failed to update click value display:', error);
+  }
+}
+
+export function updateProductionSummary(): void {
+  if (typeof window === 'undefined') return;
+
+  const totalStrawElement = document.getElementById('totalStrawProduction');
+  const totalCupElement = document.getElementById('totalCupProduction');
+  const totalPassiveElement = document.getElementById('totalPassiveProduction');
+
+  try {
+    const state = (window as any).App?.state?.getState?.();
+    if (state) {
+      // Calculate straw production
+      const strawCount = Number(state.straws || 0);
+      const strawSPD = Number(state.strawSPD || 0);
+      const widerStrawsBonus = Number(state.widerStrawsSPD || 0);
+      const totalStrawProduction = strawCount * strawSPD * (1 + widerStrawsBonus / 100);
+
+      // Calculate cup production
+      const cupCount = Number(state.cups || 0);
+      const cupSPD = Number(state.cupSPD || 0);
+      const betterCupsBonus = Number(state.betterCupsSPD || 0);
+      const totalCupProduction = cupCount * cupSPD * (1 + betterCupsBonus / 100);
+
+      // Total passive production
+      const totalProduction = totalStrawProduction + totalCupProduction;
+
+      // Update displays
+      if (totalStrawElement) {
+        totalStrawElement.textContent = totalStrawProduction.toFixed(1);
+      }
+      if (totalCupElement) {
+        totalCupElement.textContent = totalCupProduction.toFixed(1);
+      }
+      if (totalPassiveElement) {
+        totalPassiveElement.textContent = totalProduction.toFixed(1);
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to update production summary:', error);
   }
 }
 

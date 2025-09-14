@@ -16,7 +16,7 @@ export function nextStrawCost(
 
   // Improved scaling: More reasonable progression
   // Every 10 straws, cost increases by 10x instead of continuous scaling
-  const milestoneCount = count.div(10).floor();
+  const milestoneCount = new Decimal(count).div(10).floor();
   const withinMilestone = count.mod(10);
 
   // Base cost for this milestone
@@ -39,7 +39,7 @@ export function nextCupCost(
 
   // Improved scaling: More reasonable progression
   // Every 10 cups, cost increases by 10x instead of continuous scaling
-  const milestoneCount = count.div(10).floor();
+  const milestoneCount = new Decimal(count).div(10).floor();
   const withinMilestone = count.mod(10);
 
   // Base cost for this milestone

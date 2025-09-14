@@ -30,7 +30,7 @@ export function computeStrawSPD(
   let totalSPD = baseValue.mul(strawsCount).mul(upgradeMultiplier);
 
   // Milestone bonuses: Every 10 straws = 2x production
-  const milestoneCount = strawsCount.div(10).floor();
+  const milestoneCount = new Decimal(strawsCount).div(10).floor();
   if (milestoneCount.gt(0)) {
     const milestoneMultiplier = new Decimal(2).pow(milestoneCount);
     totalSPD = totalSPD.mul(milestoneMultiplier);
@@ -63,7 +63,7 @@ export function computeCupSPD(
   let totalSPD = baseValue.mul(cupsCount).mul(upgradeMultiplier);
 
   // Milestone bonuses: Every 10 cups = 2x production
-  const milestoneCount = cupsCount.div(10).floor();
+  const milestoneCount = new Decimal(cupsCount).div(10).floor();
   if (milestoneCount.gt(0)) {
     const milestoneMultiplier = new Decimal(2).pow(milestoneCount);
     totalSPD = totalSPD.mul(milestoneMultiplier);
@@ -98,7 +98,7 @@ export function computeTotalSPD(
 
   // If you have both straws and cups, get synergy bonus
   if (strawCount.gt(0) && cupCount.gt(0)) {
-    const synergyLevel = strawCount.add(cupCount).div(20).floor();
+    const synergyLevel = new Decimal(strawCount).add(cupCount).div(20).floor();
     if (synergyLevel.gt(0)) {
       synergyMultiplier = new Decimal(1.5).pow(synergyLevel);
     }

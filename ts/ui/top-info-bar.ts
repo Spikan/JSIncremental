@@ -70,16 +70,32 @@ export class TopInfoBar {
       `;
     }
 
-    // Update primary stat (total sips)
-    const primarySipsDisplay = document.getElementById('primarySipsDisplay');
+    // Update primary stat (total sips) - using the correct ID from our new layout
+    const primarySipsDisplay = document.getElementById('topSipValue');
     if (primarySipsDisplay) {
-      primarySipsDisplay.textContent = formatStatNumber(data.totalSips);
+      const formattedSips = formatStatNumber(data.totalSips);
+      primarySipsDisplay.textContent = formattedSips;
     }
 
-    // Update secondary stats
-    const perDrinkDisplay = document.getElementById('perDrinkDisplay');
+    // Update secondary stats - using the correct IDs from our new layout
+    const perDrinkDisplay = document.getElementById('topSipsPerDrink');
     if (perDrinkDisplay) {
-      perDrinkDisplay.textContent = formatStatNumber(data.perDrink);
+      const formattedPerDrink = formatStatNumber(data.perDrink);
+      perDrinkDisplay.textContent = formattedPerDrink;
+    }
+
+    const perSecondDisplay = document.getElementById('topSipsPerSecond');
+    if (perSecondDisplay) {
+      // Calculate sips per second from current state
+      try {
+        const state = (window as any).App?.state?.getState?.();
+        const drinkRate = state?.drinkRate || 1000;
+        const sipsPerSecond = data.perDrink / (drinkRate / 1000) || 0;
+        const formattedPerSecond = formatStatNumber(sipsPerSecond);
+        perSecondDisplay.textContent = formattedPerSecond;
+      } catch (error) {
+        perSecondDisplay.textContent = '0';
+      }
     }
   }
 

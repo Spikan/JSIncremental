@@ -315,7 +315,7 @@
           <div class="level-number">Level <span id="levelNumber">1</span></div>
           <div class="level-text" id="levelText">On a Blue Background</div>
         </div>
-        
+
         <div class="currency-display">
           <div class="currency-item primary">
             <div class="currency-icon">💧</div>
@@ -339,7 +339,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="game-title">
           <div class="title-main">SODA CLICKER</div>
           <div class="title-sub">PRO</div>
@@ -496,64 +496,132 @@
 
       <!-- Soda Clicking Tab -->
       <div id="sodaTab" class="tab-content active">
-        <div id="sodaDiv" class="center">
-          <div class="soda-container">
-            <img
-              src="images/regSoda.png"
-              id="sodaButton"
-              data-action="sodaClick"
-              data-args="1"
-              alt="a picture of soda for you to click"
-            />
-          </div>
+        <div class="game-main">
+          <!-- Primary Action Area -->
+          <div class="primary-action-area">
+            <div class="soda-clicking-section">
+              <div class="soda-container">
+                <img
+                  src="images/regSoda.png"
+                  id="sodaButton"
+                  data-action="sodaClick"
+                  data-args="1"
+                  alt="a picture of soda for you to click"
+                  class="soda-button"
+                />
+                <div class="click-indicator" id="clickIndicator">
+                  <div class="click-ripple"></div>
+                </div>
+              </div>
 
-          <!-- Clicking Upgrades Section - Compact layout next to soda button -->
-          <div class="clicking-upgrades-container">
-            <div class="clicking-upgrade-item">
-              <button class="clicking-upgrade-btn" data-action="buySuction">
-                <div class="clicking-upgrade-icon">💨</div>
-                <div class="clicking-upgrade-info">
-                  <div class="clicking-upgrade-name">Suction</div>
-                  <div class="clicking-upgrade-cost">
-                    <span id="suctionCostCompact">40</span> Sips
+              <div class="soda-info">
+                <!-- Drink Progress Bar -->
+                <div class="drink-progress-container">
+                  <div class="drink-info">
+                    <span class="drink-label">Next Drink:</span>
+                    <span class="drink-countdown" id="drinkCountdown">5.0s</span>
+                  </div>
+                  <div class="drink-progress-bar">
+                    <div class="drink-progress-fill" id="drinkProgressFill"></div>
                   </div>
                 </div>
-              </button>
-              <div class="clicking-upgrade-stats">
-                <span class="clicking-stat"
-                  >+<span id="suctionClickBonusCompact">1.0</span> Sips/click</span
-                >
+
+                <div class="soda-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Click Value</span>
+                    <span class="stat-value" id="clickValue">1</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Critical Chance</span>
+                    <span class="stat-value" id="criticalChance">0%</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="clicking-upgrade-item">
-              <button class="clicking-upgrade-btn" data-action="buyCriticalClick">
-                <div class="clicking-upgrade-icon">⚡</div>
-                <div class="clicking-upgrade-info">
-                  <div class="clicking-upgrade-name">Critical Click</div>
-                  <div class="clicking-upgrade-cost">
-                    <span id="criticalClickCostCompact">60</span> Sips
+            <div class="level-up-section">
+              <div class="level-up-card">
+                <div class="level-up-header">
+                  <div class="level-up-icon">⭐</div>
+                  <div class="level-up-info">
+                    <h3 class="level-up-title">Level Up</h3>
+                    <p class="level-up-description">+150% sips per drink</p>
                   </div>
                 </div>
-              </button>
-              <div class="clicking-upgrade-stats">
-                <span class="clicking-stat"
-                  ><span id="criticalClickChanceCompact">0.1</span>% chance</span
-                >
+                <button class="level-up-btn disabled" data-action="levelUp">
+                  <div class="cost-display">
+                    <span id="levelCost" class="cost-number">3000</span>
+                    <span class="cost-currency">Sips</span>
+                  </div>
+                  <div class="btn-label">Level Up</div>
+                </button>
               </div>
             </div>
           </div>
-        </div>
 
-        <div id="levelUpDiv" class="center">
-          <button class="level-up-btn disabled" data-action="levelUp">
-            <div class="cost-line">
-              <span id="levelCost" class="cost-number">3000</span>
-              <span class="cost-text">Sips</span>
+          <!-- Upgrades Sidebar -->
+          <div class="upgrades-sidebar">
+            <div class="sidebar-header">
+              <h3 class="sidebar-title">Click Upgrades</h3>
+              <p class="sidebar-subtitle">Enhance your clicking power</p>
             </div>
-            Level Up <br />
-            (+ 150% per drink)
-          </button>
+
+            <div class="upgrade-cards">
+              <div class="upgrade-card">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">💨</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Suction</h4>
+                    <p class="upgrade-description">Increase click power</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="buySuction">
+                  <div class="upgrade-cost"><span id="suctionCostCompact">40</span> Sips</div>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-effect">
+                    +<span id="suctionClickBonusCompact">1.0</span> per click
+                  </div>
+                </div>
+              </div>
+
+              <div class="upgrade-card">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">⚡</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Critical Click</h4>
+                    <p class="upgrade-description">Chance for bonus clicks</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="buyCriticalClick">
+                  <div class="upgrade-cost"><span id="criticalClickCostCompact">60</span> Sips</div>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-effect">
+                    <span id="criticalClickChanceCompact">0.1</span>% chance
+                  </div>
+                </div>
+              </div>
+
+              <div class="upgrade-card">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">⚡</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Faster Drinks</h4>
+                    <p class="upgrade-description">Reduce drink cooldown</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="buyFasterDrinks">
+                  <div class="upgrade-cost"><span id="fasterDrinksCostCompact">80</span> Sips</div>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-effect">
+                    Speed: <span id="currentDrinkSpeedCompact">5.00s</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -583,143 +651,139 @@
 
       <!-- Shop & Upgrades Tab -->
       <div id="shopTab" class="tab-content">
-        <div id="shopDiv" class="center">
-          <div class="shop-container">
-            <!-- Straw Production Group -->
-            <div class="upgrade-group">
-              <div class="upgrade-group-header">
-                <span class="upgrade-group-icon">🥤</span>
-                <div>
-                  <h3 class="upgrade-group-title">Straw Production</h3>
-                  <p class="upgrade-group-description">Base production and enhancement upgrades</p>
-                </div>
+        <div class="game-main">
+          <!-- Shop Overview Area -->
+          <div class="primary-action-area">
+            <div class="shop-overview">
+              <div class="shop-header">
+                <h2 class="shop-title">🛒 Shop & Upgrades</h2>
+                <p class="shop-subtitle">
+                  Invest in permanent improvements to boost your soda empire
+                </p>
               </div>
 
-              <div class="shop-item">
-                <div class="shop-header">
-                  <button class="shop-btn" data-action="buyStraw">
-                    <div class="cost-line">
-                      <span id="strawCost" class="cost-number">5</span>
-                      <span class="cost-text">Sips</span>
+              <div class="production-summary">
+                <div class="production-card">
+                  <div class="production-header">
+                    <div class="production-icon">📊</div>
+                    <div class="production-info">
+                      <h3>Total Production</h3>
+                      <p>Your passive income per drink</p>
                     </div>
-                    Extra Straw
-                  </button>
-                </div>
-                <div class="shop-stats">
-                  <div class="shop-stat">
-                    <span class="stat-label">Owned:</span>
-                    <span id="straws" class="stat-value">0</span>
                   </div>
-                  <div class="shop-stat">
-                    <span class="stat-label">+ per drink:</span>
-                    <span id="strawSPD" class="stat-value">0</span>
-                  </div>
-                  <div class="shop-stat">
-                    <span class="stat-label">Total production:</span>
-                    <span id="totalStrawSPD" class="stat-value">0</span> per drink
-                  </div>
-                </div>
-              </div>
-
-              <div class="shop-item upgrade-enhancer">
-                <div class="upgrade-relationship-indicator">
-                  <span class="relationship-icon">🔗</span>
-                  <span class="relationship-text">Enhances: Straws</span>
-                </div>
-                <div class="shop-header">
-                  <button class="shop-btn" data-action="buyWiderStraws">
-                    <div class="cost-line">
-                      <span id="widerStrawsCost" class="cost-number">150</span>
-                      <span class="cost-text">Sips</span>
+                  <div class="production-stats">
+                    <div class="production-stat">
+                      <span class="production-label">Straws</span>
+                      <span class="production-value" id="totalStrawProduction">0</span>
                     </div>
-                    Wider Straws Upgrade<br />
-                    <small style="color: #ff8e53; font-size: 0.7rem"
-                      >Increases straw production</small
-                    >
-                  </button>
-                </div>
-                <div class="shop-stats">
-                  <div class="shop-stat">
-                    <span class="stat-label">Owned:</span>
-                    <span id="widerStraws" class="stat-value">0</span>
-                  </div>
-                  <div class="shop-stat">
-                    <span class="stat-label">Enhancement:</span>
-                    <span id="widerStrawsSPD" class="stat-value">+0%</span>
-                  </div>
-                  <div class="shop-stat">
-                    <span class="stat-label">Total production:</span>
-                    <span id="totalWiderStrawsSPD" class="stat-value">0</span> per drink
+                    <div class="production-stat">
+                      <span class="production-label">Cups</span>
+                      <span class="production-value" id="totalCupProduction">0</span>
+                    </div>
+                    <div class="production-stat total">
+                      <span class="production-label">Total/Drink</span>
+                      <span class="production-value" id="totalPassiveProduction">0</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Cup Production Group -->
-            <div class="upgrade-group">
-              <div class="upgrade-group-header">
-                <span class="upgrade-group-icon">☕</span>
-                <div>
-                  <h3 class="upgrade-group-title">Cup Production</h3>
-                  <p class="upgrade-group-description">Base production and enhancement upgrades</p>
+          <!-- Production Buildings Sidebar -->
+          <div class="upgrades-sidebar">
+            <div class="sidebar-header">
+              <h3 class="sidebar-title">Production Buildings</h3>
+              <p class="sidebar-subtitle">Generate sips automatically</p>
+            </div>
+
+            <div class="upgrade-cards">
+              <!-- Straw Production -->
+              <div class="production-group">
+                <div class="production-group-header">
+                  <div class="production-group-icon">🥤</div>
+                  <div class="production-group-info">
+                    <h4>Straw Production</h4>
+                    <p class="text-muted">Base production building</p>
+                  </div>
+                </div>
+
+                <div class="upgrade-card">
+                  <div class="upgrade-header">
+                    <div class="upgrade-icon">🥤</div>
+                    <div class="upgrade-info">
+                      <h4 class="upgrade-name">Extra Straw</h4>
+                      <p class="upgrade-description">Generate sips per drink</p>
+                    </div>
+                  </div>
+                  <button class="upgrade-btn" data-action="buyStraw">
+                    <div class="upgrade-cost"><span id="strawCost">5</span> Sips</div>
+                  </button>
+                  <div class="upgrade-stats">
+                    <div class="upgrade-owned">Owned: <span id="straws">0</span></div>
+                    <div class="upgrade-effect">+<span id="strawSPD">0</span> per drink</div>
+                  </div>
+                </div>
+
+                <div class="upgrade-card enhancement">
+                  <div class="upgrade-header">
+                    <div class="upgrade-icon">🔧</div>
+                    <div class="upgrade-info">
+                      <h4 class="upgrade-name">Wider Straws</h4>
+                      <p class="upgrade-description">Enhance straw efficiency</p>
+                    </div>
+                  </div>
+                  <button class="upgrade-btn" data-action="buyWiderStraws">
+                    <div class="upgrade-cost"><span id="widerStrawsCost">150</span> Sips</div>
+                  </button>
+                  <div class="upgrade-stats">
+                    <div class="upgrade-owned">Owned: <span id="widerStraws">0</span></div>
+                    <div class="upgrade-effect">+<span id="widerStrawsSPD">0</span>% boost</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="shop-item">
-                <div class="shop-header">
-                  <button class="shop-btn" data-action="buyCup">
-                    <div class="cost-line">
-                      <span id="cupCost" class="cost-number">15</span>
-                      <span class="cost-text">Sips</span>
-                    </div>
-                    Bigger Cup
-                  </button>
-                </div>
-                <div class="shop-stats">
-                  <div class="shop-stat">
-                    <span class="stat-label">Owned:</span>
-                    <span id="cups" class="stat-value">0</span>
-                  </div>
-                  <div class="shop-stat">
-                    <span class="stat-label">+ per drink:</span>
-                    <span id="cupSPD" class="stat-value">0</span>
-                  </div>
-                  <div class="shop-stat">
-                    <span class="stat-label">Total production:</span>
-                    <span id="totalCupSPD" class="stat-value">0</span> per drink
+              <!-- Cup Production -->
+              <div class="production-group">
+                <div class="production-group-header">
+                  <div class="production-group-icon">☕</div>
+                  <div class="production-group-info">
+                    <h4>Cup Production</h4>
+                    <p class="text-muted">Advanced production building</p>
                   </div>
                 </div>
-              </div>
 
-              <div class="shop-item upgrade-enhancer">
-                <div class="upgrade-relationship-indicator">
-                  <span class="relationship-icon">🔗</span>
-                  <span class="relationship-text">Enhances: Cups</span>
-                </div>
-                <div class="shop-header">
-                  <button class="shop-btn" data-action="buyBetterCups">
-                    <div class="cost-line">
-                      <span id="betterCupsCost" class="cost-number">400</span>
-                      <span class="cost-text">Sips</span>
+                <div class="upgrade-card">
+                  <div class="upgrade-header">
+                    <div class="upgrade-icon">☕</div>
+                    <div class="upgrade-info">
+                      <h4 class="upgrade-name">Bigger Cup</h4>
+                      <p class="upgrade-description">Higher capacity production</p>
                     </div>
-                    Better Cups Upgrade<br />
-                    <small style="color: #ff8e53; font-size: 0.7rem"
-                      >Increases cup production</small
-                    >
+                  </div>
+                  <button class="upgrade-btn" data-action="buyCup">
+                    <div class="upgrade-cost"><span id="cupCost">15</span> Sips</div>
                   </button>
+                  <div class="upgrade-stats">
+                    <div class="upgrade-owned">Owned: <span id="cups">0</span></div>
+                    <div class="upgrade-effect">+<span id="cupSPD">0</span> per drink</div>
+                  </div>
                 </div>
-                <div class="shop-stats">
-                  <div class="shop-stat">
-                    <span class="stat-label">Owned:</span>
-                    <span id="betterCups" class="stat-value">0</span>
+
+                <div class="upgrade-card enhancement">
+                  <div class="upgrade-header">
+                    <div class="upgrade-icon">🔧</div>
+                    <div class="upgrade-info">
+                      <h4 class="upgrade-name">Better Cups</h4>
+                      <p class="upgrade-description">Enhance cup efficiency</p>
+                    </div>
                   </div>
-                  <div class="shop-stat">
-                    <span class="stat-label">Enhancement:</span>
-                    <span id="betterCupsSPD" class="stat-value">+0%</span>
-                  </div>
-                  <div class="shop-stat">
-                    <span class="stat-label">Total production:</span>
-                    <span id="totalBetterCupsSPD" class="stat-value">0</span> per drink
+                  <button class="upgrade-btn" data-action="buyBetterCups">
+                    <div class="upgrade-cost"><span id="betterCupsCost">400</span> Sips</div>
+                  </button>
+                  <div class="upgrade-stats">
+                    <div class="upgrade-owned">Owned: <span id="betterCups">0</span></div>
+                    <div class="upgrade-effect">+<span id="betterCupsSPD">0</span>% boost</div>
                   </div>
                 </div>
               </div>

@@ -5147,23 +5147,23 @@ button {
     text-align: center;
     padding: 1rem;
   }
-  
+
   .currency-display {
     gap: 1rem;
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .currency-item {
     flex: 1;
     min-width: 100px;
     justify-content: center;
   }
-  
+
   .currency-divider {
     display: none;
   }
-  
+
   .level-indicator,
   .game-title {
     min-width: auto;
@@ -5175,16 +5175,16 @@ button {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .currency-item {
     width: 100%;
     justify-content: center;
   }
-  
+
   .title-main {
     font-size: 1.1rem;
   }
-  
+
   .title-sub {
     font-size: 0.9rem;
   }
@@ -5196,12 +5196,58 @@ button {
   display: none !important;
 }
 
+/* Keep drink progress bar but style it for new layout */
+.drink-progress-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.drink-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.drink-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+}
+
+.drink-countdown {
+  font-size: 1.1rem;
+  color: #10b981;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.drink-progress-bar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.drink-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
 /* ========================================
    PHASE 1: TYPOGRAPHY STANDARDIZATION
    ======================================== */
 
 /* Typography Hierarchy */
-h1, .h1 {
+h1,
+.h1 {
   font-size: 2.5rem;
   font-weight: 900;
   line-height: 1.2;
@@ -5210,7 +5256,8 @@ h1, .h1 {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-h2, .h2 {
+h2,
+.h2 {
   font-size: 2rem;
   font-weight: 700;
   line-height: 1.3;
@@ -5219,7 +5266,8 @@ h2, .h2 {
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
-h3, .h3 {
+h3,
+.h3 {
   font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.4;
@@ -5228,7 +5276,8 @@ h3, .h3 {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
-h4, .h4 {
+h4,
+.h4 {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.4;
@@ -5264,14 +5313,627 @@ p {
 }
 
 /* Consistent spacing */
-.mb-1 { margin-bottom: 0.25rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-3 { margin-bottom: 0.75rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-5 { margin-bottom: 1.25rem; }
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+.mb-4 {
+  margin-bottom: 1rem;
+}
+.mb-5 {
+  margin-bottom: 1.25rem;
+}
 
-.mt-1 { margin-top: 0.25rem; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-3 { margin-top: 0.75rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-5 { margin-top: 1.25rem; }
+.mt-1 {
+  margin-top: 0.25rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.mt-3 {
+  margin-top: 0.75rem;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+.mt-5 {
+  margin-top: 1.25rem;
+}
+
+/* ========================================
+   PHASE 2: MAIN CONTENT GRID LAYOUT
+   ======================================== */
+
+.game-main {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - 200px);
+}
+
+/* Primary Action Area */
+.primary-action-area {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.soda-clicking-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.soda-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.soda-button {
+  width: 200px;
+  height: 200px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.3));
+  border-radius: 20px;
+}
+
+.soda-button:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 12px 35px rgba(0, 0, 0, 0.4));
+}
+
+.soda-button:active {
+  transform: scale(0.95);
+}
+
+.click-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 220px;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.click-ripple {
+  width: 100%;
+  height: 100%;
+  border: 3px solid #10b981;
+  border-radius: 50%;
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+.soda-info {
+  width: 100%;
+  max-width: 400px;
+}
+
+.soda-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #10b981;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Level Up Section */
+.level-up-section {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.level-up-card {
+  background: rgba(255, 61, 2, 0.1);
+  border: 2px solid rgba(255, 61, 2, 0.3);
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.level-up-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.level-up-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 8px rgba(255, 61, 2, 0.4));
+}
+
+.level-up-info {
+  text-align: left;
+}
+
+.level-up-title {
+  margin: 0 0 0.25rem 0;
+  color: #ff3d02;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.level-up-description {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.level-up-btn {
+  background: linear-gradient(135deg, #ff3d02, #ff6b35);
+  border: none;
+  border-radius: 15px;
+  padding: 1rem 2rem;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(255, 61, 2, 0.4);
+}
+
+.level-up-btn:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(255, 61, 2, 0.5);
+}
+
+.level-up-btn.disabled {
+  background: linear-gradient(135deg, #666, #444);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: not-allowed;
+}
+
+.cost-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.cost-number {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+}
+
+.cost-currency {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.btn-label {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Upgrades Sidebar */
+.upgrades-sidebar {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.5rem;
+  height: fit-content;
+  backdrop-filter: blur(10px);
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-title {
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.sidebar-subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+.upgrade-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.upgrade-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.upgrade-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.upgrade-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.upgrade-icon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.upgrade-info {
+  flex: 1;
+}
+
+.upgrade-name {
+  margin: 0 0 0.25rem 0;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.upgrade-description {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
+.upgrade-btn {
+  background: linear-gradient(135deg, #2a5298, #1e3a8a);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 0.75rem 1.5rem;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.upgrade-btn.affordable {
+  background: linear-gradient(135deg, #059669, #047857);
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.upgrade-btn:hover.affordable {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.upgrade-cost {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.upgrade-stats {
+  text-align: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.upgrade-effect {
+  color: #10b981;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .game-main {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .upgrades-sidebar {
+    order: -1;
+  }
+
+  .upgrade-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .primary-action-area {
+    padding: 1.5rem;
+  }
+
+  .soda-button {
+    width: 150px;
+    height: 150px;
+  }
+
+  .click-indicator {
+    width: 170px;
+    height: 170px;
+  }
+
+  .soda-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .level-up-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .level-up-info {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-main {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+
+  .primary-action-area {
+    padding: 1rem;
+  }
+
+  .upgrades-sidebar {
+    padding: 1rem;
+  }
+
+  .upgrade-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   PHASE 2: SHOP LAYOUT STYLES
+   ======================================== */
+
+.shop-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.shop-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.shop-title {
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.shop-subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+.production-summary {
+  width: 100%;
+}
+
+.production-card {
+  background: rgba(0, 179, 107, 0.1);
+  border: 2px solid rgba(0, 179, 107, 0.3);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+.production-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.production-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 179, 107, 0.4));
+}
+
+.production-info h3 {
+  margin: 0 0 0.25rem 0;
+  color: #10b981;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.production-info p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.production-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.production-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.production-stat.total {
+  background: rgba(0, 179, 107, 0.2);
+  border-color: rgba(0, 179, 107, 0.3);
+}
+
+.production-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.production-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #10b981;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+.production-stat.total .production-value {
+  font-size: 1.5rem;
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+}
+
+/* Production Groups */
+.production-group {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.production-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.production-group-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.production-group-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.production-group-info h4 {
+  margin: 0 0 0.25rem 0;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.upgrade-card.enhancement {
+  background: rgba(255, 61, 2, 0.05);
+  border-color: rgba(255, 61, 2, 0.2);
+}
+
+.upgrade-card.enhancement:hover {
+  background: rgba(255, 61, 2, 0.08);
+}
+
+.upgrade-owned {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Responsive adjustments for shop */
+@media (max-width: 768px) {
+  .production-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .production-stat {
+    padding: 0.75rem;
+  }
+
+  .shop-title {
+    font-size: 1.5rem;
+  }
+
+  .shop-subtitle {
+    font-size: 1rem;
+  }
+}

@@ -129,6 +129,17 @@ class MockDecimal {
     return new MockDecimal(Math.pow(thisValue, exponent));
   }
 
+  floor(): MockDecimal {
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return new MockDecimal(Math.floor(thisValue));
+  }
+
+  mod(other: any): MockDecimal {
+    const otherValue = other instanceof MockDecimal ? other.toNumber() : Number(other);
+    const thisValue = typeof this.value === 'number' ? this.value : 0;
+    return new MockDecimal(thisValue % otherValue);
+  }
+
   // Aliases for backward compatibility with tests
   subtract(other: any): MockDecimal {
     return this.sub(other);

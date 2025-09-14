@@ -32,8 +32,13 @@ declare global {
 
 describe('economy rules', () => {
   it('computes SPD with multipliers', () => {
-    expect(computeStrawSPD(10, 0.6, 2, 0.2)).toBeCloseTo(10 * 0.6 * (1 + 0.4), 6);
-    expect(computeCupSPD(5, 1.2, 1, 0.3)).toBeCloseTo(5 * 1.2 * (1 + 0.3), 6);
+    // Test with 10 straws: base(10 * 0.6) * upgrade(1 + 0.4) * milestone(2^1) * exponential(1.1^1)
+    // = 6 * 1.4 * 2 * 1.1 = 18.48
+    expect(computeStrawSPD(10, 0.6, 2, 0.2).toNumber()).toBeCloseTo(18.48, 2);
+
+    // Test with 5 cups: base(5 * 1.2) * upgrade(1 + 0.3) * milestone(1) * exponential(1)
+    // = 6 * 1.3 * 1 * 1 = 7.8 (no milestone/exponential bonus for 5 cups)
+    expect(computeCupSPD(5, 1.2, 1, 0.3).toNumber()).toBeCloseTo(7.8, 2);
   });
 
   it('computes totals', () => {

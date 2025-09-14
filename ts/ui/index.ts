@@ -40,16 +40,19 @@ export {
 
 /**
  * Update the enhanced top information bar with current game state
+ * Cache bust: v2
  */
 export function updateTopInfoBar(): void {
   try {
     const state = (window as any).App?.state?.getState?.();
-    if (!state) return;
+    if (!state) {
+      return;
+    }
 
     const data: TopInfoBarData = {
       level: state.level || 1,
       totalSips: state.sips || 0,
-      perDrink: state.spd || 0, // Use SPD for per-drink display
+      perDrink: state.spd || 0,
       title: state.title || 'Soda Drinker',
     };
 
@@ -101,6 +104,124 @@ export function initializeEnhancedNavigation(): void {
   } catch (error) {
     console.warn('Failed to initialize enhanced navigation:', error);
   }
+}
+
+/**
+ * Set up direct soda button click handler as fallback
+ */
+export function setupDirectSodaClickHandler(): void {
+  console.log('🔧 Setting up direct soda click handler...');
+
+  // Fix the soda button click by adding a direct handler
+  const sodaButton = document.getElementById('sodaButton');
+  if (sodaButton) {
+    console.log('🔧 Adding direct click handler to soda button');
+    sodaButton.addEventListener('click', async () => {
+      console.log('🍹 Direct soda click triggered!');
+      try {
+        const { handleSodaClick } = await import('../core/systems/clicks-system.ts');
+        await handleSodaClick(1);
+        console.log('🍹 Direct soda click successful!');
+      } catch (error) {
+        console.error('🍹 Direct soda click failed:', error);
+      }
+    });
+    console.log('✅ Direct soda click handler added successfully');
+  }
+
+  // Set up debounced monitoring for top bar updates
+  let lastValues = { sips: null, spd: null, level: null };
+  let updateTimeout: number | null = null;
+
+  const debouncedUpdateTopBar = () => {
+    if (updateTimeout) {
+      clearTimeout(updateTimeout);
+    }
+    updateTimeout = window.setTimeout(() => {
+      updateTopInfoBar();
+      updateTimeout = null;
+    }, 100); // 100ms debounce
+  };
+
+  const checkForValueChanges = () => {
+    try {
+      const state = (window as any).App?.state?.getState?.();
+      if (state) {
+        const currentSips = state.sips;
+        const currentSPD = state.spd;
+        const currentLevel = state.level;
+
+        // Check if any relevant values have changed
+        if (
+          currentSips !== lastValues.sips ||
+          currentSPD !== lastValues.spd ||
+          currentLevel !== lastValues.level
+        ) {
+          lastValues = { sips: currentSips, spd: currentSPD, level: currentLevel };
+          debouncedUpdateTopBar();
+        }
+      }
+    } catch (error) {
+      // Silent - don't spam console
+    }
+  };
+
+  // Check for changes every 500ms (more frequent than before)
+  setInterval(checkForValueChanges, 500);
+
+  console.log('✅ Sips monitoring set up for top bar updates');
+
+  // Force an immediate update of the top bar
+  updateTopInfoBar();
+
+  // Add debug function for testing header elements
+  (window as any).testHeader = () => {
+    console.log('🧪 Testing header elements...');
+    const topSipValue = document.getElementById('topSipValue');
+    const topSipsPerDrink = document.getElementById('topSipsPerDrink');
+    const topSipsPerSecond = document.getElementById('topSipsPerSecond');
+    console.log('🧪 topSipValue:', topSipValue, 'current text:', topSipValue?.textContent);
+    console.log(
+      '🧪 topSipsPerDrink:',
+      topSipsPerDrink,
+      'current text:',
+      topSipsPerDrink?.textContent
+    );
+    console.log(
+      '🧪 topSipsPerSecond:',
+      topSipsPerSecond,
+      'current text:',
+      topSipsPerSecond?.textContent
+    );
+
+    // Try to manually update them
+    if (topSipValue) {
+      topSipValue.textContent = 'TEST123';
+      console.log('🧪 Set topSipValue to TEST123');
+    }
+    if (topSipsPerDrink) {
+      topSipsPerDrink.textContent = 'TEST456';
+      console.log('🧪 Set topSipsPerDrink to TEST456');
+    }
+    if (topSipsPerSecond) {
+      topSipsPerSecond.textContent = 'TEST789';
+      console.log('🧪 Set topSipsPerSecond to TEST789');
+    }
+  };
+
+  // Add debug function to window for manual testing
+  (window as any).testSodaClick = async () => {
+    console.log('🧪 Testing soda click manually...');
+    try {
+      const { handleSodaClick } = await import('../core/systems/clicks-system.ts');
+      await handleSodaClick(1);
+      console.log('🧪 Manual soda click test successful!');
+    } catch (error) {
+      console.error('🧪 Manual soda click test failed:', error);
+    }
+  };
+
+  console.log('🧪 Added testSodaClick() function to window for debugging');
 }
 
 /**
@@ -202,6 +323,8 @@ export const updateButtonState = utils.updateButtonState;
 export const updateTopSipsPerDrink = displays.updateTopSipsPerDrink;
 export const updateTopSipsPerSecond = displays.updateTopSipsPerSecond;
 export const updateCriticalClickDisplay = displays.updateCriticalClickDisplay;
+export const updateClickValueDisplay = displays.updateClickValueDisplay;
+export const updateProductionSummary = displays.updateProductionSummary;
 export const updateDrinkSpeedDisplay = displays.updateDrinkSpeedDisplay;
 export const updateAutosaveStatus = displays.updateAutosaveStatus;
 export const updateDrinkProgress = displays.updateDrinkProgress;
@@ -248,6 +371,9 @@ export function initializeUI(): void {
 
     // Initialize mobile navigation features
     initializeMobileNavigation();
+
+    // Set up direct soda click handler as fallback
+    setupDirectSodaClickHandler();
   } catch (error) {
     reportUIError(error, 'initialize_ui_main', ErrorSeverity.CRITICAL);
   }
@@ -268,9 +394,14 @@ export function initializeUI(): void {
   if (window.App?.events) {
     // Set up CLICK.SODA event listener
     window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA!, (data: unknown) => {
+      console.log('🎉 CLICK.SODA event received!', data);
       const clickData = data as ClickSodaEventData;
       // Use optimized batch update for better performance
       updateAllDisplaysOptimized();
+      updateClickValueDisplay();
+      console.log('🔧 About to call updateTopInfoBar from CLICK.SODA event');
+      updateTopInfoBar(); // Update the header with new sips total
+      console.log('✅ updateTopInfoBar called from CLICK.SODA event');
       checkUpgradeAffordabilityOptimized();
 
       // Add visual feedback for soda click (using existing CSS system)
@@ -292,6 +423,8 @@ export function initializeUI(): void {
       const purchaseData = data as PurchaseEventData;
       // Use optimized batch update for better performance
       updateAllDisplaysOptimized();
+      updateClickValueDisplay();
+      updateProductionSummary();
       checkUpgradeAffordabilityOptimized();
       updateCriticalClickDisplay();
       updateShopStats(); // Call updateShopStats to trigger updateEnhancementValues
@@ -567,6 +700,8 @@ export function updateAllDisplays(): void {
   // Use optimized batch update for better performance
   updateAllDisplaysOptimized();
   updateCriticalClickDisplay();
+  updateClickValueDisplay();
+  updateProductionSummary();
   updateDrinkSpeedDisplayOptimized();
   updateAutosaveStatusOptimized();
   updatePlayTime();
