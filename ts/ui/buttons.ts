@@ -607,6 +607,14 @@ function setupUnifiedButtonSystem(): void {
       }
     }
   });
+
+  // Add specific handler for settings modal content to prevent closing on content click
+  const settingsModalContent = document.querySelector('.settings-modal-content');
+  if (settingsModalContent) {
+    settingsModalContent.addEventListener('click', (e: Event) => {
+      e.stopPropagation();
+    });
+  }
   setupSpecialButtonHandlers();
   // Button system setup complete
 }
