@@ -24,24 +24,49 @@ function getSafePosition(
   rangeX: number,
   rangeY: number
 ): { left: number; top: number } {
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  // Estimate feedback element dimensions
+  const estimatedWidth = 150; // Conservative estimate
+  const estimatedHeight = 40;
+  
+  // Padding from viewport edges
+  const padding = 20;
+  const minX = padding + estimatedWidth / 2;
+  const maxX = viewportWidth - padding - estimatedWidth / 2;
+  const minY = padding + estimatedHeight / 2;
+  const maxY = viewportHeight - padding - estimatedHeight / 2;
+  
   if (isMobileDevice()) {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
     const centerX = viewportWidth / 2;
     const centerY = viewportHeight / 2;
     const mobileRangeX = Math.min(rangeX, 80);
     const mobileRangeY = Math.min(rangeY, 60);
     const randomX = (Math.random() - 0.5) * mobileRangeX;
     const randomY = (Math.random() - 0.5) * mobileRangeY;
-    return { left: centerX + randomX, top: centerY + randomY };
+    
+    let left = centerX + randomX;
+    let top = centerY + randomY;
+    
+    // Clamp to viewport bounds
+    left = Math.max(minX, Math.min(maxX, left));
+    top = Math.max(minY, Math.min(maxY, top));
+    
+    return { left, top };
   } else {
     const containerRect = container.getBoundingClientRect();
     const randomX = (Math.random() - 0.5) * rangeX;
     const randomY = (Math.random() - 0.5) * rangeY;
-    return {
-      left: containerRect.left + containerRect.width / 2 + randomX,
-      top: containerRect.top + containerRect.height / 2 + randomY,
-    };
+    
+    let left = containerRect.left + containerRect.width / 2 + randomX;
+    let top = containerRect.top + containerRect.height / 2 + randomY;
+    
+    // Clamp to viewport bounds
+    left = Math.max(minX, Math.min(maxX, left));
+    top = Math.max(minY, Math.min(maxY, top));
+    
+    return { left, top };
   }
 }
 
@@ -136,10 +161,34 @@ function showFeedbackAtCoordinates(
   const fontSize = isCritical ? '1.4em' : '1.2em';
   const offsetX = (Math.random() - 0.5) * 15; // Reduced randomness
   const offsetY = (Math.random() - 0.5) * 15;
+  
+  // Calculate position with boundary checking
+  let finalX = clickX + offsetX;
+  let finalY = clickY + offsetY;
+  
+  // Get viewport dimensions
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  // Estimate feedback element dimensions (approximate)
+  const estimatedWidth = isCritical ? 200 : 150; // Critical feedback is typically wider
+  const estimatedHeight = 40;
+  
+  // Ensure feedback stays within viewport bounds with padding
+  const padding = 20;
+  const minX = padding;
+  const maxX = viewportWidth - estimatedWidth - padding;
+  const minY = padding;
+  const maxY = viewportHeight - estimatedHeight - padding;
+  
+  // Clamp position to viewport bounds
+  finalX = Math.max(minX, Math.min(maxX, finalX));
+  finalY = Math.max(minY, Math.min(maxY, finalY));
+  
   feedback.style.cssText = `
         position: fixed;
-        left: ${clickX + offsetX}px;
-        top: ${clickY + offsetY}px;
+        left: ${finalX}px;
+        top: ${finalY}px;
         transform: translate(-50%, -50%);
         pointer-events: none;
         z-index: ${isMobile ? '9999' : '1000'};
@@ -147,6 +196,9 @@ function showFeedbackAtCoordinates(
         font-size: ${fontSize};
         color: ${isCritical ? '#ff6b35' : '#4CAF50'};
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        white-space: nowrap;
+        max-width: calc(100vw - 40px);
+        text-align: center;
         ${isMobile ? 'touch-action: none; -webkit-touch-callout: none;' : ''}
         ${isMobile ? 'will-change: transform, opacity;' : ''}
     `;

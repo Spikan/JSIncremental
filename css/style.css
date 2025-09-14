@@ -3992,6 +3992,13 @@ h3 {
   -webkit-backface-visibility: hidden;
   /* Ensure smooth positioning */
   transform-origin: center center;
+  /* Prevent overflow and ensure text stays within bounds */
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+  text-align: center;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .level-up-feedback {
@@ -4012,6 +4019,13 @@ h3 {
     2px 2px 4px rgba(0, 0, 0, 0.8),
     0 0 15px rgba(255, 0, 0, 0.6);
   animation: criticalFeedback 2s ease-out forwards;
+  /* Ensure critical feedback stays within bounds */
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+  text-align: center;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .purchase-feedback {
