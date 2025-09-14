@@ -623,10 +623,26 @@ function setupUnifiedButtonSystem(): void {
 function setupSpecialButtonHandlers(): void {
   // First ensure clicks system is loaded
   function ensureClicksSystemLoaded(): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max
+      
       const checkClicksSystem = () => {
+        attempts++;
+        console.warn(`🔄 CHECKING CLICKS SYSTEM (attempt ${attempts}/${maxAttempts}):`, {
+          hasWindow: typeof window !== 'undefined',
+          hasApp: !!(window as any).App,
+          hasSystems: !!(window as any).App?.systems,
+          hasClicks: !!(window as any).App?.systems?.clicks,
+          hasHandleSodaClick: !!(window as any).App?.systems?.clicks?.handleSodaClick,
+          sodaButtonExists: domQuery.exists('#sodaButton'),
+          shopTabExists: domQuery.exists('#shopTab'),
+          timestamp: Date.now(),
+        });
+
         // Check if we're in a test environment and window is not available
         if (typeof window === 'undefined') {
+          console.warn('⚠️ Window undefined, resolving...');
           resolve();
           return;
         }
@@ -635,7 +651,11 @@ function setupSpecialButtonHandlers(): void {
         const isDomReady = domQuery.exists('#sodaButton') && domQuery.exists('#shopTab');
 
         if (hasClicksSystem && isDomReady) {
+          console.warn('✅ CLICKS SYSTEM AND DOM READY!');
           resolve();
+        } else if (attempts >= maxAttempts) {
+          console.warn('❌ TIMEOUT: Clicks system or DOM not ready after 5 seconds');
+          reject(new Error('Clicks system or DOM not ready after timeout'));
         } else {
           setTimeout(checkClicksSystem, 100);
         }
@@ -661,7 +681,14 @@ function setupSpecialButtonHandlers(): void {
   });
   // Setup soda button with clicks system check
   const setupSodaButton = async () => {
-    await ensureClicksSystemLoaded();
+    console.warn('🚀 SETUP SODA BUTTON CALLED!', { timestamp: Date.now() });
+    try {
+      await ensureClicksSystemLoaded();
+      console.warn('✅ CLICKS SYSTEM LOADED!', { timestamp: Date.now() });
+    } catch (error) {
+      console.warn('❌ FAILED TO LOAD CLICKS SYSTEM:', error);
+      return;
+    }
     const sodaDomCacheBtn = domQuery.getById('sodaButton');
     const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
 
@@ -933,7 +960,7 @@ function setupSpecialButtonHandlers(): void {
             type: typeof handleSodaClick,
             isFunction: typeof handleSodaClick === 'function',
           });
-          
+
           if (typeof handleSodaClick === 'function') {
             console.warn('🔥 CALLING HANDLE SODA CLICK...');
             // Calling handleSodaClick function directly
@@ -972,8 +999,9 @@ function setupSpecialButtonHandlers(): void {
   };
 
   // Call the async setup function
+  console.warn('🎯 CALLING SETUP SODA BUTTON...', { timestamp: Date.now() });
   setupSodaButton().catch(error => {
-    console.warn('Failed to setup soda button:', error);
+    console.warn('❌ FAILED TO SETUP SODA BUTTON:', error);
   });
 
   // Debug function to check soda button setup
