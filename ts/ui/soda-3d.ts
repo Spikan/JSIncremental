@@ -140,8 +140,8 @@ export class Soda3DButton {
 
   private setupScene(): void {
     // Set up camera position - closer but with wide FOV to show full model
-    this.camera.position.set(0, 0.3, 3.2); // Closer than before but not too close
-    this.camera.lookAt(0, -0.1, 0); // Look slightly down at model center
+    this.camera.position.set(0, 0.4, 3.2); // Moderate camera position
+    this.camera.lookAt(0, -0.6, 0); // Look way down to keep model in lower part of container
 
     // Set up renderer with mobile optimizations - use rectangular dimensions
     const width = this.config.width || this.config.size;
@@ -227,9 +227,9 @@ export class Soda3DButton {
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
 
-        // Center the model and position it slightly lower
+        // Center the model and position it much lower to avoid top cut-off
         this.model.position.sub(center);
-        this.model.position.y -= 0.1; // Move model down just a bit
+        this.model.position.y -= 0.8; // Move model down VERY significantly to avoid top cut-off
         this.centerPosition.copy(this.model.position);
 
         // Scale to fit nicely in view - larger and more prominent
@@ -279,8 +279,8 @@ export class Soda3DButton {
     cylinder.receiveShadow = true;
     this.model.add(cylinder);
 
-    // Position fallback model lower to match main model positioning
-    this.model.position.y = -0.1;
+    // Position fallback model much lower to match main model positioning
+    this.model.position.y = -0.8; // Match the main model's VERY low positioning
     this.centerPosition.copy(this.model.position);
 
     this.scene.add(this.model);
@@ -480,7 +480,7 @@ export function createSoda3DButton(containerSelector: string): Soda3DButton {
     modelPath: sodaModelUrl,
     size: 300,
     width: 300,
-    height: 480, /* Increased from 380 to 480 to match CSS container height */
+    height: 520 /* Increased from 480 to 520 to match CSS container height */,
     rotationSpeed: 0.01,
     hoverSpeedMultiplier: 3,
     clickAnimationDuration: 500,

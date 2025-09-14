@@ -7596,11 +7596,11 @@ p {
 @media (min-width: 769px) {
   .soda-button {
     width: 300px;
-    height: 480px; /* Increased from 420px to 480px - much taller for 3D model */
+    height: 520px; /* Increased from 480px to 520px - even taller to eliminate cut-off */
   }
 
   .click-indicator {
     width: 320px;
-    height: 500px; /* Increased from 440px to 500px - match desktop soda button height */
+    height: 540px; /* Increased from 500px to 540px - match desktop soda button height */
   }
 }
