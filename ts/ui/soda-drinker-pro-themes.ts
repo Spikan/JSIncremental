@@ -394,7 +394,7 @@ export function initializeSodaDrinkerProThemes(): void {
   setTimeout(showRandomNotification, 30000);
 
   console.log('✅ Soda Drinker Pro theme system initialized');
-  
+
   // Expose debug functions globally for testing
   if (typeof window !== 'undefined') {
     (window as any).debugSDP = {
@@ -406,7 +406,7 @@ export function initializeSodaDrinkerProThemes(): void {
         console.log(`🧪 Testing SDP theme for level ${level}`);
         applyThemeToBackground(level);
         showLocationFlavorText(level);
-      }
+      },
     };
     console.log('🧪 SDP debug functions available as window.debugSDP');
   }
