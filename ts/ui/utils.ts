@@ -7,6 +7,10 @@ export type DecimalLike = {
 
 import { formatDecimal, cleanExtremeDecimals } from '../core/numbers/decimal-utils';
 
+/**
+ * Enhanced number formatting system following idle game best practices
+ * Supports scientific notation, abbreviations (K, M, B, T), and proper Decimal handling
+ */
 export function formatNumber(value: any): string {
   try {
     // Try using the new Decimal formatting first, but post-process to ensure 2 decimal places
@@ -52,16 +56,69 @@ export function formatNumber(value: any): string {
   }
 
   if (typeof value === 'number' && Number.isFinite(value)) {
-    // Handle very large numbers with scientific notation
-    if (Math.abs(value) >= 1e6) {
-      return value.toExponential(2);
-    }
-    return value.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+    return formatLargeNumber(value);
   }
 
   if (typeof value === 'string') return postProcessDecimals(value);
   if (value && typeof value.toString === 'function') return postProcessDecimals(value.toString());
   return String(value);
+}
+
+/**
+ * Format large numbers with idle game conventions
+ * Uses K, M, B, T abbreviations and scientific notation for extreme values
+ */
+export function formatLargeNumber(num: number): string {
+  if (!Number.isFinite(num)) return '0';
+
+  const absNum = Math.abs(num);
+
+  // Handle very small numbers
+  if (absNum < 0.01 && absNum > 0) {
+    return num.toExponential(2);
+  }
+
+  // Handle normal range with abbreviations
+  if (absNum >= 1e15) {
+    return num.toExponential(2);
+  } else if (absNum >= 1e12) {
+    return (num / 1e12).toFixed(2) + 'T';
+  } else if (absNum >= 1e9) {
+    return (num / 1e9).toFixed(2) + 'B';
+  } else if (absNum >= 1e6) {
+    return (num / 1e6).toFixed(2) + 'M';
+  } else if (absNum >= 1e3) {
+    return (num / 1e3).toFixed(2) + 'K';
+  } else if (absNum >= 1) {
+    return num.toFixed(2);
+  } else {
+    return num.toFixed(2);
+  }
+}
+
+/**
+ * Format numbers for display in cost displays (more compact)
+ */
+export function formatCostNumber(value: any): string {
+  const formatted = formatNumber(value);
+  // Remove unnecessary decimal places for costs
+  return formatted.replace(/\.00([KMBT]?)$/, '$1');
+}
+
+/**
+ * Format numbers for display in statistics (more precise)
+ */
+export function formatStatNumber(value: any): string {
+  return formatNumber(value);
+}
+
+/**
+ * Format numbers for display in progress indicators
+ */
+export function formatProgressNumber(value: any): string {
+  const formatted = formatNumber(value);
+  // Ensure progress numbers are always positive and readable
+  return formatted.replace(/^-/, '');
 }
 
 /**
@@ -139,12 +196,12 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
   } catch (error) {
     console.warn('Failed to update cost display:', error);
   }
-  const formattedCost = formatNumber(cost as any);
+  const formattedCost = formatCostNumber(cost as any);
   let currentSips = '0';
   try {
     const st = (window as any).App?.state?.getState?.();
     // Use sips directly - formatNumber will handle Decimal properly
-    currentSips = formatNumber(st?.sips || 0);
+    currentSips = formatStatNumber(st?.sips || 0);
   } catch (error) {
     console.warn('Failed to get current sips for button title:', error);
   }
@@ -184,7 +241,7 @@ export function updateCostDisplay(elementId: string, cost: number, isAffordable:
   if (typeof window === 'undefined') return;
   const element = findElement(elementId) as HTMLElement | null;
   if (!element || !(element as any).classList) return;
-  element.innerHTML = formatNumber(cost);
+  element.innerHTML = formatCostNumber(cost);
   try {
     element.classList.toggle('affordable', isAffordable);
     element.classList.toggle('unaffordable', !isAffordable);

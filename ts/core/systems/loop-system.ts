@@ -8,6 +8,7 @@ type StartArgs = {
   updateStats?: () => void;
   updatePlayTime?: () => void;
   updateLastSaveTime?: () => void;
+  updateUI?: () => void;
   getNow?: () => number;
 };
 
@@ -17,6 +18,7 @@ export function start({
   updateStats,
   updatePlayTime,
   updateLastSaveTime,
+  updateUI,
   getNow = () => Date.now(),
 }: StartArgs) {
   try {
@@ -36,6 +38,11 @@ export function start({
       if (processDrink) processDrink();
     } catch (error) {
       console.warn('Failed to process drink in loop:', error);
+    }
+    try {
+      if (updateUI) updateUI();
+    } catch (error) {
+      console.warn('Failed to update UI in loop:', error);
     }
     const now = getNow();
     if (now - lastStatsUpdate >= 1000) {

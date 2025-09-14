@@ -48,6 +48,12 @@ export function initSplashScreen(): void {
               w.App?.systems?.unlocks?.checkAllUnlocks?.();
             } catch {}
           },
+          updateUI: () => {
+            try {
+              w.App?.ui?.updateTopInfoBar?.();
+              w.App?.ui?.updateEnhancedProgressBars?.();
+            } catch {}
+          },
           updatePlayTime: () => {
             try {
               w.App?.ui?.updatePlayTime?.();
@@ -230,6 +236,12 @@ export function startGameCore(): void {
                 w.App?.ui?.updateAllStats?.();
                 w.App?.ui?.checkUpgradeAffordability?.();
                 w.App?.systems?.unlocks?.checkAllUnlocks?.();
+              } catch {}
+            },
+            updateUI: () => {
+              try {
+                w.App?.ui?.updateTopInfoBar?.();
+                w.App?.ui?.updateEnhancedProgressBars?.();
               } catch {}
             },
             updatePlayTime: () => {

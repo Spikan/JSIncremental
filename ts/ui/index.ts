@@ -17,10 +17,16 @@ import * as labels from './labels';
 import * as utils from './utils';
 import * as buttons from './buttons';
 import subscriptionManager from './subscription-manager';
+import { topInfoBar, TopInfoBarData } from './top-info-bar';
+import { navigationManager, NavigationTab } from './navigation';
+import { drinkProgressBar, levelProgressBar, ProgressBarData } from './progress-bar';
+import { visualFeedback } from './visual-feedback';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability, buttons };
 export { labels };
+export { topInfoBar, navigationManager, drinkProgressBar, levelProgressBar, visualFeedback };
+export type { TopInfoBarData, NavigationTab, ProgressBarData };
 
 // Export optimized functions
 export {
@@ -31,6 +37,107 @@ export {
   updateAutosaveStatusOptimized,
   updateLastSaveTimeOptimized,
 };
+
+/**
+ * Update the enhanced top information bar with current game state
+ */
+export function updateTopInfoBar(): void {
+  try {
+    const state = (window as any).App?.state?.getState?.();
+    if (!state) return;
+
+    const data: TopInfoBarData = {
+      level: state.level || 1,
+      totalSips: state.sips || 0,
+      perDrink: state.spd || 0, // Use SPD for per-drink display
+      title: state.title || 'Soda Drinker',
+    };
+
+    topInfoBar.update(data);
+  } catch (error) {
+    console.warn('Failed to update top info bar:', error);
+  }
+}
+
+/**
+ * Initialize the enhanced navigation system
+ */
+export function initializeEnhancedNavigation(): void {
+  try {
+    // Initialize the navigation manager
+    navigationManager.initializeNavigation();
+
+    // Set up event listeners for tab switching
+    document.addEventListener('click', event => {
+      const target = event.target as HTMLElement;
+      const action = target.getAttribute('data-action');
+
+      if (action && action.startsWith('switchTab:')) {
+        const tabId = action.split(':')[1];
+        if (tabId) {
+          navigationManager.switchTab(tabId);
+          event.preventDefault();
+        }
+      }
+    });
+
+    // Set up keyboard navigation
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        const target = event.target as HTMLElement;
+        const action = target.getAttribute('data-action');
+
+        if (action && action.startsWith('switchTab:')) {
+          const tabId = action.split(':')[1];
+          if (tabId) {
+            navigationManager.switchTab(tabId);
+            event.preventDefault();
+          }
+        }
+      }
+    });
+
+    console.log('✅ Enhanced navigation system initialized');
+  } catch (error) {
+    console.warn('Failed to initialize enhanced navigation:', error);
+  }
+}
+
+/**
+ * Update the enhanced progress bars with current game state
+ */
+export function updateEnhancedProgressBars(): void {
+  try {
+    const state = (window as any).App?.state?.getState?.();
+    if (!state) return;
+
+    // Update drink progress bar
+    const drinkData: ProgressBarData = {
+      progress: state.drinkProgress || 0,
+      total: 100,
+      rate: state.drinkRate || 0,
+      label: 'Drink Progress',
+      showTimeRemaining: true,
+      showPercentage: true,
+      showRate: true,
+    };
+    drinkProgressBar.update(drinkData);
+
+    // Update level progress bar (if applicable)
+    const levelData: ProgressBarData = {
+      progress: state.levelProgress || 0,
+      total: state.levelTarget || 100,
+      rate: state.levelRate || 0,
+      label: 'Level Progress',
+      showTimeRemaining: false,
+      showPercentage: true,
+      showRate: false,
+    };
+    levelProgressBar.update(levelData);
+  } catch (error) {
+    console.warn('Failed to update enhanced progress bars:', error);
+  }
+}
 
 // Simple error severity levels
 enum ErrorSeverity {
@@ -166,6 +273,16 @@ export function initializeUI(): void {
       updateAllDisplaysOptimized();
       checkUpgradeAffordabilityOptimized();
 
+      // Add visual feedback for soda click (using existing CSS system)
+      const sodaButton = document.getElementById('sodaButton');
+      if (sodaButton) {
+        // Use the existing soda-clicked class instead of our animation
+        sodaButton.classList.add('soda-clicked');
+        setTimeout(() => {
+          sodaButton.classList.remove('soda-clicked');
+        }, 120);
+      }
+
       if (clickData && clickData.gained) {
         // Pass the value directly - showClickFeedback will handle Decimal objects properly
         showClickFeedback(clickData.gained, clickData.critical, clickData.clickX, clickData.clickY);
@@ -179,6 +296,25 @@ export function initializeUI(): void {
       updateCriticalClickDisplay();
       updateShopStats(); // Call updateShopStats to trigger updateEnhancementValues
       updatePurchasedCountsOptimized(); // Use optimized version
+
+      // Add visual feedback for purchases
+      if (purchaseData && purchaseData.item) {
+        // Find the button that was clicked and add purchase success feedback
+        const buttonSelectors = [
+          `[data-action="buy${purchaseData.item}"]`,
+          `[data-action="upgrade${purchaseData.item}"]`,
+          `[data-action="${purchaseData.item}"]`,
+        ];
+
+        for (const selector of buttonSelectors) {
+          const button = document.querySelector(selector);
+          if (button) {
+            visualFeedback.addPurchaseSuccess(button as HTMLElement);
+            break;
+          }
+        }
+      }
+
       if (
         purchaseData &&
         purchaseData.item &&
@@ -203,6 +339,63 @@ export function initializeUI(): void {
         checkUpgradeAffordability();
       }, 100);
     });
+  }
+
+  // Initialize enhanced UI components
+  try {
+    initializeEnhancedUIComponents();
+  } catch (error) {
+    reportUIError(error, 'initialize_enhanced_ui', ErrorSeverity.MEDIUM);
+  }
+}
+
+/**
+ * Initialize enhanced UI components
+ */
+function initializeEnhancedUIComponents(): void {
+  try {
+    console.log('🔧 Initializing enhanced UI components...');
+
+    // Initialize enhanced navigation
+    initializeEnhancedNavigation();
+
+    // Initialize enhanced top info bar
+    topInfoBar.initializeElements();
+
+    // Initialize enhanced progress bars
+    drinkProgressBar.initializeElements('drink-progress-container');
+    levelProgressBar.initializeElements('level-progress-container');
+
+    // Hide old UI elements
+    hideOldUIElements();
+
+    console.log('✅ Enhanced UI components initialized');
+  } catch (error) {
+    console.warn('Failed to initialize enhanced UI components:', error);
+  }
+}
+
+/**
+ * Hide old UI elements that are replaced by enhanced versions
+ */
+function hideOldUIElements(): void {
+  try {
+    // Hide old top sip counter
+    const oldSipCounter = document.querySelector('.top-sip-counter');
+    if (oldSipCounter) {
+      (oldSipCounter as HTMLElement).style.display = 'none';
+    }
+
+    // Hide old progress bar if enhanced version exists
+    const oldProgressContainer = document.querySelector('.drink-progress-container');
+    const enhancedProgressContainer = document.querySelector('.enhanced-progress-container');
+    if (oldProgressContainer && enhancedProgressContainer) {
+      (oldProgressContainer as HTMLElement).style.display = 'none';
+    }
+
+    console.log('✅ Old UI elements hidden');
+  } catch (error) {
+    console.warn('Failed to hide old UI elements:', error);
   }
 }
 
@@ -383,6 +576,15 @@ export function updateAllDisplays(): void {
   updatePurchasedCounts();
   updateAllStats();
   checkUpgradeAffordability();
+
+  // Update enhanced UI components
+  try {
+    updateTopInfoBar();
+    updateEnhancedProgressBars();
+  } catch (error) {
+    console.warn('Failed to update enhanced UI components:', error);
+  }
+
   // Update complete
 }
 

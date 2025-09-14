@@ -309,30 +309,41 @@
 
     <!-- Main Game Content -->
     <div id="gameContent" class="game-content mobile-content-padding" style="display: none">
-      <div id="topDiv" class="center">
-        <div id="levelDiv">
-          <h2>Level <span id="levelNumber">1</span></h2>
-          <h3>
-            Clicking Soda
-            <br />
-            <span id="levelText">On a Blue Background</span>
-          </h3>
+      <!-- Consolidated Game Header -->
+      <div class="game-header">
+        <div class="level-indicator">
+          <div class="level-number">Level <span id="levelNumber">1</span></div>
+          <div class="level-text" id="levelText">On a Blue Background</div>
         </div>
-        <div id="topSipCounter" class="top-sip-counter">
-          <span class="top-sip-label">Total Sips:</span>
-          <span id="topSipValue" class="top-sip-value">0</span>
-          <span class="top-sip-separator">|</span>
-          <span class="top-sip-label">per drink:</span>
-          <span id="topSipsPerDrink" class="top-sip-value">1</span>
-          <span class="top-sip-separator">|</span>
-          <span class="top-sip-label">per second:</span>
-          <span id="topSipsPerSecond" class="top-sip-value">1</span>
+        
+        <div class="currency-display">
+          <div class="currency-item primary">
+            <div class="currency-icon">💧</div>
+            <div class="currency-info">
+              <div class="currency-label">Total Sips</div>
+              <div class="currency-value" id="topSipValue">0</div>
+            </div>
+          </div>
+          <div class="currency-divider"></div>
+          <div class="currency-item">
+            <div class="currency-info">
+              <div class="currency-label">Per Drink</div>
+              <div class="currency-value" id="topSipsPerDrink">1</div>
+            </div>
+          </div>
+          <div class="currency-divider"></div>
+          <div class="currency-item">
+            <div class="currency-info">
+              <div class="currency-label">Per Second</div>
+              <div class="currency-value" id="topSipsPerSecond">1</div>
+            </div>
+          </div>
         </div>
-        <h1>
-          Soda Clicker
-          <br />
-          PRO!
-        </h1>
+        
+        <div class="game-title">
+          <div class="title-main">SODA CLICKER</div>
+          <div class="title-sub">PRO</div>
+        </div>
       </div>
 
       <!-- Desktop Tab Navigation -->
