@@ -26,18 +26,18 @@ function getSafePosition(
 ): { left: number; top: number } {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  
+
   // Estimate feedback element dimensions
   const estimatedWidth = 150; // Conservative estimate
   const estimatedHeight = 40;
-  
+
   // Padding from viewport edges
   const padding = 20;
   const minX = padding + estimatedWidth / 2;
   const maxX = viewportWidth - padding - estimatedWidth / 2;
   const minY = padding + estimatedHeight / 2;
   const maxY = viewportHeight - padding - estimatedHeight / 2;
-  
+
   if (isMobileDevice()) {
     const centerX = viewportWidth / 2;
     const centerY = viewportHeight / 2;
@@ -45,27 +45,27 @@ function getSafePosition(
     const mobileRangeY = Math.min(rangeY, 60);
     const randomX = (Math.random() - 0.5) * mobileRangeX;
     const randomY = (Math.random() - 0.5) * mobileRangeY;
-    
+
     let left = centerX + randomX;
     let top = centerY + randomY;
-    
+
     // Clamp to viewport bounds
     left = Math.max(minX, Math.min(maxX, left));
     top = Math.max(minY, Math.min(maxY, top));
-    
+
     return { left, top };
   } else {
     const containerRect = container.getBoundingClientRect();
     const randomX = (Math.random() - 0.5) * rangeX;
     const randomY = (Math.random() - 0.5) * rangeY;
-    
+
     let left = containerRect.left + containerRect.width / 2 + randomX;
     let top = containerRect.top + containerRect.height / 2 + randomY;
-    
+
     // Clamp to viewport bounds
     left = Math.max(minX, Math.min(maxX, left));
     top = Math.max(minY, Math.min(maxY, top));
-    
+
     return { left, top };
   }
 }
@@ -161,30 +161,30 @@ function showFeedbackAtCoordinates(
   const fontSize = isCritical ? '1.4em' : '1.2em';
   const offsetX = (Math.random() - 0.5) * 15; // Reduced randomness
   const offsetY = (Math.random() - 0.5) * 15;
-  
+
   // Calculate position with boundary checking
   let finalX = clickX + offsetX;
   let finalY = clickY + offsetY;
-  
+
   // Get viewport dimensions
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  
+
   // Estimate feedback element dimensions (approximate)
   const estimatedWidth = isCritical ? 200 : 150; // Critical feedback is typically wider
   const estimatedHeight = 40;
-  
+
   // Ensure feedback stays within viewport bounds with padding
   const padding = 20;
   const minX = padding;
   const maxX = viewportWidth - estimatedWidth - padding;
   const minY = padding;
   const maxY = viewportHeight - estimatedHeight - padding;
-  
+
   // Clamp position to viewport bounds
   finalX = Math.max(minX, Math.min(maxX, finalX));
   finalY = Math.max(minY, Math.min(maxY, finalY));
-  
+
   feedback.style.cssText = `
         position: fixed;
         left: ${finalX}px;

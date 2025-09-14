@@ -3303,8 +3303,9 @@ h3 {
     border-radius: 20px;
     font-size: 3rem;
     background: transparent; /* Ensure no background on mobile */
-    padding-top: 15px; /* Move content down slightly on mobile */
-    /* Removed box-shadow that made container visible */
+    padding: 0; /* Remove padding to prevent clipping */
+    overflow: hidden; /* Ensure 3D model stays within bounds */
+    position: relative; /* Ensure proper positioning context */
   }
 
   /* Improved mobile upgrade sections */
@@ -3827,7 +3828,9 @@ h3 {
     font-size: 2.5rem;
     margin: 0.75rem auto;
     background: transparent; /* Ensure no background on small mobile */
-    padding-top: 10px; /* Move content down slightly on small mobile */
+    padding: 0; /* Remove padding to prevent clipping */
+    overflow: hidden; /* Ensure 3D model stays within bounds */
+    position: relative; /* Ensure proper positioning context */
   }
 
   /* Compact mobile upgrade buttons */
@@ -4179,6 +4182,23 @@ h3 {
     will-change: transform, filter;
     /* Ensure proper z-index on mobile */
     z-index: 100;
+  }
+
+  /* Mobile-specific 3D canvas styling */
+  .soda-button canvas {
+    border-radius: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
+    /* Ensure proper mobile rendering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* Prevent mobile clipping */
+    max-width: 100%;
+    max-height: 100%;
   }
 
   /* Mobile-specific click animation */
@@ -6907,8 +6927,11 @@ p {
 .soda-button canvas {
   border-radius: 20px;
   position: absolute;
-  top: 20px; /* Account for container padding-top */
+  top: 0; /* Start from top of container */
   left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain; /* Ensure model fits within bounds */
 }
 
 .soda-button:hover {

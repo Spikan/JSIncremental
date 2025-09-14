@@ -144,8 +144,8 @@ export class Soda3DButton {
   }
 
   private setupScene(): void {
-    // Set up camera position - closer but with wide FOV to show full model
-    this.camera.position.set(0, 0.4, 3.2); // Moderate camera position
+    // Set up camera position - adjusted for better container fit
+    this.camera.position.set(0, 0.2, 3.0); // Lower camera position to prevent top clipping
     this.camera.lookAt(0, -0.6, 0); // Look way down to keep model in lower part of container
 
     // Set up renderer with mobile optimizations - use rectangular dimensions
@@ -232,9 +232,9 @@ export class Soda3DButton {
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
 
-        // Center the model and position it much lower to avoid top cut-off
+        // Center the model and position it to fit within container bounds
         this.model.position.sub(center);
-        this.model.position.y -= 0.8; // Move model down VERY significantly to avoid top cut-off
+        this.model.position.y -= 0.6; // Move model down to fit within container
         this.centerPosition.copy(this.model.position);
 
         // Scale to fit nicely in view - larger and more prominent
@@ -284,8 +284,8 @@ export class Soda3DButton {
     cylinder.receiveShadow = true;
     this.model.add(cylinder);
 
-    // Position fallback model much lower to match main model positioning
-    this.model.position.y = -0.8; // Match the main model's VERY low positioning
+    // Position fallback model to match main model positioning
+    this.model.position.y = -0.6; // Match the main model's positioning
     this.centerPosition.copy(this.model.position);
 
     this.scene.add(this.model);
@@ -314,11 +314,12 @@ export class Soda3DButton {
     // Click animation (bounce effect)
     if (this.isAnimating) {
       const time = Date.now() * 0.01;
-      const bounce = Math.sin(time) * 0.1;
+      const bounce = Math.sin(time) * 0.05; // Reduced bounce intensity
       this.model.position.copy(this.centerPosition);
-      this.model.position.y += bounce; // Add bounce to the centered Y position
-      // Maintain the larger base scale during animation
-      this.model.scale.setScalar(this.baseScale * (1 + Math.sin(time) * 0.05));
+      // Constrain bounce to stay within container bounds
+      this.model.position.y += Math.max(-0.05, Math.min(0.05, bounce));
+      // Maintain the larger base scale during animation with reduced intensity
+      this.model.scale.setScalar(this.baseScale * (1 + Math.sin(time) * 0.02));
     }
 
     this.renderer.render(this.scene, this.camera);
