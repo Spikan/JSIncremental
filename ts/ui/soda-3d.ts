@@ -3,6 +3,23 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import sodaModelUrl from '../../res/Soda.glb?url';
 
+console.log('🔍 Soda model URL resolved to:', sodaModelUrl);
+
+// Test if we can fetch the model file
+fetch(sodaModelUrl)
+  .then(response => {
+    console.log('🌐 Fetch test - Response status:', response.status);
+    console.log('🌐 Fetch test - Content type:', response.headers.get('content-type'));
+    console.log('🌐 Fetch test - Response OK:', response.ok);
+    return response.arrayBuffer();
+  })
+  .then(buffer => {
+    console.log('📦 Fetch test - Buffer size:', buffer.byteLength, 'bytes');
+  })
+  .catch(error => {
+    console.error('❌ Fetch test failed:', error);
+  });
+
 interface Soda3DConfig {
   containerSelector: string;
   modelPath: string;

@@ -3280,7 +3280,9 @@ h3 {
     margin: 1rem auto;
     border-radius: 20px;
     font-size: 3rem;
-    box-shadow: 0 8px 25px rgba(0, 179, 107, 0.3);
+    background: transparent; /* Ensure no background on mobile */
+    padding-top: 15px; /* Move content down slightly on mobile */
+    /* Removed box-shadow that made container visible */
   }
 
   /* Improved mobile upgrade sections */
@@ -3802,6 +3804,8 @@ h3 {
     height: 260px;
     font-size: 2.5rem;
     margin: 0.75rem auto;
+    background: transparent; /* Ensure no background on small mobile */
+    padding-top: 10px; /* Move content down slightly on small mobile */
   }
 
   /* Compact mobile upgrade buttons */
@@ -6844,9 +6848,11 @@ p {
   filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.3));
   border-radius: 20px;
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Changed from center to flex-start */
   justify-content: center;
   position: relative;
+  background: transparent; /* Ensure no background color */
+  padding-top: 20px; /* Move content down slightly */
 }
 
 /* Fallback image styling */
@@ -6865,7 +6871,7 @@ p {
 .soda-button canvas {
   border-radius: 20px;
   position: absolute;
-  top: 0;
+  top: 20px; /* Account for container padding-top */
   left: 0;
 }
 
@@ -7364,6 +7370,8 @@ p {
     width: 220px;
     height: 280px;
     filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.2)); /* Reduced glow on mobile */
+    background: transparent; /* Ensure no background on mobile */
+    padding-top: 15px; /* Slightly less padding on mobile */
   }
 
   .click-indicator {

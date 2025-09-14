@@ -35,7 +35,8 @@ export function calculateAffordabilityState(cost: number | any): AffordabilitySt
     const sipsPerSecond =
       typeof state.spd === 'number'
         ? (state.spd / (state.drinkRate || 5000)) * 1000
-        : (state.spd.toNumber() / (state.drinkRate || 5000)) * 1000;
+        : ((state.spd?.toSafeNumber?.() ?? Number(state.spd) ?? 0) / (state.drinkRate || 5000)) *
+          1000;
 
     if (sipsPerSecond > 0) {
       const remainingSips = costNum - sipsNum;

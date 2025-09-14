@@ -521,7 +521,13 @@ export function initializeUI(): void {
     initializeAuthenticSDP();
 
     // Initialize 3D soda button
-    initializeSoda3D();
+    console.log('🎮 About to initialize 3D soda button...');
+    try {
+      initializeSoda3D();
+      console.log('✅ 3D soda button initialization completed');
+    } catch (error) {
+      console.error('❌ 3D soda button initialization failed:', error);
+    }
   } catch (error) {
     reportUIError(error, 'initialize_enhanced_ui', ErrorSeverity.MEDIUM);
   }
