@@ -3,6 +3,7 @@
 
 // Import consolidated utilities
 import { formatNumber, prettify } from './utils';
+import { domQuery } from '../services/dom-query';
 
 // Detect mobile device
 function isMobileDevice(): boolean {
@@ -315,7 +316,7 @@ export function showClickFeedback(
     showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY);
     return;
   }
-  const sodaContainer = ((window as any).DOM_CACHE?.sodaButton?.parentNode ||
+  const sodaContainer = (domQuery.getById('sodaButton')?.parentNode ||
     document.getElementById('sodaButton')?.parentNode) as HTMLElement | null;
   if (!sodaContainer) return;
   showFeedbackWithContainer(sipsGained, isCritical, sodaContainer);
@@ -342,7 +343,7 @@ export function showPurchaseFeedback(
     left = clickX;
     top = clickY;
   } else {
-    const shopDiv = (window as any).DOM_CACHE?.shopDiv as HTMLElement | undefined;
+    const shopDiv = domQuery.getById('shopDiv') as HTMLElement | undefined;
     if (shopDiv) {
       const shopRect = shopDiv.getBoundingClientRect();
       left = shopRect.left + shopRect.width / 2;
@@ -405,7 +406,7 @@ export function showPurchaseFeedback(
 
 // Show level up feedback
 export function showLevelUpFeedback(sipsGained: number): void {
-  const levelUpDiv = (window as any).DOM_CACHE?.levelUpDiv as HTMLElement | undefined;
+  const levelUpDiv = domQuery.getById('levelUpDiv') as HTMLElement | undefined;
   if (!levelUpDiv) return;
   const feedback = document.createElement('div');
   feedback.className = 'levelup-feedback';

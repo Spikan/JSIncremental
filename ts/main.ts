@@ -10,6 +10,8 @@
 // Ported inline from original main.js (TS-ified minimal changes)
 // Removed unused import
 
+import { domQuery } from './services/dom-query';
+
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types
 
@@ -272,8 +274,12 @@ function initGame() {
 
     // Update UI displays after ensuring DOM cache is ready
     const updateDisplaysWhenReady = () => {
-      const domCache = (window as any).DOM_CACHE;
-      if (!domCache || !domCache.isReady || !domCache.isReady()) {
+      // DOM cache replaced with domQuery service
+      if (
+        !domQuery.exists('#sodaButton') ||
+        !domQuery.exists('#shopTab') ||
+        !domQuery.exists('#topSipValue')
+      ) {
         // Waiting for DOM_CACHE
         setTimeout(updateDisplaysWhenReady, 100);
         return;

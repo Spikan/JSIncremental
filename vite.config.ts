@@ -70,9 +70,12 @@ export default defineConfig(({ mode }) => {
       minify: isAnalyze ? false : 'terser',
       terserOptions: {
         compress: {
-          drop_console: isAnalyze ? false : true,
+          drop_console: mode === 'production' && !isAnalyze,
           drop_debugger: true,
-          pure_funcs: ['console.log', 'console.info', 'console.debug'] as string[],
+          pure_funcs:
+            mode === 'production'
+              ? ['console.log', 'console.info', 'console.debug', 'console.trace']
+              : [],
         },
       },
       reportCompressedSize: true,

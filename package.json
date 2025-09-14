@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "break_eternity.js": "^2.1.2",
+    "glob": "^11.0.3",
     "grep": "^0.1.0",
     "head": "^1.0.0",
     "tail": "^2.2.6",

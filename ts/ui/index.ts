@@ -1,6 +1,9 @@
 // UI System Coordinator
 // Main entry point for all UI-related functionality
 
+import { logger } from '../services/logger';
+import { timerManager } from '../services/timer-manager';
+import { domQuery } from '../services/dom-query';
 import * as displays from './displays';
 import {
   updateAllDisplaysOptimized,
@@ -56,7 +59,7 @@ export function updateTopInfoBar(): void {
   try {
     const state = useGameStore.getState();
     if (!state) {
-      console.warn('No state available for top info bar update');
+      logger.warn('No state available for top info bar update');
       return;
     }
 
@@ -70,7 +73,7 @@ export function updateTopInfoBar(): void {
     // Update the top info bar with current state
     topInfoBar.update(data);
   } catch (error) {
-    console.warn('Failed to update top info bar:', error);
+    logger.warn('Failed to update top info bar:', error);
   }
 }
 
@@ -80,30 +83,35 @@ export function updateTopInfoBar(): void {
 export function initializeEnhancedNavigation(): void {
   try {
     // The sidebar navigation manager initializes itself
-    console.log('✅ Enhanced sidebar navigation system initialized');
+    logger.info('Enhanced sidebar navigation system initialized');
   } catch (error) {
-    console.warn('Failed to initialize enhanced sidebar navigation:', error);
+    logger.warn('Failed to initialize enhanced sidebar navigation:', error);
   }
 }
 
 /**
  * Set up direct soda button click handler as fallback
  */
-export function setupDirectSodaClickHandler(): void {
-  console.log('🔧 Setting up direct soda click handler...');
+export function setupDirectSodaClickHandler(): () => void {
+  logger.debug('Setting up direct soda click handler...');
 
   // Set up debounced monitoring for top bar updates
   let lastValues = { sips: null, spd: null, level: null };
-  let updateTimeout: number | null = null;
+  let updateTimeout: string = '';
+  let valueCheckInterval: string = '';
 
   const debouncedUpdateTopBar = () => {
     if (updateTimeout) {
-      clearTimeout(updateTimeout);
+      timerManager.clearTimer(updateTimeout);
     }
-    updateTimeout = window.setTimeout(() => {
-      updateTopInfoBar();
-      updateTimeout = null;
-    }, 100); // 100ms debounce
+    updateTimeout = timerManager.setTimeout(
+      () => {
+        updateTopInfoBar();
+        updateTimeout = '';
+      },
+      100,
+      'Top bar update debounce'
+    ); // 100ms debounce
   };
 
   const checkForValueChanges = () => {
@@ -130,28 +138,45 @@ export function setupDirectSodaClickHandler(): void {
   };
 
   // Check for changes every 500ms (more frequent than before)
-  setInterval(checkForValueChanges, 500);
+  valueCheckInterval = timerManager.setInterval(
+    checkForValueChanges,
+    500,
+    'Value change monitoring'
+  );
 
-  console.log('✅ Sips monitoring set up for top bar updates');
+  // Cleanup function
+  const cleanup = () => {
+    if (updateTimeout) {
+      timerManager.clearTimer(updateTimeout);
+      updateTimeout = '';
+    }
+    if (valueCheckInterval) {
+      timerManager.clearTimer(valueCheckInterval);
+      valueCheckInterval = '';
+    }
+  };
+
+  // Register cleanup on page unload
+  window.addEventListener('beforeunload', cleanup);
 
   // Force an immediate update of the top bar
   updateTopInfoBar();
 
   // Add debug function for testing header elements
   (window as any).testHeader = () => {
-    console.log('🧪 Testing header elements...');
+    logger.debug('Testing header elements...');
     const topSipValue = document.getElementById('topSipValue');
     const topSipsPerDrink = document.getElementById('topSipsPerDrink');
     const topSipsPerSecond = document.getElementById('topSipsPerSecond');
-    console.log('🧪 topSipValue:', topSipValue, 'current text:', topSipValue?.textContent);
-    console.log(
-      '🧪 topSipsPerDrink:',
+    logger.debug('topSipValue:', topSipValue, 'current text:', topSipValue?.textContent);
+    logger.debug(
+      'topSipsPerDrink:',
       topSipsPerDrink,
       'current text:',
       topSipsPerDrink?.textContent
     );
-    console.log(
-      '🧪 topSipsPerSecond:',
+    logger.debug(
+      'topSipsPerSecond:',
       topSipsPerSecond,
       'current text:',
       topSipsPerSecond?.textContent
@@ -160,51 +185,51 @@ export function setupDirectSodaClickHandler(): void {
     // Try to manually update them
     if (topSipValue) {
       topSipValue.textContent = 'TEST123';
-      console.log('🧪 Set topSipValue to TEST123');
+      logger.debug('Set topSipValue to TEST123');
     }
     if (topSipsPerDrink) {
       topSipsPerDrink.textContent = 'TEST456';
-      console.log('🧪 Set topSipsPerDrink to TEST456');
+      logger.debug('Set topSipsPerDrink to TEST456');
     }
     if (topSipsPerSecond) {
       topSipsPerSecond.textContent = 'TEST789';
-      console.log('🧪 Set topSipsPerSecond to TEST789');
+      logger.debug('Set topSipsPerSecond to TEST789');
     }
   };
 
   // Add debug function to window for manual testing
   (window as any).testSodaClick = async () => {
-    console.log('🧪 Testing soda click manually...');
+    logger.debug('Testing soda click manually...');
     try {
       const { handleSodaClick } = await import('../core/systems/clicks-system.ts');
       await handleSodaClick(1);
-      console.log('🧪 Manual soda click test successful!');
+      logger.debug('Manual soda click test successful!');
     } catch (error) {
-      console.error('🧪 Manual soda click test failed:', error);
+      logger.error('Manual soda click test failed:', error);
     }
   };
 
-  console.log('🧪 Added testSodaClick() function to window for debugging');
+  logger.debug('Added testSodaClick() function to window for debugging');
 
   // Add debug function to manually test header updates
   (window as any).testHeaderUpdates = () => {
-    console.log('🧪 Testing header updates manually...');
+    logger.debug('Testing header updates manually...');
     try {
       const state = useGameStore.getState();
-      console.log('🧪 Current state:', {
+      logger.debug('Current state:', {
         sips: state.sips.toString(),
         spd: state.spd.toString(),
         drinkRate: state.drinkRate,
       });
 
       // Test individual update functions
-      console.log('🧪 Calling updateTopSipCounter...');
+      logger.debug('Calling updateTopSipCounter...');
       updateTopSipCounter();
 
-      console.log('🧪 Calling updateTopSipsPerDrink...');
+      logger.debug('Calling updateTopSipsPerDrink...');
       updateTopSipsPerDrink();
 
-      console.log('🧪 Calling updateTopSipsPerSecond...');
+      logger.debug('Calling updateTopSipsPerSecond...');
       updateTopSipsPerSecond();
 
       // Check if elements exist and their current values
@@ -212,19 +237,23 @@ export function setupDirectSodaClickHandler(): void {
       const topSipsPerDrink = document.getElementById('topSipsPerDrink');
       const topSipsPerSecond = document.getElementById('topSipsPerSecond');
 
-      console.log('🧪 Element values after manual update:', {
+      logger.debug('Element values after manual update:', {
         topSipValue: topSipValue?.textContent,
         topSipsPerDrink: topSipsPerDrink?.innerHTML,
         topSipsPerSecond: topSipsPerSecond?.innerHTML,
       });
 
-      console.log('🧪 Manual header update test complete!');
+      logger.debug('Manual header update test complete!');
     } catch (error) {
-      console.error('🧪 Manual header update test failed:', error);
+      logger.error('Manual header update test failed:', error);
     }
   };
 
-  console.log('🧪 Added testHeaderUpdates() function to window for debugging');
+  logger.debug('Added testHeaderUpdates() function to window for debugging');
+  logger.debug('Sips monitoring set up for top bar updates');
+
+  // Return cleanup function for manual cleanup if needed
+  return cleanup;
 }
 
 /**
@@ -259,7 +288,7 @@ export function updateEnhancedProgressBars(): void {
     };
     levelProgressBar.update(levelData);
   } catch (error) {
-    console.warn('Failed to update enhanced progress bars:', error);
+    logger.warn('Failed to update enhanced progress bars:', error);
   }
 }
 
@@ -304,7 +333,7 @@ function reportUIError(
     const timestamp = new Date().toISOString();
 
     // Log error with context
-    console.error(`🚨 [UI-${severity.toUpperCase()}] ${context}: ${errorMessage}`, {
+    logger.error(`[UI-${severity.toUpperCase()}] ${context}: ${errorMessage}`, {
       timestamp,
       context,
       severity,
@@ -315,8 +344,8 @@ function reportUIError(
     // For now, we'll just log it with proper categorization
   } catch (reportingError) {
     // Fallback to console if error reporting fails
-    console.error('Failed to report UI error:', reportingError);
-    console.error('Original error:', error);
+    logger.error('Failed to report UI error:', reportingError);
+    logger.error('Original error:', error);
   }
 }
 
@@ -481,7 +510,7 @@ export function initializeUI(): void {
         });
       });
     } catch (error) {
-      console.warn('Failed to subscribe to level changes:', error);
+      logger.warn('Failed to subscribe to level changes:', error);
     }
   }
 
@@ -512,9 +541,9 @@ export function initializeUI(): void {
       // Click handler is now built into the 3D button
       // No need to add additional handlers
 
-      console.log('✅ Lightweight 3D soda button initialized');
+      logger.info('Lightweight 3D soda button initialized');
     } catch (error) {
-      console.error('❌ Failed to initialize 3D soda button:', error);
+      logger.error('Failed to initialize 3D soda button:', error);
     }
 
     // Initialize displays
@@ -522,7 +551,7 @@ export function initializeUI(): void {
       updateDrinkSpeedDisplayOptimized();
       updateClickValueDisplay();
     } catch (error) {
-      console.warn('Failed to initialize displays:', error);
+      logger.warn('Failed to initialize displays:', error);
     }
 
     // Layout validation disabled - sections were intentionally removed
@@ -541,7 +570,7 @@ export function initializeUI(): void {
  */
 function initializeEnhancedUIComponents(): void {
   try {
-    console.log('🔧 Initializing enhanced UI components...');
+    logger.debug('Initializing enhanced UI components...');
 
     // Initialize enhanced navigation
     initializeEnhancedNavigation();
@@ -562,9 +591,9 @@ function initializeEnhancedUIComponents(): void {
     // Initialize secrets system
     initializeSecretsSystem();
 
-    console.log('✅ Enhanced UI components initialized');
+    logger.info('Enhanced UI components initialized');
   } catch (error) {
-    console.warn('Failed to initialize enhanced UI components:', error);
+    logger.warn('Failed to initialize enhanced UI components:', error);
   }
 }
 
@@ -581,9 +610,9 @@ function initializeDevToolsButton(): void {
       button.textContent = `🔧 Dev Tools ${devToolsEnabled ? 'ON' : 'OFF'}`;
     }
 
-    console.log('🔧 Dev tools button initialized:', devToolsEnabled ? 'ON' : 'OFF');
+    logger.debug('Dev tools button initialized:', devToolsEnabled ? 'ON' : 'OFF');
   } catch (error) {
-    console.warn('Failed to initialize dev tools button:', error);
+    logger.warn('Failed to initialize dev tools button:', error);
   }
 }
 
@@ -614,15 +643,15 @@ function initializeSecretsSystem(): void {
 
     // Initialize Konami code detector (it starts listening automatically)
     // The detector is imported and initialized automatically
-    console.log('🔐 Secrets system initialized. Konami code detector active.');
-    console.log(
-      '🔐 Konami detector status:',
+    logger.debug('Secrets system initialized. Konami code detector active.');
+    logger.debug(
+      'Konami detector status:',
       konamiCodeDetector.isSecretsUnlocked() ? 'UNLOCKED' : 'LOCKED'
     );
-    console.log('🔐 Secrets unlocked:', secretsUnlocked ? 'YES' : 'NO');
-    console.log('🙏 God tab enabled:', godTabEnabled ? 'YES' : 'NO');
+    logger.debug('Secrets unlocked:', secretsUnlocked ? 'YES' : 'NO');
+    logger.debug('God tab enabled:', godTabEnabled ? 'YES' : 'NO');
   } catch (error) {
-    console.warn('Failed to initialize secrets system:', error);
+    logger.warn('Failed to initialize secrets system:', error);
   }
 }
 
@@ -644,9 +673,9 @@ function hideOldUIElements(): void {
       (oldProgressContainer as HTMLElement).style.display = 'none';
     }
 
-    console.log('✅ Old UI elements hidden');
+    logger.debug('Old UI elements hidden');
   } catch (error) {
-    console.warn('Failed to hide old UI elements:', error);
+    logger.warn('Failed to hide old UI elements:', error);
   }
 }
 
@@ -654,7 +683,7 @@ function hideOldUIElements(): void {
 function initializeMobileNavigation(): void {
   // Mobile navigation is now handled by the sidebar navigation manager
   // No additional setup needed as the sidebar handles mobile interactions
-  console.log('✅ Mobile navigation initialized via sidebar system');
+  logger.debug('Mobile navigation initialized via sidebar system');
 }
 
 // Initialize swipe gestures for sidebar navigation
@@ -668,10 +697,13 @@ function initializeMobileNavigation(): void {
 export function updateAllDisplays(): void {
   // Update all displays
 
-  // Check if DOM_CACHE is ready before updating
-  const domCache = (window as any).DOM_CACHE;
-  if (!domCache || !domCache.isReady || !domCache.isReady()) {
-    // DOM_CACHE not ready, retry
+  // Check if critical elements are ready before updating
+  if (
+    !domQuery.exists('#sodaButton') ||
+    !domQuery.exists('#shopTab') ||
+    !domQuery.exists('#topSipValue')
+  ) {
+    // Critical elements not ready, retry
     setTimeout(updateAllDisplays, 100);
     return;
   }
@@ -695,7 +727,7 @@ export function updateAllDisplays(): void {
     updateTopInfoBar();
     updateEnhancedProgressBars();
   } catch (error) {
-    console.warn('Failed to update enhanced UI components:', error);
+    logger.warn('Failed to update enhanced UI components:', error);
   }
 
   // Update complete
@@ -776,7 +808,7 @@ export function performBatchUIUpdate(): void {
     updatePlayTime();
     if (
       typeof window !== 'undefined' &&
-      (window as any).DOM_CACHE?.statsTab?.classList?.contains('active')
+      domQuery.getById('statsTab')?.classList?.contains('active')
     ) {
       updateAllStats();
     }

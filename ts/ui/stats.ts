@@ -5,11 +5,12 @@
 import { formatNumber } from './utils';
 import { toDecimal } from '../core/numbers';
 import { computeStrawSPD, computeCupSPD } from '../core/rules/economy';
+import { domQuery } from '../services/dom-query';
 
 // Update play time display
 export function updatePlayTime(): void {
   if (typeof window === 'undefined') return;
-  const playTimeElement = (window as any).DOM_CACHE?.playTime as HTMLElement | undefined;
+  const playTimeElement = domQuery.getById('playTime') as HTMLElement | undefined;
   try {
     const state = (window as any).App?.state?.getState?.();
     if (playTimeElement && state) {
@@ -33,7 +34,7 @@ export function updatePlayTime(): void {
 
 // Update last save time display
 export function updateLastSaveTime(): void {
-  const lastSaveElement = (window as any).DOM_CACHE?.lastSaveTime as HTMLElement | undefined;
+  const lastSaveElement = domQuery.getById('lastSaveTime') as HTMLElement | undefined;
   try {
     const lastSaveMs = Number(
       (window as any).App?.state?.getState?.()?.lastSaveTime || (window as any).lastSaveTime || 0
@@ -60,7 +61,7 @@ export function updateLastSaveTime(): void {
 // Update all statistics (main coordinator function)
 export function updateAllStats(): void {
   // Only update stats if the stats tab is active and elements exist
-  if ((window as any).DOM_CACHE?.statsTab?.classList?.contains('active')) {
+  if (domQuery.getById('statsTab')?.classList?.contains('active')) {
     updateTimeStats();
     updateClickStats();
     updateEconomyStats();
@@ -72,7 +73,7 @@ export function updateAllStats(): void {
 // Update time-related statistics
 export function updateTimeStats(): void {
   // Total play time (including previous sessions)
-  const totalPlayTimeElement = (window as any).DOM_CACHE?.totalPlayTime as HTMLElement | undefined;
+  const totalPlayTimeElement = domQuery.getById('totalPlayTime') as HTMLElement | undefined;
   if (totalPlayTimeElement) {
     const totalMs = Number((window as any).App?.state?.getState?.()?.totalPlayTime || 0);
     const totalSeconds = Math.floor(totalMs / 1000);
@@ -88,7 +89,7 @@ export function updateTimeStats(): void {
     }
   }
   // Current session time
-  const sessionTimeElement = (window as any).DOM_CACHE?.sessionTime as HTMLElement | undefined;
+  const sessionTimeElement = domQuery.getById('sessionTime') as HTMLElement | undefined;
   if (sessionTimeElement) {
     const start = Number((window as any).App?.state?.getState?.()?.sessionStartTime || 0);
     if (start) {
@@ -111,29 +112,25 @@ export function updateTimeStats(): void {
 // Update click-related statistics
 export function updateClickStats(): void {
   // Total clicks
-  const totalClicksElement = (window as any).DOM_CACHE?.totalClicks as HTMLElement | undefined;
+  const totalClicksElement = domQuery.getById('totalClicks') as HTMLElement | undefined;
   if (totalClicksElement) {
     const clicks = Number((window as any).App?.state?.getState?.()?.totalClicks || 0);
     totalClicksElement.textContent = formatNumber(clicks);
   }
   // Critical clicks
-  const criticalClicksElement = (window as any).DOM_CACHE?.criticalClicksStats as
-    | HTMLElement
-    | undefined;
+  const criticalClicksElement = domQuery.getById('criticalClicksStats') as HTMLElement | undefined;
   if (criticalClicksElement) {
     const crit = Number((window as any).App?.state?.getState?.()?.criticalClicks || 0);
     criticalClicksElement.textContent = formatNumber(crit);
   }
   // Click streak
-  const clickStreakElement = (window as any).DOM_CACHE?.clickStreak as HTMLElement | undefined;
+  const clickStreakElement = domQuery.getById('clickStreak') as HTMLElement | undefined;
   if (clickStreakElement) {
     const st = (window as any).App?.state?.getState?.() || {};
     clickStreakElement.textContent = String(Number((st as any).currentClickStreak || 0));
   }
   // Best click streak
-  const bestClickStreakElement = (window as any).DOM_CACHE?.bestClickStreak as
-    | HTMLElement
-    | undefined;
+  const bestClickStreakElement = domQuery.getById('bestClickStreak') as HTMLElement | undefined;
   if (bestClickStreakElement) {
     const st = (window as any).App?.state?.getState?.() || {};
     bestClickStreakElement.textContent = String(Number((st as any).bestClickStreak || 0));
@@ -143,15 +140,13 @@ export function updateClickStats(): void {
 // Update economy-related statistics
 export function updateEconomyStats(): void {
   // Total sips earned
-  const totalSipsEarnedElement = (window as any).DOM_CACHE?.totalSipsEarned as
-    | HTMLElement
-    | undefined;
+  const totalSipsEarnedElement = domQuery.getById('totalSipsEarned') as HTMLElement | undefined;
   if (totalSipsEarnedElement) {
     const total = (window as any).App?.state?.getState?.()?.totalSipsEarned || 0;
     totalSipsEarnedElement.textContent = formatNumber(total);
   }
   // Highest sips per second
-  const highestSipsPerSecondElement = (window as any).DOM_CACHE?.highestSipsPerSecond as
+  const highestSipsPerSecondElement = domQuery.getById('highestSipsPerSecond') as
     | HTMLElement
     | undefined;
   if (highestSipsPerSecondElement) {
@@ -182,9 +177,7 @@ export function updateShopStats(): void {
     // Always call updatePurchasedCounts regardless of tab state
     updatePurchasedCounts();
     // Straws purchased
-    const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
-      | HTMLElement
-      | undefined;
+    const strawsPurchasedElement = domQuery.getById('strawsPurchased') as HTMLElement | undefined;
     if (strawsPurchasedElement) {
       const v = (window as any).App?.state?.getState?.()?.straws || 0;
       if (shouldLog)
@@ -194,9 +187,7 @@ export function updateShopStats(): void {
       console.warn('🚫 updateShopStats: strawsPurchasedElement not found in DOM_CACHE');
     }
     // Cups purchased
-    const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as
-      | HTMLElement
-      | undefined;
+    const cupsPurchasedElement = domQuery.getById('cupsPurchased') as HTMLElement | undefined;
     if (cupsPurchasedElement) {
       const v = (window as any).App?.state?.getState?.()?.cups || 0;
       if (shouldLog)
@@ -206,7 +197,7 @@ export function updateShopStats(): void {
       console.warn('🚫 updateShopStats: cupsPurchasedElement not found in DOM_CACHE');
     }
     // Suctions purchased
-    const suctionsPurchasedElement = (window as any).DOM_CACHE?.suctionsPurchased as
+    const suctionsPurchasedElement = domQuery.getById('suctionsPurchased') as
       | HTMLElement
       | undefined;
     if (suctionsPurchasedElement) {
@@ -214,7 +205,7 @@ export function updateShopStats(): void {
       suctionsPurchasedElement.textContent = formatNumber(v);
     }
     // Critical clicks purchased
-    const criticalClicksPurchasedElement = (window as any).DOM_CACHE?.criticalClicksPurchased as
+    const criticalClicksPurchasedElement = domQuery.getById('criticalClicksPurchased') as
       | HTMLElement
       | undefined;
     if (criticalClicksPurchasedElement) {
@@ -236,13 +227,13 @@ export function updateShopStats(): void {
 // Update achievement-related statistics
 export function updateAchievementStats(): void {
   // Current level
-  const currentLevelElement = (window as any).DOM_CACHE?.currentLevel as HTMLElement | undefined;
+  const currentLevelElement = domQuery.getById('currentLevel') as HTMLElement | undefined;
   if (currentLevelElement) {
     const level = (window as any).App?.state?.getState?.()?.level || 1;
     currentLevelElement.textContent = formatNumber(level);
   }
   // Total upgrades (sum of all upgrade counters)
-  const totalUpgradesElement = (window as any).DOM_CACHE?.totalUpgrades as HTMLElement | undefined;
+  const totalUpgradesElement = domQuery.getById('totalUpgrades') as HTMLElement | undefined;
   if (totalUpgradesElement) {
     const st = (window as any).App?.state?.getState?.() || {};
     const widerStraws = (st as any).widerStraws || 0;
@@ -255,9 +246,7 @@ export function updateAchievementStats(): void {
     totalUpgradesElement.textContent = formatNumber(totalUpgrades);
   }
   // Faster drinks owned
-  const fasterDrinksOwnedElement = (window as any).DOM_CACHE?.fasterDrinksOwned as
-    | HTMLElement
-    | undefined;
+  const fasterDrinksOwnedElement = domQuery.getById('fasterDrinksOwned') as HTMLElement | undefined;
   if (fasterDrinksOwnedElement) {
     const owned = (window as any).App?.state?.getState?.()?.fasterDrinks || 0;
     fasterDrinksOwnedElement.textContent = formatNumber(owned);
@@ -281,7 +270,7 @@ export function updateEnhancementValues(): void {
   });
 
   // Update base production values to show what you actually get
-  const strawSPDElement = (window as any).DOM_CACHE?.strawSPD as HTMLElement | undefined;
+  const strawSPDElement = domQuery.getById('strawSPD') as HTMLElement | undefined;
   console.log('🔍 strawSPDElement found:', !!strawSPDElement);
   if (strawSPDElement) {
     const straws = state.straws || 0;
@@ -305,7 +294,7 @@ export function updateEnhancementValues(): void {
     console.log('🔍 strawSPDElement not found in DOM_CACHE');
   }
 
-  const cupSPDElement = (window as any).DOM_CACHE?.cupSPD as HTMLElement | undefined;
+  const cupSPDElement = domQuery.getById('cupSPD') as HTMLElement | undefined;
   console.log('🔍 cupSPDElement found:', !!cupSPDElement);
   if (cupSPDElement) {
     const cups = state.cups || 0;
@@ -330,9 +319,7 @@ export function updateEnhancementValues(): void {
   }
 
   // Update Wider Straws enhancement display
-  const widerStrawsSPDElement = (window as any).DOM_CACHE?.widerStrawsSPD as
-    | HTMLElement
-    | undefined;
+  const widerStrawsSPDElement = domQuery.getById('widerStrawsSPD') as HTMLElement | undefined;
   if (widerStrawsSPDElement) {
     const widerStraws = state.widerStraws || 0;
     const widerStrawsLarge = toDecimal(widerStraws);
@@ -345,7 +332,7 @@ export function updateEnhancementValues(): void {
   }
 
   // Update Better Cups enhancement display
-  const betterCupsSPDElement = (window as any).DOM_CACHE?.betterCupsSPD as HTMLElement | undefined;
+  const betterCupsSPDElement = domQuery.getById('betterCupsSPD') as HTMLElement | undefined;
   if (betterCupsSPDElement) {
     const betterCups = state.betterCups || 0;
     const betterCupsLarge = toDecimal(betterCups);
@@ -380,9 +367,7 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update straws purchased count
-  const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
-    | HTMLElement
-    | undefined;
+  const strawsPurchasedElement = domQuery.getById('strawsPurchased') as HTMLElement | undefined;
   if (shouldLog)
     console.log(
       '🔍 strawsPurchasedElement:',
@@ -405,7 +390,7 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update cups purchased count
-  const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
+  const cupsPurchasedElement = domQuery.getById('cupsPurchased') as HTMLElement | undefined;
   if (shouldLog)
     if (shouldLog)
       console.log(
@@ -429,7 +414,7 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update wider straws purchased count
-  const widerStrawsElement = (window as any).DOM_CACHE?.widerStraws as HTMLElement | undefined;
+  const widerStrawsElement = domQuery.getById('widerStraws') as HTMLElement | undefined;
   if (widerStrawsElement) {
     const widerStraws = state.widerStraws || 0;
     const widerStrawsValue =
@@ -444,7 +429,7 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update better cups purchased count
-  const betterCupsElement = (window as any).DOM_CACHE?.betterCups as HTMLElement | undefined;
+  const betterCupsElement = domQuery.getById('betterCups') as HTMLElement | undefined;
   if (betterCupsElement) {
     const betterCups = state.betterCups || 0;
     const betterCupsValue =
@@ -459,7 +444,7 @@ export function updatePurchasedCounts(): void {
   // Note: Shop display elements are the same as the purchased elements above
 
   // Update total production indicators
-  const totalStrawSPDElement = (window as any).DOM_CACHE?.totalStrawSPD as HTMLElement | undefined;
+  const totalStrawSPDElement = domQuery.getById('totalStrawSPD') as HTMLElement | undefined;
   if (totalStrawSPDElement) {
     const straws = state.straws || 0;
     const strawSPD = state.strawSPD || 0;
@@ -476,7 +461,7 @@ export function updatePurchasedCounts(): void {
     if (shouldLog) console.log('❌ totalStrawSPD element not found');
   }
 
-  const totalWiderStrawsSPDElement = (window as any).DOM_CACHE?.totalWiderStrawsSPD as
+  const totalWiderStrawsSPDElement = domQuery.getById('totalWiderStrawsSPD') as
     | HTMLElement
     | undefined;
   if (totalWiderStrawsSPDElement) {
@@ -497,7 +482,7 @@ export function updatePurchasedCounts(): void {
     if (shouldLog) console.log('❌ totalWiderStrawsSPD element not found');
   }
 
-  const totalCupSPDElement = (window as any).DOM_CACHE?.totalCupSPD as HTMLElement | undefined;
+  const totalCupSPDElement = domQuery.getById('totalCupSPD') as HTMLElement | undefined;
   if (totalCupSPDElement) {
     const cups = state.cups || 0;
     const cupSPD = state.cupSPD || 0;
@@ -514,7 +499,7 @@ export function updatePurchasedCounts(): void {
     if (shouldLog) console.log('❌ totalCupSPD element not found');
   }
 
-  const totalBetterCupsSPDElement = (window as any).DOM_CACHE?.totalBetterCupsSPD as
+  const totalBetterCupsSPDElement = domQuery.getById('totalBetterCupsSPD') as
     | HTMLElement
     | undefined;
   if (totalBetterCupsSPDElement) {
@@ -536,9 +521,7 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update suctions purchased count
-  const suctionsPurchasedElement = (window as any).DOM_CACHE?.suctionsPurchased as
-    | HTMLElement
-    | undefined;
+  const suctionsPurchasedElement = domQuery.getById('suctionsPurchased') as HTMLElement | undefined;
   if (suctionsPurchasedElement) {
     const suctions = state.suctions || 0;
     const suctionsValue =
@@ -551,7 +534,7 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update shop display elements for suctions and criticalClicks (if they exist)
-  const shopSuctionsElement = (window as any).DOM_CACHE?.suctions as HTMLElement | undefined;
+  const shopSuctionsElement = domQuery.getById('suctions') as HTMLElement | undefined;
   if (shopSuctionsElement) {
     const suctions = state.suctions || 0;
     const suctionsValue =
@@ -563,9 +546,7 @@ export function updatePurchasedCounts(): void {
     if (shouldLog) console.log('❌ shop suctions element not found (expected for this item)');
   }
 
-  const shopCriticalClicksElement = (window as any).DOM_CACHE?.criticalClicks as
-    | HTMLElement
-    | undefined;
+  const shopCriticalClicksElement = domQuery.getById('criticalClicks') as HTMLElement | undefined;
   if (shopCriticalClicksElement) {
     const criticalClicks = state.criticalClicks || 0;
     const criticalClicksValue =
@@ -585,7 +566,7 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update critical clicks purchased count
-  const criticalClicksPurchasedElement = (window as any).DOM_CACHE?.criticalClicksPurchased as
+  const criticalClicksPurchasedElement = domQuery.getById('criticalClicksPurchased') as
     | HTMLElement
     | undefined;
   if (criticalClicksPurchasedElement) {

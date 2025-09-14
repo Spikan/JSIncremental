@@ -1,6 +1,7 @@
 // UI Labels helpers: small, reusable text setters for common UI labels (TypeScript)
 
 import { formatNumber } from './utils';
+import { domQuery } from '../services/dom-query';
 
 // Update the Click Sounds toggle label and style
 export function updateClickSoundsToggleText(enabled: boolean): void {
@@ -14,8 +15,7 @@ export function updateClickSoundsToggleText(enabled: boolean): void {
 
 // Update the drink countdown label (accepts seconds as number)
 export function updateCountdownText(secondsRemaining: number): void {
-  const countdown =
-    (window as any).DOM_CACHE?.drinkCountdown || document.getElementById('drinkCountdown');
+  const countdown = domQuery.getById('drinkCountdown') || document.getElementById('drinkCountdown');
   if (!countdown) return;
   const seconds = Math.max(0, Number(secondsRemaining) || 0);
   (countdown as HTMLElement).textContent = `${formatNumber(seconds)}s`;
@@ -23,7 +23,7 @@ export function updateCountdownText(secondsRemaining: number): void {
 
 // Generic music status label setter
 export function setMusicStatusText(text: string): void {
-  const status = (window as any).DOM_CACHE?.musicStatus || document.getElementById('musicStatus');
+  const status = domQuery.getById('musicStatus') || document.getElementById('musicStatus');
   if (!status) return;
   (status as HTMLElement).textContent = String(text);
 }

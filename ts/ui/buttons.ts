@@ -1,6 +1,7 @@
 // Modern Button System - Unified button event handling and management (TypeScript)
 
 import { mobileInputHandler } from './mobile-input';
+import { domQuery } from '../services/dom-query';
 
 type ButtonActionMeta = { func: (...args: any[]) => any; type: string; label: string };
 type ButtonTypeMeta = {
@@ -665,7 +666,7 @@ function setupSpecialButtonHandlers(): void {
   // Setup soda button with clicks system check
   const setupSodaButton = async () => {
     await ensureClicksSystemLoaded();
-    const sodaDomCacheBtn = (window as any).DOM_CACHE?.sodaButton;
+    const sodaDomCacheBtn = domQuery.getById('sodaButton');
     const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
 
     console.log('🔍 SODA BUTTON SEARCH:', {
@@ -720,7 +721,7 @@ function setupSpecialButtonHandlers(): void {
 
           // Check if this was likely a scroll vs a tap
           const scrollDelta = Math.abs(
-            window.scrollY - (sodaButton.__touchStartScrollY || window.scrollY)
+            window.scrollY - ((sodaButton as any).__touchStartScrollY || window.scrollY)
           );
           const isScroll =
             mobileInputHandler.isActive() &&
@@ -828,7 +829,7 @@ function setupSpecialButtonHandlers(): void {
           // Check if this was likely a scroll vs a tap
           const currentScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
           const scrollDelta = Math.abs(
-            currentScrollY - (sodaButton.__touchStartScrollY || currentScrollY)
+            currentScrollY - ((sodaButton as any).__touchStartScrollY || currentScrollY)
           );
           const isScroll =
             mobileInputHandler.isActive() &&
@@ -970,7 +971,7 @@ function setupSpecialButtonHandlers(): void {
 
     console.log(
       'DOM cache ready:',
-      !!(window as any).DOM_CACHE?.isReady && (window as any).DOM_CACHE.isReady()
+      !!domQuery.getById('isReady') && (window as any).DOM_CACHE.isReady()
     );
     console.log('=== END SODA BUTTON DEBUG ===');
   };

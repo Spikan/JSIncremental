@@ -8,6 +8,8 @@ import { updateLastSaveTime, updatePurchasedCounts } from './stats';
 import { checkUpgradeAffordability } from './affordability';
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { toDecimal } from '../core/numbers/migration-utils';
+import { domQuery } from '../services/dom-query';
+// Logger import removed - not used in this file
 import {
   nextStrawCost,
   nextCupCost,
@@ -108,14 +110,16 @@ const UPDATE_INTERVALS = {
 export function updateTopSipsPerDrink(): void {
   if (typeof window === 'undefined') return;
 
-  // Check if DOM_CACHE is ready
-  const domCache = (window as any).DOM_CACHE;
-  if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
+  // Check if critical elements are ready
+  if (
+    !domQuery.exists('#sodaButton') ||
+    !domQuery.exists('#shopTab') ||
+    !domQuery.exists('#topSipValue')
+  ) {
     return;
   }
 
-  const topSipsPerDrinkElement: HTMLElement | null =
-    domCache.topSipsPerDrink || document.getElementById('topSipsPerDrink');
+  const topSipsPerDrinkElement: HTMLElement | null = domQuery.getById('topSipsPerDrink');
 
   if (!topSipsPerDrinkElement) {
     return;
@@ -141,14 +145,16 @@ export function updateTopSipsPerDrink(): void {
 export function updateTopSipsPerSecond(): void {
   if (typeof window === 'undefined') return;
 
-  // Check if DOM_CACHE is ready
-  const domCache = (window as any).DOM_CACHE;
-  if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
+  // Check if critical elements are ready
+  if (
+    !domQuery.exists('#sodaButton') ||
+    !domQuery.exists('#shopTab') ||
+    !domQuery.exists('#topSipValue')
+  ) {
     return;
   }
 
-  const topSipsPerSecondElement: HTMLElement | null =
-    domCache.topSipsPerSecond || document.getElementById('topSipsPerSecond');
+  const topSipsPerSecondElement: HTMLElement | null = domQuery.getById('topSipsPerSecond');
 
   if (!topSipsPerSecondElement) {
     return;
@@ -362,10 +368,8 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
   } catch (error) {
     console.warn('Failed to update display:', error);
   }
-  const progressFill =
-    (window as any).DOM_CACHE?.progressFill || document.getElementById('drinkProgressFill');
-  const countdown =
-    (window as any).DOM_CACHE?.countdown || document.getElementById('drinkCountdown');
+  const progressFill = domQuery.getById('drinkProgressFill');
+  const countdown = domQuery.getById('drinkCountdown');
   if (progressFill && typeof currentProgress === 'number') {
     const clampedProgress = Math.min(Math.max(currentProgress, 0), 100);
     (progressFill as HTMLElement).style.width = `${clampedProgress}%`;
@@ -394,13 +398,16 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
 export function updateTopSipCounter(): void {
   if (typeof window === 'undefined') return;
 
-  // Check if DOM_CACHE is ready
-  const domCache = (window as any).DOM_CACHE;
-  if (!domCache || (typeof domCache.isReady === 'function' && !domCache.isReady())) {
+  // Check if critical elements are ready
+  if (
+    !domQuery.exists('#sodaButton') ||
+    !domQuery.exists('#shopTab') ||
+    !domQuery.exists('#topSipValue')
+  ) {
     return;
   }
 
-  const topSipElement = domCache.topSipValue || document.getElementById('topSipValue');
+  const topSipElement = domQuery.getById('topSipValue');
 
   if (topSipElement) {
     try {
@@ -417,7 +424,7 @@ export function updateTopSipCounter(): void {
 
 export function updateLevelNumber(): void {
   if (typeof window === 'undefined') return;
-  const levelEl: any = (window as any).DOM_CACHE?.levelNumber;
+  const levelEl: any = domQuery.getById('levelNumber');
   if (levelEl) {
     try {
       const state = useGameStore.getState();
@@ -437,7 +444,7 @@ export function updateLevelNumber(): void {
 
 export function updateLevelText(): void {
   if (typeof window === 'undefined') return;
-  const levelTextEl: any = (window as any).DOM_CACHE?.levelText;
+  const levelTextEl: any = domQuery.getById('levelText');
   if (levelTextEl) {
     try {
       const state = useGameStore.getState();

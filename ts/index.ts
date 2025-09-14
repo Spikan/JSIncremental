@@ -5,7 +5,7 @@ import { createEventBus } from './services/event-bus.ts';
 import { performanceMonitor } from './services/performance.ts';
 import './config.ts';
 import './core/constants.ts';
-import './dom-cache.ts';
+// DOM migration completed - using modern domQuery service
 import './god.ts';
 import * as gameInitStatic from './core/systems/game-init.ts';
 import * as loopStatic from './core/systems/loop-system.ts';
