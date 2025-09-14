@@ -615,7 +615,10 @@ function initializeSecretsSystem(): void {
     // Initialize Konami code detector (it starts listening automatically)
     // The detector is imported and initialized automatically
     console.log('🔐 Secrets system initialized. Konami code detector active.');
-    console.log('🔐 Konami detector status:', konamiCodeDetector.isSecretsUnlocked() ? 'UNLOCKED' : 'LOCKED');
+    console.log(
+      '🔐 Konami detector status:',
+      konamiCodeDetector.isSecretsUnlocked() ? 'UNLOCKED' : 'LOCKED'
+    );
     console.log('🔐 Secrets unlocked:', secretsUnlocked ? 'YES' : 'NO');
     console.log('🙏 God tab enabled:', godTabEnabled ? 'YES' : 'NO');
   } catch (error) {
