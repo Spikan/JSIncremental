@@ -8,8 +8,15 @@
 }
 
 html {
-  font-family: gillsans, serif;
+  font-family:
+    gillsans,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   font-size: 16px;
+  line-height: 1.6;
 }
 
 body {
@@ -300,6 +307,9 @@ body {
 .game-content {
   width: 100%;
   min-height: 100vh;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* ========================================
@@ -328,19 +338,21 @@ body {
 .tab-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  min-width: 150px;
-  min-height: var(--btn-md);
-  padding: var(--btn-padding-sm);
+  gap: 0.75rem;
+  min-width: 160px;
+  min-height: 48px;
+  padding: 0.75rem 1.25rem;
   font-size: 1rem;
-  background-color: var(--primary-blue);
-  color: var(--neutral-white);
-  border-color: var(--primary-green);
-  border: 2px solid;
-  border-radius: var(--btn-radius-md);
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   cursor: pointer;
-  transition: var(--btn-transition);
+  transition: all 0.2s ease;
   white-space: nowrap;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   user-select: none;
   text-decoration: none;
   position: relative;
@@ -1153,21 +1165,22 @@ body {
 
 .stat-label {
   display: block;
-  color: #ffffff;
-  font-size: 0.8rem;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
 }
 
 .stat-value {
-  color: #ff8e53;
-  font-size: 1.1rem;
-  font-weight: bold;
+  color: #00d97f;
+  font-size: 1.2rem;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Drink Progress Bar */
@@ -1340,15 +1353,19 @@ h3 {
 
 .top-sip-counter {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 1rem;
+  right: 1rem;
   color: #ffffff;
   z-index: 10;
   text-align: right;
-  background-color: rgba(0, 179, 107, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #00b36b;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .top-sip-label {
@@ -1676,15 +1693,16 @@ h3 {
 }
 
 .shop-item {
-  background: linear-gradient(135deg, rgba(0, 23, 137, 0.6), rgba(0, 23, 137, 0.3));
-  border: 2px solid #00b36b;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 2rem;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(0, 179, 107, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
+  margin-bottom: 1.5rem;
 }
 
 .shop-item::before {
@@ -1704,9 +1722,10 @@ h3 {
 }
 
 .shop-item:hover {
-  background: linear-gradient(135deg, rgba(0, 23, 137, 0.7), rgba(0, 23, 137, 0.4));
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 179, 107, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .shop-item {
@@ -1761,11 +1780,13 @@ h3 {
 
 .shop-stat {
   text-align: center;
-  padding: 0.75rem 0.5rem;
-  background: linear-gradient(135deg, rgba(0, 23, 137, 0.4), rgba(0, 23, 137, 0.2));
-  border-radius: 8px;
-  border: 1px solid rgba(0, 179, 107, 0.2);
+  padding: 1rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .shop-stat:hover {
@@ -3425,16 +3446,18 @@ button:focus {
 
 /* Desktop Tab Button Hover States */
 .tab-btn:hover {
-  background-color: var(--primary-green);
-  color: var(--neutral-white);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .tab-btn.active {
-  background-color: var(--primary-green);
-  color: var(--neutral-white);
-  border-color: var(--primary-orange);
-  box-shadow: var(--btn-shadow-md);
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-color: #00b36b;
+  box-shadow: 0 4px 16px rgba(0, 179, 107, 0.3);
+  font-weight: 600;
 }
 
 .tab-btn:active {
