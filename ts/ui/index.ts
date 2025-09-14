@@ -648,7 +648,7 @@ function initializeMobileNavigation(): void {
 // Initialize swipe gestures for tab switching
 function initializeSwipeGestures(): void {
   const tabContents = document.querySelectorAll('.tab-content');
-  const tabOrder = ['soda', 'unlocks', 'shop', 'stats', 'god', 'options', 'dev'];
+  const tabOrder = ['soda', 'shop', 'stats', 'god', 'options', 'dev'];
 
   let startX = 0;
   let startY = 0;

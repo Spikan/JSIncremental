@@ -365,10 +365,6 @@
           <span class="tab-icon">🥤</span>
           <span class="tab-label">Soda Clicking</span>
         </button>
-        <button class="tab-btn" data-action="switchTab:unlocks" aria-label="Unlocks Tab">
-          <span class="tab-icon">🔓</span>
-          <span class="tab-label">Unlocks</span>
-        </button>
         <button class="tab-btn" data-action="switchTab:shop" aria-label="Shop & Upgrades Tab">
           <span class="tab-icon">🛒</span>
           <span class="tab-label">Shop & Upgrades</span>
@@ -443,10 +439,6 @@
             <button class="close-more-options" aria-label="Close More Options">×</button>
           </div>
           <div class="more-options-grid">
-            <button class="more-option-btn" data-action="switchTab:unlocks">
-              <div class="more-option-icon">🔓</div>
-              <div class="more-option-label">Unlocks</div>
-            </button>
             <button class="more-option-btn" data-action="switchTab:god">
               <div class="more-option-icon">🙏</div>
               <div class="more-option-label">Talk to God</div>
@@ -484,7 +476,7 @@
                     src="images/regSoda.png"
                     alt="a picture of soda for you to click"
                     class="soda-fallback"
-                    style="width: 250px; height: 250px; object-fit: contain"
+                    style="width: 300px; height: 350px; object-fit: contain"
                   />
                 </div>
                 <div class="click-indicator" id="clickIndicator">
@@ -617,30 +609,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Unlocks Tab -->
-      <div id="unlocksTab" class="tab-content">
-        <div class="unlocks-container">
-          <div class="unlocks-header">
-            <h2>🔓 Feature Unlocks</h2>
-            <p class="unlocks-subtitle">Discover new features as you progress!</p>
-          </div>
-
-          <div class="unlocks-grid" id="unlocksGrid">
-            <!-- Unlock items will be populated by JavaScript -->
-          </div>
-
-          <div class="unlocks-progress">
-            <div class="progress-info">
-              <span class="progress-label">Progress:</span>
-              <span class="progress-value" id="unlocksProgress">0/12</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" id="unlocksProgressFill"></div>
             </div>
           </div>
         </div>

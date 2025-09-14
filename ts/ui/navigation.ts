@@ -33,15 +33,6 @@ export const NAVIGATION_TABS: NavigationTab[] = [
     order: 2,
   },
   {
-    id: 'unlocks',
-    label: 'Unlocks',
-    icon: '🔓',
-    mobileLabel: 'Unlock',
-    mobileIcon: '🔓',
-    category: 'progress',
-    order: 3,
-  },
-  {
     id: 'stats',
     label: 'Statistics',
     icon: '📊',
