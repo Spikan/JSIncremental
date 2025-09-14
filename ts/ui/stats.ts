@@ -162,10 +162,10 @@ export function updateEconomyStats(): void {
 
 // Update shop-related statistics
 export function updateShopStats(): void {
-  console.log('🔍 updateShopStats: Function called');
+  // console.log('🔍 updateShopStats: Function called');
   try {
-    // Reduce logging frequency for memory optimization
-    const shouldLog = Math.random() < 0.1; // Log 10% of the time for debugging
+    // Debug logging disabled for cleaner console
+    const shouldLog = false;
     if (shouldLog) console.log('📊 updateShopStats() called');
 
     // Debug: Log current state values
@@ -333,7 +333,6 @@ export function updateEnhancementValues(): void {
   const widerStrawsSPDElement = (window as any).DOM_CACHE?.widerStrawsSPD as
     | HTMLElement
     | undefined;
-  console.log('🔍 widerStrawsSPDElement found:', !!widerStrawsSPDElement);
   if (widerStrawsSPDElement) {
     const widerStraws = state.widerStraws || 0;
     const widerStrawsLarge = toDecimal(widerStraws);
@@ -342,21 +341,11 @@ export function updateEnhancementValues(): void {
     const enhancementMultiplier = toDecimal(1).add(widerStrawsLarge.mul(multiplierPerLevel));
     const enhancementPercent = enhancementMultiplier.sub(1).mul(100);
 
-    // Debug logging
-    console.log('🔍 Wider Straws Debug:', {
-      widerStraws,
-      widerStrawsLarge: widerStrawsLarge.toString(),
-      enhancementMultiplier: enhancementMultiplier.toString(),
-      enhancementPercent: enhancementPercent.toString(),
-      formatted: formatNumber(enhancementPercent.toString()),
-    });
-
     widerStrawsSPDElement.textContent = `+${formatNumber(enhancementPercent.toString())}%`;
   }
 
   // Update Better Cups enhancement display
   const betterCupsSPDElement = (window as any).DOM_CACHE?.betterCupsSPD as HTMLElement | undefined;
-  console.log('🔍 betterCupsSPDElement found:', !!betterCupsSPDElement);
   if (betterCupsSPDElement) {
     const betterCups = state.betterCups || 0;
     const betterCupsLarge = toDecimal(betterCups);
@@ -365,15 +354,6 @@ export function updateEnhancementValues(): void {
     const enhancementMultiplier = toDecimal(1).add(betterCupsLarge.mul(multiplierPerLevel));
     const enhancementPercent = enhancementMultiplier.sub(1).mul(100);
 
-    // Debug logging
-    console.log('🔍 Better Cups Debug:', {
-      betterCups,
-      betterCupsLarge: betterCupsLarge.toString(),
-      enhancementMultiplier: enhancementMultiplier.toString(),
-      enhancementPercent: enhancementPercent.toString(),
-      formatted: formatNumber(enhancementPercent.toString()),
-    });
-
     betterCupsSPDElement.textContent = `+${formatNumber(enhancementPercent.toString())}%`;
   }
 }
@@ -381,7 +361,7 @@ export function updateEnhancementValues(): void {
 // Update purchased item counts in shop displays
 export function updatePurchasedCounts(): void {
   // Reduce console logging frequency to optimize memory usage
-  const shouldLog = Math.random() < 0.1; // Only log 10% of the time
+  const shouldLog = false; // Debug logging disabled
   if (shouldLog) console.log('📊 updatePurchasedCounts() called');
 
   if (typeof window === 'undefined') return;
@@ -449,83 +429,34 @@ export function updatePurchasedCounts(): void {
   }
 
   // Update wider straws purchased count
-  const widerStrawsPurchasedElement = (window as any).DOM_CACHE?.widerStrawsPurchased as
-    | HTMLElement
-    | undefined;
-  if (widerStrawsPurchasedElement) {
+  const widerStrawsElement = (window as any).DOM_CACHE?.widerStraws as HTMLElement | undefined;
+  if (widerStrawsElement) {
     const widerStraws = state.widerStraws || 0;
     const widerStrawsValue =
       typeof widerStraws === 'object' && widerStraws.toString
         ? widerStraws.toString()
         : widerStraws;
-    widerStrawsPurchasedElement.textContent = formatNumber(widerStrawsValue);
+    widerStrawsElement.textContent = formatNumber(widerStrawsValue);
     if (shouldLog)
-      console.log(
-        '✅ Updated widerStraws:',
-        widerStrawsValue,
-        'element:',
-        widerStrawsPurchasedElement
-      );
+      console.log('✅ Updated widerStraws:', widerStrawsValue, 'element:', widerStrawsElement);
   } else {
-    if (shouldLog) console.log('❌ widerStrawsPurchased element not found');
+    if (shouldLog) console.log('❌ widerStraws element not found');
   }
 
   // Update better cups purchased count
-  const betterCupsPurchasedElement = (window as any).DOM_CACHE?.betterCupsPurchased as
-    | HTMLElement
-    | undefined;
-  if (betterCupsPurchasedElement) {
+  const betterCupsElement = (window as any).DOM_CACHE?.betterCups as HTMLElement | undefined;
+  if (betterCupsElement) {
     const betterCups = state.betterCups || 0;
     const betterCupsValue =
       typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
-    betterCupsPurchasedElement.textContent = formatNumber(betterCupsValue);
+    betterCupsElement.textContent = formatNumber(betterCupsValue);
     if (shouldLog)
-      console.log(
-        '✅ Updated betterCups:',
-        betterCupsValue,
-        'element:',
-        betterCupsPurchasedElement
-      );
+      console.log('✅ Updated betterCups:', betterCupsValue, 'element:', betterCupsElement);
   } else {
-    if (shouldLog) console.log('❌ betterCupsPurchased element not found');
+    if (shouldLog) console.log('❌ betterCups element not found');
   }
 
-  // Update shop display elements (widerStraws and betterCups)
-  const shopWiderStrawsElement = (window as any).DOM_CACHE?.widerStraws as HTMLElement | undefined;
-  if (shopWiderStrawsElement) {
-    const widerStraws = state.widerStraws || 0;
-    const widerStrawsValue =
-      typeof widerStraws === 'object' && widerStraws.toString
-        ? widerStraws.toString()
-        : widerStraws;
-    shopWiderStrawsElement.textContent = formatNumber(widerStrawsValue);
-    if (shouldLog)
-      console.log(
-        '✅ Updated shop widerStraws:',
-        widerStrawsValue,
-        'element:',
-        shopWiderStrawsElement
-      );
-  } else {
-    if (shouldLog) console.log('❌ shop widerStraws element not found');
-  }
-
-  const shopBetterCupsElement = (window as any).DOM_CACHE?.betterCups as HTMLElement | undefined;
-  if (shopBetterCupsElement) {
-    const betterCups = state.betterCups || 0;
-    const betterCupsValue =
-      typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
-    shopBetterCupsElement.textContent = formatNumber(betterCupsValue);
-    if (shouldLog)
-      console.log(
-        '✅ Updated shop betterCups:',
-        betterCupsValue,
-        'element:',
-        shopBetterCupsElement
-      );
-  } else {
-    if (shouldLog) console.log('❌ shop betterCups element not found');
-  }
+  // Note: Shop display elements are the same as the purchased elements above
 
   // Update total production indicators
   const totalStrawSPDElement = (window as any).DOM_CACHE?.totalStrawSPD as HTMLElement | undefined;

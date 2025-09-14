@@ -23,6 +23,8 @@ class KonamiCodeDetector {
 
   constructor() {
     this.initializeDetection();
+    // Check if secrets are already unlocked on page load
+    this.checkAndUnlockGodTab();
   }
 
   private initializeDetection(): void {
@@ -76,6 +78,9 @@ class KonamiCodeDetector {
 
         // Update UI
         this.updateSecretsUI();
+
+        // Unlock God tab in settings modal
+        this.unlockGodTab();
 
         // Refresh navigation to show god tab
         const navManager = w.App?.ui?.navigationManager || (window as any).navigationManager;
@@ -165,6 +170,25 @@ class KonamiCodeDetector {
     }
   }
 
+  private unlockGodTab(): void {
+    // Show the God tab in settings modal
+    const godTab = document.querySelector('.god-tab') as HTMLElement;
+    if (godTab) {
+      godTab.classList.add('unlocked');
+      godTab.style.display = 'flex';
+    }
+
+    // Update modal title to indicate secrets unlocked
+    const modalTitle = document.querySelector('.settings-modal-title');
+    if (modalTitle) {
+      modalTitle.innerHTML = `
+        <span class="settings-icon">⚙️</span>
+        Settings & Statistics
+        <span style="font-size: 0.8rem; color: #ff6b35; margin-left: 0.5rem;">🔓</span>
+      `;
+    }
+  }
+
   public isSecretsUnlocked(): boolean {
     try {
       const w = window as any;
@@ -178,6 +202,12 @@ class KonamiCodeDetector {
   public reset(): void {
     this.sequence = [];
     this.isActive = false;
+  }
+
+  public checkAndUnlockGodTab(): void {
+    if (this.isSecretsUnlocked()) {
+      this.unlockGodTab();
+    }
   }
 }
 

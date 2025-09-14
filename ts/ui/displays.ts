@@ -732,9 +732,14 @@ export const updateAllDisplaysOptimized = debounceManager.debounce(
       updateTopSipCounter();
       updateTopSipsPerDrink();
       updateTopSipsPerSecond();
+      updateLevelNumber();
+      updateLevelText();
 
       // Update upgrade prices and affordability
       updateUpgradeDisplays();
+
+      // Update cost displays and button states
+      checkUpgradeAffordability();
     } catch (error) {
       console.warn('Error in optimized display update:', error);
     }
@@ -780,15 +785,16 @@ function updateUpgradeDisplays(): void {
  * Update click upgrade displays
  */
 function updateClickUpgradeDisplays(state: any): void {
-  // Use the existing cost calculation system
-  const costs = calculateAllCosts();
-
   // Suction upgrade
   const suctionBonus = state.suctionClickBonus || 0;
-  const canAffordSuction = state.sips >= costs.suction;
 
-  updateCostDisplay('suctionCostCompact', costs.suction, canAffordSuction);
-  updateStatDisplay('suctionClickBonusCompact', suctionBonus.toFixed(1));
+  // Handle both Decimal objects and regular numbers
+  const bonusValue =
+    typeof suctionBonus.toFixed === 'function'
+      ? suctionBonus.toFixed(1)
+      : parseFloat(suctionBonus.toString()).toFixed(1);
+
+  updateStatDisplay('suctionClickBonusCompact', bonusValue);
 }
 
 /**
@@ -813,41 +819,31 @@ function updateDrinkSpeedUpgradeDisplays(state: any): void {
  * Update production building displays
  */
 function updateProductionBuildingDisplays(state: any): void {
-  const costs = calculateAllCosts();
-
   // Straw production
   const strawsOwned = state.straws || 0;
   const strawSPD = state.strawSPD || 0;
-  const canAffordStraw = state.sips >= costs.straw;
 
-  updateCostDisplay('strawCost', costs.straw, canAffordStraw);
   updateStatDisplay('straws', strawsOwned);
   updateStatDisplay('strawSPD', strawSPD);
 
   // Cup production
   const cupsOwned = state.cups || 0;
   const cupSPD = state.cupSPD || 0;
-  const canAffordCup = state.sips >= costs.cup;
 
-  updateCostDisplay('cupCost', costs.cup, canAffordCup);
   updateStatDisplay('cups', cupsOwned);
   updateStatDisplay('cupSPD', cupSPD);
 
   // Wider Straws enhancement
   const widerStrawsOwned = state.widerStraws || 0;
   const widerStrawsSPD = state.widerStrawsSPD || 0;
-  const canAffordWiderStraws = state.sips >= costs.widerStraws;
 
-  updateCostDisplay('widerStrawsCost', costs.widerStraws, canAffordWiderStraws);
   updateStatDisplay('widerStraws', widerStrawsOwned);
   updateStatDisplay('widerStrawsSPD', widerStrawsSPD);
 
   // Better Cups enhancement
   const betterCupsOwned = state.betterCups || 0;
   const betterCupsSPD = state.betterCupsSPD || 0;
-  const canAffordBetterCups = state.sips >= costs.betterCups;
 
-  updateCostDisplay('betterCupsCost', costs.betterCups, canAffordBetterCups);
   updateStatDisplay('betterCups', betterCupsOwned);
   updateStatDisplay('betterCupsSPD', betterCupsSPD);
 }

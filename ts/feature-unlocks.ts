@@ -205,7 +205,6 @@ export const FEATURE_UNLOCKS = {
   updateFeatureVisibility() {
     // Prevent recursive calls that could cause infinite loops
     if (this._updatingFeatureVisibility) {
-      console.log('[DEBUG] updateFeatureVisibility already running, skipping recursive call');
       return;
     }
     this._updatingFeatureVisibility = true;
@@ -293,31 +292,24 @@ export const FEATURE_UNLOCKS = {
   updateUpgradeVisibility() {
     // Prevent recursive calls that could cause infinite loops
     if (this._updatingUpgradeVisibility) {
-      console.log('[DEBUG] updateUpgradeVisibility already running, skipping recursive call');
       return;
     }
     this._updatingUpgradeVisibility = true;
 
     const qs = (sel: string) => document.querySelector(sel) as HTMLElement | null;
 
-    console.log('[DEBUG] updateUpgradeVisibility called');
-
     // Update suction upgrade
     const suction = qs('.upgrade-card:first-child');
-    console.log('[DEBUG] suction element found:', !!suction);
     if (suction) {
       const isUnlocked = this.unlockedFeatures.has('suction');
-      console.log('[DEBUG] suction isUnlocked:', isUnlocked);
       suction.style.display = 'block';
       this.updateUpgradeButtonForUnlock(suction, 'suction', isUnlocked);
     }
 
     // Update critical click upgrade
     const critical = qs('.upgrade-card:last-child');
-    console.log('[DEBUG] critical element found:', !!critical);
     if (critical) {
       const isUnlocked = this.unlockedFeatures.has('criticalClick');
-      console.log('[DEBUG] critical isUnlocked:', isUnlocked);
       critical.style.display = 'block';
       this.updateUpgradeButtonForUnlock(critical, 'criticalClick', isUnlocked);
     }
@@ -339,7 +331,7 @@ export const FEATURE_UNLOCKS = {
     }
 
     // Update shop items
-    const shopItems = document.querySelectorAll('.shop-item');
+    const shopItems = document.querySelectorAll('.upgrade-card');
     shopItems.forEach((item, index) => {
       let featureName = '';
       if (index === 0) featureName = 'straws';
@@ -383,10 +375,24 @@ export const FEATURE_UNLOCKS = {
       if (saved && Array.isArray(saved)) {
         // Load all saved features - they should be valid since they were saved by the system
         this.unlockedFeatures = new Set<string>(saved);
+
+        // Ensure basic upgrades are always unlocked
+        const basicUpgrades = ['straws', 'cups', 'widerStraws', 'betterCups', 'levelUp'];
+        basicUpgrades.forEach(upgrade => this.unlockedFeatures.add(upgrade));
+
         console.log('Loaded unlocked features:', Array.from(this.unlockedFeatures));
       } else {
         // Only set default features if no saved data exists
-        this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
+        this.unlockedFeatures = new Set<string>([
+          'soda',
+          'options',
+          'dev',
+          'straws',
+          'cups',
+          'widerStraws',
+          'betterCups',
+          'levelUp',
+        ]);
         console.log('No saved features found, using defaults:', Array.from(this.unlockedFeatures));
       }
     } catch (e) {
@@ -734,7 +740,6 @@ export const FEATURE_UNLOCKS = {
 
     // Update data-action to purchase unlock
     button.setAttribute('data-action', `purchaseUnlock:${featureName}`);
-    console.log(`[DEBUG] Set data-action for ${featureName}:`, button.getAttribute('data-action'));
 
     // Add appropriate classes
     button.classList.remove('affordable');
@@ -742,9 +747,6 @@ export const FEATURE_UNLOCKS = {
     if (canPurchase) {
       button.classList.add('affordable');
     }
-
-    console.log(`[DEBUG] Button classes for ${featureName}:`, button.className);
-    console.log(`[DEBUG] Button canPurchase: ${canPurchase}`);
 
     // Hide stats/effects when locked
     const stats = container.querySelector('.upgrade-stats, .upgrade-effect');
@@ -791,6 +793,8 @@ export const FEATURE_UNLOCKS = {
     // Trigger UI update to restore normal button content
     try {
       (window as any).App?.ui?.updateAllDisplays?.();
+      // Also trigger affordability check to update costs immediately
+      (window as any).App?.ui?.checkUpgradeAffordability?.();
     } catch (error) {
       console.warn('Failed to update displays after unlock:', error);
     }
@@ -799,9 +803,9 @@ export const FEATURE_UNLOCKS = {
   // Get the cost element ID for a feature
   getCostElementId(featureName: string): string {
     const costElementMap: Record<string, string> = {
-      suction: 'suctionCostCompact',
-      criticalClick: 'criticalClickCostCompact',
-      fasterDrinks: 'fasterDrinksCostCompact',
+      suction: 'suctionCost',
+      criticalClick: 'criticalClickCost',
+      fasterDrinks: 'fasterDrinksCost',
       straws: 'strawCost',
       widerStraws: 'widerStrawsCost',
       cups: 'cupCost',

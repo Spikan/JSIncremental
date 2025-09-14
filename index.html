@@ -312,8 +312,20 @@
       <!-- Consolidated Game Header -->
       <div class="game-header">
         <div class="level-indicator">
-          <div class="level-number">Level <span id="levelNumber">1</span></div>
-          <div class="level-text" id="levelText">On a Blue Background</div>
+          <div class="level-info">
+            <div class="level-number">Level <span id="levelNumber">1</span></div>
+            <div class="level-text" id="levelText">On a Blue Background</div>
+          </div>
+          <button class="level-up-btn-header disabled" data-action="levelUp">
+            <div class="level-up-icon">⭐</div>
+            <div class="level-up-details">
+              <div class="level-up-cost">
+                <span id="levelCost" class="cost-number">3000</span>
+                <span class="cost-currency">Sips</span>
+              </div>
+              <div class="level-up-label">Level Up</div>
+            </div>
+          </button>
         </div>
 
         <div class="header-main-content">
@@ -427,53 +439,6 @@
               </button>
             </div>
           </div>
-
-          <!-- Level Up Section -->
-          <div class="level-up-section">
-            <div class="level-up-card">
-              <div class="level-up-header">
-                <div class="level-up-icon">⭐</div>
-                <div class="level-up-info">
-                  <h3 class="level-up-title">Level Up</h3>
-                  <p class="level-up-description">+150% sips per drink</p>
-                </div>
-              </div>
-              <button class="level-up-btn disabled" data-action="levelUp">
-                <div class="cost-display">
-                  <span id="levelCost" class="cost-number">3000</span>
-                  <span class="cost-currency">Sips</span>
-                </div>
-                <div class="btn-label">Level Up</div>
-              </button>
-            </div>
-          </div>
-
-          <!-- Production Summary -->
-          <div class="production-summary">
-            <div class="production-card">
-              <div class="production-header">
-                <div class="production-icon">📊</div>
-                <div class="production-info">
-                  <h3>Total Production</h3>
-                  <p>Your passive income per drink</p>
-                </div>
-              </div>
-              <div class="production-stats">
-                <div class="production-stat">
-                  <span class="production-label">Straws</span>
-                  <span class="production-value" id="totalStrawProduction">0</span>
-                </div>
-                <div class="production-stat">
-                  <span class="production-label">Cups</span>
-                  <span class="production-value" id="totalCupProduction">0</span>
-                </div>
-                <div class="production-stat total">
-                  <span class="production-label">Total/Drink</span>
-                  <span class="production-value" id="totalPassiveProduction">0</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- Sidebar (Right Side) -->
@@ -578,31 +543,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- God Section -->
-            <div class="sidebar-section" data-section="god">
-              <div class="section-header" data-action="toggleSection:god">
-                <div class="section-icon">🙏</div>
-                <div class="section-info">
-                  <h3 class="section-title">Talk to God</h3>
-                  <p class="section-subtitle">Seek divine guidance</p>
-                </div>
-                <div class="section-toggle">▼</div>
-              </div>
-              <div class="section-content">
-                <div class="god-content">
-                  <div class="god-message" id="godMessage">
-                    "Welcome, mortal. I see you seek the path of the soda drinker. What wisdom do
-                    you require?"
-                  </div>
-                  <div class="god-actions">
-                    <button class="god-btn" data-action="godBlessing">Request Blessing</button>
-                    <button class="god-btn" data-action="godWisdom">Seek Wisdom</button>
-                    <button class="god-btn" data-action="godPraise">Praise the Divine</button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -660,6 +600,16 @@
             <span class="tab-icon">📊</span>
             <span class="tab-label">Statistics</span>
           </button>
+          <button
+            class="settings-tab-btn god-tab"
+            data-tab="god"
+            data-action="switchSettingsTab"
+            data-args="god"
+            style="display: none"
+          >
+            <span class="tab-icon">🙏</span>
+            <span class="tab-label">Talk to God</span>
+          </button>
         </div>
 
         <div class="settings-modal-body">
@@ -711,6 +661,49 @@
                     <div class="stat-label">Total Sips</div>
                     <div class="stat-value" id="totalSipsEarned">0</div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- God Tab Content -->
+          <div class="settings-tab-content" id="god-tab">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Divine Conversation</h4>
+              <div class="god-chat-container">
+                <div class="god-chat-messages" id="godChatMessages">
+                  <div class="god-message">
+                    <div class="god-avatar">
+                      <img
+                        src="images/TempleOS.jpg"
+                        alt="God"
+                        style="width: 100%; height: 100%; object-fit: cover"
+                      />
+                    </div>
+                    <div class="god-text">
+                      <div class="god-name">God</div>
+                      <div class="god-message-content">
+                        Welcome, mortal. I sense your dedication to the art of soda consumption.
+                        What wisdom do you seek?
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="god-chat-input-container">
+                  <input
+                    type="text"
+                    id="godChatInput"
+                    class="god-chat-input"
+                    placeholder="Ask God for guidance..."
+                    maxlength="200"
+                    onkeypress="if(event.key==='Enter') { const btn = document.querySelector('[data-action=sendGodMessage]'); if(btn) btn.click(); }"
+                  />
+                  <button class="god-chat-send" data-action="sendGodMessage">
+                    <span class="send-icon">📤</span>
+                  </button>
+                </div>
+                <div class="god-chat-hint">
+                  <small>💡 Try asking about upgrades, strategies, or secrets...</small>
                 </div>
               </div>
             </div>

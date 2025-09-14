@@ -30,7 +30,7 @@ import { initializeSodaDrinkerProThemes, addThemeStyles } from './soda-drinker-p
 import { initializeAuthenticSDP } from './authentic-sdp';
 import { initializeSoda3D } from './soda-3d';
 import { konamiCodeDetector } from './konami-code';
-import { runFullLayoutValidation } from './layout-validation';
+// import { runFullLayoutValidation } from './layout-validation'; // Disabled - sections removed
 
 // Export all UI modules
 export { displays, stats, feedback, affordability, buttons };
@@ -471,6 +471,18 @@ export function initializeUI(): void {
         checkUpgradeAffordability();
       }, 100);
     });
+
+    // Subscribe to level changes to update level text automatically
+    try {
+      import('../core/state/zustand-store').then(({ useSubscribeToLevel }) => {
+        useSubscribeToLevel(() => {
+          updateLevelText();
+          updateLevelNumber();
+        });
+      });
+    } catch (error) {
+      console.warn('Failed to subscribe to level changes:', error);
+    }
   }
 
   // Initialize enhanced UI components
@@ -504,12 +516,12 @@ export function initializeUI(): void {
       console.warn('Failed to initialize displays:', error);
     }
 
-    // Run layout validation
-    try {
-      runFullLayoutValidation();
-    } catch (error) {
-      console.warn('Layout validation failed:', error);
-    }
+    // Layout validation disabled - sections were intentionally removed
+    // try {
+    //   runFullLayoutValidation();
+    // } catch (error) {
+    //   console.warn('Layout validation failed:', error);
+    // }
   } catch (error) {
     reportUIError(error, 'initialize_enhanced_ui', ErrorSeverity.MEDIUM);
   }

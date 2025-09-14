@@ -28,6 +28,8 @@ export interface SaveGameData {
   spd?: number | string | any;
   strawSPD?: number | string | any;
   cupSPD?: number | string | any;
+  // Options including Konami code state
+  options?: any;
 }
 
 export class SaveGameLoader {
@@ -66,6 +68,9 @@ export class SaveGameLoader {
 
       // Load timing data
       this.loadTimingData(savegame);
+
+      // Load options (including Konami code state)
+      this.loadOptions(savegame);
 
       console.log('✅ Game state loaded successfully');
     } catch (error) {
@@ -334,6 +339,32 @@ export class SaveGameLoader {
     }
 
     return defaultValue;
+  }
+
+  /**
+   * Load options including Konami code state
+   */
+  private loadOptions(savegame: SaveGameData): void {
+    try {
+      if (savegame.options && typeof savegame.options === 'object') {
+        // Load options into the state
+        getStoreActions().setState({ options: savegame.options });
+
+        // Also save to the options system for persistence
+        try {
+          (window as any).App?.systems?.options?.saveOptions?.(savegame.options);
+        } catch (error) {
+          console.warn('Failed to save options to options system:', error);
+        }
+
+        console.log('✅ Options loaded:', {
+          secretsUnlocked: savegame.options.secretsUnlocked,
+          godTabEnabled: savegame.options.godTabEnabled,
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to load options:', error);
+    }
   }
 
   /**

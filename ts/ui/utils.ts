@@ -244,7 +244,9 @@ export function updateCostDisplay(elementId: string, cost: number, isAffordable:
   if (typeof window === 'undefined') return;
   const element = findElement(elementId) as HTMLElement | null;
   if (!element || !(element as any).classList) return;
-  element.innerHTML = formatCostNumber(cost);
+
+  const formattedCost = formatCostNumber(cost);
+  element.innerHTML = formattedCost;
   try {
     element.classList.toggle('affordable', isAffordable);
     element.classList.toggle('unaffordable', !isAffordable);

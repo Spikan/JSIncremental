@@ -346,11 +346,111 @@ const BUTTON_CONFIG: {
       type: 'settings-modal-btn',
       label: 'Switch Settings Tab',
     },
+    sendGodMessage: {
+      func: () => {
+        try {
+          const input = document.getElementById('godChatInput') as HTMLInputElement;
+          const messagesContainer = document.getElementById('godChatMessages');
+
+          if (!input || !messagesContainer) return;
+
+          const message = input.value.trim();
+          if (!message) return;
+
+          // Add user message
+          const userMessage = document.createElement('div');
+          userMessage.className = 'god-message';
+          userMessage.innerHTML = `
+            <div class="god-avatar">👤</div>
+            <div class="god-text">
+              <div class="god-name">You</div>
+              <div class="god-message-content">${message}</div>
+            </div>
+          `;
+          messagesContainer.appendChild(userMessage);
+
+          // Clear input
+          input.value = '';
+
+          // Scroll to bottom
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+          // Use the proper God system from god.ts
+          setTimeout(() => {
+            try {
+              // Import and use the proper God response system
+              import('../god')
+                .then(godModule => {
+                  // Create a temporary container for the God response
+                  const tempContainer = document.createElement('div');
+                  tempContainer.id = 'chatMessages';
+                  tempContainer.style.display = 'none';
+                  document.body.appendChild(tempContainer);
+
+                  // Use the proper God response system
+                  godModule.getGodResponse(message);
+
+                  // Extract the God's response from the temporary container
+                  const godMessages = tempContainer.querySelectorAll('.god-message');
+                  if (godMessages.length > 0) {
+                    const lastGodMessage = godMessages[godMessages.length - 1];
+                    const godResponse =
+                      lastGodMessage?.querySelector('.message-text')?.textContent ||
+                      'Divine wisdom flows...';
+
+                    // Add the response to our modal
+                    const godMessage = document.createElement('div');
+                    godMessage.className = 'god-message';
+                    godMessage.innerHTML = `
+                      <div class="god-avatar">
+                        <img src="images/TempleOS.jpg" alt="God" style="width: 100%; height: 100%; object-fit: cover">
+                      </div>
+                      <div class="god-text">
+                        <div class="god-name">God</div>
+                        <div class="god-message-content">${godResponse}</div>
+                      </div>
+                    `;
+                    messagesContainer.appendChild(godMessage);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                  }
+
+                  // Clean up temporary container
+                  tempContainer.remove();
+                })
+                .catch(error => {
+                  console.error('Failed to load God module - this needs to be fixed:', error);
+                  // Show error message instead of fallback
+                  const errorMessage = document.createElement('div');
+                  errorMessage.className = 'god-message';
+                  errorMessage.innerHTML = `
+                    <div class="god-avatar">
+                      <img src="images/TempleOS.jpg" alt="God" style="width: 100%; height: 100%; object-fit: cover">
+                    </div>
+                    <div class="god-text">
+                      <div class="god-name">God</div>
+                      <div class="god-message-content">The divine connection has been severed. Please refresh and try again.</div>
+                    </div>
+                  `;
+                  messagesContainer.appendChild(errorMessage);
+                  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                });
+            } catch (error) {
+              console.warn('Failed to get God response:', error);
+            }
+          }, 1000);
+        } catch (error) {
+          console.warn('Failed to send God message:', error);
+        }
+      },
+      type: 'settings-modal-btn',
+      label: 'Send God Message',
+    },
   },
 };
 
 // Enhanced accidental press prevention constants
 const POINTER_SUPPRESS_MS = 300; // Reduced from 500ms for better responsiveness
+
 const MOVEMENT_THRESHOLD = 15; // Increased from 8px for better tolerance
 
 function markPointerHandled(element: HTMLElement): void {

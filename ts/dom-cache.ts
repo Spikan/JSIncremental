@@ -20,6 +20,8 @@ const DOM_CACHE: {
   betterCups: MaybeEl;
   widerStrawsSPD: MaybeEl;
   betterCupsSPD: MaybeEl;
+  widerStrawsCost: MaybeEl;
+  betterCupsCost: MaybeEl;
   totalStrawSPD: MaybeEl;
   totalWiderStrawsSPD: MaybeEl;
   totalCupSPD: MaybeEl;
@@ -71,6 +73,8 @@ const DOM_CACHE: {
   betterCups: null,
   widerStrawsSPD: null,
   betterCupsSPD: null,
+  widerStrawsCost: null,
+  betterCupsCost: null,
   totalStrawSPD: null,
   totalWiderStrawsSPD: null,
   totalCupSPD: null,
@@ -120,6 +124,8 @@ const DOM_CACHE: {
     this.betterCups = document.getElementById('betterCups');
     this.widerStrawsSPD = document.getElementById('widerStrawsSPD');
     this.betterCupsSPD = document.getElementById('betterCupsSPD');
+    this.widerStrawsCost = document.getElementById('widerStrawsCost');
+    this.betterCupsCost = document.getElementById('betterCupsCost');
     this.totalStrawSPD = document.getElementById('totalStrawSPD');
     this.totalWiderStrawsSPD = document.getElementById('totalWiderStrawsSPD');
     this.totalCupSPD = document.getElementById('totalCupSPD');

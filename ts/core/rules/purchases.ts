@@ -60,10 +60,14 @@ export function nextWiderStrawsCost(
   const scale = new Decimal(scaling);
   const count = new Decimal(widerStrawsCount);
 
-  // Use the same milestone system as straws and cups
-  const milestone = new Decimal(25);
-  const milestoneCost = base.multiply(scale.pow(milestone));
-  const withinMilestone = count.mod(milestone);
+  // Use the same milestone system as straws and cups (every 10 items)
+  const milestoneCount = new Decimal(count).div(10).floor();
+  const withinMilestone = count.mod(10);
+
+  // Base cost for this milestone
+  const milestoneCost = base.multiply(new Decimal(10).pow(milestoneCount));
+
+  // Linear scaling within milestone (much more affordable)
   const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
 
   return milestoneCost.multiply(withinMilestoneCost).div(base);
@@ -78,10 +82,14 @@ export function nextBetterCupsCost(
   const scale = new Decimal(scaling);
   const count = new Decimal(betterCupsCount);
 
-  // Use the same milestone system as straws and cups
-  const milestone = new Decimal(25);
-  const milestoneCost = base.multiply(scale.pow(milestone));
-  const withinMilestone = count.mod(milestone);
+  // Use the same milestone system as straws and cups (every 10 items)
+  const milestoneCount = new Decimal(count).div(10).floor();
+  const withinMilestone = count.mod(10);
+
+  // Base cost for this milestone
+  const milestoneCost = base.multiply(new Decimal(10).pow(milestoneCount));
+
+  // Linear scaling within milestone (much more affordable)
   const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
 
   return milestoneCost.multiply(withinMilestoneCost).div(base);

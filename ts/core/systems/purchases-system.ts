@@ -7,7 +7,12 @@
 // MEMORY: NEVER CONVERT PURCHASE COSTS TO JAVASCRIPT NUMBERS - USE FULL DECIMAL PRECISION
 // MEMORY: SPD CALCULATIONS MUST PRESERVE DECIMAL PRECISION THROUGHOUT
 
-import { nextCupCost, nextStrawCost } from '../rules/purchases.ts';
+import {
+  nextCupCost,
+  nextStrawCost,
+  nextWiderStrawsCost,
+  nextBetterCupsCost,
+} from '../rules/purchases.ts';
 import { safeToNumberOrDecimal } from '../numbers/safe-conversion';
 import { recalcProduction } from './resources.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
@@ -224,6 +229,7 @@ export function purchaseWiderStraws({
 }) {
   const { upgrades, config } = getTypedConfig();
   const baseCost = upgrades?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150;
+  const scaling = upgrades?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING ?? 1.2;
 
   // Convert inputs to Decimal for calculations
   const sipsLarge = toDecimal(sips);
@@ -232,9 +238,10 @@ export function purchaseWiderStraws({
   const widerStrawsLarge = toDecimal(widerStraws);
   const betterCupsLarge = toDecimal(betterCups);
 
-  const baseCostLarge = new Decimal(baseCost);
   const newWiderStrawsLarge = widerStrawsLarge.add(new Decimal(1));
-  const cost = baseCostLarge.multiply(newWiderStrawsLarge);
+
+  // Use the same milestone-based cost calculation as the display
+  const cost = nextWiderStrawsCost(newWiderStrawsLarge, baseCost, scaling);
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
@@ -270,6 +277,7 @@ export function purchaseBetterCups({
 }) {
   const { upgrades, config } = getTypedConfig();
   const baseCost = upgrades?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400;
+  const scaling = upgrades?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.25;
 
   // Convert inputs to Decimal for calculations
   const sipsLarge = toDecimal(sips);
@@ -278,9 +286,10 @@ export function purchaseBetterCups({
   const widerStrawsLarge = toDecimal(widerStraws);
   const betterCupsLarge = toDecimal(betterCups);
 
-  const baseCostLarge = new Decimal(baseCost);
   const newBetterCupsLarge = betterCupsLarge.add(new Decimal(1));
-  const cost = baseCostLarge.multiply(newBetterCupsLarge);
+
+  // Use the same milestone-based cost calculation as the display
+  const cost = nextBetterCupsCost(newBetterCupsLarge, baseCost, scaling);
 
   // Check affordability using Decimal comparison
   if (!gte(sipsLarge, cost)) return null;
@@ -1058,6 +1067,7 @@ export const execute = {
           ? curr.add(result.sipsGained as any).subtract(result.spent as any)
           : new Decimal(curr ?? 0).add(result.sipsGained as any).subtract(result.spent as any);
       w.sips = nextLarge;
+      w.level = new Decimal(result.level);
       const actions = w.App?.state?.actions;
       actions?.setSips?.(nextLarge);
       actions?.setLevel?.(safeToNumberOrDecimal(result.level));
@@ -1066,8 +1076,10 @@ export const execute = {
       try {
         const actions = w.App?.state?.actions;
         actions?.setSips?.(w.sips);
+        actions?.setLevel?.(safeToNumberOrDecimal(result.level));
+        w.level = new Decimal(result.level);
       } catch (error) {
-        console.warn('Failed to update sips via actions after level up:', error);
+        console.warn('Failed to update state via actions after level up:', error);
       }
     }
     try {

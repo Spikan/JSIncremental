@@ -152,8 +152,8 @@ export function validateGameFunctionality(): boolean {
 
   // Test upgrade elements exist
   const upgradeElements = [
-    'suctionCostCompact',
-    'fasterDrinksCostCompact',
+    'suctionCost',
+    'fasterDrinksCost',
     'strawCost',
     'cupCost',
     'widerStrawsCost',

@@ -22,21 +22,13 @@ import {
 // Helper function to check if a button is in unlock mode
 function isButtonInUnlockMode(buttonId: string): boolean {
   const unlockButtons = document.querySelectorAll(`button[data-action*="purchaseUnlock"]`);
-  console.log(`[DEBUG] Checking unlock mode for ${buttonId}:`, {
-    unlockButtonsFound: unlockButtons.length,
-    unlockButtons: Array.from(unlockButtons).map(btn => ({
-      id: btn.id,
-      dataAction: btn.getAttribute('data-action'),
-      classes: btn.className,
-    })),
-  });
+  // Debug logging removed for cleaner console
 
   if (unlockButtons.length === 0) return false;
 
   // Check if this button ID corresponds to an unlock button
   const unlockButtonIds = ['buySuction', 'buyCriticalClick', 'buyFasterDrinks'];
   const isUnlockButton = unlockButtonIds.includes(buttonId);
-  console.log(`[DEBUG] ${buttonId} is unlock button: ${isUnlockButton}`);
   return isUnlockButton;
 }
 
@@ -64,16 +56,10 @@ export function checkUpgradeAffordability(): void {
 
   // Only update these buttons if they're not in unlock mode
   if (!isButtonInUnlockMode('buySuction')) {
-    console.log(`[DEBUG] Updating buySuction button`);
     updateButtonState('buySuction', canAfford(costs.suction), costs.suction);
-  } else {
-    console.log(`[DEBUG] Skipping buySuction button (in unlock mode)`);
   }
   if (!isButtonInUnlockMode('buyFasterDrinks')) {
-    console.log(`[DEBUG] Updating buyFasterDrinks button`);
     updateButtonState('buyFasterDrinks', canAfford(costs.fasterDrinks), costs.fasterDrinks);
-  } else {
-    console.log(`[DEBUG] Skipping buyFasterDrinks button (in unlock mode)`);
   }
 
   updateButtonState('buyWiderStraws', canAfford(costs.widerStraws), costs.widerStraws);
@@ -84,9 +70,7 @@ export function checkUpgradeAffordability(): void {
   updateCostDisplay('strawCost', costs.straw, canAfford(costs.straw));
   updateCostDisplay('cupCost', costs.cup, canAfford(costs.cup));
   updateCostDisplay('suctionCost', costs.suction, canAfford(costs.suction));
-  updateCostDisplay('suctionCostCompact', costs.suction, canAfford(costs.suction));
   updateCostDisplay('fasterDrinksCost', costs.fasterDrinks, canAfford(costs.fasterDrinks));
-  updateCostDisplay('fasterDrinksCostCompact', costs.fasterDrinks, canAfford(costs.fasterDrinks));
   updateCostDisplay('widerStrawsCost', costs.widerStraws, canAfford(costs.widerStraws));
   updateCostDisplay('betterCupsCost', costs.betterCups, canAfford(costs.betterCups));
   updateCostDisplay('levelUpCost', costs.levelUp, canAfford(costs.levelUp));

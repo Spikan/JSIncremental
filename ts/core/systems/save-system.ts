@@ -42,7 +42,9 @@ export function performSaveSnapshot(): any {
       lastSaveTime: Date.now(),
       totalPlayTime: Number(state.totalPlayTime || 0),
       totalClicks: Number(state.totalClicks || w.totalClicks || 0),
-      level: String(w.level || 1),
+      level: String(state.level || w.level || 1),
+      // Save options including Konami code state
+      options: state.options || {},
     };
 
     w.App?.storage?.saveGame?.(payload);

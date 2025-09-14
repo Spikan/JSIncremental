@@ -101,14 +101,14 @@ export const formatDecimal = (value: any): string => {
       return value.isNaN() ? 'NaN' : value.isNegative() ? '-∞' : '∞';
     }
 
-    const num = value.toNumber();
+    // For Decimal objects, use toString() directly instead of toNumber()
+    const rawString = value.toString();
+
+    // Check if it's a small number that can be formatted nicely
+    const num = parseFloat(rawString);
     if (isFinite(num) && Math.abs(num) < 1000000) {
       return num.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
     }
-
-    // For large numbers, always use intelligent decimal cleanup
-    // This handles precision artifacts even in very large numbers
-    const rawString = value.toString();
     if (rawString.includes('.') && !rawString.includes('e') && !rawString.includes('E')) {
       const parts = rawString.split('.');
       if (parts.length === 2 && parts[1].length > 2) {

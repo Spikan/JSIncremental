@@ -30,14 +30,7 @@ export class SidebarNavigationManager {
         title: 'Shop',
         subtitle: 'Production buildings',
         icon: '🛒',
-        expanded: true, // Start with shop expanded since upgrades is removed
-      },
-      {
-        id: 'god',
-        title: 'Talk to God',
-        subtitle: 'Seek divine guidance',
-        icon: '🙏',
-        expanded: false,
+        expanded: true, // Start with shop expanded
       },
     ];
 
