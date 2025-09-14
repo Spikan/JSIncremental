@@ -857,13 +857,13 @@ function updateLevelUpDisplay(state: any): void {
 
   updateCostDisplay('levelCost', costs.levelUp, canLevelUp);
 
-  // Update level up button state
-  const levelUpBtn = document.querySelector('.level-up-btn');
-  if (levelUpBtn) {
+  // Update clickable level box state
+  const levelBox = document.querySelector('.level-box-clickable');
+  if (levelBox) {
     if (canLevelUp) {
-      levelUpBtn.classList.remove('disabled');
+      levelBox.classList.remove('disabled');
     } else {
-      levelUpBtn.classList.add('disabled');
+      levelBox.classList.add('disabled');
     }
   }
 }

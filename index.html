@@ -320,25 +320,25 @@
       <!-- Consolidated Game Header -->
       <div class="game-header">
         <div class="level-indicator">
-          <div class="level-info">
-            <div class="level-number">Level <span id="levelNumber">1</span></div>
-            <div class="level-text" id="levelText">On a Blue Background</div>
-          </div>
-          <div class="level-actions">
-            <button class="level-up-btn-header disabled" data-action="levelUp">
-              <div class="level-up-icon">⭐</div>
-              <div class="level-up-details">
-                <div class="level-up-cost">
-                  <span id="levelCost" class="cost-number">3000</span>
-                  <span class="cost-currency">Sips</span>
-                </div>
-                <div class="level-up-label">Level Up</div>
+          <button class="level-box-clickable disabled" data-action="levelUp">
+            <div class="level-badge">
+              <div class="level-number">
+                <span class="level-label">Level</span>
+                <span id="levelNumber">1</span>
               </div>
-            </button>
-            <button class="settings-cogwheel" data-action="openSettings" aria-label="Open Settings">
-              <span class="cogwheel-icon">⚙️</span>
-            </button>
-          </div>
+              <div class="level-text" id="levelText">On a Blue Background</div>
+            </div>
+            <div class="level-up-info">
+              <div class="level-up-cost">
+                <span id="levelCost" class="cost-number">3000</span>
+                <span class="cost-currency">Sips</span>
+              </div>
+              <div class="level-up-label">Level Up</div>
+            </div>
+          </button>
+          <button class="settings-cogwheel" data-action="openSettings" aria-label="Open Settings">
+            <span class="cogwheel-icon">⚙️</span>
+          </button>
         </div>
 
         <div class="header-main-content">
