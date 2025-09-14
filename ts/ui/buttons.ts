@@ -665,12 +665,23 @@ function setupSpecialButtonHandlers(): void {
     const sodaDomCacheBtn = domQuery.getById('sodaButton');
     const sodaButton = sodaDomCacheBtn || document.getElementById('sodaButton');
 
-    console.log('🔍 SODA BUTTON SEARCH:', {
+    console.warn('🔍 SODA BUTTON SEARCH:', {
       fromDomCache: !!sodaDomCacheBtn,
       fromDocument: !!document.getElementById('sodaButton'),
       finalButton: !!sodaButton,
       buttonId: sodaButton?.id,
       timestamp: Date.now(),
+    });
+
+    // Debug: Check if clicks system is available
+    const clicksSystem = (window as any).App?.systems?.clicks;
+    console.warn('🔍 CLICKS SYSTEM DEBUG:', {
+      hasApp: !!(window as any).App,
+      hasSystems: !!(window as any).App?.systems,
+      hasClicks: !!(window as any).App?.systems?.clicks,
+      hasHandleSodaClick: !!(window as any).App?.systems?.clicks?.handleSodaClick,
+      clicksSystemType: typeof clicksSystem,
+      handleSodaClickType: typeof clicksSystem?.handleSodaClick,
     });
     if (sodaButton && (sodaButton as any).addEventListener) {
       if ((window as any).PointerEvent) {
@@ -883,7 +894,7 @@ function setupSpecialButtonHandlers(): void {
 
       // Standard click event handler
       sodaButton.addEventListener('click', (e: any) => {
-        console.log('🔥 SODA BUTTON STANDARD CLICK EVENT FIRED!', {
+        console.warn('🔥 SODA BUTTON STANDARD CLICK EVENT FIRED!', {
           shouldSuppress: shouldSuppressClick(sodaButton),
           buttonId: e?.target?.id,
           timestamp: Date.now(),
@@ -891,7 +902,7 @@ function setupSpecialButtonHandlers(): void {
         });
 
         if (shouldSuppressClick(sodaButton)) {
-          console.log('🔥 Soda button click suppressed');
+          console.warn('🔥 Soda button click suppressed');
           return;
         }
         try {
@@ -908,10 +919,23 @@ function setupSpecialButtonHandlers(): void {
         }
         try {
           // Button click handling
+          console.warn('🔥 SODA CLICK HANDLER EXECUTING:', {
+            timestamp: Date.now(),
+            hasApp: !!(window as any).App,
+            hasSystems: !!(window as any).App?.systems,
+            hasClicks: !!(window as any).App?.systems?.clicks,
+          });
 
           // Try multiple ways to call the function
           const handleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
+          console.warn('🔥 HANDLE SODA CLICK FUNCTION:', {
+            found: !!handleSodaClick,
+            type: typeof handleSodaClick,
+            isFunction: typeof handleSodaClick === 'function',
+          });
+          
           if (typeof handleSodaClick === 'function') {
+            console.warn('🔥 CALLING HANDLE SODA CLICK...');
             // Calling handleSodaClick function directly
             handleSodaClick(1).catch((error: any) => {
               console.warn('Failed to handle soda click:', error);
