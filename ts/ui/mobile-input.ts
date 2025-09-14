@@ -43,6 +43,7 @@ export class MobileInputHandler {
 
     this.setupTouchHandling();
     this.setupContextMenuPrevention();
+    this.setupMoreOptionsModal();
     this.isInitialized = true;
   }
 
@@ -97,6 +98,158 @@ export class MobileInputHandler {
       }
     } catch (error) {
       console.warn('Failed to apply ultra-compact header:', error);
+    }
+  }
+
+  /**
+   * Setup the "More Options" modal functionality
+   */
+  private setupMoreOptionsModal(): void {
+    const moreOptionsModal = document.getElementById('moreOptionsModal');
+    const closeButton = document.querySelector('.close-more-options');
+    const moreTab = document.querySelector('[data-action="showMoreOptions"]');
+
+    if (!moreOptionsModal) {
+      console.warn('More options modal not found');
+      return;
+    }
+
+    // Show modal when "More" tab is clicked
+    if (moreTab) {
+      moreTab.addEventListener('click', event => {
+        event.preventDefault();
+        this.showMoreOptionsModal();
+      });
+    }
+
+    // Close modal when close button is clicked
+    if (closeButton) {
+      closeButton.addEventListener('click', () => {
+        this.hideMoreOptionsModal();
+      });
+    }
+
+    // Close modal when backdrop is clicked
+    moreOptionsModal.addEventListener('click', event => {
+      if (event.target === moreOptionsModal) {
+        this.hideMoreOptionsModal();
+      }
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && moreOptionsModal.style.display !== 'none') {
+        this.hideMoreOptionsModal();
+      }
+    });
+
+    // Setup more option buttons
+    this.setupMoreOptionButtons();
+  }
+
+  /**
+   * Setup more option buttons
+   */
+  private setupMoreOptionButtons(): void {
+    const moreOptionButtons = document.querySelectorAll('.more-option-btn');
+
+    moreOptionButtons.forEach((button: Element) => {
+      const btn = button as HTMLElement;
+
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        const action = btn.getAttribute('data-action');
+
+        if (action && action.startsWith('switchTab:')) {
+          const tabName = action.split(':')[1];
+          if (tabName) {
+            this.switchToTab(tabName);
+          }
+        }
+      });
+    });
+  }
+
+  /**
+   * Show the more options modal
+   */
+  private showMoreOptionsModal(): void {
+    const moreOptionsModal = document.getElementById('moreOptionsModal');
+    if (!moreOptionsModal) return;
+
+    moreOptionsModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+
+    // Focus management
+    const firstButton = moreOptionsModal.querySelector('.more-option-btn') as HTMLElement;
+    if (firstButton) {
+      firstButton.focus();
+    }
+
+    // Add haptic feedback
+    this.triggerHapticFeedback();
+  }
+
+  /**
+   * Hide the more options modal
+   */
+  private hideMoreOptionsModal(): void {
+    const moreOptionsModal = document.getElementById('moreOptionsModal');
+    if (!moreOptionsModal) return;
+
+    moreOptionsModal.style.display = 'none';
+    document.body.style.overflow = ''; // Restore scrolling
+
+    // Return focus to the More tab
+    const moreTab = document.querySelector('[data-action="showMoreOptions"]') as HTMLElement;
+    if (moreTab) {
+      moreTab.focus();
+    }
+  }
+
+  /**
+   * Switch to a specific tab
+   */
+  private switchToTab(tabName: string): void {
+    // Update tab content visibility
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(tab => tab.classList.remove('active'));
+
+    const selectedTab = document.getElementById(`${tabName}Tab`);
+    if (selectedTab) {
+      selectedTab.classList.add('active');
+    }
+
+    // Update mobile tab items
+    const mobileTabItems = document.querySelectorAll('.mobile-tab-item');
+    mobileTabItems.forEach(item => item.classList.remove('active'));
+
+    // Activate the correct tab
+    const targetTab = document.querySelector(`[data-action="switchTab:${tabName}"]`);
+    if (targetTab) {
+      targetTab.classList.add('active');
+    }
+
+    // Close more options modal
+    this.hideMoreOptionsModal();
+
+    // Add haptic feedback
+    this.triggerHapticFeedback();
+
+    console.log(`Switched to tab: ${tabName}`);
+  }
+
+  /**
+   * Trigger haptic feedback if available
+   */
+  private triggerHapticFeedback(): void {
+    try {
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50); // Short vibration
+      }
+    } catch (error) {
+      // Haptic feedback is not critical
+      console.debug('Haptic feedback not available:', error);
     }
   }
 

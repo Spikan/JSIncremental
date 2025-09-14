@@ -391,7 +391,7 @@
         </button>
       </div>
 
-      <!-- Mobile Bottom Navigation -->
+      <!-- Mobile Bottom Navigation - Simplified to 4 main tabs -->
       <div class="mobile-tab-navigation mobile-only">
         <div
           class="mobile-tab-item active"
@@ -415,16 +415,6 @@
         </div>
         <div
           class="mobile-tab-item"
-          data-action="switchTab:unlocks"
-          aria-label="Unlocks Tab"
-          role="button"
-          tabindex="0"
-        >
-          <div class="mobile-tab-icon">🔓</div>
-          <div class="mobile-tab-label">Unlock</div>
-        </div>
-        <div
-          class="mobile-tab-item"
           data-action="switchTab:stats"
           aria-label="Statistics Tab"
           role="button"
@@ -435,8 +425,8 @@
         </div>
         <div
           class="mobile-tab-item"
-          data-action="switchTab:options"
-          aria-label="Options Tab"
+          data-action="showMoreOptions"
+          aria-label="More Options"
           role="button"
           tabindex="0"
         >
@@ -445,6 +435,33 @@
         </div>
       </div>
 
+      <!-- More Options Modal for Mobile -->
+      <div id="moreOptionsModal" class="more-options-modal" style="display: none;">
+        <div class="more-options-content">
+          <div class="more-options-header">
+            <h3>More Options</h3>
+            <button class="close-more-options" aria-label="Close More Options">×</button>
+          </div>
+          <div class="more-options-grid">
+            <button class="more-option-btn" data-action="switchTab:unlocks">
+              <div class="more-option-icon">🔓</div>
+              <div class="more-option-label">Unlocks</div>
+            </button>
+            <button class="more-option-btn" data-action="switchTab:god">
+              <div class="more-option-icon">🙏</div>
+              <div class="more-option-label">Talk to God</div>
+            </button>
+            <button class="more-option-btn" data-action="switchTab:options">
+              <div class="more-option-icon">⚙️</div>
+              <div class="more-option-label">Settings</div>
+            </button>
+            <button class="more-option-btn" data-action="switchTab:dev">
+              <div class="more-option-icon">🔧</div>
+              <div class="more-option-label">Dev Tools</div>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Soda Clicking Tab -->
       <div id="sodaTab" class="tab-content active">
@@ -581,7 +598,9 @@
                   </div>
                 </div>
                 <button class="upgrade-btn" data-action="upgradeFasterDrinks">
-                  <div class="upgrade-cost"><span id="fasterDrinksUpCostCompact">1500</span> Sips</div>
+                  <div class="upgrade-cost">
+                    <span id="fasterDrinksUpCostCompact">1500</span> Sips
+                  </div>
                 </button>
                 <div class="upgrade-stats">
                   <div class="upgrade-effect">

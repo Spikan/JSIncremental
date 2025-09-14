@@ -19,6 +19,55 @@ html {
   line-height: 1.6;
 }
 
+/* ========================================
+   TYPOGRAPHY IMPROVEMENTS - Phase 1
+   ======================================== */
+
+/* Typography scale for consistent sizing */
+:root {
+  --text-xs: 0.75rem;   /* 12px - minimum readable size */
+  --text-sm: 0.875rem;  /* 14px - small text */
+  --text-base: 1rem;    /* 16px - base size */
+  --text-lg: 1.125rem;  /* 18px - large text */
+  --text-xl: 1.25rem;   /* 20px - extra large */
+  --text-2xl: 1.5rem;   /* 24px - headings */
+  --text-3xl: 1.875rem; /* 30px - large headings */
+  --text-4xl: 2.25rem;  /* 36px - display text */
+}
+
+/* Ensure minimum readable sizes for mobile */
+.mobile-tab-label {
+  font-size: var(--text-sm) !important; /* Was 0.75rem, now 0.875rem */
+  line-height: 1.3;
+}
+
+.currency-label {
+  font-size: var(--text-sm) !important; /* Was 0.8rem, now 0.875rem */
+  line-height: 1.4;
+}
+
+/* Improve contrast for better readability */
+.currency-value {
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.secondary-metric-value {
+  color: #00d97f !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Better spacing for mobile elements */
+.mobile-tab-item {
+  min-height: 80px !important; /* Increased from 60px */
+  padding: 0.75rem 0.5rem !important;
+}
+
+.mobile-tab-icon {
+  font-size: 1.8rem !important; /* Increased from 1.6rem */
+  margin-bottom: 0.25rem;
+}
+
 body {
   background-color: #001789;
   color: #ffffff;
@@ -372,7 +421,7 @@ body {
   text-align: center;
 }
 
-/* Mobile Bottom Navigation */
+/* Mobile Bottom Navigation - Improved for 4 tabs */
 .mobile-tab-navigation {
   position: fixed;
   bottom: 0;
@@ -380,16 +429,15 @@ body {
   right: 0;
   background: linear-gradient(135deg, rgba(0, 23, 137, 0.95), rgba(0, 36, 179, 0.95));
   border-top: 2px solid #00b36b;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 12px 8px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 1rem 0.75rem;
   z-index: 1000;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  /* Improved mobile spacing */
-  min-height: 70px;
+  min-height: 80px; /* Increased height for better touch targets */
 }
 
 .mobile-tab-item {
@@ -397,13 +445,12 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px 8px;
-  min-width: 60px;
-  min-height: 60px;
+  padding: 0.75rem 0.5rem;
+  min-width: 80px; /* Increased from 60px */
+  min-height: 80px; /* Increased from 60px for better touch targets */
   border-radius: 16px;
   transition: all 0.3s ease;
   cursor: pointer;
-  /* Enhanced idle game UX */
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   position: relative;
@@ -412,9 +459,8 @@ body {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   color: rgba(255, 255, 255, 0.85);
-  /* Improved touch target */
   flex: 1;
-  max-width: 80px;
+  max-width: 100px; /* Increased from 80px */
 }
 
 .mobile-tab-icon {
@@ -474,14 +520,159 @@ body {
   background: rgba(0, 179, 107, 0.3);
 }
 
-/* Mobile Content Padding */
+/* Mobile Content Padding - Updated for new nav height */
 .mobile-content-padding {
   padding-bottom: 0;
 }
 
+/* ========================================
+   MORE OPTIONS MODAL - Phase 1
+   ======================================== */
+
+.more-options-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.more-options-content {
+  background: linear-gradient(135deg, rgba(0, 23, 137, 0.95), rgba(0, 36, 179, 0.95));
+  border: 2px solid #00b36b;
+  border-radius: 20px;
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+.more-options-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.more-options-header h3 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.close-more-options {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-more-options:hover {
+  background: rgba(255, 61, 2, 0.2);
+  border-color: #ff3d02;
+  color: #ff3d02;
+  transform: scale(1.1);
+}
+
+.more-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.more-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 100px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.more-option-btn:hover {
+  background: rgba(0, 179, 107, 0.15);
+  border-color: rgba(0, 179, 107, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 179, 107, 0.2);
+  color: #ffffff;
+}
+
+.more-option-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.more-option-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: transform 0.2s ease;
+}
+
+.more-option-btn:hover .more-option-icon {
+  transform: scale(1.1);
+}
+
+.more-option-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 768px) {
   .mobile-content-padding {
-    padding-bottom: 90px; /* Increased for better spacing */
+    padding-bottom: 100px; /* Increased for new nav height (80px + 20px margin) */
   }
 
   /* Improved mobile content spacing */
@@ -6970,7 +7161,11 @@ p {
   }
 
   .upgrades-sidebar {
-    order: -1;
+    order: 1; /* Put upgrades AFTER soda button on mobile */
+  }
+
+  .primary-action-area {
+    order: 0; /* Ensure soda button comes first */
   }
 
   .upgrade-cards {
