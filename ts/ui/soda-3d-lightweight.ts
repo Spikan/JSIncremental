@@ -14,7 +14,20 @@ declare global {
     skyboxImage: string;
     cameraOrbit: string;
     fieldOfView: string;
-    addEventListener(type: 'load' | 'error' | 'progress' | 'model-visibility' | 'camera-change' | 'mouseenter' | 'mouseleave' | 'click' | 'touchstart' | 'touchend', listener: (event: any) => void): void;
+    addEventListener(
+      type:
+        | 'load'
+        | 'error'
+        | 'progress'
+        | 'model-visibility'
+        | 'camera-change'
+        | 'mouseenter'
+        | 'mouseleave'
+        | 'click'
+        | 'touchstart'
+        | 'touchend',
+      listener: (event: any) => void
+    ): void;
   }
 }
 
@@ -50,7 +63,7 @@ export class Soda3DButton {
     try {
       console.log('🔄 Starting 3D model initialization...');
       console.log('📍 Looking for container:', this.config.containerSelector);
-      
+
       this.container = document.querySelector(this.config.containerSelector);
       if (!this.container) {
         console.error('❌ Container not found:', this.config.containerSelector);
@@ -67,7 +80,7 @@ export class Soda3DButton {
 
       // Clear existing content (fallback image)
       this.container.innerHTML = '';
-      
+
       // Set container for model-viewer - simple setup
       this.container.style.position = 'relative';
       this.container.style.width = '200px';
@@ -76,20 +89,19 @@ export class Soda3DButton {
 
       // Create model-viewer element
       this.modelViewer = document.createElement('model-viewer') as ModelViewerElement;
-      
+
       this.setupModelViewer();
-      
+
       // Add to container
       this.container.appendChild(this.modelViewer);
-      
+
       // Set up event listeners
       this.setupEventListeners();
       console.log('✅ Event listeners set up');
-      
+
       // Load the model
       await this.loadModel();
       console.log('✅ Model loading initiated');
-      
     } catch (error) {
       console.error('❌ Failed to initialize 3D model:', error);
       console.log('🔄 Falling back to CSS 3D effect...');
@@ -101,26 +113,26 @@ export class Soda3DButton {
     return new Promise((resolve, reject) => {
       let attempts = 0;
       const maxAttempts = 30; // 3 seconds max wait
-      
+
       console.log('⏳ Waiting for model-viewer web component...');
-      
+
       const checkModelViewer = () => {
         attempts++;
-        
+
         // Check if the web component is defined
         if (customElements.get('model-viewer')) {
           resolve();
           return;
         }
-        
+
         if (attempts >= maxAttempts) {
           reject(new Error('model-viewer web component not available after timeout'));
           return;
         }
-        
+
         setTimeout(checkModelViewer, 100);
       };
-      
+
       checkModelViewer();
     });
   }
@@ -137,17 +149,16 @@ export class Soda3DButton {
     // this.modelViewer.setAttribute('auto-rotate', ''); // Disabled - using custom rotation
     // this.modelViewer.setAttribute('camera-controls', ''); // Disabled - users shouldn't move camera
     this.modelViewer.setAttribute('interaction-prompt', 'none');
-    
+
     // Use model-viewer defaults - let it auto-fit the model
     this.modelViewer.setAttribute('bounds', 'tight');
     this.modelViewer.setAttribute('loading', 'eager');
     this.modelViewer.setAttribute('reveal', 'auto');
-    
+
     // Start custom rotation
     this.startRotation();
     // Remove all custom camera settings to use defaults
   }
-
 
   private setupEventListeners() {
     // Basic event listeners
@@ -181,38 +192,36 @@ export class Soda3DButton {
       console.log('🔄 Starting model load process...');
       console.log('📍 Model path:', this.config.modelPath);
       console.log('🔍 Model viewer element:', this.modelViewer);
-      
+
       // Test if model file exists
       const response = await fetch(this.config.modelPath);
       if (!response.ok) {
         throw new Error(`Model file not found: ${response.status}`);
       }
-      
+
       console.log('🌐 Model file found, size:', response.headers.get('content-length'), 'bytes');
-      
+
       // Set the model source
       this.modelViewer.src = this.config.modelPath;
       console.log('🎯 Model source set, waiting for load event...');
       console.log('🔍 Model viewer src after setting:', this.modelViewer.src);
-      
+
       // Don't wait for the model to load - let the event handlers deal with it
       // The model-viewer will trigger 'load' or 'error' events
-      
     } catch (error) {
       console.error('❌ Failed to load model file:', error);
       this.showFallback();
     }
   }
 
-
   private async handleClick() {
     if (!this.isLoaded) return;
-    
+
     // Click animation
     // Scale down slightly
     this.modelViewer.style.transform = 'scale(0.95)';
     this.modelViewer.style.transition = `transform ${this.clickAnimationDuration}ms ease`;
-    
+
     // Reset after animation
     setTimeout(() => {
       this.modelViewer.style.transform = 'scale(1)';
@@ -220,7 +229,7 @@ export class Soda3DButton {
         this.modelViewer.style.transition = '';
       }, this.clickAnimationDuration);
     }, this.clickAnimationDuration / 2);
-    
+
     // Call the game's soda click handler
     try {
       const { handleSodaClick } = await import('../core/systems/clicks-system');
@@ -229,7 +238,7 @@ export class Soda3DButton {
     } catch (error) {
       console.error('❌ Failed to trigger soda click in game:', error);
     }
-    
+
     // Trigger additional click handlers
     this.clickHandlers.forEach(handler => {
       try {
@@ -242,12 +251,12 @@ export class Soda3DButton {
 
   private showFallback() {
     if (!this.container) return;
-    
+
     console.error('❌ 3D model failed to load - no fallback available');
-    
+
     // Clear container first
     this.container.innerHTML = '';
-    
+
     // Show error message instead of CSS fallback
     const errorDiv = document.createElement('div');
     errorDiv.style.width = `${this.config.width || this.config.size}px`;
@@ -263,7 +272,7 @@ export class Soda3DButton {
     errorDiv.style.padding = '20px';
     errorDiv.style.fontSize = '14px';
     errorDiv.innerHTML = '3D Model<br>Failed to Load';
-    
+
     // Add error message to container
     this.container.appendChild(errorDiv);
     console.log('❌ 3D model error displayed');
@@ -293,23 +302,6 @@ export class Soda3DButton {
     }
   }
 
-  setRotationSpeed(_speed: number) {
-    // Model-viewer doesn't support custom rotation speeds
-    // We'll use the default auto-rotate behavior
-  }
-
-  destroy() {
-    // Clean up event listeners
-    this.clickHandlers = [];
-    
-    // Remove model viewer
-    if (this.modelViewer && this.modelViewer.parentNode) {
-      this.modelViewer.parentNode.removeChild(this.modelViewer);
-    }
-    
-    this.isLoaded = false;
-  }
-
   // Get current state
   get isModelLoaded(): boolean {
     return this.isLoaded;
@@ -325,13 +317,13 @@ export class Soda3DButton {
       if (this.rotationAngle >= 360) {
         this.rotationAngle -= 360;
       }
-      
+
       // Update camera orbit with our custom rotation
       this.modelViewer.setAttribute('camera-orbit', `${this.rotationAngle}deg 75deg auto`);
-      
+
       this.animationId = requestAnimationFrame(animate);
     };
-    
+
     animate();
   }
 
