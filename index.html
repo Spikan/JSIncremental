@@ -405,16 +405,6 @@
         </div>
         <div
           class="mobile-tab-item"
-          data-action="switchTab:unlocks"
-          aria-label="Unlocks Tab"
-          role="button"
-          tabindex="0"
-        >
-          <div class="mobile-tab-icon">🔓</div>
-          <div class="mobile-tab-label">Unlock</div>
-        </div>
-        <div
-          class="mobile-tab-item"
           data-action="switchTab:shop"
           aria-label="Shop & Upgrades Tab"
           role="button"
@@ -422,6 +412,16 @@
         >
           <div class="mobile-tab-icon">🛒</div>
           <div class="mobile-tab-label">Shop</div>
+        </div>
+        <div
+          class="mobile-tab-item"
+          data-action="switchTab:unlocks"
+          aria-label="Unlocks Tab"
+          role="button"
+          tabindex="0"
+        >
+          <div class="mobile-tab-icon">🔓</div>
+          <div class="mobile-tab-label">Unlock</div>
         </div>
         <div
           class="mobile-tab-item"
@@ -435,33 +435,13 @@
         </div>
         <div
           class="mobile-tab-item"
-          data-action="switchTab:god"
-          aria-label="Talk to God Tab"
-          role="button"
-          tabindex="0"
-        >
-          <div class="mobile-tab-icon">🙏</div>
-          <div class="mobile-tab-label">God</div>
-        </div>
-        <div
-          class="mobile-tab-item"
           data-action="switchTab:options"
           aria-label="Options Tab"
           role="button"
           tabindex="0"
         >
           <div class="mobile-tab-icon">⚙️</div>
-          <div class="mobile-tab-label">Opt</div>
-        </div>
-        <div
-          class="mobile-tab-item"
-          data-action="switchTab:dev"
-          aria-label="Dev Tools Tab"
-          role="button"
-          tabindex="0"
-        >
-          <div class="mobile-tab-icon">🔧</div>
-          <div class="mobile-tab-label">Dev</div>
+          <div class="mobile-tab-label">More</div>
         </div>
       </div>
 
@@ -834,6 +814,45 @@
               <div class="info-item">
                 <span class="info-label">Play Time:</span>
                 <span class="info-value" id="playTime">0:00:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile-only: God Section -->
+          <div class="options-section mobile-only">
+            <h3>🙏 Talk to God</h3>
+            <div class="god-section-mobile">
+              <div class="god-header-mobile">
+                <h4>Seek Divine Guidance</h4>
+                <p>Ask the almighty for wisdom and blessings in your soda journey.</p>
+              </div>
+              <div class="god-content-mobile">
+                <div class="god-message-mobile" id="godMessageMobile">
+                  "Welcome, mortal. I see you seek the path of the soda drinker. What wisdom do you require?"
+                </div>
+                <div class="god-actions-mobile">
+                  <button class="god-btn-mobile" data-action="godBlessing">Request Blessing</button>
+                  <button class="god-btn-mobile" data-action="godWisdom">Seek Wisdom</button>
+                  <button class="god-btn-mobile" data-action="godPraise">Praise the Divine</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile-only: Dev Tools Section -->
+          <div class="options-section mobile-only">
+            <h3>🔧 Development Tools</h3>
+            <div class="dev-section-mobile">
+              <div class="dev-warning-mobile">
+                <p>⚠️ Development tools are for testing purposes only. Use with caution!</p>
+              </div>
+              <div class="dev-actions-mobile">
+                <button class="dev-btn-mobile" data-action="devAddSips">Add Sips</button>
+                <button class="dev-btn-mobile" data-action="devAddTime">Add Time</button>
+                <button class="dev-btn-mobile" data-action="devUnlockAll">Unlock All</button>
+                <button class="dev-btn-mobile" data-action="devResetUnlocks">Reset Unlocks</button>
+                <button class="dev-btn-mobile" data-action="devClearConsole">Clear Console</button>
+                <button class="dev-btn-mobile" data-action="devPerformanceTest">Performance Test</button>
               </div>
             </div>
           </div>

@@ -378,16 +378,18 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, #001789, #0024b3);
+  background: linear-gradient(135deg, rgba(0, 23, 137, 0.95), rgba(0, 36, 179, 0.95));
   border-top: 2px solid #00b36b;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 8px 4px;
+  padding: 12px 8px;
   z-index: 1000;
-  box-shadow: 0 -4px 12px rgba(0, 179, 107, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  /* Improved mobile spacing */
+  min-height: 70px;
 }
 
 .mobile-tab-item {
@@ -395,39 +397,47 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px 6px;
-  min-width: 52px;
-  min-height: 52px;
-  border-radius: 12px;
+  padding: 12px 8px;
+  min-width: 60px;
+  min-height: 60px;
+  border-radius: 16px;
   transition: all 0.3s ease;
   cursor: pointer;
   /* Enhanced idle game UX */
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
+  /* Improved touch target */
+  flex: 1;
+  max-width: 80px;
 }
 
 .mobile-tab-icon {
-  font-size: 1.4rem;
-  margin-bottom: 2px;
+  font-size: 1.6rem;
+  margin-bottom: 4px;
   transition: all 0.2s ease;
+  /* Better visual hierarchy */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .mobile-tab-label {
-  font-size: 0.7rem;
-  font-weight: bold;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-align: center;
-  line-height: 1;
+  line-height: 1.2;
   transition: all 0.2s ease;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  /* Better readability */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
 }
 
 /* Mobile Tab Active State */
@@ -471,7 +481,25 @@ body {
 
 @media (max-width: 768px) {
   .mobile-content-padding {
-    padding-bottom: 80px;
+    padding-bottom: 90px; /* Increased for better spacing */
+  }
+  
+  /* Improved mobile content spacing */
+  .tab-content {
+    padding: 1rem 0.75rem;
+    min-height: calc(100vh - 90px);
+  }
+  
+  /* Better mobile container spacing */
+  .game-main,
+  .unlocks-container,
+  .shop-container,
+  .stats-container,
+  .god-container,
+  .dev-container,
+  .options-container {
+    padding: 1rem 0.75rem;
+    margin: 0;
   }
 }
 
@@ -2981,6 +3009,241 @@ h3 {
   html {
     font-size: 14px;
   }
+  
+  /* Improved mobile body layout */
+  body {
+    padding-bottom: 0;
+    overflow-x: hidden;
+  }
+  
+  /* Better mobile content hierarchy */
+  .game-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Improved mobile primary action area */
+  .primary-action-area {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(0, 179, 107, 0.1), rgba(0, 36, 179, 0.1));
+    border-radius: 16px;
+    margin-bottom: 1rem;
+  }
+  
+  /* Better mobile soda button */
+  .soda-button {
+    width: 200px;
+    height: 200px;
+    margin: 1rem auto;
+    border-radius: 50%;
+    font-size: 3rem;
+    box-shadow: 0 8px 25px rgba(0, 179, 107, 0.3);
+  }
+  
+  /* Improved mobile upgrade sections */
+  .clicking-upgrades-container,
+  .drink-speed-upgrade-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  
+  /* Better mobile upgrade buttons */
+  .clicking-upgrade-btn,
+  .drink-speed-upgrade-btn {
+    width: 100%;
+    min-height: 70px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  /* Improved mobile shop layout */
+  .shop-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .shop-item {
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Better mobile stats layout */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+    text-align: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0, 179, 107, 0.1), rgba(0, 36, 179, 0.1));
+  }
+  
+  /* Improved mobile text hierarchy */
+  h1, h2, h3 {
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+  }
+  
+  /* Better mobile spacing for sections */
+  .unlocks-container,
+  .god-container,
+  .dev-container,
+  .options-container {
+    padding: 1rem;
+  }
+  
+  .unlocks-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Improved mobile form elements */
+  input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 0.75rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Better mobile button spacing */
+  button {
+    min-height: 44px; /* iOS recommended touch target */
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+  
+  /* Enhanced mobile touch feedback */
+  .mobile-tab-item:active,
+  button:active,
+  .soda-button:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Better mobile scroll behavior */
+  .tab-content {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Improved mobile text selection */
+  .mobile-tab-label,
+  .mobile-tab-icon {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Better mobile focus indicators */
+  .mobile-tab-item:focus-visible,
+  button:focus-visible {
+    outline: 2px solid #00d97f;
+    outline-offset: 2px;
+  }
+  
+  /* Mobile-only sections in Options tab */
+  .mobile-only {
+    display: block;
+  }
+  
+  .god-section-mobile,
+  .dev-section-mobile {
+    background: linear-gradient(135deg, rgba(0, 179, 107, 0.1), rgba(0, 36, 179, 0.1));
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .god-header-mobile h4 {
+    color: #00d97f;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .god-header-mobile p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .god-message-mobile {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-style: italic;
+    color: #ffffff;
+    border-left: 3px solid #00d97f;
+  }
+  
+  .god-actions-mobile,
+  .dev-actions-mobile {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .god-btn-mobile,
+  .dev-btn-mobile {
+    background: linear-gradient(135deg, #00b36b, #00d97f);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    min-height: 44px;
+  }
+  
+  .god-btn-mobile:hover,
+  .dev-btn-mobile:hover {
+    background: linear-gradient(135deg, #00d97f, #00b36b);
+    transform: translateY(-1px);
+  }
+  
+  .dev-warning-mobile {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .dev-warning-mobile p {
+    color: #ffc107;
+    font-size: 0.85rem;
+    margin: 0;
+  }
 
   #levelDiv {
     position: relative;
@@ -3226,6 +3489,11 @@ h3 {
     display: none;
   }
 
+  /* Hide mobile-only sections on desktop */
+  .mobile-only {
+    display: none !important;
+  }
+
   /* Remove mobile content padding on desktop */
   .mobile-content-padding {
     padding-bottom: 0;
@@ -3245,7 +3513,96 @@ h3 {
 
 @media (max-width: 480px) {
   html {
-    font-size: 12px;
+    font-size: 13px; /* Slightly larger for better readability */
+  }
+  
+  /* Ultra-compact mobile navigation */
+  .mobile-tab-navigation {
+    padding: 8px 4px;
+    min-height: 65px;
+  }
+  
+  .mobile-tab-item {
+    padding: 8px 4px;
+    min-width: 50px;
+    min-height: 50px;
+    border-radius: 12px;
+  }
+  
+  .mobile-tab-icon {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+  }
+  
+  .mobile-tab-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3px;
+  }
+  
+  /* Compact mobile content */
+  .tab-content {
+    padding: 0.75rem 0.5rem;
+    min-height: calc(100vh - 65px);
+  }
+  
+  /* Ultra-compact mobile primary action area */
+  .primary-action-area {
+    padding: 1rem 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Smaller mobile soda button */
+  .soda-button {
+    width: 160px;
+    height: 160px;
+    font-size: 2.5rem;
+    margin: 0.75rem auto;
+  }
+  
+  /* Compact mobile upgrade buttons */
+  .clicking-upgrade-btn,
+  .drink-speed-upgrade-btn {
+    min-height: 60px;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Single column mobile stats */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .stat-card {
+    padding: 0.75rem;
+  }
+  
+  /* Compact mobile shop */
+  .shop-container {
+    padding: 0.75rem 0.5rem;
+    gap: 0.75rem;
+  }
+  
+  .shop-item {
+    padding: 1rem;
+  }
+  
+  /* Compact mobile text */
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  h3 {
+    font-size: 1.1rem;
+  }
+  
+  /* Better mobile spacing */
+  .game-main,
+  .unlocks-container,
+  .god-container,
+  .dev-container,
+  .options-container {
+    padding: 0.75rem 0.5rem;
   }
 
   #topDiv,
