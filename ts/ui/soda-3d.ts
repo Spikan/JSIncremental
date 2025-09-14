@@ -479,8 +479,11 @@ export class Soda3DButton {
 
   public resize(size: number): void {
     this.config.size = size;
-    this.renderer.setSize(size, size);
-    this.camera.aspect = 1;
+    // Use the configured width and height, not just size
+    const width = this.config.width || size;
+    const height = this.config.height || size;
+    this.renderer.setSize(width, height);
+    this.camera.aspect = width / height; // Proper aspect ratio for rectangular dimensions
     this.camera.updateProjectionMatrix();
   }
 
@@ -516,7 +519,7 @@ export function createSoda3DButton(containerSelector: string): Soda3DButton {
   // Detect screen size for responsive sizing
   const isSmallMobile = window.innerWidth <= 480;
   const isMobile = window.innerWidth <= 768;
-  
+
   let width, height;
   if (isSmallMobile) {
     // Small mobile: 200x290
@@ -531,7 +534,7 @@ export function createSoda3DButton(containerSelector: string): Soda3DButton {
     width = 320;
     height = 560;
   }
-  
+
   const config: Soda3DConfig = {
     containerSelector,
     modelPath: sodaModelUrl,
