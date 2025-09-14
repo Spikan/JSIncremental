@@ -7348,6 +7348,19 @@ p {
   opacity: 0.8;
 }
 
+/* Enhanced affordability classes (separate from main system) */
+.upgrade-btn.enhanced-affordable {
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.upgrade-btn.enhanced-near-affordable {
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.upgrade-btn.enhanced-unaffordable {
+  box-shadow: 0 0 10px rgba(107, 114, 128, 0.3);
+}
+
 /* Animation keyframes for enhanced button states */
 @keyframes nearAffordablePulse {
   0%,

@@ -78,34 +78,34 @@ export function applyEnhancedAffordabilityClasses(): void {
 
     const affordabilityState = calculateAffordabilityState(cost);
 
-    // Determine what class should be applied
+    // Determine what enhanced class should be applied (using different names to avoid conflicts)
     let targetClass = '';
     if (affordabilityState.affordable) {
-      targetClass = 'affordable';
+      targetClass = 'enhanced-affordable';
     } else if (affordabilityState.nearAffordable) {
-      targetClass = 'near-affordable';
+      targetClass = 'enhanced-near-affordable';
     } else {
-      targetClass = 'unaffordable';
+      targetClass = 'enhanced-unaffordable';
     }
 
-    // Only update classes if they've actually changed
-    const hasAffordable = element.classList.contains('affordable');
-    const hasNearAffordable = element.classList.contains('near-affordable');
-    const hasUnaffordable = element.classList.contains('unaffordable');
+    // Only update enhanced classes if they've actually changed
+    const hasEnhancedAffordable = element.classList.contains('enhanced-affordable');
+    const hasEnhancedNearAffordable = element.classList.contains('enhanced-near-affordable');
+    const hasEnhancedUnaffordable = element.classList.contains('enhanced-unaffordable');
 
     const needsUpdate = 
-      (targetClass === 'affordable' && !hasAffordable) ||
-      (targetClass === 'near-affordable' && !hasNearAffordable) ||
-      (targetClass === 'unaffordable' && !hasUnaffordable) ||
-      (targetClass !== 'affordable' && hasAffordable) ||
-      (targetClass !== 'near-affordable' && hasNearAffordable) ||
-      (targetClass !== 'unaffordable' && hasUnaffordable);
+      (targetClass === 'enhanced-affordable' && !hasEnhancedAffordable) ||
+      (targetClass === 'enhanced-near-affordable' && !hasEnhancedNearAffordable) ||
+      (targetClass === 'enhanced-unaffordable' && !hasEnhancedUnaffordable) ||
+      (targetClass !== 'enhanced-affordable' && hasEnhancedAffordable) ||
+      (targetClass !== 'enhanced-near-affordable' && hasEnhancedNearAffordable) ||
+      (targetClass !== 'enhanced-unaffordable' && hasEnhancedUnaffordable);
 
     if (needsUpdate) {
-      // Remove existing affordability classes
-      element.classList.remove('affordable', 'near-affordable', 'unaffordable');
+      // Remove existing enhanced affordability classes (don't touch main system classes)
+      element.classList.remove('enhanced-affordable', 'enhanced-near-affordable', 'enhanced-unaffordable');
 
-      // Apply new class
+      // Apply new enhanced class
       if (targetClass) {
         element.classList.add(targetClass);
       }
