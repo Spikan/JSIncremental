@@ -28,6 +28,7 @@ import {
 } from './enhanced-affordability';
 import { initializeSodaDrinkerProThemes, addThemeStyles } from './soda-drinker-pro-themes';
 import { initializeAuthenticSDP } from './authentic-sdp';
+import { initializeSoda3D } from './soda-3d';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability, buttons };
@@ -518,6 +519,9 @@ export function initializeUI(): void {
 
     // Initialize authentic SDP experience
     initializeAuthenticSDP();
+    
+    // Initialize 3D soda button
+    initializeSoda3D();
   } catch (error) {
     reportUIError(error, 'initialize_enhanced_ui', ErrorSeverity.MEDIUM);
   }

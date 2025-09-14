@@ -17,6 +17,7 @@ function createManualChunks(id: string): string {
   if (id.includes('node_modules')) {
     if (id.includes('zustand')) return 'vendor-zustand';
     if (id.includes('zod')) return 'vendor-zod';
+    if (id.includes('three')) return 'vendor-three';
     return 'vendor';
   }
 
@@ -50,6 +51,9 @@ function createAssetFileNames(assetInfo: any): string {
     return `assets/[name]-[hash].${ext}`;
   }
   if (/\.(json)$/.test(assetInfo.name ?? '')) {
+    return `assets/[name]-[hash].${ext}`;
+  }
+  if (/\.(glb|gltf)$/.test(assetInfo.name ?? '')) {
     return `assets/[name]-[hash].${ext}`;
   }
   return `assets/[name]-[hash].${ext}`;
@@ -99,7 +103,7 @@ export default defineConfig(({ mode }) => {
     },
 
     optimizeDeps: {
-      include: ['zustand', 'zod'] as string[],
+      include: ['zustand', 'zod', 'three'] as string[],
       exclude: [] as string[],
     },
   } as const;
