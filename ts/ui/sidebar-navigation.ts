@@ -40,13 +40,6 @@ export class SidebarNavigationManager {
         expanded: false,
       },
       {
-        id: 'settings',
-        title: 'Settings',
-        subtitle: 'Options & tools',
-        icon: '⚙️',
-        expanded: false,
-      },
-      {
         id: 'god',
         title: 'Talk to God',
         subtitle: 'Seek divine guidance',

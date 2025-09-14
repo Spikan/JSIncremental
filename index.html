@@ -366,6 +366,12 @@
           </div>
         </div>
 
+        <div class="header-actions">
+          <button class="settings-cogwheel" data-action="openSettings" aria-label="Open Settings">
+            <span class="cogwheel-icon">⚙️</span>
+          </button>
+        </div>
+
         <div class="game-title">
           <div class="title-main">SODA CLICKER</div>
           <div class="title-sub">PRO</div>
@@ -610,41 +616,6 @@
               </div>
             </div>
 
-            <!-- Settings Section -->
-            <div class="sidebar-section" data-section="settings">
-              <div class="section-header" data-action="toggleSection:settings">
-                <div class="section-icon">⚙️</div>
-                <div class="section-info">
-                  <h3 class="section-title">Settings</h3>
-                  <p class="section-subtitle">Options & tools</p>
-                </div>
-                <div class="section-toggle">▼</div>
-              </div>
-              <div class="section-content">
-                <div class="settings-group">
-                  <h4 class="settings-group-title">Audio</h4>
-                  <button
-                    id="buttonSoundsToggle"
-                    data-action="toggleButtonSounds"
-                    class="settings-btn"
-                  >
-                    🔊 Button Sounds ON
-                  </button>
-                </div>
-                <div class="settings-group">
-                  <h4 class="settings-group-title">Save & Load</h4>
-                  <button data-action="save" class="settings-btn">Save Game</button>
-                  <button data-action="delete_save" class="settings-btn">Delete Save</button>
-                </div>
-                <div class="settings-group">
-                  <h4 class="settings-group-title">Dev Tools</h4>
-                  <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
-                    🔧 Dev Tools OFF
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <!-- God Section -->
             <div class="sidebar-section" data-section="god">
               <div class="section-header" data-action="toggleSection:god">
@@ -687,5 +658,47 @@
       // Let main.js handle the script loading since the modular files are now working
       console.log('🔧 Core scripts loaded, main.js will handle the rest...');
     </script>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="settings-modal" style="display: none">
+      <div class="settings-modal-overlay" data-action="closeSettings"></div>
+      <div class="settings-modal-content">
+        <div class="settings-modal-header">
+          <h2 class="settings-modal-title">
+            <span class="settings-icon">⚙️</span>
+            Settings
+          </h2>
+          <button
+            class="settings-modal-close"
+            data-action="closeSettings"
+            aria-label="Close Settings"
+          >
+            <span class="close-icon">×</span>
+          </button>
+        </div>
+
+        <div class="settings-modal-body">
+          <div class="settings-group">
+            <h4 class="settings-group-title">Audio</h4>
+            <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="settings-btn">
+              🔊 Button Sounds ON
+            </button>
+          </div>
+
+          <div class="settings-group">
+            <h4 class="settings-group-title">Save & Load</h4>
+            <button data-action="save" class="settings-btn">Save Game</button>
+            <button data-action="delete_save" class="settings-btn">Delete Save</button>
+          </div>
+
+          <div class="settings-group">
+            <h4 class="settings-group-title">Dev Tools</h4>
+            <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
+              🔧 Dev Tools OFF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

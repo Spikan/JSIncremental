@@ -31,6 +31,7 @@ const BUTTON_CONFIG: {
     'dev-btn': { audio: 'click', feedback: 'info', className: 'dev-btn' },
     'chat-send-btn': { audio: 'click', feedback: 'info', className: 'chat-send-btn' },
     'splash-start-btn': { audio: 'click', feedback: 'info', className: 'splash-start-btn' },
+    'settings-modal-btn': { audio: 'click', feedback: 'info', className: 'settings-modal-btn' },
   },
   actions: {
     buyStraw: {
@@ -283,6 +284,44 @@ const BUTTON_CONFIG: {
       func: () => (window as any).App?.systems?.dev?.openImportDialog?.(),
       type: 'save-btn',
       label: 'Import Save',
+    },
+    // Settings Modal Actions
+    openSettings: {
+      func: () => {
+        try {
+          const modal = document.getElementById('settingsModal');
+          if (modal) {
+            modal.style.display = 'flex';
+            // Add a small delay to ensure the display change is processed
+            setTimeout(() => {
+              modal.classList.add('settings-modal-open');
+            }, 10);
+          }
+        } catch (error) {
+          console.warn('Failed to open settings modal:', error);
+        }
+      },
+      type: 'settings-modal-btn',
+      label: 'Open Settings',
+    },
+    closeSettings: {
+      func: () => {
+        try {
+          const modal = document.getElementById('settingsModal');
+          if (modal) {
+            modal.classList.add('settings-modal-closing');
+            // Add a small delay before hiding to allow for close animation
+            setTimeout(() => {
+              modal.style.display = 'none';
+              modal.classList.remove('settings-modal-open', 'settings-modal-closing');
+            }, 300);
+          }
+        } catch (error) {
+          console.warn('Failed to close settings modal:', error);
+        }
+      },
+      type: 'settings-modal-btn',
+      label: 'Close Settings',
     },
   },
 };
