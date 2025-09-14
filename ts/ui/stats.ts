@@ -257,32 +257,62 @@ export function updateAchievementStats(): void {
 
 // Update enhancement values for upgrade displays
 export function updateEnhancementValues(): void {
+  console.log('🔍 updateEnhancementValues: Function called');
   const state = (window as any).App?.state?.getState?.();
-  if (!state) return;
+  if (!state) {
+    console.log('🔍 updateEnhancementValues: No state available');
+    return;
+  }
+
+  console.log('🔍 updateEnhancementValues: State available', {
+    straws: state.straws,
+    cups: state.cups,
+    widerStraws: state.widerStraws,
+    betterCups: state.betterCups,
+  });
 
   // Update base production values to show what you actually get
   const strawSPDElement = (window as any).DOM_CACHE?.strawSPD as HTMLElement | undefined;
+  console.log('🔍 strawSPDElement found:', !!strawSPDElement);
   if (strawSPDElement) {
     const straws = state.straws || 0;
     const strawsLarge = toDecimal(straws);
     const baseSPD = 2.0; // From upgrades.json
     const totalProduction = strawsLarge.mul(baseSPD);
+    console.log('🔍 Straw production calculation:', {
+      straws,
+      baseSPD,
+      totalProduction: totalProduction.toString(),
+      formatted: formatNumber(totalProduction.toString()),
+    });
     strawSPDElement.textContent = formatNumber(totalProduction.toString());
+  } else {
+    console.log('🔍 strawSPDElement not found in DOM_CACHE');
   }
 
   const cupSPDElement = (window as any).DOM_CACHE?.cupSPD as HTMLElement | undefined;
+  console.log('🔍 cupSPDElement found:', !!cupSPDElement);
   if (cupSPDElement) {
     const cups = state.cups || 0;
     const cupsLarge = toDecimal(cups);
     const baseSPD = 5.0; // From upgrades.json
     const totalProduction = cupsLarge.mul(baseSPD);
+    console.log('🔍 Cup production calculation:', {
+      cups,
+      baseSPD,
+      totalProduction: totalProduction.toString(),
+      formatted: formatNumber(totalProduction.toString()),
+    });
     cupSPDElement.textContent = formatNumber(totalProduction.toString());
+  } else {
+    console.log('🔍 cupSPDElement not found in DOM_CACHE');
   }
 
   // Update Wider Straws enhancement display
   const widerStrawsSPDElement = (window as any).DOM_CACHE?.widerStrawsSPD as
     | HTMLElement
     | undefined;
+  console.log('🔍 widerStrawsSPDElement found:', !!widerStrawsSPDElement);
   if (widerStrawsSPDElement) {
     const widerStraws = state.widerStraws || 0;
     const widerStrawsLarge = toDecimal(widerStraws);
@@ -305,6 +335,7 @@ export function updateEnhancementValues(): void {
 
   // Update Better Cups enhancement display
   const betterCupsSPDElement = (window as any).DOM_CACHE?.betterCupsSPD as HTMLElement | undefined;
+  console.log('🔍 betterCupsSPDElement found:', !!betterCupsSPDElement);
   if (betterCupsSPDElement) {
     const betterCups = state.betterCups || 0;
     const betterCupsLarge = toDecimal(betterCups);
