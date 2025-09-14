@@ -483,13 +483,13 @@ body {
   .mobile-content-padding {
     padding-bottom: 90px; /* Increased for better spacing */
   }
-  
+
   /* Improved mobile content spacing */
   .tab-content {
     padding: 1rem 0.75rem;
     min-height: calc(100vh - 90px);
   }
-  
+
   /* Better mobile container spacing */
   .game-main,
   .unlocks-container,
@@ -3009,20 +3009,20 @@ h3 {
   html {
     font-size: 14px;
   }
-  
+
   /* Improved mobile body layout */
   body {
     padding-bottom: 0;
     overflow-x: hidden;
   }
-  
+
   /* Better mobile content hierarchy */
   .game-main {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   /* Improved mobile primary action area */
   .primary-action-area {
     padding: 1.5rem 1rem;
@@ -3031,7 +3031,7 @@ h3 {
     border-radius: 16px;
     margin-bottom: 1rem;
   }
-  
+
   /* Better mobile soda button */
   .soda-button {
     width: 200px;
@@ -3041,7 +3041,7 @@ h3 {
     font-size: 3rem;
     box-shadow: 0 8px 25px rgba(0, 179, 107, 0.3);
   }
-  
+
   /* Improved mobile upgrade sections */
   .clicking-upgrades-container,
   .drink-speed-upgrade-container {
@@ -3050,7 +3050,7 @@ h3 {
     gap: 1rem;
     margin: 1rem 0;
   }
-  
+
   /* Better mobile upgrade buttons */
   .clicking-upgrade-btn,
   .drink-speed-upgrade-btn {
@@ -3065,7 +3065,7 @@ h3 {
     justify-content: center;
     gap: 0.5rem;
   }
-  
+
   /* Improved mobile shop layout */
   .shop-container {
     display: grid;
@@ -3073,42 +3073,44 @@ h3 {
     gap: 1rem;
     padding: 1rem;
   }
-  
+
   .shop-item {
     padding: 1.25rem;
     border-radius: 12px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   /* Better mobile stats layout */
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
-  
+
   .stat-card {
     padding: 1rem;
     text-align: center;
     border-radius: 12px;
     background: linear-gradient(135deg, rgba(0, 179, 107, 0.1), rgba(0, 36, 179, 0.1));
   }
-  
+
   /* Improved mobile text hierarchy */
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     margin-bottom: 0.75rem;
     line-height: 1.3;
   }
-  
+
   h2 {
     font-size: 1.5rem;
   }
-  
+
   h3 {
     font-size: 1.25rem;
   }
-  
+
   /* Better mobile spacing for sections */
   .unlocks-container,
   .god-container,
@@ -3116,22 +3118,24 @@ h3 {
   .options-container {
     padding: 1rem;
   }
-  
+
   .unlocks-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   /* Improved mobile form elements */
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     font-size: 16px; /* Prevents zoom on iOS */
     padding: 0.75rem;
     border-radius: 8px;
     width: 100%;
     max-width: 100%;
   }
-  
+
   /* Better mobile button spacing */
   button {
     min-height: 44px; /* iOS recommended touch target */
@@ -3139,7 +3143,7 @@ h3 {
     font-size: 0.9rem;
     border-radius: 8px;
   }
-  
+
   /* Enhanced mobile touch feedback */
   .mobile-tab-item:active,
   button:active,
@@ -3147,13 +3151,13 @@ h3 {
     transform: scale(0.95);
     transition: transform 0.1s ease;
   }
-  
+
   /* Better mobile scroll behavior */
   .tab-content {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
-  
+
   /* Improved mobile text selection */
   .mobile-tab-label,
   .mobile-tab-icon {
@@ -3162,19 +3166,19 @@ h3 {
     -ms-user-select: none;
     user-select: none;
   }
-  
+
   /* Better mobile focus indicators */
   .mobile-tab-item:focus-visible,
   button:focus-visible {
     outline: 2px solid #00d97f;
     outline-offset: 2px;
   }
-  
+
   /* Mobile-only sections in Options tab */
   .mobile-only {
     display: block;
   }
-  
+
   .god-section-mobile,
   .dev-section-mobile {
     background: linear-gradient(135deg, rgba(0, 179, 107, 0.1), rgba(0, 36, 179, 0.1));
@@ -3183,19 +3187,19 @@ h3 {
     margin: 1rem 0;
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .god-header-mobile h4 {
     color: #00d97f;
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
   }
-  
+
   .god-header-mobile p {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.9rem;
     margin-bottom: 1rem;
   }
-  
+
   .god-message-mobile {
     background: rgba(0, 0, 0, 0.3);
     padding: 1rem;
@@ -3205,14 +3209,14 @@ h3 {
     color: #ffffff;
     border-left: 3px solid #00d97f;
   }
-  
+
   .god-actions-mobile,
   .dev-actions-mobile {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .god-btn-mobile,
   .dev-btn-mobile {
     background: linear-gradient(135deg, #00b36b, #00d97f);
@@ -3224,13 +3228,13 @@ h3 {
     transition: all 0.2s ease;
     min-height: 44px;
   }
-  
+
   .god-btn-mobile:hover,
   .dev-btn-mobile:hover {
     background: linear-gradient(135deg, #00d97f, #00b36b);
     transform: translateY(-1px);
   }
-  
+
   .dev-warning-mobile {
     background: rgba(255, 193, 7, 0.1);
     border: 1px solid rgba(255, 193, 7, 0.3);
@@ -3238,7 +3242,7 @@ h3 {
     padding: 0.75rem;
     margin-bottom: 1rem;
   }
-  
+
   .dev-warning-mobile p {
     color: #ffc107;
     font-size: 0.85rem;
@@ -3515,42 +3519,42 @@ h3 {
   html {
     font-size: 13px; /* Slightly larger for better readability */
   }
-  
+
   /* Ultra-compact mobile navigation */
   .mobile-tab-navigation {
     padding: 8px 4px;
     min-height: 65px;
   }
-  
+
   .mobile-tab-item {
     padding: 8px 4px;
     min-width: 50px;
     min-height: 50px;
     border-radius: 12px;
   }
-  
+
   .mobile-tab-icon {
     font-size: 1.4rem;
     margin-bottom: 2px;
   }
-  
+
   .mobile-tab-label {
     font-size: 0.65rem;
     letter-spacing: 0.3px;
   }
-  
+
   /* Compact mobile content */
   .tab-content {
     padding: 0.75rem 0.5rem;
     min-height: calc(100vh - 65px);
   }
-  
+
   /* Ultra-compact mobile primary action area */
   .primary-action-area {
     padding: 1rem 0.75rem;
     margin-bottom: 0.75rem;
   }
-  
+
   /* Smaller mobile soda button */
   .soda-button {
     width: 160px;
@@ -3558,7 +3562,7 @@ h3 {
     font-size: 2.5rem;
     margin: 0.75rem auto;
   }
-  
+
   /* Compact mobile upgrade buttons */
   .clicking-upgrade-btn,
   .drink-speed-upgrade-btn {
@@ -3566,36 +3570,36 @@ h3 {
     padding: 0.75rem;
     font-size: 0.8rem;
   }
-  
+
   /* Single column mobile stats */
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
-  
+
   .stat-card {
     padding: 0.75rem;
   }
-  
+
   /* Compact mobile shop */
   .shop-container {
     padding: 0.75rem 0.5rem;
     gap: 0.75rem;
   }
-  
+
   .shop-item {
     padding: 1rem;
   }
-  
+
   /* Compact mobile text */
   h2 {
     font-size: 1.25rem;
   }
-  
+
   h3 {
     font-size: 1.1rem;
   }
-  
+
   /* Better mobile spacing */
   .game-main,
   .unlocks-container,
@@ -6193,25 +6197,58 @@ button {
 @media (max-width: 768px) {
   .game-header {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.5rem;
     text-align: center;
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+    /* Much more compact mobile header */
+    min-height: auto;
+  }
+
+  .level-indicator {
+    order: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .level-number {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .level-text {
+    font-size: 0.8rem;
+    opacity: 0.9;
   }
 
   .header-main-content {
-    gap: 0.75rem;
+    gap: 0.5rem;
+    order: 2;
   }
 
   .currency-display {
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
     justify-content: center;
+    /* Compact single row layout */
+    flex-direction: row;
   }
 
   .currency-item {
+    min-width: auto;
+    padding: 0.5rem 0.75rem;
+    /* Smaller currency items */
+    font-size: 0.85rem;
     flex: 1;
-    min-width: 100px;
     justify-content: center;
+  }
+
+  .currency-icon {
+    font-size: 1.2rem;
+    margin-right: 0.25rem;
+  }
+
+  .currency-value {
+    font-size: 0.9rem;
+    font-weight: 600;
   }
 
   .currency-divider {
@@ -6220,15 +6257,23 @@ button {
 
   .header-drink-progress {
     max-width: 100%;
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem;
+    order: 3;
+    /* Compact drink progress */
+    margin-top: 0.5rem;
   }
 
   .drink-progress-info {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
   }
 
   .drink-countdown {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .drink-progress-bar {
+    height: 6px;
   }
 
   .level-indicator,
@@ -6238,14 +6283,62 @@ button {
 }
 
 @media (max-width: 480px) {
+  /* Ultra-compact header for small mobile screens */
+  .game-header {
+    padding: 0.5rem 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .level-indicator {
+    margin-bottom: 0.25rem;
+  }
+
+  .level-number {
+    font-size: 0.9rem;
+  }
+
+  .level-text {
+    font-size: 0.7rem;
+  }
+
   .currency-display {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .currency-item {
-    width: 100%;
+    flex: 1;
+    min-width: 80px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.8rem;
     justify-content: center;
+  }
+
+  .currency-icon {
+    font-size: 1rem;
+    margin-right: 0.2rem;
+  }
+
+  .currency-value {
+    font-size: 0.85rem;
+  }
+
+  .header-drink-progress {
+    padding: 0.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .drink-progress-info {
+    font-size: 0.7rem;
+  }
+
+  .drink-countdown {
+    font-size: 0.75rem;
+  }
+
+  .drink-progress-bar {
+    height: 4px;
   }
 
   .title-main {
@@ -6254,6 +6347,62 @@ button {
 
   .title-sub {
     font-size: 0.9rem;
+  }
+  
+  /* Ultra-compact mobile header option */
+  .game-header.ultra-compact {
+    padding: 0.4rem 0.5rem;
+    gap: 0.2rem;
+    min-height: 60px;
+  }
+  
+  .game-header.ultra-compact .level-indicator {
+    margin-bottom: 0.2rem;
+  }
+  
+  .game-header.ultra-compact .level-number {
+    font-size: 0.85rem;
+  }
+  
+  .game-header.ultra-compact .level-text {
+    font-size: 0.65rem;
+  }
+  
+  .game-header.ultra-compact .currency-display {
+    gap: 0.4rem;
+  }
+  
+  .game-header.ultra-compact .currency-item {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.75rem;
+    min-width: 70px;
+  }
+  
+  .game-header.ultra-compact .currency-icon {
+    font-size: 0.9rem;
+    margin-right: 0.15rem;
+  }
+  
+  .game-header.ultra-compact .currency-value {
+    font-size: 0.8rem;
+  }
+  
+  .game-header.ultra-compact .header-drink-progress {
+    padding: 0.3rem;
+    margin-top: 0.2rem;
+  }
+  
+  .game-header.ultra-compact .drink-progress-info {
+    font-size: 0.65rem;
+    margin-bottom: 0.15rem;
+  }
+  
+  .game-header.ultra-compact .drink-countdown {
+    font-size: 0.7rem;
+  }
+  
+  .game-header.ultra-compact .drink-progress-bar {
+    height: 3px;
   }
 }
 

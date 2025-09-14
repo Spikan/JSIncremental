@@ -79,6 +79,25 @@ export class MobileInputHandler {
     } catch (error) {
       console.warn('Failed to set mobile touch styles:', error);
     }
+    
+    // Apply ultra-compact header on mobile
+    this.applyUltraCompactHeader();
+  }
+  
+  /**
+   * Apply ultra-compact header styling on mobile devices
+   */
+  private applyUltraCompactHeader(): void {
+    try {
+      const gameHeader = document.querySelector('.game-header');
+      if (gameHeader && this.isMobileDevice()) {
+        // Add ultra-compact class for maximum space savings
+        gameHeader.classList.add('ultra-compact');
+        console.log('Applied ultra-compact header for mobile');
+      }
+    } catch (error) {
+      console.warn('Failed to apply ultra-compact header:', error);
+    }
   }
 
   /**
