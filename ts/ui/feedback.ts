@@ -45,6 +45,75 @@ function getSafePosition(
   }
 }
 
+// Show milestone feedback
+function showMilestoneFeedback(
+  message: string,
+  x: number,
+  y: number,
+  type: 'straw' | 'cup' | 'global' = 'global'
+): void {
+  try {
+    const feedbackElement = document.createElement('div');
+    feedbackElement.className = 'milestone-feedback';
+    feedbackElement.textContent = message;
+
+    // Style based on milestone type
+    const colors = {
+      straw: '#4CAF50', // Green for straws
+      cup: '#2196F3', // Blue for cups
+      global: '#FF9800', // Orange for global milestones
+    };
+
+    feedbackElement.style.cssText = `
+      position: fixed;
+      left: ${x}px;
+      top: ${y}px;
+      color: ${colors[type]};
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      z-index: 10000;
+      pointer-events: none;
+      animation: milestoneFloat 3s ease-out forwards;
+      text-align: center;
+    `;
+
+    // Add animation keyframes if not already added
+    if (!document.querySelector('#milestone-animation-styles')) {
+      const style = document.createElement('style');
+      style.id = 'milestone-animation-styles';
+      style.textContent = `
+        @keyframes milestoneFloat {
+          0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: translateY(-30px) scale(1.2);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-60px) scale(0.8);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(feedbackElement);
+
+    // Remove after animation
+    setTimeout(() => {
+      if (feedbackElement.parentNode) {
+        feedbackElement.parentNode.removeChild(feedbackElement);
+      }
+    }, 3000);
+  } catch (error) {
+    console.warn('Failed to show milestone feedback:', error);
+  }
+}
+
 // Show feedback at specific click coordinates
 function showFeedbackAtCoordinates(
   sipsGained: number | any, // Accept both numbers and Decimal objects
@@ -435,3 +504,6 @@ function formatTime(seconds: number): string {
     return `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''}`;
   }
 }
+
+// Export milestone feedback function
+export { showMilestoneFeedback };

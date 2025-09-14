@@ -13,20 +13,19 @@ export function nextStrawCost(
   const base = new Decimal(baseCost);
   const scale = new Decimal(scaling);
   const count = new Decimal(strawCount);
-  // count is small (player-owned items). Use safe exponent bound.
-  {
-    // Use safe conversion to preserve extreme values
-    const nRaw = (count as any).toNumber?.();
-    let n: number;
-    if (nRaw !== undefined && isFinite(nRaw) && Math.abs(nRaw) < 1e15) {
-      n = nRaw;
-    } else {
-      // For extreme values, use a safe fallback instead of truncating
-      n = 0;
-    }
-    const exp = Math.max(0, Math.min(n, 1_000_000));
-    return base.multiply(scale.pow(exp));
-  }
+
+  // Improved scaling: More reasonable progression
+  // Every 10 straws, cost increases by 10x instead of continuous scaling
+  const milestoneCount = count.div(10).floor();
+  const withinMilestone = count.mod(10);
+
+  // Base cost for this milestone
+  const milestoneCost = base.multiply(new Decimal(10).pow(milestoneCount));
+
+  // Linear scaling within milestone (much more affordable)
+  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
+
+  return milestoneCost.multiply(withinMilestoneCost).div(base);
 }
 
 export function nextCupCost(
@@ -37,19 +36,19 @@ export function nextCupCost(
   const base = new Decimal(baseCost);
   const scale = new Decimal(scaling);
   const count = new Decimal(cupCount);
-  {
-    // Use safe conversion to preserve extreme values
-    const nRaw = (count as any).toNumber?.();
-    let n: number;
-    if (nRaw !== undefined && isFinite(nRaw) && Math.abs(nRaw) < 1e15) {
-      n = nRaw;
-    } else {
-      // For extreme values, use a safe fallback instead of truncating
-      n = 0;
-    }
-    const exp = Math.max(0, Math.min(n, 1_000_000));
-    return base.multiply(scale.pow(exp));
-  }
+
+  // Improved scaling: More reasonable progression
+  // Every 10 cups, cost increases by 10x instead of continuous scaling
+  const milestoneCount = count.div(10).floor();
+  const withinMilestone = count.mod(10);
+
+  // Base cost for this milestone
+  const milestoneCost = base.multiply(new Decimal(10).pow(milestoneCount));
+
+  // Linear scaling within milestone (much more affordable)
+  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
+
+  return milestoneCost.multiply(withinMilestoneCost).div(base);
 }
 
 // Legacy functions for backward compatibility

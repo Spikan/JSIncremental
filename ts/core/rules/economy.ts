@@ -29,9 +29,18 @@ export function computeStrawSPD(
   // Calculate base production: baseSPD * straws * upgradeMultiplier
   let totalSPD = baseValue.mul(strawsCount).mul(upgradeMultiplier);
 
-  // NO artificial soft caps - break_eternity.js handles all scaling naturally
+  // Milestone bonuses: Every 10 straws = 2x production
+  const milestoneCount = strawsCount.div(10).floor();
+  if (milestoneCount.gt(0)) {
+    const milestoneMultiplier = new Decimal(2).pow(milestoneCount);
+    totalSPD = totalSPD.mul(milestoneMultiplier);
+  }
 
-  // NO artificial milestone bonuses - break_eternity.js handles all scaling naturally
+  // Exponential scaling: Each straw gets more powerful
+  if (strawsCount.gt(0)) {
+    const exponentialBonus = new Decimal(1.1).pow(strawsCount.div(10).floor());
+    totalSPD = totalSPD.mul(exponentialBonus);
+  }
 
   return totalSPD;
 }
@@ -53,9 +62,18 @@ export function computeCupSPD(
   // Calculate base production: baseSPD * cups * upgradeMultiplier
   let totalSPD = baseValue.mul(cupsCount).mul(upgradeMultiplier);
 
-  // NO artificial soft caps - break_eternity.js handles all scaling naturally
+  // Milestone bonuses: Every 10 cups = 2x production
+  const milestoneCount = cupsCount.div(10).floor();
+  if (milestoneCount.gt(0)) {
+    const milestoneMultiplier = new Decimal(2).pow(milestoneCount);
+    totalSPD = totalSPD.mul(milestoneMultiplier);
+  }
 
-  // NO artificial milestone bonuses - break_eternity.js handles all scaling naturally
+  // Exponential scaling: Each cup gets more powerful
+  if (cupsCount.gt(0)) {
+    const exponentialBonus = new Decimal(1.15).pow(cupsCount.div(10).floor());
+    totalSPD = totalSPD.mul(exponentialBonus);
+  }
 
   return totalSPD;
 }
@@ -75,13 +93,27 @@ export function computeTotalSPD(
   const strawContribution = strawValue.mul(strawCount);
   const cupContribution = cupValue.mul(cupCount);
 
-  // NO artificial synergy calculations - break_eternity.js handles all scaling naturally
-  const synergyMultiplier = new Decimal(1);
+  // Synergy bonuses: Buildings work better together
+  let synergyMultiplier = new Decimal(1);
+
+  // If you have both straws and cups, get synergy bonus
+  if (strawCount.gt(0) && cupCount.gt(0)) {
+    const synergyLevel = strawCount.add(cupCount).div(20).floor();
+    if (synergyLevel.gt(0)) {
+      synergyMultiplier = new Decimal(1.5).pow(synergyLevel);
+    }
+  }
 
   // Calculate total before scaling
   let totalSPD = strawContribution.add(cupContribution).mul(synergyMultiplier);
 
-  // NO artificial total soft caps - break_eternity.js handles all scaling naturally
+  // Global milestone bonuses: Every 100 total buildings = 3x production
+  const totalBuildings = strawCount.add(cupCount);
+  const globalMilestoneCount = totalBuildings.div(100).floor();
+  if (globalMilestoneCount.gt(0)) {
+    const globalMilestoneMultiplier = new Decimal(3).pow(globalMilestoneCount);
+    totalSPD = totalSPD.mul(globalMilestoneMultiplier);
+  }
 
   return totalSPD;
 }
