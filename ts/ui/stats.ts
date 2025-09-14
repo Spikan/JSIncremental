@@ -167,64 +167,66 @@ export function updateShopStats(): void {
     const shouldLog = Math.random() < 0.1; // Log 10% of the time for debugging
     if (shouldLog) console.log('📊 updateShopStats() called');
 
-  // Debug: Log current state values
-  const state = (window as any).App?.state?.getState?.();
-  if (state) {
-    if (shouldLog)
-      console.log('🔍 Current state values:', {
-        straws: state.straws,
-        cups: state.cups,
-        sips: state.sips,
-      });
-  }
+    // Debug: Log current state values
+    const state = (window as any).App?.state?.getState?.();
+    if (state) {
+      if (shouldLog)
+        console.log('🔍 Current state values:', {
+          straws: state.straws,
+          cups: state.cups,
+          sips: state.sips,
+        });
+    }
 
-  // Always call updatePurchasedCounts regardless of tab state
-  updatePurchasedCounts();
-  // Straws purchased
-  const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
-    | HTMLElement
-    | undefined;
-  if (strawsPurchasedElement) {
-    const v = (window as any).App?.state?.getState?.()?.straws || 0;
-    if (shouldLog)
-      console.log('🔍 updateShopStats: Straws value =', v, 'formatted =', formatNumber(v));
-    strawsPurchasedElement.textContent = formatNumber(v);
-  } else {
-    console.warn('🚫 updateShopStats: strawsPurchasedElement not found in DOM_CACHE');
-  }
-  // Cups purchased
-  const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as HTMLElement | undefined;
-  if (cupsPurchasedElement) {
-    const v = (window as any).App?.state?.getState?.()?.cups || 0;
-    if (shouldLog)
-      console.log('🔍 updateShopStats: Cups value =', v, 'formatted =', formatNumber(v));
-    cupsPurchasedElement.textContent = formatNumber(v);
-  } else {
-    console.warn('🚫 updateShopStats: cupsPurchasedElement not found in DOM_CACHE');
-  }
-  // Suctions purchased
-  const suctionsPurchasedElement = (window as any).DOM_CACHE?.suctionsPurchased as
-    | HTMLElement
-    | undefined;
-  if (suctionsPurchasedElement) {
-    const v = (window as any).App?.state?.getState?.()?.suctions || 0;
-    suctionsPurchasedElement.textContent = formatNumber(v);
-  }
-  // Critical clicks purchased
-  const criticalClicksPurchasedElement = (window as any).DOM_CACHE?.criticalClicksPurchased as
-    | HTMLElement
-    | undefined;
-  if (criticalClicksPurchasedElement) {
-    const v = (window as any).App?.state?.getState?.()?.criticalClicks || 0;
-    criticalClicksPurchasedElement.textContent = formatNumber(v);
-  }
+    // Always call updatePurchasedCounts regardless of tab state
+    updatePurchasedCounts();
+    // Straws purchased
+    const strawsPurchasedElement = (window as any).DOM_CACHE?.strawsPurchased as
+      | HTMLElement
+      | undefined;
+    if (strawsPurchasedElement) {
+      const v = (window as any).App?.state?.getState?.()?.straws || 0;
+      if (shouldLog)
+        console.log('🔍 updateShopStats: Straws value =', v, 'formatted =', formatNumber(v));
+      strawsPurchasedElement.textContent = formatNumber(v);
+    } else {
+      console.warn('🚫 updateShopStats: strawsPurchasedElement not found in DOM_CACHE');
+    }
+    // Cups purchased
+    const cupsPurchasedElement = (window as any).DOM_CACHE?.cupsPurchased as
+      | HTMLElement
+      | undefined;
+    if (cupsPurchasedElement) {
+      const v = (window as any).App?.state?.getState?.()?.cups || 0;
+      if (shouldLog)
+        console.log('🔍 updateShopStats: Cups value =', v, 'formatted =', formatNumber(v));
+      cupsPurchasedElement.textContent = formatNumber(v);
+    } else {
+      console.warn('🚫 updateShopStats: cupsPurchasedElement not found in DOM_CACHE');
+    }
+    // Suctions purchased
+    const suctionsPurchasedElement = (window as any).DOM_CACHE?.suctionsPurchased as
+      | HTMLElement
+      | undefined;
+    if (suctionsPurchasedElement) {
+      const v = (window as any).App?.state?.getState?.()?.suctions || 0;
+      suctionsPurchasedElement.textContent = formatNumber(v);
+    }
+    // Critical clicks purchased
+    const criticalClicksPurchasedElement = (window as any).DOM_CACHE?.criticalClicksPurchased as
+      | HTMLElement
+      | undefined;
+    if (criticalClicksPurchasedElement) {
+      const v = (window as any).App?.state?.getState?.()?.criticalClicks || 0;
+      criticalClicksPurchasedElement.textContent = formatNumber(v);
+    }
 
-  // Update purchased item counts in shop displays
-  updatePurchasedCounts();
+    // Update purchased item counts in shop displays
+    updatePurchasedCounts();
 
-  // Update enhancement values for upgrade displays
-  console.log('🔍 updateShopStats: About to call updateEnhancementValues');
-  updateEnhancementValues();
+    // Update enhancement values for upgrade displays
+    console.log('🔍 updateShopStats: About to call updateEnhancementValues');
+    updateEnhancementValues();
   } catch (error) {
     console.error('🔍 updateShopStats: Error occurred:', error);
   }

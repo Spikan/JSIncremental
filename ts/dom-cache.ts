@@ -24,6 +24,8 @@ const DOM_CACHE: {
   totalWiderStrawsSPD: MaybeEl;
   totalCupSPD: MaybeEl;
   totalBetterCupsSPD: MaybeEl;
+  strawSPD: MaybeEl;
+  cupSPD: MaybeEl;
   statsTab: MaybeEl;
   progressFill: MaybeEl;
   countdown: MaybeEl;
@@ -73,6 +75,8 @@ const DOM_CACHE: {
   totalWiderStrawsSPD: null,
   totalCupSPD: null,
   totalBetterCupsSPD: null,
+  strawSPD: null,
+  cupSPD: null,
   statsTab: null,
   progressFill: null,
   countdown: null,
@@ -120,6 +124,8 @@ const DOM_CACHE: {
     this.totalWiderStrawsSPD = document.getElementById('totalWiderStrawsSPD');
     this.totalCupSPD = document.getElementById('totalCupSPD');
     this.totalBetterCupsSPD = document.getElementById('totalBetterCupsSPD');
+    this.strawSPD = document.getElementById('strawSPD');
+    this.cupSPD = document.getElementById('cupSPD');
     this.statsTab = document.getElementById('statsTab');
     this.progressFill = document.getElementById('drinkProgressFill');
     this.countdown = document.getElementById('drinkCountdown');
