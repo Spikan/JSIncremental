@@ -132,7 +132,7 @@ export function resetGameState() {
 
     const criticalClickChance = new Decimal(BAL.CRITICAL_CLICK_BASE_CHANCE || 0.01);
     w.criticalClickChance = criticalClickChance;
-    const criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER || 5);
+    const criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER || 10);
     w.criticalClickMultiplier = criticalClickMultiplier;
     const criticalClicks = new Decimal(0);
     const criticalClickUpCounter = new Decimal(1);

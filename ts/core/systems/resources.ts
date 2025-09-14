@@ -39,10 +39,10 @@ export function recalcProduction({
 
   // Convert all values to Decimal for consistent calculations
   const strawBaseSPD = toDecimal(
-    base.strawBaseSPD ?? upgrades?.straws?.baseSPD ?? config.STRAW_BASE_SPD ?? 0.6
+    base.strawBaseSPD ?? upgrades?.straws?.baseSPD ?? config.STRAW_BASE_SPD ?? 2.0
   );
   const cupBaseSPD = toDecimal(
-    base.cupBaseSPD ?? upgrades?.cups?.baseSPD ?? config.CUP_BASE_SPD ?? 1.2
+    base.cupBaseSPD ?? upgrades?.cups?.baseSPD ?? config.CUP_BASE_SPD ?? 5.0
   );
   const baseSipsPerDrink = toDecimal(base.baseSipsPerDrink ?? config.BASE_SIPS_PER_DRINK ?? 1);
 

@@ -72,9 +72,10 @@ export async function handleSodaClick(multiplier: number = 1) {
     );
     const multiplierValue = toDecimal(multiplier || 1);
 
-    // Base click value (1 sip) + suction bonus (0.3 per suction level)
+    // Base click value (1 sip) + suction bonus (from config)
     const baseClick = new Decimal(1);
-    const suctionBonus = suctionValue.multiply(new Decimal(0.3));
+    const suctionBonusPerLevel = new Decimal(1.0); // Updated from 0.3 to 1.0
+    const suctionBonus = suctionValue.multiply(suctionBonusPerLevel);
     const totalClickValue = baseClick.add(suctionBonus).multiply(multiplierValue);
 
     // Add to sips with Decimal arithmetic
