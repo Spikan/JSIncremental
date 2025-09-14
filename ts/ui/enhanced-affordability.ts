@@ -18,9 +18,9 @@ export function calculateAffordabilityState(cost: number | any): AffordabilitySt
   const state = useGameStore.getState();
   const currentSips = state.sips;
 
-  // Convert to numbers for calculation
-  const costNum = typeof cost === 'number' ? cost : cost.toNumber();
-  const sipsNum = typeof currentSips === 'number' ? currentSips : currentSips.toNumber();
+  // Convert to numbers for calculation - use safe conversion for Decimal types
+  const costNum = typeof cost === 'number' ? cost : (cost?.toSafeNumber?.() ?? Number(cost));
+  const sipsNum = typeof currentSips === 'number' ? currentSips : (currentSips?.toSafeNumber?.() ?? Number(currentSips));
 
   const affordable = sipsNum >= costNum;
   const percentageToAfford = Math.min((sipsNum / costNum) * 100, 100);
