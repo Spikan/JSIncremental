@@ -357,8 +357,936 @@ body {
   width: 100%;
   min-height: 100vh;
   padding: 1rem;
-  max-width: 1200px;
+}
+
+/* Main Game Content Layout */
+.main-game-content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  max-width: 1600px;
   margin: 0 auto;
+  min-height: calc(100vh - 200px);
+  padding: 1.5rem;
+}
+
+/* Main Content Area (Left Side) */
+.main-content-area {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-height: 100%;
+}
+
+/* Soda Main Section */
+.soda-main-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+/* Soda Container */
+.soda-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Soda Button */
+.soda-button {
+  width: 300px;
+  height: 400px;
+  border: none;
+  border-radius: 20px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.3));
+}
+
+.soda-button:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.4));
+}
+
+.soda-button:active {
+  transform: scale(0.95);
+}
+
+/* Click Indicator */
+.click-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 420px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.click-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 179, 107, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Soda Stats */
+.soda-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  color: #00b36b;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Level Up Section */
+.level-up-section {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.level-up-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 500px;
+  width: 100%;
+}
+
+.level-up-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.level-up-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 193, 7, 0.2);
+  border-radius: 50%;
+  border: 2px solid #ffc107;
+}
+
+.level-up-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+  font-size: 1.3rem;
+}
+
+.level-up-info p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.level-up-btn {
+  background: linear-gradient(135deg, #ffc107, #ff8f00);
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 120px;
+}
+
+.level-up-btn:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+}
+
+.level-up-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cost-display {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.cost-number {
+  font-weight: bold;
+  color: #000;
+}
+
+.cost-currency {
+  color: #000;
+  font-size: 0.8rem;
+}
+
+.btn-label {
+  font-size: 0.8rem;
+  color: #000;
+  font-weight: 600;
+}
+
+/* Production Summary */
+.production-summary {
+  background: rgba(0, 179, 107, 0.1);
+  border: 1px solid rgba(0, 179, 107, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+}
+
+.production-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.production-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+}
+
+.production-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 179, 107, 0.2);
+  border-radius: 50%;
+  border: 2px solid #00b36b;
+}
+
+.production-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+  font-size: 1.2rem;
+}
+
+.production-info p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.production-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.production-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.production-stat.total {
+  background: rgba(0, 179, 107, 0.2);
+  border-color: #00b36b;
+}
+
+.production-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.production-value {
+  font-size: 1.2rem;
+  color: #00b36b;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Game Sidebar */
+.game-sidebar {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.5rem;
+  height: fit-content;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.sidebar-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.sidebar-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: none; /* Hidden on desktop, shown on mobile */
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Sidebar Content */
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Sidebar Section */
+.sidebar-section {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.section-header:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.section-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.section-info {
+  flex: 1;
+}
+
+.section-title {
+  margin: 0 0 0.25rem 0;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.section-subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.section-toggle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform 0.3s ease;
+}
+
+.sidebar-section.expanded .section-toggle {
+  transform: rotate(180deg);
+}
+
+.section-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.sidebar-section.expanded .section-content {
+  max-height: 1000px;
+}
+
+/* Upgrade Groups */
+.upgrade-group {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.upgrade-group:last-child {
+  border-bottom: none;
+}
+
+.upgrade-group-title {
+  margin: 0 0 1rem 0;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.upgrade-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.upgrade-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.upgrade-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.upgrade-card.enhancement {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.upgrade-card.enhancement:hover {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: rgba(255, 193, 7, 0.4);
+}
+
+.upgrade-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.upgrade-icon {
+  font-size: 1.2rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+.upgrade-info {
+  flex: 1;
+}
+
+.upgrade-name {
+  margin: 0 0 0.25rem 0;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.upgrade-description {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.upgrade-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #00b36b, #00a85a);
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.upgrade-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 179, 107, 0.3);
+}
+
+.upgrade-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upgrade-cost {
+  font-size: 0.9rem;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.upgrade-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.upgrade-owned,
+.upgrade-effect {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 179, 107, 0.2);
+  border-radius: 50%;
+  border: 2px solid #00b36b;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  color: #00b36b;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Settings Groups */
+.settings-group {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-group:last-child {
+  border-bottom: none;
+}
+
+.settings-group-title {
+  margin: 0 0 0.75rem 0;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.settings-btn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #ffffff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.settings-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.settings-btn:last-child {
+  margin-bottom: 0;
+}
+
+/* God Content */
+.god-content {
+  padding: 1rem;
+}
+
+.god-message {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+  font-style: italic;
+  text-align: center;
+}
+
+.god-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.god-btn {
+  background: linear-gradient(135deg, #ff8e53, #ff6b35);
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.god-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 142, 83, 0.3);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN - MOBILE LAYOUT
+   ======================================== */
+
+/* Tablet Layout */
+@media (max-width: 1024px) {
+  .main-game-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .game-sidebar {
+    order: 2;
+  }
+
+  .main-content-area {
+    order: 1;
+  }
+
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .game-sidebar.collapsed {
+    display: none;
+  }
+
+  .game-sidebar.expanded {
+    display: flex;
+  }
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+  .main-game-content {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+
+  .soda-main-section {
+    padding: 1.5rem;
+  }
+
+  .soda-button {
+    width: 250px;
+    height: 350px;
+  }
+
+  .click-indicator {
+    width: 270px;
+    height: 370px;
+  }
+
+  .soda-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .level-up-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .production-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .game-sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100vh;
+    z-index: 1000;
+    transition: right 0.3s ease;
+    border-radius: 0;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+  }
+
+  .game-sidebar.expanded {
+    right: 0;
+  }
+
+  .sidebar-header {
+    position: sticky;
+    top: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    z-index: 1001;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .upgrade-cards {
+    gap: 0.5rem;
+  }
+
+  .upgrade-card {
+    padding: 0.75rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .stat-card {
+    padding: 0.75rem;
+  }
+}
+
+/* Small Mobile Layout */
+@media (max-width: 480px) {
+  .soda-button {
+    width: 200px;
+    height: 300px;
+  }
+
+  .click-indicator {
+    width: 220px;
+    height: 320px;
+  }
+
+  .soda-main-section {
+    padding: 1rem;
+  }
+
+  .level-up-section {
+    padding: 1rem;
+  }
+
+  .production-summary {
+    padding: 1rem;
+  }
+
+  .game-sidebar {
+    padding: 1rem 0.75rem;
+  }
+
+  .section-header {
+    padding: 0.75rem;
+  }
+
+  .upgrade-group {
+    padding: 0.75rem;
+  }
+
+  .settings-group {
+    padding: 0.75rem;
+  }
+
+  .god-content {
+    padding: 0.75rem;
+  }
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 768px) {
+  /* Add smooth transitions for mobile sidebar */
+  .game-sidebar {
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Mobile sidebar overlay animation */
+  .sidebar-overlay {
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Mobile soda button enhancements */
+  .soda-button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Mobile upgrade cards - better touch targets */
+  .upgrade-btn {
+    min-height: 44px; /* iOS recommended touch target size */
+    touch-action: manipulation;
+  }
+
+  .settings-btn {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .god-btn {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Mobile section headers - better touch targets */
+  .section-header {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Mobile sidebar toggle button */
+  .sidebar-toggle {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Mobile production stats - stack vertically */
+  .production-stats {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  /* Mobile level up card - stack vertically */
+  .level-up-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  /* Mobile soda stats - single column */
+  .soda-stats {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
 }
 
 /* ========================================
@@ -3180,7 +4108,6 @@ h3 {
 .upgrade-btn:hover::before {
   left: 100%;
 }
-
 
 .upgrade-btn:active {
   transform: scale(0.98);

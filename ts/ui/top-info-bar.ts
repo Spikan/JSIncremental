@@ -4,6 +4,7 @@
  */
 
 import { formatStatNumber } from './utils';
+import { useGameStore } from '../core/state/zustand-store';
 
 export interface TopInfoBarData {
   level: number;
@@ -22,47 +23,23 @@ export class TopInfoBar {
   }
 
   public initializeElements(): void {
-    this.container = document.getElementById('topDiv');
-    this.levelDiv = document.getElementById('levelDiv');
+    // Look for the currency display container in the new layout
+    this.container = document.querySelector('.currency-display') as HTMLElement;
+    this.levelDiv = document.querySelector('.level-display') as HTMLElement;
 
-    if (this.container && !this.statsContainer) {
-      this.createStatsContainer();
-    }
-  }
-
-  private createStatsContainer(): void {
-    if (!this.container) return;
-
-    // Create the new stats container
-    this.statsContainer = document.createElement('div');
-    this.statsContainer.className = 'top-stats-container';
-    this.statsContainer.innerHTML = `
-      <div class="primary-stat">
-        <div class="primary-stat-label">Total Sips</div>
-        <div class="primary-stat-value" id="primarySipsDisplay">0</div>
-      </div>
-      <div class="secondary-stat">
-        <div class="secondary-stat-item">
-          <div class="secondary-stat-label">Per Drink</div>
-          <div class="secondary-stat-value" id="perDrinkDisplay">0</div>
-        </div>
-      </div>
-    `;
-
-    // Insert the stats container after the level div
-    if (this.levelDiv && this.levelDiv.nextSibling) {
-      this.container.insertBefore(this.statsContainer, this.levelDiv.nextSibling);
-    } else {
-      this.container.appendChild(this.statsContainer);
-    }
+    // The stats container is the currency display itself
+    this.statsContainer = this.container;
   }
 
   public update(data: TopInfoBarData): void {
     this.initializeElements();
 
-    if (!this.container || !this.statsContainer) return;
+    if (!this.container) {
+      console.warn('❌ Currency display container not found');
+      return;
+    }
 
-    // Update level information
+    // Update level information (if level display exists)
     if (this.levelDiv) {
       this.levelDiv.innerHTML = `
         <h2>Level ${data.level}</h2>
@@ -88,7 +65,7 @@ export class TopInfoBar {
     if (perSecondDisplay) {
       // Calculate sips per second from current state
       try {
-        const state = (window as any).App?.state?.getState?.();
+        const state = useGameStore.getState();
         const drinkRate = state?.drinkRate || 1000;
         const sipsPerSecond = data.perDrink / (drinkRate / 1000) || 0;
         const formattedPerSecond = formatStatNumber(sipsPerSecond);

@@ -93,7 +93,7 @@ export function applyEnhancedAffordabilityClasses(): void {
     const hasEnhancedNearAffordable = element.classList.contains('enhanced-near-affordable');
     const hasEnhancedUnaffordable = element.classList.contains('enhanced-unaffordable');
 
-    const needsUpdate = 
+    const needsUpdate =
       (targetClass === 'enhanced-affordable' && !hasEnhancedAffordable) ||
       (targetClass === 'enhanced-near-affordable' && !hasEnhancedNearAffordable) ||
       (targetClass === 'enhanced-unaffordable' && !hasEnhancedUnaffordable) ||
@@ -103,7 +103,11 @@ export function applyEnhancedAffordabilityClasses(): void {
 
     if (needsUpdate) {
       // Remove existing enhanced affordability classes (don't touch main system classes)
-      element.classList.remove('enhanced-affordable', 'enhanced-near-affordable', 'enhanced-unaffordable');
+      element.classList.remove(
+        'enhanced-affordable',
+        'enhanced-near-affordable',
+        'enhanced-unaffordable'
+      );
 
       // Apply new enhanced class
       if (targetClass) {

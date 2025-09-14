@@ -11,7 +11,7 @@ import { toDecimal, gte } from '../core/numbers/migration-utils';
 import { NumericValue, CostResult } from '../types/app-types';
 import { nextStrawCost, nextCupCost } from '../core/rules/purchases';
 
-// Direct break_eternity.js Decimal access
+// Direct break_eternity.js Decimal access (consistent with core systems)
 const Decimal = (globalThis as any).Decimal;
 
 // Helper function to check if a button is in unlock mode

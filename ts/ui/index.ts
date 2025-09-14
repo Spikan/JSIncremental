@@ -16,10 +16,10 @@ import * as affordability from './affordability';
 import * as labels from './labels';
 import * as utils from './utils';
 import * as buttons from './buttons';
-import subscriptionManager from './subscription-manager';
+// import subscriptionManager from './subscription-manager'; // Not needed for sidebar navigation
 import { topInfoBar, TopInfoBarData } from './top-info-bar';
 import { useGameStore } from '../core/state/zustand-store';
-import { navigationManager, NavigationTab } from './navigation';
+import { sidebarNavigation, SidebarSection } from './sidebar-navigation';
 import { drinkProgressBar, levelProgressBar, ProgressBarData } from './progress-bar';
 import { visualFeedback } from './visual-feedback';
 import {
@@ -30,12 +30,13 @@ import { initializeSodaDrinkerProThemes, addThemeStyles } from './soda-drinker-p
 import { initializeAuthenticSDP } from './authentic-sdp';
 import { initializeSoda3D } from './soda-3d';
 import { konamiCodeDetector } from './konami-code';
+import { runFullLayoutValidation } from './layout-validation';
 
 // Export all UI modules
 export { displays, stats, feedback, affordability, buttons };
 export { labels };
-export { topInfoBar, navigationManager, drinkProgressBar, levelProgressBar, visualFeedback };
-export type { TopInfoBarData, NavigationTab, ProgressBarData };
+export { topInfoBar, sidebarNavigation, drinkProgressBar, levelProgressBar, visualFeedback };
+export type { TopInfoBarData, SidebarSection, ProgressBarData };
 
 // Export optimized functions
 export {
@@ -53,8 +54,9 @@ export {
  */
 export function updateTopInfoBar(): void {
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (!state) {
+      console.warn('No state available for top info bar update');
       return;
     }
 
@@ -62,9 +64,10 @@ export function updateTopInfoBar(): void {
       level: state.level || 1,
       totalSips: state.sips || 0,
       perDrink: state.spd || 0,
-      title: state.title || 'Soda Drinker',
+      title: 'Soda Drinker', // Title is not in the state, use default
     };
 
+    // Update the top info bar with current state
     topInfoBar.update(data);
   } catch (error) {
     console.warn('Failed to update top info bar:', error);
@@ -72,46 +75,14 @@ export function updateTopInfoBar(): void {
 }
 
 /**
- * Initialize the enhanced navigation system
+ * Initialize the enhanced sidebar navigation system
  */
 export function initializeEnhancedNavigation(): void {
   try {
-    // Initialize the navigation manager
-    navigationManager.initializeNavigation();
-
-    // Set up event listeners for tab switching
-    document.addEventListener('click', event => {
-      const target = event.target as HTMLElement;
-      const action = target.getAttribute('data-action');
-
-      if (action && action.startsWith('switchTab:')) {
-        const tabId = action.split(':')[1];
-        if (tabId) {
-          navigationManager.switchTab(tabId);
-          event.preventDefault();
-        }
-      }
-    });
-
-    // Set up keyboard navigation
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        const target = event.target as HTMLElement;
-        const action = target.getAttribute('data-action');
-
-        if (action && action.startsWith('switchTab:')) {
-          const tabId = action.split(':')[1];
-          if (tabId) {
-            navigationManager.switchTab(tabId);
-            event.preventDefault();
-          }
-        }
-      }
-    });
-
-    console.log('✅ Enhanced navigation system initialized');
+    // The sidebar navigation manager initializes itself
+    console.log('✅ Enhanced sidebar navigation system initialized');
   } catch (error) {
-    console.warn('Failed to initialize enhanced navigation:', error);
+    console.warn('Failed to initialize enhanced sidebar navigation:', error);
   }
 }
 
@@ -137,7 +108,7 @@ export function setupDirectSodaClickHandler(): void {
 
   const checkForValueChanges = () => {
     try {
-      const state = (window as any).App?.state?.getState?.();
+      const state = useGameStore.getState();
       if (state) {
         const currentSips = state.sips;
         const currentSPD = state.spd;
@@ -261,7 +232,7 @@ export function setupDirectSodaClickHandler(): void {
  */
 export function updateEnhancedProgressBars(): void {
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (!state) return;
 
     // Update drink progress bar
@@ -278,9 +249,9 @@ export function updateEnhancedProgressBars(): void {
 
     // Update level progress bar (if applicable)
     const levelData: ProgressBarData = {
-      progress: state.levelProgress || 0,
-      total: state.levelTarget || 100,
-      rate: state.levelRate || 0,
+      progress: 0, // Level progress not in state, use default
+      total: 100, // Level target not in state, use default
+      rate: 0, // Level rate not in state, use default
       label: 'Level Progress',
       showTimeRemaining: false,
       showPercentage: true,
@@ -425,14 +396,11 @@ export function initializeUI(): void {
   if (window.App?.events) {
     // Set up CLICK.SODA event listener
     window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA!, (data: unknown) => {
-      console.log('🎉 CLICK.SODA event received!', data);
       const clickData = data as ClickSodaEventData;
       // Use optimized batch update for better performance
       updateAllDisplaysOptimized();
       updateClickValueDisplay();
-      console.log('🔧 About to call updateTopInfoBar from CLICK.SODA event');
       updateTopInfoBar(); // Update the header with new sips total
-      console.log('✅ updateTopInfoBar called from CLICK.SODA event');
       checkUpgradeAffordabilityOptimized();
 
       // Add visual feedback for soda click (using existing CSS system)
@@ -529,6 +497,13 @@ export function initializeUI(): void {
     } catch (error) {
       console.error('❌ 3D soda button initialization failed:', error);
     }
+
+    // Run layout validation
+    try {
+      runFullLayoutValidation();
+    } catch (error) {
+      console.warn('Layout validation failed:', error);
+    }
   } catch (error) {
     reportUIError(error, 'initialize_enhanced_ui', ErrorSeverity.MEDIUM);
   }
@@ -571,8 +546,7 @@ function initializeEnhancedUIComponents(): void {
  */
 function initializeDevToolsButton(): void {
   try {
-    const w = window as any;
-    const state = w.App?.state?.getState?.();
+    const state = useGameStore.getState();
     const devToolsEnabled = state?.options?.devToolsEnabled ?? false;
 
     const button = document.querySelector('.dev-toggle-btn');
@@ -591,8 +565,7 @@ function initializeDevToolsButton(): void {
  */
 function initializeSecretsSystem(): void {
   try {
-    const w = window as any;
-    const state = w.App?.state?.getState?.();
+    const state = useGameStore.getState();
     const secretsUnlocked = state?.options?.secretsUnlocked ?? false;
     const godTabEnabled = state?.options?.godTabEnabled ?? false;
 
@@ -652,185 +625,17 @@ function hideOldUIElements(): void {
 
 // Initialize mobile navigation features
 function initializeMobileNavigation(): void {
-  if (!isMobileDevice()) return;
-
-  // Add keyboard navigation support for mobile tabs
-  const mobileTabItems = document.querySelectorAll('.mobile-tab-item');
-  const mobileEventListeners: Array<{ element: Element; type: string; handler: EventListener }> =
-    [];
-
-  mobileTabItems.forEach((item: any) => {
-    // Handle keyboard navigation
-    const keydownHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        const action = item.getAttribute('data-action');
-        if (action && action.startsWith('switchTab:')) {
-          const tabName = action.split(':')[1];
-          switchTab(tabName, e);
-        }
-      }
-    };
-
-    // Handle touch events
-    const touchstartHandler = (e: TouchEvent) => {
-      e.preventDefault();
-      item.classList.add('touching');
-    };
-
-    const touchendHandler = (e: TouchEvent) => {
-      e.preventDefault();
-      item.classList.remove('touching');
-      const action = item.getAttribute('data-action');
-      if (action && action.startsWith('switchTab:')) {
-        const tabName = action.split(':')[1];
-        switchTab(tabName, e);
-      }
-    };
-
-    // Add event listeners and track them for cleanup
-    item.addEventListener('keydown', keydownHandler);
-    item.addEventListener('touchstart', touchstartHandler);
-    item.addEventListener('touchend', touchendHandler);
-
-    mobileEventListeners.push(
-      { element: item, type: 'keydown', handler: keydownHandler as EventListener },
-      { element: item, type: 'touchstart', handler: touchstartHandler as EventListener },
-      { element: item, type: 'touchend', handler: touchendHandler as EventListener }
-    );
-  });
-
-  // Register cleanup with subscription manager
-  subscriptionManager.register(
-    'mobile-navigation',
-    () => {
-      mobileEventListeners.forEach(({ element, type, handler }) => {
-        element.removeEventListener(type, handler);
-      });
-      mobileEventListeners.length = 0;
-    },
-    'Mobile Navigation Event Listeners'
-  );
-
-  // Initialize swipe gestures for tab content
-  initializeSwipeGestures();
-
-  // Mobile navigation initialized
+  // Mobile navigation is now handled by the sidebar navigation manager
+  // No additional setup needed as the sidebar handles mobile interactions
+  console.log('✅ Mobile navigation initialized via sidebar system');
 }
 
-// Initialize swipe gestures for tab switching
-function initializeSwipeGestures(): void {
-  const tabContents = document.querySelectorAll('.tab-content');
-  const tabOrder = ['soda', 'shop', 'stats', 'god', 'options', 'dev'];
-
-  let startX = 0;
-  let startY = 0;
-  let currentTabIndex = 0;
-
-  // Find current tab index
-  function getCurrentTabIndex(): number {
-    const activeTab = document.querySelector('.tab-content.active');
-    if (!activeTab) return 0;
-
-    const tabId = activeTab.id.replace('Tab', '');
-    return tabOrder.indexOf(tabId);
-  }
-
-  // Check if a tab is disabled
-  function isTabDisabled(tabName: string): boolean {
-    try {
-      const w = window as any;
-      const state = w.App?.state?.getState?.();
-
-      if (tabName === 'dev') {
-        return !state?.options?.devTabEnabled;
-      }
-      if (tabName === 'god') {
-        return !state?.options?.godTabEnabled;
-      }
-
-      return false; // Other tabs are always enabled
-    } catch {
-      return false;
-    }
-  }
-
-  // Find and switch to the next available tab in the given direction
-  function findAndSwitchToAvailableTab(startIndex: number, direction: number): void {
-    let index = startIndex;
-    const maxAttempts = tabOrder.length;
-    let attempts = 0;
-
-    while (attempts < maxAttempts) {
-      if (index >= 0 && index < tabOrder.length) {
-        const tabName = tabOrder[index];
-        if (tabName && !isTabDisabled(tabName)) {
-          const event = new Event('swipe');
-          switchTab(tabName, event);
-          return;
-        }
-      }
-
-      index += direction;
-      attempts++;
-    }
-  }
-
-  // Add swipe listeners to all tab content areas
-  const swipeEventListeners: Array<{ element: Element; type: string; handler: EventListener }> = [];
-
-  tabContents.forEach((tabContent: any) => {
-    const touchstartHandler = (e: TouchEvent) => {
-      if (e.touches && e.touches.length > 0 && e.touches[0]) {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        currentTabIndex = getCurrentTabIndex();
-      }
-    };
-
-    const touchendHandler = (e: TouchEvent) => {
-      if (e.changedTouches && e.changedTouches.length > 0 && e.changedTouches[0]) {
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-
-        const deltaX = endX - startX;
-        const deltaY = endY - startY;
-
-        // Only process horizontal swipes
-        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-          if (deltaX > 0) {
-            // Swipe right - previous available tab
-            findAndSwitchToAvailableTab(currentTabIndex - 1, -1);
-          } else {
-            // Swipe left - next available tab
-            findAndSwitchToAvailableTab(currentTabIndex + 1, 1);
-          }
-        }
-      }
-    };
-
-    // Add event listeners and track them for cleanup
-    tabContent.addEventListener('touchstart', touchstartHandler);
-    tabContent.addEventListener('touchend', touchendHandler);
-
-    swipeEventListeners.push(
-      { element: tabContent, type: 'touchstart', handler: touchstartHandler as EventListener },
-      { element: tabContent, type: 'touchend', handler: touchendHandler as EventListener }
-    );
-  });
-
-  // Register cleanup with subscription manager
-  subscriptionManager.register(
-    'swipe-gestures',
-    () => {
-      swipeEventListeners.forEach(({ element, type, handler }) => {
-        element.removeEventListener(type, handler);
-      });
-      swipeEventListeners.length = 0;
-    },
-    'Swipe Gesture Event Listeners'
-  );
-}
+// Initialize swipe gestures for sidebar navigation
+// function initializeSwipeGestures(): void {
+//   // Swipe gestures are now handled by the sidebar navigation manager
+//   // No additional setup needed as the sidebar handles mobile swipe interactions
+//   console.log('✅ Swipe gestures initialized via sidebar system');
+// }
 
 // Update all UI displays (useful for initialization and major state changes)
 export function updateAllDisplays(): void {
@@ -870,69 +675,35 @@ export function updateAllDisplays(): void {
   // Update complete
 }
 
-// Enhanced switchTab function for both desktop and mobile navigation
-export function switchTab(tabName: string, event?: Event | null): void {
-  // Update tab content visibility
-  const tabContents = document.querySelectorAll('.tab-content');
-  tabContents.forEach(tab => (tab as Element).classList.remove('active'));
-  const selectedTab = document.getElementById(`${tabName}Tab`);
-  if (selectedTab) {
-    selectedTab.classList.add('active');
-  }
+// Enhanced sidebar section toggle function
+export function toggleSidebarSection(sectionName: string, _event?: Event | null): void {
+  try {
+    // Toggle the sidebar section
+    sidebarNavigation.toggleSection(sectionName);
 
-  // Update desktop tab buttons
-  const desktopTabButtons = document.querySelectorAll('.tab-btn');
-  desktopTabButtons.forEach((btn: any) => btn.classList.remove('active'));
-
-  // Update mobile tab items
-  const mobileTabItems = document.querySelectorAll('.mobile-tab-item');
-  mobileTabItems.forEach((item: any) => item.classList.remove('active'));
-
-  // Find and activate the correct tab button/item
-  const clickedElement = event?.target as any;
-  let targetElement = clickedElement;
-
-  // If clicking on a child element, find the parent tab element
-  if (
-    clickedElement &&
-    !clickedElement.classList.contains('tab-btn') &&
-    !clickedElement.classList.contains('mobile-tab-item')
-  ) {
-    targetElement =
-      clickedElement.closest('.tab-btn') || clickedElement.closest('.mobile-tab-item');
-  }
-
-  // Activate the clicked element
-  if (targetElement) {
-    targetElement.classList.add('active');
-  } else {
-    // Fallback: activate by data-action attribute
-    const fallbackElement = document.querySelector(`[data-action="switchTab:${tabName}"]`);
-    if (fallbackElement) {
-      fallbackElement.classList.add('active');
+    // Add haptic feedback on mobile
+    if (isMobileDevice()) {
+      triggerHapticFeedback();
     }
-  }
 
-  // Add haptic feedback on mobile
-  if (isMobileDevice()) {
-    triggerHapticFeedback();
-  }
-
-  // Tab-specific updates
-  if (tabName === 'stats') {
-    try {
-      updateAllStats();
-    } catch (error) {
-      reportUIError(error, 'update_stats_tab', ErrorSeverity.MEDIUM);
+    // Section-specific updates
+    if (sectionName === 'stats') {
+      try {
+        updateAllStats();
+      } catch (error) {
+        reportUIError(error, 'update_stats_section', ErrorSeverity.MEDIUM);
+      }
     }
-  }
-  if (tabName === 'unlocks') {
-    try {
-      const sys = (window as any).App?.systems?.unlocks;
-      if (sys?.updateUnlocksTab) sys.updateUnlocksTab();
-    } catch (error) {
-      reportUIError(error, 'update_unlocks_tab', ErrorSeverity.MEDIUM);
+    if (sectionName === 'unlocks') {
+      try {
+        const sys = (window as any).App?.systems?.unlocks;
+        if (sys?.updateUnlocksTab) sys.updateUnlocksTab();
+      } catch (error) {
+        reportUIError(error, 'update_unlocks_section', ErrorSeverity.MEDIUM);
+      }
     }
+  } catch (error) {
+    reportUIError(error, 'toggle_sidebar_section', ErrorSeverity.MEDIUM);
   }
 }
 
@@ -989,25 +760,19 @@ export const safeUpdateAllDisplays = withErrorBoundary(
   }
 );
 
-export const safeSwitchTab = withErrorBoundary(
+export const safeToggleSidebarSection = withErrorBoundary(
   (...args: unknown[]) => {
-    const [tabName, event] = args;
-    return switchTab(tabName as string, event as Event | null | undefined);
+    const [sectionName, event] = args;
+    return toggleSidebarSection(sectionName as string, event as Event | null | undefined);
   },
-  'switch_tab',
+  'toggle_sidebar_section',
   ErrorSeverity.MEDIUM,
   () => {
-    // Fallback: show soda tab
+    // Fallback: expand upgrades section
     try {
-      const sodaTab = document.querySelector('.tab-content[id="sodaTab"]');
-      const otherTabs = document.querySelectorAll('.tab-content:not(#sodaTab)');
-
-      if (sodaTab) {
-        sodaTab.classList.add('active');
-        otherTabs.forEach(tab => tab.classList.remove('active'));
-      }
+      sidebarNavigation.expandSection('upgrades');
     } catch (fallbackError) {
-      reportUIError(fallbackError, 'switch_tab_fallback', ErrorSeverity.HIGH);
+      reportUIError(fallbackError, 'toggle_sidebar_section_fallback', ErrorSeverity.HIGH);
     }
   }
 );
@@ -1018,7 +783,7 @@ export function initializeErrorBoundaries(): void {
     // Wrap critical global functions with error boundaries
     if (typeof window !== 'undefined') {
       (window as any).safeUpdateAllDisplays = safeUpdateAllDisplays;
-      (window as any).safeSwitchTab = safeSwitchTab;
+      (window as any).safeToggleSidebarSection = safeToggleSidebarSection;
     }
   } catch (error) {
     reportUIError(error, 'initialize_error_boundaries', ErrorSeverity.HIGH);

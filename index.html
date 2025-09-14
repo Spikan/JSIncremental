@@ -359,911 +359,398 @@
         </div>
       </div>
 
-      <!-- Desktop Tab Navigation -->
-      <div class="tab-navigation desktop-only">
-        <button class="tab-btn active" data-action="switchTab:soda" aria-label="Soda Clicking Tab">
-          <span class="tab-icon">🥤</span>
-          <span class="tab-label">Soda Clicking</span>
-        </button>
-        <button class="tab-btn" data-action="switchTab:shop" aria-label="Shop & Upgrades Tab">
-          <span class="tab-icon">🛒</span>
-          <span class="tab-label">Shop & Upgrades</span>
-        </button>
-        <button class="tab-btn" data-action="switchTab:stats" aria-label="Statistics Tab">
-          <span class="tab-icon">📊</span>
-          <span class="tab-label">Statistics</span>
-        </button>
-        <button class="tab-btn" data-action="switchTab:god" aria-label="Talk to God Tab">
-          <span class="tab-icon">🙏</span>
-          <span class="tab-label">Talk to God</span>
-        </button>
-        <button class="tab-btn" data-action="switchTab:options" aria-label="Options Tab">
-          <span class="tab-icon">⚙️</span>
-          <span class="tab-label">Options</span>
-        </button>
-        <button class="tab-btn" data-action="switchTab:dev" aria-label="Dev Tools Tab">
-          <span class="tab-icon">🔧</span>
-          <span class="tab-label">Dev Tools</span>
-        </button>
-      </div>
+      <!-- Main Game Content -->
+      <div id="mainGameContent" class="main-game-content">
+        <!-- Main Content Area (Left Side) -->
+        <div class="main-content-area">
+          <!-- Soda Clicking Section -->
+          <div class="soda-main-section">
+            <div class="soda-container">
+              <div
+                id="sodaButton"
+                data-action="sodaClick"
+                data-args="1"
+                class="soda-button"
+                role="button"
+                tabindex="0"
+                aria-label="Click to drink soda"
+              >
+                <!-- 3D model will be inserted here, fallback image for loading -->
+                <img
+                  src="images/regSoda.png"
+                  alt="a picture of soda for you to click"
+                  class="soda-fallback"
+                  style="width: 100%; height: 100%; object-fit: contain"
+                />
+              </div>
+              <div class="click-indicator" id="clickIndicator">
+                <div class="click-ripple"></div>
+              </div>
+            </div>
 
-      <!-- Mobile Bottom Navigation - Simplified to 4 main tabs -->
-      <div class="mobile-tab-navigation mobile-only">
-        <div
-          class="mobile-tab-item active"
-          data-action="switchTab:soda"
-          aria-label="Soda Clicking Tab"
-          role="button"
-          tabindex="0"
-        >
-          <div class="mobile-tab-icon">🥤</div>
-          <div class="mobile-tab-label">Soda</div>
-        </div>
-        <div
-          class="mobile-tab-item"
-          data-action="switchTab:shop"
-          aria-label="Shop & Upgrades Tab"
-          role="button"
-          tabindex="0"
-        >
-          <div class="mobile-tab-icon">🛒</div>
-          <div class="mobile-tab-label">Shop</div>
-        </div>
-        <div
-          class="mobile-tab-item"
-          data-action="switchTab:stats"
-          aria-label="Statistics Tab"
-          role="button"
-          tabindex="0"
-        >
-          <div class="mobile-tab-icon">📊</div>
-          <div class="mobile-tab-label">Stats</div>
-        </div>
-        <div
-          class="mobile-tab-item"
-          data-action="showMoreOptions"
-          aria-label="More Options"
-          role="button"
-          tabindex="0"
-        >
-          <div class="mobile-tab-icon">⚙️</div>
-          <div class="mobile-tab-label">More</div>
-        </div>
-      </div>
-
-      <!-- More Options Modal for Mobile -->
-      <div id="moreOptionsModal" class="more-options-modal" style="display: none">
-        <div class="more-options-content">
-          <div class="more-options-header">
-            <h3>More Options</h3>
-            <button class="close-more-options" aria-label="Close More Options">×</button>
+            <!-- Soda Stats -->
+            <div class="soda-stats">
+              <div class="stat-item">
+                <span class="stat-label">Click Value</span>
+                <span class="stat-value" id="clickValue">1</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Critical Chance</span>
+                <span class="stat-value" id="criticalChance">0%</span>
+              </div>
+            </div>
           </div>
-          <div class="more-options-grid">
-            <button class="more-option-btn" data-action="switchTab:god">
-              <div class="more-option-icon">🙏</div>
-              <div class="more-option-label">Talk to God</div>
+
+          <!-- Level Up Section -->
+          <div class="level-up-section">
+            <div class="level-up-card">
+              <div class="level-up-header">
+                <div class="level-up-icon">⭐</div>
+                <div class="level-up-info">
+                  <h3 class="level-up-title">Level Up</h3>
+                  <p class="level-up-description">+150% sips per drink</p>
+                </div>
+              </div>
+              <button class="level-up-btn disabled" data-action="levelUp">
+                <div class="cost-display">
+                  <span id="levelCost" class="cost-number">3000</span>
+                  <span class="cost-currency">Sips</span>
+                </div>
+                <div class="btn-label">Level Up</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Production Summary -->
+          <div class="production-summary">
+            <div class="production-card">
+              <div class="production-header">
+                <div class="production-icon">📊</div>
+                <div class="production-info">
+                  <h3>Total Production</h3>
+                  <p>Your passive income per drink</p>
+                </div>
+              </div>
+              <div class="production-stats">
+                <div class="production-stat">
+                  <span class="production-label">Straws</span>
+                  <span class="production-value" id="totalStrawProduction">0</span>
+                </div>
+                <div class="production-stat">
+                  <span class="production-label">Cups</span>
+                  <span class="production-value" id="totalCupProduction">0</span>
+                </div>
+                <div class="production-stat total">
+                  <span class="production-label">Total/Drink</span>
+                  <span class="production-value" id="totalPassiveProduction">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar (Right Side) -->
+        <div class="game-sidebar">
+          <!-- Sidebar Header -->
+          <div class="sidebar-header">
+            <h2 class="sidebar-title">Game Menu</h2>
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+              <span class="toggle-icon">☰</span>
             </button>
-            <button class="more-option-btn" data-action="switchTab:options">
-              <div class="more-option-icon">⚙️</div>
-              <div class="more-option-label">Settings</div>
-            </button>
-            <button class="more-option-btn" data-action="switchTab:dev">
-              <div class="more-option-icon">🔧</div>
-              <div class="more-option-label">Dev Tools</div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Soda Clicking Tab -->
-      <div id="sodaTab" class="tab-content active">
-        <div class="game-main">
-          <!-- Primary Action Area -->
-          <div class="primary-action-area">
-            <div class="soda-clicking-section">
-              <div class="soda-container">
-                <div
-                  id="sodaButton"
-                  data-action="sodaClick"
-                  data-args="1"
-                  class="soda-button"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Click to drink soda"
-                >
-                  <!-- 3D model will be inserted here, fallback image for loading -->
-                  <img
-                    src="images/regSoda.png"
-                    alt="a picture of soda for you to click"
-                    class="soda-fallback"
-                    style="width: 100%; height: 100%; object-fit: contain"
-                  />
-                </div>
-                <div class="click-indicator" id="clickIndicator">
-                  <div class="click-ripple"></div>
-                </div>
-              </div>
-
-              <div class="soda-info">
-                <div class="soda-stats">
-                  <div class="stat-item">
-                    <span class="stat-label">Click Value</span>
-                    <span class="stat-value" id="clickValue">1</span>
-                  </div>
-                  <div class="stat-item">
-                    <span class="stat-label">Critical Chance</span>
-                    <span class="stat-value" id="criticalChance">0%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="level-up-section">
-              <div class="level-up-card">
-                <div class="level-up-header">
-                  <div class="level-up-icon">⭐</div>
-                  <div class="level-up-info">
-                    <h3 class="level-up-title">Level Up</h3>
-                    <p class="level-up-description">+150% sips per drink</p>
-                  </div>
-                </div>
-                <button class="level-up-btn disabled" data-action="levelUp">
-                  <div class="cost-display">
-                    <span id="levelCost" class="cost-number">3000</span>
-                    <span class="cost-currency">Sips</span>
-                  </div>
-                  <div class="btn-label">Level Up</div>
-                </button>
-              </div>
-            </div>
           </div>
 
-          <!-- Upgrades Sidebar -->
-          <div class="upgrades-sidebar">
-            <div class="sidebar-header">
-              <h3 class="sidebar-title">Click Upgrades</h3>
-              <p class="sidebar-subtitle">Enhance your clicking power</p>
-            </div>
-
-            <div class="upgrade-cards">
-              <div class="upgrade-card">
-                <div class="upgrade-header">
-                  <div class="upgrade-icon">💨</div>
-                  <div class="upgrade-info">
-                    <h4 class="upgrade-name">Suction</h4>
-                    <p class="upgrade-description">Increase click power</p>
-                  </div>
+          <!-- Sidebar Content -->
+          <div class="sidebar-content">
+            <!-- Upgrades Section -->
+            <div class="sidebar-section" data-section="upgrades">
+              <div class="section-header" data-action="toggleSection:upgrades">
+                <div class="section-icon">⚡</div>
+                <div class="section-info">
+                  <h3 class="section-title">Upgrades</h3>
+                  <p class="section-subtitle">Enhance your power</p>
                 </div>
-                <button class="upgrade-btn" data-action="buySuction">
-                  <div class="upgrade-cost"><span id="suctionCostCompact">40</span> Sips</div>
-                </button>
-                <div class="upgrade-stats">
-                  <div class="upgrade-effect">
-                    +<span id="suctionClickBonusCompact">1.0</span> per click
-                  </div>
-                </div>
+                <div class="section-toggle">▼</div>
               </div>
+              <div class="section-content">
+                <!-- Click Upgrades -->
+                <div class="upgrade-group">
+                  <h4 class="upgrade-group-title">Click Upgrades</h4>
+                  <div class="upgrade-cards">
+                    <div class="upgrade-card">
+                      <div class="upgrade-header">
+                        <div class="upgrade-icon">💨</div>
+                        <div class="upgrade-info">
+                          <h4 class="upgrade-name">Suction</h4>
+                          <p class="upgrade-description">Increase click power</p>
+                        </div>
+                      </div>
+                      <button class="upgrade-btn" data-action="buySuction">
+                        <div class="upgrade-cost"><span id="suctionCostCompact">40</span> Sips</div>
+                      </button>
+                      <div class="upgrade-stats">
+                        <div class="upgrade-effect">
+                          +<span id="suctionClickBonusCompact">1.0</span> per click
+                        </div>
+                      </div>
+                    </div>
 
-              <div class="upgrade-card">
-                <div class="upgrade-header">
-                  <div class="upgrade-icon">⚡</div>
-                  <div class="upgrade-info">
-                    <h4 class="upgrade-name">Critical Click</h4>
-                    <p class="upgrade-description">Chance for bonus clicks</p>
-                  </div>
-                </div>
-                <button class="upgrade-btn" data-action="buyCriticalClick">
-                  <div class="upgrade-cost"><span id="criticalClickCostCompact">60</span> Sips</div>
-                </button>
-                <div class="upgrade-stats">
-                  <div class="upgrade-effect">
-                    <span id="criticalClickChanceCompact">0.1</span>% chance
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Drink Speed Upgrades Sidebar -->
-          <div class="upgrades-sidebar">
-            <div class="sidebar-header">
-              <h3 class="sidebar-title">Drink Speed Upgrades</h3>
-              <p class="sidebar-subtitle">Enhance your drinking speed</p>
-            </div>
-
-            <div class="upgrade-cards">
-              <div class="upgrade-card">
-                <div class="upgrade-header">
-                  <div class="upgrade-icon">⚡</div>
-                  <div class="upgrade-info">
-                    <h4 class="upgrade-name">Faster Drinks</h4>
-                    <p class="upgrade-description">Reduce drink time</p>
-                  </div>
-                </div>
-                <button class="upgrade-btn" data-action="buyFasterDrinks">
-                  <div class="upgrade-cost"><span id="fasterDrinksCostCompact">80</span> Sips</div>
-                </button>
-                <div class="upgrade-stats">
-                  <div class="upgrade-effect">
-                    Speed: <span id="currentDrinkSpeedCompact">5.00s</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="upgrade-card">
-                <div class="upgrade-header">
-                  <div class="upgrade-icon">🔧</div>
-                  <div class="upgrade-info">
-                    <h4 class="upgrade-name">Upgrade Faster Drinks</h4>
-                    <p class="upgrade-description">Enhance drink speed bonus</p>
-                  </div>
-                </div>
-                <button class="upgrade-btn" data-action="upgradeFasterDrinks">
-                  <div class="upgrade-cost">
-                    <span id="fasterDrinksUpCostCompact">1500</span> Sips
-                  </div>
-                </button>
-                <div class="upgrade-stats">
-                  <div class="upgrade-effect">
-                    Bonus: <span id="drinkSpeedBonusCompact">0%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Shop & Upgrades Tab -->
-      <div id="shopTab" class="tab-content">
-        <div class="game-main">
-          <!-- Shop Overview Area -->
-          <div class="primary-action-area">
-            <div class="shop-overview">
-              <div class="shop-header">
-                <h2 class="shop-title">🛒 Shop & Upgrades</h2>
-                <p class="shop-subtitle">
-                  Invest in permanent improvements to boost your soda empire
-                </p>
-              </div>
-
-              <div class="production-summary">
-                <div class="production-card">
-                  <div class="production-header">
-                    <div class="production-icon">📊</div>
-                    <div class="production-info">
-                      <h3>Total Production</h3>
-                      <p>Your passive income per drink</p>
+                    <div class="upgrade-card">
+                      <div class="upgrade-header">
+                        <div class="upgrade-icon">⚡</div>
+                        <div class="upgrade-info">
+                          <h4 class="upgrade-name">Critical Click</h4>
+                          <p class="upgrade-description">Chance for bonus clicks</p>
+                        </div>
+                      </div>
+                      <button class="upgrade-btn" data-action="buyCriticalClick">
+                        <div class="upgrade-cost">
+                          <span id="criticalClickCostCompact">60</span> Sips
+                        </div>
+                      </button>
+                      <div class="upgrade-stats">
+                        <div class="upgrade-effect">
+                          <span id="criticalClickChanceCompact">0.1</span>% chance
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="production-stats">
-                    <div class="production-stat">
-                      <span class="production-label">Straws</span>
-                      <span class="production-value" id="totalStrawProduction">0</span>
+                </div>
+
+                <!-- Drink Speed Upgrades -->
+                <div class="upgrade-group">
+                  <h4 class="upgrade-group-title">Drink Speed Upgrades</h4>
+                  <div class="upgrade-cards">
+                    <div class="upgrade-card">
+                      <div class="upgrade-header">
+                        <div class="upgrade-icon">⚡</div>
+                        <div class="upgrade-info">
+                          <h4 class="upgrade-name">Faster Drinks</h4>
+                          <p class="upgrade-description">Reduce drink time</p>
+                        </div>
+                      </div>
+                      <button class="upgrade-btn" data-action="buyFasterDrinks">
+                        <div class="upgrade-cost">
+                          <span id="fasterDrinksCostCompact">80</span> Sips
+                        </div>
+                      </button>
+                      <div class="upgrade-stats">
+                        <div class="upgrade-effect">
+                          Speed: <span id="currentDrinkSpeedCompact">5.00s</span>
+                        </div>
+                      </div>
                     </div>
-                    <div class="production-stat">
-                      <span class="production-label">Cups</span>
-                      <span class="production-value" id="totalCupProduction">0</span>
-                    </div>
-                    <div class="production-stat total">
-                      <span class="production-label">Total/Drink</span>
-                      <span class="production-value" id="totalPassiveProduction">0</span>
+
+                    <div class="upgrade-card">
+                      <div class="upgrade-header">
+                        <div class="upgrade-icon">🔧</div>
+                        <div class="upgrade-info">
+                          <h4 class="upgrade-name">Upgrade Faster Drinks</h4>
+                          <p class="upgrade-description">Enhance drink speed bonus</p>
+                        </div>
+                      </div>
+                      <button class="upgrade-btn" data-action="upgradeFasterDrinks">
+                        <div class="upgrade-cost">
+                          <span id="fasterDrinksUpCostCompact">1500</span> Sips
+                        </div>
+                      </button>
+                      <div class="upgrade-stats">
+                        <div class="upgrade-effect">
+                          Bonus: <span id="drinkSpeedBonusCompact">0%</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Production Buildings Sidebar -->
-          <div class="upgrades-sidebar">
-            <div class="sidebar-header">
-              <h3 class="sidebar-title">Production Buildings</h3>
-              <p class="sidebar-subtitle">Generate sips automatically</p>
-            </div>
-
-            <div class="upgrade-cards">
-              <!-- Straw Production -->
-              <div class="production-group">
-                <div class="production-group-header">
-                  <div class="production-group-icon">🥤</div>
-                  <div class="production-group-info">
-                    <h4>Straw Production</h4>
-                    <p class="text-muted">Base production building</p>
-                  </div>
+            <!-- Shop Section -->
+            <div class="sidebar-section" data-section="shop">
+              <div class="section-header" data-action="toggleSection:shop">
+                <div class="section-icon">🛒</div>
+                <div class="section-info">
+                  <h3 class="section-title">Shop</h3>
+                  <p class="section-subtitle">Production buildings</p>
                 </div>
+                <div class="section-toggle">▼</div>
+              </div>
+              <div class="section-content">
+                <!-- Production Buildings -->
+                <div class="upgrade-group">
+                  <h4 class="upgrade-group-title">Production Buildings</h4>
+                  <div class="upgrade-cards">
+                    <!-- Straw Production -->
+                    <div class="upgrade-card">
+                      <div class="upgrade-header">
+                        <div class="upgrade-icon">🥤</div>
+                        <div class="upgrade-info">
+                          <h4 class="upgrade-name">Extra Straw</h4>
+                          <p class="upgrade-description">Generate sips per drink</p>
+                        </div>
+                      </div>
+                      <button class="upgrade-btn" data-action="buyStraw">
+                        <div class="upgrade-cost"><span id="strawCost">5</span> Sips</div>
+                      </button>
+                      <div class="upgrade-stats">
+                        <div class="upgrade-owned">Owned: <span id="straws">0</span></div>
+                        <div class="upgrade-effect">+<span id="strawSPD">0</span> per drink</div>
+                      </div>
+                    </div>
 
-                <div class="upgrade-card">
-                  <div class="upgrade-header">
-                    <div class="upgrade-icon">🥤</div>
-                    <div class="upgrade-info">
-                      <h4 class="upgrade-name">Extra Straw</h4>
-                      <p class="upgrade-description">Generate sips per drink</p>
+                    <!-- Cup Production -->
+                    <div class="upgrade-card">
+                      <div class="upgrade-header">
+                        <div class="upgrade-icon">☕</div>
+                        <div class="upgrade-info">
+                          <h4 class="upgrade-name">Bigger Cup</h4>
+                          <p class="upgrade-description">Higher capacity production</p>
+                        </div>
+                      </div>
+                      <button class="upgrade-btn" data-action="buyCup">
+                        <div class="upgrade-cost"><span id="cupCost">15</span> Sips</div>
+                      </button>
+                      <div class="upgrade-stats">
+                        <div class="upgrade-owned">Owned: <span id="cups">0</span></div>
+                        <div class="upgrade-effect">+<span id="cupSPD">0</span> per drink</div>
+                      </div>
+                    </div>
+
+                    <!-- Wider Straws Enhancement -->
+                    <div class="upgrade-card enhancement">
+                      <div class="upgrade-header">
+                        <div class="upgrade-icon">🔧</div>
+                        <div class="upgrade-info">
+                          <h4 class="upgrade-name">Wider Straws</h4>
+                          <p class="upgrade-description">Enhance straw efficiency</p>
+                        </div>
+                      </div>
+                      <button class="upgrade-btn" data-action="buyWiderStraws">
+                        <div class="upgrade-cost"><span id="widerStrawsCost">150</span> Sips</div>
+                      </button>
+                      <div class="upgrade-stats">
+                        <div class="upgrade-owned">Owned: <span id="widerStraws">0</span></div>
+                        <div class="upgrade-effect">+<span id="widerStrawsSPD">0</span>% boost</div>
+                      </div>
+                    </div>
+
+                    <!-- Better Cups Enhancement -->
+                    <div class="upgrade-card enhancement">
+                      <div class="upgrade-header">
+                        <div class="upgrade-icon">🔧</div>
+                        <div class="upgrade-info">
+                          <h4 class="upgrade-name">Better Cups</h4>
+                          <p class="upgrade-description">Enhance cup efficiency</p>
+                        </div>
+                      </div>
+                      <button class="upgrade-btn" data-action="buyBetterCups">
+                        <div class="upgrade-cost"><span id="betterCupsCost">400</span> Sips</div>
+                      </button>
+                      <div class="upgrade-stats">
+                        <div class="upgrade-owned">Owned: <span id="betterCups">0</span></div>
+                        <div class="upgrade-effect">+<span id="betterCupsSPD">0</span>% boost</div>
+                      </div>
                     </div>
                   </div>
-                  <button class="upgrade-btn" data-action="buyStraw">
-                    <div class="upgrade-cost"><span id="strawCost">5</span> Sips</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="sidebar-section" data-section="stats">
+              <div class="section-header" data-action="toggleSection:stats">
+                <div class="section-icon">📊</div>
+                <div class="section-info">
+                  <h3 class="section-title">Statistics</h3>
+                  <p class="section-subtitle">Track your progress</p>
+                </div>
+                <div class="section-toggle">▼</div>
+              </div>
+              <div class="section-content">
+                <div class="stats-grid">
+                  <div class="stat-card">
+                    <div class="stat-icon">👆</div>
+                    <div class="stat-content">
+                      <div class="stat-label">Total Clicks</div>
+                      <div class="stat-value" id="totalClicks">0</div>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon">⏰</div>
+                    <div class="stat-content">
+                      <div class="stat-label">Play Time</div>
+                      <div class="stat-value" id="totalPlayTime">0:00:00</div>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon">💧</div>
+                    <div class="stat-content">
+                      <div class="stat-label">Total Sips</div>
+                      <div class="stat-value" id="totalSipsEarned">0</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="sidebar-section" data-section="settings">
+              <div class="section-header" data-action="toggleSection:settings">
+                <div class="section-icon">⚙️</div>
+                <div class="section-info">
+                  <h3 class="section-title">Settings</h3>
+                  <p class="section-subtitle">Options & tools</p>
+                </div>
+                <div class="section-toggle">▼</div>
+              </div>
+              <div class="section-content">
+                <div class="settings-group">
+                  <h4 class="settings-group-title">Audio</h4>
+                  <button
+                    id="buttonSoundsToggle"
+                    data-action="toggleButtonSounds"
+                    class="settings-btn"
+                  >
+                    🔊 Button Sounds ON
                   </button>
-                  <div class="upgrade-stats">
-                    <div class="upgrade-owned">Owned: <span id="straws">0</span></div>
-                    <div class="upgrade-effect">+<span id="strawSPD">0</span> per drink</div>
-                  </div>
                 </div>
-
-                <div class="upgrade-card enhancement">
-                  <div class="upgrade-header">
-                    <div class="upgrade-icon">🔧</div>
-                    <div class="upgrade-info">
-                      <h4 class="upgrade-name">Wider Straws</h4>
-                      <p class="upgrade-description">Enhance straw efficiency</p>
-                    </div>
-                  </div>
-                  <button class="upgrade-btn" data-action="buyWiderStraws">
-                    <div class="upgrade-cost"><span id="widerStrawsCost">150</span> Sips</div>
+                <div class="settings-group">
+                  <h4 class="settings-group-title">Save & Load</h4>
+                  <button data-action="save" class="settings-btn">Save Game</button>
+                  <button data-action="delete_save" class="settings-btn">Delete Save</button>
+                </div>
+                <div class="settings-group">
+                  <h4 class="settings-group-title">Dev Tools</h4>
+                  <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
+                    🔧 Dev Tools OFF
                   </button>
-                  <div class="upgrade-stats">
-                    <div class="upgrade-owned">Owned: <span id="widerStraws">0</span></div>
-                    <div class="upgrade-effect">+<span id="widerStrawsSPD">0</span>% boost</div>
-                  </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Cup Production -->
-              <div class="production-group">
-                <div class="production-group-header">
-                  <div class="production-group-icon">☕</div>
-                  <div class="production-group-info">
-                    <h4>Cup Production</h4>
-                    <p class="text-muted">Advanced production building</p>
-                  </div>
+            <!-- God Section -->
+            <div class="sidebar-section" data-section="god">
+              <div class="section-header" data-action="toggleSection:god">
+                <div class="section-icon">🙏</div>
+                <div class="section-info">
+                  <h3 class="section-title">Talk to God</h3>
+                  <p class="section-subtitle">Seek divine guidance</p>
                 </div>
-
-                <div class="upgrade-card">
-                  <div class="upgrade-header">
-                    <div class="upgrade-icon">☕</div>
-                    <div class="upgrade-info">
-                      <h4 class="upgrade-name">Bigger Cup</h4>
-                      <p class="upgrade-description">Higher capacity production</p>
-                    </div>
+                <div class="section-toggle">▼</div>
+              </div>
+              <div class="section-content">
+                <div class="god-content">
+                  <div class="god-message" id="godMessage">
+                    "Welcome, mortal. I see you seek the path of the soda drinker. What wisdom do
+                    you require?"
                   </div>
-                  <button class="upgrade-btn" data-action="buyCup">
-                    <div class="upgrade-cost"><span id="cupCost">15</span> Sips</div>
-                  </button>
-                  <div class="upgrade-stats">
-                    <div class="upgrade-owned">Owned: <span id="cups">0</span></div>
-                    <div class="upgrade-effect">+<span id="cupSPD">0</span> per drink</div>
-                  </div>
-                </div>
-
-                <div class="upgrade-card enhancement">
-                  <div class="upgrade-header">
-                    <div class="upgrade-icon">🔧</div>
-                    <div class="upgrade-info">
-                      <h4 class="upgrade-name">Better Cups</h4>
-                      <p class="upgrade-description">Enhance cup efficiency</p>
-                    </div>
-                  </div>
-                  <button class="upgrade-btn" data-action="buyBetterCups">
-                    <div class="upgrade-cost"><span id="betterCupsCost">400</span> Sips</div>
-                  </button>
-                  <div class="upgrade-stats">
-                    <div class="upgrade-owned">Owned: <span id="betterCups">0</span></div>
-                    <div class="upgrade-effect">+<span id="betterCupsSPD">0</span>% boost</div>
+                  <div class="god-actions">
+                    <button class="god-btn" data-action="godBlessing">Request Blessing</button>
+                    <button class="god-btn" data-action="godWisdom">Seek Wisdom</button>
+                    <button class="god-btn" data-action="godPraise">Praise the Divine</button>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Options Tab -->
-      <div id="optionsTab" class="tab-content">
-        <div class="options-container">
-          <div class="options-section">
-            <h3>🔊 Button Audio</h3>
-            <div class="sound-controls">
-              <button
-                id="buttonSoundsToggle"
-                data-action="toggleButtonSounds"
-                class="sound-toggle-btn"
-              >
-                🔊 Button Sounds ON
-              </button>
-              <p class="sound-description">Enable or disable button click sound effects</p>
-            </div>
-          </div>
-
-          <div class="options-section">
-            <h3>💾 Save & Load</h3>
-            <div class="save-controls">
-              <button data-action="save" class="save-btn">Save Game</button>
-              <button data-action="delete_save" class="save-btn">Delete Save</button>
-              <button data-action="devExportSave" class="save-btn">Export Save</button>
-              <button data-action="devImportSave" class="save-btn">Import Save</button>
-            </div>
-          </div>
-
-          <div class="options-section">
-            <h3>⏰ Auto-Save Settings</h3>
-            <div class="autosave-controls">
-              <label class="autosave-toggle">
-                <input type="checkbox" id="autosaveToggle" data-action="toggleAutosave" />
-                <span class="toggle-slider"></span>
-                Enable Auto-Save
-              </label>
-              <div class="autosave-interval">
-                <label for="autosaveInterval">Auto-Save Interval:</label>
-                <select id="autosaveInterval" data-action="changeAutosaveInterval">
-                  <option value="5">5 seconds</option>
-                  <option value="10" selected>10 seconds</option>
-                  <option value="15">15 seconds</option>
-                  <option value="30">30 seconds</option>
-                  <option value="60">1 minute</option>
-                  <option value="300">5 minutes</option>
-                </select>
-              </div>
-              <div class="autosave-status">
-                <span id="autosaveStatus">Auto-save enabled (10s)</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="options-section">
-            <h3>🔧 Developer Options</h3>
-            <div class="dev-controls">
-              <button id="devToolsToggle" data-action="toggleDevTools" class="dev-toggle-btn">
-                🔧 Dev Tools OFF
-              </button>
-              <p class="dev-description">Show or hide the developer tools tab</p>
-            </div>
-          </div>
-
-          <div class="options-section secrets-section hidden">
-            <h3>🔐 Secrets</h3>
-            <div class="secrets-controls">
-              <div class="konami-code-display">
-                <div class="konami-arrows">
-                  <span class="arrow">↑</span>
-                  <span class="arrow">↑</span>
-                  <span class="arrow">↓</span>
-                  <span class="arrow">↓</span>
-                  <span class="arrow">←</span>
-                  <span class="arrow">→</span>
-                  <span class="arrow">←</span>
-                  <span class="arrow">→</span>
-                  <span class="key">B</span>
-                  <span class="key">A</span>
-                </div>
-                <p class="secrets-description">The ancient code has been entered...</p>
-              </div>
-              <button id="godToggle" data-action="toggleGodTab" class="god-toggle-btn">
-                🙏 Talk to God ON
-              </button>
-              <p class="god-description">Enable or disable the mystical god tab</p>
-            </div>
-          </div>
-
-          <div class="options-section">
-            <h3>🎮 Game Information</h3>
-            <div class="game-info">
-              <div class="info-item">
-                <span class="info-label">Version:</span>
-                <span class="info-value">1.0.0</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Last Save:</span>
-                <span class="info-value" id="lastSaveTime">Never</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Play Time:</span>
-                <span class="info-value" id="playTime">0:00:00</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Mobile-only: God Section -->
-          <div class="options-section mobile-only">
-            <h3>🙏 Talk to God</h3>
-            <div class="god-section-mobile">
-              <div class="god-header-mobile">
-                <h4>Seek Divine Guidance</h4>
-                <p>Ask the almighty for wisdom and blessings in your soda journey.</p>
-              </div>
-              <div class="god-content-mobile">
-                <div class="god-message-mobile" id="godMessageMobile">
-                  "Welcome, mortal. I see you seek the path of the soda drinker. What wisdom do you
-                  require?"
-                </div>
-                <div class="god-actions-mobile">
-                  <button class="god-btn-mobile" data-action="godBlessing">Request Blessing</button>
-                  <button class="god-btn-mobile" data-action="godWisdom">Seek Wisdom</button>
-                  <button class="god-btn-mobile" data-action="godPraise">Praise the Divine</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Mobile-only: Dev Tools Section -->
-          <div class="options-section mobile-only">
-            <h3>🔧 Development Tools</h3>
-            <div class="dev-section-mobile">
-              <div class="dev-warning-mobile">
-                <p>⚠️ Development tools are for testing purposes only. Use with caution!</p>
-              </div>
-              <div class="dev-actions-mobile">
-                <button class="dev-btn-mobile" data-action="devAddSips">Add Sips</button>
-                <button class="dev-btn-mobile" data-action="devAddTime">Add Time</button>
-                <button class="dev-btn-mobile" data-action="devUnlockAll">Unlock All</button>
-                <button class="dev-btn-mobile" data-action="devResetUnlocks">Reset Unlocks</button>
-                <button class="dev-btn-mobile" data-action="devClearConsole">Clear Console</button>
-                <button class="dev-btn-mobile" data-action="devPerformanceTest">
-                  Performance Test
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stats Tab -->
-      <div id="statsTab" class="tab-content">
-        <div class="stats-container">
-          <div class="stats-section">
-            <h3>⏱️ Time & Progress</h3>
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-icon">⏰</div>
-                <div class="stat-content">
-                  <div class="stat-label">Total Play Time</div>
-                  <div class="stat-value" id="totalPlayTime">0:00:00</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">🎯</div>
-                <div class="stat-content">
-                  <div class="stat-label">Current Session</div>
-                  <div class="stat-value" id="sessionTime">0:00:00</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">📅</div>
-                <div class="stat-content">
-                  <div class="stat-label">Days Since Start</div>
-                  <div class="stat-value" id="daysSinceStart">0</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="stats-section">
-            <h3>🖱️ Clicking Statistics</h3>
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-icon">👆</div>
-                <div class="stat-content">
-                  <div class="stat-label">Total Clicks</div>
-                  <div class="stat-value" id="totalClicks">0</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">⚡</div>
-                <div class="stat-content">
-                  <div class="stat-label">Clicks Per Second</div>
-                  <div class="stat-value" id="clicksPerSecond">0.00</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">🏆</div>
-                <div class="stat-content">
-                  <div class="stat-label">Best Click Streak</div>
-                  <div class="stat-value" id="bestClickStreak">0</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="stats-section">
-            <h3>💰 Economy & Progress</h3>
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-icon">💧</div>
-                <div class="stat-content">
-                  <div class="stat-label">Total Sips Earned</div>
-                  <div class="stat-value" id="totalSipsEarned">0</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">📈</div>
-                <div class="stat-content">
-                  <div class="stat-label">Current Sips/Second</div>
-                  <div class="stat-value" id="currentSipsPerSecond">0.00</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">🚀</div>
-                <div class="stat-content">
-                  <div class="stat-label">Highest Sips/Second</div>
-                  <div class="stat-value" id="highestSipsPerSecond">0.00</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="stats-section">
-            <h3>🛒 Shop & Upgrades</h3>
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-icon">🥤</div>
-                <div class="stat-content">
-                  <div class="stat-label">Straws Purchased</div>
-                  <div class="stat-value" id="strawsPurchased">0</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">☕</div>
-                <div class="stat-content">
-                  <div class="stat-label">Cups Purchased</div>
-                  <div class="stat-value" id="cupsPurchased">0</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">🥤</div>
-                <div class="stat-content">
-                  <div class="stat-label">Wider Straw Upgrades</div>
-                  <div class="stat-value" id="widerStrawsPurchased">0</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">☕</div>
-                <div class="stat-content">
-                  <div class="stat-label">Better Cup Upgrades</div>
-                  <div class="stat-value" id="betterCupsPurchased">0</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">💨</div>
-                <div class="stat-content">
-                  <div class="stat-label">Suctions Purchased</div>
-                  <div class="stat-value" id="suctionsPurchased">0</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">💥</div>
-                <div class="stat-content">
-                  <div class="stat-label">Critical Clicks</div>
-                  <div class="stat-value" id="criticalClicksPurchased">0</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="stats-section">
-            <h3>🎉 Achievements & Milestones</h3>
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-icon">⭐</div>
-                <div class="stat-content">
-                  <div class="stat-label">Current Level</div>
-                  <div class="stat-value" id="currentLevel">1</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">🔧</div>
-                <div class="stat-content">
-                  <div class="stat-label">Total Upgrades</div>
-                  <div class="stat-value" id="totalUpgrades">0</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">💎</div>
-                <div class="stat-content">
-                  <div class="stat-label">Faster Drinks Owned</div>
-                  <div class="stat-value" id="fasterDrinksOwned">0</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TempleOS God Tab -->
-      <div id="godTab" class="tab-content">
-        <div class="god-container">
-          <div class="god-header">
-            <h2>🙏 Talk to God</h2>
-            <p class="god-subtitle">Seek divine wisdom and guidance</p>
-          </div>
-
-          <div class="chat-container">
-            <div class="chat-messages" id="chatMessages">
-              <div class="message god-message">
-                <div class="message-avatar">
-                  <img
-                    src="images/TempleOS.jpg"
-                    alt="God"
-                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px"
-                  />
-                </div>
-                <div class="message-content">
-                  <div class="message-sender">God</div>
-                  <div class="message-text">
-                    Greetings, mortal! I am listening to your prayers. What would you like to
-                    discuss?
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="chat-input-container">
-              <input
-                type="text"
-                id="chatInput"
-                class="chat-input"
-                placeholder="Type your message to God..."
-                maxlength="100"
-              />
-              <button data-action="sendChat" class="chat-send-btn">🙏 Send</button>
-            </div>
-          </div>
-
-          <div class="god-info">
-            <p>
-              💡 <strong>Tip:</strong> God responds with divine wisdom and guidance. Type anything
-              to receive spiritual insight!
-            </p>
-            <p style="margin-top: 1rem; font-size: 0.9em; color: #ff8e53; font-style: italic">
-              <strong>Divine Inspiration:</strong> This sacred oracle draws wisdom from ancient
-              sacred texts, providing guidance through carefully selected words of divine origin.<br />
-              <em
-                >The divine word generator uses mystical wisdom to offer meaningful insights and
-                inspiration for your journey.</em
-              >
-            </p>
-            <p style="margin-top: 0.5rem; font-size: 0.8em; color: #888; font-style: italic">
-              <em>⚡ If you know, you know... this oracle runs on 64-bit divine wisdom ✨</em>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Dev Tools Tab -->
-      <div id="devTab" class="tab-content">
-        <div class="dev-container">
-          <div class="dev-header">
-            <h2>🔧 Development Tools</h2>
-            <p class="dev-subtitle">Testing and development utilities</p>
-            <div class="dev-status" id="devStatus">
-              <span class="dev-status-label">Dev Mode:</span>
-              <span class="dev-status-value" id="devModeStatus">Disabled</span>
-            </div>
-          </div>
-
-          <div class="dev-section">
-            <h3>🚀 Feature Unlocks</h3>
-            <div class="dev-grid">
-              <button data-action="devUnlockAll" class="dev-btn unlock-all">
-                <div class="dev-btn-icon">🔓</div>
-                <div class="dev-btn-text">Unlock All Features</div>
-              </button>
-              <button data-action="devUnlockShop" class="dev-btn unlock-shop">
-                <div class="dev-btn-icon">🛒</div>
-                <div class="dev-btn-text">Unlock Shop</div>
-              </button>
-              <button data-action="devUnlockUpgrades" class="dev-btn unlock-upgrades">
-                <div class="dev-btn-icon">⚡</div>
-                <div class="dev-btn-text">Unlock All Upgrades</div>
-              </button>
-              <button data-action="devResetUnlocks" class="dev-btn reset">
-                <div class="dev-btn-icon">🔄</div>
-                <div class="dev-btn-text">Reset Unlocks</div>
-              </button>
-            </div>
-          </div>
-
-          <div class="dev-section">
-            <h3>⏰ Time Travel</h3>
-            <div class="dev-grid">
-              <button data-action="devAddTime:3600000" class="dev-btn time-travel">
-                <div class="dev-btn-icon">⏰</div>
-                <div class="dev-btn-text">+1 Hour</div>
-              </button>
-              <button data-action="devAddTime:86400000" class="dev-btn time-travel">
-                <div class="dev-btn-icon">📅</div>
-                <div class="dev-btn-text">+1 Day</div>
-              </button>
-              <button data-action="devAddTime:604800000" class="dev-btn time-travel">
-                <div class="dev-btn-icon">📆</div>
-                <div class="dev-btn-text">+1 Week</div>
-              </button>
-              <button data-action="devAddTime:2592000000" class="dev-btn time-travel">
-                <div class="dev-btn-icon">🗓️</div>
-                <div class="dev-btn-text">+1 Month</div>
-              </button>
-            </div>
-          </div>
-
-          <div class="dev-section">
-            <h3>💰 Resource Management</h3>
-            <div class="dev-grid">
-              <button data-action="devAddSips:1000" class="dev-btn resources">
-                <div class="dev-btn-icon">🥤</div>
-                <div class="dev-btn-text">+1000 Sips</div>
-              </button>
-              <button data-action="devAddSips:10000" class="dev-btn resources">
-                <div class="dev-btn-icon">🥤</div>
-                <div class="dev-btn-text">+10K Sips</div>
-              </button>
-              <button data-action="devAddSips:100000" class="dev-btn resources">
-                <div class="dev-btn-icon">🥤</div>
-                <div class="dev-btn-text">+100K Sips</div>
-              </button>
-              <button data-action="devAddSips:1000000" class="dev-btn resources">
-                <div class="dev-btn-icon">🥤</div>
-                <div class="dev-btn-text">+1M Sips</div>
-              </button>
-            </div>
-          </div>
-
-          <div class="dev-section">
-            <h3>🐛 Debug Tools</h3>
-            <div class="dev-grid">
-              <button data-action="devClearConsole" class="dev-btn debug-tools">
-                <div class="dev-btn-icon">🧹</div>
-                <div class="dev-btn-text">Clear Console</div>
-              </button>
-              <button data-action="devExportState" class="dev-btn debug-tools">
-                <div class="dev-btn-icon">💾</div>
-                <div class="dev-btn-text">Export State</div>
-              </button>
-              <button data-action="devPerformanceTest" class="dev-btn debug-tools">
-                <div class="dev-btn-icon">⚡</div>
-                <div class="dev-btn-text">Performance Test</div>
-              </button>
-            </div>
-            <div class="dev-info">
-              <p>
-                🐛 <strong>Debug Tools:</strong> Essential debugging utilities for development and
-                testing.
-              </p>
-            </div>
-          </div>
-
-          <div class="dev-section">
-            <h3>🌌 Large Number Tests</h3>
-            <div class="dev-grid">
-              <button
-                data-action="largeNumberTest:addExtremeResources"
-                class="dev-btn large-number-test"
-              >
-                <div class="dev-btn-icon">🌟</div>
-                <div class="dev-btn-text">Add Extreme Resources</div>
-              </button>
-              <button
-                data-action="largeNumberTest:resetAllResources"
-                class="dev-btn large-number-test reset"
-              >
-                <div class="dev-btn-icon">🔄</div>
-                <div class="dev-btn-text">Reset All Resources</div>
-              </button>
-            </div>
-            <div class="dev-info">
-              <p>
-                🌌 <strong>Large Number Tests:</strong> Test extreme value handling with
-                break_eternity.js.
-              </p>
-            </div>
-          </div>
-
-          <div class="dev-info">
-            <p>
-              ⚠️ <strong>Warning:</strong> These tools are for development and testing purposes
-              only!
-            </p>
-            <p>
-              💡 <strong>Tip:</strong> Use these tools to test game balance, debug issues, or
-              experiment with different game states.
-            </p>
           </div>
         </div>
       </div>

@@ -1,12 +1,84 @@
 // UI Display Updates (TypeScript)
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
 import { useGameStore } from '../core/state/zustand-store';
-import { Decimal } from '../core/numbers';
 import { safeToNumberOrDecimal } from '../core/numbers/safe-conversion';
 import subscriptionManager from './subscription-manager';
 import debounceManager from './debounce-utils';
 import { updateLastSaveTime, updatePurchasedCounts } from './stats';
 import { checkUpgradeAffordability } from './affordability';
+import { getUpgradesAndConfig } from '../core/systems/config-accessor';
+import { toDecimal } from '../core/numbers/migration-utils';
+import { nextStrawCost, nextCupCost } from '../core/rules/purchases';
+
+// Direct break_eternity.js Decimal access (consistent with core systems)
+const Decimal = (globalThis as any).Decimal;
+
+// Cost calculation function (copied from affordability.ts)
+function calculateAllCosts(): any {
+  const { upgrades: dataUp, config } = getUpgradesAndConfig();
+  const costs = {} as any;
+
+  // Use the new improved cost calculation functions
+  const strawBaseCost = toDecimal(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
+  const strawScaling = toDecimal(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
+  const strawCount = toDecimal(useGameStore.getState()?.straws || 0);
+  costs.straw = nextStrawCost(strawCount, strawBaseCost, strawScaling);
+
+  const cupBaseCost = toDecimal(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
+  const cupScaling = toDecimal(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
+  const cupCount = toDecimal(useGameStore.getState()?.cups || 0);
+  costs.cup = nextCupCost(cupCount, cupBaseCost, cupScaling);
+
+  const suctionBaseCost = toDecimal(dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40);
+  const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
+  const suctionCount = toDecimal(useGameStore.getState()?.suctions || 0);
+  costs.suction = suctionBaseCost.multiply(suctionScaling.pow(suctionCount));
+
+  const fasterDrinksBaseCost = toDecimal(
+    dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST ?? 80
+  );
+  const fasterDrinksScaling = toDecimal(
+    dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.1
+  );
+  const fasterDrinksCount = toDecimal(useGameStore.getState()?.fasterDrinks || 0);
+  costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksCount));
+
+  const criticalClickBaseCost = toDecimal(
+    dataUp?.criticalClick?.baseCost ?? config.CRITICAL_CLICK_BASE_COST ?? 60
+  );
+  const criticalClickScaling = toDecimal(
+    dataUp?.criticalClick?.scaling ?? config.CRITICAL_CLICK_SCALING ?? 1.12
+  );
+  const criticalClickCount = toDecimal(useGameStore.getState()?.criticalClicks || 0);
+  costs.criticalClick = criticalClickBaseCost.multiply(
+    criticalClickScaling.pow(criticalClickCount)
+  );
+
+  const widerStrawsBaseCost = toDecimal(
+    dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
+  );
+  const widerStrawsCount = toDecimal(useGameStore.getState()?.widerStraws || 0);
+  costs.widerStraws = widerStrawsBaseCost.multiply(widerStrawsCount.add(new Decimal(1)));
+
+  const betterCupsBaseCost = toDecimal(
+    dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400
+  );
+  const betterCupsCount = toDecimal(useGameStore.getState()?.betterCups || 0);
+  costs.betterCups = betterCupsBaseCost.multiply(betterCupsCount.add(new Decimal(1)));
+
+  const fasterDrinksUpBaseCost = toDecimal(
+    dataUp?.fasterDrinks?.upgradeBaseCost ?? config.FASTER_DRINKS_UPGRADE_BASE_COST ?? 1500
+  );
+  const fasterDrinksUpCount = toDecimal(useGameStore.getState()?.fasterDrinksUpCounter || 0);
+  costs.fasterDrinksUp = fasterDrinksUpBaseCost.multiply(fasterDrinksUpCount);
+
+  const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
+  const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);
+  const levelCount = toDecimal(useGameStore.getState()?.level || 1);
+  costs.levelUp = levelUpBaseCost.multiply(levelUpScaling.pow(levelCount));
+
+  return costs;
+}
 
 // Subscription keys for tracking
 const SUBSCRIPTION_KEYS = {
@@ -689,6 +761,9 @@ export const updateAllDisplaysOptimized = debounceManager.debounce(
       updateTopSipCounter();
       updateTopSipsPerDrink();
       updateTopSipsPerSecond();
+
+      // Update upgrade prices and affordability
+      updateUpgradeDisplays();
     } catch (error) {
       console.warn('Error in optimized display update:', error);
     }
@@ -696,6 +771,185 @@ export const updateAllDisplaysOptimized = debounceManager.debounce(
   UPDATE_INTERVALS.NORMAL,
   { trailing: true, maxWait: UPDATE_INTERVALS.SLOW }
 );
+
+/**
+ * Update all upgrade displays including prices and stats
+ */
+function updateUpgradeDisplays(): void {
+  try {
+    const state = useGameStore.getState();
+    if (!state) {
+      console.warn('No state available for upgrade displays update');
+      return;
+    }
+
+    // Update click upgrades
+    updateClickUpgradeDisplays(state);
+
+    // Update drink speed upgrades
+    updateDrinkSpeedUpgradeDisplays(state);
+
+    // Update production buildings
+    updateProductionBuildingDisplays(state);
+
+    // Update level up display
+    updateLevelUpDisplay(state);
+
+    // Update production summary
+    updateProductionSummaryDisplay(state);
+
+    // Update soda stats
+    updateSodaStats(state);
+  } catch (error) {
+    console.warn('Error updating upgrade displays:', error);
+  }
+}
+
+/**
+ * Update click upgrade displays
+ */
+function updateClickUpgradeDisplays(state: any): void {
+  // Use the existing cost calculation system
+  const costs = calculateAllCosts();
+
+  // Suction upgrade
+  const suctionBonus = state.suctionClickBonus || 0;
+  const canAffordSuction = state.sips >= costs.suction;
+
+  updateCostDisplay('suctionCostCompact', costs.suction, canAffordSuction);
+  updateStatDisplay('suctionClickBonusCompact', suctionBonus.toFixed(1));
+
+  // Critical Click upgrade
+  const criticalClickChance = state.criticalClickChance || 0;
+  const canAffordCriticalClick = state.sips >= costs.criticalClick;
+
+  updateCostDisplay('criticalClickCostCompact', costs.criticalClick, canAffordCriticalClick);
+  updateStatDisplay('criticalClickChanceCompact', criticalClickChance.toFixed(1));
+}
+
+/**
+ * Update drink speed upgrade displays
+ */
+function updateDrinkSpeedUpgradeDisplays(state: any): void {
+  const costs = calculateAllCosts();
+
+  // Faster Drinks upgrade
+  const currentDrinkSpeed = state.drinkRate || 5000;
+  const canAffordFasterDrinks = state.sips >= costs.fasterDrinks;
+
+  updateCostDisplay('fasterDrinksCostCompact', costs.fasterDrinks, canAffordFasterDrinks);
+  updateStatDisplay('currentDrinkSpeedCompact', (currentDrinkSpeed / 1000).toFixed(2) + 's');
+
+  // Upgrade Faster Drinks
+  const drinkSpeedBonus = state.drinkSpeedBonus || 0;
+  const canAffordFasterDrinksUp = state.sips >= costs.fasterDrinksUp;
+
+  updateCostDisplay('fasterDrinksUpCostCompact', costs.fasterDrinksUp, canAffordFasterDrinksUp);
+  updateStatDisplay('drinkSpeedBonusCompact', drinkSpeedBonus.toFixed(0));
+}
+
+/**
+ * Update production building displays
+ */
+function updateProductionBuildingDisplays(state: any): void {
+  const costs = calculateAllCosts();
+
+  // Straw production
+  const strawsOwned = state.straws || 0;
+  const strawSPD = state.strawSPD || 0;
+  const canAffordStraw = state.sips >= costs.straw;
+
+  updateCostDisplay('strawCost', costs.straw, canAffordStraw);
+  updateStatDisplay('straws', strawsOwned);
+  updateStatDisplay('strawSPD', strawSPD);
+
+  // Cup production
+  const cupsOwned = state.cups || 0;
+  const cupSPD = state.cupSPD || 0;
+  const canAffordCup = state.sips >= costs.cup;
+
+  updateCostDisplay('cupCost', costs.cup, canAffordCup);
+  updateStatDisplay('cups', cupsOwned);
+  updateStatDisplay('cupSPD', cupSPD);
+
+  // Wider Straws enhancement
+  const widerStrawsOwned = state.widerStraws || 0;
+  const widerStrawsSPD = state.widerStrawsSPD || 0;
+  const canAffordWiderStraws = state.sips >= costs.widerStraws;
+
+  updateCostDisplay('widerStrawsCost', costs.widerStraws, canAffordWiderStraws);
+  updateStatDisplay('widerStraws', widerStrawsOwned);
+  updateStatDisplay('widerStrawsSPD', widerStrawsSPD);
+
+  // Better Cups enhancement
+  const betterCupsOwned = state.betterCups || 0;
+  const betterCupsSPD = state.betterCupsSPD || 0;
+  const canAffordBetterCups = state.sips >= costs.betterCups;
+
+  updateCostDisplay('betterCupsCost', costs.betterCups, canAffordBetterCups);
+  updateStatDisplay('betterCups', betterCupsOwned);
+  updateStatDisplay('betterCupsSPD', betterCupsSPD);
+}
+
+/**
+ * Update level up display
+ */
+function updateLevelUpDisplay(state: any): void {
+  const costs = calculateAllCosts();
+  const canLevelUp = state.sips >= costs.levelUp;
+
+  updateCostDisplay('levelCost', costs.levelUp, canLevelUp);
+
+  // Update level up button state
+  const levelUpBtn = document.querySelector('.level-up-btn');
+  if (levelUpBtn) {
+    if (canLevelUp) {
+      levelUpBtn.classList.remove('disabled');
+    } else {
+      levelUpBtn.classList.add('disabled');
+    }
+  }
+}
+
+/**
+ * Update production summary display
+ */
+function updateProductionSummaryDisplay(state: any): void {
+  // Update total straw production
+  const totalStrawProduction = state.strawSPD || 0;
+  updateStatDisplay('totalStrawProduction', totalStrawProduction);
+
+  // Update total cup production
+  const totalCupProduction = state.cupSPD || 0;
+  updateStatDisplay('totalCupProduction', totalCupProduction);
+
+  // Update total passive production
+  const totalPassiveProduction = totalStrawProduction + totalCupProduction;
+  updateStatDisplay('totalPassiveProduction', totalPassiveProduction);
+}
+
+/**
+ * Update soda stats display
+ */
+function updateSodaStats(state: any): void {
+  // Update click value
+  const clickValue = state.clickValue || 1;
+  updateStatDisplay('clickValue', clickValue);
+
+  // Update critical chance
+  const criticalChance = state.criticalClickChance || 0;
+  updateStatDisplay('criticalChance', criticalChance.toFixed(1) + '%');
+}
+
+/**
+ * Update a stat display element
+ */
+function updateStatDisplay(elementId: string, value: string | number): void {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.textContent = String(value);
+  }
+}
 
 /**
  * Throttled version of affordability checking for better performance
