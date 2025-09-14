@@ -9,6 +9,7 @@ import { checkUpgradeAffordability } from './affordability';
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { toDecimal } from '../core/numbers/migration-utils';
 import { domQuery } from '../services/dom-query';
+import { uiBatcher } from '../services/ui-batcher';
 // Logger import removed - not used in this file
 import {
   nextStrawCost,
@@ -593,28 +594,29 @@ function getLevelText(level: number): string {
 /**
  * Debounced version of updateAllDisplays for better performance
  */
-export const updateAllDisplaysOptimized = debounceManager.debounce(
-  DEBOUNCE_KEYS.UPDATE_ALL_DISPLAYS,
-  () => {
-    try {
-      updateTopSipCounter();
-      updateTopSipsPerDrink();
-      updateTopSipsPerSecond();
-      updateLevelNumber();
-      updateLevelText();
+export const updateAllDisplaysOptimized = () => {
+  uiBatcher.schedule(
+    'updateAllDisplays',
+    () => {
+      try {
+        updateTopSipCounter();
+        updateTopSipsPerDrink();
+        updateTopSipsPerSecond();
+        updateLevelNumber();
+        updateLevelText();
 
-      // Update upgrade prices and affordability
-      updateUpgradeDisplays();
+        // Update upgrade prices and affordability
+        updateUpgradeDisplays();
 
-      // Update cost displays and button states
-      checkUpgradeAffordability();
-    } catch (error) {
-      console.warn('Error in optimized display update:', error);
-    }
-  },
-  UPDATE_INTERVALS.NORMAL,
-  { trailing: true, maxWait: UPDATE_INTERVALS.SLOW }
-);
+        // Update cost displays and button states
+        checkUpgradeAffordability();
+      } catch (error) {
+        console.warn('Error in optimized display update:', error);
+      }
+    },
+    'high'
+  );
+};
 
 /**
  * Update all upgrade displays including prices and stats

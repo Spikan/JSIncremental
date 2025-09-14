@@ -1,6 +1,9 @@
 // Lightweight 3D Soda Button using Model Viewer (No Three.js)
 // Bundle size: ~100KB vs 1.5MB Three.js (93% reduction)
 
+// Import the 3D model asset so Vite can process it
+import sodaModelUrl from '../../res/Soda.glb?url';
+
 // ModelViewerElement will be available globally from the CDN script
 declare global {
   interface ModelViewerElement extends HTMLElement {
@@ -342,7 +345,7 @@ export class Soda3DButton {
 // Export default configuration
 export const defaultSoda3DConfig: Soda3DConfig = {
   containerSelector: '#sodaButton',
-  modelPath: '/res/Soda.glb', // Use direct path instead of imported URL
+  modelPath: sodaModelUrl, // Use Vite-processed asset URL
   size: 200,
   width: 200,
   height: 200,

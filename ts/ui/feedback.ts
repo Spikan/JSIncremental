@@ -4,6 +4,7 @@
 // Import consolidated utilities
 import { formatNumber, prettify } from './utils';
 import { domQuery } from '../services/dom-query';
+import { timerManager } from '../services/timer-manager';
 
 // Detect mobile device
 function isMobileDevice(): boolean {
@@ -130,11 +131,15 @@ function showMilestoneFeedback(
     document.body.appendChild(feedbackElement);
 
     // Remove after animation
-    setTimeout(() => {
-      if (feedbackElement.parentNode) {
-        feedbackElement.parentNode.removeChild(feedbackElement);
-      }
-    }, 3000);
+    timerManager.setTimeout(
+      () => {
+        if (feedbackElement.parentNode) {
+          feedbackElement.parentNode.removeChild(feedbackElement);
+        }
+      },
+      3000,
+      'Remove click feedback element'
+    );
   } catch (error) {
     console.warn('Failed to show milestone feedback:', error);
   }
@@ -227,11 +232,12 @@ function showFeedbackAtCoordinates(
   } catch {
     setTimeout(animate, 16);
   }
-  setTimeout(
+  timerManager.setTimeout(
     () => {
       if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
     },
-    isCritical ? 2500 : 2000
+    isCritical ? 2500 : 2000,
+    'Remove purchase feedback'
   );
 }
 
@@ -297,11 +303,12 @@ function showFeedbackWithContainer(
     console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
     setTimeout(animate, 16);
   }
-  setTimeout(
+  timerManager.setTimeout(
     () => {
       if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
     },
-    isCritical ? 2500 : 2000
+    isCritical ? 2500 : 2000,
+    'Remove purchase feedback'
   );
 }
 

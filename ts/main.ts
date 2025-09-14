@@ -11,6 +11,7 @@
 // Removed unused import
 
 import { domQuery } from './services/dom-query';
+import { timerManager } from './services/timer-manager';
 
 const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
 // DOM_CACHE and Decimal are declared in global types
@@ -57,17 +58,17 @@ function initGame() {
     console.log('🔧 Unlocks system available:', !!(window as any).App?.systems?.unlocks);
     if (!(window as any).App?.systems?.unlocks) {
       console.log('⏳ Waiting for unlocks system to load...');
-      setTimeout(initGame, 100);
+      timerManager.setTimeout(initGame, 100, 'Retry initGame - unlocks system');
       return;
     }
     if (typeof DOM_CACHE === 'undefined') {
       console.log('⏳ Waiting for DOM_CACHE to load...');
-      setTimeout(initGame, 100);
+      timerManager.setTimeout(initGame, 100, 'Retry initGame - unlocks system');
       return;
     }
     if (!GC || (typeof GC === 'object' && Object.keys(GC).length === 0)) {
       console.log('⏳ Waiting for GAME_CONFIG to load...');
-      setTimeout(initGame, 100);
+      timerManager.setTimeout(initGame, 100, 'Retry initGame - unlocks system');
       return;
     }
 
@@ -281,7 +282,11 @@ function initGame() {
         !domQuery.exists('#topSipValue')
       ) {
         // Waiting for DOM_CACHE
-        setTimeout(updateDisplaysWhenReady, 100);
+        timerManager.setTimeout(
+          updateDisplaysWhenReady,
+          100,
+          'Retry display update - DOM not ready'
+        );
         return;
       }
       // DOM_CACHE ready, updating displays

@@ -4,6 +4,7 @@
 import { logger } from '../services/logger';
 import { timerManager } from '../services/timer-manager';
 import { domQuery } from '../services/dom-query';
+import { uiBatcher } from '../services/ui-batcher';
 import * as displays from './displays';
 import {
   updateAllDisplaysOptimized,
@@ -436,9 +437,13 @@ export function initializeUI(): void {
       if (sodaButton) {
         // Use the existing soda-clicked class instead of our animation
         sodaButton.classList.add('soda-clicked');
-        setTimeout(() => {
-          sodaButton.classList.remove('soda-clicked');
-        }, 120);
+        timerManager.setTimeout(
+          () => {
+            sodaButton.classList.remove('soda-clicked');
+          },
+          120,
+          'Remove soda-clicked class'
+        );
       }
 
       if (clickData && clickData.gained) {
@@ -495,10 +500,14 @@ export function initializeUI(): void {
       updateLastSaveTime();
     });
     (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.LOADED, () => {
-      setTimeout(() => {
-        updateAllDisplays();
-        checkUpgradeAffordability();
-      }, 100);
+      timerManager.setTimeout(
+        () => {
+          updateAllDisplays();
+          checkUpgradeAffordability();
+        },
+        100,
+        'Post-game-load display update'
+      );
     });
 
     // Subscribe to level changes to update level text automatically
@@ -704,14 +713,14 @@ export function updateAllDisplays(): void {
     !domQuery.exists('#topSipValue')
   ) {
     // Critical elements not ready, retry
-    setTimeout(updateAllDisplays, 100);
+    timerManager.setTimeout(updateAllDisplays, 100, 'Retry display update');
     return;
   }
 
   // Use optimized batch update for better performance
   updateAllDisplaysOptimized();
-  updateClickValueDisplay();
-  updateProductionSummary();
+  uiBatcher.schedule('updateClickValueDisplay', updateClickValueDisplay, 'normal');
+  uiBatcher.schedule('updateProductionSummary', updateProductionSummary, 'normal');
   updateDrinkSpeedDisplayOptimized();
   updateAutosaveStatusOptimized();
   updatePlayTime();
