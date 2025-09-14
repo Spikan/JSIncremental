@@ -1,7 +1,7 @@
 // Enhanced Type Definitions for Soda Clicker Pro (TypeScript)
 // Replacing excessive 'any' usage with proper types
 
-import { DecimalType } from '../core/numbers/decimal-utils';
+import { DecimalType } from '../core/numbers/simplified';
 import { GameState, GameOptions } from '../core/state/shape';
 
 // Enhanced numeric value type

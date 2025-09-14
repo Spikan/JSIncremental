@@ -1,6 +1,6 @@
 // TypeScript port of validation schemas with a safe Zod fallback
 
-import { toDecimal } from '../numbers/migration-utils';
+import { toDecimal } from '../numbers/simplified';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const z: any =

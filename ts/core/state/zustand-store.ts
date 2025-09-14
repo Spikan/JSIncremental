@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
-import { toDecimal, add } from '../numbers/migration-utils';
+import { toDecimal, add } from '../numbers/simplified';
 
 // Extended state interface with actions
 interface GameStore extends GameState {

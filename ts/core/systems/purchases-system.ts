@@ -13,13 +13,12 @@ import {
   nextWiderStrawsCost,
   nextBetterCupsCost,
 } from '../rules/purchases.ts';
-import { safeToNumberOrDecimal } from '../numbers/safe-conversion';
+import { safeToNumberOrDecimal } from '../numbers/simplified';
 import { recalcProduction } from './resources.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
-import { toDecimal, gte } from '../numbers/migration-utils';
-import { DecimalType } from '../numbers/decimal-utils';
+import { toDecimal, gte, DecimalType } from '../numbers/simplified';
 
 function getTypedConfig(): { upgrades: any; config: any } {
   const { upgrades, config } = getUpgradesAndConfig();

@@ -7,7 +7,7 @@
 // MEMORY: PRESERVE FULL PRECISION FOR ALL AFFORDABILITY CHECKS
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { updateButtonState, updateCostDisplay } from './utils';
-import { toDecimal, gte } from '../core/numbers/migration-utils';
+import { toDecimal, gte } from '../core/numbers/simplified';
 import { NumericValue, CostResult } from '../types/app-types';
 import {
   nextStrawCost,

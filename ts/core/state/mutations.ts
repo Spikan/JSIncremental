@@ -2,8 +2,7 @@
 // Maximum performance with direct break_eternity.js operations
 
 // Direct break_eternity.js access
-import { toDecimal, add, subtract, multiply } from '../numbers/migration-utils';
-import { DecimalType } from '../numbers/decimal-utils';
+import { toDecimal, add, subtract, multiply, DecimalType } from '../numbers/simplified';
 
 // Type for values that can be Decimal or converted to Decimal
 export type NumericValue = number | string | DecimalType;

@@ -1,8 +1,7 @@
 // Unlock Purchase System (TypeScript)
 // Handles one-time purchases for feature unlocks
 
-import { DecimalType } from '../numbers/decimal-utils';
-import { toDecimal, gte } from '../numbers/migration-utils';
+import { DecimalType, toDecimal, gte } from '../numbers/simplified';
 
 export interface UnlockPurchaseResult {
   success: boolean;

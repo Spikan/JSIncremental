@@ -5,7 +5,7 @@
 // MEMORY: NEVER CONVERT SPD TO JAVASCRIPT NUMBERS - PRESERVE FULL DECIMAL PRECISION
 // MEMORY: DRINK PROGRESSION SHOULD PRODUCE EXPONENTIALLY LARGE VALUES AS INTENDED
 
-import { toDecimal } from '../numbers/migration-utils';
+import { toDecimal } from '../numbers/simplified';
 // Direct Decimal access - no wrapper needed
 
 export type ProcessDrinkArgs = {

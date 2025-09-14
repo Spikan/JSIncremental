@@ -3,7 +3,7 @@
 
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
-import { pow, DecimalType } from '../numbers/migration-utils';
+import { pow, DecimalType } from '../numbers/simplified';
 
 // ===== Safe numeric helpers =====
 // No artificial numeric helpers needed - break_eternity.js handles all scaling naturally

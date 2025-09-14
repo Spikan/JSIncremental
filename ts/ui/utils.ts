@@ -5,7 +5,7 @@ export type DecimalLike = {
   toString?: () => string;
 };
 
-import { formatDecimal, cleanExtremeDecimals } from '../core/numbers/decimal-utils';
+import { formatNumber as formatDecimal } from '../core/numbers/simplified';
 
 /**
  * Enhanced number formatting system following idle game best practices
@@ -127,7 +127,7 @@ export function formatProgressNumber(value: any): string {
  */
 function postProcessDecimals(formatted: string): string {
   // Use the intelligent decimal cleanup function for consistency
-  return cleanExtremeDecimals(formatted);
+  return formatted;
 }
 
 export function findElement(elementId: string): HTMLElement | null {

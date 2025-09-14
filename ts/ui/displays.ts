@@ -1,13 +1,12 @@
 // UI Display Updates (TypeScript)
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
 import { getCostCalculationData, getDisplayData } from '../core/state/zustand-store';
-import { safeToNumberOrDecimal } from '../core/numbers/safe-conversion';
+import { safeToNumberOrDecimal, toDecimal } from '../core/numbers/simplified';
 import subscriptionManager from './subscription-manager';
 import debounceManager from './debounce-utils';
 import { updateLastSaveTime, updatePurchasedCounts } from './stats';
 import { checkUpgradeAffordability } from './affordability';
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
-import { toDecimal } from '../core/numbers/migration-utils';
 import { domQuery } from '../services/dom-query';
 import { uiBatcher } from '../services/ui-batcher';
 // Logger import removed - not used in this file

@@ -8,7 +8,7 @@
 
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
-import { toDecimal, add } from '../numbers/migration-utils';
+import { toDecimal, add } from '../numbers/simplified';
 import { recalcProduction } from './resources';
 
 type Win = typeof window & {

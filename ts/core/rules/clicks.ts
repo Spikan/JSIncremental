@@ -1,7 +1,7 @@
 // Pure helpers for click outcomes with Decimal support (TypeScript)
 
 // Direct Decimal access - no wrapper needed
-import { DecimalType } from '../numbers/decimal-utils';
+import { DecimalType } from '../numbers/simplified';
 
 export function computeClick({
   baseClick,

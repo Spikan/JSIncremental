@@ -3,7 +3,7 @@
 // DecimalOps removed - no longer using toSafeNumber
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
-import { DecimalType } from '../numbers/decimal-utils';
+import { DecimalType } from '../numbers/simplified';
 
 export function nextStrawCost(
   strawCount: number | string | DecimalType,

@@ -6,8 +6,7 @@ import {
 } from '../rules/economy.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
 // Direct Decimal access - no wrapper needed
-import { toDecimal } from '../numbers/migration-utils';
-import { DecimalType } from '../numbers/decimal-utils';
+import { toDecimal, DecimalType } from '../numbers/simplified';
 
 function getConfig(): { upgrades: any; config: any } {
   return getUpgradesAndConfig();

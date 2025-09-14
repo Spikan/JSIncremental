@@ -8,8 +8,7 @@
 
 import type { GameState } from './shape';
 // Direct break_eternity.js access
-import { toDecimal } from '../numbers/migration-utils';
-import { DecimalType } from '../numbers/decimal-utils';
+import { toDecimal, DecimalType } from '../numbers/simplified';
 
 // Type for actions available in the Zustand store (enhanced for Decimal)
 interface StateActions {

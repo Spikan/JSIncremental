@@ -2,7 +2,7 @@
 // Enhanced for Decimal support
 
 // Direct Decimal access - no wrapper needed
-import { NumericValue } from '../numbers/migration-utils';
+import { NumericValue } from '../numbers/simplified';
 
 export type GameOptions = {
   autosaveEnabled: boolean;

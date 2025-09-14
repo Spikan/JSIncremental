@@ -2,7 +2,7 @@
 
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
-import { toDecimal } from '../numbers/migration-utils';
+import { toDecimal } from '../numbers/simplified';
 
 export function trackClick() {
   try {
