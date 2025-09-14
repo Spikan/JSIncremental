@@ -445,7 +445,7 @@
         <div class="game-sidebar">
           <!-- Sidebar Header -->
           <div class="sidebar-header">
-            <h2 class="sidebar-title">Game Menu</h2>
+            <h2 class="sidebar-title">Shop</h2>
             <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
               <span class="toggle-icon">☰</span>
             </button>
@@ -453,92 +453,79 @@
 
           <!-- Sidebar Content -->
           <div class="sidebar-content">
-            <!-- Shop Section -->
-            <div class="sidebar-section" data-section="shop">
-              <div class="section-header" data-action="toggleSection:shop">
-                <div class="section-icon">🛒</div>
-                <div class="section-info">
-                  <h3 class="section-title">Shop</h3>
-                  <p class="section-subtitle">Production buildings</p>
+            <!-- Production Buildings -->
+            <div class="upgrade-group">
+              <h4 class="upgrade-group-title">Production Buildings</h4>
+              <div class="upgrade-cards">
+                <!-- Straw Production -->
+                <div class="upgrade-card">
+                  <div class="upgrade-header">
+                    <div class="upgrade-icon">🥤</div>
+                    <div class="upgrade-info">
+                      <h4 class="upgrade-name">Extra Straw</h4>
+                      <p class="upgrade-description">Generate sips per drink</p>
+                    </div>
+                  </div>
+                  <button class="upgrade-btn" data-action="buyStraw">
+                    <div class="upgrade-cost"><span id="strawCost">5</span> Sips</div>
+                  </button>
+                  <div class="upgrade-stats">
+                    <div class="upgrade-owned">Owned: <span id="straws">0</span></div>
+                    <div class="upgrade-effect">+<span id="strawSPD">0</span> per drink</div>
+                  </div>
                 </div>
-                <div class="section-toggle">▼</div>
-              </div>
-              <div class="section-content">
-                <!-- Production Buildings -->
-                <div class="upgrade-group">
-                  <h4 class="upgrade-group-title">Production Buildings</h4>
-                  <div class="upgrade-cards">
-                    <!-- Straw Production -->
-                    <div class="upgrade-card">
-                      <div class="upgrade-header">
-                        <div class="upgrade-icon">🥤</div>
-                        <div class="upgrade-info">
-                          <h4 class="upgrade-name">Extra Straw</h4>
-                          <p class="upgrade-description">Generate sips per drink</p>
-                        </div>
-                      </div>
-                      <button class="upgrade-btn" data-action="buyStraw">
-                        <div class="upgrade-cost"><span id="strawCost">5</span> Sips</div>
-                      </button>
-                      <div class="upgrade-stats">
-                        <div class="upgrade-owned">Owned: <span id="straws">0</span></div>
-                        <div class="upgrade-effect">+<span id="strawSPD">0</span> per drink</div>
-                      </div>
-                    </div>
 
-                    <!-- Cup Production -->
-                    <div class="upgrade-card">
-                      <div class="upgrade-header">
-                        <div class="upgrade-icon">☕</div>
-                        <div class="upgrade-info">
-                          <h4 class="upgrade-name">Bigger Cup</h4>
-                          <p class="upgrade-description">Higher capacity production</p>
-                        </div>
-                      </div>
-                      <button class="upgrade-btn" data-action="buyCup">
-                        <div class="upgrade-cost"><span id="cupCost">15</span> Sips</div>
-                      </button>
-                      <div class="upgrade-stats">
-                        <div class="upgrade-owned">Owned: <span id="cups">0</span></div>
-                        <div class="upgrade-effect">+<span id="cupSPD">0</span> per drink</div>
-                      </div>
+                <!-- Cup Production -->
+                <div class="upgrade-card">
+                  <div class="upgrade-header">
+                    <div class="upgrade-icon">☕</div>
+                    <div class="upgrade-info">
+                      <h4 class="upgrade-name">Bigger Cup</h4>
+                      <p class="upgrade-description">Higher capacity production</p>
                     </div>
+                  </div>
+                  <button class="upgrade-btn" data-action="buyCup">
+                    <div class="upgrade-cost"><span id="cupCost">15</span> Sips</div>
+                  </button>
+                  <div class="upgrade-stats">
+                    <div class="upgrade-owned">Owned: <span id="cups">0</span></div>
+                    <div class="upgrade-effect">+<span id="cupSPD">0</span> per drink</div>
+                  </div>
+                </div>
 
-                    <!-- Wider Straws Enhancement -->
-                    <div class="upgrade-card enhancement">
-                      <div class="upgrade-header">
-                        <div class="upgrade-icon">🔧</div>
-                        <div class="upgrade-info">
-                          <h4 class="upgrade-name">Wider Straws</h4>
-                          <p class="upgrade-description">Enhance straw efficiency</p>
-                        </div>
-                      </div>
-                      <button class="upgrade-btn" data-action="buyWiderStraws">
-                        <div class="upgrade-cost"><span id="widerStrawsCost">150</span> Sips</div>
-                      </button>
-                      <div class="upgrade-stats">
-                        <div class="upgrade-owned">Owned: <span id="widerStraws">0</span></div>
-                        <div class="upgrade-effect">+<span id="widerStrawsSPD">0</span>% boost</div>
-                      </div>
+                <!-- Wider Straws Enhancement -->
+                <div class="upgrade-card enhancement">
+                  <div class="upgrade-header">
+                    <div class="upgrade-icon">🔧</div>
+                    <div class="upgrade-info">
+                      <h4 class="upgrade-name">Wider Straws</h4>
+                      <p class="upgrade-description">Enhance straw efficiency</p>
                     </div>
+                  </div>
+                  <button class="upgrade-btn" data-action="buyWiderStraws">
+                    <div class="upgrade-cost"><span id="widerStrawsCost">150</span> Sips</div>
+                  </button>
+                  <div class="upgrade-stats">
+                    <div class="upgrade-owned">Owned: <span id="widerStraws">0</span></div>
+                    <div class="upgrade-effect">+<span id="widerStrawsSPD">0</span>% boost</div>
+                  </div>
+                </div>
 
-                    <!-- Better Cups Enhancement -->
-                    <div class="upgrade-card enhancement">
-                      <div class="upgrade-header">
-                        <div class="upgrade-icon">🔧</div>
-                        <div class="upgrade-info">
-                          <h4 class="upgrade-name">Better Cups</h4>
-                          <p class="upgrade-description">Enhance cup efficiency</p>
-                        </div>
-                      </div>
-                      <button class="upgrade-btn" data-action="buyBetterCups">
-                        <div class="upgrade-cost"><span id="betterCupsCost">400</span> Sips</div>
-                      </button>
-                      <div class="upgrade-stats">
-                        <div class="upgrade-owned">Owned: <span id="betterCups">0</span></div>
-                        <div class="upgrade-effect">+<span id="betterCupsSPD">0</span>% boost</div>
-                      </div>
+                <!-- Better Cups Enhancement -->
+                <div class="upgrade-card enhancement">
+                  <div class="upgrade-header">
+                    <div class="upgrade-icon">🔧</div>
+                    <div class="upgrade-info">
+                      <h4 class="upgrade-name">Better Cups</h4>
+                      <p class="upgrade-description">Enhance cup efficiency</p>
                     </div>
+                  </div>
+                  <button class="upgrade-btn" data-action="buyBetterCups">
+                    <div class="upgrade-cost"><span id="betterCupsCost">400</span> Sips</div>
+                  </button>
+                  <div class="upgrade-stats">
+                    <div class="upgrade-owned">Owned: <span id="betterCups">0</span></div>
+                    <div class="upgrade-effect">+<span id="betterCupsSPD">0</span>% boost</div>
                   </div>
                 </div>
               </div>

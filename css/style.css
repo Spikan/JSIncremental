@@ -724,76 +724,7 @@ body {
   gap: 1rem;
 }
 
-/* Sidebar Section */
-.sidebar-section {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.section-header:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.section-icon {
-  font-size: 1.5rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-}
-
-.section-info {
-  flex: 1;
-}
-
-.section-title {
-  margin: 0 0 0.25rem 0;
-  color: #ffffff;
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.section-subtitle {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.8rem;
-}
-
-.section-toggle {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.7);
-  transition: transform 0.3s ease;
-}
-
-.sidebar-section.expanded .section-toggle {
-  transform: rotate(180deg);
-}
-
-.section-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-
-.sidebar-section.expanded .section-content {
-  max-height: 1000px;
-}
+/* Sidebar Section - Removed as shop is now direct content */
 
 /* Upgrade Groups */
 .upgrade-group {
@@ -1196,9 +1127,7 @@ body {
     padding: 1rem 0.75rem;
   }
 
-  .section-header {
-    padding: 0.75rem;
-  }
+  /* Section header styles removed - no longer needed */
 
   .upgrade-group {
     padding: 0.75rem;
@@ -1256,11 +1185,7 @@ body {
     touch-action: manipulation;
   }
 
-  /* Mobile section headers - better touch targets */
-  .section-header {
-    min-height: 44px;
-    touch-action: manipulation;
-  }
+  /* Mobile section headers - removed as no longer needed */
 
   /* Mobile sidebar toggle button */
   .sidebar-toggle {

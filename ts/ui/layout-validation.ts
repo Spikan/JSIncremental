@@ -33,14 +33,7 @@ export function validateSidebarLayout(): boolean {
     errors.push('Soda button not found');
   }
 
-  // Check sidebar sections
-  const expectedSections = ['upgrades', 'shop', 'stats', 'settings', 'god'];
-  expectedSections.forEach(sectionId => {
-    const section = document.querySelector(`[data-section="${sectionId}"]`);
-    if (!section) {
-      errors.push(`Sidebar section '${sectionId}' not found`);
-    }
-  });
+  // Sidebar section checks removed - shop is now direct content
 
   // Check sidebar toggle button
   const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -112,17 +105,7 @@ export function validateSidebarNavigation(): boolean {
     errors.push('Sidebar navigation manager not available on window object');
   }
 
-  // Check section headers have proper data attributes
-  const sectionHeaders = document.querySelectorAll('.section-header[data-action]');
-  if (sectionHeaders.length === 0) {
-    errors.push('No section headers with data-action attributes found');
-  }
-
-  // Check section content areas
-  const sectionContents = document.querySelectorAll('.section-content');
-  if (sectionContents.length === 0) {
-    errors.push('No section content areas found');
-  }
+  // Section validation removed - shop is now direct content
 
   // Report results
   if (errors.length > 0) {
@@ -187,14 +170,7 @@ export function validateGameFunctionality(): boolean {
     }
   });
 
-  // Test sidebar sections exist
-  const sidebarSections = ['upgrades', 'shop', 'stats', 'settings', 'god'];
-  sidebarSections.forEach(sectionId => {
-    const section = document.querySelector(`[data-section="${sectionId}"]`);
-    if (!section) {
-      errors.push(`Sidebar section '${sectionId}' not found`);
-    }
-  });
+  // Sidebar section tests removed - shop is now direct content
 
   // Test if App state is available
   if (typeof (window as any).App === 'undefined') {

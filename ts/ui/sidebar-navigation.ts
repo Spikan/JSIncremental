@@ -1,42 +1,16 @@
 /**
  * Sidebar Navigation System
- * Handles collapsible sidebar sections and mobile navigation
+ * Handles mobile sidebar toggle functionality
  */
 
-export interface SidebarSection {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: string;
-  expanded: boolean;
-}
-
 export class SidebarNavigationManager {
-  private sections: Map<string, SidebarSection> = new Map();
   private sidebar: HTMLElement | null = null;
   private sidebarToggle: HTMLElement | null = null;
   private isMobile: boolean = false;
 
   constructor() {
-    this.initializeSections();
     this.detectMobile();
     this.initializeSidebar();
-  }
-
-  private initializeSections(): void {
-    const sectionData: SidebarSection[] = [
-      {
-        id: 'shop',
-        title: 'Shop',
-        subtitle: 'Production buildings',
-        icon: '🛒',
-        expanded: true, // Start with shop expanded
-      },
-    ];
-
-    sectionData.forEach(section => {
-      this.sections.set(section.id, section);
-    });
   }
 
   private detectMobile(): void {
@@ -67,9 +41,6 @@ export class SidebarNavigationManager {
 
     // Add event listeners
     this.setupEventListeners();
-
-    // Initialize section states
-    this.initializeSectionStates();
   }
 
   private setupEventListeners(): void {
@@ -79,23 +50,6 @@ export class SidebarNavigationManager {
         this.toggleSidebar();
       });
     }
-
-    // Section header clicks
-    document.addEventListener('click', event => {
-      const target = event.target as HTMLElement;
-      const sectionHeader = target.closest('.section-header');
-
-      if (sectionHeader) {
-        const action = sectionHeader.getAttribute('data-action');
-        if (action && action.startsWith('toggleSection:')) {
-          const sectionId = action.split(':')[1];
-          if (sectionId) {
-            this.toggleSection(sectionId);
-            event.preventDefault();
-          }
-        }
-      }
-    });
 
     // Close sidebar when clicking outside on mobile
     if (this.isMobile) {
@@ -117,62 +71,6 @@ export class SidebarNavigationManager {
         this.collapseSidebar();
       }
     });
-  }
-
-  private initializeSectionStates(): void {
-    this.sections.forEach((section, sectionId) => {
-      const sectionElement = document.querySelector(`[data-section="${sectionId}"]`);
-      if (sectionElement) {
-        if (section.expanded) {
-          sectionElement.classList.add('expanded');
-        } else {
-          sectionElement.classList.remove('expanded');
-        }
-      }
-    });
-  }
-
-  public toggleSection(sectionId: string): void {
-    const section = this.sections.get(sectionId);
-    if (!section) {
-      console.warn(`Section ${sectionId} not found`);
-      return;
-    }
-
-    // Toggle the section state
-    section.expanded = !section.expanded;
-    this.sections.set(sectionId, section);
-
-    // Update the UI
-    const sectionElement = document.querySelector(`[data-section="${sectionId}"]`);
-    if (sectionElement) {
-      if (section.expanded) {
-        sectionElement.classList.add('expanded');
-      } else {
-        sectionElement.classList.remove('expanded');
-      }
-    }
-
-    // On mobile, expand sidebar when opening a section
-    if (this.isMobile && section.expanded) {
-      this.expandSidebar();
-    }
-
-    console.log(`Toggled section ${sectionId}:`, section.expanded ? 'expanded' : 'collapsed');
-  }
-
-  public expandSection(sectionId: string): void {
-    const section = this.sections.get(sectionId);
-    if (section && !section.expanded) {
-      this.toggleSection(sectionId);
-    }
-  }
-
-  public collapseSection(sectionId: string): void {
-    const section = this.sections.get(sectionId);
-    if (section && section.expanded) {
-      this.toggleSection(sectionId);
-    }
   }
 
   public toggleSidebar(): void {
@@ -268,15 +166,6 @@ export class SidebarNavigationManager {
       this.sidebar?.classList.remove('collapsed', 'expanded');
       this.removeSidebarOverlay();
     }
-  }
-
-  public getSectionState(sectionId: string): boolean {
-    const section = this.sections.get(sectionId);
-    return section?.expanded || false;
-  }
-
-  public getAllSections(): SidebarSection[] {
-    return Array.from(this.sections.values());
   }
 
   public isSidebarExpanded(): boolean {

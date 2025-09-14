@@ -19,7 +19,7 @@ import * as buttons from './buttons';
 // import subscriptionManager from './subscription-manager'; // Not needed for sidebar navigation
 import { topInfoBar, TopInfoBarData } from './top-info-bar';
 import { useGameStore } from '../core/state/zustand-store';
-import { sidebarNavigation, SidebarSection } from './sidebar-navigation';
+import { sidebarNavigation } from './sidebar-navigation';
 import { drinkProgressBar, levelProgressBar, ProgressBarData } from './progress-bar';
 import { visualFeedback } from './visual-feedback';
 import {
@@ -36,7 +36,7 @@ import { konamiCodeDetector } from './konami-code';
 export { displays, stats, feedback, affordability, buttons };
 export { labels };
 export { topInfoBar, sidebarNavigation, drinkProgressBar, levelProgressBar, visualFeedback };
-export type { TopInfoBarData, SidebarSection, ProgressBarData };
+export type { TopInfoBarData, ProgressBarData };
 
 // Export optimized functions
 export {
@@ -692,46 +692,9 @@ export function updateAllDisplays(): void {
   // Update complete
 }
 
-// Enhanced sidebar section toggle function
-export function toggleSidebarSection(sectionName: string, _event?: Event | null): void {
-  try {
-    // Toggle the sidebar section
-    sidebarNavigation.toggleSection(sectionName);
+// toggleSidebarSection removed - no longer needed as shop is direct content
 
-    // Add haptic feedback on mobile
-    if (isMobileDevice()) {
-      triggerHapticFeedback();
-    }
-
-    // Section-specific updates
-    if (sectionName === 'stats') {
-      try {
-        updateAllStats();
-      } catch (error) {
-        reportUIError(error, 'update_stats_section', ErrorSeverity.MEDIUM);
-      }
-    }
-    if (sectionName === 'unlocks') {
-      try {
-        const sys = (window as any).App?.systems?.unlocks;
-        if (sys?.updateUnlocksTab) sys.updateUnlocksTab();
-      } catch (error) {
-        reportUIError(error, 'update_unlocks_section', ErrorSeverity.MEDIUM);
-      }
-    }
-  } catch (error) {
-    reportUIError(error, 'toggle_sidebar_section', ErrorSeverity.MEDIUM);
-  }
-}
-
-// Helper function to detect mobile device
-function isMobileDevice(): boolean {
-  return (
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-    'ontouchstart' in window ||
-    navigator.maxTouchPoints > 0
-  );
-}
+// isMobileDevice function removed - no longer needed
 
 // Error Boundary Wrapper for Critical UI Operations
 export function withErrorBoundary<T extends (...args: unknown[]) => unknown>(
@@ -777,22 +740,7 @@ export const safeUpdateAllDisplays = withErrorBoundary(
   }
 );
 
-export const safeToggleSidebarSection = withErrorBoundary(
-  (...args: unknown[]) => {
-    const [sectionName, event] = args;
-    return toggleSidebarSection(sectionName as string, event as Event | null | undefined);
-  },
-  'toggle_sidebar_section',
-  ErrorSeverity.MEDIUM,
-  () => {
-    // Fallback: expand upgrades section
-    try {
-      sidebarNavigation.expandSection('upgrades');
-    } catch (fallbackError) {
-      reportUIError(fallbackError, 'toggle_sidebar_section_fallback', ErrorSeverity.HIGH);
-    }
-  }
-);
+// safeToggleSidebarSection removed - no longer needed as shop is direct content
 
 // Initialize error boundaries for critical operations
 export function initializeErrorBoundaries(): void {
@@ -800,7 +748,7 @@ export function initializeErrorBoundaries(): void {
     // Wrap critical global functions with error boundaries
     if (typeof window !== 'undefined') {
       (window as any).safeUpdateAllDisplays = safeUpdateAllDisplays;
-      (window as any).safeToggleSidebarSection = safeToggleSidebarSection;
+      // safeToggleSidebarSection removed - no longer needed
     }
   } catch (error) {
     reportUIError(error, 'initialize_error_boundaries', ErrorSeverity.HIGH);
@@ -808,17 +756,7 @@ export function initializeErrorBoundaries(): void {
 }
 
 // Helper function to trigger haptic feedback
-function triggerHapticFeedback(): void {
-  try {
-    // Check if vibration API is available
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50); // Short vibration
-    }
-  } catch (error) {
-    // Haptic feedback is not critical, so we can silently fail
-    console.debug('Haptic feedback not available:', error);
-  }
-}
+// triggerHapticFeedback function removed - no longer needed
 
 // Batch UI updates for performance (use in game loop)
 export function performBatchUIUpdate(): void {
