@@ -270,16 +270,29 @@ export function getAbsurdUpgradeDescription(upgradeName: string, level: number):
  */
 export function showAbsurdNotification(): void {
   const notifications = [
-    'A pigeon somewhere approves of your soda choice.',
-    'The vending machine in sector 7 is jealous.',
-    'Your soda consumption has been noted by the authorities.',
-    'Somewhere, a can of soda sheds a single tear of joy.',
-    'The Soda Council convenes to discuss your progress.',
-    'A distant refrigerator hums in approval.',
-    'The carbonation whispers ancient secrets.',
-    'Your soda technique has achieved legendary status.',
-    'The Bureau of Beverage Affairs has taken notice.',
-    'A moth lands on your screen, impressed by your dedication.',
+    // Authentic SDP-style mundane observations
+    'A spider watches from the corner. It approves.',
+    'The waterslide in the distance remains unused.',
+    'Your bedroom door creaks. Nobody enters.',
+    'The parking lot is vast and empty.',
+    'A single bird lands on the bus stop bench.',
+    'The DMV line moves forward by one person.',
+    'Your kitchen faucet drips exactly three times.',
+    'The laundromat washing machine enters its final cycle.',
+    'An elevator dings on the 4th floor. Nobody gets out.',
+    'The gas station attendant counts the register.',
+    'A shopping cart rolls across the empty lot.',
+    'The hotel ice machine dispenses seven cubes.',
+    'Your car radio plays a song from 1987.',
+    'The office printer makes a sound. It is not printing.',
+    'A moth circles the porch light exactly 12 times.',
+    'The vending machine hums in B-flat.',
+    'Your phone vibrates. There is no message.',
+    'The ceiling fan wobbles imperceptibly.',
+    'A cat walks across the roof. It does not look down.',
+    'The refrigerator compressor kicks on.',
+    'Someone three blocks away starts their car.',
+    'A leaf falls in the backyard. It lands silently.',
   ];
 
   const randomNotification =
@@ -381,6 +394,22 @@ export function initializeSodaDrinkerProThemes(): void {
   setTimeout(showRandomNotification, 30000);
 
   console.log('✅ Soda Drinker Pro theme system initialized');
+  
+  // Expose debug functions globally for testing
+  if (typeof window !== 'undefined') {
+    (window as any).debugSDP = {
+      applyTheme: applyThemeToBackground,
+      showFlavor: showLocationFlavorText,
+      showNotification: showAbsurdNotification,
+      getTheme: getThemeForLevel,
+      testLevel: (level: number) => {
+        console.log(`🧪 Testing SDP theme for level ${level}`);
+        applyThemeToBackground(level);
+        showLocationFlavorText(level);
+      }
+    };
+    console.log('🧪 SDP debug functions available as window.debugSDP');
+  }
 }
 
 /**
