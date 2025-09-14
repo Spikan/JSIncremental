@@ -346,7 +346,7 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
       0,
       currentDrinkRate - (clampedProgress / 100) * currentDrinkRate
     );
-    const remainingSeconds = formatNumber(remainingTime / 1000);
+    const remainingSeconds = (remainingTime / 1000).toFixed(2);
     (countdown as HTMLElement).textContent = `${remainingSeconds}s`;
     if (remainingTime <= 1000) {
       (countdown as HTMLElement).classList.add('countdown-warning');
