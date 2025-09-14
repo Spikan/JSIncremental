@@ -553,9 +553,32 @@ function initializeEnhancedUIComponents(): void {
     // Hide old UI elements
     hideOldUIElements();
 
+    // Initialize dev tools button
+    initializeDevToolsButton();
+
     console.log('✅ Enhanced UI components initialized');
   } catch (error) {
     console.warn('Failed to initialize enhanced UI components:', error);
+  }
+}
+
+/**
+ * Initialize dev tools button with correct state
+ */
+function initializeDevToolsButton(): void {
+  try {
+    const w = window as any;
+    const state = w.App?.state?.getState?.();
+    const devToolsEnabled = state?.options?.devToolsEnabled ?? false;
+    
+    const button = document.querySelector('.dev-toggle-btn');
+    if (button) {
+      button.textContent = `🔧 Dev Tools ${devToolsEnabled ? 'ON' : 'OFF'}`;
+    }
+    
+    console.log('🔧 Dev tools button initialized:', devToolsEnabled ? 'ON' : 'OFF');
+  } catch (error) {
+    console.warn('Failed to initialize dev tools button:', error);
   }
 }
 

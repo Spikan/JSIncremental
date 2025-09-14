@@ -99,6 +99,11 @@ export class NavigationManager {
     this.desktopNav.innerHTML = '';
 
     NAVIGATION_TABS.forEach(tab => {
+      // Skip dev tab if not enabled
+      if (tab.id === 'dev' && !this.isDevToolsEnabled()) {
+        return;
+      }
+      
       const button = this.createDesktopTabButton(tab);
       if (this.desktopNav) {
         this.desktopNav.appendChild(button);
@@ -113,6 +118,11 @@ export class NavigationManager {
     this.mobileNav.innerHTML = '';
 
     NAVIGATION_TABS.forEach(tab => {
+      // Skip dev tab if not enabled
+      if (tab.id === 'dev' && !this.isDevToolsEnabled()) {
+        return;
+      }
+      
       const tabItem = this.createMobileTabItem(tab);
       if (this.mobileNav) {
         this.mobileNav.appendChild(tabItem);
@@ -187,6 +197,26 @@ export class NavigationManager {
 
   public getTabById(id: string): NavigationTab | undefined {
     return NAVIGATION_TABS.find(tab => tab.id === id);
+  }
+
+  private isDevToolsEnabled(): boolean {
+    try {
+      const w = window as any;
+      return w.App?.state?.getState?.()?.options?.devToolsEnabled ?? false;
+    } catch {
+      return false;
+    }
+  }
+
+  public refreshNavigation(): void {
+    // If currently on dev tab and it gets disabled, switch to soda tab
+    if (this.currentTab === 'dev' && !this.isDevToolsEnabled()) {
+      this.switchTab('soda');
+    }
+    
+    // Recreate navigation to show/hide dev tab
+    this.createDesktopNavigation();
+    this.createMobileNavigation();
   }
 }
 

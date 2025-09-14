@@ -287,6 +287,7 @@ export function initOnDomReady(): void {
               autosaveInterval: 10,
               clickSoundsEnabled: true,
               musicEnabled: true,
+              devToolsEnabled: false, // Hidden by default
             } as any;
             const loaded =
               (window as any).App?.systems?.options?.loadOptions?.(defaults) || defaults;

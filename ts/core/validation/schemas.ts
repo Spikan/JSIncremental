@@ -153,6 +153,7 @@ export type GameOptions = {
   clickSoundsEnabled: boolean;
   musicEnabled: boolean;
   musicStreamPreferences?: Record<string, boolean>;
+  devToolsEnabled: boolean;
 };
 export const GameOptionsSchema = z.object({
   autosaveEnabled: z.boolean(),
@@ -160,6 +161,7 @@ export const GameOptionsSchema = z.object({
   clickSoundsEnabled: z.boolean(),
   musicEnabled: z.boolean(),
   musicStreamPreferences: z.record(z.string(), z.boolean()).optional(),
+  devToolsEnabled: z.boolean(),
 });
 
 export function validateUnlocks(data: any) {

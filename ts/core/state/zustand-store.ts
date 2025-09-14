@@ -136,6 +136,7 @@ const defaultState: GameState = {
       preferred: 'local',
       fallbacks: ['local'],
     },
+    devToolsEnabled: false, // Hidden by default
   },
 };
 

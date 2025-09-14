@@ -8,6 +8,7 @@ export type GameOptions = {
   clickSoundsEnabled: boolean;
   musicEnabled: boolean;
   musicStreamPreferences?: any;
+  devToolsEnabled: boolean; // Show/hide dev tools tab
 };
 
 export function loadOptions(defaults: GameOptions): GameOptions {

@@ -13,6 +13,7 @@ export type GameOptions = {
     preferred: string;
     fallbacks: string[];
   };
+  devToolsEnabled: boolean;
 };
 
 export type GameState = {
@@ -113,5 +114,6 @@ export const defaultState: GameState = {
       preferred: 'local',
       fallbacks: [],
     },
+    devToolsEnabled: false, // Hidden by default
   },
 };

@@ -121,6 +121,41 @@ const BUTTON_CONFIG: {
       type: 'sound-toggle-btn',
       label: 'Toggle Button Sounds',
     },
+    toggleDevTools: {
+      func: () => {
+        try {
+          const w = window as any;
+          const state = w.App?.state?.getState?.();
+          if (state?.options) {
+            const newValue = !state.options.devToolsEnabled;
+            
+            // Update the state
+            w.App?.state?.setState?.({
+              options: { ...state.options, devToolsEnabled: newValue }
+            });
+            
+            // Save to storage
+            w.App?.systems?.options?.saveOptions?.({ ...state.options, devToolsEnabled: newValue });
+            
+            // Update button text
+            const button = document.querySelector('.dev-toggle-btn');
+            if (button) {
+              button.textContent = `🔧 Dev Tools ${newValue ? 'ON' : 'OFF'}`;
+            }
+            
+            // Refresh navigation to show/hide dev tab
+            const navManager = w.App?.ui?.navigationManager || (window as any).navigationManager;
+            if (navManager?.refreshNavigation) {
+              navManager.refreshNavigation();
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to toggle dev tools:', e);
+        }
+      },
+      type: 'dev-toggle-btn',
+      label: 'Toggle Dev Tools',
+    },
     startGame: {
       func: () => {
         try {
