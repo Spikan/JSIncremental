@@ -7653,10 +7653,18 @@ p {
 
 /* Desktop-specific soda button sizing - must come last to override mobile styles */
 @media (min-width: 769px) {
+  .soda-container {
+    padding: 0; /* Remove padding on desktop to allow full button size */
+    max-width: none; /* Remove max-width constraint */
+    width: auto; /* Allow container to size to content */
+    min-width: 320px; /* Ensure minimum width for button */
+  }
+
   .soda-button {
     width: 320px; /* Slightly wider for larger model */
     height: 560px; /* Taller to accommodate larger model and prevent clipping */
     padding: 20px; /* Restore padding for desktop */
+    flex-shrink: 0; /* Prevent button from shrinking */
   }
 
   .click-indicator {
