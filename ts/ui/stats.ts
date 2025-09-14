@@ -288,15 +288,10 @@ export function updateEnhancementValues(): void {
     const widerStraws = state.widerStraws || 0;
     const baseSPD = 2.0; // From upgrades.json
     const widerMultiplierPerLevel = 0.5; // From upgrades.json
-    
+
     // Use actual game logic with all bonuses
-    const actualStrawSPD = computeStrawSPD(
-      straws, 
-      baseSPD, 
-      widerStraws, 
-      widerMultiplierPerLevel
-    );
-    
+    const actualStrawSPD = computeStrawSPD(straws, baseSPD, widerStraws, widerMultiplierPerLevel);
+
     console.log('🔍 Straw production calculation (with bonuses):', {
       straws,
       widerStraws,
@@ -317,15 +312,10 @@ export function updateEnhancementValues(): void {
     const betterCups = state.betterCups || 0;
     const baseSPD = 5.0; // From upgrades.json
     const betterMultiplierPerLevel = 1.0; // From upgrades.json
-    
+
     // Use actual game logic with all bonuses
-    const actualCupSPD = computeCupSPD(
-      cups, 
-      baseSPD, 
-      betterCups, 
-      betterMultiplierPerLevel
-    );
-    
+    const actualCupSPD = computeCupSPD(cups, baseSPD, betterCups, betterMultiplierPerLevel);
+
     console.log('🔍 Cup production calculation (with bonuses):', {
       cups,
       betterCups,

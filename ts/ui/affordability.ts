@@ -9,6 +9,7 @@ import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { updateButtonState, updateCostDisplay } from './utils';
 import { toDecimal, gte } from '../core/numbers/migration-utils';
 import { NumericValue, CostResult } from '../types/app-types';
+import { nextStrawCost, nextCupCost } from '../core/rules/purchases';
 
 // Direct break_eternity.js Decimal access
 const Decimal = (globalThis as any).Decimal;
@@ -77,16 +78,16 @@ function calculateAllCosts(): CostResult {
   const { upgrades: dataUp, config } = getUpgradesAndConfig();
   const costs = {} as CostResult;
 
-  // Direct Decimal operations - break_eternity.js handles all edge cases
+  // Use the new improved cost calculation functions
   const strawBaseCost = toDecimal(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
   const strawScaling = toDecimal(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
   const strawCount = toDecimal((window as any).App?.state?.getState?.()?.straws || 0);
-  costs.straw = strawBaseCost.multiply(strawScaling.pow(strawCount));
+  costs.straw = nextStrawCost(strawCount, strawBaseCost, strawScaling);
 
   const cupBaseCost = toDecimal(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
   const cupScaling = toDecimal(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
   const cupCount = toDecimal((window as any).App?.state?.getState?.()?.cups || 0);
-  costs.cup = cupBaseCost.multiply(cupScaling.pow(cupCount));
+  costs.cup = nextCupCost(cupCount, cupBaseCost, cupScaling);
 
   const suctionBaseCost = toDecimal(dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40);
   const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
