@@ -6897,8 +6897,7 @@ p {
 }
 
 .soda-button {
-  width: 300px;
-  height: 420px; /* Increased from 380px to 420px */
+  /* Width and height will be set by responsive rules */
   cursor: pointer;
   transition: all 0.2s ease;
   filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.3));
@@ -7664,9 +7663,9 @@ p {
   }
 
   .soda-button {
-    width: 320px; /* Slightly wider for larger model */
-    height: 560px; /* Taller to accommodate larger model and prevent clipping */
-    padding: 20px; /* Restore padding for desktop */
+    width: 320px !important; /* Slightly wider for larger model */
+    height: 560px !important; /* Taller to accommodate larger model and prevent clipping */
+    padding: 20px !important; /* Restore padding for desktop */
     flex-shrink: 0; /* Prevent button from shrinking */
   }
 
