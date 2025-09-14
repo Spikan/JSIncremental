@@ -117,8 +117,9 @@ export class Soda3DButton {
   }
 
   private setupScene(): void {
-    // Set up camera position
-    this.camera.position.z = 3;
+    // Set up camera position - slightly above and looking down to prevent top cut-off
+    this.camera.position.set(0, 0.3, 3);
+    this.camera.lookAt(0, -0.1, 0); // Look slightly down
 
     // Set up renderer with mobile optimizations
     this.renderer.setSize(this.config.size, this.config.size);
@@ -202,13 +203,14 @@ export class Soda3DButton {
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
 
-        // Center the model and store the centered position
+        // Center the model and position it slightly lower to prevent top cut-off
         this.model.position.sub(center);
+        this.model.position.y -= 0.2; // Move model down slightly
         this.centerPosition.copy(this.model.position);
 
-        // Scale to fit nicely in view - increased size for better visibility
+        // Scale to fit nicely in view - balanced size to prevent cut-off
         const maxDimension = Math.max(size.x, size.y, size.z);
-        this.baseScale = 3.5 / maxDimension; // Increased from 2 to 3.5 for larger model
+        this.baseScale = 3.0 / maxDimension; // Reduced from 3.5 to 3.0 to prevent top cut-off
         this.model.scale.setScalar(this.baseScale);
 
         this.scene.add(this.model);
@@ -252,6 +254,10 @@ export class Soda3DButton {
     cylinder.castShadow = true;
     cylinder.receiveShadow = true;
     this.model.add(cylinder);
+
+    // Position fallback model lower to match main model positioning
+    this.model.position.y = -0.2;
+    this.centerPosition.copy(this.model.position);
 
     this.scene.add(this.model);
     this.isLoaded = true;
