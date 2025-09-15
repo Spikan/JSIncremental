@@ -365,7 +365,9 @@ export class SaveGameLoader {
   private loadHybridLevelData(savegame: SaveGameData): void {
     try {
       console.log('🔍 Loading hybrid level data from save:', savegame.hybridLevelData);
-
+      console.log('🔍 Full savegame object keys:', Object.keys(savegame));
+      console.log('🔍 Full savegame object:', savegame);
+      
       if (savegame.hybridLevelData) {
         const { currentLevel, unlockedLevels } = savegame.hybridLevelData;
         console.log('🔍 Parsed hybrid level data:', { currentLevel, unlockedLevels });
@@ -376,12 +378,12 @@ export class SaveGameLoader {
           // Ensure level 1 is always unlocked
           const levelsToRestore = [...new Set([1, ...(unlockedLevels || [])])];
           const levelToRestore = currentLevel || 1;
-          
+
           console.log('🔄 Restoring hybrid level state:', {
             currentLevel: levelToRestore,
-            unlockedLevels: levelsToRestore
+            unlockedLevels: levelsToRestore,
           });
-          
+
           hybridSystem.restoreState(levelToRestore, levelsToRestore);
           console.log('✅ Hybrid level system state restored successfully');
         } else {

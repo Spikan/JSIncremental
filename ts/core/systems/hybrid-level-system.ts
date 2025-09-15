@@ -355,16 +355,16 @@ export class HybridLevelSystem {
   // Method for save loader to restore state
   restoreState(currentLevel: number, unlockedLevels: number[]): void {
     console.log('🔄 Restoring hybrid level state:', { currentLevel, unlockedLevels });
-    
+
     // Restore unlocked levels
     this.unlockedLevels = new Set(unlockedLevels);
     console.log('✅ Restored unlocked levels:', Array.from(this.unlockedLevels));
-    
+
     // Restore current level (only if it's unlocked)
     if (this.unlockedLevels.has(currentLevel)) {
       this.currentLevel = currentLevel;
       console.log('✅ Restored current level:', this.currentLevel);
-      
+
       // Apply theme for the restored level
       this.applyLevelTheme();
     } else {
@@ -600,7 +600,10 @@ export class HybridLevelSystem {
       // Don't load from storage here - the main save system will handle loading
       // Just initialize with level 1 unlocked by default
       this.unlockedLevels = new Set([1]);
-      console.log('🏗️ Hybrid system initialized with default unlocked levels:', Array.from(this.unlockedLevels));
+      console.log(
+        '🏗️ Hybrid system initialized with default unlocked levels:',
+        Array.from(this.unlockedLevels)
+      );
     } catch (error) {
       console.warn('Failed to initialize unlocked levels:', error);
       this.unlockedLevels = new Set([1]);

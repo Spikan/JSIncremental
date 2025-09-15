@@ -145,6 +145,13 @@ export const GameSaveSchema = z.object({
     .union([z.number().min(1), z.string()])
     .transform((val: number | string) => (typeof val === 'string' ? toDecimal(val) : val))
     .optional(),
+  // Hybrid level system data
+  hybridLevelData: z.object({
+    currentLevel: z.number().min(1).optional(),
+    unlockedLevels: z.array(z.number().min(1)).optional(),
+  }).optional(),
+  // Options including Konami code state
+  options: z.any().optional(),
 });
 
 export type GameOptions = {

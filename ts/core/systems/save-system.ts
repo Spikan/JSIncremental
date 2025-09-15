@@ -44,9 +44,9 @@ export function performSaveSnapshot(): any {
       totalClicks: Number(state.totalClicks || w.totalClicks || 0),
       // Save hybrid level system data (single source of truth for levels)
       hybridLevelData: (() => {
-        const currentLevel = w.App?.systems?.hybridLevel?.getCurrentLevelId?.() || 1;
-        const unlockedLevels = w.App?.systems?.hybridLevel?.getUnlockedLevelIds?.() || [1];
-        console.log('💾 Saving hybrid level data:', { currentLevel, unlockedLevels });
+        const hybridSystem = w.App?.systems?.hybridLevel;
+        const currentLevel = hybridSystem?.getCurrentLevelId?.() || 1;
+        const unlockedLevels = hybridSystem?.getUnlockedLevelIds?.() || [1];
         return {
           currentLevel,
           unlockedLevels,
@@ -56,6 +56,7 @@ export function performSaveSnapshot(): any {
       options: state.options || {},
     };
 
+    console.log('💾 Full save payload:', payload);
     w.App?.storage?.saveGame?.(payload);
     try {
       w.App?.state?.setState?.({ lastSaveTime: payload.lastSaveTime });
