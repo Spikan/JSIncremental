@@ -94,6 +94,13 @@ if (typeof window !== 'undefined') {
   };
 }
 
+// Apply initial theme from hybrid level system
+try {
+  hybridLevelSystem.applyInitialTheme();
+} catch (error) {
+  console.warn('Failed to apply initial theme:', error);
+}
+
 __pushDiag({ type: 'index', stage: 'app-created' });
 
 // Static wiring of core systems/UI for deterministic bootstrap

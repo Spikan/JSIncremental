@@ -341,6 +341,11 @@ export class HybridLevelSystem {
     return this.unlockedLevels.has(levelId);
   }
 
+  applyInitialTheme(): void {
+    console.log('🎨 Applying initial theme from hybrid level system');
+    this.applyLevelTheme();
+  }
+
   getUnlockedLevels(): HybridLevel[] {
     return this.getAllLevels().filter(level => this.unlockedLevels.has(level.id));
   }
@@ -433,7 +438,7 @@ export class HybridLevelSystem {
       this.currentLevel = levelId;
       this.saveCurrentLevel();
       this.applyLevelTheme();
-      
+
       // Update the old level system to keep it in sync
       try {
         const app: any = (window as any).App;
@@ -443,7 +448,7 @@ export class HybridLevelSystem {
       } catch (error) {
         console.warn('Failed to update old level system:', error);
       }
-      
+
       // this.playLevelAudio(); // Audio removed
       return true;
     }
@@ -469,13 +474,14 @@ export class HybridLevelSystem {
     }
 
     // Also apply background directly to body for immediate effect
-    document.body.style.background = level.visualTheme.backgroundImage || level.visualTheme.backgroundColor;
+    document.body.style.background =
+      level.visualTheme.backgroundImage || level.visualTheme.backgroundColor;
     document.body.style.backgroundAttachment = 'fixed';
 
     console.log('🎨 Theme applied:', {
       backgroundColor: level.visualTheme.backgroundColor,
       backgroundImage: level.visualTheme.backgroundImage,
-      bodyBackground: document.body.style.background
+      bodyBackground: document.body.style.background,
     });
 
     // Add level-specific particles

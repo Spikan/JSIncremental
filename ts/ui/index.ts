@@ -39,7 +39,7 @@ import {
   initializeEnhancedAffordabilitySystem,
   addPurchaseSuccessAnimation,
 } from './enhanced-affordability';
-import { initializeSodaDrinkerProThemes, addThemeStyles } from './soda-drinker-pro-themes';
+import { addThemeStyles } from './soda-drinker-pro-themes';
 import { initializeAuthenticSDP } from './authentic-sdp';
 import { createSoda3DButton } from './soda-3d-lightweight';
 import { konamiCodeDetector } from './konami-code';
@@ -615,7 +615,7 @@ export function initializeUI(): void {
 
     // Initialize Soda Drinker Pro theme system
     addThemeStyles();
-    initializeSodaDrinkerProThemes();
+    // initializeSodaDrinkerProThemes(); // Disabled - using hybrid level system themes instead
 
     // Initialize authentic SDP experience
     initializeAuthenticSDP();
