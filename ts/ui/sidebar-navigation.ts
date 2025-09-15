@@ -36,6 +36,19 @@ export class SidebarNavigationManager {
       return;
     }
 
+    if (!this.sidebarToggle) {
+      console.warn('Sidebar toggle button not found');
+      return;
+    }
+
+    // Debug mobile detection
+    console.log('Mobile detection:', {
+      isMobile: this.isMobile,
+      windowWidth: window.innerWidth,
+      sidebarToggle: this.sidebarToggle,
+      sidebarToggleDisplay: getComputedStyle(this.sidebarToggle).display,
+    });
+
     // Set initial state
     this.updateSidebarState();
 

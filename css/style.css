@@ -711,6 +711,8 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   display: none; /* Hidden on desktop, shown on mobile */
+  z-index: 1000; /* Ensure it's above other elements */
+  position: relative; /* Ensure proper positioning */
 }
 
 .sidebar-toggle:hover {
@@ -1053,7 +1055,9 @@ body {
   }
 
   .sidebar-toggle {
-    display: block;
+    display: block !important; /* Force visibility on mobile */
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .upgrade-cards {
@@ -1163,6 +1167,12 @@ body {
     min-width: 44px;
     min-height: 44px;
     touch-action: manipulation;
+    background: rgba(0, 179, 107, 0.8) !important; /* More visible green background */
+    border: 2px solid rgba(0, 179, 107, 1) !important; /* Stronger border */
+    color: #ffffff !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 179, 107, 0.3);
   }
 
   /* Mobile production stats - stack vertically */
