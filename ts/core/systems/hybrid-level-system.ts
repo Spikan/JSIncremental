@@ -482,6 +482,7 @@ export class HybridLevelSystem {
 
     console.log('🎨 Applying theme for level:', level.id, level.name, level.visualTheme);
     console.log('🎨 Current body background before theme:', document.body.style.background);
+    console.log('🎨 Current unlocked levels:', Array.from(this.unlockedLevels));
 
     // Apply visual theme
     const root = document.documentElement;
