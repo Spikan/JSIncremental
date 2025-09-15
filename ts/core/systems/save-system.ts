@@ -43,6 +43,11 @@ export function performSaveSnapshot(): any {
       totalPlayTime: Number(state.totalPlayTime || 0),
       totalClicks: Number(state.totalClicks || w.totalClicks || 0),
       level: String(state.level || w.level || 1),
+      // Save hybrid level system data
+      hybridLevelData: {
+        currentLevel: w.App?.systems?.hybridLevel?.getCurrentLevelId?.() || 1,
+        unlockedLevels: w.App?.systems?.hybridLevel?.getUnlockedLevelIds?.() || [1],
+      },
       // Save options including Konami code state
       options: state.options || {},
     };

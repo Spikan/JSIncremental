@@ -30,6 +30,11 @@ export interface SaveGameData {
   cupSPD?: number | string | any;
   // Options including Konami code state
   options?: any;
+  // Hybrid level system data
+  hybridLevelData?: {
+    currentLevel?: number;
+    unlockedLevels?: number[];
+  };
 }
 
 export class SaveGameLoader {
@@ -71,6 +76,9 @@ export class SaveGameLoader {
 
       // Load options (including Konami code state)
       this.loadOptions(savegame);
+
+      // Load hybrid level system data
+      this.loadHybridLevelData(savegame);
 
       console.log('✅ Game state loaded successfully');
     } catch (error) {
@@ -364,6 +372,50 @@ export class SaveGameLoader {
       }
     } catch (error) {
       console.warn('Failed to load options:', error);
+    }
+  }
+
+  /**
+   * Load hybrid level system data
+   */
+  private loadHybridLevelData(savegame: SaveGameData): void {
+    try {
+      if (savegame.hybridLevelData) {
+        const { currentLevel, unlockedLevels } = savegame.hybridLevelData;
+        
+        // Load current level
+        if (typeof currentLevel === 'number' && currentLevel >= 1) {
+          try {
+            (window as any).App?.systems?.hybridLevel?.switchToLevel?.(currentLevel);
+            console.log('✅ Hybrid level system current level loaded:', currentLevel);
+          } catch (error) {
+            console.warn('Failed to set hybrid level system current level:', error);
+          }
+        }
+
+        // Load unlocked levels
+        if (Array.isArray(unlockedLevels) && unlockedLevels.length > 0) {
+          try {
+            // Ensure level 1 is always unlocked
+            const levelsToUnlock = [...new Set([1, ...unlockedLevels])];
+            
+            // Unlock each level
+            levelsToUnlock.forEach(levelId => {
+              try {
+                (window as any).App?.systems?.hybridLevel?.unlockLevel?.(levelId);
+              } catch (error) {
+                console.warn(`Failed to unlock level ${levelId}:`, error);
+              }
+            });
+            
+            console.log('✅ Hybrid level system unlocked levels loaded:', levelsToUnlock);
+          } catch (error) {
+            console.warn('Failed to load hybrid level system unlocked levels:', error);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load hybrid level data:', error);
     }
   }
 

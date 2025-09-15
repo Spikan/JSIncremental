@@ -64,7 +64,8 @@ export function checkUpgradeAffordability(): void {
 
   updateButtonState('buyWiderStraws', canAfford(costs.widerStraws), costs.widerStraws);
   updateButtonState('buyBetterCups', canAfford(costs.betterCups), costs.betterCups);
-  updateButtonState('levelUp', canAfford(costs.levelUp), costs.levelUp);
+  // levelUp button is handled by hybrid level system - don't update its state here
+  // updateButtonState('levelUp', canAfford(costs.levelUp), costs.levelUp);
 
   // Cost displays
   updateCostDisplay('strawCost', costs.straw, canAfford(costs.straw));
@@ -73,8 +74,8 @@ export function checkUpgradeAffordability(): void {
   updateCostDisplay('fasterDrinksCost', costs.fasterDrinks, canAfford(costs.fasterDrinks));
   updateCostDisplay('widerStrawsCost', costs.widerStraws, canAfford(costs.widerStraws));
   updateCostDisplay('betterCupsCost', costs.betterCups, canAfford(costs.betterCups));
-  updateCostDisplay('levelUpCost', costs.levelUp, canAfford(costs.levelUp));
-  // levelCost is now handled by hybrid level system - don't override it
+  // levelUpCost and levelCost are handled by hybrid level system - don't override them
+  // updateCostDisplay('levelUpCost', costs.levelUp, canAfford(costs.levelUp));
 
   // Update unlock feature visibility and affordability
   try {

@@ -341,6 +341,14 @@ export class HybridLevelSystem {
     return this.unlockedLevels.has(levelId);
   }
 
+  getCurrentLevelId(): number {
+    return this.currentLevel;
+  }
+
+  getUnlockedLevelIds(): number[] {
+    return Array.from(this.unlockedLevels);
+  }
+
   applyInitialTheme(): void {
     console.log('🎨 Applying initial theme from hybrid level system');
     this.applyLevelTheme();
