@@ -48,6 +48,7 @@ import { mobileInputHandler } from './ui/mobile-input';
 import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
 import { processOfflineProgression } from './core/systems/offline-progression';
 import { showOfflineModal } from './ui/offline-modal';
+import { sidebarNavigation } from './ui/sidebar-navigation';
 // DecimalOps removed - no longer using toSafeNumber
 
 // Export for potential use
@@ -333,6 +334,16 @@ function initGame() {
 
     // Initialize mobile input handling using modular system
     mobileInputHandler.initialize();
+
+    // Initialize sidebar navigation
+    try {
+      console.log('Initializing sidebar navigation...');
+      sidebarNavigation.forceInitialize();
+      console.log('Sidebar navigation initialized:', sidebarNavigation);
+    } catch (error) {
+      console.warn('Failed to initialize sidebar navigation:', error);
+    }
+
     try {
       (window as any).App?.systems?.audio?.button?.initButtonAudioSystem?.();
     } catch (error) {

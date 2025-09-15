@@ -7,12 +7,28 @@ export class SidebarNavigationManager {
   private sidebar: HTMLElement | null = null;
   private mobileMenuToggle: HTMLElement | null = null;
   private isMobile: boolean = false;
+  private initialized: boolean = false;
 
   constructor() {
     this.isMobile = window.innerWidth <= 768;
+    this.setupResizeListener();
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.initialize());
+    } else {
+      this.initialize();
+    }
+  }
+
+  private initialize(): void {
+    if (this.initialized) return;
+
     this.initializeElements();
     this.setupEventListeners();
-    this.setupResizeListener();
+    this.initialized = true;
+
+    console.log('SidebarNavigationManager initialized successfully');
   }
 
   private initializeElements(): void {
@@ -39,10 +55,15 @@ export class SidebarNavigationManager {
 
   private setupEventListeners(): void {
     if (this.mobileMenuToggle) {
-      this.mobileMenuToggle.addEventListener('click', () => {
+      console.log('Setting up event listener for mobile menu toggle');
+      this.mobileMenuToggle.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
         console.log('Mobile menu toggle clicked');
         this.toggleMobileSidebar();
       });
+    } else {
+      console.warn('Mobile menu toggle button not found for event listener setup');
     }
   }
 
@@ -93,6 +114,12 @@ export class SidebarNavigationManager {
 
     this.sidebar.classList.remove('mobile-open');
     console.log('Mobile sidebar closed');
+  }
+
+  public forceInitialize(): void {
+    if (!this.initialized) {
+      this.initialize();
+    }
   }
 }
 
