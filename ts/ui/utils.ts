@@ -20,19 +20,7 @@ export function formatNumber(value: any): string {
     console.warn('Failed to format with Decimal, falling back:', error);
   }
 
-  // Legacy formatting for backward compatibility
-  try {
-    if (typeof (window as any)?.prettify === 'function') {
-      try {
-        const formatted = (window as any).prettify(value);
-        return postProcessDecimals(formatted);
-      } catch (error) {
-        console.warn('Failed to prettify value:', error);
-      }
-    }
-  } catch (error) {
-    console.warn('Failed to format value:', error);
-  }
+  // Legacy formatting removed - use modern formatNumber instead
 
   if (value == null) return '0';
 

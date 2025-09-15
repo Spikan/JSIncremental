@@ -1,6 +1,7 @@
 // Level Selector UI - Interface for switching between SDP levels
 
 import { hybridLevelSystem, HybridLevel } from '../core/systems/hybrid-level-system';
+import { formatNumber } from './utils';
 
 export class LevelSelector {
   private container: HTMLElement | null = null;
@@ -245,11 +246,7 @@ export class LevelSelector {
           </div>
           <div style="font-size: 9px; color: ${canUnlock ? '#27ae60' : '#e74c3c'}; line-height: 1.3; text-align: center;">
             <div style="margin-bottom: 2px;">
-              ${
-                typeof (window as any).prettify !== 'undefined'
-                  ? (window as any).prettify(level.unlockRequirement.sips)
-                  : level.unlockRequirement.sips.toLocaleString()
-              } Sips
+              ${formatNumber(level.unlockRequirement.sips)} Sips
             </div>
             <div style="margin-bottom: 2px;">
               ${level.unlockRequirement.clicks.toLocaleString()} Clicks

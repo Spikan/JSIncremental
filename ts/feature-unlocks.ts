@@ -1,6 +1,7 @@
 // Feature unlocks system (TypeScript)
 
 import { unlockPurchases } from './core/systems/unlock-purchases';
+import { formatNumber } from './ui/utils';
 
 type UnlockCondition = { sips: number; clicks: number };
 type UnlockMap = Record<string, UnlockCondition>;
@@ -497,10 +498,7 @@ export const FEATURE_UNLOCKS = {
               .map(feature => {
                 const isUnlocked = this.unlockedFeatures.has(feature);
                 const purchaseInfo = this.getUnlockPurchaseInfo(feature);
-                const costText =
-                  typeof (window as any).prettify !== 'undefined'
-                    ? (window as any).prettify(Number(purchaseInfo.cost.toString()))
-                    : purchaseInfo.cost.toString();
+                const costText = formatNumber(Number(purchaseInfo.cost.toString()));
 
                 return `
                   <div class="feature-item ${isUnlocked ? 'unlocked' : 'locked'}">
@@ -580,10 +578,7 @@ export const FEATURE_UNLOCKS = {
     };
 
     const info = featureInfo[tabName] || { icon: '❓', name: tabName };
-    const costText =
-      typeof (window as any).prettify !== 'undefined'
-        ? (window as any).prettify(Number(cost.toString()))
-        : cost.toString();
+    const costText = formatNumber(Number(cost.toString()));
 
     // Update button content
     button.innerHTML = `
@@ -645,10 +640,7 @@ export const FEATURE_UNLOCKS = {
     };
 
     const info = featureInfo[tabName] || { icon: '❓', name: tabName };
-    const costText =
-      typeof (window as any).prettify !== 'undefined'
-        ? (window as any).prettify(Number(cost.toString()))
-        : cost.toString();
+    const costText = formatNumber(Number(cost.toString()));
 
     // Update item content
     item.innerHTML = `
@@ -720,10 +712,7 @@ export const FEATURE_UNLOCKS = {
     };
 
     const info = featureInfo[featureName] || { icon: '❓', name: featureName };
-    const costText =
-      typeof (window as any).prettify !== 'undefined'
-        ? (window as any).prettify(Number(cost.toString()))
-        : cost.toString();
+    const costText = formatNumber(Number(cost.toString()));
 
     // Find the button within the container
     const button = container.querySelector('button') as HTMLElement;

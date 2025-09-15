@@ -728,10 +728,7 @@ function updateLevelUpDisplay(state: any): void {
       // Update the requirements
       const requirementsEl = document.getElementById('levelRequirements');
       if (requirementsEl) {
-        const sipsText =
-          typeof (window as any).prettify !== 'undefined'
-            ? (window as any).prettify(nextLevel.unlockRequirement.sips)
-            : nextLevel.unlockRequirement.sips.toLocaleString();
+        const sipsText = formatNumber(nextLevel.unlockRequirement.sips);
 
         let requirementsText = `${sipsText} sips, ${nextLevel.unlockRequirement.clicks.toLocaleString()} clicks`;
         if (nextLevel.unlockRequirement.level) {
