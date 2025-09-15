@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,9 +6,8 @@
     <title>Soda Clicker Pro</title>
     <meta name="description" content="Soda Clicker Pro" />
     <meta name="author" content="Spikan" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="stylesheet" type="text/css" href="css/style-header-fixed.css" />
     <link rel="icon" type="image/png" href="images/regSoda.png" />
-
     <!-- Ensure Decimal/Zod are available before any modules execute (prod places module in head) -->
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
@@ -39,7 +37,6 @@
           });
         } catch {}
       })();
-
       // Safety check to ensure functions are available - moved to after main.js loads
       window.addEventListener('load', function () {
         // Wait for modules to load and APIs to be available
@@ -56,10 +53,8 @@
           }
           console.log('✅ App.ui.switchTab is available');
         }
-
         // Start checking after a brief initial delay
         setTimeout(checkFunctionsLoaded, 1000);
-
         // HTML-level splash fallback: ensure any interaction starts the game
         try {
           var manualStart = function () {
@@ -83,7 +78,6 @@
                   game.style.visibility = 'visible';
                   game.style.opacity = '1';
                   game.classList && game.classList.add('active');
-
                   // Reinitialize DOM cache now that game content is visible
                   if (window.DOM_CACHE && typeof window.DOM_CACHE.init === 'function') {
                     console.log(
@@ -104,7 +98,6 @@
                       } catch {}
                     };
                   })();
-
                   var pollInitAndLoop = function () {
                     try {
                       // Call initGame if it exists
@@ -113,14 +106,12 @@
                           window.initGame();
                         });
                       }
-
                       // Start main loop with real callbacks when available
                       var loopStart =
                         window.App &&
                         window.App.systems &&
                         window.App.systems.loop &&
                         window.App.systems.loop.start;
-
                       if (typeof loopStart === 'function') {
                         try {
                           var cfg = (window.GAME_CONFIG && window.GAME_CONFIG.TIMING) || {};
@@ -246,7 +237,6 @@
               } catch {}
             } catch {}
           };
-
           var startIfPossible = function (e) {
             try {
               var splash = document.getElementById('splashScreen');
@@ -293,7 +283,6 @@
       });
     </script>
   </head>
-
   <body>
     <!-- Splash Screen -->
     <div id="splashScreen" class="splash-overlay">
@@ -319,10 +308,9 @@
         </div>
       </div>
     </div>
-
     <!-- Main Game Content -->
     <div id="gameContent" class="game-content mobile-content-padding" style="display: none">
-      <!-- Consolidated Game Header -->
+                        <!-- Consolidated Game Header -->
       <div class="game-header">
         <div class="level-indicator">
           <!-- Unified Level Control -->
@@ -356,7 +344,6 @@
             <span class="hamburger-icon">☰</span>
           </button>
         </div>
-
         <div class="header-main-content">
           <div class="currency-display-compact">
             <div class="currency-primary">
@@ -375,7 +362,6 @@
               </div>
             </div>
           </div>
-
           <!-- Compact Drink Progress Bar -->
           <div class="header-drink-progress-compact">
             <div class="drink-progress-row">
@@ -397,13 +383,37 @@
             </div>
           </div>
         </div>
-
         <div class="game-title">
           <div class="title-main">SODA CLICKER</div>
           <div class="title-sub">PRO</div>
         </div>
       </div>
-
+          <!-- Compact Drink Progress Bar -->
+          <div class="header-drink-progress-compact">
+            <div class="drink-progress-row">
+              <div class="drink-progress-info-compact">
+                <span class="drink-label-small">Next:</span>
+                <span class="drink-countdown" id="drinkCountdown">5.0s</span>
+              </div>
+              <div class="drink-progress-bar-compact">
+                <div class="drink-progress-fill" id="drinkProgressFill"></div>
+              </div>
+              <button
+                class="faster-drinks-btn-compact"
+                data-action="buyFasterDrinks"
+                title="Faster Drinks"
+              >
+                <span class="faster-drinks-icon">⚡</span>
+                <span class="faster-drinks-speed" id="currentDrinkSpeed">5.00s</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="game-title">
+          <div class="title-main">SODA CLICKER</div>
+          <div class="title-sub">PRO</div>
+        </div>
+      </div>
       <!-- Main Game Content -->
       <div id="mainGameContent" class="main-game-content">
         <!-- Main Content Area (Left Side) -->
@@ -432,7 +442,6 @@
                 <div class="click-ripple"></div>
               </div>
             </div>
-
             <!-- Suction Button with Click Power Display -->
             <div class="suction-button-container">
               <button class="suction-btn" data-action="buySuction">
@@ -454,7 +463,6 @@
             </div>
           </div>
         </div>
-
         <!-- Sidebar (Right Side) -->
         <div class="game-sidebar">
           <!-- Sidebar Header -->
@@ -464,7 +472,6 @@
               <span class="close-icon">×</span>
             </button>
           </div>
-
           <!-- Sidebar Content -->
           <div class="sidebar-content">
             <!-- Straw Production -->
@@ -484,7 +491,6 @@
                 <div class="upgrade-effect">+<span id="strawSPD">0</span> per drink</div>
               </div>
             </div>
-
             <!-- Cup Production -->
             <div class="upgrade-card">
               <div class="upgrade-header">
@@ -502,7 +508,6 @@
                 <div class="upgrade-effect">+<span id="cupSPD">0</span> per drink</div>
               </div>
             </div>
-
             <!-- Wider Straws Enhancement -->
             <div class="upgrade-card enhancement">
               <div class="upgrade-header">
@@ -520,7 +525,6 @@
                 <div class="upgrade-effect">+<span id="widerStrawsSPD">0</span>% boost</div>
               </div>
             </div>
-
             <!-- Better Cups Enhancement -->
             <div class="upgrade-card enhancement">
               <div class="upgrade-header">
@@ -542,7 +546,6 @@
         </div>
       </div>
     </div>
-
     <!-- Single entry: ts/index.ts will import all other modules -->
     <script type="module" src="ts/index.ts"></script>
     <script>
@@ -552,11 +555,9 @@
       } else {
         console.log('✅ Decimal library loaded successfully');
       }
-
       // Let main.js handle the script loading since the modular files are now working
       console.log('🔧 Core scripts loaded, main.js will handle the rest...');
     </script>
-
     <!-- Settings Modal -->
     <div id="settingsModal" class="settings-modal" style="display: none">
       <div class="settings-modal-overlay" data-action="closeSettings"></div>
@@ -574,7 +575,6 @@
             <span class="close-icon">×</span>
           </button>
         </div>
-
         <!-- Tab Navigation -->
         <div class="settings-modal-tabs">
           <button
@@ -616,13 +616,11 @@
             <span class="tab-label">Talk to God</span>
           </button>
         </div>
-
         <div class="settings-modal-body">
           <!-- Settings Tab Content -->
           <div class="settings-tab-content active" id="settings-tab">
             <div class="settings-group">
               <h4 class="settings-group-title">Audio</h4>
-
               <div class="audio-control">
                 <label for="masterVolumeSlider">🔊 Master Volume</label>
                 <div class="volume-slider-container">
@@ -638,7 +636,6 @@
                   <span id="masterVolumeValue" class="volume-value">70%</span>
                 </div>
               </div>
-
               <div class="audio-control">
                 <label for="musicVolumeSlider">🎵 Music Volume</label>
                 <div class="volume-slider-container">
@@ -654,7 +651,6 @@
                   <span id="musicVolumeValue" class="volume-value">25%</span>
                 </div>
               </div>
-
               <div class="audio-control">
                 <label for="sfxVolumeSlider">🔔 SFX Volume</label>
                 <div class="volume-slider-container">
@@ -670,18 +666,15 @@
                   <span id="sfxVolumeValue" class="volume-value">60%</span>
                 </div>
               </div>
-
               <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="settings-btn">
                 🔊 Button Sounds ON
               </button>
             </div>
-
             <div class="settings-group">
               <h4 class="settings-group-title">Save & Load</h4>
               <button data-action="save" class="settings-btn">Save Game</button>
               <button data-action="delete_save" class="settings-btn">Delete Save</button>
             </div>
-
             <div class="settings-group">
               <h4 class="settings-group-title">Dev Tools</h4>
               <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
@@ -689,7 +682,6 @@
               </button>
             </div>
           </div>
-
           <!-- Statistics Tab Content -->
           <div class="settings-tab-content" id="statistics-tab">
             <div class="settings-group">
@@ -719,7 +711,6 @@
               </div>
             </div>
           </div>
-
           <!-- God Tab Content -->
           <div class="settings-tab-content" id="god-tab">
             <div class="settings-group">
@@ -762,7 +753,6 @@
               </div>
             </div>
           </div>
-
           <!-- Dev Tools Tab Content -->
           <div class="settings-tab-content" id="dev-tab">
             <div class="settings-group">
@@ -782,7 +772,6 @@
                 </button>
               </div>
             </div>
-
             <div class="settings-group">
               <h4 class="settings-group-title">Unlocks & Features</h4>
               <div class="dev-buttons-grid">
@@ -792,7 +781,6 @@
                 <button data-action="devResetUnlocks" class="dev-btn">🔒 Reset Unlocks</button>
               </div>
             </div>
-
             <div class="settings-group">
               <h4 class="settings-group-title">Testing & Debug</h4>
               <div class="dev-buttons-grid">
@@ -815,7 +803,6 @@
                 <button data-action="devClearConsole" class="dev-btn">🧹 Clear Console</button>
               </div>
             </div>
-
             <div class="settings-group">
               <h4 class="settings-group-title">Data Management</h4>
               <div class="dev-buttons-grid">
@@ -831,7 +818,6 @@
                 </button>
               </div>
             </div>
-
             <div class="settings-group">
               <h4 class="settings-group-title">Quick Actions</h4>
               <div class="dev-input-group">
@@ -846,7 +832,6 @@
                   </button>
                 </div>
               </div>
-
               <div class="dev-input-group">
                 <label for="devCustomTime">Add Custom Time (hours):</label>
                 <div class="dev-input-row">

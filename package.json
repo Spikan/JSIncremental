@@ -22,7 +22,9 @@
     "performance": "node -e \"console.log('Performance monitoring available via performanceMonitor global')\"",
     "prepare": "husky",
     "quality": "npm run lint && npm run format:check && npm run type-check",
-    "fix": "npm run lint:fix && npm run format"
+    "fix": "npm run lint:fix && npm run format",
+    "css:optimize": "node scripts/header-fix-optimizer.js",
+    "css:analyze": "node scripts/css-analyzer.js"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
