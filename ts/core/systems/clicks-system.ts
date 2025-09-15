@@ -76,7 +76,14 @@ export async function handleSodaClick(multiplier: number = 1) {
     const baseClick = new Decimal(1);
     const suctionBonusPerLevel = new Decimal(1.0); // Updated from 0.3 to 1.0
     const suctionBonus = suctionValue.multiply(suctionBonusPerLevel);
-    const totalClickValue = baseClick.add(suctionBonus).multiply(multiplierValue);
+    const baseClickValue = baseClick.add(suctionBonus).multiply(multiplierValue);
+
+    // Apply level bonuses from hybrid level system
+    const levelBonuses = w.App?.systems?.hybridLevel?.getCurrentLevelBonuses?.() || {
+      sipMultiplier: 1.0,
+      clickMultiplier: 1.0,
+    };
+    const totalClickValue = baseClickValue.mul(toDecimal(levelBonuses.clickMultiplier));
 
     // Add to sips with Decimal arithmetic
     const currentSips = toDecimal(w.sips || 0);

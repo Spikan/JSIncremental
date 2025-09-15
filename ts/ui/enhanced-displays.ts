@@ -7,6 +7,7 @@ import { getDisplayData } from '../core/state/zustand-store';
 import { domQuery } from '../services/dom-query';
 import { logger } from '../services/logger';
 import { safeToNumberOrDecimal } from '../core/numbers/simplified';
+import { updateLevelUpDisplay } from './displays';
 
 // Store previous values to detect changes
 interface DisplayState {
@@ -241,7 +242,24 @@ class EnhancedDisplayManager {
       this.updateLevelDisplayAnimated();
       this.updateClickCounterAnimated();
       this.updateDrinkSpeedAnimated();
+
+      // Update hybrid level system display
+      this.updateHybridLevelDisplay();
     });
+  }
+
+  /**
+   * Update hybrid level system display
+   */
+  private updateHybridLevelDisplay(): void {
+    try {
+      const displayData = getDisplayData();
+      if (displayData) {
+        updateLevelUpDisplay(displayData);
+      }
+    } catch (error) {
+      logger.warn('Failed to update hybrid level display:', error);
+    }
   }
 
   /**

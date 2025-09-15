@@ -7449,6 +7449,59 @@ button {
   justify-content: center;
 }
 
+/* Environment system replaced by hybrid level system */
+
+/* Level Selector Button */
+.level-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(155, 89, 182, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 160px;
+  height: 48px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: white;
+}
+
+.level-btn:hover {
+  background: rgba(155, 89, 182, 0.2);
+  border-color: rgba(155, 89, 182, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+}
+
+.level-btn:active {
+  transform: translateY(0);
+  background: rgba(155, 89, 182, 0.3);
+}
+
+.level-icon {
+  font-size: 16px;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.level-label {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  transition: all 0.3s ease;
+  font-size: 10px;
+}
+
 .settings-cogwheel:hover .cogwheel-icon {
   transform: rotate(15deg);
   filter: drop-shadow(0 2px 8px rgba(255, 61, 2, 0.4));

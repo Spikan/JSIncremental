@@ -27,9 +27,16 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       if (now - lastDrinkTime < drinkRate) return;
 
       // Add full sips-per-drink (base + production) with Decimal support
-      const spdVal = toDecimal(
+      const baseSpdVal = toDecimal(
         state.spd ?? w.sipsPerDrink?.toNumber?.() ?? w.sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
       );
+
+      // Apply level bonuses from hybrid level system
+      const levelBonuses = w.App?.systems?.hybridLevel?.getCurrentLevelBonuses?.() || {
+        sipMultiplier: 1.0,
+        clickMultiplier: 1.0,
+      };
+      const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
 
       // Handle sips accumulation with Decimal arithmetic
       const currentSips = toDecimal(w.sips || 0);

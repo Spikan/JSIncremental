@@ -36,6 +36,8 @@ const BUTTON_CONFIG: {
     'splash-start-btn': { audio: 'click', feedback: 'info', className: 'splash-start-btn' },
     'audio-btn': { audio: 'click', feedback: 'info', className: 'audio-btn' },
     'settings-modal-btn': { audio: 'click', feedback: 'info', className: 'settings-modal-btn' },
+    // Environment system replaced by hybrid level system
+    'level-btn': { audio: 'click', feedback: 'info', className: 'level-btn' },
   },
   actions: {
     buyStraw: {
@@ -69,7 +71,55 @@ const BUTTON_CONFIG: {
       label: 'Buy Faster Drinks',
     },
     levelUp: {
-      func: () => (window as any).App?.systems?.purchases?.execute?.levelUp?.(),
+      func: () => {
+        // Use hybrid level system to unlock next level in sequence
+        const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
+          const currentLevel = hybridSystem.getCurrentLevel();
+          if (currentLevel) {
+            const allLevels = hybridSystem.getAllLevels();
+            const nextLevelId = currentLevel.id + 1;
+            const nextLevel = allLevels.find((level: any) => level.id === nextLevelId);
+
+            if (nextLevel) {
+              const state = (window as any).App?.state?.getState?.() || {};
+              const sips = state.sips || new Decimal(0);
+              const clicks = state.totalClicks || 0;
+              const currentLevelNum = state.level || 1;
+
+              const canUnlock =
+                sips.gte(nextLevel.unlockRequirement.sips) &&
+                clicks >= nextLevel.unlockRequirement.clicks &&
+                currentLevelNum >= (nextLevel.unlockRequirement.level || 1);
+
+              if (canUnlock) {
+                // Unlock the next level
+                if (hybridSystem.unlockLevel(nextLevel.id)) {
+                  // Switch to the new level
+                  hybridSystem.switchToLevel(nextLevel.id);
+
+                  // Show notification
+                  import('./level-selector')
+                    .then(({ levelSelector }) => {
+                      levelSelector.showUnlockNotification(nextLevel.id);
+                    })
+                    .catch(error => {
+                      console.warn('Failed to load level selector for notifications:', error);
+                    });
+
+                  // Update the display
+                  try {
+                    (window as any).App?.ui?.updateLevelUpDisplay?.(state);
+                    (window as any).App?.ui?.updateLevelText?.();
+                  } catch (error) {
+                    console.warn('Failed to update level display:', error);
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       type: 'level-up-btn',
       label: 'Level Up',
     },
@@ -356,6 +406,25 @@ const BUTTON_CONFIG: {
       },
       type: 'settings-modal-btn',
       label: 'Close Settings',
+    },
+    // Environment selector removed - replaced by level selector
+    openLevelSelector: {
+      func: () => {
+        try {
+          // Import and use the level selector
+          import('./level-selector')
+            .then(({ levelSelector }) => {
+              levelSelector.show();
+            })
+            .catch(error => {
+              console.warn('Failed to load level selector:', error);
+            });
+        } catch (error) {
+          console.warn('Failed to open level selector:', error);
+        }
+      },
+      type: 'level-btn',
+      label: 'Open Level Selector',
     },
     closeOfflineModal: {
       func: () => {

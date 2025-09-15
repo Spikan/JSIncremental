@@ -140,6 +140,13 @@ export function setupDirectSodaClickHandler(): () => void {
         ) {
           lastValues = { sips: currentSips, spd: currentSPD, level: currentLevel };
           debouncedUpdateTopBar();
+
+          // Update hybrid level system display
+          try {
+            updateAllDisplaysAnimated();
+          } catch (error) {
+            console.warn('Failed to call updateAllDisplaysAnimated:', error);
+          }
         }
       }
     } catch (error) {
@@ -413,7 +420,8 @@ export function initializeUI(): void {
     // Initialize mobile navigation features
     initializeMobileNavigation();
 
-    // Set up direct soda click handler as fallback - DISABLED (causing double clicks)
+    // Set up direct soda click handler as fallback
+    setupDirectSodaClickHandler();
   } catch (error) {
     reportUIError(error, 'initialize_ui_main', ErrorSeverity.CRITICAL);
   }
@@ -437,12 +445,14 @@ export function initializeUI(): void {
       const clickData = data as ClickSodaEventData;
       // Use enhanced animated displays for better visual experience
       try {
+        console.log('🔄 Main update: Calling updateAllDisplaysAnimated');
         updateAllDisplaysAnimated();
         updateClickValueDisplay();
         updateTopInfoBar(); // Update the header with new sips total
         checkUpgradeAffordabilityOptimized();
       } catch (error) {
         // Fallback to original system if enhanced displays fail
+        console.error('❌ Main update: Enhanced displays failed, using fallback:', error);
         logger.warn('Enhanced displays failed, using fallback:', error);
         updateAllDisplaysOptimized();
         updateClickValueDisplay();

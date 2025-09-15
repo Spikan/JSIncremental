@@ -74,7 +74,7 @@ export function checkUpgradeAffordability(): void {
   updateCostDisplay('widerStrawsCost', costs.widerStraws, canAfford(costs.widerStraws));
   updateCostDisplay('betterCupsCost', costs.betterCups, canAfford(costs.betterCups));
   updateCostDisplay('levelUpCost', costs.levelUp, canAfford(costs.levelUp));
-  updateCostDisplay('levelCost', costs.levelUp, canAfford(costs.levelUp));
+  // levelCost is now handled by hybrid level system - don't override it
 
   // Update unlock feature visibility and affordability
   try {

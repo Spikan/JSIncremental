@@ -19,6 +19,8 @@ import * as unlockPurchasesStatic from './core/systems/unlock-purchases.ts';
 import * as devStatic from './core/systems/dev.ts';
 import * as saveStatic from './core/systems/save-system.ts';
 import * as optionsStatic from './core/systems/options-system.ts';
+// Environment system replaced by hybrid level system
+import { hybridLevelSystem } from './core/systems/hybrid-level-system.ts';
 import { AppStorage as storageImpl } from './services/storage.ts';
 import './main.ts';
 
@@ -84,6 +86,7 @@ if (typeof window !== 'undefined') {
       audio: { button: {} },
       gameInit: {},
       drink: {},
+      hybridLevel: hybridLevelSystem,
     },
     ui: {},
     data: {},
@@ -227,6 +230,29 @@ try {
                           w.App?.ui?.updatePurchasedCounts?.();
                           w.App?.ui?.checkUpgradeAffordability?.();
                           w.App?.systems?.unlocks?.checkAllUnlocks?.();
+
+                          // Check for level unlocks
+                          try {
+                            const newlyUnlockedLevels =
+                              w.App?.systems?.hybridLevel?.checkForUnlocks?.();
+                            if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
+                              // Import and show notifications for newly unlocked levels
+                              import('./ui/level-selector')
+                                .then(({ levelSelector }) => {
+                                  newlyUnlockedLevels.forEach((levelId: number) => {
+                                    levelSelector.showUnlockNotification(levelId);
+                                  });
+                                })
+                                .catch(error => {
+                                  console.warn(
+                                    'Failed to load level selector for notifications:',
+                                    error
+                                  );
+                                });
+                            }
+                          } catch (error) {
+                            console.warn('Failed to check level unlocks:', error);
+                          }
                         } catch {}
                       },
                       updatePlayTime: () => {
@@ -309,6 +335,29 @@ try {
                             w.App?.ui?.updatePurchasedCounts?.();
                             w.App?.ui?.checkUpgradeAffordability?.();
                             w.App?.systems?.unlocks?.checkAllUnlocks?.();
+
+                            // Check for level unlocks
+                            try {
+                              const newlyUnlockedLevels =
+                                w.App?.systems?.hybridLevel?.checkForUnlocks?.();
+                              if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
+                                // Import and show notifications for newly unlocked levels
+                                import('./ui/level-selector')
+                                  .then(({ levelSelector }) => {
+                                    newlyUnlockedLevels.forEach((levelId: number) => {
+                                      levelSelector.showUnlockNotification(levelId);
+                                    });
+                                  })
+                                  .catch(error => {
+                                    console.warn(
+                                      'Failed to load level selector for notifications:',
+                                      error
+                                    );
+                                  });
+                              }
+                            } catch (error) {
+                              console.warn('Failed to check level unlocks:', error);
+                            }
                           } catch {}
                         },
                         updatePlayTime: () => {
