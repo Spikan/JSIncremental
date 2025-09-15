@@ -697,64 +697,59 @@ function updateLevelUpDisplay(state: any): void {
   const hybridSystem = (window as any).App?.systems?.hybridLevel;
 
   if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
-    const currentLevel = hybridSystem.getCurrentLevel();
-    if (currentLevel) {
-      // Show next level in sequence (not just unlockable)
-      const allLevels = hybridSystem.getAllLevels();
-      const nextLevelId = currentLevel.id + 1;
-      const nextLevel = allLevels.find((level: any) => level.id === nextLevelId);
+    // Get the next unlockable level (not just next sequential)
+    const nextLevel = hybridSystem.getNextUnlockableLevel();
 
-      if (nextLevel) {
-        const sips = state.sips || new Decimal(0);
-        const clicks = state.totalClicks || 0;
-        const currentLevelNum = state.level || 1;
+    if (nextLevel) {
+      const sips = state.sips || new Decimal(0);
+      const clicks = state.totalClicks || 0;
+      const currentLevelNum = state.level || 1;
 
-        const canUnlock =
-          sips.gte(nextLevel.unlockRequirement.sips) &&
-          clicks >= nextLevel.unlockRequirement.clicks &&
-          currentLevelNum >= (nextLevel.unlockRequirement.level || 1);
+      const canUnlock =
+        sips.gte(nextLevel.unlockRequirement.sips) &&
+        clicks >= nextLevel.unlockRequirement.clicks &&
+        currentLevelNum >= (nextLevel.unlockRequirement.level || 1);
 
-        // Update the level cost display with next level requirements
-        const levelCostEl = document.getElementById('levelCost');
-        const costCurrencyEl = document.querySelector('.cost-currency');
-        const levelUpLabelEl = document.querySelector('.level-up-label');
+      // Update the level cost display with next level requirements
+      const levelCostEl = document.getElementById('levelCost');
+      const costCurrencyEl = document.querySelector('.cost-currency');
+      const levelUpLabelEl = document.querySelector('.level-up-label');
 
-        if (levelCostEl) {
-          const sipsText =
-            typeof (window as any).prettify !== 'undefined'
-              ? (window as any).prettify(nextLevel.unlockRequirement.sips)
-              : nextLevel.unlockRequirement.sips.toLocaleString();
+      if (levelCostEl) {
+        const sipsText =
+          typeof (window as any).prettify !== 'undefined'
+            ? (window as any).prettify(nextLevel.unlockRequirement.sips)
+            : nextLevel.unlockRequirement.sips.toLocaleString();
 
-          // Update the cost display
-          levelCostEl.innerHTML = `
-          <div style="font-size: 12px; color: ${canUnlock ? '#2ecc71' : '#ffffff'}; text-align: center; line-height: 1.4; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-            <div style="font-weight: bold; margin-bottom: 6px; font-size: 14px; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.9);">Next: ${nextLevel.name}</div>
-            <div style="font-size: 12px; margin-bottom: 3px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${sipsText} Sips</div>
-            <div style="font-size: 12px; margin-bottom: 3px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${nextLevel.unlockRequirement.clicks.toLocaleString()} Clicks</div>
-            ${nextLevel.unlockRequirement.level ? `<div style="font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">Level ${nextLevel.unlockRequirement.level}</div>` : ''}
-          </div>
-        `;
-        }
-
-        // Update the currency label and level up label
-        if (costCurrencyEl) {
-          costCurrencyEl.textContent = '';
-        }
-        if (levelUpLabelEl) {
-          levelUpLabelEl.textContent = 'Level Up';
-        }
-
-        // Update clickable level box state
-        const levelBox = document.querySelector('.level-box-clickable');
-        if (levelBox) {
-          if (canUnlock) {
-            levelBox.classList.remove('disabled');
-          } else {
-            levelBox.classList.add('disabled');
-          }
-        }
-        return;
+        // Update the cost display
+        levelCostEl.innerHTML = `
+        <div style="font-size: 12px; color: ${canUnlock ? '#2ecc71' : '#ffffff'}; text-align: center; line-height: 1.4; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+          <div style="font-weight: bold; margin-bottom: 6px; font-size: 14px; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.9);">Next: ${nextLevel.name}</div>
+          <div style="font-size: 12px; margin-bottom: 3px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${sipsText} Sips</div>
+          <div style="font-size: 12px; margin-bottom: 3px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${nextLevel.unlockRequirement.clicks.toLocaleString()} Clicks</div>
+          ${nextLevel.unlockRequirement.level ? `<div style="font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">Level ${nextLevel.unlockRequirement.level}</div>` : ''}
+        </div>
+      `;
       }
+
+      // Update the currency label and level up label
+      if (costCurrencyEl) {
+        costCurrencyEl.textContent = '';
+      }
+      if (levelUpLabelEl) {
+        levelUpLabelEl.textContent = 'Level Up';
+      }
+
+      // Update clickable level box state
+      const levelBox = document.querySelector('.level-box-clickable');
+      if (levelBox) {
+        if (canUnlock) {
+          levelBox.classList.remove('disabled');
+        } else {
+          levelBox.classList.add('disabled');
+        }
+      }
+      return;
     }
   }
 

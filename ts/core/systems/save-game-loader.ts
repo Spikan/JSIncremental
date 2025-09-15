@@ -382,7 +382,7 @@ export class SaveGameLoader {
     try {
       if (savegame.hybridLevelData) {
         const { currentLevel, unlockedLevels } = savegame.hybridLevelData;
-        
+
         // Load current level
         if (typeof currentLevel === 'number' && currentLevel >= 1) {
           try {
@@ -398,7 +398,7 @@ export class SaveGameLoader {
           try {
             // Ensure level 1 is always unlocked
             const levelsToUnlock = [...new Set([1, ...unlockedLevels])];
-            
+
             // Unlock each level
             levelsToUnlock.forEach(levelId => {
               try {
@@ -407,7 +407,7 @@ export class SaveGameLoader {
                 console.warn(`Failed to unlock level ${levelId}:`, error);
               }
             });
-            
+
             console.log('✅ Hybrid level system unlocked levels loaded:', levelsToUnlock);
           } catch (error) {
             console.warn('Failed to load hybrid level system unlocked levels:', error);
