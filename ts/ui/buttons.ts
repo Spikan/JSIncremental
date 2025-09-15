@@ -72,31 +72,45 @@ const BUTTON_CONFIG: {
     },
     levelUp: {
       func: () => {
+        console.log('🎮 Level Up button clicked!');
         // Use hybrid level system to unlock next level in sequence
         const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        console.log('🔍 Hybrid system available:', !!hybridSystem);
+        
         if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
           const currentLevel = hybridSystem.getCurrentLevel();
+          console.log('📍 Current level:', currentLevel);
+          
           if (currentLevel) {
             const allLevels = hybridSystem.getAllLevels();
             const nextLevelId = currentLevel.id + 1;
             const nextLevel = allLevels.find((level: any) => level.id === nextLevelId);
+            console.log('🎯 Next level:', nextLevel);
 
             if (nextLevel) {
               const state = (window as any).App?.state?.getState?.() || {};
               const sips = state.sips || new Decimal(0);
               const clicks = state.totalClicks || 0;
               const currentLevelNum = state.level || 1;
+              
+              console.log('📊 Current stats:', { sips: sips.toString(), clicks, currentLevelNum });
+              console.log('📋 Next level requirements:', nextLevel.unlockRequirement);
 
               const canUnlock =
                 sips.gte(nextLevel.unlockRequirement.sips) &&
                 clicks >= nextLevel.unlockRequirement.clicks &&
                 currentLevelNum >= (nextLevel.unlockRequirement.level || 1);
+              
+              console.log('✅ Can unlock:', canUnlock);
 
               if (canUnlock) {
+                console.log('🔓 Attempting to unlock level:', nextLevel.id);
                 // Unlock the next level
                 if (hybridSystem.unlockLevel(nextLevel.id)) {
+                  console.log('✅ Level unlocked successfully!');
                   // Switch to the new level
                   hybridSystem.switchToLevel(nextLevel.id);
+                  console.log('🔄 Switched to level:', nextLevel.id);
 
                   // Show notification
                   import('./level-selector')
@@ -111,13 +125,24 @@ const BUTTON_CONFIG: {
                   try {
                     (window as any).App?.ui?.updateLevelUpDisplay?.(state);
                     (window as any).App?.ui?.updateLevelText?.();
+                    console.log('🔄 Display updated');
                   } catch (error) {
                     console.warn('Failed to update level display:', error);
                   }
+                } else {
+                  console.log('❌ Failed to unlock level');
                 }
+              } else {
+                console.log('❌ Cannot unlock - requirements not met');
               }
+            } else {
+              console.log('❌ No next level found');
             }
+          } else {
+            console.log('❌ No current level found');
           }
+        } else {
+          console.log('❌ Hybrid system not available');
         }
       },
       type: 'level-up-btn',
