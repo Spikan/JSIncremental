@@ -94,12 +94,8 @@ if (typeof window !== 'undefined') {
   };
 }
 
-// Apply initial theme from hybrid level system
-try {
-  hybridLevelSystem.applyInitialTheme();
-} catch (error) {
-  console.warn('Failed to apply initial theme:', error);
-}
+// Initial theme will be applied by save system after loading game state
+// This prevents theme conflicts during initialization
 
 __pushDiag({ type: 'index', stage: 'app-created' });
 

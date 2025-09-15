@@ -17,7 +17,6 @@ export interface SaveGameData {
   criticalClicks?: number | string | any;
   criticalClickUpCounter?: number | string | any;
   suctionClickBonus?: number | string | any;
-  level?: number | string | any;
   totalClicks?: number | string | any;
   gameStartDate?: number | string | any;
   lastClickTime?: number | string | any;
@@ -209,23 +208,8 @@ export class SaveGameLoader {
    */
   private loadLevelAndProgress(savegame: SaveGameData): void {
     try {
-      if (typeof savegame.level !== 'undefined') {
-        const levelValue = this.parseDecimalValue(savegame.level, 1);
-        // Level should always be at least 1 and convert to number for compatibility
-        const levelNum =
-          typeof levelValue === 'number'
-            ? Math.max(1, levelValue)
-            : Math.max(1, levelValue.toNumber());
-        getStoreActions().setLevel(levelNum);
-        (window as any).level = new (window as any).Decimal(levelNum);
-
-        try {
-          (window as any).App?.stateBridge?.setLevel(levelNum);
-        } catch (error) {
-          console.warn('Failed to set level via bridge:', error);
-        }
-      }
-
+      // Level is now handled by hybrid level system, skip old level loading
+      // Only load totalClicks for progress tracking
       if (typeof savegame.totalClicks !== 'undefined') {
         const totalClicksValue = this.parseDecimalValue(savegame.totalClicks);
         getStoreActions().setTotalClicks(totalClicksValue);
@@ -389,10 +373,10 @@ export class SaveGameLoader {
             // Ensure level 1 is always unlocked
             const levelsToUnlock = [...new Set([1, ...unlockedLevels])];
 
-            // Unlock each level
+            // Unlock each level silently (no notifications during save loading)
             levelsToUnlock.forEach(levelId => {
               try {
-                (window as any).App?.systems?.hybridLevel?.unlockLevel?.(levelId);
+                (window as any).App?.systems?.hybridLevel?.unlockLevel?.(levelId, true);
               } catch (error) {
                 console.warn(`Failed to unlock level ${levelId}:`, error);
               }
@@ -408,23 +392,43 @@ export class SaveGameLoader {
         if (typeof currentLevel === 'number' && currentLevel >= 1) {
           try {
             const hybridSystem = (window as any).App?.systems?.hybridLevel;
+            console.log('🔍 Loading hybrid level data:', {
+              currentLevel,
+              hybridSystem: !!hybridSystem,
+            });
+
             if (hybridSystem && hybridSystem.isLevelUnlocked(currentLevel)) {
+              console.log('✅ Level is unlocked, switching to level:', currentLevel);
               hybridSystem.switchToLevel(currentLevel);
+              // Ensure theme is applied after switching
+              console.log('🎨 Applying theme for loaded level...');
+              hybridSystem.applyInitialTheme();
               console.log('✅ Hybrid level system current level loaded:', currentLevel);
             } else {
               // If the saved level isn't unlocked, default to level 1 (The Beach)
               console.log('⚠️ Saved level not unlocked, defaulting to level 1 (The Beach)');
               hybridSystem?.switchToLevel(1);
+              console.log('🎨 Applying theme for default level...');
+              hybridSystem?.applyInitialTheme();
             }
           } catch (error) {
             console.warn('Failed to set hybrid level system current level:', error);
             // Fallback to level 1
             try {
               (window as any).App?.systems?.hybridLevel?.switchToLevel?.(1);
+              (window as any).App?.systems?.hybridLevel?.applyInitialTheme?.();
             } catch (fallbackError) {
               console.warn('Failed to set fallback level 1:', fallbackError);
             }
           }
+        }
+      } else {
+        // No hybrid level data in save, apply default theme
+        console.log('🎨 No hybrid level data in save, applying default theme');
+        try {
+          (window as any).App?.systems?.hybridLevel?.applyInitialTheme?.();
+        } catch (error) {
+          console.warn('Failed to apply default theme:', error);
         }
       }
     } catch (error) {

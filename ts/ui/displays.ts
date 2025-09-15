@@ -431,15 +431,23 @@ export function updateLevelNumber(): void {
   const levelEl: any = domQuery.getById('levelNumber');
   if (levelEl) {
     try {
-      const displayData = getDisplayData();
-      const level = safeToNumberOrDecimal(displayData.level || 1);
-      const levelNum =
-        typeof level === 'number'
-          ? level
-          : Math.abs(level.toNumber()) < 1e15
-            ? level.toNumber()
-            : 1;
-      levelEl.innerHTML = String(levelNum);
+      // Use hybrid level system as single source of truth
+      const hybridSystem = (window as any).App?.systems?.hybridLevel;
+      if (hybridSystem && typeof hybridSystem.getCurrentLevelId === 'function') {
+        const levelId = hybridSystem.getCurrentLevelId();
+        levelEl.innerHTML = String(levelId);
+      } else {
+        // Fallback to old system if hybrid system not available
+        const displayData = getDisplayData();
+        const level = safeToNumberOrDecimal(displayData.level || 1);
+        const levelNum =
+          typeof level === 'number'
+            ? level
+            : Math.abs(level.toNumber()) < 1e15
+              ? level.toNumber()
+              : 1;
+        levelEl.innerHTML = String(levelNum);
+      }
     } catch (error) {
       console.warn('Failed to update display:', error);
     }
@@ -451,14 +459,14 @@ export function updateLevelText(): void {
   const levelTextEl: any = domQuery.getById('levelText');
   if (levelTextEl) {
     try {
-      // Use hybrid level system as primary
+      // Use hybrid level system as single source of truth
       const hybridSystem = (window as any).App?.systems?.hybridLevel;
       let levelText = 'Level 1: The Beach';
 
       if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
         const currentLevel = hybridSystem.getCurrentLevel();
         if (currentLevel) {
-          levelText = `${currentLevel.name}`;
+          levelText = `Level ${currentLevel.id}: ${currentLevel.name}`;
         }
       }
 

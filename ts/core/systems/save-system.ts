@@ -42,8 +42,7 @@ export function performSaveSnapshot(): any {
       lastSaveTime: Date.now(),
       totalPlayTime: Number(state.totalPlayTime || 0),
       totalClicks: Number(state.totalClicks || w.totalClicks || 0),
-      level: String(state.level || w.level || 1),
-      // Save hybrid level system data
+      // Save hybrid level system data (single source of truth for levels)
       hybridLevelData: {
         currentLevel: w.App?.systems?.hybridLevel?.getCurrentLevelId?.() || 1,
         unlockedLevels: w.App?.systems?.hybridLevel?.getUnlockedLevelIds?.() || [1],

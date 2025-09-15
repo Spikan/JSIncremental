@@ -312,12 +312,14 @@ export const VIVIAN_CLARK_LEVELS: HybridLevel[] = [
 export class HybridLevelSystem {
   private currentLevel: number = 1;
   private unlockedLevels: Set<number> = new Set([1]);
+  private isInitialized: boolean = false;
   // private completedLevels: Set<number> = new Set(); // Future feature
 
   constructor() {
     console.log('🏗️ Initializing HybridLevelSystem...');
     this.loadUnlockedLevels();
     this.loadCurrentLevel();
+    this.isInitialized = true;
     console.log('🏗️ HybridLevelSystem initialized:', {
       currentLevel: this.currentLevel,
       unlockedLevels: Array.from(this.unlockedLevels),
@@ -425,8 +427,18 @@ export class HybridLevelSystem {
     return sipsMet && clicksMet && levelMet;
   }
 
-  unlockLevel(levelId: number): boolean {
-    console.log(`🔓 Attempting to unlock level ${levelId}...`);
+  unlockLevel(levelId: number, silent: boolean = false): boolean {
+    if (!silent) {
+      console.log(`🔓 Attempting to unlock level ${levelId}...`);
+    }
+
+    // For silent unlocks (like during save loading), just add to unlocked set
+    if (silent) {
+      this.unlockedLevels.add(levelId);
+      this.saveUnlockedLevels();
+      return true;
+    }
+
     if (this.canUnlockLevel(levelId)) {
       console.log(`✅ Unlocking level ${levelId}`);
       this.unlockedLevels.add(levelId);
@@ -442,23 +454,21 @@ export class HybridLevelSystem {
   }
 
   switchToLevel(levelId: number): boolean {
+    console.log('🔄 switchToLevel called with levelId:', levelId);
+    console.log('🔄 Current unlocked levels:', Array.from(this.unlockedLevels));
+
     if (this.unlockedLevels.has(levelId)) {
+      console.log('✅ Level is unlocked, switching to:', levelId);
       this.currentLevel = levelId;
       this.saveCurrentLevel();
-      this.applyLevelTheme();
 
-      // Update the old level system to keep it in sync
-      try {
-        const app: any = (window as any).App;
-        if (app?.state?.setState) {
-          app.state.setState({ level: levelId });
-        }
-      } catch (error) {
-        console.warn('Failed to update old level system:', error);
-      }
+      console.log('🎨 Applying theme for level:', levelId);
+      this.applyLevelTheme();
 
       // this.playLevelAudio(); // Audio removed
       return true;
+    } else {
+      console.log('❌ Level not unlocked:', levelId);
     }
     return false;
   }
@@ -471,6 +481,7 @@ export class HybridLevelSystem {
     }
 
     console.log('🎨 Applying theme for level:', level.id, level.name, level.visualTheme);
+    console.log('🎨 Current body background before theme:', document.body.style.background);
 
     // Apply visual theme
     const root = document.documentElement;
@@ -617,11 +628,22 @@ export class HybridLevelSystem {
 
   // Check for new level unlocks
   checkForUnlocks(): number[] {
+    console.log('🔍 checkForUnlocks called, isInitialized:', this.isInitialized);
+
+    // Don't trigger notifications during initial load
+    if (!this.isInitialized) {
+      console.log('⏸️ Skipping unlock check during initialization');
+      return [];
+    }
+
     const newlyUnlocked: number[] = [];
     const state = (window as any).App?.state?.getState?.() || {};
     const sips = state.sips || new Decimal(0);
     const clicks = state.totalClicks || 0;
-    const currentLevel = state.level || 1;
+    // Use hybrid system's current level instead of old system's level
+    const currentLevel = this.currentLevel;
+
+    console.log('🔍 Checking unlocks with state:', { sips: sips.toString(), clicks, currentLevel });
 
     this.getAllLevels().forEach(level => {
       if (!this.unlockedLevels.has(level.id)) {
@@ -632,6 +654,7 @@ export class HybridLevelSystem {
         const levelMet = currentLevel >= (level.unlockRequirement.level || 1);
 
         if (sipsMet && clicksMet && levelMet) {
+          console.log('🎉 Unlocking level:', level.id, level.name);
           this.unlockedLevels.add(level.id);
           newlyUnlocked.push(level.id);
         }
@@ -639,6 +662,7 @@ export class HybridLevelSystem {
     });
 
     if (newlyUnlocked.length > 0) {
+      console.log('💾 Saving newly unlocked levels:', newlyUnlocked);
       this.saveUnlockedLevels();
     }
 
