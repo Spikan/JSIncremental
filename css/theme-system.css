@@ -1,0 +1,120 @@
+/* Theme System CSS - Clean theming without !important overrides */
+
+/* Root theme variables - these will be set by JavaScript */
+:root {
+  --theme-bg: var(--level-bg-color, #001789);
+  --theme-accent: var(--level-accent-color, #00d97f);
+  --theme-text: var(--level-text-color, #ffffff);
+  --theme-border: var(--level-border-color, #00d97f);
+}
+
+/* Theme-aware base styles with higher specificity */
+.game-content .suction-btn,
+.game-content .upgrade-polygon,
+.game-content .upgrade-card,
+.game-content .upgrade-btn,
+body .game-content .suction-btn,
+body .game-content .upgrade-polygon,
+body .game-content .upgrade-card,
+body .game-content .upgrade-btn {
+  background: var(--theme-bg) !important;
+  border-color: var(--theme-accent) !important;
+  color: var(--theme-accent) !important;
+  background-image: none !important;
+}
+
+.game-content .suction-btn:hover,
+.game-content .upgrade-polygon:hover,
+.game-content .upgrade-btn:hover,
+body .game-content .suction-btn:hover,
+body .game-content .upgrade-polygon:hover,
+body .game-content .upgrade-btn:hover {
+  background: var(--theme-accent) !important;
+  color: var(--theme-bg) !important;
+  background-image: none !important;
+}
+
+/* Shop and sidebar theming */
+.game-content .game-sidebar,
+.game-content .sidebar-content,
+.game-content .sidebar-header {
+  background: var(--theme-bg) !important;
+  border-color: var(--theme-accent) !important;
+  color: var(--theme-accent) !important;
+}
+
+/* Upgrade card theming */
+.game-content .upgrade-card {
+  background: var(--theme-bg) !important;
+  border-color: var(--theme-accent) !important;
+  color: var(--theme-accent) !important;
+}
+
+.game-content .upgrade-card .upgrade-header,
+.game-content .upgrade-card .upgrade-info,
+.game-content .upgrade-card .upgrade-stats {
+  color: var(--theme-accent) !important;
+}
+
+/* Suction button container theming */
+.game-content .suction-button-container {
+  background: var(--theme-bg) !important;
+  border-color: var(--theme-accent) !important;
+  color: var(--theme-accent) !important;
+}
+
+/* Progress bar theming */
+.game-content .progress-bar-main {
+  border-color: var(--theme-accent) !important;
+}
+
+.game-content .progress-fill-main {
+  background: var(--theme-accent) !important;
+}
+
+.game-content .countdown-minimal {
+  color: var(--theme-accent) !important;
+}
+
+/* Affordability states - these should override theme when needed */
+.game-content .upgrade-btn.affordable,
+.game-content .suction-btn.affordable {
+  background: #00ff88 !important;
+  color: #000000 !important;
+  border-color: #00ff88 !important;
+}
+
+.game-content .upgrade-btn.unaffordable,
+.game-content .suction-btn.unaffordable {
+  background: var(--theme-bg) !important;
+  color: var(--theme-accent) !important;
+  border-color: var(--theme-accent) !important;
+  opacity: 0.6;
+}
+
+.game-content .upgrade-btn.disabled,
+.game-content .suction-btn.disabled {
+  background: #666666 !important;
+  color: #999999 !important;
+  border-color: #444444 !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Level-specific theming overrides */
+.game-content[data-level='1'] {
+  --theme-bg: #001789;
+  --theme-accent: #00d97f;
+}
+
+.game-content[data-level='2'] {
+  --theme-bg: #2d5016;
+  --theme-accent: #4ade80;
+}
+
+.game-content[data-level='3'] {
+  --theme-bg: #7c2d12;
+  --theme-accent: #f97316;
+}
+
+/* Add more level-specific themes as needed */

@@ -83,6 +83,16 @@ export function checkUpgradeAffordability(): void {
   } catch (error) {
     console.warn('Failed to update feature visibility in affordability check:', error);
   }
+
+  // Apply level themes after affordability states are updated
+  try {
+    const hybridSystem = (window as any).App?.systems?.hybridLevel;
+    if (hybridSystem && typeof hybridSystem.applyCurrentLevelTheme === 'function') {
+      hybridSystem.applyCurrentLevelTheme();
+    }
+  } catch (error) {
+    console.warn('Failed to apply level theme after affordability update:', error);
+  }
 }
 
 // Update shop button states based on current affordability

@@ -18,21 +18,21 @@ function analyzeCSS(css) {
     cssVariables: [],
     duplicateValues: {},
     unusedVariables: [],
-    optimizationOpportunities: []
+    optimizationOpportunities: [],
   };
-  
+
   // Find all media queries
   const mediaRegex = /@media\s*\(([^)]+)\)\s*\{/g;
   let match;
   while ((match = mediaRegex.exec(css)) !== null) {
     analysis.mediaQueries.push(match[1].trim());
   }
-  
+
   // Find all CSS variables
   const variableRegex = /--[a-zA-Z0-9-]+:\s*[^;]+;/g;
   const variables = css.match(variableRegex) || [];
   analysis.cssVariables = variables.map(v => v.trim());
-  
+
   // Find duplicate values
   const colorRegex = /#[0-9a-fA-F]{3,6}/g;
   const colors = css.match(colorRegex) || [];
@@ -40,13 +40,13 @@ function analyzeCSS(css) {
   colors.forEach(color => {
     colorCounts[color] = (colorCounts[color] || 0) + 1;
   });
-  
+
   Object.entries(colorCounts).forEach(([color, count]) => {
     if (count > 3) {
       analysis.duplicateValues[color] = count;
     }
   });
-  
+
   // Find font-size duplicates
   const fontSizeRegex = /font-size:\s*([0-9.]+rem)/g;
   const fontSizes = css.match(fontSizeRegex) || [];
@@ -55,13 +55,13 @@ function analyzeCSS(css) {
     const value = size.match(/([0-9.]+rem)/)[1];
     fontSizeCounts[value] = (fontSizeCounts[value] || 0) + 1;
   });
-  
+
   Object.entries(fontSizeCounts).forEach(([size, count]) => {
     if (count > 2) {
       analysis.duplicateValues[size] = count;
     }
   });
-  
+
   // Find padding/margin duplicates
   const spacingRegex = /(padding|margin):\s*([0-9.]+rem)/g;
   const spacing = css.match(spacingRegex) || [];
@@ -70,13 +70,13 @@ function analyzeCSS(css) {
     const value = space.match(/([0-9.]+rem)/)[1];
     spacingCounts[value] = (spacingCounts[value] || 0) + 1;
   });
-  
+
   Object.entries(spacingCounts).forEach(([space, count]) => {
     if (count > 3) {
       analysis.duplicateValues[space] = count;
     }
   });
-  
+
   // Check for unused variables
   analysis.cssVariables.forEach(variable => {
     const varName = variable.split(':')[0].trim();
@@ -86,20 +86,23 @@ function analyzeCSS(css) {
       analysis.unusedVariables.push(varName);
     }
   });
-  
+
   // Calculate optimization opportunities
-  const totalDuplicates = Object.values(analysis.duplicateValues).reduce((sum, count) => sum + count, 0);
+  const totalDuplicates = Object.values(analysis.duplicateValues).reduce(
+    (sum, count) => sum + count,
+    0
+  );
   const unusedVarCount = analysis.unusedVariables.length;
   const mediaQueryCount = analysis.mediaQueries.length;
-  
+
   analysis.optimizationOpportunities = [
     `Remove ${unusedVarCount} unused CSS variables`,
     `Consolidate ${mediaQueryCount} media queries`,
     `Replace ${totalDuplicates} duplicate values with variables`,
     `Remove redundant CSS rules`,
-    `Optimize selector specificity`
+    `Optimize selector specificity`,
   ];
-  
+
   return analysis;
 }
 
@@ -129,13 +132,19 @@ analysis.optimizationOpportunities.forEach(opportunity => {
 // Calculate potential savings
 const estimatedSavings = {
   unusedVariables: analysis.unusedVariables.length * 50, // ~50 chars per variable
-  duplicateValues: Object.values(analysis.duplicateValues).reduce((sum, count) => sum + (count - 1) * 20, 0), // ~20 chars per duplicate
+  duplicateValues: Object.values(analysis.duplicateValues).reduce(
+    (sum, count) => sum + (count - 1) * 20,
+    0
+  ), // ~20 chars per duplicate
   mediaQueryConsolidation: analysis.mediaQueries.length * 30, // ~30 chars per media query
-  whitespaceOptimization: analysis.totalCharacters * 0.05 // 5% from whitespace
+  whitespaceOptimization: analysis.totalCharacters * 0.05, // 5% from whitespace
 };
 
-const totalEstimatedSavings = Object.values(estimatedSavings).reduce((sum, savings) => sum + savings, 0);
-const percentageSavings = (totalEstimatedSavings / analysis.totalCharacters * 100).toFixed(1);
+const totalEstimatedSavings = Object.values(estimatedSavings).reduce(
+  (sum, savings) => sum + savings,
+  0
+);
+const percentageSavings = ((totalEstimatedSavings / analysis.totalCharacters) * 100).toFixed(1);
 
 console.log('\nEstimated optimization potential:');
 console.log(`Unused variables: ${estimatedSavings.unusedVariables} characters`);

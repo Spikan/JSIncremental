@@ -7,6 +7,8 @@
     <meta name="description" content="Soda Clicker Pro" />
     <meta name="author" content="Spikan" />
     <link rel="stylesheet" type="text/css" href="css/style-header-fixed.css" />
+    <link rel="stylesheet" type="text/css" href="css/soda-drinker-header-v2.css" />
+    <link rel="stylesheet" type="text/css" href="css/theme-system.css" />
     <link rel="icon" type="image/png" href="images/regSoda.png" />
     <!-- Ensure Decimal/Zod are available before any modules execute (prod places module in head) -->
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
@@ -310,108 +312,83 @@
     </div>
     <!-- Main Game Content -->
     <div id="gameContent" class="game-content mobile-content-padding" style="display: none">
-                        <!-- Consolidated Game Header -->
-      <div class="game-header">
-        <div class="level-indicator">
-          <!-- Unified Level Control -->
-          <div class="unified-level-control">
-            <div class="current-level-section">
-              <span class="current-level-name" id="currentLevelName">The Beach (Level 1)</span>
-              <button
-                class="switch-dropdown-btn"
-                data-action="toggleLevelDropdown"
-                aria-label="Switch Level"
-              >
-                Switch ▼
-              </button>
-            </div>
-            <div class="next-level-section">
-              <div class="next-level-name" id="nextLevelName">Next: The Park (Level 2)</div>
-              <div class="requirements" id="levelRequirements">100 sips, 25 clicks</div>
-              <button class="unlock-btn" data-action="unlockLevel" aria-label="Unlock Next Level">
-                Unlock Level
-              </button>
-            </div>
-            <div class="level-dropdown" id="levelDropdown" style="display: none">
-              <!-- Populated dynamically with unlocked levels -->
-            </div>
-          </div>
-          <button class="settings-cogwheel" data-action="openSettings" aria-label="Open Settings">
-            <span class="cogwheel-icon">⚙️</span>
-          </button>
-          <!-- Mobile Menu Button in Header -->
-          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">
-            <span class="hamburger-icon">☰</span>
-          </button>
+      <!-- Consolidated Game Header -->
+      <!-- Soda Drinker Pro Thematic Header -->
+      <div class="soda-drinker-header" id="sodaDrinkerHeader">
+        <!-- Low-Poly Background Elements -->
+        <div class="header-polygon-bg">
+          <div class="polygon-shape polygon-1"></div>
+          <div class="polygon-shape polygon-2"></div>
+          <div class="polygon-shape polygon-3"></div>
+          <div class="polygon-shape polygon-4"></div>
         </div>
+
+        <!-- Main Header Content -->
         <div class="header-main-content">
-          <div class="currency-display-compact">
-            <div class="currency-primary">
-              <div class="currency-icon">💧</div>
-              <div class="currency-value" id="topSipValue">0</div>
-              <div class="currency-label">Sips</div>
-            </div>
-            <div class="currency-secondary">
-              <div class="currency-item-compact">
-                <span class="currency-label-small">Per Drink:</span>
-                <span class="currency-value-small" id="topSipsPerDrink">1</span>
+          <!-- Left: Level Display -->
+          <div class="level-display-section">
+            <div class="level-polygon-container">
+              <div class="level-polygon" id="levelPolygon">
+                <span class="level-number" id="levelNumber">1</span>
               </div>
-              <div class="currency-item-compact">
-                <span class="currency-label-small">Per Sec:</span>
-                <span class="currency-value-small" id="topSipsPerSecond">1</span>
+              <div class="level-info-minimal">
+                <div class="level-name-minimal" id="currentLevelName">THE BEACH</div>
+                <div class="level-progress-minimal">
+                  <div class="progress-bar-minimal" id="levelProgressBar">
+                    <div class="progress-fill-minimal" id="levelProgressFill"></div>
+                  </div>
+                </div>
+                <div class="unlock-requirements" id="unlockRequirements">
+                  <div class="requirement-text">Next: 100 sips, 25 clicks</div>
+                </div>
               </div>
             </div>
           </div>
-          <!-- Compact Drink Progress Bar -->
-          <div class="header-drink-progress-compact">
-            <div class="drink-progress-row">
-              <div class="drink-progress-info-compact">
-                <span class="drink-label-small">Next:</span>
-                <span class="drink-countdown" id="drinkCountdown">5.0s</span>
+
+          <!-- Center: Currency Display -->
+          <div class="currency-display-section">
+            <div class="currency-polygon-main">
+              <div class="currency-icon-polygon">💧</div>
+              <div class="currency-value-main" id="topSipValue">0</div>
+              <div class="currency-label-main">SIPS</div>
+            </div>
+            <div class="secondary-stats-minimal">
+              <div class="stat-polygon" id="sipsPerDrinkStat">
+                <span class="stat-value" id="topSipsPerDrink">1</span>
+                <span class="stat-label">/DRINK</span>
               </div>
-              <div class="drink-progress-bar-compact">
-                <div class="drink-progress-fill" id="drinkProgressFill"></div>
+              <div class="stat-polygon" id="sipsPerSecondStat">
+                <span class="stat-value" id="topSipsPerSecond">1</span>
+                <span class="stat-label">/SEC</span>
               </div>
-              <button
-                class="faster-drinks-btn-compact"
-                data-action="buyFasterDrinks"
-                title="Faster Drinks"
-              >
-                <span class="faster-drinks-icon">⚡</span>
-                <span class="faster-drinks-speed" id="currentDrinkSpeed">5.00s</span>
+            </div>
+          </div>
+
+          <!-- Right: Controls -->
+          <div class="controls-section">
+            <button class="control-polygon" data-action="openSettings" aria-label="Open Settings">
+              <span class="control-icon">⚙</span>
+            </button>
+            <button class="control-polygon" id="mobileMenuToggle" aria-label="Toggle Menu">
+              <span class="control-icon">☰</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+          <div class="progress-container-minimal">
+            <div class="progress-bar-main" id="drinkProgressBar">
+              <div class="progress-fill-main" id="drinkProgressFill"></div>
+            </div>
+            <div class="progress-info-minimal">
+              <span class="countdown-minimal" id="drinkCountdown">5.0s</span>
+              <button class="upgrade-polygon" data-action="buyFasterDrinks" title="Faster Drinks">
+                <span class="upgrade-icon">⚡</span>
+                <span class="upgrade-text" id="currentDrinkSpeed">5.00s</span>
               </button>
             </div>
           </div>
-        </div>
-        <div class="game-title">
-          <div class="title-main">SODA CLICKER</div>
-          <div class="title-sub">PRO</div>
-        </div>
-      </div>
-          <!-- Compact Drink Progress Bar -->
-          <div class="header-drink-progress-compact">
-            <div class="drink-progress-row">
-              <div class="drink-progress-info-compact">
-                <span class="drink-label-small">Next:</span>
-                <span class="drink-countdown" id="drinkCountdown">5.0s</span>
-              </div>
-              <div class="drink-progress-bar-compact">
-                <div class="drink-progress-fill" id="drinkProgressFill"></div>
-              </div>
-              <button
-                class="faster-drinks-btn-compact"
-                data-action="buyFasterDrinks"
-                title="Faster Drinks"
-              >
-                <span class="faster-drinks-icon">⚡</span>
-                <span class="faster-drinks-speed" id="currentDrinkSpeed">5.00s</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="game-title">
-          <div class="title-main">SODA CLICKER</div>
-          <div class="title-sub">PRO</div>
         </div>
       </div>
       <!-- Main Game Content -->
@@ -588,6 +565,15 @@
           </button>
           <button
             class="settings-tab-btn"
+            data-tab="levels"
+            data-action="switchSettingsTab"
+            data-args="levels"
+          >
+            <span class="tab-icon">🎮</span>
+            <span class="tab-label">Levels</span>
+          </button>
+          <button
+            class="settings-tab-btn"
             data-tab="statistics"
             data-action="switchSettingsTab"
             data-args="statistics"
@@ -680,6 +666,31 @@
               <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
                 🔧 Dev Tools OFF
               </button>
+            </div>
+          </div>
+          <!-- Levels Tab Content -->
+          <div class="settings-tab-content" id="levels-tab">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Level Selection</h4>
+              <div class="level-selector-container">
+                <div class="current-level-display">
+                  <div class="current-level-info">
+                    <span class="current-level-name" id="settingsCurrentLevelName">The Beach</span>
+                    <span class="current-level-number"
+                      >Level <span id="settingsCurrentLevelNumber">1</span></span
+                    >
+                  </div>
+                </div>
+                <div class="level-list" id="settingsLevelList">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+            </div>
+            <div class="settings-group">
+              <h4 class="settings-group-title">Level Requirements</h4>
+              <div class="level-requirements-display" id="settingsLevelRequirements">
+                <!-- Populated dynamically -->
+              </div>
             </div>
           </div>
           <!-- Statistics Tab Content -->

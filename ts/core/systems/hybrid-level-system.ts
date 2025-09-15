@@ -9,7 +9,6 @@ export interface HybridLevel {
   unlockRequirement: {
     sips: number;
     clicks: number;
-    level?: number; // Required level in our system
   };
   bonuses: {
     sipMultiplier: number;
@@ -39,7 +38,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'The Beach',
     description: 'Sip soda by the seaside with waves crashing in the background',
     category: 'main',
-    unlockRequirement: { sips: 0, clicks: 0, level: 1 },
+    unlockRequirement: { sips: 0, clicks: 0 },
     bonuses: { sipMultiplier: 1.0, clickMultiplier: 1.0 },
     visualTheme: {
       backgroundColor: '#87CEEB',
@@ -56,7 +55,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'The Park',
     description: 'Enjoy nature while drinking soda among trees and benches',
     category: 'main',
-    unlockRequirement: { sips: 100, clicks: 25, level: 1 },
+    unlockRequirement: { sips: 100, clicks: 25 },
     bonuses: { sipMultiplier: 1.1, clickMultiplier: 1.0 },
     visualTheme: {
       backgroundColor: '#90EE90',
@@ -73,7 +72,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Weird Room',
     description: 'A strange, surreal space where reality bends',
     category: 'main',
-    unlockRequirement: { sips: 250, clicks: 50, level: 2 },
+    unlockRequirement: { sips: 250, clicks: 50 },
     bonuses: { sipMultiplier: 1.2, clickMultiplier: 1.1 },
     visualTheme: {
       backgroundColor: '#DDA0DD',
@@ -90,7 +89,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'in SPACE',
     description: 'Zero-gravity soda drinking among the stars',
     category: 'main',
-    unlockRequirement: { sips: 500, clicks: 100, level: 3 },
+    unlockRequirement: { sips: 500, clicks: 100 },
     bonuses: { sipMultiplier: 1.5, clickMultiplier: 1.2, specialEffect: 'floating' },
     visualTheme: {
       backgroundColor: '#000080',
@@ -107,7 +106,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'In a Castle',
     description: 'Medieval soda drinking in a grand castle',
     category: 'main',
-    unlockRequirement: { sips: 1000, clicks: 200, level: 4 },
+    unlockRequirement: { sips: 1000, clicks: 200 },
     bonuses: { sipMultiplier: 1.3, clickMultiplier: 1.1 },
     visualTheme: {
       backgroundColor: '#8B4513',
@@ -124,7 +123,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Inside a Mouth',
     description: 'A surreal journey inside a giant mouth',
     category: 'main',
-    unlockRequirement: { sips: 2000, clicks: 400, level: 5 },
+    unlockRequirement: { sips: 2000, clicks: 400 },
     bonuses: { sipMultiplier: 1.4, clickMultiplier: 1.3 },
     visualTheme: {
       backgroundColor: '#FFB6C1',
@@ -141,7 +140,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Before a convention',
     description: 'Corporate soda drinking before a big event',
     category: 'main',
-    unlockRequirement: { sips: 4000, clicks: 800, level: 6 },
+    unlockRequirement: { sips: 4000, clicks: 800 },
     bonuses: { sipMultiplier: 1.2, clickMultiplier: 1.1 },
     visualTheme: {
       backgroundColor: '#708090',
@@ -158,7 +157,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Empty Pool',
     description: 'Soda drinking in an empty swimming pool',
     category: 'main',
-    unlockRequirement: { sips: 8000, clicks: 1600, level: 7 },
+    unlockRequirement: { sips: 8000, clicks: 1600 },
     bonuses: { sipMultiplier: 1.3, clickMultiplier: 1.2 },
     visualTheme: {
       backgroundColor: '#00CED1',
@@ -175,7 +174,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Dark Woods',
     description: 'Mysterious forest with eerie atmosphere',
     category: 'main',
-    unlockRequirement: { sips: 16000, clicks: 3200, level: 8 },
+    unlockRequirement: { sips: 16000, clicks: 3200 },
     bonuses: { sipMultiplier: 1.6, clickMultiplier: 1.4 },
     visualTheme: {
       backgroundColor: '#2F4F2F',
@@ -192,7 +191,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'County Fair',
     description: 'Carnival atmosphere with rides and games',
     category: 'main',
-    unlockRequirement: { sips: 32000, clicks: 6400, level: 9 },
+    unlockRequirement: { sips: 32000, clicks: 6400 },
     bonuses: { sipMultiplier: 1.4, clickMultiplier: 1.3 },
     visualTheme: {
       backgroundColor: '#FF6347',
@@ -215,7 +214,7 @@ export const BONUS_LEVELS: HybridLevel[] = [
     name: 'An outdoor wedding',
     description: 'Celebrate with soda at a beautiful outdoor wedding',
     category: 'bonus',
-    unlockRequirement: { sips: 100000, clicks: 20000, level: 10 },
+    unlockRequirement: { sips: 100000, clicks: 20000 },
     bonuses: { sipMultiplier: 2.0, clickMultiplier: 1.8 },
     visualTheme: {
       backgroundColor: '#FFB6C1',
@@ -232,7 +231,7 @@ export const BONUS_LEVELS: HybridLevel[] = [
     name: 'Hall of faces',
     description: 'A surreal gallery of faces watching you drink',
     category: 'bonus',
-    unlockRequirement: { sips: 200000, clicks: 40000, level: 15 },
+    unlockRequirement: { sips: 200000, clicks: 40000 },
     bonuses: { sipMultiplier: 2.5, clickMultiplier: 2.0 },
     visualTheme: {
       backgroundColor: '#2F2F2F',
@@ -254,7 +253,7 @@ export const HISTORICAL_LEVELS: HybridLevel[] = [
     name: 'in ancient times',
     description: 'Travel back to ancient civilizations',
     category: 'historical',
-    unlockRequirement: { sips: 500000, clicks: 100000, level: 20 },
+    unlockRequirement: { sips: 500000, clicks: 100000 },
     bonuses: { sipMultiplier: 3.0, clickMultiplier: 2.5 },
     visualTheme: {
       backgroundColor: '#8B4513',
@@ -271,7 +270,7 @@ export const HISTORICAL_LEVELS: HybridLevel[] = [
     name: 'The roaring 20s',
     description: 'Experience the jazz age with soda',
     category: 'historical',
-    unlockRequirement: { sips: 1000000, clicks: 200000, level: 25 },
+    unlockRequirement: { sips: 1000000, clicks: 200000 },
     bonuses: { sipMultiplier: 3.5, clickMultiplier: 3.0 },
     visualTheme: {
       backgroundColor: '#8B0000',
@@ -293,7 +292,7 @@ export const VIVIAN_CLARK_LEVELS: HybridLevel[] = [
     name: 'Vivian Clark Title',
     description: 'Enter the mysterious world of Vivian Clark',
     category: 'vivian',
-    unlockRequirement: { sips: 10000000, clicks: 2000000, level: 30 },
+    unlockRequirement: { sips: 10000000, clicks: 2000000 },
     bonuses: { sipMultiplier: 5.0, clickMultiplier: 4.0, specialEffect: 'vivian_mode' },
     visualTheme: {
       backgroundColor: '#000000',
@@ -319,6 +318,9 @@ export class HybridLevelSystem {
     this.loadUnlockedLevels();
     this.loadCurrentLevel();
     this.isInitialized = true;
+
+    // Expose force theme application for debugging
+    (window as any).forceThemeApplication = () => this.forceThemeApplication();
   }
 
   getAllLevels(): HybridLevel[] {
@@ -382,15 +384,12 @@ export class HybridLevelSystem {
     const state = (window as any).App?.state?.getState?.() || {};
     const sips = state.sips || new Decimal(0);
     const clicks = state.totalClicks || 0;
-    const currentLevelNum = state.level || 1;
 
     // Find the next level that can be unlocked
     for (const level of allLevels) {
       if (!this.unlockedLevels.has(level.id)) {
         const canUnlock =
-          sips.gte(level.unlockRequirement.sips) &&
-          clicks >= level.unlockRequirement.clicks &&
-          currentLevelNum >= (level.unlockRequirement.level || 1);
+          sips.gte(level.unlockRequirement.sips) && clicks >= level.unlockRequirement.clicks;
         if (canUnlock) {
           return level;
         }
@@ -416,16 +415,13 @@ export class HybridLevelSystem {
     const state = (window as any).App?.state?.getState?.() || {};
     const sips = state.sips || new Decimal(0);
     const clicks = state.totalClicks || 0;
-    // Use hybrid system's current level instead of old system's level
-    const currentHybridLevel = this.currentLevel;
 
     const sipsMet = sips.gte
       ? sips.gte(level.unlockRequirement.sips)
       : Number(sips) >= level.unlockRequirement.sips;
     const clicksMet = clicks >= level.unlockRequirement.clicks;
-    const levelMet = currentHybridLevel >= (level.unlockRequirement.level || 1);
 
-    return sipsMet && clicksMet && levelMet;
+    return sipsMet && clicksMet;
   }
 
   unlockLevel(levelId: number, silent: boolean = false): boolean {
@@ -461,6 +457,9 @@ export class HybridLevelSystem {
       return;
     }
 
+    // Apply global theme variables
+    this.applyGlobalTheme(level);
+
     // Apply visual theme
     const root = document.documentElement;
     root.style.setProperty('--level-bg-color', level.visualTheme.backgroundColor);
@@ -477,6 +476,267 @@ export class HybridLevelSystem {
 
     // Add level-specific particles
     this.addLevelParticles(level);
+  }
+
+  /**
+   * Apply theme to root element for global theming
+   */
+  private applyGlobalTheme(level: HybridLevel): void {
+    const root = document.documentElement;
+    const gameContent = document.querySelector('.game-content') as HTMLElement;
+
+    // Set global theme variables
+    root.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
+    root.style.setProperty('--theme-accent', level.visualTheme.accentColor);
+    root.style.setProperty('--theme-text', '#ffffff');
+    root.style.setProperty('--theme-border', level.visualTheme.accentColor);
+
+    // Set level-specific data attribute for CSS targeting
+    if (gameContent) {
+      gameContent.setAttribute('data-level', level.id.toString());
+    }
+
+    // Debug: Check if suction button exists and apply theme directly
+    const suctionBtn = document.querySelector('.suction-btn') as HTMLElement;
+    if (suctionBtn) {
+      console.log('🎨 Suction button found, applying theme directly');
+      suctionBtn.style.setProperty('background', level.visualTheme.backgroundColor, 'important');
+      suctionBtn.style.setProperty('border-color', level.visualTheme.accentColor, 'important');
+      suctionBtn.style.setProperty('color', level.visualTheme.accentColor, 'important');
+      suctionBtn.style.setProperty('background-image', 'none', 'important');
+    } else {
+      console.log('🎨 Suction button not found');
+    }
+
+    console.log('🎨 Applied global theme for level:', level.name, {
+      bg: level.visualTheme.backgroundColor,
+      accent: level.visualTheme.accentColor,
+    });
+  }
+
+  /**
+   * Apply level theme to all UI elements
+   */
+  private applyThemeToUIElements(level: HybridLevel): void {
+    // Apply theme to shop elements
+    this.applyThemeToShopElements(level);
+
+    // Apply theme to upgrade elements
+    this.applyThemeToUpgradeElements(level);
+
+    // Apply theme to stat elements
+    this.applyThemeToStatElements(level);
+
+    // Apply theme to button elements
+    this.applyThemeToButtonElements(level);
+
+    // Apply theme to modal and tab elements
+    this.applyThemeToModalElements(level);
+
+    // Apply theme to main game content
+    this.applyThemeToMainGameElements(level);
+  }
+
+  /**
+   * Public method to apply current level theme (called from affordability system)
+   */
+  public applyCurrentLevelTheme(): void {
+    const currentLevel = this.getCurrentLevel();
+    if (currentLevel) {
+      console.log('🎨 Applying current level theme:', currentLevel.name);
+      this.applyThemeToUIElements(currentLevel);
+    }
+  }
+
+  /**
+   * Force theme application (for debugging and manual calls)
+   */
+  public forceThemeApplication(): void {
+    console.log('🎨 Force applying theme...');
+    this.applyCurrentLevelTheme();
+
+    // Also force apply to specific problematic elements
+    const currentLevel = this.getCurrentLevel();
+    if (currentLevel) {
+      this.forceApplyToProblematicElements(currentLevel);
+    }
+  }
+
+  /**
+   * Force apply theme to problematic elements that might not be caught by CSS
+   */
+  private forceApplyToProblematicElements(level: HybridLevel): void {
+    const problematicSelectors = [
+      '.suction-btn',
+      '.upgrade-polygon',
+      '.upgrade-card',
+      '.upgrade-btn',
+      '.suction-button-container',
+    ];
+
+    problematicSelectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(element => {
+        const el = element as HTMLElement;
+        el.style.setProperty('background', level.visualTheme.backgroundColor, 'important');
+        el.style.setProperty('border-color', level.visualTheme.accentColor, 'important');
+        el.style.setProperty('color', level.visualTheme.accentColor, 'important');
+        el.style.setProperty('background-image', 'none', 'important');
+      });
+    });
+
+    console.log('🎨 Force applied theme to problematic elements');
+  }
+
+  /**
+   * Apply theme to shop elements
+   */
+  private applyThemeToShopElements(level: HybridLevel): void {
+    const shopElements = document.querySelectorAll(
+      '.shop-btn, .upgrade-btn, .suction-btn, .upgrade-card, .upgrade-polygon, .suction-button-container, .game-sidebar, .sidebar-content, .sidebar-header, .upgrade-header, .upgrade-info, .upgrade-stats, .upgrade-name, .upgrade-description, .upgrade-cost, .upgrade-owned, .upgrade-effect, .suction-info, .suction-name, .suction-cost, .suction-effect, .click-power-display, .click-power-label, .click-power-value, .suction-bonus, .upgrade-icon, .suction-icon'
+    );
+
+    console.log('🎨 Applying theme to shop elements:', shopElements.length, 'elements found');
+    console.log('🎨 Theme colors:', {
+      bg: level.visualTheme.backgroundColor,
+      accent: level.visualTheme.accentColor,
+    });
+
+    shopElements.forEach((element, index) => {
+      const el = element as HTMLElement;
+      const isAffordable = el.classList.contains('affordable');
+      const isUnaffordable = el.classList.contains('unaffordable');
+      const isDisabled = el.classList.contains('disabled');
+
+      console.log(`🎨 Element ${index}:`, el.className, {
+        isAffordable,
+        isUnaffordable,
+        isDisabled,
+      });
+
+      // Set theme variables - CSS will handle the actual styling
+      el.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
+      el.style.setProperty('--theme-accent', level.visualTheme.accentColor);
+      el.style.setProperty('--theme-text', '#ffffff');
+      el.style.setProperty('--theme-border', level.visualTheme.accentColor);
+
+      console.log(`🎨 Element ${index}: Set theme variables for`, el.className);
+    });
+  }
+
+  /**
+   * Apply theme to upgrade elements
+   */
+  private applyThemeToUpgradeElements(level: HybridLevel): void {
+    const upgradeElements = document.querySelectorAll(
+      '.upgrade-card, .upgrade-btn, .suction-btn, .upgrade-polygon, .suction-button-container, .upgrade-header, .upgrade-info, .upgrade-stats'
+    );
+
+    upgradeElements.forEach(element => {
+      const el = element as HTMLElement;
+
+      // Set theme variables - CSS will handle the actual styling
+      el.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
+      el.style.setProperty('--theme-accent', level.visualTheme.accentColor);
+      el.style.setProperty('--theme-text', '#ffffff');
+      el.style.setProperty('--theme-border', level.visualTheme.accentColor);
+    });
+  }
+
+  /**
+   * Apply theme to stat elements
+   */
+  private applyThemeToStatElements(level: HybridLevel): void {
+    const statElements = document.querySelectorAll('.stat, .stat-value, .stat-label');
+
+    statElements.forEach(element => {
+      const el = element as HTMLElement;
+      el.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
+      el.style.setProperty('--theme-accent', level.visualTheme.accentColor);
+      el.style.color = level.visualTheme.accentColor;
+    });
+  }
+
+  /**
+   * Apply theme to button elements
+   */
+  private applyThemeToButtonElements(level: HybridLevel): void {
+    const buttonElements = document.querySelectorAll('button, .button, .btn');
+
+    buttonElements.forEach(element => {
+      const el = element as HTMLElement;
+
+      // Set theme variables - CSS will handle the actual styling
+      el.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
+      el.style.setProperty('--theme-accent', level.visualTheme.accentColor);
+      el.style.setProperty('--theme-text', '#ffffff');
+      el.style.setProperty('--theme-border', level.visualTheme.accentColor);
+    });
+  }
+
+  /**
+   * Apply theme to modal and tab elements
+   */
+  private applyThemeToModalElements(level: HybridLevel): void {
+    const modalElements = document.querySelectorAll(
+      '.settings-modal, .settings-modal-content, .settings-tab-btn, .settings-tab-content, .level-item, .level-selector-container'
+    );
+
+    modalElements.forEach(element => {
+      const el = element as HTMLElement;
+
+      // Set theme variables
+      el.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
+      el.style.setProperty('--theme-accent', level.visualTheme.accentColor);
+
+      // Apply theme colors to modal elements
+      if (
+        el.classList.contains('settings-modal') ||
+        el.classList.contains('settings-modal-content')
+      ) {
+        el.style.borderColor = level.visualTheme.accentColor;
+      }
+
+      if (el.classList.contains('settings-tab-btn')) {
+        el.style.borderColor = level.visualTheme.accentColor;
+        el.style.color = level.visualTheme.accentColor;
+      }
+
+      if (el.classList.contains('level-item') && !el.classList.contains('locked')) {
+        el.style.borderColor = level.visualTheme.accentColor;
+        el.style.color = level.visualTheme.accentColor;
+      }
+    });
+  }
+
+  /**
+   * Apply theme to main game content elements
+   */
+  private applyThemeToMainGameElements(level: HybridLevel): void {
+    const mainGameElements = document.querySelectorAll(
+      '.main-game-content, .main-content-area, .soda-main-section, .soda-container, .click-indicator, .progress-bar-main, .progress-fill-main, .progress-info-minimal, .countdown-minimal'
+    );
+
+    mainGameElements.forEach(element => {
+      const el = element as HTMLElement;
+
+      // Set theme variables
+      el.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
+      el.style.setProperty('--theme-accent', level.visualTheme.accentColor);
+
+      // Apply theme colors to specific elements
+      if (el.classList.contains('progress-bar-main')) {
+        el.style.borderColor = level.visualTheme.accentColor;
+      }
+
+      if (el.classList.contains('progress-fill-main')) {
+        el.style.backgroundColor = level.visualTheme.accentColor;
+      }
+
+      if (el.classList.contains('countdown-minimal')) {
+        el.style.color = level.visualTheme.accentColor;
+      }
+    });
   }
 
   // Audio integration removed to keep bundle size manageable
@@ -582,8 +842,6 @@ export class HybridLevelSystem {
     const state = (window as any).App?.state?.getState?.() || {};
     const sips = state.sips || new Decimal(0);
     const clicks = state.totalClicks || 0;
-    // Use hybrid system's current level instead of old system's level
-    const currentLevel = this.currentLevel;
 
     this.getAllLevels().forEach(level => {
       if (!this.unlockedLevels.has(level.id)) {
@@ -591,9 +849,8 @@ export class HybridLevelSystem {
           ? sips.gte(level.unlockRequirement.sips)
           : Number(sips) >= level.unlockRequirement.sips;
         const clicksMet = clicks >= level.unlockRequirement.clicks;
-        const levelMet = currentLevel >= (level.unlockRequirement.level || 1);
 
-        if (sipsMet && clicksMet && levelMet) {
+        if (sipsMet && clicksMet) {
           this.unlockedLevels.add(level.id);
           newlyUnlocked.push(level.id);
         }
@@ -611,6 +868,15 @@ export class HybridLevelSystem {
   getLevelBonuses(): { sipMultiplier: number; clickMultiplier: number; specialEffect?: string } {
     const level = this.getCurrentLevel();
     return level?.bonuses || { sipMultiplier: 1.0, clickMultiplier: 1.0 };
+  }
+
+  // Alias for compatibility
+  getCurrentLevelBonuses(): {
+    sipMultiplier: number;
+    clickMultiplier: number;
+    specialEffect?: string;
+  } {
+    return this.getLevelBonuses();
   }
 
   // Get level text for display

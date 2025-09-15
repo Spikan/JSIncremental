@@ -581,6 +581,8 @@ const BUTTON_CONFIG: {
     switchSettingsTab: {
       func: (tabName: string) => {
         try {
+          console.log('🔄 Switching to settings tab:', tabName);
+
           // Remove active class from all tabs and content
           const allTabs = document.querySelectorAll('.settings-tab-btn');
           const allContent = document.querySelectorAll('.settings-tab-content');
@@ -592,8 +594,13 @@ const BUTTON_CONFIG: {
           const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
           const selectedContent = document.getElementById(`${tabName}-tab`);
 
+          console.log('🎯 Selected tab element:', selectedTab);
+          console.log('🎯 Selected content element:', selectedContent);
+
           if (selectedTab) selectedTab.classList.add('active');
           if (selectedContent) selectedContent.classList.add('active');
+
+          console.log('✅ Settings tab switched successfully');
         } catch (error) {
           console.warn('Failed to switch settings tab:', error);
         }

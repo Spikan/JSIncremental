@@ -307,6 +307,18 @@ export function deleteSave() {
       console.warn('Failed to reset unlocks after save deletion:', error);
     }
 
+    // Reset hybrid level system
+    try {
+      const hybridSystem = (window as any).App?.systems?.hybridLevel;
+      if (hybridSystem) {
+        // Reset to level 1 with only level 1 unlocked
+        hybridSystem.restoreState(1, [1]);
+        console.log('✅ Hybrid level system reset to level 1');
+      }
+    } catch (error) {
+      console.warn('Failed to reset hybrid level system after save deletion:', error);
+    }
+
     // Reset game state
     resetGameState();
 

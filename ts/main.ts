@@ -49,6 +49,7 @@ import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
 import { processOfflineProgression } from './core/systems/offline-progression';
 import { showOfflineModal } from './ui/offline-modal';
 import { sidebarNavigation } from './ui/sidebar-navigation';
+import { sodaDrinkerHeaderService } from './services/soda-drinker-header-service';
 // DecimalOps removed - no longer using toSafeNumber
 
 // Export for potential use
@@ -342,6 +343,21 @@ function initGame() {
       console.log('Sidebar navigation initialized:', sidebarNavigation);
     } catch (error) {
       console.warn('Failed to initialize sidebar navigation:', error);
+    }
+
+    // Initialize Soda Drinker Pro header
+    try {
+      console.log('Initializing Soda Drinker Pro header...');
+      sodaDrinkerHeaderService
+        .initialize()
+        .then(() => {
+          console.log('Soda Drinker Pro header initialized');
+        })
+        .catch(error => {
+          console.warn('Failed to initialize Soda Drinker Pro header:', error);
+        });
+    } catch (error) {
+      console.warn('Failed to initialize Soda Drinker Pro header:', error);
     }
 
     try {

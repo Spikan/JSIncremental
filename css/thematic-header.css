@@ -1,0 +1,844 @@
+/* Thematic Header CSS: Immersive soda-themed header effects */
+/* This file contains all the CSS for the new thematic header design */
+
+/* CSS Custom Properties for Thematic Effects */
+:root {
+  /* Liquid Colors */
+  --liquid-primary: #00d97f;
+  --liquid-secondary: #00b366;
+  --liquid-accent: #00ff88;
+  --liquid-shadow: rgba(0, 217, 127, 0.3);
+  --liquid-glow: rgba(0, 217, 127, 0.6);
+
+  /* Bubble Colors */
+  --bubble-primary: rgba(255, 255, 255, 0.9);
+  --bubble-secondary: rgba(0, 217, 127, 0.7);
+  --bubble-accent: rgba(0, 255, 136, 0.5);
+  --bubble-highlight: rgba(255, 255, 255, 0.8);
+
+  /* Animation Timings */
+  --liquid-flow-duration: 2s;
+  --bubble-float-duration: 3s;
+  --particle-lifetime: 4s;
+  --ripple-duration: 0.3s;
+
+  /* Performance Levels */
+  --particle-density: 1;
+  --animation-complexity: 1;
+  --effect-intensity: 1;
+
+  /* Spacing and Sizing */
+  --header-height: 120px;
+  --bubble-size: 50px;
+  --control-size: 50px;
+}
+
+/* Main Header Container */
+.thematic-header {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 23, 137, 0.4) 50%,
+    rgba(0, 0, 0, 0.95) 100%
+  );
+  backdrop-filter: blur(15px);
+  border-bottom: 3px solid var(--liquid-primary);
+  padding: 1rem 1.25rem;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 0.75rem;
+  overflow: hidden;
+  min-height: var(--header-height);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Background Effects Layer */
+.header-background-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bubble-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  z-index: 1;
+}
+
+.liquid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    var(--liquid-shadow) 25%,
+    transparent 50%,
+    var(--liquid-shadow) 75%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  animation: liquidFlow var(--liquid-flow-duration) ease-in-out infinite;
+  opacity: 0.3;
+  z-index: 2;
+}
+
+@keyframes liquidFlow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Content Layer */
+.header-content-layer {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* Left Section: Level Badge */
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.thematic-level-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(0, 217, 127, 0.1);
+  border: 2px solid var(--liquid-primary);
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.thematic-level-badge:hover {
+  background: rgba(0, 217, 127, 0.2);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 8px 25px var(--liquid-shadow);
+}
+
+.level-bubble-container {
+  position: relative;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+}
+
+.level-bubble {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--bubble-primary) 0%,
+    var(--bubble-secondary) 70%,
+    var(--bubble-accent) 100%
+  );
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bubbleFloat var(--bubble-float-duration) ease-in-out infinite;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.level-bubble::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  width: 30%;
+  height: 30%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+@keyframes bubbleFloat {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.05);
+  }
+}
+
+.level-number {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #000;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  z-index: 1;
+}
+
+.level-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 120px;
+}
+
+.level-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--liquid-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.level-progress-liquid {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--liquid-primary);
+}
+
+.level-progress-liquid .liquid-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--liquid-primary) 0%,
+    var(--liquid-secondary) 50%,
+    var(--liquid-accent) 100%
+  );
+  width: var(--liquid-progress, 0%);
+  transition: width 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Center Section: Currency Display */
+.header-center {
+  display: flex;
+  justify-content: center;
+}
+
+.currency-display-thematic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.primary-currency-bubble {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--bubble-primary) 0%,
+    var(--bubble-secondary) 70%,
+    var(--bubble-accent) 100%
+  );
+  border-radius: 25px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.3);
+  animation: currencyPulse 3s ease-in-out infinite;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-currency-bubble::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.primary-currency-bubble:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes currencyPulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 16px var(--liquid-shadow);
+  }
+}
+
+.currency-icon-liquid {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  animation: iconFloat 2s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.currency-value-floating {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #000;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  animation: valueGlow 2s ease-in-out infinite;
+}
+
+@keyframes valueGlow {
+  0%,
+  100% {
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 1px 2px rgba(255, 255, 255, 0.8),
+      0 0 10px var(--liquid-glow);
+  }
+}
+
+.currency-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #000;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.secondary-metrics-bubbles {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.metric-bubble {
+  background: rgba(0, 217, 127, 0.2);
+  border: 1px solid var(--liquid-primary);
+  border-radius: 15px;
+  padding: 0.4rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.metric-bubble:hover {
+  background: rgba(0, 217, 127, 0.3);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.metric-value {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--liquid-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.metric-label {
+  font-size: 0.7rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Right Section: Controls */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.thematic-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.settings-bubble,
+.mobile-menu-bubble {
+  width: var(--control-size);
+  height: var(--control-size);
+  border: none;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--bubble-primary) 0%,
+    var(--bubble-secondary) 70%,
+    var(--bubble-accent) 100%
+  );
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-bubble::before,
+.mobile-menu-bubble::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 30%;
+  height: 30%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.settings-bubble:hover,
+.mobile-menu-bubble:hover {
+  transform: translateY(-2px) scale(1.1);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.bubble-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  z-index: 1;
+  position: relative;
+}
+
+/* Progress Bar Layer */
+.header-progress-layer {
+  position: relative;
+  z-index: 3;
+}
+
+.drink-progress-thematic {
+  width: 100%;
+}
+
+.progress-liquid-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  padding: 0.75rem 1rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--liquid-primary);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.liquid-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--liquid-primary);
+  position: relative;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.liquid-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--liquid-primary) 0%,
+    var(--liquid-secondary) 50%,
+    var(--liquid-accent) 100%
+  );
+  width: var(--liquid-progress, 0%);
+  transition: width 0.5s ease;
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.liquid-bubbles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.progress-info-floating {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 120px;
+}
+
+.countdown-liquid {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--liquid-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  animation: countdownPulse 1s ease-in-out infinite;
+}
+
+@keyframes countdownPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.faster-drinks-bubble {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--bubble-primary) 0%,
+    var(--bubble-secondary) 70%,
+    var(--bubble-accent) 100%
+  );
+  border: none;
+  border-radius: 15px;
+  padding: 0.4rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.faster-drinks-bubble::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.faster-drinks-bubble:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.drink-speed-text {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #000;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  z-index: 1;
+  position: relative;
+}
+
+/* Performance Mode Adjustments */
+.thematic-header.performance-low {
+  --particle-density: 0.3;
+  --animation-complexity: 0.5;
+  --effect-intensity: 0.7;
+}
+
+.thematic-header.performance-low .bubble-canvas {
+  display: none;
+}
+
+.thematic-header.performance-low .liquid-overlay {
+  animation: none;
+}
+
+.thematic-header.performance-low .level-bubble {
+  animation: none;
+}
+
+.thematic-header.performance-low .primary-currency-bubble {
+  animation: none;
+}
+
+.thematic-header.performance-low .currency-icon-liquid {
+  animation: none;
+}
+
+.thematic-header.performance-low .currency-value-floating {
+  animation: none;
+}
+
+.thematic-header.performance-medium {
+  --particle-density: 0.6;
+  --animation-complexity: 0.7;
+  --effect-intensity: 0.8;
+}
+
+.thematic-header.performance-medium .liquid-overlay {
+  animation-duration: 4s;
+}
+
+.thematic-header.performance-medium .level-bubble {
+  animation-duration: 4s;
+}
+
+.thematic-header.performance-medium .primary-currency-bubble {
+  animation-duration: 4s;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .thematic-header {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    text-align: center;
+    padding: 0.625rem 0.875rem;
+    min-height: auto;
+  }
+
+  .header-content-layer {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .thematic-level-badge {
+    justify-content: center;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .level-bubble-container {
+    width: 40px;
+    height: 40px;
+  }
+
+  .level-number {
+    font-size: 1rem;
+  }
+
+  .primary-currency-bubble {
+    padding: 0.75rem 1rem;
+  }
+
+  .currency-value-floating {
+    font-size: 1.5rem;
+  }
+
+  .secondary-metrics-bubbles {
+    justify-content: center;
+  }
+
+  .thematic-controls {
+    justify-content: center;
+  }
+
+  .settings-bubble,
+  .mobile-menu-bubble {
+    width: 40px;
+    height: 40px;
+  }
+
+  .progress-liquid-container {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .progress-info-floating {
+    justify-content: center;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .thematic-header {
+    padding: 0.4rem 0.625rem;
+    gap: 0.2rem;
+  }
+
+  .thematic-level-badge {
+    padding: 0.3rem 0.6rem;
+    gap: 0.5rem;
+  }
+
+  .level-bubble-container {
+    width: 35px;
+    height: 35px;
+  }
+
+  .level-number {
+    font-size: 0.9rem;
+  }
+
+  .level-name {
+    font-size: 0.8rem;
+  }
+
+  .primary-currency-bubble {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .currency-value-floating {
+    font-size: 1.3rem;
+  }
+
+  .currency-label {
+    font-size: 0.7rem;
+  }
+
+  .metric-bubble {
+    padding: 0.3rem 0.6rem;
+  }
+
+  .metric-value {
+    font-size: 0.8rem;
+  }
+
+  .metric-label {
+    font-size: 0.6rem;
+  }
+
+  .settings-bubble,
+  .mobile-menu-bubble {
+    width: 35px;
+    height: 35px;
+  }
+
+  .bubble-icon {
+    font-size: 1rem;
+  }
+
+  .liquid-progress-bar {
+    height: 6px;
+  }
+
+  .countdown-liquid {
+    font-size: 0.8rem;
+  }
+
+  .faster-drinks-bubble {
+    padding: 0.3rem 0.6rem;
+  }
+
+  .drink-speed-text {
+    font-size: 0.7rem;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .thematic-header * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .liquid-overlay {
+    animation: none;
+  }
+
+  .level-bubble {
+    animation: none;
+  }
+
+  .primary-currency-bubble {
+    animation: none;
+  }
+
+  .currency-icon-liquid {
+    animation: none;
+  }
+
+  .currency-value-floating {
+    animation: none;
+  }
+
+  .countdown-liquid {
+    animation: none;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .thematic-header {
+    border-bottom: 3px solid #ffffff;
+  }
+
+  .thematic-level-badge {
+    border: 2px solid #ffffff;
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .primary-currency-bubble {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .metric-bubble {
+    border: 1px solid #ffffff;
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .settings-bubble,
+  .mobile-menu-bubble {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .liquid-progress-bar {
+    border: 1px solid #ffffff;
+  }
+
+  .liquid-fill {
+    background: #ffffff;
+  }
+}

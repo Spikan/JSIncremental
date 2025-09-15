@@ -254,7 +254,7 @@ export class LevelSelector {
             <div style="margin-bottom: 2px;">
               ${level.unlockRequirement.clicks.toLocaleString()} Clicks
             </div>
-            ${level.unlockRequirement.level ? `<div style="font-size: 9px;">Level ${level.unlockRequirement.level}</div>` : ''}
+            ${(level.unlockRequirement as any).level ? `<div style="font-size: 9px;">Level ${(level.unlockRequirement as any).level}</div>` : ''}
           </div>
         </div>
       `
