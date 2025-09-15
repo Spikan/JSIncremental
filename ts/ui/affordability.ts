@@ -9,6 +9,8 @@ import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { updateButtonState, updateCostDisplay } from './utils';
 import { toDecimal, gte } from '../core/numbers/simplified';
 import { NumericValue, CostResult } from '../types/app-types';
+import { useGameStore } from '../core/state/zustand-store';
+import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
 import {
   nextStrawCost,
   nextCupCost,
@@ -38,7 +40,7 @@ export function checkUpgradeAffordability(): void {
 
   getUpgradesAndConfig();
 
-  const rawSipsLarge = toDecimal((window as any).App?.state?.getState?.()?.sips || 0);
+  const rawSipsLarge = toDecimal(useGameStore.getState().sips || 0);
   const currentSipsLarge = rawSipsLarge;
 
   // Function to check affordability using Decimal comparison
@@ -79,14 +81,14 @@ export function checkUpgradeAffordability(): void {
 
   // Update unlock feature visibility and affordability
   try {
-    (window as any).App?.systems?.unlocks?.updateFeatureVisibility?.();
+    // Modernized - feature visibility handled by store
   } catch (error) {
     console.warn('Failed to update feature visibility in affordability check:', error);
   }
 
   // Apply level themes after affordability states are updated
   try {
-    const hybridSystem = (window as any).App?.systems?.hybridLevel;
+    const hybridSystem = hybridLevelSystem;
     if (hybridSystem && typeof hybridSystem.applyCurrentLevelTheme === 'function') {
       hybridSystem.applyCurrentLevelTheme();
     }
@@ -108,17 +110,17 @@ function calculateAllCosts(): CostResult {
   // Use the new improved cost calculation functions
   const strawBaseCost = toDecimal(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
   const strawScaling = toDecimal(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
-  const strawCount = toDecimal((window as any).App?.state?.getState?.()?.straws || 0);
+  const strawCount = toDecimal(useGameStore.getState().straws || 0);
   costs.straw = nextStrawCost(strawCount, strawBaseCost, strawScaling);
 
   const cupBaseCost = toDecimal(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
   const cupScaling = toDecimal(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
-  const cupCount = toDecimal((window as any).App?.state?.getState?.()?.cups || 0);
+  const cupCount = toDecimal(useGameStore.getState().cups || 0);
   costs.cup = nextCupCost(cupCount, cupBaseCost, cupScaling);
 
   const suctionBaseCost = toDecimal(dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40);
   const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
-  const suctionCount = toDecimal((window as any).App?.state?.getState?.()?.suctions || 0);
+  const suctionCount = toDecimal(useGameStore.getState().suctions || 0);
   costs.suction = suctionBaseCost.multiply(suctionScaling.pow(suctionCount));
 
   const fasterDrinksBaseCost = toDecimal(
@@ -127,7 +129,7 @@ function calculateAllCosts(): CostResult {
   const fasterDrinksScaling = toDecimal(
     dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.1
   );
-  const fasterDrinksCount = toDecimal((window as any).App?.state?.getState?.()?.fasterDrinks || 0);
+  const fasterDrinksCount = toDecimal(useGameStore.getState().fasterDrinks || 0);
   costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksCount));
 
   const widerStrawsBaseCost = toDecimal(
@@ -136,7 +138,7 @@ function calculateAllCosts(): CostResult {
   const widerStrawsScaling = toDecimal(
     dataUp?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING ?? 1.2
   );
-  const widerStrawsCount = toDecimal((window as any).App?.state?.getState?.()?.widerStraws || 0);
+  const widerStrawsCount = toDecimal(useGameStore.getState().widerStraws || 0);
   costs.widerStraws = nextWiderStrawsCost(
     widerStrawsCount,
     widerStrawsBaseCost,
@@ -149,12 +151,12 @@ function calculateAllCosts(): CostResult {
   const betterCupsScaling = toDecimal(
     dataUp?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.25
   );
-  const betterCupsCount = toDecimal((window as any).App?.state?.getState?.()?.betterCups || 0);
+  const betterCupsCount = toDecimal(useGameStore.getState().betterCups || 0);
   costs.betterCups = nextBetterCupsCost(betterCupsCount, betterCupsBaseCost, betterCupsScaling);
 
   const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
   const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);
-  const levelCount = toDecimal((window as any).App?.state?.getState?.()?.level || 1);
+  const levelCount = toDecimal(useGameStore.getState().level || 1);
   costs.levelUp = levelUpBaseCost.multiply(levelUpScaling.pow(levelCount));
 
   return costs;
