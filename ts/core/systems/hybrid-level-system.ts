@@ -352,6 +352,28 @@ export class HybridLevelSystem {
     return Array.from(this.unlockedLevels);
   }
 
+  // Method for save loader to restore state
+  restoreState(currentLevel: number, unlockedLevels: number[]): void {
+    console.log('🔄 Restoring hybrid level state:', { currentLevel, unlockedLevels });
+    
+    // Restore unlocked levels
+    this.unlockedLevels = new Set(unlockedLevels);
+    console.log('✅ Restored unlocked levels:', Array.from(this.unlockedLevels));
+    
+    // Restore current level (only if it's unlocked)
+    if (this.unlockedLevels.has(currentLevel)) {
+      this.currentLevel = currentLevel;
+      console.log('✅ Restored current level:', this.currentLevel);
+      
+      // Apply theme for the restored level
+      this.applyLevelTheme();
+    } else {
+      console.log('⚠️ Saved level not unlocked, defaulting to level 1');
+      this.currentLevel = 1;
+      this.applyLevelTheme();
+    }
+  }
+
   applyInitialTheme(): void {
     console.log('🎨 Applying initial theme from hybrid level system');
     this.applyLevelTheme();
@@ -565,73 +587,45 @@ export class HybridLevelSystem {
 
   private saveUnlockedLevels(): void {
     try {
-      const app: any = (window as any).App;
-      const data = Array.from(this.unlockedLevels);
-      if (app?.storage?.setJSON) {
-        app.storage.setJSON('unlockedLevels', data);
-      } else {
-        localStorage.setItem('unlockedLevels', JSON.stringify(data));
-      }
+      // Don't save here - let the main save system handle it
+      // The main save system will call getUnlockedLevelIds() when saving
+      console.log('💾 Hybrid system unlocked levels updated:', Array.from(this.unlockedLevels));
     } catch (error) {
-      console.warn('Failed to save unlocked levels:', error);
+      console.warn('Failed to update unlocked levels state:', error);
     }
   }
 
   private loadUnlockedLevels(): void {
     try {
-      const app: any = (window as any).App;
-      let data: number[] = [];
-      if (app?.storage?.getJSON) {
-        data = app.storage.getJSON('unlockedLevels', []);
-      } else {
-        const stored = localStorage.getItem('unlockedLevels');
-        if (stored) data = JSON.parse(stored);
-      }
-
-      if (Array.isArray(data)) {
-        this.unlockedLevels = new Set(data);
-        // Ensure level 1 is always unlocked
-        this.unlockedLevels.add(1);
-      }
+      // Don't load from storage here - the main save system will handle loading
+      // Just initialize with level 1 unlocked by default
+      this.unlockedLevels = new Set([1]);
+      console.log('🏗️ Hybrid system initialized with default unlocked levels:', Array.from(this.unlockedLevels));
     } catch (error) {
-      console.warn('Failed to load unlocked levels:', error);
+      console.warn('Failed to initialize unlocked levels:', error);
       this.unlockedLevels = new Set([1]);
     }
   }
 
   private loadCurrentLevel(): void {
     try {
-      const app: any = (window as any).App;
-      let level = 1;
-      if (app?.storage?.getJSON) {
-        level = app.storage.getJSON('currentLevel', 1);
-      } else {
-        const stored = localStorage.getItem('currentLevel');
-        if (stored) level = JSON.parse(stored);
-      }
-
-      // Ensure the level is valid and unlocked
-      if (typeof level === 'number' && level >= 1 && this.unlockedLevels.has(level)) {
-        this.currentLevel = level;
-      } else {
-        this.currentLevel = 1;
-      }
+      // Don't load from storage here - the main save system will handle loading
+      // Just initialize with level 1 by default
+      this.currentLevel = 1;
+      console.log('🏗️ Hybrid system initialized with default current level:', this.currentLevel);
     } catch (error) {
-      console.warn('Failed to load current level:', error);
+      console.warn('Failed to initialize current level:', error);
       this.currentLevel = 1;
     }
   }
 
   private saveCurrentLevel(): void {
     try {
-      const app: any = (window as any).App;
-      if (app?.storage?.setJSON) {
-        app.storage.setJSON('currentLevel', this.currentLevel);
-      } else {
-        localStorage.setItem('currentLevel', this.currentLevel.toString());
-      }
+      // Don't save here - let the main save system handle it
+      // The main save system will call getCurrentLevelId() when saving
+      console.log('💾 Hybrid system current level updated:', this.currentLevel);
     } catch (error) {
-      console.warn('Failed to save current level:', error);
+      console.warn('Failed to update current level state:', error);
     }
   }
 

@@ -365,67 +365,27 @@ export class SaveGameLoader {
   private loadHybridLevelData(savegame: SaveGameData): void {
     try {
       console.log('🔍 Loading hybrid level data from save:', savegame.hybridLevelData);
-      
+
       if (savegame.hybridLevelData) {
         const { currentLevel, unlockedLevels } = savegame.hybridLevelData;
         console.log('🔍 Parsed hybrid level data:', { currentLevel, unlockedLevels });
 
-        // Load unlocked levels first
-        if (Array.isArray(unlockedLevels) && unlockedLevels.length > 0) {
-          try {
-            // Ensure level 1 is always unlocked
-            const levelsToUnlock = [...new Set([1, ...unlockedLevels])];
-            console.log('🔍 Levels to unlock:', levelsToUnlock);
-
-            // Unlock each level silently (no notifications during save loading)
-            levelsToUnlock.forEach(levelId => {
-              try {
-                const result = (window as any).App?.systems?.hybridLevel?.unlockLevel?.(levelId, true);
-                console.log(`🔓 Unlocked level ${levelId}:`, result);
-              } catch (error) {
-                console.warn(`Failed to unlock level ${levelId}:`, error);
-              }
-            });
-
-            console.log('✅ Hybrid level system unlocked levels loaded:', levelsToUnlock);
-          } catch (error) {
-            console.warn('Failed to load hybrid level system unlocked levels:', error);
-          }
-        }
-
-        // Load current level - only if it's valid and unlocked
-        if (typeof currentLevel === 'number' && currentLevel >= 1) {
-          try {
-            const hybridSystem = (window as any).App?.systems?.hybridLevel;
-            console.log('🔍 Loading hybrid level data:', {
-              currentLevel,
-              hybridSystem: !!hybridSystem,
-            });
-
-            if (hybridSystem && hybridSystem.isLevelUnlocked(currentLevel)) {
-              console.log('✅ Level is unlocked, switching to level:', currentLevel);
-              hybridSystem.switchToLevel(currentLevel);
-              // Ensure theme is applied after switching
-              console.log('🎨 Applying theme for loaded level...');
-              hybridSystem.applyInitialTheme();
-              console.log('✅ Hybrid level system current level loaded:', currentLevel);
-            } else {
-              // If the saved level isn't unlocked, default to level 1 (The Beach)
-              console.log('⚠️ Saved level not unlocked, defaulting to level 1 (The Beach)');
-              hybridSystem?.switchToLevel(1);
-              console.log('🎨 Applying theme for default level...');
-              hybridSystem?.applyInitialTheme();
-            }
-          } catch (error) {
-            console.warn('Failed to set hybrid level system current level:', error);
-            // Fallback to level 1
-            try {
-              (window as any).App?.systems?.hybridLevel?.switchToLevel?.(1);
-              (window as any).App?.systems?.hybridLevel?.applyInitialTheme?.();
-            } catch (fallbackError) {
-              console.warn('Failed to set fallback level 1:', fallbackError);
-            }
-          }
+        // Restore hybrid level system state
+        const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        if (hybridSystem && hybridSystem.restoreState) {
+          // Ensure level 1 is always unlocked
+          const levelsToRestore = [...new Set([1, ...(unlockedLevels || [])])];
+          const levelToRestore = currentLevel || 1;
+          
+          console.log('🔄 Restoring hybrid level state:', {
+            currentLevel: levelToRestore,
+            unlockedLevels: levelsToRestore
+          });
+          
+          hybridSystem.restoreState(levelToRestore, levelsToRestore);
+          console.log('✅ Hybrid level system state restored successfully');
+        } else {
+          console.warn('⚠️ Hybrid level system not available for state restoration');
         }
       } else {
         // No hybrid level data in save, apply default theme
