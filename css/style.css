@@ -4481,7 +4481,7 @@ h3 {
   }
 
   #sodaButton {
-    max-height: 40vh;
+    max-height: 60vh; /* Increased from 40vh to prevent bottom cutoff */
   }
 
   .shop-item {
@@ -4687,7 +4687,7 @@ h3 {
 /* Landscape orientation adjustments */
 @media (orientation: landscape) and (max-height: 500px) {
   #sodaButton {
-    max-height: 30vh;
+    max-height: 50vh; /* Increased from 30vh to prevent bottom cutoff in landscape */
   }
 
   .shop-container {

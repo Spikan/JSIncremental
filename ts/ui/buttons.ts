@@ -396,9 +396,9 @@ const BUTTON_CONFIG: {
           console.log('Current volume adjustments:', {
             title: state.titleVolumeAdjustment,
             gameplay: state.gameplayVolumeAdjustment,
-            currentTrack: state.currentTrack
+            currentTrack: state.currentTrack,
           });
-          
+
           // Quick test: reduce gameplay music by additional 10%
           enhancedAudioManager.adjustTrackVolumes(1.0, 0.65);
           console.log('Applied test adjustment: Title=1.0, Gameplay=0.65');
@@ -414,14 +414,14 @@ const BUTTON_CONFIG: {
         try {
           // Force transition to gameplay music to test looping
           enhancedAudioManager.forceTransitionToGameplay();
-          
+
           const state = enhancedAudioManager.getAudioState();
           console.log('Testing trimmed music looping:', {
             currentTrack: state.currentTrack,
             musicPlaying: state.musicPlaying,
-            titleMusicPlayed: state.titleMusicPlayed
+            titleMusicPlayed: state.titleMusicPlayed,
           });
-          
+
           // Log when the music should loop
           console.log('Watch console for trimmed loop behavior - should skip 5s of dead air');
           console.log('If timing is off, adjust the sprite end time in enhanced-audio-manager.ts');

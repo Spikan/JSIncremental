@@ -18,7 +18,6 @@ export interface SoundEffect {
 export class EnhancedAudioManager {
   private static instance: EnhancedAudioManager;
   private soundEffects: Map<string, SoundEffect> = new Map();
-  private backgroundMusic: Howl | null = null;
   private titleMusic: Howl | null = null;
   private gameplayMusic: Howl | null = null;
   private currentTrack: 'title' | 'gameplay' | null = null;
@@ -89,7 +88,7 @@ export class EnhancedAudioManager {
             this.transitionToGameplayMusic();
           }, 100);
         },
-        onloaderror: (id, error) => {
+        onloaderror: (_, error) => {
           logger.warn('Failed to load title music:', error);
         },
       });
@@ -110,7 +109,7 @@ export class EnhancedAudioManager {
           // Set a timer to restart before the dead air
           const duration = this.gameplayMusic?.duration() || 0;
           const loopPoint = Math.max(0, (duration - 5) * 1000); // 5 seconds before end
-          
+
           if (loopPoint > 0) {
             setTimeout(() => {
               if (this.musicEnabled && !this.muted && this.currentTrack === 'gameplay') {
@@ -136,13 +135,12 @@ export class EnhancedAudioManager {
             }, 100);
           }
         },
-        onloaderror: (id, error) => {
+        onloaderror: (_, error) => {
           logger.warn('Failed to load gameplay music:', error);
         },
       });
 
-      // Set initial background music reference to title music
-      this.backgroundMusic = this.titleMusic;
+      // Set initial current track to title music
       this.currentTrack = 'title';
     } catch (error) {
       logger.warn('Failed to create background music:', error);
@@ -377,7 +375,6 @@ export class EnhancedAudioManager {
       }
 
       // Switch to gameplay music
-      this.backgroundMusic = this.gameplayMusic;
       this.currentTrack = 'gameplay';
 
       // Ensure gameplay music is fully loaded before starting
@@ -403,10 +400,10 @@ export class EnhancedAudioManager {
     try {
       // Start the gameplay music (timer-based loop will handle dead air)
       this.gameplayMusic.play();
-      
+
       // Start loop monitoring to ensure seamless playback
       this.startLoopMonitoring();
-      
+
       logger.debug('Transitioned to gameplay music with timer-based looping');
     } catch (error) {
       logger.warn('Failed to start gameplay music loop:', error);
@@ -457,7 +454,6 @@ export class EnhancedAudioManager {
       // If title music hasn't played yet, start with title music
       if (!this.titleMusicPlayed && this.titleMusic) {
         if (!this.titleMusic.playing()) {
-          this.backgroundMusic = this.titleMusic;
           this.currentTrack = 'title';
           this.titleMusic.play();
           logger.debug('Started title music');
@@ -466,7 +462,6 @@ export class EnhancedAudioManager {
       // Otherwise, start gameplay music
       else if (this.gameplayMusic) {
         if (!this.gameplayMusic.playing()) {
-          this.backgroundMusic = this.gameplayMusic;
           this.currentTrack = 'gameplay';
           this.startGameplayMusicLoop();
         }
@@ -483,7 +478,7 @@ export class EnhancedAudioManager {
     try {
       // Stop loop monitoring
       this.stopLoopMonitoring();
-      
+
       // Stop whichever track is currently playing
       if (this.titleMusic && this.titleMusic.playing()) {
         this.titleMusic.stop();
@@ -506,10 +501,14 @@ export class EnhancedAudioManager {
 
     // Update volume for both music tracks with individual adjustments
     if (this.titleMusic) {
-      this.titleMusic.volume(this.musicVolume * this.masterVolume * this.titleMusicVolumeAdjustment);
+      this.titleMusic.volume(
+        this.musicVolume * this.masterVolume * this.titleMusicVolumeAdjustment
+      );
     }
     if (this.gameplayMusic) {
-      this.gameplayMusic.volume(this.musicVolume * this.masterVolume * this.gameplayMusicVolumeAdjustment);
+      this.gameplayMusic.volume(
+        this.musicVolume * this.masterVolume * this.gameplayMusicVolumeAdjustment
+      );
     }
   }
 
@@ -528,10 +527,14 @@ export class EnhancedAudioManager {
 
     // Update volume for both music tracks with individual adjustments
     if (this.titleMusic) {
-      this.titleMusic.volume(this.musicVolume * this.masterVolume * this.titleMusicVolumeAdjustment);
+      this.titleMusic.volume(
+        this.musicVolume * this.masterVolume * this.titleMusicVolumeAdjustment
+      );
     }
     if (this.gameplayMusic) {
-      this.gameplayMusic.volume(this.musicVolume * this.masterVolume * this.gameplayMusicVolumeAdjustment);
+      this.gameplayMusic.volume(
+        this.musicVolume * this.masterVolume * this.gameplayMusicVolumeAdjustment
+      );
     }
   }
 
@@ -591,13 +594,19 @@ export class EnhancedAudioManager {
 
     // Apply the new adjustments immediately
     if (this.titleMusic) {
-      this.titleMusic.volume(this.musicVolume * this.masterVolume * this.titleMusicVolumeAdjustment);
+      this.titleMusic.volume(
+        this.musicVolume * this.masterVolume * this.titleMusicVolumeAdjustment
+      );
     }
     if (this.gameplayMusic) {
-      this.gameplayMusic.volume(this.musicVolume * this.masterVolume * this.gameplayMusicVolumeAdjustment);
+      this.gameplayMusic.volume(
+        this.musicVolume * this.masterVolume * this.gameplayMusicVolumeAdjustment
+      );
     }
 
-    logger.debug(`Track volume adjustments: Title=${this.titleMusicVolumeAdjustment}, Gameplay=${this.gameplayMusicVolumeAdjustment}`);
+    logger.debug(
+      `Track volume adjustments: Title=${this.titleMusicVolumeAdjustment}, Gameplay=${this.gameplayMusicVolumeAdjustment}`
+    );
   }
 
   /**
@@ -659,7 +668,6 @@ export class EnhancedAudioManager {
         this.gameplayMusic = null;
       }
 
-      this.backgroundMusic = null;
       this.currentTrack = null;
 
       logger.debug('Audio manager cleaned up');
