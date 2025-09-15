@@ -56,7 +56,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'The Park',
     description: 'Enjoy nature while drinking soda among trees and benches',
     category: 'main',
-    unlockRequirement: { sips: 100, clicks: 25, level: 2 },
+    unlockRequirement: { sips: 100, clicks: 25, level: 1 },
     bonuses: { sipMultiplier: 1.1, clickMultiplier: 1.0 },
     visualTheme: {
       backgroundColor: '#90EE90',
@@ -73,7 +73,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Weird Room',
     description: 'A strange, surreal space where reality bends',
     category: 'main',
-    unlockRequirement: { sips: 250, clicks: 50, level: 3 },
+    unlockRequirement: { sips: 250, clicks: 50, level: 2 },
     bonuses: { sipMultiplier: 1.2, clickMultiplier: 1.1 },
     visualTheme: {
       backgroundColor: '#DDA0DD',
@@ -90,7 +90,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'in SPACE',
     description: 'Zero-gravity soda drinking among the stars',
     category: 'main',
-    unlockRequirement: { sips: 500, clicks: 100, level: 4 },
+    unlockRequirement: { sips: 500, clicks: 100, level: 3 },
     bonuses: { sipMultiplier: 1.5, clickMultiplier: 1.2, specialEffect: 'floating' },
     visualTheme: {
       backgroundColor: '#000080',
@@ -107,7 +107,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'In a Castle',
     description: 'Medieval soda drinking in a grand castle',
     category: 'main',
-    unlockRequirement: { sips: 1000, clicks: 200, level: 5 },
+    unlockRequirement: { sips: 1000, clicks: 200, level: 4 },
     bonuses: { sipMultiplier: 1.3, clickMultiplier: 1.1 },
     visualTheme: {
       backgroundColor: '#8B4513',
@@ -124,7 +124,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Inside a Mouth',
     description: 'A surreal journey inside a giant mouth',
     category: 'main',
-    unlockRequirement: { sips: 2000, clicks: 400, level: 6 },
+    unlockRequirement: { sips: 2000, clicks: 400, level: 5 },
     bonuses: { sipMultiplier: 1.4, clickMultiplier: 1.3 },
     visualTheme: {
       backgroundColor: '#FFB6C1',
@@ -141,7 +141,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Before a convention',
     description: 'Corporate soda drinking before a big event',
     category: 'main',
-    unlockRequirement: { sips: 4000, clicks: 800, level: 7 },
+    unlockRequirement: { sips: 4000, clicks: 800, level: 6 },
     bonuses: { sipMultiplier: 1.2, clickMultiplier: 1.1 },
     visualTheme: {
       backgroundColor: '#708090',
@@ -158,7 +158,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Empty Pool',
     description: 'Soda drinking in an empty swimming pool',
     category: 'main',
-    unlockRequirement: { sips: 8000, clicks: 1600, level: 8 },
+    unlockRequirement: { sips: 8000, clicks: 1600, level: 7 },
     bonuses: { sipMultiplier: 1.3, clickMultiplier: 1.2 },
     visualTheme: {
       backgroundColor: '#00CED1',
@@ -175,7 +175,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'Dark Woods',
     description: 'Mysterious forest with eerie atmosphere',
     category: 'main',
-    unlockRequirement: { sips: 16000, clicks: 3200, level: 9 },
+    unlockRequirement: { sips: 16000, clicks: 3200, level: 8 },
     bonuses: { sipMultiplier: 1.6, clickMultiplier: 1.4 },
     visualTheme: {
       backgroundColor: '#2F4F2F',
@@ -192,7 +192,7 @@ export const SODA_DRINKER_PRO_LEVELS: HybridLevel[] = [
     name: 'County Fair',
     description: 'Carnival atmosphere with rides and games',
     category: 'main',
-    unlockRequirement: { sips: 32000, clicks: 6400, level: 10 },
+    unlockRequirement: { sips: 32000, clicks: 6400, level: 9 },
     bonuses: { sipMultiplier: 1.4, clickMultiplier: 1.3 },
     visualTheme: {
       backgroundColor: '#FF6347',
@@ -215,7 +215,7 @@ export const BONUS_LEVELS: HybridLevel[] = [
     name: 'An outdoor wedding',
     description: 'Celebrate with soda at a beautiful outdoor wedding',
     category: 'bonus',
-    unlockRequirement: { sips: 100000, clicks: 20000, level: 25 },
+    unlockRequirement: { sips: 100000, clicks: 20000, level: 10 },
     bonuses: { sipMultiplier: 2.0, clickMultiplier: 1.8 },
     visualTheme: {
       backgroundColor: '#FFB6C1',
@@ -232,7 +232,7 @@ export const BONUS_LEVELS: HybridLevel[] = [
     name: 'Hall of faces',
     description: 'A surreal gallery of faces watching you drink',
     category: 'bonus',
-    unlockRequirement: { sips: 200000, clicks: 40000, level: 35 },
+    unlockRequirement: { sips: 200000, clicks: 40000, level: 15 },
     bonuses: { sipMultiplier: 2.5, clickMultiplier: 2.0 },
     visualTheme: {
       backgroundColor: '#2F2F2F',
@@ -254,7 +254,7 @@ export const HISTORICAL_LEVELS: HybridLevel[] = [
     name: 'in ancient times',
     description: 'Travel back to ancient civilizations',
     category: 'historical',
-    unlockRequirement: { sips: 500000, clicks: 100000, level: 50 },
+    unlockRequirement: { sips: 500000, clicks: 100000, level: 20 },
     bonuses: { sipMultiplier: 3.0, clickMultiplier: 2.5 },
     visualTheme: {
       backgroundColor: '#8B4513',
@@ -271,7 +271,7 @@ export const HISTORICAL_LEVELS: HybridLevel[] = [
     name: 'The roaring 20s',
     description: 'Experience the jazz age with soda',
     category: 'historical',
-    unlockRequirement: { sips: 1000000, clicks: 200000, level: 75 },
+    unlockRequirement: { sips: 1000000, clicks: 200000, level: 25 },
     bonuses: { sipMultiplier: 3.5, clickMultiplier: 3.0 },
     visualTheme: {
       backgroundColor: '#8B0000',
@@ -293,7 +293,7 @@ export const VIVIAN_CLARK_LEVELS: HybridLevel[] = [
     name: 'Vivian Clark Title',
     description: 'Enter the mysterious world of Vivian Clark',
     category: 'vivian',
-    unlockRequirement: { sips: 10000000, clicks: 2000000, level: 100 },
+    unlockRequirement: { sips: 10000000, clicks: 2000000, level: 30 },
     bonuses: { sipMultiplier: 5.0, clickMultiplier: 4.0, specialEffect: 'vivian_mode' },
     visualTheme: {
       backgroundColor: '#000000',
