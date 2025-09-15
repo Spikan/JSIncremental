@@ -383,6 +383,15 @@ export class LevelSelector {
       // Update UI to reflect new level
       this.updateLevelDisplay();
 
+      // Update main UI displays
+      try {
+        (window as any).App?.ui?.updateLevelText?.();
+        (window as any).App?.ui?.updateLevelNumber?.();
+        (window as any).App?.ui?.updateAllDisplaysAnimated?.();
+      } catch (error) {
+        console.warn('Failed to update main UI displays:', error);
+      }
+
       // Emit event for other systems
       try {
         (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.LEVEL?.CHANGED, {

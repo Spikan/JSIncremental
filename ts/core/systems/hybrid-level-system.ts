@@ -355,6 +355,13 @@ export class HybridLevelSystem {
   applyInitialTheme(): void {
     console.log('🎨 Applying initial theme from hybrid level system');
     this.applyLevelTheme();
+
+    // Also update the level text display
+    try {
+      (window as any).App?.ui?.updateLevelText?.();
+    } catch (error) {
+      console.warn('Failed to update level text during initialization:', error);
+    }
   }
 
   getUnlockedLevels(): HybridLevel[] {

@@ -325,29 +325,27 @@
       <!-- Consolidated Game Header -->
       <div class="game-header">
         <div class="level-indicator">
-          <button class="level-box-clickable disabled" data-action="levelUp">
-            <div class="level-badge">
-              <div class="level-number">
-                <span class="level-label">Level</span>
-                <span id="levelNumber">1</span>
-              </div>
-              <div class="level-text" id="levelText">On a Blue Background</div>
+          <!-- Unified Level Control -->
+          <div class="unified-level-control">
+            <div class="current-level-section">
+              <span class="current-level-name" id="currentLevelName">The Beach (Level 1)</span>
+              <button class="switch-dropdown-btn" data-action="toggleLevelDropdown" aria-label="Switch Level">
+                Switch ▼
+              </button>
             </div>
-            <div class="level-up-info">
-              <div class="level-up-cost">
-                <span id="levelCost" class="cost-number">3000</span>
-                <span class="cost-currency">Sips</span>
-              </div>
-              <div class="level-up-label">Level Up</div>
+            <div class="next-level-section">
+              <div class="next-level-name" id="nextLevelName">Next: The Park (Level 2)</div>
+              <div class="requirements" id="levelRequirements">100 sips, 25 clicks</div>
+              <button class="unlock-btn" data-action="unlockLevel" aria-label="Unlock Next Level">
+                Unlock Level
+              </button>
             </div>
-          </button>
+            <div class="level-dropdown" id="levelDropdown" style="display: none;">
+              <!-- Populated dynamically with unlocked levels -->
+            </div>
+          </div>
           <button class="settings-cogwheel" data-action="openSettings" aria-label="Open Settings">
             <span class="cogwheel-icon">⚙️</span>
-          </button>
-          <!-- Level Selector Button -->
-          <button class="level-btn" data-action="openLevelSelector" aria-label="Select Level">
-            <span class="level-icon">🎮</span>
-            <span class="level-label" id="currentLevel">The Beach</span>
           </button>
           <!-- Mobile Menu Button in Header -->
           <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">

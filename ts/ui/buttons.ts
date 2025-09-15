@@ -70,9 +70,9 @@ const BUTTON_CONFIG: {
       type: 'drink-speed-upgrade-btn',
       label: 'Buy Faster Drinks',
     },
-    levelUp: {
+    unlockLevel: {
       func: () => {
-        console.log('🎮 Level Up button clicked!');
+        console.log('🎮 Unlock Level button clicked!');
         // Use hybrid level system to unlock next level in sequence
         const hybridSystem = (window as any).App?.systems?.hybridLevel;
         console.log('🔍 Hybrid system available:', !!hybridSystem);
@@ -174,8 +174,31 @@ const BUTTON_CONFIG: {
           console.log('❌ Hybrid system not available');
         }
       },
-      type: 'level-up-btn',
-      label: 'Level Up',
+      type: 'unlock-btn',
+      label: 'Unlock Level',
+    },
+    toggleLevelDropdown: {
+      func: () => {
+        console.log('🎮 Toggle Level Dropdown clicked!');
+        const dropdown = document.getElementById('levelDropdown');
+        if (dropdown) {
+          const isVisible = dropdown.style.display !== 'none';
+          dropdown.style.display = isVisible ? 'none' : 'block';
+          
+          // Update button text
+          const button = document.querySelector('[data-action="toggleLevelDropdown"]');
+          if (button) {
+            button.textContent = isVisible ? 'Switch ▼' : 'Switch ▲';
+          }
+          
+          // Populate dropdown if showing
+          if (!isVisible) {
+            populateLevelDropdown();
+          }
+        }
+      },
+      type: 'switch-dropdown-btn',
+      label: 'Switch Level',
     },
     purchaseUnlock: {
       func: (featureName: string) =>
@@ -1724,6 +1747,71 @@ export function getTouchSensitivityConfig() {
   } catch (error) {
     console.warn('Failed to get touch sensitivity config:', error);
     return null;
+  }
+}
+
+// Level Dropdown Functions
+export function populateLevelDropdown(): void {
+  const dropdown = document.getElementById('levelDropdown');
+  if (!dropdown) return;
+
+  const hybridSystem = (window as any).App?.systems?.hybridLevel;
+  if (!hybridSystem) return;
+
+  const currentLevel = hybridSystem.getCurrentLevel();
+  const allLevels = hybridSystem.getAllLevels();
+  const unlockedLevels = allLevels.filter((level: any) => hybridSystem.isLevelUnlocked(level.id));
+
+  dropdown.innerHTML = '';
+
+  unlockedLevels.forEach((level: any) => {
+    const item = document.createElement('div');
+    item.className = 'level-dropdown-item';
+    if (level.id === currentLevel?.id) {
+      item.classList.add('current');
+    }
+
+    item.innerHTML = `
+      <span class="level-icon">${level.icon || '🎮'}</span>
+      <div class="level-info">
+        <div class="level-name">${level.name}</div>
+        <div class="level-description">Level ${level.id}</div>
+      </div>
+    `;
+
+    item.addEventListener('click', () => {
+      switchToLevel(level.id);
+      dropdown.style.display = 'none';
+      const button = document.querySelector('[data-action="toggleLevelDropdown"]');
+      if (button) {
+        button.textContent = 'Switch ▼';
+      }
+    });
+
+    dropdown.appendChild(item);
+  });
+}
+
+export function switchToLevel(levelId: number): void {
+  const hybridSystem = (window as any).App?.systems?.hybridLevel;
+  if (!hybridSystem) return;
+
+  console.log('🔄 Switching to level:', levelId);
+  
+  if (hybridSystem.switchToLevel(levelId)) {
+    console.log('✅ Switched to level:', levelId);
+    
+    // Update UI
+    try {
+      (window as any).App?.ui?.updateLevelText?.();
+      (window as any).App?.ui?.updateLevelNumber?.();
+      (window as any).App?.ui?.updateAllDisplaysAnimated?.();
+      console.log('🔄 UI updated');
+    } catch (error) {
+      console.warn('Failed to update UI:', error);
+    }
+  } else {
+    console.log('❌ Failed to switch to level:', levelId);
   }
 }
 

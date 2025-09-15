@@ -459,39 +459,35 @@ export function updateLevelNumber(): void {
 
 export function updateLevelText(): void {
   if (typeof window === 'undefined') return;
-  const levelTextEl: any = domQuery.getById('levelText');
-  if (levelTextEl) {
-    try {
-      // Use hybrid level system as single source of truth
-      const hybridSystem = (window as any).App?.systems?.hybridLevel;
-      let levelText = 'Level 1: The Beach';
+  
+  try {
+    // Use hybrid level system as single source of truth
+    const hybridSystem = (window as any).App?.systems?.hybridLevel;
+    let levelText = 'The Beach (Level 1)';
 
-      console.log('🔍 updateLevelText called, hybridSystem available:', !!hybridSystem);
+    console.log('🔍 updateLevelText called, hybridSystem available:', !!hybridSystem);
 
-      if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
-        const currentLevel = hybridSystem.getCurrentLevel();
-        console.log('🔍 Current level from hybrid system:', currentLevel);
+    if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
+      const currentLevel = hybridSystem.getCurrentLevel();
+      console.log('🔍 Current level from hybrid system:', currentLevel);
 
-        if (currentLevel) {
-          levelText = `Level ${currentLevel.id}: ${currentLevel.name}`;
-          console.log('✅ Setting level text to:', levelText);
-        } else {
-          console.log('⚠️ No current level found in hybrid system');
-        }
+      if (currentLevel) {
+        levelText = `${currentLevel.name} (Level ${currentLevel.id})`;
+        console.log('✅ Setting level text to:', levelText);
       } else {
-        console.log('⚠️ Hybrid system not available or getCurrentLevel not a function');
+        console.log('⚠️ No current level found in hybrid system');
       }
-
-      levelTextEl.innerHTML = levelText;
-
-      // Also update the level button
-      const levelButton = document.getElementById('currentLevel');
-      if (levelButton) {
-        levelButton.textContent = levelText;
-      }
-    } catch (error) {
-      console.warn('Failed to update display:', error);
+    } else {
+      console.log('⚠️ Hybrid system not available or getCurrentLevel not a function');
     }
+
+    // Update the current level name display
+    const currentLevelNameEl = document.getElementById('currentLevelName');
+    if (currentLevelNameEl) {
+      currentLevelNameEl.textContent = levelText;
+    }
+  } catch (error) {
+    console.warn('Failed to update level text:', error);
   }
 }
 
@@ -723,50 +719,46 @@ function updateLevelUpDisplay(state: any): void {
     if (nextLevel) {
       const sips = state.sips || new Decimal(0);
       const clicks = state.totalClicks || 0;
-      const currentLevelNum = state.level || 1;
+      const currentLevel = hybridSystem.getCurrentLevel();
+      const currentLevelNum = currentLevel?.id || 1;
 
       const canUnlock =
         sips.gte(nextLevel.unlockRequirement.sips) &&
         clicks >= nextLevel.unlockRequirement.clicks &&
         currentLevelNum >= (nextLevel.unlockRequirement.level || 1);
 
-      // Update the level cost display with next level requirements
-      const levelCostEl = document.getElementById('levelCost');
-      const costCurrencyEl = document.querySelector('.cost-currency');
-      const levelUpLabelEl = document.querySelector('.level-up-label');
+      // Update the next level name
+      const nextLevelNameEl = document.getElementById('nextLevelName');
+      if (nextLevelNameEl) {
+        nextLevelNameEl.textContent = `Next: ${nextLevel.name} (Level ${nextLevel.id})`;
+      }
 
-      if (levelCostEl) {
+      // Update the requirements
+      const requirementsEl = document.getElementById('levelRequirements');
+      if (requirementsEl) {
         const sipsText =
           typeof (window as any).prettify !== 'undefined'
             ? (window as any).prettify(nextLevel.unlockRequirement.sips)
             : nextLevel.unlockRequirement.sips.toLocaleString();
 
-        // Update the cost display
-        levelCostEl.innerHTML = `
-        <div style="font-size: 12px; color: ${canUnlock ? '#2ecc71' : '#ffffff'}; text-align: center; line-height: 1.4; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-          <div style="font-weight: bold; margin-bottom: 6px; font-size: 14px; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.9);">Next: ${nextLevel.name}</div>
-          <div style="font-size: 12px; margin-bottom: 3px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${sipsText} Sips</div>
-          <div style="font-size: 12px; margin-bottom: 3px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">${nextLevel.unlockRequirement.clicks.toLocaleString()} Clicks</div>
-          ${nextLevel.unlockRequirement.level ? `<div style="font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">Level ${nextLevel.unlockRequirement.level}</div>` : ''}
-        </div>
-      `;
+        let requirementsText = `${sipsText} sips, ${nextLevel.unlockRequirement.clicks.toLocaleString()} clicks`;
+        if (nextLevel.unlockRequirement.level) {
+          requirementsText += `, level ${nextLevel.unlockRequirement.level}`;
+        }
+
+        requirementsEl.textContent = requirementsText;
+        requirementsEl.style.color = canUnlock ? '#2ecc71' : '#ffffff';
       }
 
-      // Update the currency label and level up label
-      if (costCurrencyEl) {
-        costCurrencyEl.textContent = '';
-      }
-      if (levelUpLabelEl) {
-        levelUpLabelEl.textContent = 'Level Up';
-      }
-
-      // Update clickable level box state
-      const levelBox = document.querySelector('.level-box-clickable');
-      if (levelBox) {
+      // Update unlock button state
+      const unlockBtn = document.querySelector('[data-action="unlockLevel"]');
+      if (unlockBtn) {
         if (canUnlock) {
-          levelBox.classList.remove('disabled');
+          unlockBtn.classList.remove('disabled');
+          unlockBtn.removeAttribute('disabled');
         } else {
-          levelBox.classList.add('disabled');
+          unlockBtn.classList.add('disabled');
+          unlockBtn.setAttribute('disabled', 'true');
         }
       }
       return;
@@ -774,30 +766,22 @@ function updateLevelUpDisplay(state: any): void {
   }
 
   // If no hybrid system or no next level, show default
-  const levelCostEl = document.getElementById('levelCost');
-  const costCurrencyEl = document.querySelector('.cost-currency');
-  const levelUpLabelEl = document.querySelector('.level-up-label');
+  const nextLevelNameEl = document.getElementById('nextLevelName');
+  const requirementsEl = document.getElementById('levelRequirements');
+  const unlockBtn = document.querySelector('[data-action="unlockLevel"]');
 
-  if (levelCostEl) {
-    levelCostEl.innerHTML = `
-      <div style="font-size: 12px; color: #ffffff; text-align: center; line-height: 1.4; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-        <div style="font-weight: bold; margin-bottom: 6px; font-size: 14px; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.9);">No More Levels</div>
-        <div style="font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">All levels unlocked!</div>
-      </div>
-    `;
+  if (nextLevelNameEl) {
+    nextLevelNameEl.textContent = 'All Levels Unlocked!';
   }
 
-  if (costCurrencyEl) {
-    costCurrencyEl.textContent = '';
-  }
-  if (levelUpLabelEl) {
-    levelUpLabelEl.textContent = 'All Unlocked';
+  if (requirementsEl) {
+    requirementsEl.textContent = 'No more levels to unlock';
+    requirementsEl.style.color = '#ffffff';
   }
 
-  // Disable level box
-  const levelBox = document.querySelector('.level-box-clickable');
-  if (levelBox) {
-    levelBox.classList.add('disabled');
+  if (unlockBtn) {
+    unlockBtn.classList.add('disabled');
+    unlockBtn.setAttribute('disabled', 'true');
   }
 }
 
