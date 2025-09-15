@@ -585,6 +585,16 @@
             <span class="tab-label">Statistics</span>
           </button>
           <button
+            class="settings-tab-btn dev-tab"
+            data-tab="dev"
+            data-action="switchSettingsTab"
+            data-args="dev"
+            style="display: none"
+          >
+            <span class="tab-icon">🔧</span>
+            <span class="tab-label">Dev Tools</span>
+          </button>
+          <button
             class="settings-tab-btn god-tab"
             data-tab="god"
             data-action="switchSettingsTab"
@@ -601,6 +611,55 @@
           <div class="settings-tab-content active" id="settings-tab">
             <div class="settings-group">
               <h4 class="settings-group-title">Audio</h4>
+
+              <div class="audio-control">
+                <label for="masterVolumeSlider">🔊 Master Volume</label>
+                <div class="volume-slider-container">
+                  <input
+                    type="range"
+                    id="masterVolumeSlider"
+                    class="volume-slider"
+                    min="0"
+                    max="100"
+                    value="70"
+                    step="5"
+                  />
+                  <span id="masterVolumeValue" class="volume-value">70%</span>
+                </div>
+              </div>
+
+              <div class="audio-control">
+                <label for="musicVolumeSlider">🎵 Music Volume</label>
+                <div class="volume-slider-container">
+                  <input
+                    type="range"
+                    id="musicVolumeSlider"
+                    class="volume-slider"
+                    min="0"
+                    max="100"
+                    value="25"
+                    step="5"
+                  />
+                  <span id="musicVolumeValue" class="volume-value">25%</span>
+                </div>
+              </div>
+
+              <div class="audio-control">
+                <label for="sfxVolumeSlider">🔔 SFX Volume</label>
+                <div class="volume-slider-container">
+                  <input
+                    type="range"
+                    id="sfxVolumeSlider"
+                    class="volume-slider"
+                    min="0"
+                    max="100"
+                    value="60"
+                    step="5"
+                  />
+                  <span id="sfxVolumeValue" class="volume-value">60%</span>
+                </div>
+              </div>
+
               <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="settings-btn">
                 🔊 Button Sounds ON
               </button>
@@ -688,6 +747,107 @@
                 </div>
                 <div class="god-chat-hint">
                   <small>💡 Try asking about upgrades, strategies, or secrets...</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dev Tools Tab Content -->
+          <div class="settings-tab-content" id="dev-tab">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Resource Management</h4>
+              <div class="dev-buttons-grid">
+                <button data-action="devAddSips" data-args="1000" class="dev-btn">
+                  💧 +1K Sips
+                </button>
+                <button data-action="devAddSips" data-args="1000000" class="dev-btn">
+                  💧 +1M Sips
+                </button>
+                <button data-action="devAddTime" data-args="3600000" class="dev-btn">
+                  ⏰ +1 Hour
+                </button>
+                <button data-action="devAddTime" data-args="86400000" class="dev-btn">
+                  ⏰ +1 Day
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Unlocks & Features</h4>
+              <div class="dev-buttons-grid">
+                <button data-action="devUnlockAll" class="dev-btn">🔓 Unlock All</button>
+                <button data-action="devUnlockShop" class="dev-btn">🏪 Unlock Shop</button>
+                <button data-action="devUnlockUpgrades" class="dev-btn">⬆️ Unlock Upgrades</button>
+                <button data-action="devResetUnlocks" class="dev-btn">🔒 Reset Unlocks</button>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Testing & Debug</h4>
+              <div class="dev-buttons-grid">
+                <button data-action="devTestOffline" data-args="2" class="dev-btn">
+                  🌙 Test Offline (2h)
+                </button>
+                <button data-action="forceGameplayMusic" class="dev-btn">
+                  🎵 Switch to Gameplay Music
+                </button>
+                <button data-action="testVolumeBalance" class="dev-btn">
+                  🔊 Test Volume Balance
+                </button>
+                <button data-action="testMusicLooping" class="dev-btn">
+                  🔄 Test Trimmed Loop
+                </button>
+                <button data-action="devTestOffline" data-args="8" class="dev-btn">
+                  🌙 Test Offline (8h)
+                </button>
+                <button data-action="devPerformanceTest" class="dev-btn">
+                  📊 Performance Test
+                </button>
+                <button data-action="devClearConsole" class="dev-btn">🧹 Clear Console</button>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Data Management</h4>
+              <div class="dev-buttons-grid">
+                <button data-action="devExportState" class="dev-btn">📤 Export State</button>
+                <button data-action="devImportSave" class="dev-btn">📥 Import Save</button>
+                <button data-action="devExportSave" class="dev-btn">💾 Export Save</button>
+                <button
+                  data-action="largeNumberTest"
+                  data-args="addExtremeResources"
+                  class="dev-btn"
+                >
+                  🔢 Add Extreme Numbers
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Quick Actions</h4>
+              <div class="dev-input-group">
+                <label for="devCustomSips">Add Custom Sips:</label>
+                <div class="dev-input-row">
+                  <input type="number" id="devCustomSips" placeholder="Amount" class="dev-input" />
+                  <button
+                    onclick="const input = document.getElementById('devCustomSips'); const amount = input.value; if(amount) { const btn = document.querySelector('[data-action=devAddSips]'); if(btn) { btn.setAttribute('data-args', amount); btn.click(); input.value = ''; } }"
+                    class="dev-btn"
+                  >
+                    ➕ Add
+                  </button>
+                </div>
+              </div>
+
+              <div class="dev-input-group">
+                <label for="devCustomTime">Add Custom Time (hours):</label>
+                <div class="dev-input-row">
+                  <input type="number" id="devCustomTime" placeholder="Hours" class="dev-input" />
+                  <button
+                    onclick="const input = document.getElementById('devCustomTime'); const hours = input.value; if(hours) { const ms = hours * 60 * 60 * 1000; const btn = document.querySelector('[data-action=devAddTime]'); if(btn) { btn.setAttribute('data-args', ms); btn.click(); input.value = ''; } }"
+                    class="dev-btn"
+                  >
+                    ➕ Add
+                  </button>
                 </div>
               </div>
             </div>

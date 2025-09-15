@@ -16,8 +16,17 @@ import {
 } from './displays';
 import * as stats from './stats';
 import * as feedback from './feedback';
+import {
+  showEnhancedClickFeedback,
+  showEnhancedPurchaseFeedback,
+  enhanceButtonInteractions,
+} from './enhanced-feedback';
+import { updateAllDisplaysAnimated } from './enhanced-displays';
 import * as affordability from './affordability';
 import * as labels from './labels';
+import { devToolsManager } from './dev-tools-manager';
+import { enhancedAudioManager } from '../services/enhanced-audio-manager';
+import { audioControlsManager } from './audio-controls';
 import * as utils from './utils';
 import * as buttons from './buttons';
 // import subscriptionManager from './subscription-manager'; // Not needed for sidebar navigation
@@ -426,11 +435,20 @@ export function initializeUI(): void {
     // Set up CLICK.SODA event listener
     window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA!, (data: unknown) => {
       const clickData = data as ClickSodaEventData;
-      // Use optimized batch update for better performance
-      updateAllDisplaysOptimized();
-      updateClickValueDisplay();
-      updateTopInfoBar(); // Update the header with new sips total
-      checkUpgradeAffordabilityOptimized();
+      // Use enhanced animated displays for better visual experience
+      try {
+        updateAllDisplaysAnimated();
+        updateClickValueDisplay();
+        updateTopInfoBar(); // Update the header with new sips total
+        checkUpgradeAffordabilityOptimized();
+      } catch (error) {
+        // Fallback to original system if enhanced displays fail
+        logger.warn('Enhanced displays failed, using fallback:', error);
+        updateAllDisplaysOptimized();
+        updateClickValueDisplay();
+        updateTopInfoBar();
+        checkUpgradeAffordabilityOptimized();
+      }
 
       // Add visual feedback for soda click (using existing CSS system)
       const sodaButton = document.getElementById('sodaButton');
@@ -447,8 +465,35 @@ export function initializeUI(): void {
       }
 
       if (clickData && clickData.gained) {
-        // Pass the value directly - showClickFeedback will handle Decimal objects properly
-        showClickFeedback(clickData.gained, clickData.critical, clickData.clickX, clickData.clickY);
+        // Play click sound effect
+        try {
+          if (clickData.critical) {
+            enhancedAudioManager.playSound('click-critical');
+          } else {
+            enhancedAudioManager.playSound('click');
+          }
+        } catch (error) {
+          logger.debug('Failed to play click sound:', error);
+        }
+
+        // Use enhanced Framer Motion feedback for better visual experience
+        try {
+          showEnhancedClickFeedback(
+            clickData.gained,
+            clickData.critical,
+            clickData.clickX,
+            clickData.clickY
+          );
+        } catch (error) {
+          // Fallback to original system if enhanced fails
+          logger.warn('Enhanced click feedback failed, using fallback:', error);
+          showClickFeedback(
+            clickData.gained,
+            clickData.critical,
+            clickData.clickX,
+            clickData.clickY
+          );
+        }
       }
     });
     window.App.events.on(window.App.EVENT_NAMES?.ECONOMY?.PURCHASE!, (data: unknown) => {
@@ -481,19 +526,39 @@ export function initializeUI(): void {
         }
       }
 
-      if (
-        purchaseData &&
-        purchaseData.item &&
-        purchaseData.cost &&
-        typeof purchaseData.clickX === 'number' &&
-        typeof purchaseData.clickY === 'number'
-      ) {
-        showPurchaseFeedback(
-          purchaseData.item,
-          Number(purchaseData.cost),
-          purchaseData.clickX,
-          purchaseData.clickY
-        );
+      if (purchaseData && purchaseData.item) {
+        // Play purchase success sound
+        try {
+          enhancedAudioManager.playSound('purchase-success');
+        } catch (error) {
+          logger.debug('Failed to play purchase success sound:', error);
+        }
+
+        // Use enhanced purchase feedback with button animations
+        try {
+          showEnhancedPurchaseFeedback(
+            purchaseData.item,
+            Number(purchaseData.cost || 0),
+            typeof purchaseData.clickX === 'number' ? purchaseData.clickX : null,
+            typeof purchaseData.clickY === 'number' ? purchaseData.clickY : null,
+            true // success
+          );
+        } catch (error) {
+          // Fallback to original system
+          logger.warn('Enhanced purchase feedback failed, using fallback:', error);
+          if (
+            purchaseData.cost &&
+            typeof purchaseData.clickX === 'number' &&
+            typeof purchaseData.clickY === 'number'
+          ) {
+            showPurchaseFeedback(
+              purchaseData.item,
+              Number(purchaseData.cost),
+              purchaseData.clickX,
+              purchaseData.clickY
+            );
+          }
+        }
       }
     });
     (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.SAVED, () => {
@@ -529,6 +594,14 @@ export function initializeUI(): void {
 
     // Initialize enhanced affordability system
     initializeEnhancedAffordabilitySystem();
+
+    // Initialize enhanced button interactions with Framer Motion
+    try {
+      enhanceButtonInteractions();
+      logger.info('Enhanced button interactions initialized');
+    } catch (error) {
+      logger.warn('Failed to initialize enhanced button interactions:', error);
+    }
 
     // Initialize Soda Drinker Pro theme system
     addThemeStyles();
@@ -583,6 +656,15 @@ function initializeEnhancedUIComponents(): void {
 
     // Initialize enhanced navigation
     initializeEnhancedNavigation();
+
+    // Initialize dev tools manager
+    devToolsManager.initialize();
+
+    // Initialize enhanced audio manager
+    enhancedAudioManager.startBackgroundMusic();
+
+    // Initialize audio controls manager
+    audioControlsManager.initialize();
 
     // Initialize enhanced top info bar
     topInfoBar.initializeElements();

@@ -46,6 +46,8 @@ if (BAL && TIMING && LIMITS) {
 import { saveGameLoader } from './core/systems/save-game-loader';
 import { mobileInputHandler } from './ui/mobile-input';
 import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
+import { processOfflineProgression } from './core/systems/offline-progression';
+import { showOfflineModal } from './ui/offline-modal';
 // DecimalOps removed - no longer using toSafeNumber
 
 // Export for potential use
@@ -190,6 +192,35 @@ function initGame() {
       });
     } catch (error) {
       console.warn('Failed to emit game loaded event:', error);
+    }
+
+    // Check for offline progression if this was a returning player
+    if (savegame) {
+      try {
+        // Delay offline progression check to ensure state is fully loaded
+        timerManager.setTimeout(
+          () => {
+            const offlineResult = processOfflineProgression({
+              maxOfflineHours: 8, // Cap at 8 hours
+              minOfflineMinutes: 1, // Show modal if away for 1+ minutes
+              offlineEfficiency: 1.0, // Full efficiency offline
+            });
+
+            if (offlineResult) {
+              // Show welcome back modal with offline earnings
+              showOfflineModal(offlineResult, {
+                showParticles: true,
+                autoCloseAfter: 0, // No auto-close, let player claim
+                playSound: false, // No sound for now
+              });
+            }
+          },
+          500,
+          'Offline progression check'
+        );
+      } catch (error) {
+        console.warn('Failed to process offline progression:', error);
+      }
     }
 
     // Use Zustand store for state management instead of local variables

@@ -2,6 +2,8 @@
 
 import { mobileInputHandler } from './mobile-input';
 import { domQuery } from '../services/dom-query';
+import { enhancedAudioManager } from '../services/enhanced-audio-manager';
+import { audioControlsManager } from './audio-controls';
 
 type ButtonActionMeta = { func: (...args: any[]) => any; type: string; label: string };
 type ButtonTypeMeta = {
@@ -32,6 +34,7 @@ const BUTTON_CONFIG: {
     'dev-btn': { audio: 'click', feedback: 'info', className: 'dev-btn' },
     'chat-send-btn': { audio: 'click', feedback: 'info', className: 'chat-send-btn' },
     'splash-start-btn': { audio: 'click', feedback: 'info', className: 'splash-start-btn' },
+    'audio-btn': { audio: 'click', feedback: 'info', className: 'audio-btn' },
     'settings-modal-btn': { audio: 'click', feedback: 'info', className: 'settings-modal-btn' },
   },
   actions: {
@@ -116,31 +119,10 @@ const BUTTON_CONFIG: {
     toggleDevTools: {
       func: () => {
         try {
-          const w = window as any;
-          const state = w.App?.state?.getState?.();
-          if (state?.options) {
-            const newValue = !state.options.devToolsEnabled;
-
-            // Update the state
-            w.App?.state?.setState?.({
-              options: { ...state.options, devToolsEnabled: newValue },
-            });
-
-            // Save to storage
-            w.App?.systems?.options?.saveOptions?.({ ...state.options, devToolsEnabled: newValue });
-
-            // Update button text
-            const button = document.querySelector('.dev-toggle-btn');
-            if (button) {
-              button.textContent = `🔧 Dev Tools ${newValue ? 'ON' : 'OFF'}`;
-            }
-
-            // Refresh navigation to show/hide dev tab
-            const navManager = w.App?.ui?.navigationManager || (window as any).navigationManager;
-            if (navManager?.refreshNavigation) {
-              navManager.refreshNavigation();
-            }
-          }
+          // Use the dev tools manager for proper handling
+          import('./dev-tools-manager').then(({ devToolsManager }) => {
+            devToolsManager.toggleDevTools();
+          });
         } catch (e) {
           console.warn('Failed to toggle dev tools:', e);
         }
@@ -286,6 +268,50 @@ const BUTTON_CONFIG: {
       type: 'save-btn',
       label: 'Import Save',
     },
+    devTestOffline: {
+      func: (hoursAway?: string) => {
+        try {
+          const hours = Number(hoursAway) || 2; // Default 2 hours
+          const millisecondsAway = hours * 60 * 60 * 1000;
+
+          // Set lastSaveTime to simulate being away
+          const w: any = window as any;
+          const fakeLastSaveTime = Date.now() - millisecondsAway;
+
+          // Update the save time
+          w.lastSaveTime = fakeLastSaveTime;
+          w.App?.state?.setState?.({ lastSaveTime: fakeLastSaveTime });
+
+          // Trigger offline progression check
+          import('../core/systems/offline-progression').then(({ processOfflineProgression }) => {
+            import('../ui/offline-modal').then(({ showOfflineModal }) => {
+              const result = processOfflineProgression({
+                maxOfflineHours: 8,
+                minOfflineMinutes: 0.1, // Show even for short times in dev mode
+                offlineEfficiency: 1.0,
+              });
+
+              if (result) {
+                showOfflineModal(result, {
+                  showParticles: true,
+                  autoCloseAfter: 0,
+                  playSound: false,
+                });
+                console.log(
+                  `🎉 Offline test: Simulated ${hours}h away, earned ${result.sipsEarned} sips`
+                );
+              } else {
+                console.log('❌ Offline test: No offline progression triggered');
+              }
+            });
+          });
+        } catch (error) {
+          console.error('Failed to test offline progression:', error);
+        }
+      },
+      type: 'dev-btn',
+      label: 'Test Offline',
+    },
     // Settings Modal Actions
     openSettings: {
       func: () => {
@@ -296,6 +322,13 @@ const BUTTON_CONFIG: {
             // Add a small delay to ensure the display change is processed
             setTimeout(() => {
               modal.classList.add('settings-modal-open');
+
+              // Refresh audio controls to sync with current state
+              try {
+                audioControlsManager.refresh();
+              } catch (error) {
+                console.debug('Audio controls not available yet:', error);
+              }
             }, 10);
           }
         } catch (error) {
@@ -323,6 +356,81 @@ const BUTTON_CONFIG: {
       },
       type: 'settings-modal-btn',
       label: 'Close Settings',
+    },
+    closeOfflineModal: {
+      func: () => {
+        try {
+          const modal = document.getElementById('offlineModal');
+          if (modal) {
+            modal.style.animation = 'offlineModalFadeIn 0.2s ease-in reverse';
+            setTimeout(() => {
+              if (modal.parentNode) {
+                modal.remove();
+              }
+            }, 200);
+          }
+        } catch (error) {
+          console.warn('Failed to close offline modal:', error);
+        }
+      },
+      type: 'offline-modal-btn',
+      label: 'Claim Offline Earnings',
+    },
+    forceGameplayMusic: {
+      func: () => {
+        try {
+          enhancedAudioManager.forceTransitionToGameplay();
+          const state = enhancedAudioManager.getAudioState();
+          console.log(`Music transitioned to: ${state.currentTrack}`);
+        } catch (error) {
+          console.warn('Failed to transition to gameplay music:', error);
+        }
+      },
+      type: 'dev-btn',
+      label: 'Force Gameplay Music',
+    },
+    testVolumeBalance: {
+      func: () => {
+        try {
+          const state = enhancedAudioManager.getAudioState();
+          console.log('Current volume adjustments:', {
+            title: state.titleVolumeAdjustment,
+            gameplay: state.gameplayVolumeAdjustment,
+            currentTrack: state.currentTrack
+          });
+          
+          // Quick test: reduce gameplay music by additional 10%
+          enhancedAudioManager.adjustTrackVolumes(1.0, 0.65);
+          console.log('Applied test adjustment: Title=1.0, Gameplay=0.65');
+        } catch (error) {
+          console.warn('Failed to test volume balance:', error);
+        }
+      },
+      type: 'dev-btn',
+      label: '🔊 Test Volume Balance',
+    },
+    testMusicLooping: {
+      func: () => {
+        try {
+          // Force transition to gameplay music to test looping
+          enhancedAudioManager.forceTransitionToGameplay();
+          
+          const state = enhancedAudioManager.getAudioState();
+          console.log('Testing trimmed music looping:', {
+            currentTrack: state.currentTrack,
+            musicPlaying: state.musicPlaying,
+            titleMusicPlayed: state.titleMusicPlayed
+          });
+          
+          // Log when the music should loop
+          console.log('Watch console for trimmed loop behavior - should skip 5s of dead air');
+          console.log('If timing is off, adjust the sprite end time in enhanced-audio-manager.ts');
+        } catch (error) {
+          console.warn('Failed to test music looping:', error);
+        }
+      },
+      type: 'dev-btn',
+      label: '🔄 Test Trimmed Loop',
     },
     switchSettingsTab: {
       func: (tabName: string) => {
