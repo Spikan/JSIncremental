@@ -6,6 +6,7 @@ export type DecimalLike = {
 };
 
 import { formatNumber as formatDecimal } from '../core/numbers/simplified';
+import { useGameStore } from '../core/state/zustand-store';
 
 /**
  * Enhanced number formatting system following idle game best practices
@@ -194,7 +195,7 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
   const formattedCost = formatCostNumber(cost as any);
   let currentSips = '0';
   try {
-    const st = (window as any).App?.state?.getState?.();
+    const st = useGameStore.getState();
     // Use sips directly - formatNumber will handle Decimal properly
     currentSips = formatStatNumber(st?.sips || 0);
   } catch (error) {
@@ -246,7 +247,7 @@ export function updateCostDisplay(elementId: string, cost: number, isAffordable:
 export const GameState = {
   get sips(): number | any {
     if (typeof window === 'undefined') return 0;
-    const st = (window as any).App?.state?.getState?.();
+    const st = useGameStore.getState();
     const sipsValue = st && typeof st.sips !== 'undefined' ? st.sips : (window as any).sips;
     // CRITICAL FIX: Don't truncate extreme values to 0 - return the Decimal for proper formatting
     if (sipsValue && typeof sipsValue.toNumber === 'function') {
@@ -262,14 +263,14 @@ export const GameState = {
   },
   get level(): number {
     if (typeof window === 'undefined') return 1;
-    const st = (window as any).App?.state?.getState?.();
+    const st = useGameStore.getState();
     return st && typeof st.level !== 'undefined'
       ? Number(st.level || 1)
       : Number((window as any).level || 1);
   },
   get spd(): number | any {
     if (typeof window === 'undefined') return 0;
-    const st = (window as any).App?.state?.getState?.();
+    const st = useGameStore.getState();
     const spdValue = st && typeof st.spd !== 'undefined' ? st.spd : (window as any).spd;
     // CRITICAL FIX: Don't truncate extreme values to 0 - return the Decimal for proper formatting
     if (spdValue && typeof spdValue.toNumber === 'function') {
@@ -285,7 +286,7 @@ export const GameState = {
   },
   get drinkRate(): number {
     if (typeof window === 'undefined') return 0;
-    const st = (window as any).App?.state?.getState?.();
+    const st = useGameStore.getState();
     return st && typeof st.drinkRate !== 'undefined' ? st.drinkRate : (window as any).drinkRate;
   },
 };

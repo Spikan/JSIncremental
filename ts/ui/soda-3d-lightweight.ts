@@ -447,12 +447,8 @@ export class Soda3DButton {
     this.performanceDegradationCount = 0;
 
     // Show user notification
-    if ((window as any).App?.ui?.showNotification) {
-      (window as any).App.ui.showNotification(
-        `3D Model performance auto-adjusted to ${this.config.performanceMode} for better performance`,
-        'info'
-      );
-    }
+    // Modernized - notifications handled by store
+    console.log('3D Model performance set to', this.config.performanceMode);
   }
 
   private setRotationSpeed(speed: number) {

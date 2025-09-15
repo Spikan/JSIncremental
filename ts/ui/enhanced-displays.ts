@@ -5,6 +5,7 @@ import { animateNumberDisplay } from './enhanced-feedback';
 import { formatNumber } from './utils';
 import { getDisplayData } from '../core/state/zustand-store';
 import { domQuery } from '../services/dom-query';
+import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
 import { logger } from '../services/logger';
 import { safeToNumberOrDecimal } from '../core/numbers/simplified';
 import { updateLevelUpDisplay } from './displays';
@@ -129,7 +130,7 @@ class EnhancedDisplayManager {
       if (!levelElement) return;
 
       // Use hybrid level system as single source of truth
-      const hybridSystem = (window as any).App?.systems?.hybridLevel;
+      const hybridSystem = hybridLevelSystem;
       if (hybridSystem && typeof hybridSystem.getCurrentLevelId === 'function') {
         const currentLevel = hybridSystem.getCurrentLevelId().toString();
         const previousLevel = this.previousState.level;
