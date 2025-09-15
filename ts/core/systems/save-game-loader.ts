@@ -364,13 +364,8 @@ export class SaveGameLoader {
    */
   private loadHybridLevelData(savegame: SaveGameData): void {
     try {
-      console.log('🔍 Loading hybrid level data from save:', savegame.hybridLevelData);
-      console.log('🔍 Full savegame object keys:', Object.keys(savegame));
-      console.log('🔍 Full savegame object:', savegame);
-      
       if (savegame.hybridLevelData) {
         const { currentLevel, unlockedLevels } = savegame.hybridLevelData;
-        console.log('🔍 Parsed hybrid level data:', { currentLevel, unlockedLevels });
 
         // Restore hybrid level system state
         const hybridSystem = (window as any).App?.systems?.hybridLevel;
@@ -379,19 +374,21 @@ export class SaveGameLoader {
           const levelsToRestore = [...new Set([1, ...(unlockedLevels || [])])];
           const levelToRestore = currentLevel || 1;
 
-          console.log('🔄 Restoring hybrid level state:', {
-            currentLevel: levelToRestore,
-            unlockedLevels: levelsToRestore,
-          });
-
           hybridSystem.restoreState(levelToRestore, levelsToRestore);
-          console.log('✅ Hybrid level system state restored successfully');
+
+          // Update UI displays after restoring hybrid level state
+          try {
+            (window as any).App?.ui?.updateLevelText?.();
+            (window as any).App?.ui?.updateLevelNumber?.();
+            (window as any).App?.ui?.updateAllDisplaysAnimated?.();
+          } catch (error) {
+            console.warn('Failed to update UI displays after hybrid level restoration:', error);
+          }
         } else {
           console.warn('⚠️ Hybrid level system not available for state restoration');
         }
       } else {
         // No hybrid level data in save, apply default theme
-        console.log('🎨 No hybrid level data in save, applying default theme');
         try {
           (window as any).App?.systems?.hybridLevel?.applyInitialTheme?.();
         } catch (error) {

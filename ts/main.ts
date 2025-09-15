@@ -176,12 +176,9 @@ function initGame() {
       const w: any = window as any;
       if (w.App && w.App.storage && typeof w.App.storage.loadGame === 'function') {
         savegame = w.App.storage.loadGame();
-        console.log('🔍 Loaded save from App.storage.loadGame():', savegame);
       } else {
         savegame = JSON.parse(localStorage.getItem('save') as any);
-        console.log('🔍 Loaded save from localStorage.getItem("save"):', savegame);
       }
-      
     } catch (e) {
       console.warn('Failed to load save, starting fresh.', e);
       savegame = null;

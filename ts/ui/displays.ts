@@ -465,20 +465,12 @@ export function updateLevelText(): void {
     const hybridSystem = (window as any).App?.systems?.hybridLevel;
     let levelText = 'The Beach (Level 1)';
 
-    console.log('🔍 updateLevelText called, hybridSystem available:', !!hybridSystem);
-
     if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
       const currentLevel = hybridSystem.getCurrentLevel();
-      console.log('🔍 Current level from hybrid system:', currentLevel);
 
       if (currentLevel) {
         levelText = `${currentLevel.name} (Level ${currentLevel.id})`;
-        console.log('✅ Setting level text to:', levelText);
-      } else {
-        console.log('⚠️ No current level found in hybrid system');
       }
-    } else {
-      console.log('⚠️ Hybrid system not available or getCurrentLevel not a function');
     }
 
     // Update the current level name display

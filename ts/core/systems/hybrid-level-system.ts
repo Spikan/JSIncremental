@@ -316,14 +316,9 @@ export class HybridLevelSystem {
   // private completedLevels: Set<number> = new Set(); // Future feature
 
   constructor() {
-    console.log('🏗️ Initializing HybridLevelSystem...');
     this.loadUnlockedLevels();
     this.loadCurrentLevel();
     this.isInitialized = true;
-    console.log('🏗️ HybridLevelSystem initialized:', {
-      currentLevel: this.currentLevel,
-      unlockedLevels: Array.from(this.unlockedLevels),
-    });
   }
 
   getAllLevels(): HybridLevel[] {
@@ -344,7 +339,6 @@ export class HybridLevelSystem {
   }
 
   getCurrentLevelId(): number {
-    console.log('🔍 getCurrentLevelId called, returning:', this.currentLevel);
     return this.currentLevel;
   }
 
@@ -354,28 +348,21 @@ export class HybridLevelSystem {
 
   // Method for save loader to restore state
   restoreState(currentLevel: number, unlockedLevels: number[]): void {
-    console.log('🔄 Restoring hybrid level state:', { currentLevel, unlockedLevels });
-
     // Restore unlocked levels
     this.unlockedLevels = new Set(unlockedLevels);
-    console.log('✅ Restored unlocked levels:', Array.from(this.unlockedLevels));
 
     // Restore current level (only if it's unlocked)
     if (this.unlockedLevels.has(currentLevel)) {
       this.currentLevel = currentLevel;
-      console.log('✅ Restored current level:', this.currentLevel);
-
       // Apply theme for the restored level
       this.applyLevelTheme();
     } else {
-      console.log('⚠️ Saved level not unlocked, defaulting to level 1');
       this.currentLevel = 1;
       this.applyLevelTheme();
     }
   }
 
   applyInitialTheme(): void {
-    console.log('🎨 Applying initial theme from hybrid level system');
     this.applyLevelTheme();
 
     // Also update the level text display
@@ -423,11 +410,6 @@ export class HybridLevelSystem {
   canUnlockLevel(levelId: number): boolean {
     const level = this.getAllLevels().find(l => l.id === levelId);
     if (!level || this.unlockedLevels.has(levelId)) {
-      console.log(`🔒 Level ${levelId} cannot be unlocked:`, {
-        levelExists: !!level,
-        alreadyUnlocked: this.unlockedLevels.has(levelId),
-        unlockedLevels: Array.from(this.unlockedLevels),
-      });
       return false;
     }
 
@@ -443,25 +425,10 @@ export class HybridLevelSystem {
     const clicksMet = clicks >= level.unlockRequirement.clicks;
     const levelMet = currentHybridLevel >= (level.unlockRequirement.level || 1);
 
-    console.log(`🔍 Checking unlock for level ${levelId}:`, {
-      sips: sips.toString(),
-      clicks,
-      currentHybridLevel,
-      requirements: level.unlockRequirement,
-      sipsMet,
-      clicksMet,
-      levelMet,
-      canUnlock: sipsMet && clicksMet && levelMet,
-    });
-
     return sipsMet && clicksMet && levelMet;
   }
 
   unlockLevel(levelId: number, silent: boolean = false): boolean {
-    if (!silent) {
-      console.log(`🔓 Attempting to unlock level ${levelId}...`);
-    }
-
     // For silent unlocks (like during save loading), just add to unlocked set
     if (silent) {
       this.unlockedLevels.add(levelId);
@@ -470,49 +437,29 @@ export class HybridLevelSystem {
     }
 
     if (this.canUnlockLevel(levelId)) {
-      console.log(`✅ Unlocking level ${levelId}`);
       this.unlockedLevels.add(levelId);
       this.saveUnlockedLevels();
-      console.log(
-        `✅ Level ${levelId} unlocked successfully! Unlocked levels:`,
-        Array.from(this.unlockedLevels)
-      );
       return true;
     }
-    console.log(`❌ Failed to unlock level ${levelId}`);
     return false;
   }
 
   switchToLevel(levelId: number): boolean {
-    console.log('🔄 switchToLevel called with levelId:', levelId);
-    console.log('🔄 Current unlocked levels:', Array.from(this.unlockedLevels));
-
     if (this.unlockedLevels.has(levelId)) {
-      console.log('✅ Level is unlocked, switching to:', levelId);
       this.currentLevel = levelId;
       this.saveCurrentLevel();
-
-      console.log('🎨 Applying theme for level:', levelId);
       this.applyLevelTheme();
-
-      // this.playLevelAudio(); // Audio removed
       return true;
     } else {
-      console.log('❌ Level not unlocked:', levelId);
+      return false;
     }
-    return false;
   }
 
   private applyLevelTheme(): void {
     const level = this.getCurrentLevel();
     if (!level) {
-      console.log('🎨 No level found for theme application');
       return;
     }
-
-    console.log('🎨 Applying theme for level:', level.id, level.name, level.visualTheme);
-    console.log('🎨 Current body background before theme:', document.body.style.background);
-    console.log('🎨 Current unlocked levels:', Array.from(this.unlockedLevels));
 
     // Apply visual theme
     const root = document.documentElement;
@@ -527,12 +474,6 @@ export class HybridLevelSystem {
     document.body.style.background =
       level.visualTheme.backgroundImage || level.visualTheme.backgroundColor;
     document.body.style.backgroundAttachment = 'fixed';
-
-    console.log('🎨 Theme applied:', {
-      backgroundColor: level.visualTheme.backgroundColor,
-      backgroundImage: level.visualTheme.backgroundImage,
-      bodyBackground: document.body.style.background,
-    });
 
     // Add level-specific particles
     this.addLevelParticles(level);
@@ -589,7 +530,6 @@ export class HybridLevelSystem {
     try {
       // Don't save here - let the main save system handle it
       // The main save system will call getUnlockedLevelIds() when saving
-      console.log('💾 Hybrid system unlocked levels updated:', Array.from(this.unlockedLevels));
     } catch (error) {
       console.warn('Failed to update unlocked levels state:', error);
     }
@@ -615,7 +555,6 @@ export class HybridLevelSystem {
       // Don't load from storage here - the main save system will handle loading
       // Just initialize with level 1 by default
       this.currentLevel = 1;
-      console.log('🏗️ Hybrid system initialized with default current level:', this.currentLevel);
     } catch (error) {
       console.warn('Failed to initialize current level:', error);
       this.currentLevel = 1;
@@ -634,11 +573,8 @@ export class HybridLevelSystem {
 
   // Check for new level unlocks
   checkForUnlocks(): number[] {
-    console.log('🔍 checkForUnlocks called, isInitialized:', this.isInitialized);
-
     // Don't trigger notifications during initial load
     if (!this.isInitialized) {
-      console.log('⏸️ Skipping unlock check during initialization');
       return [];
     }
 
@@ -649,8 +585,6 @@ export class HybridLevelSystem {
     // Use hybrid system's current level instead of old system's level
     const currentLevel = this.currentLevel;
 
-    console.log('🔍 Checking unlocks with state:', { sips: sips.toString(), clicks, currentLevel });
-
     this.getAllLevels().forEach(level => {
       if (!this.unlockedLevels.has(level.id)) {
         const sipsMet = sips.gte
@@ -660,7 +594,6 @@ export class HybridLevelSystem {
         const levelMet = currentLevel >= (level.unlockRequirement.level || 1);
 
         if (sipsMet && clicksMet && levelMet) {
-          console.log('🎉 Unlocking level:', level.id, level.name);
           this.unlockedLevels.add(level.id);
           newlyUnlocked.push(level.id);
         }
@@ -668,7 +601,6 @@ export class HybridLevelSystem {
     });
 
     if (newlyUnlocked.length > 0) {
-      console.log('💾 Saving newly unlocked levels:', newlyUnlocked);
       this.saveUnlockedLevels();
     }
 
