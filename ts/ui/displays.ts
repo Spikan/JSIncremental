@@ -1,7 +1,8 @@
 // UI Display Updates (TypeScript)
 import { formatNumber, updateButtonState, updateCostDisplay } from './utils';
-import { getCostCalculationData, getDisplayData } from '../core/state/zustand-store';
+import { getCostCalculationData, getDisplayData, useGameStore } from '../core/state/zustand-store';
 import { safeToNumberOrDecimal, toDecimal } from '../core/numbers/simplified';
+import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
 import subscriptionManager from './subscription-manager';
 import debounceManager from './debounce-utils';
 import { updateLastSaveTime, updatePurchasedCounts } from './stats';
@@ -238,18 +239,18 @@ export function updateProductionSummary(): void {
   const totalPassiveElement = document.getElementById('totalPassiveProduction');
 
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (state) {
       // Calculate straw production
       const strawCount = Number(state.straws || 0);
       const strawSPD = Number(state.strawSPD || 0);
-      const widerStrawsBonus = Number(state.widerStrawsSPD || 0);
+      const widerStrawsBonus = Number(state.widerStraws || 0);
       const totalStrawProduction = strawCount * strawSPD * (1 + widerStrawsBonus / 100);
 
       // Calculate cup production
       const cupCount = Number(state.cups || 0);
       const cupSPD = Number(state.cupSPD || 0);
-      const betterCupsBonus = Number(state.betterCupsSPD || 0);
+      const betterCupsBonus = Number(state.betterCups || 0);
       const totalCupProduction = cupCount * cupSPD * (1 + betterCupsBonus / 100);
 
       // Total passive production
@@ -432,7 +433,7 @@ export function updateLevelNumber(): void {
   if (levelEl) {
     try {
       // Use hybrid level system as single source of truth
-      const hybridSystem = (window as any).App?.systems?.hybridLevel;
+      const hybridSystem = hybridLevelSystem;
       if (hybridSystem && typeof hybridSystem.getCurrentLevelId === 'function') {
         const levelId = hybridSystem.getCurrentLevelId();
         console.log('🔍 updateLevelNumber: Setting level number to:', levelId);

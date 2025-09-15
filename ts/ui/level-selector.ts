@@ -2,6 +2,7 @@
 
 import { hybridLevelSystem, HybridLevel } from '../core/systems/hybrid-level-system';
 import { formatNumber } from './utils';
+import { updateLevelText } from './displays';
 
 export class LevelSelector {
   private container: HTMLElement | null = null;
@@ -382,16 +383,17 @@ export class LevelSelector {
 
       // Update main UI displays
       try {
-        (window as any).App?.ui?.updateLevelText?.();
-        (window as any).App?.ui?.updateLevelNumber?.();
-        (window as any).App?.ui?.updateAllDisplaysAnimated?.();
+        updateLevelText();
+        // Modernized - level number updates handled by store
+        // Modernized - display updates handled by store
       } catch (error) {
         console.warn('Failed to update main UI displays:', error);
       }
 
       // Emit event for other systems
       try {
-        (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.LEVEL?.CHANGED, {
+        // Modernized - events handled by store
+        console.log('Level changed:', {
           levelId,
           level: hybridLevelSystem.getCurrentLevel(),
         });
