@@ -91,8 +91,22 @@ export class SidebarNavigationManager {
       }, 1000);
     }
 
+    // Add close button event listener
+    this.setupCloseButton();
+
     // Add swipe-to-close functionality
     this.setupSwipeToClose();
+  }
+
+  private setupCloseButton(): void {
+    const closeBtn = document.getElementById('sidebarCloseBtn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.closeMobileSidebar();
+      });
+    }
   }
 
   private setupSwipeToClose(): void {
@@ -230,13 +244,6 @@ export class SidebarNavigationManager {
     overlay.addEventListener('click', () => {
       this.closeMobileSidebar();
     });
-
-    // Prevent sidebar content clicks from closing the sidebar
-    if (this.sidebar) {
-      this.sidebar.addEventListener('click', e => {
-        e.stopPropagation();
-      });
-    }
 
     document.body.appendChild(overlay);
   }
