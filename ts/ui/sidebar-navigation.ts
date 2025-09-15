@@ -59,8 +59,30 @@ export class SidebarNavigationManager {
   private setupEventListeners(): void {
     // Sidebar toggle button
     if (this.sidebarToggle) {
+      // Add click event
       this.sidebarToggle.addEventListener('click', () => {
+        console.log('Sidebar toggle clicked');
         this.toggleSidebar();
+      });
+
+      // Add touch events for better mobile responsiveness
+      this.sidebarToggle.addEventListener(
+        'touchstart',
+        e => {
+          e.preventDefault();
+          console.log('Sidebar toggle touch start');
+          this.toggleSidebar();
+        },
+        { passive: false }
+      );
+
+      // Add pointer events for better cross-platform support
+      this.sidebarToggle.addEventListener('pointerdown', e => {
+        if (e.pointerType === 'touch') {
+          e.preventDefault();
+          console.log('Sidebar toggle pointer down (touch)');
+          this.toggleSidebar();
+        }
       });
     }
 
