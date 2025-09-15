@@ -231,6 +231,13 @@ export class SidebarNavigationManager {
       this.closeMobileSidebar();
     });
 
+    // Prevent sidebar content clicks from closing the sidebar
+    if (this.sidebar) {
+      this.sidebar.addEventListener('click', e => {
+        e.stopPropagation();
+      });
+    }
+
     document.body.appendChild(overlay);
   }
 
