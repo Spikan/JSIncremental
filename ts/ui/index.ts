@@ -106,7 +106,7 @@ export function setupDirectSodaClickHandler(): () => void {
   logger.debug('Setting up direct soda click handler...');
 
   // Set up debounced monitoring for top bar updates
-  let lastValues = { sips: null, spd: null, level: null };
+  let lastValues = { sips: null, spd: null, level: null, hybridLevel: null };
   let updateTimeout: string = '';
   let valueCheckInterval: string = '';
 
@@ -131,18 +131,24 @@ export function setupDirectSodaClickHandler(): () => void {
         const currentSips = gameData.sips;
         const currentSPD = gameData.spd;
         const currentLevel = gameData.level;
+        
+        // Also check hybrid level system's current level
+        const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        const currentHybridLevel = hybridSystem?.getCurrentLevelId?.() || 1;
 
         // Check if any relevant values have changed
         if (
           currentSips !== lastValues.sips ||
           currentSPD !== lastValues.spd ||
-          currentLevel !== lastValues.level
+          currentLevel !== lastValues.level ||
+          currentHybridLevel !== lastValues.hybridLevel
         ) {
-          lastValues = { sips: currentSips, spd: currentSPD, level: currentLevel };
+          lastValues = { sips: currentSips, spd: currentSPD, level: currentLevel, hybridLevel: currentHybridLevel };
           debouncedUpdateTopBar();
 
           // Update hybrid level system display
           try {
+            console.log('🔄 Value change detected, calling updateAllDisplaysAnimated');
             updateAllDisplaysAnimated();
           } catch (error) {
             console.warn('Failed to call updateAllDisplaysAnimated:', error);

@@ -468,7 +468,7 @@ export function updateLevelText(): void {
       if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
         const currentLevel = hybridSystem.getCurrentLevel();
         console.log('🔍 Current level from hybrid system:', currentLevel);
-        
+
         if (currentLevel) {
           levelText = `Level ${currentLevel.id}: ${currentLevel.name}`;
           console.log('✅ Setting level text to:', levelText);

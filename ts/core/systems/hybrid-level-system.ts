@@ -344,6 +344,7 @@ export class HybridLevelSystem {
   }
 
   getCurrentLevelId(): number {
+    console.log('🔍 getCurrentLevelId called, returning:', this.currentLevel);
     return this.currentLevel;
   }
 
