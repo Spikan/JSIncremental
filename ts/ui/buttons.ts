@@ -101,31 +101,16 @@ const BUTTON_CONFIG: {
               });
               console.log('📋 Next level requirements:', nextLevel.unlockRequirement);
 
-              const canUnlock =
-                sips.gte(nextLevel.unlockRequirement.sips) &&
-                clicks >= nextLevel.unlockRequirement.clicks &&
-                currentHybridLevel >= (nextLevel.unlockRequirement.level || 1);
+              // Check if level is already unlocked
+              const isAlreadyUnlocked = hybridSystem.isLevelUnlocked(nextLevel.id);
+              console.log('🔍 Level already unlocked:', isAlreadyUnlocked);
 
-              console.log('✅ Can unlock:', canUnlock);
-
-              if (canUnlock) {
-                console.log('🔓 Attempting to unlock level:', nextLevel.id);
-                // Unlock the next level
-                if (hybridSystem.unlockLevel(nextLevel.id)) {
-                  console.log('✅ Level unlocked successfully!');
-                  // Switch to the new level
-                  hybridSystem.switchToLevel(nextLevel.id);
-                  console.log('🔄 Switched to level:', nextLevel.id);
-
-                  // Show notification
-                  import('./level-selector')
-                    .then(({ levelSelector }) => {
-                      levelSelector.showUnlockNotification(nextLevel.id);
-                    })
-                    .catch(error => {
-                      console.warn('Failed to load level selector for notifications:', error);
-                    });
-
+              if (isAlreadyUnlocked) {
+                // Level is already unlocked, just switch to it
+                console.log('🔄 Switching to already unlocked level:', nextLevel.id);
+                if (hybridSystem.switchToLevel(nextLevel.id)) {
+                  console.log('✅ Switched to level:', nextLevel.id);
+                  
                   // Update the display
                   try {
                     (window as any).App?.ui?.updateLevelUpDisplay?.(state);
@@ -135,10 +120,49 @@ const BUTTON_CONFIG: {
                     console.warn('Failed to update level display:', error);
                   }
                 } else {
-                  console.log('❌ Failed to unlock level');
+                  console.log('❌ Failed to switch to level');
                 }
               } else {
-                console.log('❌ Cannot unlock - requirements not met');
+                // Level is not unlocked, check if we can unlock it
+                const canUnlock =
+                  sips.gte(nextLevel.unlockRequirement.sips) &&
+                  clicks >= nextLevel.unlockRequirement.clicks &&
+                  currentHybridLevel >= (nextLevel.unlockRequirement.level || 1);
+
+                console.log('✅ Can unlock:', canUnlock);
+
+                if (canUnlock) {
+                  console.log('🔓 Attempting to unlock level:', nextLevel.id);
+                  // Unlock the next level
+                  if (hybridSystem.unlockLevel(nextLevel.id)) {
+                    console.log('✅ Level unlocked successfully!');
+                    // Switch to the new level
+                    hybridSystem.switchToLevel(nextLevel.id);
+                    console.log('🔄 Switched to level:', nextLevel.id);
+
+                    // Show notification
+                    import('./level-selector')
+                      .then(({ levelSelector }) => {
+                        levelSelector.showUnlockNotification(nextLevel.id);
+                      })
+                      .catch(error => {
+                        console.warn('Failed to load level selector for notifications:', error);
+                      });
+
+                    // Update the display
+                    try {
+                      (window as any).App?.ui?.updateLevelUpDisplay?.(state);
+                      (window as any).App?.ui?.updateLevelText?.();
+                      console.log('🔄 Display updated');
+                    } catch (error) {
+                      console.warn('Failed to update level display:', error);
+                    }
+                  } else {
+                    console.log('❌ Failed to unlock level');
+                  }
+                } else {
+                  console.log('❌ Cannot unlock - requirements not met');
+                }
               }
             } else {
               console.log('❌ No next level found');
