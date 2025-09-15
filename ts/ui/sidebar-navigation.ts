@@ -72,32 +72,10 @@ export class SidebarNavigationManager {
     if (this.mobileMenuToggle) {
       console.log('Setting up event listener for mobile menu toggle');
 
-      // Add visual feedback for mobile debugging
+      // Simple click handler
       this.mobileMenuToggle.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Mobile menu toggle clicked');
-
-        // Visual feedback - change button color briefly
-        this.mobileMenuToggle!.style.backgroundColor = '#ff6b6b';
-        setTimeout(() => {
-          this.mobileMenuToggle!.style.backgroundColor = '';
-        }, 200);
-
-        this.toggleMobileSidebar();
-      });
-
-      // Also add touch events for better mobile response
-      this.mobileMenuToggle.addEventListener('touchstart', e => {
-        e.preventDefault();
-        console.log('Mobile menu toggle touch start');
-        this.mobileMenuToggle!.style.backgroundColor = '#4ecdc4';
-      });
-
-      this.mobileMenuToggle.addEventListener('touchend', e => {
-        e.preventDefault();
-        console.log('Mobile menu toggle touch end');
-        this.mobileMenuToggle!.style.backgroundColor = '';
         this.toggleMobileSidebar();
       });
     } else {
@@ -112,6 +90,45 @@ export class SidebarNavigationManager {
         }
       }, 1000);
     }
+
+    // Add swipe-to-close functionality
+    this.setupSwipeToClose();
+  }
+
+  private setupSwipeToClose(): void {
+    if (!this.sidebar) return;
+
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+
+    this.sidebar.addEventListener('touchstart', e => {
+      if (e.touches && e.touches[0]) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isDragging = false;
+      }
+    });
+
+    this.sidebar.addEventListener('touchmove', e => {
+      if (!isDragging && e.touches && e.touches[0]) {
+        const deltaX = Math.abs(e.touches[0].clientX - startX);
+        const deltaY = Math.abs(e.touches[0].clientY - startY);
+        isDragging = deltaX > 10 || deltaY > 10;
+      }
+    });
+
+    this.sidebar.addEventListener('touchend', e => {
+      if (isDragging && e.changedTouches && e.changedTouches[0]) {
+        const endX = e.changedTouches[0].clientX;
+        const deltaX = endX - startX;
+
+        // Swipe right to close (if swiped more than 50px to the right)
+        if (deltaX > 50) {
+          this.closeMobileSidebar();
+        }
+      }
+    });
   }
 
   private setupResizeListener(): void {
@@ -176,15 +193,14 @@ export class SidebarNavigationManager {
 
     console.log('Opening mobile sidebar...');
     this.sidebar.classList.add('mobile-open');
-    console.log('Mobile sidebar opened, classes:', this.sidebar.className);
 
-    // Visual feedback - make sidebar visible with animation
-    this.sidebar.style.display = 'flex';
-    this.sidebar.style.animation = 'slideIn 0.3s ease-out';
+    // Add overlay
+    this.addSidebarOverlay();
 
-    // Also add a visible background to make it obvious
-    this.sidebar.style.backgroundColor = 'rgba(0, 179, 107, 0.1)';
-    this.sidebar.style.border = '3px solid #00b36b';
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+
+    console.log('Mobile sidebar opened');
   }
 
   public closeMobileSidebar(): void {
@@ -195,16 +211,34 @@ export class SidebarNavigationManager {
 
     console.log('Closing mobile sidebar...');
     this.sidebar.classList.remove('mobile-open');
-    console.log('Mobile sidebar closed, classes:', this.sidebar.className);
 
-    // Visual feedback - animate out then hide
-    this.sidebar.style.animation = 'slideOut 0.3s ease-in';
-    setTimeout(() => {
-      this.sidebar!.style.display = 'none';
-      this.sidebar!.style.animation = '';
-      this.sidebar!.style.backgroundColor = '';
-      this.sidebar!.style.border = '';
-    }, 300);
+    // Remove overlay
+    this.removeSidebarOverlay();
+
+    // Restore body scroll
+    document.body.style.overflow = '';
+
+    console.log('Mobile sidebar closed');
+  }
+
+  private addSidebarOverlay(): void {
+    // Remove existing overlay if any
+    this.removeSidebarOverlay();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-sidebar-overlay active';
+    overlay.addEventListener('click', () => {
+      this.closeMobileSidebar();
+    });
+
+    document.body.appendChild(overlay);
+  }
+
+  private removeSidebarOverlay(): void {
+    const overlay = document.querySelector('.mobile-sidebar-overlay');
+    if (overlay) {
+      overlay.remove();
+    }
   }
 
   public forceInitialize(): void {

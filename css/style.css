@@ -705,33 +705,36 @@ body {
 /* Mobile Menu Toggle Button */
 .mobile-menu-toggle {
   display: none; /* Hidden by default */
-  background: rgba(0, 179, 107, 0.9);
-  border: 2px solid rgba(0, 179, 107, 1);
-  border-radius: 8px;
-  padding: 0.75rem;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
   color: #ffffff;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 1.2rem;
-  font-weight: bold;
-  min-width: 44px;
-  min-height: 44px;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  position: relative;
+  z-index: 10001; /* Above everything */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .mobile-menu-toggle:hover {
-  background: rgba(0, 179, 107, 1);
-  transform: scale(1.05);
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
 }
 
 .mobile-menu-toggle .hamburger-icon {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   line-height: 1;
+  font-weight: bold;
 }
 
 /* Mobile sidebar animations */
@@ -1022,19 +1025,41 @@ body {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 80%;
-    max-width: 300px;
+    width: 85%;
+    max-width: 350px;
     height: 100vh;
-    z-index: 1000;
-    display: flex; /* Always display flex, but positioned off-screen */
+    z-index: 10000;
+    display: flex;
     flex-direction: column;
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(10px);
-    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgba(0, 23, 137, 0.95), rgba(0, 36, 179, 0.9));
+    backdrop-filter: blur(20px);
+    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-left: 3px solid rgba(0, 179, 107, 0.8);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
   }
 
   .game-sidebar.mobile-open {
-    right: 0; /* Slide in from right when open */
+    right: 0;
+  }
+
+  /* Mobile sidebar overlay */
+  .mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+  }
+
+  .mobile-sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
   }
 }
 
