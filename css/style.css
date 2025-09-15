@@ -702,21 +702,36 @@ body {
   font-weight: bold;
 }
 
-.sidebar-toggle {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+  display: none; /* Hidden by default */
+  background: rgba(0, 179, 107, 0.9);
+  border: 2px solid rgba(0, 179, 107, 1);
   border-radius: 8px;
-  padding: 0.5rem;
+  padding: 0.75rem;
   color: #ffffff;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: none; /* Hidden on desktop, shown on mobile */
-  z-index: 2000; /* Ensure it's above the header (z-index: 100) */
-  position: relative; /* Ensure proper positioning */
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  font-weight: bold;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  position: relative;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.2);
+.mobile-menu-toggle:hover {
+  background: rgba(0, 179, 107, 1);
+  transform: scale(1.05);
+}
+
+.mobile-menu-toggle .hamburger-icon {
+  font-size: 1.5rem;
+  line-height: 1;
 }
 
 /* Sidebar Content - Direct Upgrade Cards */
@@ -976,16 +991,16 @@ body {
     order: 1;
   }
 
-  .sidebar-toggle {
-    display: block;
-  }
-
-  .game-sidebar.collapsed {
-    display: none;
-  }
-
-  .game-sidebar.expanded {
+  .mobile-menu-toggle {
     display: flex;
+  }
+
+  .game-sidebar {
+    display: none; /* Hidden by default on mobile */
+  }
+
+  .game-sidebar.mobile-open {
+    display: flex; /* Show when mobile menu is open */
   }
 }
 
@@ -1052,14 +1067,6 @@ body {
     margin-bottom: 1rem;
     padding: 1rem;
     border-radius: 12px;
-  }
-
-  .sidebar-toggle {
-    display: block !important; /* Force visibility on mobile */
-    visibility: visible !important;
-    opacity: 1 !important;
-    z-index: 2000 !important; /* Ensure it's above header */
-    position: relative !important;
   }
 
   .upgrade-cards {
@@ -1163,19 +1170,6 @@ body {
   }
 
   /* Mobile section headers - removed as no longer needed */
-
-  /* Mobile sidebar toggle button */
-  .sidebar-toggle {
-    min-width: 44px;
-    min-height: 44px;
-    touch-action: manipulation;
-    background: rgba(0, 179, 107, 0.8) !important; /* More visible green background */
-    border: 2px solid rgba(0, 179, 107, 1) !important; /* Stronger border */
-    color: #ffffff !important;
-    font-size: 1.2rem;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0, 179, 107, 0.3);
-  }
 
   /* Mobile production stats - stack vertically */
   .production-stats {
