@@ -631,20 +631,25 @@ export function initializeUI(): void {
     // Initialize authentic SDP experience
     initializeAuthenticSDP();
 
-    // Initialize lightweight 3D soda button
+    // Initialize lightweight 3D soda button with performance optimization
     try {
-      createSoda3DButton({
+      const soda3DButton = createSoda3DButton({
         containerSelector: '#sodaButton',
         size: 200,
         rotationSpeed: 1.0,
         hoverSpeedMultiplier: 2.0,
+        performanceMode: 'medium', // Start with balanced performance
+        frameRateLimit: 30, // 30fps default
         // clickAnimationDuration removed
       });
+
+      // Store reference for performance management
+      (window as any).soda3DButton = soda3DButton;
 
       // Click handler is now built into the 3D button
       // No need to add additional handlers
 
-      logger.info('Lightweight 3D soda button initialized');
+      logger.info('Lightweight 3D soda button initialized with performance optimization');
     } catch (error) {
       logger.error('Failed to initialize 3D soda button:', error);
     }

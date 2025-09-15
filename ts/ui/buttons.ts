@@ -877,6 +877,29 @@ function setupUnifiedButtonSystem(): void {
       e.stopPropagation();
     });
   }
+
+  // Add performance mode change handler for 3D model
+  const modelPerformanceSelect = document.getElementById(
+    'modelPerformanceMode'
+  ) as HTMLSelectElement;
+  if (modelPerformanceSelect) {
+    modelPerformanceSelect.addEventListener('change', (e: Event) => {
+      const target = e.target as HTMLSelectElement;
+      const mode = target.value as 'low' | 'medium' | 'high';
+
+      // Update 3D model performance mode
+      const soda3DButton = (window as any).soda3DButton;
+      if (soda3DButton && typeof soda3DButton.setPerformanceMode === 'function') {
+        soda3DButton.setPerformanceMode(mode);
+        console.log(`🎮 3D Model performance mode changed to: ${mode}`);
+
+        // Show feedback
+        if ((window as any).App?.ui?.showNotification) {
+          (window as any).App.ui.showNotification(`3D Model performance set to ${mode}`, 'info');
+        }
+      }
+    });
+  }
   setupSpecialButtonHandlers();
   // Button system setup complete
 }

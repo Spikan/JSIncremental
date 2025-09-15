@@ -180,7 +180,8 @@ export class BubbleParticleSystem {
     particle.life = 0;
     particle.maxLife = 3000; // 3 seconds
     particle.color =
-      this.config.bubbleColors[Math.floor(Math.random() * this.config.bubbleColors.length)] || '#ffffff';
+      this.config.bubbleColors[Math.floor(Math.random() * this.config.bubbleColors.length)] ||
+      '#ffffff';
     particle.type = 'celebration';
     particle.text = '✨';
     particle.scale = 1;
@@ -213,7 +214,8 @@ export class BubbleParticleSystem {
     particle.life = 0;
     particle.maxLife = Math.random() * 3000 + 2000;
     particle.color =
-      this.config.bubbleColors[Math.floor(Math.random() * this.config.bubbleColors.length)] || '#ffffff';
+      this.config.bubbleColors[Math.floor(Math.random() * this.config.bubbleColors.length)] ||
+      '#ffffff';
     particle.type = 'ambient';
     particle.scale = 1;
     particle.rotation = 0;

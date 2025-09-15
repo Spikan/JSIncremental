@@ -662,6 +662,17 @@
               <button data-action="delete_save" class="settings-btn">Delete Save</button>
             </div>
             <div class="settings-group">
+              <h4 class="settings-group-title">Performance</h4>
+              <div class="performance-control">
+                <label for="modelPerformanceMode">🎮 3D Model Performance</label>
+                <select id="modelPerformanceMode" class="performance-select">
+                  <option value="low">Low (15fps) - Best for slow devices</option>
+                  <option value="medium" selected>Medium (30fps) - Balanced</option>
+                  <option value="high">High (60fps) - Best quality</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-group">
               <h4 class="settings-group-title">Dev Tools</h4>
               <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
                 🔧 Dev Tools OFF

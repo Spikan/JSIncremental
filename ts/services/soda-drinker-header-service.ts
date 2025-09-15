@@ -42,7 +42,7 @@ export class SodaDrinkerHeaderService {
     };
 
     this.setupAccessibility();
-    
+
     // Reference unused methods to prevent TypeScript warnings
     this.toggleLevelDropdown = this.toggleLevelDropdown.bind(this);
     this.unlockNextLevel = this.unlockNextLevel.bind(this);

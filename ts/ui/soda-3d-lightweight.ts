@@ -45,6 +45,8 @@ interface Soda3DConfig {
   height?: number;
   rotationSpeed: number;
   hoverSpeedMultiplier: number;
+  performanceMode: 'high' | 'medium' | 'low';
+  frameRateLimit: number; // FPS limit for animation
   // clickAnimationDuration removed
 }
 
@@ -57,9 +59,21 @@ export class Soda3DButton {
   private rotationAngle = 0;
   private rotationSpeed = 0.5; // degrees per frame
   private animationId: number | null = null;
+  private lastFrameTime = 0;
+  private frameInterval = 1000 / 60; // Default 60fps, will be adjusted based on performance mode
+  private frameCount = 0;
+  private performanceMonitorStartTime = 0;
+  private actualFPS = 0;
+  private performanceDegradationCount = 0;
 
   constructor(private config: Soda3DConfig) {
     // clickAnimationDuration removed
+
+    // Auto-detect performance mode if not specified
+    this.autoDetectPerformance();
+
+    // Set up performance mode
+    this.setupPerformanceMode();
 
     // Initialize the 3D model
     this.initializeModel();
@@ -161,9 +175,35 @@ export class Soda3DButton {
     this.modelViewer.setAttribute('loading', 'eager');
     this.modelViewer.setAttribute('reveal', 'auto');
 
+    // Performance optimizations based on mode
+    this.applyPerformanceOptimizations();
+
     // Start custom rotation
     this.startRotation();
     // Remove all custom camera settings to use defaults
+  }
+
+  private applyPerformanceOptimizations() {
+    switch (this.config.performanceMode) {
+      case 'low':
+        // Minimal quality settings for low-end devices
+        this.modelViewer.setAttribute('shadow-intensity', '0');
+        this.modelViewer.setAttribute('exposure', '0.5');
+        this.modelViewer.setAttribute('tone-mapping', 'basic');
+        break;
+      case 'medium':
+        // Balanced settings
+        this.modelViewer.setAttribute('shadow-intensity', '0.3');
+        this.modelViewer.setAttribute('exposure', '1.0');
+        this.modelViewer.setAttribute('tone-mapping', 'neutral');
+        break;
+      case 'high':
+        // High quality settings
+        this.modelViewer.setAttribute('shadow-intensity', '1.0');
+        this.modelViewer.setAttribute('exposure', '1.5');
+        this.modelViewer.setAttribute('tone-mapping', 'aggressive');
+        break;
+    }
   }
 
   private setupEventListeners() {
@@ -287,8 +327,71 @@ export class Soda3DButton {
     return this.isLoaded && this.modelViewer && this.modelViewer.autoRotate;
   }
 
+  private autoDetectPerformance() {
+    // Auto-detect device performance capabilities
+    const canvas = document.createElement('canvas');
+    const gl =
+      canvas.getContext('webgl') ||
+      (canvas.getContext('experimental-webgl') as WebGLRenderingContext | null);
+
+    // Check for hardware acceleration and device capabilities
+    const isLowEndDevice =
+      navigator.hardwareConcurrency <= 2 || // Low CPU cores
+      (navigator as any).deviceMemory <= 2 || // Low RAM (if available)
+      (gl && !(gl.getParameter(gl.RENDERER) as string).includes('GPU')) || // No GPU acceleration
+      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent); // Mobile device
+
+    if (isLowEndDevice) {
+      this.config.performanceMode = 'low';
+      this.config.frameRateLimit = 15;
+      console.log('🔄 Auto-detected low-end device, using low performance mode');
+    } else if (this.config.performanceMode === 'medium') {
+      // Keep medium as default for most devices
+      console.log('🔄 Using medium performance mode');
+    }
+  }
+
+  private setupPerformanceMode() {
+    // Set frame rate based on performance mode
+    switch (this.config.performanceMode) {
+      case 'high':
+        this.frameInterval = 1000 / 60; // 60fps
+        break;
+      case 'medium':
+        this.frameInterval = 1000 / 30; // 30fps
+        break;
+      case 'low':
+        this.frameInterval = 1000 / 15; // 15fps
+        break;
+    }
+
+    console.log(
+      `🎯 Performance mode: ${this.config.performanceMode}, Target FPS: ${1000 / this.frameInterval}`
+    );
+  }
+
   private startRotation() {
-    const animate = () => {
+    this.performanceMonitorStartTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      // Frame rate limiting
+      if (currentTime - this.lastFrameTime < this.frameInterval) {
+        this.animationId = requestAnimationFrame(animate);
+        return;
+      }
+
+      this.lastFrameTime = currentTime;
+      this.frameCount++;
+
+      // Performance monitoring
+      this.monitorPerformance(currentTime);
+
+      // Skip animation updates in low performance mode when not hovered
+      if (this.config.performanceMode === 'low' && this.rotationSpeed === 0.5) {
+        this.animationId = requestAnimationFrame(animate);
+        return;
+      }
+
       this.rotationAngle += this.rotationSpeed;
       if (this.rotationAngle >= 360) {
         this.rotationAngle -= 360;
@@ -300,11 +403,96 @@ export class Soda3DButton {
       this.animationId = requestAnimationFrame(animate);
     };
 
-    animate();
+    animate(0);
+  }
+
+  private monitorPerformance(currentTime: number) {
+    // Monitor FPS every 2 seconds
+    if (currentTime - this.performanceMonitorStartTime >= 2000) {
+      this.actualFPS = this.frameCount / ((currentTime - this.performanceMonitorStartTime) / 1000);
+      const targetFPS = 1000 / this.frameInterval;
+
+      // Check if performance is significantly below target
+      if (this.actualFPS < targetFPS * 0.7) {
+        this.performanceDegradationCount++;
+        console.warn(
+          `⚠️ 3D Model performance degraded: ${this.actualFPS.toFixed(1)}fps vs target ${targetFPS}fps`
+        );
+
+        // Auto-downgrade performance after 3 consecutive poor performance checks
+        if (this.performanceDegradationCount >= 3) {
+          this.autoDowngradePerformance();
+        }
+      } else {
+        this.performanceDegradationCount = 0;
+      }
+
+      // Reset monitoring
+      this.frameCount = 0;
+      this.performanceMonitorStartTime = currentTime;
+    }
+  }
+
+  private autoDowngradePerformance() {
+    const currentMode = this.config.performanceMode;
+
+    if (currentMode === 'high') {
+      this.setPerformanceMode('medium');
+      console.log('🔄 Auto-downgraded 3D model performance from high to medium');
+    } else if (currentMode === 'medium') {
+      this.setPerformanceMode('low');
+      console.log('🔄 Auto-downgraded 3D model performance from medium to low');
+    }
+
+    this.performanceDegradationCount = 0;
+
+    // Show user notification
+    if ((window as any).App?.ui?.showNotification) {
+      (window as any).App.ui.showNotification(
+        `3D Model performance auto-adjusted to ${this.config.performanceMode} for better performance`,
+        'info'
+      );
+    }
   }
 
   private setRotationSpeed(speed: number) {
     this.rotationSpeed = speed;
+  }
+
+  // Performance management methods
+  public setPerformanceMode(mode: 'high' | 'medium' | 'low') {
+    this.config.performanceMode = mode;
+    this.setupPerformanceMode();
+  }
+
+  public setFrameRateLimit(fps: number) {
+    this.config.frameRateLimit = fps;
+    this.frameInterval = 1000 / fps;
+  }
+
+  public pauseAnimation() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+
+  public resumeAnimation() {
+    if (!this.animationId && this.isLoaded) {
+      this.startRotation();
+    }
+  }
+
+  public getPerformanceStatus() {
+    return {
+      performanceMode: this.config.performanceMode,
+      frameRateLimit: this.config.frameRateLimit,
+      currentFrameInterval: this.frameInterval,
+      actualFPS: this.actualFPS,
+      performanceDegradationCount: this.performanceDegradationCount,
+      isAnimating: this.animationId !== null,
+      isLoaded: this.isLoaded,
+    };
   }
 
   public destroy() {
@@ -324,6 +512,8 @@ export const getDefaultSoda3DConfig = (): Soda3DConfig => ({
   height: 200,
   rotationSpeed: 1.0,
   hoverSpeedMultiplier: 2.0,
+  performanceMode: 'medium', // Default to medium performance
+  frameRateLimit: 30, // Default to 30fps
   // clickAnimationDuration removed
 });
 
@@ -349,6 +539,12 @@ export const defaultSoda3DConfig = {
   },
   get hoverSpeedMultiplier() {
     return getDefaultSoda3DConfig().hoverSpeedMultiplier;
+  },
+  get performanceMode() {
+    return getDefaultSoda3DConfig().performanceMode;
+  },
+  get frameRateLimit() {
+    return getDefaultSoda3DConfig().frameRateLimit;
   },
   // clickAnimationDuration removed
 };
