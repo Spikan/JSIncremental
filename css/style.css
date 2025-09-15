@@ -704,7 +704,7 @@ body {
 
 /* Mobile Menu Toggle Button */
 .mobile-menu-toggle {
-  display: none; /* Hidden by default */
+  display: none; /* Hidden on desktop by default */
   background: rgba(0, 179, 107, 0.8);
   border: 2px solid rgba(0, 179, 107, 1);
   border-radius: 8px;
@@ -716,7 +716,6 @@ body {
   font-weight: bold;
   min-width: 40px;
   min-height: 40px;
-  display: flex;
   align-items: center;
   justify-content: center;
   touch-action: manipulation;
@@ -1115,6 +1114,13 @@ body {
   /* Show close button on mobile */
   .sidebar-close-btn {
     display: flex;
+  }
+}
+
+/* Ensure mobile menu toggle is hidden on desktop */
+@media (min-width: 769px) {
+  .mobile-menu-toggle {
+    display: none !important;
   }
 }
 
