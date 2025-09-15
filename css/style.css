@@ -706,8 +706,8 @@ body {
 .mobile-menu-toggle {
   display: none; /* Hidden by default */
   position: fixed;
-  bottom: 20px; /* Bottom right corner */
-  right: 20px;
+  bottom: 20px; /* Bottom of entire screen */
+  right: 20px; /* Right edge of screen */
   width: 50px;
   height: 50px;
   background: rgba(0, 0, 0, 0.8);
