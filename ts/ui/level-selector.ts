@@ -458,7 +458,7 @@ export class LevelSelector {
     setTimeout(() => {
       notification.style.animation = 'slideOutRight 0.3s ease-in';
       setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    }, 2000);
   }
 
   public showUnlockNotification(levelId: number): void {
@@ -470,17 +470,18 @@ export class LevelSelector {
     notification.style.cssText = `
       position: fixed;
       top: 20px;
-      left: 20px;
+      right: 20px;
       background: linear-gradient(135deg, #27ae60, #2ecc71);
       color: white;
-      padding: 15px 20px;
+      padding: 12px 16px;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       z-index: 10001;
       font-family: 'Courier New', monospace;
-      font-size: 14px;
-      max-width: 300px;
-      animation: slideInLeft 0.3s ease-out;
+      font-size: 12px;
+      max-width: 250px;
+      animation: slideInRight 0.3s ease-out;
+      pointer-events: none;
     `;
 
     notification.innerHTML = `

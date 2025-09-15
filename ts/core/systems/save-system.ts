@@ -43,10 +43,15 @@ export function performSaveSnapshot(): any {
       totalPlayTime: Number(state.totalPlayTime || 0),
       totalClicks: Number(state.totalClicks || w.totalClicks || 0),
       // Save hybrid level system data (single source of truth for levels)
-      hybridLevelData: {
-        currentLevel: w.App?.systems?.hybridLevel?.getCurrentLevelId?.() || 1,
-        unlockedLevels: w.App?.systems?.hybridLevel?.getUnlockedLevelIds?.() || [1],
-      },
+      hybridLevelData: (() => {
+        const currentLevel = w.App?.systems?.hybridLevel?.getCurrentLevelId?.() || 1;
+        const unlockedLevels = w.App?.systems?.hybridLevel?.getUnlockedLevelIds?.() || [1];
+        console.log('💾 Saving hybrid level data:', { currentLevel, unlockedLevels });
+        return {
+          currentLevel,
+          unlockedLevels,
+        };
+      })(),
       // Save options including Konami code state
       options: state.options || {},
     };

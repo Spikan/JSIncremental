@@ -459,7 +459,7 @@ export function updateLevelNumber(): void {
 
 export function updateLevelText(): void {
   if (typeof window === 'undefined') return;
-  
+
   try {
     // Use hybrid level system as single source of truth
     const hybridSystem = (window as any).App?.systems?.hybridLevel;

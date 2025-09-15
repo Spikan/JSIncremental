@@ -184,13 +184,13 @@ const BUTTON_CONFIG: {
         if (dropdown) {
           const isVisible = dropdown.style.display !== 'none';
           dropdown.style.display = isVisible ? 'none' : 'block';
-          
+
           // Update button text
           const button = document.querySelector('[data-action="toggleLevelDropdown"]');
           if (button) {
             button.textContent = isVisible ? 'Switch ▼' : 'Switch ▲';
           }
-          
+
           // Populate dropdown if showing
           if (!isVisible) {
             populateLevelDropdown();
@@ -1797,10 +1797,10 @@ export function switchToLevel(levelId: number): void {
   if (!hybridSystem) return;
 
   console.log('🔄 Switching to level:', levelId);
-  
+
   if (hybridSystem.switchToLevel(levelId)) {
     console.log('✅ Switched to level:', levelId);
-    
+
     // Update UI
     try {
       (window as any).App?.ui?.updateLevelText?.();

@@ -364,19 +364,24 @@ export class SaveGameLoader {
    */
   private loadHybridLevelData(savegame: SaveGameData): void {
     try {
+      console.log('🔍 Loading hybrid level data from save:', savegame.hybridLevelData);
+      
       if (savegame.hybridLevelData) {
         const { currentLevel, unlockedLevels } = savegame.hybridLevelData;
+        console.log('🔍 Parsed hybrid level data:', { currentLevel, unlockedLevels });
 
         // Load unlocked levels first
         if (Array.isArray(unlockedLevels) && unlockedLevels.length > 0) {
           try {
             // Ensure level 1 is always unlocked
             const levelsToUnlock = [...new Set([1, ...unlockedLevels])];
+            console.log('🔍 Levels to unlock:', levelsToUnlock);
 
             // Unlock each level silently (no notifications during save loading)
             levelsToUnlock.forEach(levelId => {
               try {
-                (window as any).App?.systems?.hybridLevel?.unlockLevel?.(levelId, true);
+                const result = (window as any).App?.systems?.hybridLevel?.unlockLevel?.(levelId, true);
+                console.log(`🔓 Unlocked level ${levelId}:`, result);
               } catch (error) {
                 console.warn(`Failed to unlock level ${levelId}:`, error);
               }
