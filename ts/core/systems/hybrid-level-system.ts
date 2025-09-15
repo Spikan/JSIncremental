@@ -372,13 +372,14 @@ export class HybridLevelSystem {
     const state = (window as any).App?.state?.getState?.() || {};
     const sips = state.sips || new Decimal(0);
     const clicks = state.totalClicks || 0;
-    const currentLevel = state.level || 1;
+    // Use hybrid system's current level instead of old system's level
+    const currentHybridLevel = this.currentLevel;
 
     const sipsMet = sips.gte
       ? sips.gte(level.unlockRequirement.sips)
       : Number(sips) >= level.unlockRequirement.sips;
     const clicksMet = clicks >= level.unlockRequirement.clicks;
-    const levelMet = currentLevel >= (level.unlockRequirement.level || 1);
+    const levelMet = currentHybridLevel >= (level.unlockRequirement.level || 1);
 
     return sipsMet && clicksMet && levelMet;
   }

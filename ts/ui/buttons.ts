@@ -76,11 +76,11 @@ const BUTTON_CONFIG: {
         // Use hybrid level system to unlock next level in sequence
         const hybridSystem = (window as any).App?.systems?.hybridLevel;
         console.log('🔍 Hybrid system available:', !!hybridSystem);
-        
+
         if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
           const currentLevel = hybridSystem.getCurrentLevel();
           console.log('📍 Current level:', currentLevel);
-          
+
           if (currentLevel) {
             const allLevels = hybridSystem.getAllLevels();
             const nextLevelId = currentLevel.id + 1;
@@ -91,16 +91,17 @@ const BUTTON_CONFIG: {
               const state = (window as any).App?.state?.getState?.() || {};
               const sips = state.sips || new Decimal(0);
               const clicks = state.totalClicks || 0;
-              const currentLevelNum = state.level || 1;
+              // Use hybrid system's current level instead of old system's level
+              const currentHybridLevel = currentLevel.id;
               
-              console.log('📊 Current stats:', { sips: sips.toString(), clicks, currentLevelNum });
+              console.log('📊 Current stats:', { sips: sips.toString(), clicks, currentHybridLevel });
               console.log('📋 Next level requirements:', nextLevel.unlockRequirement);
 
               const canUnlock =
                 sips.gte(nextLevel.unlockRequirement.sips) &&
                 clicks >= nextLevel.unlockRequirement.clicks &&
-                currentLevelNum >= (nextLevel.unlockRequirement.level || 1);
-              
+                currentHybridLevel >= (nextLevel.unlockRequirement.level || 1);
+
               console.log('✅ Can unlock:', canUnlock);
 
               if (canUnlock) {
