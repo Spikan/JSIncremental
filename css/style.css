@@ -1019,11 +1019,22 @@ body {
   }
 
   .game-sidebar {
-    display: none; /* Hidden by default on mobile */
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    z-index: 1000;
+    display: flex; /* Always display flex, but positioned off-screen */
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .game-sidebar.mobile-open {
-    display: flex; /* Show when mobile menu is open */
+    right: 0; /* Slide in from right when open */
   }
 }
 

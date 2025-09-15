@@ -139,9 +139,28 @@ export class SidebarNavigationManager {
   }
 
   public toggleMobileSidebar(): void {
-    if (!this.sidebar || !this.isMobile) return;
+    console.log('toggleMobileSidebar called:', {
+      sidebar: this.sidebar,
+      isMobile: this.isMobile,
+      windowWidth: window.innerWidth,
+    });
+
+    if (!this.sidebar) {
+      console.warn('No sidebar found, trying to find it again...');
+      this.sidebar = document.querySelector('.game-sidebar');
+      if (!this.sidebar) {
+        console.error('Sidebar still not found!');
+        return;
+      }
+    }
+
+    if (!this.isMobile) {
+      console.warn('Not on mobile, but toggling anyway for testing');
+    }
 
     const isOpen = this.sidebar.classList.contains('mobile-open');
+    console.log('Sidebar state:', { isOpen, classes: this.sidebar.className });
+
     if (isOpen) {
       this.closeMobileSidebar();
     } else {
@@ -150,27 +169,41 @@ export class SidebarNavigationManager {
   }
 
   public openMobileSidebar(): void {
-    if (!this.sidebar) return;
+    if (!this.sidebar) {
+      console.error('Cannot open sidebar - no sidebar element');
+      return;
+    }
 
+    console.log('Opening mobile sidebar...');
     this.sidebar.classList.add('mobile-open');
-    console.log('Mobile sidebar opened');
+    console.log('Mobile sidebar opened, classes:', this.sidebar.className);
 
     // Visual feedback - make sidebar visible with animation
     this.sidebar.style.display = 'flex';
     this.sidebar.style.animation = 'slideIn 0.3s ease-out';
+
+    // Also add a visible background to make it obvious
+    this.sidebar.style.backgroundColor = 'rgba(0, 179, 107, 0.1)';
+    this.sidebar.style.border = '3px solid #00b36b';
   }
 
   public closeMobileSidebar(): void {
-    if (!this.sidebar) return;
+    if (!this.sidebar) {
+      console.error('Cannot close sidebar - no sidebar element');
+      return;
+    }
 
+    console.log('Closing mobile sidebar...');
     this.sidebar.classList.remove('mobile-open');
-    console.log('Mobile sidebar closed');
+    console.log('Mobile sidebar closed, classes:', this.sidebar.className);
 
     // Visual feedback - animate out then hide
     this.sidebar.style.animation = 'slideOut 0.3s ease-in';
     setTimeout(() => {
       this.sidebar!.style.display = 'none';
       this.sidebar!.style.animation = '';
+      this.sidebar!.style.backgroundColor = '';
+      this.sidebar!.style.border = '';
     }, 300);
   }
 
