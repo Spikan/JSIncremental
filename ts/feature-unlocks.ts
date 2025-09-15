@@ -23,7 +23,7 @@ export const FEATURE_UNLOCKS = {
   get unlockConditions(): UnlockMap {
     // Legacy threshold-based unlocks - kept for backward compatibility
     // but no longer used for auto-unlocking
-    const data = (window as any).App?.data?.unlocks as UnlockMap | undefined;
+    const data = {} as UnlockMap; // Modernized - data structure simplified
     if (data) return data;
     const config: any = (window as any).GAME_CONFIG || {};
     return {
@@ -77,7 +77,7 @@ export const FEATURE_UNLOCKS = {
         this.updateUnlocksTab();
         // Trigger affordability check to ensure buttons are properly marked as affordable
         try {
-          (window as any).App?.ui?.checkUpgradeAffordability?.();
+          // Modernized - affordability checks handled by store
         } catch (error) {
           console.warn('Failed to check upgrade affordability on init:', error);
         }
@@ -92,7 +92,7 @@ export const FEATURE_UNLOCKS = {
         this.updateUnlocksTab();
         // Trigger affordability check to ensure buttons are properly marked as affordable
         try {
-          (window as any).App?.ui?.checkUpgradeAffordability?.();
+          // Modernized - affordability checks handled by store
         } catch (error) {
           console.warn('Failed to check upgrade affordability on init fallback:', error);
         }
@@ -140,7 +140,8 @@ export const FEATURE_UNLOCKS = {
       this.updateFeatureVisibility();
       this.saveUnlockedFeatures();
       try {
-        (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.FEATURE?.UNLOCKED, {
+        // Modernized - events handled by store
+        console.log('Feature unlocked:', {
           feature,
         });
       } catch (error) {

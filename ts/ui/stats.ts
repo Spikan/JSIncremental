@@ -6,13 +6,14 @@ import { formatNumber } from './utils';
 import { toDecimal } from '../core/numbers';
 import { computeStrawSPD, computeCupSPD } from '../core/rules/economy';
 import { domQuery } from '../services/dom-query';
+import { useGameStore } from '../core/state/zustand-store';
 
 // Update play time display
 export function updatePlayTime(): void {
   if (typeof window === 'undefined') return;
   const playTimeElement = domQuery.getById('playTime') as HTMLElement | undefined;
   try {
-    const state = (window as any).App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (playTimeElement && state) {
       const totalMs = Number(state.totalPlayTime || (window as any).totalPlayTime || 0);
       const totalSeconds = Math.floor(totalMs / 1000);
@@ -37,7 +38,7 @@ export function updateLastSaveTime(): void {
   const lastSaveElement = domQuery.getById('lastSaveTime') as HTMLElement | undefined;
   try {
     const lastSaveMs = Number(
-      (window as any).App?.state?.getState?.()?.lastSaveTime || (window as any).lastSaveTime || 0
+      useGameStore.getState().lastSaveTime || (window as any).lastSaveTime || 0
     );
     if (lastSaveElement && lastSaveMs) {
       const now = new Date();
@@ -75,7 +76,7 @@ export function updateTimeStats(): void {
   // Total play time (including previous sessions)
   const totalPlayTimeElement = domQuery.getById('totalPlayTime') as HTMLElement | undefined;
   if (totalPlayTimeElement) {
-    const totalMs = Number((window as any).App?.state?.getState?.()?.totalPlayTime || 0);
+    const totalMs = Number(useGameStore.getState().totalPlayTime || 0);
     const totalSeconds = Math.floor(totalMs / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -91,7 +92,7 @@ export function updateTimeStats(): void {
   // Current session time
   const sessionTimeElement = domQuery.getById('sessionTime') as HTMLElement | undefined;
   if (sessionTimeElement) {
-    const start = Number((window as any).App?.state?.getState?.()?.sessionStartTime || 0);
+    const start = Number(useGameStore.getState().sessionStartTime || 0);
     if (start) {
       const sessionTime = Date.now() - start;
       const sessionSeconds = Math.floor(sessionTime / 1000);
