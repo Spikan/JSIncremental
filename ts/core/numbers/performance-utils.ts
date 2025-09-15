@@ -3,7 +3,7 @@
 
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
-import { pow, multiply, DecimalType } from './migration-utils';
+import { pow, multiply, DecimalType } from './simplified';
 
 // Simple LRU cache implementation
 class LRUCache<K, V> {

@@ -14,15 +14,7 @@ export {
   useActions,
 } from './zustand-store';
 
-// Export legacy compatibility layer
-export {
-  createLegacyStore,
-  appStore,
-  selectors,
-  migrateToZustand,
-  getZustandStore,
-  getZustandActions,
-} from './zustand-bridge';
+// Legacy compatibility layer removed - use Zustand store directly
 
 // Legacy type exports for backward compatibility
 export type Unsubscribe = () => void;
