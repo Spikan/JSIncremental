@@ -315,7 +315,13 @@ export class HybridLevelSystem {
   // private completedLevels: Set<number> = new Set(); // Future feature
 
   constructor() {
+    console.log('🏗️ Initializing HybridLevelSystem...');
     this.loadUnlockedLevels();
+    this.loadCurrentLevel();
+    console.log('🏗️ HybridLevelSystem initialized:', {
+      currentLevel: this.currentLevel,
+      unlockedLevels: Array.from(this.unlockedLevels)
+    });
   }
 
   getAllLevels(): HybridLevel[] {
@@ -367,7 +373,14 @@ export class HybridLevelSystem {
 
   canUnlockLevel(levelId: number): boolean {
     const level = this.getAllLevels().find(l => l.id === levelId);
-    if (!level || this.unlockedLevels.has(levelId)) return false;
+    if (!level || this.unlockedLevels.has(levelId)) {
+      console.log(`🔒 Level ${levelId} cannot be unlocked:`, {
+        levelExists: !!level,
+        alreadyUnlocked: this.unlockedLevels.has(levelId),
+        unlockedLevels: Array.from(this.unlockedLevels)
+      });
+      return false;
+    }
 
     const state = (window as any).App?.state?.getState?.() || {};
     const sips = state.sips || new Decimal(0);
@@ -381,15 +394,30 @@ export class HybridLevelSystem {
     const clicksMet = clicks >= level.unlockRequirement.clicks;
     const levelMet = currentHybridLevel >= (level.unlockRequirement.level || 1);
 
+    console.log(`🔍 Checking unlock for level ${levelId}:`, {
+      sips: sips.toString(),
+      clicks,
+      currentHybridLevel,
+      requirements: level.unlockRequirement,
+      sipsMet,
+      clicksMet,
+      levelMet,
+      canUnlock: sipsMet && clicksMet && levelMet
+    });
+
     return sipsMet && clicksMet && levelMet;
   }
 
   unlockLevel(levelId: number): boolean {
+    console.log(`🔓 Attempting to unlock level ${levelId}...`);
     if (this.canUnlockLevel(levelId)) {
+      console.log(`✅ Unlocking level ${levelId}`);
       this.unlockedLevels.add(levelId);
       this.saveUnlockedLevels();
+      console.log(`✅ Level ${levelId} unlocked successfully! Unlocked levels:`, Array.from(this.unlockedLevels));
       return true;
     }
+    console.log(`❌ Failed to unlock level ${levelId}`);
     return false;
   }
 
@@ -501,6 +529,29 @@ export class HybridLevelSystem {
     } catch (error) {
       console.warn('Failed to load unlocked levels:', error);
       this.unlockedLevels = new Set([1]);
+    }
+  }
+
+  private loadCurrentLevel(): void {
+    try {
+      const app: any = (window as any).App;
+      let level = 1;
+      if (app?.storage?.getJSON) {
+        level = app.storage.getJSON('currentLevel', 1);
+      } else {
+        const stored = localStorage.getItem('currentLevel');
+        if (stored) level = JSON.parse(stored);
+      }
+
+      // Ensure the level is valid and unlocked
+      if (typeof level === 'number' && level >= 1 && this.unlockedLevels.has(level)) {
+        this.currentLevel = level;
+      } else {
+        this.currentLevel = 1;
+      }
+    } catch (error) {
+      console.warn('Failed to load current level:', error);
+      this.currentLevel = 1;
     }
   }
 
