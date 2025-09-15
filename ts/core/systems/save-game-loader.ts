@@ -383,17 +383,7 @@ export class SaveGameLoader {
       if (savegame.hybridLevelData) {
         const { currentLevel, unlockedLevels } = savegame.hybridLevelData;
 
-        // Load current level
-        if (typeof currentLevel === 'number' && currentLevel >= 1) {
-          try {
-            (window as any).App?.systems?.hybridLevel?.switchToLevel?.(currentLevel);
-            console.log('✅ Hybrid level system current level loaded:', currentLevel);
-          } catch (error) {
-            console.warn('Failed to set hybrid level system current level:', error);
-          }
-        }
-
-        // Load unlocked levels
+        // Load unlocked levels first
         if (Array.isArray(unlockedLevels) && unlockedLevels.length > 0) {
           try {
             // Ensure level 1 is always unlocked
@@ -411,6 +401,29 @@ export class SaveGameLoader {
             console.log('✅ Hybrid level system unlocked levels loaded:', levelsToUnlock);
           } catch (error) {
             console.warn('Failed to load hybrid level system unlocked levels:', error);
+          }
+        }
+
+        // Load current level - only if it's valid and unlocked
+        if (typeof currentLevel === 'number' && currentLevel >= 1) {
+          try {
+            const hybridSystem = (window as any).App?.systems?.hybridLevel;
+            if (hybridSystem && hybridSystem.isLevelUnlocked(currentLevel)) {
+              hybridSystem.switchToLevel(currentLevel);
+              console.log('✅ Hybrid level system current level loaded:', currentLevel);
+            } else {
+              // If the saved level isn't unlocked, default to level 1 (The Beach)
+              console.log('⚠️ Saved level not unlocked, defaulting to level 1 (The Beach)');
+              hybridSystem?.switchToLevel(1);
+            }
+          } catch (error) {
+            console.warn('Failed to set hybrid level system current level:', error);
+            // Fallback to level 1
+            try {
+              (window as any).App?.systems?.hybridLevel?.switchToLevel?.(1);
+            } catch (fallbackError) {
+              console.warn('Failed to set fallback level 1:', fallbackError);
+            }
           }
         }
       }
