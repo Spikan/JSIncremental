@@ -435,8 +435,11 @@ export function updateLevelNumber(): void {
       const hybridSystem = (window as any).App?.systems?.hybridLevel;
       if (hybridSystem && typeof hybridSystem.getCurrentLevelId === 'function') {
         const levelId = hybridSystem.getCurrentLevelId();
+        console.log('🔍 updateLevelNumber: Setting level number to:', levelId);
         levelEl.innerHTML = String(levelId);
+        console.log('🔍 updateLevelNumber: DOM element now shows:', levelEl.innerHTML);
       } else {
+        console.log('⚠️ updateLevelNumber: Hybrid system not available, using fallback');
         // Fallback to old system if hybrid system not available
         const displayData = getDisplayData();
         const level = safeToNumberOrDecimal(displayData.level || 1);

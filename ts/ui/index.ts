@@ -131,7 +131,7 @@ export function setupDirectSodaClickHandler(): () => void {
         const currentSips = gameData.sips;
         const currentSPD = gameData.spd;
         const currentLevel = gameData.level;
-        
+
         // Also check hybrid level system's current level
         const hybridSystem = (window as any).App?.systems?.hybridLevel;
         const currentHybridLevel = hybridSystem?.getCurrentLevelId?.() || 1;
@@ -143,7 +143,12 @@ export function setupDirectSodaClickHandler(): () => void {
           currentLevel !== lastValues.level ||
           currentHybridLevel !== lastValues.hybridLevel
         ) {
-          lastValues = { sips: currentSips, spd: currentSPD, level: currentLevel, hybridLevel: currentHybridLevel };
+          lastValues = {
+            sips: currentSips,
+            spd: currentSPD,
+            level: currentLevel,
+            hybridLevel: currentHybridLevel,
+          };
           debouncedUpdateTopBar();
 
           // Update hybrid level system display
