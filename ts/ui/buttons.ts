@@ -93,8 +93,12 @@ const BUTTON_CONFIG: {
               const clicks = state.totalClicks || 0;
               // Use hybrid system's current level instead of old system's level
               const currentHybridLevel = currentLevel.id;
-              
-              console.log('📊 Current stats:', { sips: sips.toString(), clicks, currentHybridLevel });
+
+              console.log('📊 Current stats:', {
+                sips: sips.toString(),
+                clicks,
+                currentHybridLevel,
+              });
               console.log('📋 Next level requirements:', nextLevel.unlockRequirement);
 
               const canUnlock =
