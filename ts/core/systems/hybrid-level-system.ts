@@ -433,6 +433,17 @@ export class HybridLevelSystem {
       this.currentLevel = levelId;
       this.saveCurrentLevel();
       this.applyLevelTheme();
+      
+      // Update the old level system to keep it in sync
+      try {
+        const app: any = (window as any).App;
+        if (app?.state?.setState) {
+          app.state.setState({ level: levelId });
+        }
+      } catch (error) {
+        console.warn('Failed to update old level system:', error);
+      }
+      
       // this.playLevelAudio(); // Audio removed
       return true;
     }
@@ -441,7 +452,12 @@ export class HybridLevelSystem {
 
   private applyLevelTheme(): void {
     const level = this.getCurrentLevel();
-    if (!level) return;
+    if (!level) {
+      console.log('🎨 No level found for theme application');
+      return;
+    }
+
+    console.log('🎨 Applying theme for level:', level.id, level.name, level.visualTheme);
 
     // Apply visual theme
     const root = document.documentElement;
@@ -451,6 +467,16 @@ export class HybridLevelSystem {
     if (level.visualTheme.backgroundImage) {
       root.style.setProperty('--level-bg-image', level.visualTheme.backgroundImage);
     }
+
+    // Also apply background directly to body for immediate effect
+    document.body.style.background = level.visualTheme.backgroundImage || level.visualTheme.backgroundColor;
+    document.body.style.backgroundAttachment = 'fixed';
+
+    console.log('🎨 Theme applied:', {
+      backgroundColor: level.visualTheme.backgroundColor,
+      backgroundImage: level.visualTheme.backgroundImage,
+      bodyBackground: document.body.style.background
+    });
 
     // Add level-specific particles
     this.addLevelParticles(level);

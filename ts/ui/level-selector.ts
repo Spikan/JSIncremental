@@ -166,23 +166,24 @@ export class LevelSelector {
   }
 
   private createLevelCard(level: HybridLevel, isCurrent: boolean): HTMLElement {
+    const isUnlocked = hybridLevelSystem.isLevelUnlocked(level.id);
     const card = document.createElement('div');
-    card.className = `level-card ${level.isUnlocked ? 'unlocked' : 'locked'} ${isCurrent ? 'current' : ''}`;
+    card.className = `level-card ${isUnlocked ? 'unlocked' : 'locked'} ${isCurrent ? 'current' : ''}`;
 
     const canUnlock = hybridLevelSystem.canUnlockLevel(level.id);
 
     card.style.cssText = `
       background: ${
-        level.isUnlocked
+        isUnlocked
           ? `linear-gradient(135deg, ${level.visualTheme.backgroundColor}, ${level.visualTheme.accentColor})`
           : 'linear-gradient(135deg, #2c3e50, #34495e)'
       };
-      border: 2px solid ${isCurrent ? '#f39c12' : level.isUnlocked ? '#27ae60' : '#7f8c8d'};
+      border: 2px solid ${isCurrent ? '#f39c12' : isUnlocked ? '#27ae60' : '#7f8c8d'};
       border-radius: 10px;
       padding: 18px;
-      cursor: ${level.isUnlocked ? 'pointer' : 'default'};
+      cursor: ${isUnlocked ? 'pointer' : 'default'};
       transition: all 0.3s ease;
-      opacity: ${level.isUnlocked ? '1' : '0.6'};
+      opacity: ${isUnlocked ? '1' : '0.6'};
       position: relative;
       overflow: visible;
       min-height: 200px;
@@ -194,8 +195,8 @@ export class LevelSelector {
       card.style.boxShadow = '0 0 20px rgba(243, 156, 18, 0.5)';
     }
 
-    const statusIcon = level.isUnlocked ? '✅' : canUnlock ? '🔓' : '🔒';
-    const statusText = level.isUnlocked
+    const statusIcon = isUnlocked ? '✅' : canUnlock ? '🔓' : '🔒';
+    const statusText = isUnlocked
       ? isCurrent
         ? 'Current'
         : 'Available'
@@ -207,27 +208,27 @@ export class LevelSelector {
       <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
         <span style="font-size: 24px; margin-right: 12px; flex-shrink: 0;">${this.getCategoryIcon(level.category)}</span>
         <div style="flex: 1; min-width: 0;">
-          <h4 style="margin: 0 0 4px 0; color: ${level.isUnlocked ? '#2c3e50' : '#7f8c8d'}; font-size: 16px; font-weight: bold; line-height: 1.2;">
+          <h4 style="margin: 0 0 4px 0; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; font-size: 16px; font-weight: bold; line-height: 1.2;">
             Level ${level.id}: ${level.name}
           </h4>
-          <span style="font-size: 12px; color: ${level.isUnlocked ? '#27ae60' : '#7f8c8d'}; font-weight: 500;">
+          <span style="font-size: 12px; color: ${isUnlocked ? '#27ae60' : '#7f8c8d'}; font-weight: 500;">
             ${statusIcon} ${statusText}
           </span>
         </div>
       </div>
       
       <div style="flex: 1; margin-bottom: 12px;">
-        <p style="margin: 0 0 12px 0; font-size: 12px; color: ${level.isUnlocked ? '#2c3e50' : '#7f8c8d'}; line-height: 1.4; word-wrap: break-word;">
+        <p style="margin: 0 0 12px 0; font-size: 12px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; line-height: 1.4; word-wrap: break-word;">
           ${level.description}
         </p>
         
         <div style="margin-bottom: 8px;">
-          <div style="font-size: 11px; color: ${level.isUnlocked ? '#2c3e50' : '#7f8c8d'}; margin-bottom: 4px; font-weight: 500;">
+          <div style="font-size: 11px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; margin-bottom: 4px; font-weight: 500;">
             <strong>Bonuses:</strong> ${level.bonuses.sipMultiplier}x Sips, ${level.bonuses.clickMultiplier}x Clicks
           </div>
           ${
             level.bonuses.specialEffect
-              ? `<div style="font-size: 11px; color: ${level.isUnlocked ? '#2c3e50' : '#7f8c8d'}; font-weight: 500;">
+              ? `<div style="font-size: 11px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; font-weight: 500;">
               <strong>Special:</strong> ${level.bonuses.specialEffect}
             </div>`
               : ''
@@ -236,7 +237,7 @@ export class LevelSelector {
       </div>
       
       ${
-        !level.isUnlocked
+        !isUnlocked
           ? `
         <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 6px; padding: 10px; margin-bottom: 12px;">
           <div style="font-size: 11px; color: #e74c3c; font-weight: bold; margin-bottom: 4px;">
@@ -262,7 +263,7 @@ export class LevelSelector {
       
       <div style="margin-top: auto;">
         ${
-          level.isUnlocked && !isCurrent
+          isUnlocked && !isCurrent
             ? `
           <button class="select-level-btn" style="
             background: #3498db;
@@ -284,7 +285,7 @@ export class LevelSelector {
         }
         
         ${
-          !level.isUnlocked && canUnlock
+          !isUnlocked && canUnlock
             ? `
           <button class="unlock-level-btn" style="
             background: #f39c12;
@@ -327,7 +328,7 @@ export class LevelSelector {
     `;
 
     // Add click handlers
-    if (level.isUnlocked && !isCurrent) {
+    if (isUnlocked && !isCurrent) {
       const selectBtn = card.querySelector('.select-level-btn');
       selectBtn?.addEventListener('click', e => {
         e.stopPropagation();
@@ -335,7 +336,7 @@ export class LevelSelector {
       });
     }
 
-    if (!level.isUnlocked && canUnlock) {
+    if (!isUnlocked && canUnlock) {
       const unlockBtn = card.querySelector('.unlock-level-btn');
       unlockBtn?.addEventListener('click', e => {
         e.stopPropagation();
@@ -344,7 +345,7 @@ export class LevelSelector {
     }
 
     // Add hover effects
-    if (level.isUnlocked) {
+    if (isUnlocked) {
       card.addEventListener('mouseenter', () => {
         if (!isCurrent) {
           card.style.transform = 'translateY(-2px)';

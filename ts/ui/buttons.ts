@@ -110,7 +110,7 @@ const BUTTON_CONFIG: {
                 console.log('🔄 Switching to already unlocked level:', nextLevel.id);
                 if (hybridSystem.switchToLevel(nextLevel.id)) {
                   console.log('✅ Switched to level:', nextLevel.id);
-                  
+
                   // Update the display
                   try {
                     (window as any).App?.ui?.updateLevelUpDisplay?.(state);
