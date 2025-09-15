@@ -699,9 +699,6 @@ function initializeEnhancedUIComponents(): void {
     drinkProgressBar.initializeElements('drink-progress-container');
     levelProgressBar.initializeElements('level-progress-container');
 
-    // Hide old UI elements
-    hideOldUIElements();
-
     // Initialize dev tools button
     initializeDevToolsButton();
 
@@ -769,30 +766,6 @@ function initializeSecretsSystem(): void {
     logger.debug('God tab enabled:', godTabEnabled ? 'YES' : 'NO');
   } catch (error) {
     logger.warn('Failed to initialize secrets system:', error);
-  }
-}
-
-/**
- * Hide old UI elements that are replaced by enhanced versions
- */
-function hideOldUIElements(): void {
-  try {
-    // Hide old top sip counter
-    const oldSipCounter = document.querySelector('.top-sip-counter');
-    if (oldSipCounter) {
-      (oldSipCounter as HTMLElement).style.display = 'none';
-    }
-
-    // Hide old progress bar if enhanced version exists
-    const oldProgressContainer = document.querySelector('.drink-progress-container');
-    const enhancedProgressContainer = document.querySelector('.enhanced-progress-container');
-    if (oldProgressContainer && enhancedProgressContainer) {
-      (oldProgressContainer as HTMLElement).style.display = 'none';
-    }
-
-    logger.debug('Old UI elements hidden');
-  } catch (error) {
-    logger.warn('Failed to hide old UI elements:', error);
   }
 }
 

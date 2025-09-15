@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 // large-number.ts removed - using Decimal directly
-import { Decimal } from '../ts/core/numbers/migration-utils';
+import { Decimal } from '../ts/core/numbers/simplified';
 import { computeClick } from '../ts/core/rules/clicks';
 import { computeTotalSipsPerDrink } from '../ts/core/rules/economy';
 import { nextStrawCost } from '../ts/core/rules/purchases';

@@ -3,7 +3,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Decimal, createTestDecimal } from './test-utils';
-import { toDecimal, add, multiply, gte } from '../ts/core/numbers/migration-utils';
+import { toDecimal, add, multiply, gte } from '../ts/core/numbers/simplified';
 import { safeToNumber } from '../ts/core/numbers/safe-conversion';
 import { computeClick } from '../ts/core/rules/clicks';
 import { computeTotalSipsPerDrink } from '../ts/core/rules/economy';

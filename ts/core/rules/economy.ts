@@ -153,23 +153,6 @@ export function computePrestigeBonus(
 }
 
 /**
- * Calculate golden straw multiplier for very large straw counts
- */
-export function computeGoldenStrawMultiplier(
-  _straws: number | string | DecimalType, // unused - artificial caps removed
-  goldenStrawCount: number | string | DecimalType = 0
-): DecimalType {
-  const goldenCount = new Decimal(goldenStrawCount);
-
-  // Base multiplier from golden straws
-  let multiplier = new Decimal('1').add(goldenCount.mul(new Decimal('0.1')));
-
-  // NO artificial golden straw bonuses - break_eternity.js handles all scaling naturally
-
-  return multiplier;
-}
-
-/**
  * Calculate efficiency bonus for optimized production
  */
 export function computeEfficiencyBonus(
@@ -233,43 +216,4 @@ export function computeInterestRate(
   // NO artificial deposit bonuses - break_eternity.js handles all scaling naturally
 
   return baseRate;
-}
-
-// Legacy functions for backward compatibility
-export function computeStrawSPDLegacy(
-  _straws: number | string, // unused - function signature changed
-  baseSPD: number | string,
-  widerStrawsCount: number | string,
-  widerMultiplierPerLevel: number | string = 0
-): DecimalType {
-  // Return Decimal directly - no JavaScript number conversion
-  return computeStrawSPD(baseSPD, widerStrawsCount, widerMultiplierPerLevel);
-}
-
-export function computeCupSPDLegacy(
-  _cups: number | string, // unused - function signature changed
-  baseSPD: number | string,
-  betterCupsCount: number | string,
-  betterMultiplierPerLevel: number | string = 0
-): DecimalType {
-  // Return Decimal directly - no JavaScript number conversion
-  return computeCupSPD(baseSPD, betterCupsCount, betterMultiplierPerLevel);
-}
-
-export function computeTotalSPDLegacy(
-  straws: number | string,
-  strawSPD: number | string,
-  cups: number | string,
-  cupSPD: number | string
-): DecimalType {
-  // Return Decimal directly - no JavaScript number conversion
-  return computeTotalSPD(straws, strawSPD, cups, cupSPD);
-}
-
-export function computeTotalSipsPerDrinkLegacy(
-  baseSipsPerDrink: number | string,
-  totalSPD: number | string
-): DecimalType {
-  // Return Decimal directly - no JavaScript number conversion
-  return computeTotalSipsPerDrink(baseSipsPerDrink, totalSPD);
 }

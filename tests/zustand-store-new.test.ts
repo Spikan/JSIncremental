@@ -10,13 +10,11 @@ import {
   useHighestSipsPerSecond,
   useOptions,
   useActions,
-} from '../ts/core/state/zustand-store';
-import {
   createLegacyStore,
   appStore,
   selectors,
   migrateToZustand,
-} from '../ts/core/state/zustand-bridge';
+} from '../ts/core/state/zustand-store';
 import {
   setupTestEnvironment,
   expectLargeNumberToEqual,

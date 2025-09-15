@@ -94,22 +94,3 @@ export function nextBetterCupsCost(
 
   return milestoneCost.multiply(withinMilestoneCost).div(base);
 }
-
-// Legacy functions for backward compatibility
-export function nextStrawCostLegacy(
-  strawCount: number | string,
-  baseCost: number | string,
-  scaling: number | string
-): DecimalType {
-  // Return Decimal directly - no JavaScript number conversion
-  return nextStrawCost(strawCount, baseCost, scaling);
-}
-
-export function nextCupCostLegacy(
-  cupCount: number | string,
-  baseCost: number | string,
-  scaling: number | string
-): DecimalType {
-  // Return Decimal directly - no JavaScript number conversion
-  return nextCupCost(cupCount, baseCost, scaling);
-}
