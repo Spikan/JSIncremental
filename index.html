@@ -67,7 +67,9 @@
             console.error('❌ App object not found - TypeScript module may have failed to load');
             console.log(
               '🔧 Available globals:',
-              Object.keys(window).filter(function(k) { return k.startsWith('App') || k.includes('index'); })
+              Object.keys(window).filter(function (k) {
+                return k.startsWith('App') || k.includes('index');
+              })
             );
           } else {
             console.log('✅ App object found:', Object.keys(window.App));
@@ -98,6 +100,24 @@
             } else {
               console.error('❌ UI system not available or initializeUI not found');
             }
+            
+            // Check if game loop is actually running
+            setTimeout(() => {
+              console.log('🔧 Checking game state after 2 seconds...');
+              if (window.App && window.App.state) {
+                try {
+                  const state = window.App.state.getState();
+                  console.log('🔧 Current game state:', {
+                    sips: state.sips || 0,
+                    clicks: state.clicks || 0,
+                    drinkProgress: state.drinkProgress || 0,
+                    lastDrinkTime: state.lastDrinkTime || 0
+                  });
+                } catch (error) {
+                  console.error('❌ Error getting game state:', error);
+                }
+              }
+            }, 2000);
           }
         }, 1000);
         // HTML-level splash fallback: ensure any interaction starts the game
