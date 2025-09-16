@@ -244,9 +244,26 @@ try {
   });
 }
 
-// Ensure a default, non-blocking initOnDomReady exists even if early imports stall
-console.log('🔧 About to start tryBoot initialization...');
-console.log('🔧 Reached tryBoot initialization section');
+// Load async systems before tryBoot
+console.log('🔧 Loading async systems...');
+
+// Load hybrid level system
+try {
+  console.log('🔧 About to import hybrid level system...');
+  const hybridLevel = await import('./core/systems/hybrid-level-system');
+  App.systems.hybridLevel = hybridLevel.hybridLevelSystem;
+  console.log('✅ Hybrid level system loaded');
+} catch (e) {
+  __pushDiag({
+    type: 'import',
+    module: 'hybrid-level',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
+  console.warn('⚠️ hybrid level system load failed:', e);
+}
+
+console.log('🔧 Async systems loaded, starting tryBoot initialization...');
 
 // Define tryBoot function outside of try block so it can run independently
 let booted = false;
@@ -714,22 +731,6 @@ try {
     err: String((e && (e as any).message) || e),
   });
   console.warn('⚠️ dev system load failed:', e);
-}
-
-// Load hybrid level system
-try {
-  console.log('🔧 About to import hybrid level system...');
-  const hybridLevel = await import('./core/systems/hybrid-level-system');
-  App.systems.hybridLevel = hybridLevel.hybridLevelSystem;
-  console.log('✅ Hybrid level system loaded');
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'hybrid-level',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-  console.warn('⚠️ hybrid level system load failed:', e);
 }
 
 // game-init already loaded early
