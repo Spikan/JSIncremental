@@ -141,8 +141,10 @@ try {
 
   // Other systems can load asynchronously
   console.log('🔧 Critical systems loaded, continuing with async systems...');
+  console.log('🔧 About to call __pushDiag...');
 
   __pushDiag({ type: 'wire', module: 'core-static', ok: true });
+  console.log('🔧 __pushDiag completed successfully');
 } catch (e) {
   __pushDiag({
     type: 'wire',
@@ -154,241 +156,242 @@ try {
 
 // Ensure a default, non-blocking initOnDomReady exists even if early imports stall
 console.log('🔧 About to start tryBoot initialization...');
+console.log('🔧 Reached tryBoot initialization section');
 
 // Define tryBoot function outside of try block so it can run independently
 let booted = false;
 let retryCount = 0;
 const maxRetries = 50; // 5 seconds max
 const tryBoot = () => {
-      console.log(`🔧 tryBoot called (attempt ${retryCount + 1}/${maxRetries})`);
-      try {
-        if (retryCount >= maxRetries) {
-          console.error('❌ Max retries reached for loop system initialization');
-          return;
-        }
-        retryCount++;
-        // Ensure baseline timing state
-        if (App?.state?.getState && App?.state?.setState) {
-          const st = App.state.getState();
-          const CFG = GC as any;
-          const TIMING = (CFG.TIMING || {}) as any;
-          const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
-          if (!st.drinkRate || Number(st.drinkRate) <= 0) {
-            App.state.setState({ drinkRate: DEFAULT_RATE });
-          }
-          if (!st.lastDrinkTime) {
-            App.state.setState({ lastDrinkTime: Date.now() - DEFAULT_RATE });
-          }
-        }
-        // Call initGame if present (one-time)
-        if (!booted && typeof initGame === 'function') {
-          try {
-            console.log('🔧 Calling initGame...');
-            initGame();
-            console.log('✅ initGame completed successfully');
-          } catch (error) {
-            console.error('❌ initGame failed:', error);
-          }
-        }
-        const loopStart = App?.systems?.loop?.start;
-        console.log('🔧 Checking loop system availability:', !!loopStart);
-        console.log('🔧 App.systems.loop:', App?.systems?.loop);
-        console.log('🔧 Available methods:', Object.keys(App?.systems?.loop || {}));
-        if (!booted && typeof loopStart === 'function') {
-          console.log('🔧 Starting game loop...');
-          loopStart({
-            updateDrinkProgress: () => {
-              try {
-                const st = App?.state?.getState?.() || {};
-                const now = Date.now();
-                const last = Number(st.lastDrinkTime ?? 0);
-                const rate = Number(st.drinkRate ?? 1000);
-                const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-                App?.state?.setState?.({ drinkProgress: pct });
-                App?.ui?.updateDrinkProgress?.(pct, rate);
-              } catch {}
-            },
-            processDrink: () => {
-              try {
-                App?.systems?.drink?.processDrink?.();
-              } catch {}
-            },
-            updateStats: () => {
-              try {
-                App?.ui?.updatePlayTime?.();
-                App?.ui?.updateLastSaveTime?.();
-                App?.ui?.updateAllStats?.();
-                App?.ui?.updatePurchasedCounts?.();
-                App?.ui?.checkUpgradeAffordability?.();
-                App?.systems?.unlocks?.checkAllUnlocks?.();
-
-                // Check for level unlocks
-                try {
-                  const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
-                  if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
-                    // Import and show notifications for newly unlocked levels
-                    import('./ui/level-selector')
-                      .then(({ levelSelector }) => {
-                        newlyUnlockedLevels.forEach((levelId: number) => {
-                          levelSelector.showUnlockNotification(levelId);
-                        });
-                      })
-                      .catch(error => {
-                        console.warn('Failed to load level selector for notifications:', error);
-                      });
-                  }
-                } catch (error) {
-                  console.warn('Failed to check level unlocks:', error);
-                }
-              } catch {}
-            },
-            updatePlayTime: () => {
-              try {
-                App?.ui?.updatePlayTime?.();
-              } catch {}
-            },
-            updateLastSaveTime: () => {
-              try {
-                App?.ui?.updateLastSaveTime?.();
-              } catch {}
-            },
-            updateUI: () => {
-              try {
-                // Update individual header elements
-                App?.ui?.updateTopSipCounter?.();
-                App?.ui?.updateTopSipsPerDrink?.();
-                App?.ui?.updateTopSipsPerSecond?.();
-              } catch (error) {
-                console.error('❌ updateUI error:', error);
-              }
-            },
-          });
-          booted = true;
-          console.log('✅ Game loop started successfully');
-          __pushDiag({ type: 'loop', stage: 'fallback-started' });
-          return;
-        } else {
-          console.log(`⏳ Loop system not ready, retrying... (${retryCount}/${maxRetries})`);
-        }
-      } catch (error) {
-        console.error('❌ Error in tryBoot:', error);
+  console.log(`🔧 tryBoot called (attempt ${retryCount + 1}/${maxRetries})`);
+  try {
+    if (retryCount >= maxRetries) {
+      console.error('❌ Max retries reached for loop system initialization');
+      return;
+    }
+    retryCount++;
+    // Ensure baseline timing state
+    if (App?.state?.getState && App?.state?.setState) {
+      const st = App.state.getState();
+      const CFG = GC as any;
+      const TIMING = (CFG.TIMING || {}) as any;
+      const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
+      if (!st.drinkRate || Number(st.drinkRate) <= 0) {
+        App.state.setState({ drinkRate: DEFAULT_RATE });
       }
-      setTimeout(tryBoot, 100);
-    };
+      if (!st.lastDrinkTime) {
+        App.state.setState({ lastDrinkTime: Date.now() - DEFAULT_RATE });
+      }
+    }
+    // Call initGame if present (one-time)
+    if (!booted && typeof initGame === 'function') {
+      try {
+        console.log('🔧 Calling initGame...');
+        initGame();
+        console.log('✅ initGame completed successfully');
+      } catch (error) {
+        console.error('❌ initGame failed:', error);
+      }
+    }
+    const loopStart = App?.systems?.loop?.start;
+    console.log('🔧 Checking loop system availability:', !!loopStart);
+    console.log('🔧 App.systems.loop:', App?.systems?.loop);
+    console.log('🔧 Available methods:', Object.keys(App?.systems?.loop || {}));
+    if (!booted && typeof loopStart === 'function') {
+      console.log('🔧 Starting game loop...');
+      loopStart({
+        updateDrinkProgress: () => {
+          try {
+            const st = App?.state?.getState?.() || {};
+            const now = Date.now();
+            const last = Number(st.lastDrinkTime ?? 0);
+            const rate = Number(st.drinkRate ?? 1000);
+            const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
+            App?.state?.setState?.({ drinkProgress: pct });
+            App?.ui?.updateDrinkProgress?.(pct, rate);
+          } catch {}
+        },
+        processDrink: () => {
+          try {
+            App?.systems?.drink?.processDrink?.();
+          } catch {}
+        },
+        updateStats: () => {
+          try {
+            App?.ui?.updatePlayTime?.();
+            App?.ui?.updateLastSaveTime?.();
+            App?.ui?.updateAllStats?.();
+            App?.ui?.updatePurchasedCounts?.();
+            App?.ui?.checkUpgradeAffordability?.();
+            App?.systems?.unlocks?.checkAllUnlocks?.();
+
+            // Check for level unlocks
+            try {
+              const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
+              if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
+                // Import and show notifications for newly unlocked levels
+                import('./ui/level-selector')
+                  .then(({ levelSelector }) => {
+                    newlyUnlockedLevels.forEach((levelId: number) => {
+                      levelSelector.showUnlockNotification(levelId);
+                    });
+                  })
+                  .catch(error => {
+                    console.warn('Failed to load level selector for notifications:', error);
+                  });
+              }
+            } catch (error) {
+              console.warn('Failed to check level unlocks:', error);
+            }
+          } catch {}
+        },
+        updatePlayTime: () => {
+          try {
+            App?.ui?.updatePlayTime?.();
+          } catch {}
+        },
+        updateLastSaveTime: () => {
+          try {
+            App?.ui?.updateLastSaveTime?.();
+          } catch {}
+        },
+        updateUI: () => {
+          try {
+            // Update individual header elements
+            App?.ui?.updateTopSipCounter?.();
+            App?.ui?.updateTopSipsPerDrink?.();
+            App?.ui?.updateTopSipsPerSecond?.();
+          } catch (error) {
+            console.error('❌ updateUI error:', error);
+          }
+        },
+      });
+      booted = true;
+      console.log('✅ Game loop started successfully');
+      __pushDiag({ type: 'loop', stage: 'fallback-started' });
+      return;
+    } else {
+      console.log(`⏳ Loop system not ready, retrying... (${retryCount}/${maxRetries})`);
+    }
+  } catch (error) {
+    console.error('❌ Error in tryBoot:', error);
+  }
+  setTimeout(tryBoot, 100);
+};
 
 // Call tryBoot outside of any try block to ensure it runs
+console.log('🔧 About to call tryBoot function...');
 try {
+  console.log('🔧 Calling tryBoot now...');
   tryBoot();
+  console.log('🔧 tryBoot call completed');
 } catch (error) {
   console.error('❌ Error calling tryBoot:', error);
 }
 
 // After 1s, force-show game content to avoid being stuck on splash
 setTimeout(() => {
-    try {
-      const splash = document.getElementById('splashScreen') as any;
-      const game = document.getElementById('gameContent') as any;
-      if (splash && game && splash.style.display !== 'none') {
-        console.log('🔄 Force-hiding splash screen after timeout');
-        splash.style.display = 'none';
-        splash.style.visibility = 'hidden';
-        splash.style.pointerEvents = 'none';
-        if (splash.parentNode) splash.parentNode.removeChild(splash);
-        game.style.display = 'block';
-        game.style.visibility = 'visible';
-        game.style.opacity = '1';
-        document.body?.classList?.add('game-started');
-        __pushDiag({ type: 'splash', action: 'forced-hide' });
-        // After forced hide, also try to boot the loop
-        try {
-          // Use proper module access instead of window globals
-          let booted = false;
-          const tryBoot2 = () => {
-            try {
-              const loopStart = App?.systems?.loop?.start;
-              if (!booted && typeof loopStart === 'function') {
-                loopStart({
-                  updateDrinkProgress: () => {
-                    try {
-                      const st = App?.state?.getState?.() || {};
-                      const now = Date.now();
-                      const last = Number(st.lastDrinkTime ?? 0);
-                      const rate = Number(st.drinkRate ?? 1000);
-                      const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-                      App?.state?.setState?.({ drinkProgress: pct });
-                      App?.ui?.updateDrinkProgress?.(pct, rate);
-                    } catch {}
-                  },
-                  processDrink: () => {
-                    try {
-                      App?.systems?.drink?.processDrink?.();
-                    } catch {}
-                  },
-                  updateStats: () => {
-                    try {
-                      App?.ui?.updatePlayTime?.();
-                      App?.ui?.updateLastSaveTime?.();
-                      App?.ui?.updateAllStats?.();
-                      App?.ui?.updatePurchasedCounts?.();
-                      App?.ui?.checkUpgradeAffordability?.();
-                      App?.systems?.unlocks?.checkAllUnlocks?.();
+  try {
+    const splash = document.getElementById('splashScreen') as any;
+    const game = document.getElementById('gameContent') as any;
+    if (splash && game && splash.style.display !== 'none') {
+      console.log('🔄 Force-hiding splash screen after timeout');
+      splash.style.display = 'none';
+      splash.style.visibility = 'hidden';
+      splash.style.pointerEvents = 'none';
+      if (splash.parentNode) splash.parentNode.removeChild(splash);
+      game.style.display = 'block';
+      game.style.visibility = 'visible';
+      game.style.opacity = '1';
+      document.body?.classList?.add('game-started');
+      __pushDiag({ type: 'splash', action: 'forced-hide' });
+      // After forced hide, also try to boot the loop
+      try {
+        // Use proper module access instead of window globals
+        let booted = false;
+        const tryBoot2 = () => {
+          try {
+            const loopStart = App?.systems?.loop?.start;
+            if (!booted && typeof loopStart === 'function') {
+              loopStart({
+                updateDrinkProgress: () => {
+                  try {
+                    const st = App?.state?.getState?.() || {};
+                    const now = Date.now();
+                    const last = Number(st.lastDrinkTime ?? 0);
+                    const rate = Number(st.drinkRate ?? 1000);
+                    const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
+                    App?.state?.setState?.({ drinkProgress: pct });
+                    App?.ui?.updateDrinkProgress?.(pct, rate);
+                  } catch {}
+                },
+                processDrink: () => {
+                  try {
+                    App?.systems?.drink?.processDrink?.();
+                  } catch {}
+                },
+                updateStats: () => {
+                  try {
+                    App?.ui?.updatePlayTime?.();
+                    App?.ui?.updateLastSaveTime?.();
+                    App?.ui?.updateAllStats?.();
+                    App?.ui?.updatePurchasedCounts?.();
+                    App?.ui?.checkUpgradeAffordability?.();
+                    App?.systems?.unlocks?.checkAllUnlocks?.();
 
-                      // Check for level unlocks
-                      try {
-                        const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
-                        if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
-                          // Import and show notifications for newly unlocked levels
-                          import('./ui/level-selector')
-                            .then(({ levelSelector }) => {
-                              newlyUnlockedLevels.forEach((levelId: number) => {
-                                levelSelector.showUnlockNotification(levelId);
-                              });
-                            })
-                            .catch(error => {
-                              console.warn(
-                                'Failed to load level selector for notifications:',
-                                error
-                              );
+                    // Check for level unlocks
+                    try {
+                      const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
+                      if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
+                        // Import and show notifications for newly unlocked levels
+                        import('./ui/level-selector')
+                          .then(({ levelSelector }) => {
+                            newlyUnlockedLevels.forEach((levelId: number) => {
+                              levelSelector.showUnlockNotification(levelId);
                             });
-                        }
-                      } catch (error) {
-                        console.warn('Failed to check level unlocks:', error);
+                          })
+                          .catch(error => {
+                            console.warn('Failed to load level selector for notifications:', error);
+                          });
                       }
-                    } catch {}
-                  },
-                  updatePlayTime: () => {
-                    try {
-                      App?.ui?.updatePlayTime?.();
-                    } catch {}
-                  },
-                  updateLastSaveTime: () => {
-                    try {
-                      App?.ui?.updateLastSaveTime?.();
-                    } catch {}
-                  },
-                  updateUI: () => {
-                    try {
-                      // Update individual header elements
-                      App?.ui?.updateTopSipCounter?.();
-                      App?.ui?.updateTopSipsPerDrink?.();
-                      App?.ui?.updateTopSipsPerSecond?.();
                     } catch (error) {
-                      console.error('❌ updateUI error (second loop):', error);
+                      console.warn('Failed to check level unlocks:', error);
                     }
-                  },
-                });
-                booted = true;
-                __pushDiag({ type: 'loop', stage: 'fallback-started-post-hide' });
-                return;
-              }
-            } catch {}
-            setTimeout(tryBoot2, 100);
-          };
-          tryBoot2();
-        } catch {}
-      }
-    } catch {}
-  }, 1000);
+                  } catch {}
+                },
+                updatePlayTime: () => {
+                  try {
+                    App?.ui?.updatePlayTime?.();
+                  } catch {}
+                },
+                updateLastSaveTime: () => {
+                  try {
+                    App?.ui?.updateLastSaveTime?.();
+                  } catch {}
+                },
+                updateUI: () => {
+                  try {
+                    // Update individual header elements
+                    App?.ui?.updateTopSipCounter?.();
+                    App?.ui?.updateTopSipsPerDrink?.();
+                    App?.ui?.updateTopSipsPerSecond?.();
+                  } catch (error) {
+                    console.error('❌ updateUI error (second loop):', error);
+                  }
+                },
+              });
+              booted = true;
+              __pushDiag({ type: 'loop', stage: 'fallback-started-post-hide' });
+              return;
+            }
+          } catch {}
+          setTimeout(tryBoot2, 100);
+        };
+        tryBoot2();
+      } catch {}
+    }
+  } catch {}
+}, 1000);
 
 __pushDiag({ type: 'wire', module: 'initOnDomReady-default' });
 try {
