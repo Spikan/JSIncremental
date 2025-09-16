@@ -25,29 +25,4 @@ export interface Store<T extends object> {
   subscribe: (_listener: Listener<T>) => Unsubscribe;
 }
 
-// Legacy createStore function now creates a Zustand-compatible wrapper
-export function createStore<T extends object>(initialState: T): Store<T> {
-  console.warn('⚠️ createStore is deprecated. Use useGameStore or gameStore directly.');
-
-  // For now, return a basic store implementation
-  // The real Zustand store is available via useGameStore
-  let state: T = { ...(initialState as any) };
-  const listeners = new Set<(_state: T) => void>();
-
-  function getState(): T {
-    return state;
-  }
-
-  function setState(partial: Partial<T>): void {
-    if (partial == null || typeof partial !== 'object') return;
-    state = { ...state, ...partial } as T;
-    for (const listener of listeners) listener(state);
-  }
-
-  function subscribe(listener: (state: T) => void): () => void {
-    listeners.add(listener);
-    return () => listeners.delete(listener);
-  }
-
-  return { getState, setState, subscribe };
-}
+// createStore function removed - use useGameStore directly

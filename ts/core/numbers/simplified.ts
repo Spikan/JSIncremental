@@ -200,8 +200,4 @@ export const Numbers = {
   pow,
 };
 
-// Make available globally for backward compatibility
-if (typeof window !== 'undefined') {
-  (window as any).Numbers = Numbers;
-  (window as any).Decimal = Decimal;
-}
+// Global assignments removed - use proper imports

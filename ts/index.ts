@@ -538,38 +538,7 @@ try {
   console.warn('Failed to expose App.actions getter:', error);
 }
 
-try {
-  const bridge = (_app: any) => ({
-    init: () => {
-      // No-op for compatibility
-    },
-    setDrinkRate: () => {
-      // No-op for compatibility
-    },
-    setDrinkProgress: () => {
-      // No-op for compatibility
-    },
-    setLastDrinkTime: () => {
-      // No-op for compatibility
-    },
-    setLevel: () => {
-      // No-op for compatibility
-    },
-    autoSync: () => {
-      // No-op for compatibility
-    },
-  });
-  // Modernized - bridge handled by store
-  // Modernized - bridge handled by store
-  const bridgeInstance = bridge(App);
-  bridgeInstance.init();
-  // Modernized - state bridge handled by store
-  // Modernized - state bridge handled by store
-  App.stateBridge = bridgeInstance;
-  console.log('✅ State bridge initialized');
-} catch (error) {
-  console.warn('⚠️ State bridge initialization failed:', error);
-}
+// State bridge removed - no longer needed
 
 try {
   console.log('🔧 Loading UI system with dynamic import...');
