@@ -52,13 +52,19 @@ export function processDrinkFactory({
       const lastDrinkTime: number = Number(state.lastDrinkTime ?? getLastDrinkTime());
 
       const now = getNow();
-      if (now - lastDrinkTime < drinkRate) return;
+      // Debug logging removed for production
+      if (now - lastDrinkTime < drinkRate) {
+        // Too soon to process drink
+        return;
+      }
 
       // Add full sips-per-drink (base + production) with Decimal support
       const sipsPerDrink = getSipsPerDrink();
+      const stateSpdValue = state.spd?.toNumber?.() ?? state.spd ?? 0;
       const baseSpdVal = toDecimal(
-        state.spd ?? sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
+        stateSpdValue > 0 ? stateSpdValue : (sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1)
       );
+      // Debug logging removed for production
 
       // Apply level bonuses from hybrid level system (defensive access)
       let levelBonuses = { sipMultiplier: 1.0, clickMultiplier: 1.0 };
@@ -73,7 +79,9 @@ export function processDrinkFactory({
 
       // Handle sips accumulation with Decimal arithmetic
       const currentSips = toDecimal(getSips() || 0);
-      setSips(currentSips.add(spdVal));
+      const newSips = currentSips.add(spdVal);
+      // Debug logging removed for production
+      setSips(newSips);
 
       // Mirror totals with Decimal support
       const prevTotal = toDecimal(getTotalSipsEarned() || 0);

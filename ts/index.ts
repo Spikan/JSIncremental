@@ -200,6 +200,19 @@ try {
     },
   };
 
+  // Register services BEFORE loading drink system
+  console.log('🔧 Registering services with service locator...');
+  ServiceLocator.register(SERVICE_KEYS.APP, App);
+  ServiceLocator.register(SERVICE_KEYS.DECIMAL, Decimal);
+  ServiceLocator.register(SERVICE_KEYS.GAME_CONFIG, (window as any).GAME_CONFIG);
+  ServiceLocator.register('sips', (window as any).sips);
+  ServiceLocator.register('sipsPerDrink', (window as any).sipsPerDrink);
+  ServiceLocator.register('spd', (window as any).spd);
+  ServiceLocator.register('totalSipsEarned', 0);
+  ServiceLocator.register('highestSipsPerSecond', 0);
+  ServiceLocator.register('lastAutosaveClockMs', 0);
+  console.log('✅ Services registered successfully');
+
   // Load drink system immediately - also critical
   console.log('🔧 About to import drink system...');
   const drinkModule = await import('./core/systems/drink-system');
@@ -208,10 +221,16 @@ try {
     getApp: () => ServiceLocator.get(SERVICE_KEYS.APP),
     getGameConfig: () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
     getSips: () => ServiceLocator.get('sips'),
-    setSips: (value: any) => ServiceLocator.register('sips', value),
+    setSips: (value: any) => {
+      ServiceLocator.register('sips', value);
+      // Also update the Zustand store
+      if (App?.state?.setState) {
+        App.state.setState({ sips: value });
+      }
+    },
     getSipsPerDrink: () => ServiceLocator.get('sipsPerDrink'),
     getDrinkRate: () => 1000,
-    getLastDrinkTime: () => 0,
+    getLastDrinkTime: () => Date.now() - 2000, // Set to 2 seconds ago so drinks can process immediately
     getSpd: () => ServiceLocator.get('spd'),
     getTotalSipsEarned: () => ServiceLocator.get('totalSipsEarned'),
     getHighestSipsPerSecond: () => ServiceLocator.get('highestSipsPerSecond'),
@@ -281,8 +300,12 @@ try {
         },
         processDrink: () => {
           try {
+            console.log('🔧 Calling processDrink...');
             App?.systems?.drink?.processDrink?.();
-          } catch {}
+            console.log('🔧 processDrink completed');
+          } catch (error) {
+            console.error('❌ processDrink error:', error);
+          }
         },
         updateStats: () => {
           try {
@@ -637,18 +660,7 @@ try {
 
 console.log('✅ App object created and ready');
 
-// Register services with the service locator
-console.log('🔧 Registering services with service locator...');
-ServiceLocator.register(SERVICE_KEYS.APP, App);
-ServiceLocator.register(SERVICE_KEYS.DECIMAL, Decimal);
-ServiceLocator.register(SERVICE_KEYS.GAME_CONFIG, (window as any).GAME_CONFIG);
-ServiceLocator.register('sips', 0);
-ServiceLocator.register('sipsPerDrink', 1);
-ServiceLocator.register('spd', 1);
-ServiceLocator.register('totalSipsEarned', 0);
-ServiceLocator.register('highestSipsPerSecond', 0);
-ServiceLocator.register('lastAutosaveClockMs', 0);
-console.log('✅ Services registered successfully');
+// Services already registered earlier
 
 console.log('🔧 index.ts finished loading, App object created:', !!App);
 __pushDiag({ type: 'index', stage: 'end' });

@@ -1,32 +1,31 @@
 // TypeScript port of validation schemas with a safe Zod fallback
 
 import { toDecimal } from '../numbers/simplified';
+import { z } from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const z: any =
-  (typeof window !== 'undefined' && (window as any).Zod) ||
-  (typeof globalThis !== 'undefined' && (globalThis as any).Zod) ||
-  (() => {
-    const chain: any = {
-      parse: (data: any) => data,
-      omit: () => chain,
-      optional: () => chain,
-      min: () => chain,
-      max: () => chain,
-      record: () => chain,
-    };
-    return {
-      object: () => chain,
-      number: () => chain,
-      boolean: () => chain,
-      string: () => chain,
-      any: () => chain,
-      record: () => chain,
-    };
-  })();
+const zod: any = z || (() => {
+  const chain: any = {
+    parse: (data: any) => data,
+    omit: () => chain,
+    optional: () => chain,
+    min: () => chain,
+    max: () => chain,
+    record: () => chain,
+    union: () => chain,
+  };
+  return {
+    object: () => chain,
+    number: () => chain,
+    boolean: () => chain,
+    string: () => chain,
+    any: () => chain,
+    record: () => chain,
+  };
+})();
 
 export type Unlock = { sips: number; clicks: number };
-export const UnlockSchema = z.object({ sips: z.number().min(0), clicks: z.number().min(0) });
+export const UnlockSchema = zod.object({ sips: zod.number().min(0), clicks: zod.number().min(0) });
 
 export type Unlocks = Record<
   | 'suction'
