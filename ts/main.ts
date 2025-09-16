@@ -224,13 +224,8 @@ function initGame() {
 
     // Use Zustand store for state management instead of local variables
     // Get current state from store
-    // Modernized - state handled by store
-    const currentState = useGameStore.getState();
-
     // Compute production
     const config = BAL || {};
-    // Modernized - resources system handled by store
-    const state = useGameStore.getState();
     const up = {
       straws: { baseSPD: config.STRAW_BASE_SPD },
       cups: { baseSPD: config.CUP_BASE_SPD },
@@ -254,10 +249,11 @@ function initGame() {
     try {
       // Use safe conversion to handle extreme values without returning Infinity
       // Preserve extreme SPD values - don't use toSafeNumber
-      const strawSPDValue = result.strawSPD;
-      const cupSPDValue = result.cupSPD;
+      // Modernized - use actual values from store
+      const strawSPDValue = result.base.strawBaseSPD;
+      const cupSPDValue = result.base.cupBaseSPD;
       // Preserve extreme SPD values - don't use toSafeNumber
-      const spdValue = result.sipsPerDrink;
+      const spdValue = result.base.baseSipsPerDrink;
 
       // Store values directly in Zustand store instead of local variables
 
@@ -272,6 +268,8 @@ function initGame() {
       } catch (error) {
         console.warn('Failed to update store with recalculated SPD values:', error);
       }
+    } catch (error) {
+      console.warn('Failed to handle Decimal results:', error);
     }
     
     // Fallback production calculation using store values

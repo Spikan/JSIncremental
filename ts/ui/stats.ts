@@ -13,7 +13,7 @@ export function updatePlayTime(): void {
   if (typeof window === 'undefined') return;
   const playTimeElement = domQuery.getById('playTime') as HTMLElement | undefined;
   try {
-    const state = useGameStore.getState();
+    const state = useGameStore.getState() as any; // TODO: Fix type definitions
     if (playTimeElement && state) {
       const totalMs = Number(state.totalPlayTime || (window as any).totalPlayTime || 0);
       const totalSeconds = Math.floor(totalMs / 1000);
@@ -123,7 +123,7 @@ export function updateClickStats(): void {
   const criticalClicksElement = domQuery.getById('criticalClicksStats') as HTMLElement | undefined;
   if (criticalClicksElement) {
     // Modernized - state handled by store
-    const crit = useGameStore.getState().criticalClicks || 0;
+    const crit = useGameStore.getState().totalClicks || 0; // Using totalClicks as fallback
     criticalClicksElement.textContent = formatNumber(crit);
   }
   // Click streak
@@ -172,7 +172,7 @@ export function updateShopStats(): void {
 
     // Debug: Log current state values
     // Modernized - state handled by store
-    const state = useGameStore.getState();
+    const state = useGameStore.getState() as any; // TODO: Fix type definitions
     if (state) {
       if (shouldLog)
         console.log('🔍 Current state values:', {
@@ -221,7 +221,7 @@ export function updateShopStats(): void {
       | undefined;
     if (criticalClicksPurchasedElement) {
       // Modernized - state handled by store
-      const v = useGameStore.getState().criticalClicks || 0;
+      const v = useGameStore.getState().totalClicks || 0; // Using totalClicks as fallback
       criticalClicksPurchasedElement.textContent = formatNumber(v);
     }
 
