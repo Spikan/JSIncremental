@@ -1427,21 +1427,28 @@ function setupSpecialButtonHandlers(): void {
         }
         try {
           // Button click handling
+          console.log('🔧 Soda button clicked!');
           import('../core/systems/clicks-system')
             .then(async ({ handleSodaClickFactory }) => {
+              console.log('🔧 Click system loaded, calling handleSodaClick...');
               const handleSodaClick = handleSodaClickFactory();
               await handleSodaClick(1.0); // Default multiplier of 1.0
-
+              console.log('🔧 handleSodaClick completed, triggering UI update...');
+              
               // Trigger UI update after click
               if (window.App?.ui?.updateAllDisplays) {
+                console.log('🔧 Calling updateAllDisplays after click...');
                 window.App.ui.updateAllDisplays();
+                console.log('🔧 updateAllDisplays completed');
+              } else {
+                console.warn('🔧 updateAllDisplays not available');
               }
             })
             .catch(error => {
               console.warn('Failed to load click system:', error);
             });
         } catch (error) {
-          // Error handling - logging removed for production
+          console.error('Soda click handler error:', error);
         }
       });
     }

@@ -381,13 +381,19 @@ try {
         updateUI: () => {
           try {
             // Update individual header elements
+            console.log('🔧 updateUI: calling updateTopSipCounter...');
             App?.ui?.updateTopSipCounter?.();
+            console.log('🔧 updateUI: calling updateTopSipsPerDrink...');
             App?.ui?.updateTopSipsPerDrink?.();
+            console.log('🔧 updateUI: calling updateTopSipsPerSecond...');
             App?.ui?.updateTopSipsPerSecond?.();
-
+            
             // Update main game UI elements
+            console.log('🔧 updateUI: calling updateAllDisplays...');
             App?.ui?.updateAllDisplays?.();
+            console.log('🔧 updateUI: calling updateDrinkProgress...');
             App?.ui?.updateDrinkProgress?.();
+            console.log('🔧 updateUI: completed successfully');
           } catch (error) {
             console.error('❌ updateUI error:', error);
           }
