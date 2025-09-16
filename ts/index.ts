@@ -222,6 +222,7 @@ try {
   ServiceLocator.register('spd', toDecimal((window as any).spd || 1));
   ServiceLocator.register('totalSipsEarned', toDecimal(0));
   ServiceLocator.register('highestSipsPerSecond', toDecimal(0));
+  ServiceLocator.register('lastDrinkTime', Date.now() - 2000); // Set to 2 seconds ago so drinks can process immediately
   ServiceLocator.register('lastAutosaveClockMs', Date.now());
   console.log('✅ Services registered successfully');
 
@@ -250,7 +251,8 @@ try {
       return spd;
     },
     getDrinkRate: () => 1000,
-    getLastDrinkTime: () => Date.now() - 2000, // Set to 2 seconds ago so drinks can process immediately
+    getLastDrinkTime: () => ServiceLocator.get('lastDrinkTime') || Date.now() - 2000,
+    setLastDrinkTime: (value: number) => ServiceLocator.register('lastDrinkTime', value),
     getSpd: () => ServiceLocator.get('spd'),
     getTotalSipsEarned: () => ServiceLocator.get('totalSipsEarned'),
     getHighestSipsPerSecond: () => ServiceLocator.get('highestSipsPerSecond'),
@@ -387,7 +389,7 @@ try {
             App?.ui?.updateTopSipsPerDrink?.();
             console.log('🔧 updateUI: calling updateTopSipsPerSecond...');
             App?.ui?.updateTopSipsPerSecond?.();
-            
+
             // Update main game UI elements
             console.log('🔧 updateUI: calling updateAllDisplays...');
             App?.ui?.updateAllDisplays?.();

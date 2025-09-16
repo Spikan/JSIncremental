@@ -18,6 +18,7 @@ export type ProcessDrinkArgs = {
   getSipsPerDrink?: () => any;
   getDrinkRate?: () => number;
   getLastDrinkTime?: () => number;
+  setLastDrinkTime?: (value: number) => void;
   getSpd?: () => any;
   getTotalSipsEarned?: () => any;
   getHighestSipsPerSecond?: () => any;
@@ -34,6 +35,7 @@ export function processDrinkFactory({
   getSipsPerDrink = () => ServiceLocator.get('sipsPerDrink'),
   getDrinkRate = () => 1000,
   getLastDrinkTime = () => 0,
+  setLastDrinkTime = (value: number) => ServiceLocator.register('lastDrinkTime', value),
   getSpd = () => ServiceLocator.get('spd'),
   getTotalSipsEarned = () => ServiceLocator.get('totalSipsEarned'),
   getHighestSipsPerSecond = () => ServiceLocator.get('highestSipsPerSecond'),
@@ -110,6 +112,11 @@ export function processDrinkFactory({
         App?.stateBridge?.setLastDrinkTime?.(nextLast);
       } catch (error) {
         console.warn('Failed to set last drink time via bridge:', error);
+      }
+      try {
+        setLastDrinkTime(nextLast);
+      } catch (error) {
+        console.warn('Failed to set last drink time via service locator:', error);
       }
       try {
         App?.stateBridge?.setDrinkProgress?.(nextProgress);

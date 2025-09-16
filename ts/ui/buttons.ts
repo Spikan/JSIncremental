@@ -1434,7 +1434,7 @@ function setupSpecialButtonHandlers(): void {
               const handleSodaClick = handleSodaClickFactory();
               await handleSodaClick(1.0); // Default multiplier of 1.0
               console.log('🔧 handleSodaClick completed, triggering UI update...');
-              
+
               // Trigger UI update after click
               if (window.App?.ui?.updateAllDisplays) {
                 console.log('🔧 Calling updateAllDisplays after click...');
