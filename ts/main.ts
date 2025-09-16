@@ -108,28 +108,13 @@ function initGame() {
     }
     if (!GC || (typeof GC === 'object' && Object.keys(GC).length === 0)) {
       console.log('⏳ Waiting for GAME_CONFIG to load...');
-      // Don't retry indefinitely - use fallback config after a few attempts
-      const retryCount = (window as any).__initGameRetryCount || 0;
-      if (retryCount < 10) {
-        (window as any).__initGameRetryCount = retryCount + 1;
-        timerManager.setTimeout(initGame, 100, 'Retry initGame - GAME_CONFIG');
-        return;
-      } else {
-        console.warn('⚠️ GAME_CONFIG not available after 10 retries, using fallback values');
-      }
+      // GAME_CONFIG must be available - fail fast if not
+      throw new Error('GAME_CONFIG not available - configuration must be loaded before initGame');
     }
 
-    const CONF = GC || {};
-    const BAL = CONF.BALANCE || {
-      STRAW_BASE_SPD: 2.0,
-      CUP_BASE_SPD: 5.0,
-      BASE_SIPS_PER_DRINK: 1,
-      WIDER_STRAWS_MULTIPLIER: 0.5,
-      BETTER_CUPS_MULTIPLIER: 0.4,
-    };
-    const TIMING = CONF.TIMING || {
-      DEFAULT_DRINK_RATE: 5000,
-    };
+    const CONF = GC;
+    const BAL = CONF.BALANCE;
+    const TIMING = CONF.TIMING;
 
     // Initialize state through Zustand store instead of legacy globals
     // All state is now managed through App.state

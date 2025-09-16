@@ -67,46 +67,11 @@ export class BootstrapSystem {
    * Get game configuration
    */
   public getGameConfig(): any {
-    // Try to get config from window first (for legacy compatibility)
-    if (typeof window !== 'undefined' && (window as any).GAME_CONFIG) {
-      return (window as any).GAME_CONFIG;
+    // GAME_CONFIG must be available - fail fast if not
+    if (typeof window === 'undefined' || !(window as any).GAME_CONFIG) {
+      throw new Error('GAME_CONFIG not available - configuration must be loaded before bootstrap');
     }
-
-    // Fallback: return a minimal config to prevent initialization blocking
-    console.warn('GAME_CONFIG not available on window, using fallback config');
-    return {
-      BALANCE: {
-        STRAW_BASE_COST: 25,
-        STRAW_SCALING: 1.12,
-        CUP_BASE_COST: 100,
-        CUP_SCALING: 1.15,
-        SUCTION_BASE_COST: 10,
-        SUCTION_SCALING: 1.1,
-        FASTER_DRINKS_BASE_COST: 80,
-        FASTER_DRINKS_SCALING: 1.1,
-        WIDER_STRAWS_BASE_COST: 150,
-        WIDER_STRAWS_SCALING: 1.12,
-        BETTER_CUPS_BASE_COST: 400,
-        BETTER_CUPS_SCALING: 1.12,
-        STRAW_BASE_SPD: 2.0,
-        CUP_BASE_SPD: 5.0,
-        SUCTION_CLICK_BONUS: 1.0,
-        BASE_SIPS_PER_DRINK: 1,
-        WIDER_STRAWS_MULTIPLIER: 0.5,
-        BETTER_CUPS_MULTIPLIER: 0.4,
-      },
-      TIMING: {
-        DEFAULT_DRINK_RATE: 5000,
-        MIN_SAVE_INTERVAL: 1000,
-        AUTOSAVE_INTERVAL: 10,
-        DOM_READY_DELAY: 100,
-      },
-      LIMITS: {
-        MAX_CLICK_TIMES: 100,
-        TARGET_FPS: 60,
-        STATS_UPDATE_INTERVAL: 1000,
-      },
-    };
+    return (window as any).GAME_CONFIG;
   }
 
   /**
@@ -193,7 +158,7 @@ export class BootstrapSystem {
   }
 
   /**
-   * Get game configuration values with fallbacks
+   * Get game configuration values
    */
   public getGameConfigValue<T>(path: string, defaultValue: T): T {
     const config = this.getGameConfig();

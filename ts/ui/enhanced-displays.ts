@@ -159,36 +159,8 @@ class EnhancedDisplayManager {
 
         this.previousState.level = currentLevel;
       } else {
-        // Fallback to old system if hybrid system not available
-        const displayData = getDisplayData();
-        if (!displayData?.level) return;
-
-        const currentLevel = displayData.level.toString();
-        const previousLevel = this.previousState.level;
-
-        // Check for level up
-        if (previousLevel && currentLevel !== previousLevel) {
-          const prevLevelNum = parseInt(previousLevel) || 1;
-          const currLevelNum = parseInt(currentLevel) || 1;
-
-          if (currLevelNum > prevLevelNum) {
-            // Level up detected! Show celebration
-            this.celebrateLevelUp(currLevelNum);
-          }
-
-          // Animate the level change
-          if (this.animationEnabled) {
-            animateNumberDisplay(levelElement, prevLevelNum, currLevelNum, value =>
-              Math.floor(value).toString()
-            );
-          } else {
-            levelElement.textContent = currentLevel;
-          }
-        } else {
-          levelElement.textContent = currentLevel;
-        }
-
-        this.previousState.level = currentLevel;
+        // Hybrid system not available - fail fast instead of fallback
+        throw new Error('Hybrid level system not available - cannot update level display');
       }
     } catch (error) {
       logger.error('Failed to update animated level display:', error);

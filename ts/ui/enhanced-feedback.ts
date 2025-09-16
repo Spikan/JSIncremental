@@ -73,8 +73,7 @@ export function showEnhancedClickFeedback(
     animationService.showClickFeedback(config);
   } catch (error) {
     logger.error('Failed to show enhanced click feedback:', error);
-    // Fallback to original system if needed
-    fallbackToOriginalFeedback(sipsGained, isCritical, clickX, clickY);
+    throw error; // Fail fast instead of fallback
   }
 }
 
@@ -301,23 +300,7 @@ function findPurchaseButton(itemName: string): HTMLElement | null {
   return null;
 }
 
-function fallbackToOriginalFeedback(
-  sipsGained: any,
-  isCritical: boolean,
-  clickX: number | null,
-  clickY: number | null
-): void {
-  logger.warn('Using fallback to original feedback system');
-
-  // Import and use your existing feedback system as fallback
-  try {
-    import('./feedback').then(({ showClickFeedback }) => {
-      showClickFeedback(sipsGained, isCritical, clickX, clickY);
-    });
-  } catch (error) {
-    logger.error('Fallback feedback system also failed:', error);
-  }
-}
+// Fallback function removed - fail fast instead
 
 // Export performance controls
 export const animationControls = {

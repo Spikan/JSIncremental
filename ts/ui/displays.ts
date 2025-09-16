@@ -440,17 +440,8 @@ export function updateLevelNumber(): void {
         levelEl.innerHTML = String(levelId);
         console.log('🔍 updateLevelNumber: DOM element now shows:', levelEl.innerHTML);
       } else {
-        console.log('⚠️ updateLevelNumber: Hybrid system not available, using fallback');
-        // Fallback to old system if hybrid system not available
-        const displayData = getDisplayData();
-        const level = safeToNumberOrDecimal(displayData.level || 1);
-        const levelNum =
-          typeof level === 'number'
-            ? level
-            : Math.abs(level.toNumber()) < 1e15
-              ? level.toNumber()
-              : 1;
-        levelEl.innerHTML = String(levelNum);
+        // Hybrid system not available - fail fast instead of fallback
+        throw new Error('Hybrid level system not available - cannot update level display');
       }
     } catch (error) {
       console.warn('Failed to update display:', error);
