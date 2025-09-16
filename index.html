@@ -60,14 +60,37 @@
       window.addEventListener('load', function () {
         // Game initialization is handled by main.js
         console.log('✅ Page loaded, main.js will handle initialization');
-        
+
         // Check if the TypeScript module loaded
         setTimeout(() => {
           if (!window.App) {
             console.error('❌ App object not found - TypeScript module may have failed to load');
-            console.log('🔧 Available globals:', Object.keys(window).filter(k => k.startsWith('App') || k.includes('index')));
+            console.log(
+              '🔧 Available globals:',
+              Object.keys(window).filter(k => k.startsWith('App') || k.includes('index'))
+            );
           } else {
             console.log('✅ App object found:', Object.keys(window.App));
+            
+            // Check if game loop is running
+            if (window.App.systems && window.App.systems.loop) {
+              console.log('✅ Loop system available:', typeof window.App.systems.loop.start);
+            } else {
+              console.error('❌ Loop system not available');
+            }
+            
+            // Check if UI is initialized
+            if (window.App.ui && typeof window.App.ui.initializeUI === 'function') {
+              console.log('✅ UI system available, calling initializeUI...');
+              try {
+                window.App.ui.initializeUI();
+                console.log('✅ UI initialized successfully');
+              } catch (error) {
+                console.error('❌ UI initialization failed:', error);
+              }
+            } else {
+              console.error('❌ UI system not available or initializeUI not found');
+            }
           }
         }, 1000);
         // HTML-level splash fallback: ensure any interaction starts the game
@@ -547,7 +570,11 @@
       </div>
     </div>
     <!-- Single entry: ts/index.ts will import all other modules -->
-    <script type="module" src="ts/index.ts" onerror="console.error('❌ Failed to load TypeScript module:', this.src)"></script>
+    <script
+      type="module"
+      src="ts/index.ts"
+      onerror="console.error('❌ Failed to load TypeScript module:', this.src)"
+    ></script>
     <script>
       // Ensure Decimal is available globally before loading main.js
       if (typeof Decimal === 'undefined') {
