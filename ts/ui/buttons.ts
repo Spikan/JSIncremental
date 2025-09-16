@@ -1428,9 +1428,14 @@ function setupSpecialButtonHandlers(): void {
         try {
           // Button click handling
           import('../core/systems/clicks-system')
-            .then(({ handleSodaClickFactory }) => {
+            .then(async ({ handleSodaClickFactory }) => {
               const handleSodaClick = handleSodaClickFactory();
-              handleSodaClick(1.0); // Default multiplier of 1.0
+              await handleSodaClick(1.0); // Default multiplier of 1.0
+
+              // Trigger UI update after click
+              if (window.App?.ui?.updateAllDisplays) {
+                window.App.ui.updateAllDisplays();
+              }
             })
             .catch(error => {
               console.warn('Failed to load click system:', error);

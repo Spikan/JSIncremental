@@ -384,6 +384,10 @@ try {
             App?.ui?.updateTopSipCounter?.();
             App?.ui?.updateTopSipsPerDrink?.();
             App?.ui?.updateTopSipsPerSecond?.();
+
+            // Update main game UI elements
+            App?.ui?.updateAllDisplays?.();
+            App?.ui?.updateDrinkProgress?.();
           } catch (error) {
             console.error('❌ updateUI error:', error);
           }
