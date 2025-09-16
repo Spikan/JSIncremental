@@ -221,29 +221,33 @@ try {
   try {
     const { useGameStore } = await import('./core/state/zustand-store');
     console.log('🔧 zustand-store imported successfully, useGameStore:', typeof useGameStore);
+    console.log('🔧 useGameStore.getState():', typeof useGameStore.getState);
+    console.log('🔧 useGameStore.setState:', typeof useGameStore.setState);
     console.log('🔧 About to call useGameStore.setState...');
     useGameStore.setState({
-    sips: toDecimal(0),
-    spd: toDecimal(1),
-    level: 1,
-    drinkRate: 1000,
-    drinkProgress: 0,
-    lastDrinkTime: Date.now() - 2000, // Set to 2 seconds ago so drinks can process immediately
-    totalClicks: 0,
-    totalSipsEarned: toDecimal(0),
-    highestSipsPerSecond: toDecimal(0),
-    suctionClickBonus: 0,
-    options: {
-      autosaveEnabled: true,
-      autosaveInterval: 30,
-      clickSoundsEnabled: true,
-      musicEnabled: true,
-      devToolsEnabled: false,
-      secretsUnlocked: false,
-      godTabEnabled: false,
-    },
-  });
-  console.log('✅ Zustand store initialized');
+      sips: toDecimal(0),
+      spd: toDecimal(1),
+      level: 1,
+      drinkRate: 1000,
+      drinkProgress: 0,
+      lastDrinkTime: Date.now() - 2000, // Set to 2 seconds ago so drinks can process immediately
+      totalClicks: 0,
+      totalSipsEarned: toDecimal(0),
+      highestSipsPerSecond: toDecimal(0),
+      suctionClickBonus: 0,
+      options: {
+        autosaveEnabled: true,
+        autosaveInterval: 30,
+        clickSoundsEnabled: true,
+        musicEnabled: true,
+        devToolsEnabled: false,
+        secretsUnlocked: false,
+        godTabEnabled: false,
+      },
+    });
+    console.log('🔧 setState call completed');
+    console.log('🔧 Current store state:', useGameStore.getState());
+    console.log('✅ Zustand store initialized');
   } catch (error) {
     console.error('❌ Failed to initialize Zustand store:', error);
     throw error;
