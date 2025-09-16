@@ -116,8 +116,19 @@ try {
 
   // Load loop system immediately - also critical
   console.log('🔧 About to import loop system...');
-  const loopModule = await import('./core/systems/loop-system');
-  console.log('🔧 Loop system import completed');
+  let loopModule: any;
+  try {
+    loopModule = await Promise.race([
+      import('./core/systems/loop-system'),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Loop system import timeout after 5 seconds')), 5000)
+      ),
+    ]);
+    console.log('🔧 Loop system import completed');
+  } catch (error) {
+    console.error('❌ Loop system import failed:', error);
+    throw error;
+  }
 
   App.systems.loop = {
     start: (args: any) => {
