@@ -95,58 +95,44 @@ export class SaveGameLoader {
         // Use parseDecimalValue to preserve extreme values
         const sipsValue = this.parseDecimalValue(savegame.sips);
         getStoreActions().setSips(sipsValue);
-        (window as any).sips =
-          typeof sipsValue === 'number' ? new (window as any).Decimal(sipsValue) : sipsValue;
+        // Global state removed - using Zustand store only
       }
 
       if (typeof savegame.straws !== 'undefined') {
         const strawsValue = this.parseDecimalValue(savegame.straws);
         getStoreActions().setStraws(strawsValue);
-        (window as any).straws =
-          typeof strawsValue === 'number' ? new (window as any).Decimal(strawsValue) : strawsValue;
+        // Global state removed - using Zustand store only
       }
 
       if (typeof savegame.cups !== 'undefined') {
         const cupsValue = this.parseDecimalValue(savegame.cups);
         getStoreActions().setCups(cupsValue);
-        (window as any).cups =
-          typeof cupsValue === 'number' ? new (window as any).Decimal(cupsValue) : cupsValue;
+        // Global state removed - using Zustand store only
       }
 
       if (typeof savegame.suctions !== 'undefined') {
         const suctionsValue = this.parseDecimalValue(savegame.suctions);
         getStoreActions().setSuctions(suctionsValue);
-        (window as any).suctions =
-          typeof suctionsValue === 'number'
-            ? new (window as any).Decimal(suctionsValue)
-            : suctionsValue;
+        // Global state removed - using Zustand store only
       }
 
       // Load SPD values to preserve extreme values - CRITICAL: Use parseDecimalValue to preserve precision
       if (typeof savegame.spd !== 'undefined') {
         const spdValue = this.parseDecimalValue(savegame.spd);
         getStoreActions().setSPD(spdValue);
-        // Ensure window value is always a Decimal, preserving extreme values
-        (window as any).spd =
-          typeof spdValue === 'number' ? new (window as any).Decimal(spdValue) : spdValue;
+        // Global state removed - using Zustand store only
       }
 
       if (typeof savegame.strawSPD !== 'undefined') {
         const strawSPDValue = this.parseDecimalValue(savegame.strawSPD);
         getStoreActions().setStrawSPD(strawSPDValue);
-        // Ensure window value is always a Decimal, preserving extreme values
-        (window as any).strawSPD =
-          typeof strawSPDValue === 'number'
-            ? new (window as any).Decimal(strawSPDValue)
-            : strawSPDValue;
+        // Global state removed - using Zustand store only
       }
 
       if (typeof savegame.cupSPD !== 'undefined') {
         const cupSPDValue = this.parseDecimalValue(savegame.cupSPD);
         getStoreActions().setCupSPD(cupSPDValue);
-        // Ensure window value is always a Decimal, preserving extreme values
-        (window as any).cupSPD =
-          typeof cupSPDValue === 'number' ? new (window as any).Decimal(cupSPDValue) : cupSPDValue;
+        // Global state removed - using Zustand store only
       }
     } catch (error) {
       console.warn('Failed to load basic resources:', error);
@@ -161,28 +147,19 @@ export class SaveGameLoader {
       if (typeof savegame.fasterDrinks !== 'undefined') {
         const fasterDrinksValue = this.parseDecimalValue(savegame.fasterDrinks);
         getStoreActions().setFasterDrinks(fasterDrinksValue);
-        (window as any).fasterDrinks =
-          typeof fasterDrinksValue === 'number'
-            ? new (window as any).Decimal(fasterDrinksValue)
-            : fasterDrinksValue;
+        // Global state removed - using Zustand store only
       }
 
       if (typeof savegame.widerStraws !== 'undefined') {
         const widerStrawsValue = this.parseDecimalValue(savegame.widerStraws);
         getStoreActions().setWiderStraws(widerStrawsValue);
-        (window as any).widerStraws =
-          typeof widerStrawsValue === 'number'
-            ? new (window as any).Decimal(widerStrawsValue)
-            : widerStrawsValue;
+        // Global state removed - using Zustand store only
       }
 
       if (typeof savegame.betterCups !== 'undefined') {
         const betterCupsValue = this.parseDecimalValue(savegame.betterCups);
         getStoreActions().setBetterCups(betterCupsValue);
-        (window as any).betterCups =
-          typeof betterCupsValue === 'number'
-            ? new (window as any).Decimal(betterCupsValue)
-            : betterCupsValue;
+        // Global state removed - using Zustand store only
       }
     } catch (error) {
       console.warn('Failed to load upgrade levels:', error);

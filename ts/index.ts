@@ -9,10 +9,10 @@ import { optimizedEventBus } from './services/optimized-event-bus';
 import { performanceMonitor } from './services/performance';
 import './config';
 import './core/constants';
-import { ServiceLocator, SERVICE_KEYS } from './core/services/service-locator';
-import Decimal from 'break_eternity.js';
+// ServiceLocator removed - using Zustand store directly
+// Decimal import removed - using toDecimal from simplified.ts
 import { toDecimal } from './core/numbers/simplified';
-import { processDrinkFactory } from './core/systems/drink-system';
+// processDrinkFactory removed - using direct processDrink function
 // DOM migration completed - using modern domQuery service
 import './god';
 // Static imports removed - using dynamic imports instead
@@ -209,61 +209,37 @@ try {
     },
   };
 
-  // Register services BEFORE loading drink system
-  console.log('🔧 Registering services with service locator...');
-  ServiceLocator.register(SERVICE_KEYS.APP, App);
-  ServiceLocator.register(SERVICE_KEYS.DECIMAL, Decimal);
-  ServiceLocator.register(SERVICE_KEYS.GAME_CONFIG, (window as any).GAME_CONFIG);
-
-  // Initialize sips with proper Decimal value
-  const initialSips = toDecimal((window as any).sips || 0);
-  ServiceLocator.register('sips', initialSips);
-  ServiceLocator.register('sipsPerDrink', toDecimal((window as any).sipsPerDrink || 1));
-  ServiceLocator.register('spd', toDecimal((window as any).spd || 1));
-  ServiceLocator.register('totalSipsEarned', toDecimal(0));
-  ServiceLocator.register('highestSipsPerSecond', toDecimal(0));
-  ServiceLocator.register('lastDrinkTime', Date.now() - 2000); // Set to 2 seconds ago so drinks can process immediately
-  ServiceLocator.register('lastAutosaveClockMs', Date.now());
-  console.log('✅ Services registered successfully');
-
-  // Drink system is now loaded via static import at the top of the file
-  console.log('🔧 Using statically imported drink system...');
-
-  const factory = processDrinkFactory({
-    getApp: () => ServiceLocator.get(SERVICE_KEYS.APP),
-    getGameConfig: () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
-    getSips: () => {
-      const sips = ServiceLocator.get('sips');
-      console.log('🔧 getSips called, returning:', sips?.toString?.() || sips);
-      return sips;
+  // Initialize Zustand store with default values
+  console.log('🔧 Initializing Zustand store...');
+  const { useGameStore } = await import('./core/state/zustand-store');
+  useGameStore.setState({
+    sips: toDecimal(0),
+    spd: toDecimal(1),
+    level: 1,
+    drinkRate: 1000,
+    drinkProgress: 0,
+    lastDrinkTime: Date.now() - 2000, // Set to 2 seconds ago so drinks can process immediately
+    totalClicks: 0,
+    totalSipsEarned: toDecimal(0),
+    highestSipsPerSecond: toDecimal(0),
+    suctionClickBonus: 0,
+    options: {
+      autosaveEnabled: true,
+      autosaveInterval: 30,
+      clickSoundsEnabled: true,
+      musicEnabled: true,
+      devToolsEnabled: false,
+      secretsUnlocked: false,
+      godTabEnabled: false,
     },
-    setSips: (value: any) => {
-      console.log('🔧 setSips called with:', value?.toString?.() || value);
-      ServiceLocator.register('sips', value);
-      // Also update the Zustand store
-      if (App?.state?.setState) {
-        App.state.setState({ sips: value });
-      }
-    },
-    getSipsPerDrink: () => {
-      const spd = ServiceLocator.get('sipsPerDrink');
-      console.log('🔧 getSipsPerDrink called, returning:', spd?.toString?.() || spd);
-      return spd;
-    },
-    getDrinkRate: () => 1000,
-    getLastDrinkTime: () => ServiceLocator.get('lastDrinkTime') || Date.now() - 2000,
-    setLastDrinkTime: (value: number) => ServiceLocator.register('lastDrinkTime', value),
-    getSpd: () => ServiceLocator.get('spd'),
-    getTotalSipsEarned: () => ServiceLocator.get('totalSipsEarned'),
-    getHighestSipsPerSecond: () => ServiceLocator.get('highestSipsPerSecond'),
-    getLastAutosaveClockMs: () => ServiceLocator.get('lastAutosaveClockMs'),
-    setLastAutosaveClockMs: (value: number) =>
-      ServiceLocator.register('lastAutosaveClockMs', value),
   });
-  if (factory) {
-    App.systems.drink.processDrink = factory;
-    console.log('✅ Drink system loaded');
-  }
+  console.log('✅ Zustand store initialized');
+
+  // Modernized drink system using only Zustand store
+  console.log('🔧 Using modernized drink system...');
+  const { processDrink } = await import('./core/systems/drink-system');
+  App.systems.drink.processDrink = processDrink;
+  console.log('✅ Drink system loaded');
 
   App.systems.loop = loopSystem;
   console.log('✅ Inline loop system created');
@@ -311,12 +287,12 @@ try {
       loopStart({
         updateDrinkProgress: () => {
           try {
-            const st = App?.state?.getState?.() || {};
+            const state = useGameStore.getState();
             const now = Date.now();
-            const last = Number(st.lastDrinkTime ?? 0);
-            const rate = Number(st.drinkRate ?? 1000);
+            const last = Number(state.lastDrinkTime ?? 0);
+            const rate = Number(state.drinkRate ?? 1000);
             const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-            App?.state?.setState?.({ drinkProgress: pct });
+            useGameStore.setState({ drinkProgress: pct });
             App?.ui?.updateDrinkProgress?.(pct, rate);
           } catch (error) {
             console.error('❌ Failed to update drink progress:', error);
@@ -325,10 +301,10 @@ try {
         processDrink: () => {
           try {
             console.log('🔧 Calling processDrink...');
-            const beforeSips = ServiceLocator.get('sips');
+            const beforeSips = useGameStore.getState().sips;
             console.log('🔧 Before processDrink - sips:', beforeSips?.toString?.() || beforeSips);
             App?.systems?.drink?.processDrink?.();
-            const afterSips = ServiceLocator.get('sips');
+            const afterSips = useGameStore.getState().sips;
             console.log('🔧 After processDrink - sips:', afterSips?.toString?.() || afterSips);
             console.log('🔧 processDrink completed');
           } catch (error) {

@@ -7,192 +7,96 @@
 
 // Modern ES6 imports - proper module resolution
 import { toDecimal } from '../numbers/simplified';
-import { ServiceLocator, SERVICE_KEYS } from '../services/service-locator';
+import { useGameStore } from '../state/zustand-store';
 
-export type ProcessDrinkArgs = {
-  getNow?: () => number;
-  getApp?: () => any;
-  getGameConfig?: () => any;
-  getSips?: () => any;
-  setSips?: (value: any) => void;
-  getSipsPerDrink?: () => any;
-  getDrinkRate?: () => number;
-  getLastDrinkTime?: () => number;
-  setLastDrinkTime?: (value: number) => void;
-  getSpd?: () => any;
-  getTotalSipsEarned?: () => any;
-  getHighestSipsPerSecond?: () => any;
-  getLastAutosaveClockMs?: () => number;
-  setLastAutosaveClockMs?: (value: number) => void;
-};
+// Modern drink system using only Zustand store
+export function processDrink(): void {
+  try {
+    // Get current state from Zustand store
+    const state = useGameStore.getState();
+    const now = Date.now();
 
-export function processDrinkFactory({
-  getNow = () => Date.now(),
-  getApp = () => ServiceLocator.get(SERVICE_KEYS.APP),
-  getGameConfig = () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
-  getSips = () => ServiceLocator.get('sips'),
-  setSips = (value: any) => ServiceLocator.register('sips', value),
-  getSipsPerDrink = () => ServiceLocator.get('sipsPerDrink'),
-  getDrinkRate = () => 1000,
-  getLastDrinkTime = () => 0,
-  setLastDrinkTime = (value: number) => ServiceLocator.register('lastDrinkTime', value),
-  getSpd = () => ServiceLocator.get('spd'),
-  getTotalSipsEarned = () => ServiceLocator.get('totalSipsEarned'),
-  getHighestSipsPerSecond = () => ServiceLocator.get('highestSipsPerSecond'),
-  getLastAutosaveClockMs = () => ServiceLocator.get('lastAutosaveClockMs'),
-  setLastAutosaveClockMs = (value: number) => ServiceLocator.register('lastAutosaveClockMs', value),
-}: ProcessDrinkArgs = {}) {
-  return function processDrink() {
+    // Check if enough time has passed since last drink
+    console.log('🔧 Drink system timing check:', {
+      now,
+      lastDrinkTime: state.lastDrinkTime,
+      drinkRate: state.drinkRate,
+      timeSinceLastDrink: now - state.lastDrinkTime,
+      shouldProcess: now - state.lastDrinkTime >= state.drinkRate,
+    });
+
+    if (now - state.lastDrinkTime < state.drinkRate) {
+      console.log('🔧 Drink system: too soon, returning early');
+      return;
+    }
+
+    // Get game config from global (this is the only global we need)
+    const GAME_CONFIG = (globalThis as any).GAME_CONFIG;
+    const BAL = GAME_CONFIG?.BALANCE || {};
+
+    // Apply level bonuses from hybrid level system (defensive access)
+    let levelBonuses = { sipMultiplier: 1.0, clickMultiplier: 1.0 };
     try {
-      const App = getApp();
-      const GAME_CONFIG = getGameConfig();
-      const BAL = GAME_CONFIG?.BALANCE || {};
-      const state = App?.state?.getState?.() || {};
-
-      // Required state from legacy globals (kept during migration)
-      const drinkRate: number = Number(state.drinkRate ?? getDrinkRate());
-      const lastDrinkTime: number = Number(state.lastDrinkTime ?? getLastDrinkTime());
-
-      const now = getNow();
-      // Debug logging removed for production
-      if (now - lastDrinkTime < drinkRate) {
-        // Too soon to process drink
-        return;
-      }
-
-      // Add full sips-per-drink (base + production) with Decimal support
-      const sipsPerDrink = getSipsPerDrink();
-      const stateSpdValue = state.spd?.toNumber?.() ?? state.spd ?? 0;
-      const baseSpdVal = toDecimal(
-        stateSpdValue > 0
-          ? stateSpdValue
-          : (sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1)
-      );
-      // Debug logging removed for production
-
-      // Apply level bonuses from hybrid level system (defensive access)
-      let levelBonuses = { sipMultiplier: 1.0, clickMultiplier: 1.0 };
-      try {
-        if (App?.systems?.hybridLevel?.getCurrentLevelBonuses) {
-          levelBonuses = App.systems.hybridLevel.getCurrentLevelBonuses();
-        }
-      } catch (error) {
-        console.warn('⚠️ Failed to get level bonuses, using defaults:', error);
-      }
-      const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
-
-      // Handle sips accumulation with Decimal arithmetic
-      const currentSips = toDecimal(getSips() || 0);
-      const newSips = currentSips.add(spdVal);
-      // Debug logging removed for production
-      setSips(newSips);
-
-      // Mirror totals with Decimal support
-      const prevTotal = toDecimal(getTotalSipsEarned() || 0);
-      const prevHigh = toDecimal(getHighestSipsPerSecond() || 0);
-      const spdNum = toDecimal(state.spd ?? getSpd() ?? 0);
-
-      // Calculate current sips per second (keep in Decimal space to preserve precision)
-      const rateInSeconds = drinkRate / 1000;
-      const rateInSecondsDecimal = toDecimal(rateInSeconds);
-      const currentSipsPerSecond =
-        rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : toDecimal(0);
-
-      // Compare highest SPS using Decimal operations to preserve extreme values
-      const highest = prevHigh.gte(currentSipsPerSecond) ? prevHigh : currentSipsPerSecond;
-
-      // Update total sips earned
-      const newTotalEarned = prevTotal.add(spdVal);
-
-      // Reset progress and last drink time
-      const nextLast = now;
-      const nextProgress = 0;
-
-      try {
-        App?.stateBridge?.setLastDrinkTime?.(nextLast);
-      } catch (error) {
-        console.warn('Failed to set last drink time via bridge:', error);
-      }
-      try {
-        setLastDrinkTime(nextLast);
-      } catch (error) {
-        console.warn('Failed to set last drink time via service locator:', error);
-      }
-      try {
-        App?.stateBridge?.setDrinkProgress?.(nextProgress);
-      } catch (error) {
-        console.warn('Failed to set drink progress via bridge:', error);
-      }
-
-      try {
-        // Keep Decimal in state for sips and totalSipsPerSecond to preserve extreme value precision
-        // Always use string representation to avoid precision loss with extreme values
-        const highestForUI = highest.toString();
-
-        App?.state?.setState?.({
-          sips: getSips(),
-          totalSipsEarned: newTotalEarned,
-          highestSipsPerSecond: highestForUI,
-          lastDrinkTime: nextLast,
-          drinkProgress: nextProgress,
-        });
-      } catch (error) {
-        console.warn('Failed to update drink state:', error);
-      }
-
-      try {
-        App?.ui?.updateDrinkProgress?.(nextProgress, drinkRate);
-      } catch (error) {
-        console.warn('Failed to update drink progress UI:', error);
-      }
-      // Update top counters immediately after awarding sips
-      try {
-        App?.ui?.updateTopSipsPerDrink?.();
-      } catch (error) {
-        console.warn('Failed to update top sips per drink display:', error);
-      }
-      try {
-        App?.ui?.updateTopSipsPerSecond?.();
-      } catch (error) {
-        console.warn('Failed to update top sips per second display:', error);
-      }
-      try {
-        App?.ui?.updateTopSipCounter?.();
-      } catch (error) {
-        console.warn('Failed to update top sip counter display:', error);
-      }
-      // Autosave handled by wall-clock timer below
-      // Wall-clock autosave: also trigger by elapsed real time regardless of drink cadence
-      try {
-        const enabled = !!state?.options?.autosaveEnabled;
-        const intervalSec = Number(state?.options?.autosaveInterval || 10);
-        if (enabled) {
-          const nowMs = Date.now();
-          const last = Number(getLastAutosaveClockMs() || 0);
-          const intervalMs = Math.max(0, intervalSec * 1000);
-          if (!last) {
-            setLastAutosaveClockMs(nowMs);
-          } else if (nowMs - last >= intervalMs) {
-            try {
-              App?.systems?.save?.performSaveSnapshot?.();
-            } catch (error) {
-              console.warn('Failed to perform autosave snapshot:', error);
-            }
-            setLastAutosaveClockMs(nowMs);
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to handle wall-clock autosave:', error);
-      }
-      try {
-        App?.ui?.checkUpgradeAffordability?.();
-      } catch (error) {
-        console.warn('Failed to check upgrade affordability:', error);
+      const App = (globalThis as any).App;
+      if (App?.systems?.hybridLevel?.getCurrentLevelBonuses) {
+        levelBonuses = App.systems.hybridLevel.getCurrentLevelBonuses();
       }
     } catch (error) {
-      console.error('❌ CRITICAL: Failed to process drink:', error);
-      // Re-throw to ensure the error is not silently ignored
-      throw error;
+      console.warn('⚠️ Failed to get level bonuses, using defaults:', error);
     }
-  };
+
+    // Calculate base SPD value - handle Decimal 0 properly
+    const stateSpdValue = state.spd?.toNumber?.() ?? state.spd ?? 0;
+    const baseSpdVal = toDecimal(
+      stateSpdValue > 0
+        ? stateSpdValue
+        : (state.spd?.toNumber?.() ?? state.spd ?? BAL.BASE_SIPS_PER_DRINK ?? 1)
+    );
+
+    console.log('🔧 Drink system calculation:', {
+      stateSpd: state.spd,
+      stateSpdValue,
+      baseSpdVal: baseSpdVal.toString(),
+      levelBonuses,
+      BAL_BASE_SIPS_PER_DRINK: BAL.BASE_SIPS_PER_DRINK,
+    });
+
+    const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
+    const currentSips = toDecimal(state.sips || 0);
+    const newSips = currentSips.add(spdVal);
+
+    console.log('🔧 Drink system sips calculation:', {
+      spdVal: spdVal.toString(),
+      currentSips: currentSips.toString(),
+      newSips: newSips.toString(),
+    });
+
+    // Update Zustand store with new values
+    useGameStore.setState({
+      sips: newSips,
+      totalSipsEarned: toDecimal(state.totalSipsEarned || 0).add(spdVal),
+      lastDrinkTime: now,
+      drinkProgress: 0,
+    });
+
+    // Calculate sips per second for tracking
+    const spdNum = toDecimal(state.spd || 0);
+    const rateInSeconds = state.drinkRate / 1000;
+    const rateInSecondsDecimal = toDecimal(rateInSeconds);
+    const currentSipsPerSecond =
+      rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : toDecimal(0);
+
+    // Update highest sips per second if needed
+    if (currentSipsPerSecond.gt(toDecimal(state.highestSipsPerSecond || 0))) {
+      useGameStore.setState({ highestSipsPerSecond: currentSipsPerSecond });
+    }
+
+    // Update last autosave clock (this is handled by the autosave system)
+    // useGameStore.setState({ lastAutosaveClockMs: now });
+
+    console.log('✅ Drink processed successfully - sips:', newSips.toString());
+  } catch (error) {
+    console.error('❌ CRITICAL: Failed to process drink:', error);
+    throw error;
+  }
 }
