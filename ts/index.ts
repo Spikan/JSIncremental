@@ -149,6 +149,7 @@ try {
 // Ensure a default, non-blocking initOnDomReady exists even if early imports stall
 try {
   // Simplified initialization - using proper module imports instead of complex nested structure
+  console.log('🔧 Starting tryBoot initialization...');
   __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
   try {
     // Kick game progression after splash via loop once available
@@ -158,6 +159,7 @@ try {
     const maxRetries = 50; // 5 seconds max
     const tryBoot = () => {
       try {
+        console.log(`🔧 tryBoot called (attempt ${retryCount + 1}/${maxRetries})`);
         if (retryCount >= maxRetries) {
           console.error('❌ Max retries reached for loop system initialization');
           return;
