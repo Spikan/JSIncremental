@@ -60,6 +60,16 @@
       window.addEventListener('load', function () {
         // Game initialization is handled by main.js
         console.log('✅ Page loaded, main.js will handle initialization');
+        
+        // Check if the TypeScript module loaded
+        setTimeout(() => {
+          if (!window.App) {
+            console.error('❌ App object not found - TypeScript module may have failed to load');
+            console.log('🔧 Available globals:', Object.keys(window).filter(k => k.startsWith('App') || k.includes('index')));
+          } else {
+            console.log('✅ App object found:', Object.keys(window.App));
+          }
+        }, 1000);
         // HTML-level splash fallback: ensure any interaction starts the game
         try {
           var manualStart = function () {
@@ -537,7 +547,7 @@
       </div>
     </div>
     <!-- Single entry: ts/index.ts will import all other modules -->
-    <script type="module" src="ts/index.ts"></script>
+    <script type="module" src="ts/index.ts" onerror="console.error('❌ Failed to load TypeScript module:', this.src)"></script>
     <script>
       // Ensure Decimal is available globally before loading main.js
       if (typeof Decimal === 'undefined') {
