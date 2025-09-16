@@ -151,7 +151,13 @@ try {
           throw error;
         }
         try {
-          if (processDrink) processDrink();
+          if (processDrink) {
+            console.log('🔧 Calling processDrink in game loop...');
+            processDrink();
+            console.log('🔧 processDrink completed in game loop');
+          } else {
+            console.warn('⚠️ processDrink function not available in game loop');
+          }
         } catch (error) {
           console.error('❌ CRITICAL: Failed to process drink in loop:', error);
           // Don't continue the loop if drink processing fails - this is core functionality
@@ -238,8 +244,19 @@ try {
   // Modernized drink system using only Zustand store
   console.log('🔧 Using modernized drink system...');
   const { processDrink } = await import('./core/systems/drink-system');
+  console.log('🔧 processDrink function:', typeof processDrink);
   App.systems.drink.processDrink = processDrink;
   console.log('✅ Drink system loaded');
+
+  // Load hybrid level system early so UI can access it
+  console.log('🔧 Loading hybrid level system...');
+  try {
+    const hybridLevel = await import('./core/systems/hybrid-level-system');
+    App.systems.hybridLevel = hybridLevel.hybridLevelSystem;
+    console.log('✅ Hybrid level system loaded');
+  } catch (e) {
+    console.warn('⚠️ hybrid level system load failed:', e);
+  }
 
   App.systems.loop = loopSystem;
   console.log('✅ Inline loop system created');
@@ -417,21 +434,7 @@ try {
 // Load async systems before tryBoot
 console.log('🔧 Loading async systems...');
 
-// Load hybrid level system
-try {
-  console.log('🔧 About to import hybrid level system...');
-  const hybridLevel = await import('./core/systems/hybrid-level-system');
-  App.systems.hybridLevel = hybridLevel.hybridLevelSystem;
-  console.log('✅ Hybrid level system loaded');
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'hybrid-level',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-  console.warn('⚠️ hybrid level system load failed:', e);
-}
+// Hybrid level system already loaded above
 
 console.log('🔧 Async systems loaded, starting tryBoot initialization...');
 
