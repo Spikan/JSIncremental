@@ -4,26 +4,26 @@ console.log('🚀 ts/index.ts module loading...');
 console.log('🔧 Module execution started');
 (window as any).__tsIndexLoaded = true;
 
-import { useGameStore } from './core/state/zustand-store.ts';
-import { optimizedEventBus } from './services/optimized-event-bus.ts';
-import { performanceMonitor } from './services/performance.ts';
-import './config.ts';
-import './core/constants.ts';
-import { ServiceLocator, SERVICE_KEYS } from './core/services/service-locator.ts';
+import { useGameStore } from './core/state/zustand-store';
+import { optimizedEventBus } from './services/optimized-event-bus';
+import { performanceMonitor } from './services/performance';
+import './config';
+import './core/constants';
+import { ServiceLocator, SERVICE_KEYS } from './core/services/service-locator';
 import Decimal from 'break_eternity.js';
 // DOM migration completed - using modern domQuery service
-import './god.ts';
+import './god';
 // Static imports removed - using dynamic imports instead
 
 console.log('🔧 Imports completed, setting up App object...');
 // Environment system replaced by hybrid level system
-import { hybridLevelSystem } from './core/systems/hybrid-level-system.ts';
-import { AppStorage as storageImpl } from './services/storage.ts';
-import './main.ts';
+import { hybridLevelSystem } from './core/systems/hybrid-level-system';
+import { AppStorage as storageImpl } from './services/storage';
+import './main';
 
 // Import functions that are referenced in the code
-import { initGame } from './main.ts';
-import { config as GC } from './config.ts';
+import { initGame } from './main';
+import { config as GC } from './config';
 
 let storage: any = storageImpl;
 // Use optimized event bus
@@ -113,26 +113,28 @@ __pushDiag({ type: 'index', stage: 'app-created' });
 try {
   // Create lazy loading system for critical modules
   console.log('🔧 Setting up lazy loading for critical systems...');
-  
+
   // Create lazy-loaded loop system
   let loopModuleLoaded = false;
   let loopModulePromise: Promise<any> | null = null;
-  
+
   App.systems.loop = {
     start: async (args: any) => {
       console.log('🔧 Loop system start called, loading module...');
-      
+
       if (!loopModuleLoaded && !loopModulePromise) {
-        loopModulePromise = import('./core/systems/loop-system.ts').then(module => {
-          console.log('✅ Loop system module loaded');
-          loopModuleLoaded = true;
-          return module;
-        }).catch(err => {
-          console.warn('⚠️ Loop system module failed to load:', err.message);
-          return null;
-        });
+        loopModulePromise = import('./core/systems/loop-system')
+          .then(module => {
+            console.log('✅ Loop system module loaded');
+            loopModuleLoaded = true;
+            return module;
+          })
+          .catch(err => {
+            console.warn('⚠️ Loop system module failed to load:', err.message);
+            return null;
+          });
       }
-      
+
       if (loopModulePromise) {
         const module = await loopModulePromise;
         if (module && module.start) {
@@ -140,7 +142,7 @@ try {
           return module.start(args);
         }
       }
-      
+
       // Fallback implementation
       console.log('🔧 Using fallback loop system');
       const tick = () => {
@@ -160,14 +162,14 @@ try {
       console.log('🔧 Loop system stopped');
     },
   };
-  
+
   console.log('✅ Lazy-loaded loop system created');
 
   // Load drink system immediately - also critical
   try {
     console.log('🔧 About to import drink system...');
     const drinkModule = (await Promise.race([
-      import('./core/systems/drink-system.ts'),
+      import('./core/systems/drink-system'),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Drink system import timeout')), 5000)
       ),
@@ -580,7 +582,7 @@ try {
 }
 
 try {
-  const uiModule = await import('./ui/index.ts');
+  const uiModule = await import('./ui/index');
   // Modernized - UI module handled by store
   // Modernized - UI module handled by store
   Object.assign(App.ui, uiModule);
@@ -610,7 +612,7 @@ try {
 }
 
 try {
-  const st = await import('./services/storage.ts');
+  const st = await import('./services/storage');
   storage = (st as any).AppStorage ? (st as any).AppStorage : storage;
   try {
     // Storage no longer assigned to window - use proper module exports
@@ -628,7 +630,7 @@ try {
 }
 
 try {
-  const res = await import('./core/systems/resources.ts');
+  const res = await import('./core/systems/resources');
   Object.assign(App.systems.resources, res);
 } catch (e) {
   __pushDiag({
@@ -640,7 +642,7 @@ try {
   console.warn('⚠️ resources system load failed:', e);
 }
 try {
-  const pur = await import('./core/systems/purchases-system.ts');
+  const pur = await import('./core/systems/purchases-system');
   Object.assign(App.systems.purchases, pur);
 } catch (e) {
   __pushDiag({
@@ -653,7 +655,7 @@ try {
 }
 // Loop system already loaded above - skipping duplicate load
 try {
-  const save = await import('./core/systems/save-system.ts');
+  const save = await import('./core/systems/save-system');
   Object.assign(App.systems.save, save);
 } catch (e) {
   __pushDiag({
@@ -666,7 +668,7 @@ try {
 }
 // Drink system already loaded above - skipping duplicate load
 try {
-  const clicks = await import('./core/systems/clicks-system.ts');
+  const clicks = await import('./core/systems/clicks-system');
   Object.assign(App.systems.clicks, clicks);
 } catch (e) {
   __pushDiag({
@@ -678,7 +680,7 @@ try {
   console.warn('⚠️ clicks system load failed:', e);
 }
 try {
-  const audio = await import('./core/systems/button-audio.ts');
+  const audio = await import('./core/systems/button-audio');
   Object.assign(App.systems.audio.button, audio);
 } catch (e) {
   __pushDiag({
@@ -690,7 +692,7 @@ try {
   console.warn('⚠️ button-audio system load failed:', e);
 }
 try {
-  const autosave = await import('./core/systems/autosave.ts');
+  const autosave = await import('./core/systems/autosave');
   Object.assign(App.systems.autosave, autosave);
 } catch (e) {
   __pushDiag({
@@ -702,7 +704,7 @@ try {
   console.warn('⚠️ autosave system load failed:', e);
 }
 try {
-  const dev = await import('./core/systems/dev.ts');
+  const dev = await import('./core/systems/dev');
   App.systems.dev = dev as any;
 } catch (e) {
   __pushDiag({
