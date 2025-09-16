@@ -71,7 +71,14 @@
             );
           } else {
             console.log('✅ App object found:', Object.keys(window.App));
-
+            
+            // Check if TypeScript module loaded
+            if ((window as any).__tsIndexLoaded) {
+              console.log('✅ TypeScript module loaded successfully');
+            } else {
+              console.error('❌ TypeScript module not loaded - __tsIndexLoaded not found');
+            }
+            
             // Check if game loop is running
             if (window.App.systems && window.App.systems.loop) {
               console.log('✅ Loop system available:', typeof window.App.systems.loop.start);

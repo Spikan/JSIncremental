@@ -2,6 +2,7 @@
 
 console.log('🚀 ts/index.ts module loading...');
 console.log('🔧 Module execution started');
+(window as any).__tsIndexLoaded = true;
 
 import { useGameStore } from './core/state/zustand-store.ts';
 import { optimizedEventBus } from './services/optimized-event-bus.ts';
