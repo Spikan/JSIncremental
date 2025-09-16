@@ -1,6 +1,7 @@
 // Entry module providing a small public API surface and environment checks (TypeScript)
 
 console.log('🚀 ts/index.ts module loading...');
+console.log('🔧 Module execution started');
 
 import { useGameStore } from './core/state/zustand-store.ts';
 import { optimizedEventBus } from './services/optimized-event-bus.ts';
@@ -10,6 +11,8 @@ import './core/constants.ts';
 // DOM migration completed - using modern domQuery service
 import './god.ts';
 // Static imports removed - using dynamic imports instead
+
+console.log('🔧 Imports completed, setting up App object...');
 // Environment system replaced by hybrid level system
 import { hybridLevelSystem } from './core/systems/hybrid-level-system.ts';
 import { AppStorage as storageImpl } from './services/storage.ts';
