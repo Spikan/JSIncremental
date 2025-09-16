@@ -303,7 +303,8 @@ const createSelector = <T>(
     }
 
     try {
-      return useGameStore(selector);
+      const state = useGameStore.getState();
+      return selector(state);
     } catch (error) {
       console.warn(`${selectorName} selector failed, returning default:`, error);
       return defaultValue;
@@ -408,11 +409,7 @@ export const useOptions = createSelector(state => state.options, defaultState.op
 
 // Actions selector (memoized to prevent unnecessary re-renders)
 export const useActions = () => {
-  if (typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true) {
-    return useGameStore.getState().actions;
-  }
-
-  return useGameStore(state => state.actions);
+  return useGameStore.getState().actions;
 };
 
 // Composite selectors for commonly accessed data combinations
