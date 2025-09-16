@@ -157,8 +157,12 @@ console.log('🔧 About to start tryBoot initialization...');
 try {
   // Simplified initialization - using proper module imports instead of complex nested structure
   console.log('🔧 Starting tryBoot initialization...');
-  console.log('🔧 App object available:', !!App);
-  console.log('🔧 GC available:', !!GC);
+  try {
+    console.log('🔧 App object available:', !!App);
+    console.log('🔧 GC available:', !!GC);
+  } catch (error) {
+    console.error('❌ Error checking App/GC availability:', error);
+  }
   __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
   try {
     // Kick game progression after splash via loop once available
@@ -679,7 +683,9 @@ try {
     }
   };
   setTimeout(seedIfNeeded, 400);
-} catch {}
+} catch (error) {
+  console.error('❌ Error in outer tryBoot initialization:', error);
+}
 
 try {
   // initOnDomReady no longer on window - use proper module exports
