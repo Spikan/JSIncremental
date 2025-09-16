@@ -163,7 +163,11 @@ try {
   } catch (error) {
     console.error('❌ Error checking App/GC availability:', error);
   }
-  __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
+  try {
+    __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
+  } catch (error) {
+    console.error('❌ Error calling __pushDiag:', error);
+  }
   try {
     // Kick game progression after splash via loop once available
     // Use proper module access instead of window globals
