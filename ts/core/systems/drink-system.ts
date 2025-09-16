@@ -62,7 +62,9 @@ export function processDrinkFactory({
       const sipsPerDrink = getSipsPerDrink();
       const stateSpdValue = state.spd?.toNumber?.() ?? state.spd ?? 0;
       const baseSpdVal = toDecimal(
-        stateSpdValue > 0 ? stateSpdValue : (sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1)
+        stateSpdValue > 0
+          ? stateSpdValue
+          : (sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1)
       );
       // Debug logging removed for production
 

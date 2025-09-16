@@ -11,6 +11,7 @@ import './config';
 import './core/constants';
 import { ServiceLocator, SERVICE_KEYS } from './core/services/service-locator';
 import Decimal from 'break_eternity.js';
+import { toDecimal } from './core/numbers/simplified';
 // DOM migration completed - using modern domQuery service
 import './god';
 // Static imports removed - using dynamic imports instead
@@ -205,12 +206,15 @@ try {
   ServiceLocator.register(SERVICE_KEYS.APP, App);
   ServiceLocator.register(SERVICE_KEYS.DECIMAL, Decimal);
   ServiceLocator.register(SERVICE_KEYS.GAME_CONFIG, (window as any).GAME_CONFIG);
-  ServiceLocator.register('sips', (window as any).sips);
-  ServiceLocator.register('sipsPerDrink', (window as any).sipsPerDrink);
-  ServiceLocator.register('spd', (window as any).spd);
-  ServiceLocator.register('totalSipsEarned', 0);
-  ServiceLocator.register('highestSipsPerSecond', 0);
-  ServiceLocator.register('lastAutosaveClockMs', 0);
+  
+  // Initialize sips with proper Decimal value
+  const initialSips = toDecimal((window as any).sips || 0);
+  ServiceLocator.register('sips', initialSips);
+  ServiceLocator.register('sipsPerDrink', toDecimal((window as any).sipsPerDrink || 1));
+  ServiceLocator.register('spd', toDecimal((window as any).spd || 1));
+  ServiceLocator.register('totalSipsEarned', toDecimal(0));
+  ServiceLocator.register('highestSipsPerSecond', toDecimal(0));
+  ServiceLocator.register('lastAutosaveClockMs', Date.now());
   console.log('✅ Services registered successfully');
 
   // Load drink system immediately - also critical
@@ -220,15 +224,24 @@ try {
   const factory = drinkModule.processDrinkFactory?.({
     getApp: () => ServiceLocator.get(SERVICE_KEYS.APP),
     getGameConfig: () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
-    getSips: () => ServiceLocator.get('sips'),
+    getSips: () => {
+      const sips = ServiceLocator.get('sips');
+      console.log('🔧 getSips called, returning:', sips?.toString?.() || sips);
+      return sips;
+    },
     setSips: (value: any) => {
+      console.log('🔧 setSips called with:', value?.toString?.() || value);
       ServiceLocator.register('sips', value);
       // Also update the Zustand store
       if (App?.state?.setState) {
         App.state.setState({ sips: value });
       }
     },
-    getSipsPerDrink: () => ServiceLocator.get('sipsPerDrink'),
+    getSipsPerDrink: () => {
+      const spd = ServiceLocator.get('sipsPerDrink');
+      console.log('🔧 getSipsPerDrink called, returning:', spd?.toString?.() || spd);
+      return spd;
+    },
     getDrinkRate: () => 1000,
     getLastDrinkTime: () => Date.now() - 2000, // Set to 2 seconds ago so drinks can process immediately
     getSpd: () => ServiceLocator.get('spd'),
@@ -301,7 +314,11 @@ try {
         processDrink: () => {
           try {
             console.log('🔧 Calling processDrink...');
+            const beforeSips = ServiceLocator.get('sips');
+            console.log('🔧 Before processDrink - sips:', beforeSips?.toString?.() || beforeSips);
             App?.systems?.drink?.processDrink?.();
+            const afterSips = ServiceLocator.get('sips');
+            console.log('🔧 After processDrink - sips:', afterSips?.toString?.() || afterSips);
             console.log('🔧 processDrink completed');
           } catch (error) {
             console.error('❌ processDrink error:', error);

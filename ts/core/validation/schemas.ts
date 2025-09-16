@@ -4,25 +4,27 @@ import { toDecimal } from '../numbers/simplified';
 import { z } from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const zod: any = z || (() => {
-  const chain: any = {
-    parse: (data: any) => data,
-    omit: () => chain,
-    optional: () => chain,
-    min: () => chain,
-    max: () => chain,
-    record: () => chain,
-    union: () => chain,
-  };
-  return {
-    object: () => chain,
-    number: () => chain,
-    boolean: () => chain,
-    string: () => chain,
-    any: () => chain,
-    record: () => chain,
-  };
-})();
+const zod: any =
+  z ||
+  (() => {
+    const chain: any = {
+      parse: (data: any) => data,
+      omit: () => chain,
+      optional: () => chain,
+      min: () => chain,
+      max: () => chain,
+      record: () => chain,
+      union: () => chain,
+    };
+    return {
+      object: () => chain,
+      number: () => chain,
+      boolean: () => chain,
+      string: () => chain,
+      any: () => chain,
+      record: () => chain,
+    };
+  })();
 
 export type Unlock = { sips: number; clicks: number };
 export const UnlockSchema = zod.object({ sips: zod.number().min(0), clicks: zod.number().min(0) });
