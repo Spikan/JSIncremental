@@ -114,38 +114,94 @@ try {
   // Create lazy loading system for critical modules
   console.log('🔧 Setting up lazy loading for critical systems...');
 
-  // Load loop system immediately - also critical
-  console.log('🔧 About to import loop system...');
-  let loopModule: any;
-  try {
-    loopModule = await Promise.race([
-      import('./core/systems/loop-system'),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Loop system import timeout after 5 seconds')), 5000)
-      ),
-    ]);
-    console.log('🔧 Loop system import completed');
-  } catch (error) {
-    console.error('❌ Loop system import failed:', error);
-    throw error;
-  }
-
-  App.systems.loop = {
-    start: (args: any) => {
+  // Inline loop system to avoid import hanging issues in production
+  console.log('🔧 Creating inline loop system...');
+  
+  let rafId: number | null = null;
+  
+  const loopSystem = {
+    start: ({
+      updateDrinkProgress,
+      processDrink,
+      updateStats,
+      updatePlayTime,
+      updateLastSaveTime,
+      updateUI,
+      getNow = () => Date.now(),
+    }: any) => {
       console.log('🔧 Loop system start called');
-      if (loopModule.start) {
-        return loopModule.start(args);
+      try {
+        loopSystem.stop();
+      } catch (error) {
+        console.warn('Failed to stop previous loop:', error);
       }
-      throw new Error('Loop system start method not available');
+      let lastStatsUpdate = 0;
+
+      function tick() {
+        try {
+          if (updateDrinkProgress) updateDrinkProgress();
+        } catch (error) {
+          console.warn('Failed to update drink progress in loop:', error);
+        }
+        try {
+          if (processDrink) processDrink();
+        } catch (error) {
+          console.warn('Failed to process drink in loop:', error);
+        }
+        try {
+          if (updateUI) updateUI();
+        } catch (error) {
+          console.warn('Failed to update UI in loop:', error);
+        }
+        const now = getNow();
+        if (now - lastStatsUpdate >= 1000) {
+          lastStatsUpdate = now;
+          try {
+            if (updateStats) updateStats();
+          } catch (error) {
+            console.warn('Failed to update stats in loop:', error);
+          }
+          try {
+            if (updatePlayTime) updatePlayTime();
+          } catch (error) {
+            console.warn('Failed to update play time in loop:', error);
+          }
+          try {
+            if (updateLastSaveTime) updateLastSaveTime();
+          } catch (error) {
+            console.warn('Failed to update last save time in loop:', error);
+          }
+        }
+        rafId = requestAnimationFrame(tick) as unknown as number;
+      }
+
+      function runOnceSafely(fn: (() => void) | undefined) {
+        try {
+          if (fn) fn();
+        } catch (error) {
+          console.warn('Failed to run function safely:', error);
+        }
+      }
+
+      if (updateDrinkProgress) runOnceSafely(updateDrinkProgress);
+      if (processDrink) runOnceSafely(processDrink);
+      lastStatsUpdate = getNow();
+      if (updateStats) runOnceSafely(updateStats);
+      if (updatePlayTime) runOnceSafely(updatePlayTime);
+      if (updateLastSaveTime) runOnceSafely(updateLastSaveTime);
+      rafId = requestAnimationFrame(tick) as unknown as number;
     },
     stop: () => {
       console.log('🔧 Loop system stopped');
-      if (loopModule.stop) {
-        loopModule.stop();
+      if (rafId != null) {
+        cancelAnimationFrame(rafId as unknown as number);
+        rafId = null;
       }
     },
   };
-  console.log('✅ Loop system loaded');
+
+  App.systems.loop = loopSystem;
+  console.log('✅ Inline loop system created');
 
   // Load drink system immediately - also critical
   console.log('🔧 About to import drink system...');
