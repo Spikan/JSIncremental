@@ -549,16 +549,11 @@ export const getDisplayData = () => {
 
 // Computed selectors for derived state
 export const useTotalResources = () => {
-  const sips = useSips();
-  const straws = useStraws();
-  const cups = useCups();
-  const suctions = useSuctions();
-
   return {
-    sips,
-    straws,
-    cups,
-    suctions,
+    sips: useSips(),
+    straws: useStraws(),
+    cups: useCups(),
+    suctions: useSuctions(),
     total: (state: GameStore) =>
       state.sips
         ?.add(state.straws || new Decimal(0))
@@ -569,26 +564,19 @@ export const useTotalResources = () => {
 };
 
 export const useProductionStats = () => {
-  const spd = useSPD();
-  const strawSPD = useStrawSPD();
-  const cupSPD = useCupSPD();
-
   return {
-    spd,
-    strawSPD,
-    cupSPD,
+    spd: useSPD(),
+    strawSPD: useStrawSPD(),
+    cupSPD: useCupSPD(),
     totalSPD: (state: GameStore) =>
       state.strawSPD?.add(state.cupSPD || new Decimal(0)).toString() || '0',
   };
 };
 
 export const useClickStats = () => {
-  const totalClicks = useTotalClicks();
-  const suctionClickBonus = useSuctionClickBonus();
-
   return {
-    totalClicks,
-    suctionClickBonus,
+    totalClicks: useTotalClicks(),
+    suctionClickBonus: useSuctionClickBonus(),
     effectiveMultiplier: (state: GameStore) => state.suctionClickBonus?.toString() || '0',
   };
 };
