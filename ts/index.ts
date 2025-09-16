@@ -217,8 +217,12 @@ try {
 
   // Initialize Zustand store with default values
   console.log('🔧 Initializing Zustand store...');
-  const { useGameStore } = await import('./core/state/zustand-store');
-  useGameStore.setState({
+  console.log('🔧 About to import zustand-store...');
+  try {
+    const { useGameStore } = await import('./core/state/zustand-store');
+    console.log('🔧 zustand-store imported successfully, useGameStore:', typeof useGameStore);
+    console.log('🔧 About to call useGameStore.setState...');
+    useGameStore.setState({
     sips: toDecimal(0),
     spd: toDecimal(1),
     level: 1,
@@ -240,6 +244,10 @@ try {
     },
   });
   console.log('✅ Zustand store initialized');
+  } catch (error) {
+    console.error('❌ Failed to initialize Zustand store:', error);
+    throw error;
+  }
 
   // Modernized drink system using only Zustand store
   console.log('🔧 Using modernized drink system...');
