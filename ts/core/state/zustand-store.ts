@@ -6,7 +6,6 @@
 // MEMORY: USE STRING REPRESENTATIONS FOR EXTREME VALUES IN REACT HOOKS
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
-import { useMemo } from 'react';
 import type { GameOptions, GameState } from './shape';
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
@@ -558,21 +557,18 @@ export const useTotalResources = () => {
   const cups = useCups();
   const suctions = useSuctions();
 
-  return useMemo(
-    () => ({
-      sips,
-      straws,
-      cups,
-      suctions,
-      total: (state: GameStore) =>
-        state.sips
-          ?.add(state.straws || new Decimal(0))
-          .add(state.cups || new Decimal(0))
-          .add(state.suctions || new Decimal(0))
-          .toString() || '0',
-    }),
-    [sips, straws, cups, suctions]
-  );
+  return {
+    sips,
+    straws,
+    cups,
+    suctions,
+    total: (state: GameStore) =>
+      state.sips
+        ?.add(state.straws || new Decimal(0))
+        .add(state.cups || new Decimal(0))
+        .add(state.suctions || new Decimal(0))
+        .toString() || '0',
+  };
 };
 
 export const useProductionStats = () => {
@@ -580,30 +576,24 @@ export const useProductionStats = () => {
   const strawSPD = useStrawSPD();
   const cupSPD = useCupSPD();
 
-  return useMemo(
-    () => ({
-      spd,
-      strawSPD,
-      cupSPD,
-      totalSPD: (state: GameStore) =>
-        state.strawSPD?.add(state.cupSPD || new Decimal(0)).toString() || '0',
-    }),
-    [spd, strawSPD, cupSPD]
-  );
+  return {
+    spd,
+    strawSPD,
+    cupSPD,
+    totalSPD: (state: GameStore) =>
+      state.strawSPD?.add(state.cupSPD || new Decimal(0)).toString() || '0',
+  };
 };
 
 export const useClickStats = () => {
   const totalClicks = useTotalClicks();
   const suctionClickBonus = useSuctionClickBonus();
 
-  return useMemo(
-    () => ({
-      totalClicks,
-      suctionClickBonus,
-      effectiveMultiplier: (state: GameStore) => state.suctionClickBonus?.toString() || '0',
-    }),
-    [totalClicks, suctionClickBonus]
-  );
+  return {
+    totalClicks,
+    suctionClickBonus,
+    effectiveMultiplier: (state: GameStore) => state.suctionClickBonus?.toString() || '0',
+  };
 };
 
 // Optimized subscription hooks
