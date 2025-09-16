@@ -131,6 +131,8 @@ export default defineConfig(({ mode }) => {
           categories: ['games', 'entertainment'],
           lang: 'en',
           dir: 'ltr',
+          id: 'soda-clicker-pro',
+          display_override: ['window-controls-overlay', 'standalone'],
         },
       }),
     ],
@@ -166,6 +168,7 @@ export default defineConfig(({ mode }) => {
           }),
         ] as any[],
       },
+      copyPublicDir: true,
     },
 
     server: {
@@ -179,5 +182,5 @@ export default defineConfig(({ mode }) => {
       include: ['zustand', 'zod'] as string[],
       exclude: ['@google/model-viewer'] as string[],
     },
-  } as const;
+  };
 });

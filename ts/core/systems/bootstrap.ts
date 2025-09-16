@@ -39,7 +39,11 @@ export class BootstrapSystem {
     }
 
     if (missing.length > 0) {
-      console.log('⚠️ Some non-critical dependencies missing:', missing.join(', '), '- proceeding anyway');
+      console.log(
+        '⚠️ Some non-critical dependencies missing:',
+        missing.join(', '),
+        '- proceeding anyway'
+      );
     }
 
     console.log('✅ Critical dependencies are ready');
@@ -67,7 +71,7 @@ export class BootstrapSystem {
     if (typeof window !== 'undefined' && (window as any).GAME_CONFIG) {
       return (window as any).GAME_CONFIG;
     }
-    
+
     // Fallback: return a minimal config to prevent initialization blocking
     console.warn('GAME_CONFIG not available on window, using fallback config');
     return {
@@ -125,12 +129,14 @@ export class BootstrapSystem {
    */
   public waitForDependencies(onGameReady: () => void, maxRetries = 50): void {
     const retryCount = (window as any).__bootstrapRetryCount || 0;
-    
+
     if (this.areDependenciesReady()) {
       console.log('🚀 All dependencies ready, initializing game...');
       onGameReady();
     } else if (retryCount < maxRetries) {
-      console.log(`⏳ Dependencies not ready, retrying in 100ms... (${retryCount + 1}/${maxRetries})`);
+      console.log(
+        `⏳ Dependencies not ready, retrying in 100ms... (${retryCount + 1}/${maxRetries})`
+      );
       (window as any).__bootstrapRetryCount = retryCount + 1;
       setTimeout(() => this.waitForDependencies(onGameReady, maxRetries), 100);
     } else {

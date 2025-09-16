@@ -74,14 +74,29 @@ function initGame() {
     try {
       pwaService.getStatus(); // This initializes the service
       console.log('📱 PWA service initialized');
+      
+      // Check PWA installability
+      const isInstallable = pwaService.checkInstallability();
+      console.log('📱 PWA installable:', isInstallable);
+      
+      if (!isInstallable) {
+        const status = pwaService.getDetailedStatus();
+        console.log('📱 PWA status:', status);
+      }
 
       // Add install button click handler
       const installButton = document.getElementById('pwa-install-button');
       if (installButton) {
         installButton.addEventListener('click', async () => {
-          const success = await pwaService.installApp();
-          if (success) {
-            console.log('✅ PWA installed successfully');
+          try {
+            const success = await pwaService.installApp();
+            if (success) {
+              console.log('✅ PWA installed successfully');
+            } else {
+              console.log('❌ PWA installation failed or was dismissed');
+            }
+          } catch (error) {
+            console.error('❌ PWA installation error:', error);
           }
         });
       }
@@ -401,7 +416,7 @@ function initGame() {
     }
   } catch (error) {
     console.error('Error in initGame:', error);
-    
+
     // Always try to show the game even if initialization fails
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
@@ -414,7 +429,7 @@ function initGame() {
       } catch (e) {
         console.warn('Failed to hide splash screen:', e);
       }
-      
+
       try {
         gameContent.style.display = 'block';
         gameContent.style.visibility = 'visible';
@@ -427,7 +442,7 @@ function initGame() {
 
       // DOM elements are already available, no reinitialization needed
       console.log('🔄 Game content is visible, DOM elements are ready');
-      
+
       // Try to start a minimal game loop even if initGame failed
       try {
         const w = window as any;

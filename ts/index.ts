@@ -103,68 +103,39 @@ __pushDiag({ type: 'index', stage: 'app-created' });
 
 // Static wiring of core systems/UI for deterministic bootstrap
 try {
-  // Loop system
-  // Modernized - loop system handled by store
-  // Drink system
+  // Load critical systems synchronously for production stability
+  console.log('🔧 Loading critical systems...');
+  
+  // Load loop system immediately - this is critical for game functionality
   try {
-    // Factory creation moved to dynamic import
-    const factory = null;
-    // Modernized - drink system handled by store
-    if (factory) console.log('Drink factory modernized');
-  } catch {}
-  // Clicks system
-  // Modernized - clicks system handled by store
-  // Purchases system
+    const loopModule = await import('./core/systems/loop-system.ts');
+    Object.assign(App.systems.loop, loopModule);
+    console.log('✅ Loop system loaded');
+  } catch (e) {
+    console.error('❌ Failed to load loop system:', e);
+    __pushDiag({
+      type: 'wire',
+      module: 'loop-critical',
+      ok: false,
+      err: String((e && (e as any).message) || e),
+    });
+  }
+  
+  // Load drink system immediately - also critical
   try {
-    // Modernized - purchases system handled by store
-  } catch {}
-  // Unlocks
-  // Modernized - unlocks system handled by store
-  // Modernized - unlocks system handled by store
-  // Modernized - unlocks system handled by store
-  // Modernized - unlocks system handled by store
-  // Modernized - unlocks system handled by store
-  // Unlocks system handled by store - no longer assigned to window
-  // Unlock Purchases
-  // Modernized - unlock purchases handled by store
-  // Game init
-  // Modernized - game init handled by store
-  // initOnDomReady no longer assigned to window - use proper module exports
-  try {
-    if (
-      // Modernized - game start handled by store
-      false &&
-      false
-    ) {
-      // Modernized - game start function handled by store
-      // Modernized - game start handled by store
+    const drinkModule = await import('./core/systems/drink-system.ts');
+    const factory = drinkModule.processDrinkFactory?.();
+    if (factory) {
+      App.systems.drink.processDrink = factory;
+      console.log('✅ Drink system loaded');
     }
-  } catch {}
-  // UI
-  // Modernized - UI handled by store
-  // Audio (button) system
-  try {
-    // Modernized - audio button handled by store
-  } catch {}
-  // Save system
-  try {
-    // Modernized - save system handled by store
-  } catch {}
-  // Options system
-  try {
-    // Modernized - options system handled by store
-  } catch {}
-  // Dev tools
-  try {
-    // Modernized - dev system handled by store
-  } catch {}
-  try {
-    // Modernized - UI initialization handled by store
-  } catch {}
-  // Initialize unlocks after UI is ready so visibility updates apply
-  try {
-    // Modernized - unlocks init handled by store
-  } catch {}
+  } catch (e) {
+    console.warn('⚠️ Failed to load drink system:', e);
+  }
+  
+  // Other systems can load asynchronously
+  console.log('🔧 Critical systems loaded, continuing with async systems...');
+  
   __pushDiag({ type: 'wire', module: 'core-static', ok: true });
 } catch (e) {
   __pushDiag({
@@ -183,8 +154,15 @@ try {
     // Kick game progression after splash via loop once available
     // Use proper module access instead of window globals
     let booted = false;
+    let retryCount = 0;
+    const maxRetries = 50; // 5 seconds max
     const tryBoot = () => {
       try {
+        if (retryCount >= maxRetries) {
+          console.error('❌ Max retries reached for loop system initialization');
+          return;
+        }
+        retryCount++;
         // Ensure baseline timing state
         if (App?.state?.getState && App?.state?.setState) {
           const st = App.state.getState();
@@ -205,6 +183,7 @@ try {
           } catch {}
         }
         const loopStart = App?.systems?.loop?.start;
+        console.log('🔧 Checking loop system availability:', !!loopStart);
         if (!booted && typeof loopStart === 'function') {
           loopStart({
             updateDrinkProgress: () => {
@@ -274,10 +253,15 @@ try {
             },
           });
           booted = true;
+          console.log('✅ Game loop started successfully');
           __pushDiag({ type: 'loop', stage: 'fallback-started' });
           return;
+        } else {
+          console.log(`⏳ Loop system not ready, retrying... (${retryCount}/${maxRetries})`);
         }
-      } catch {}
+      } catch (error) {
+        console.error('❌ Error in tryBoot:', error);
+      }
       setTimeout(tryBoot, 100);
     };
     tryBoot();
@@ -561,18 +545,7 @@ try {
   });
   console.warn('⚠️ purchases system load failed:', e);
 }
-try {
-  const loop = await import('./core/systems/loop-system.ts');
-  Object.assign(App.systems.loop, loop);
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'loop',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-  console.warn('⚠️ loop system load failed:', e);
-}
+// Loop system already loaded above - skipping duplicate load
 try {
   const save = await import('./core/systems/save-system.ts');
   Object.assign(App.systems.save, save);
@@ -585,21 +558,7 @@ try {
   });
   console.warn('⚠️ save system load failed:', e);
 }
-try {
-  const drink = await import('./core/systems/drink-system.ts');
-  const factory = (drink as any).processDrinkFactory?.();
-  if (factory) {
-    App.systems.drink.processDrink = factory;
-  }
-} catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'drink',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-  console.warn('⚠️ drink system load failed:', e);
-}
+// Drink system already loaded above - skipping duplicate load
 try {
   const clicks = await import('./core/systems/clicks-system.ts');
   Object.assign(App.systems.clicks, clicks);

@@ -71,6 +71,19 @@ export class PWAService {
     // Check if running in standalone mode (installed)
     this.status.isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     this.status.isInstalled = this.status.isStandalone;
+    
+    // Also check for other indicators of PWA installation
+    if (!this.status.isStandalone) {
+      // Check if running in fullscreen mode (another indicator of PWA)
+      this.status.isStandalone = window.matchMedia('(display-mode: fullscreen)').matches;
+      this.status.isInstalled = this.status.isStandalone;
+    }
+    
+    // Check if the app was launched from home screen (iOS)
+    if (!this.status.isStandalone && (window.navigator as any).standalone === true) {
+      this.status.isStandalone = true;
+      this.status.isInstalled = true;
+    }
   }
 
   private onStatusChange(): void {
@@ -139,6 +152,51 @@ export class PWAService {
 
   public canInstall(): boolean {
     return this.status.canInstall;
+  }
+
+  /**
+   * Check if the app meets PWA installation criteria
+   */
+  public checkInstallability(): boolean {
+    // Check if service worker is registered
+    if (!('serviceWorker' in navigator)) {
+      return false;
+    }
+
+    // Check if manifest is loaded
+    const manifestLink = document.querySelector('link[rel="manifest"]');
+    if (!manifestLink) {
+      return false;
+    }
+
+    // Check if we have the required icons
+    const hasIcons = document.querySelector('link[rel="icon"]') !== null;
+    if (!hasIcons) {
+      return false;
+    }
+
+    // Check if running over HTTPS (required for PWA)
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Get detailed PWA status for debugging
+   */
+  public getDetailedStatus(): any {
+    return {
+      ...this.status,
+      hasServiceWorker: 'serviceWorker' in navigator,
+      hasManifest: !!document.querySelector('link[rel="manifest"]'),
+      hasIcons: !!document.querySelector('link[rel="icon"]'),
+      isHttps: location.protocol === 'https:' || location.hostname === 'localhost',
+      userAgent: navigator.userAgent,
+      displayMode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 
+                  window.matchMedia('(display-mode: fullscreen)').matches ? 'fullscreen' : 'browser',
+    };
   }
 }
 
