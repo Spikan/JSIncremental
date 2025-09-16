@@ -715,6 +715,22 @@ try {
   });
   console.warn('⚠️ dev system load failed:', e);
 }
+
+// Load hybrid level system
+try {
+  const hybridLevel = await import('./core/systems/hybrid-level-system');
+  App.systems.hybridLevel = hybridLevel.hybridLevelSystem;
+  console.log('✅ Hybrid level system loaded');
+} catch (e) {
+  __pushDiag({
+    type: 'import',
+    module: 'hybrid-level',
+    ok: false,
+    err: String((e && (e as any).message) || e),
+  });
+  console.warn('⚠️ hybrid level system load failed:', e);
+}
+
 // game-init already loaded early
 
 console.log('✅ App object created and ready');

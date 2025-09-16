@@ -60,11 +60,15 @@ export function processDrinkFactory({
         state.spd ?? sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
       );
 
-      // Apply level bonuses from hybrid level system
-      const levelBonuses = App?.systems?.hybridLevel?.getCurrentLevelBonuses?.() || {
-        sipMultiplier: 1.0,
-        clickMultiplier: 1.0,
-      };
+      // Apply level bonuses from hybrid level system (defensive access)
+      let levelBonuses = { sipMultiplier: 1.0, clickMultiplier: 1.0 };
+      try {
+        if (App?.systems?.hybridLevel?.getCurrentLevelBonuses) {
+          levelBonuses = App.systems.hybridLevel.getCurrentLevelBonuses();
+        }
+      } catch (error) {
+        console.warn('⚠️ Failed to get level bonuses, using defaults:', error);
+      }
       const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
 
       // Handle sips accumulation with Decimal arithmetic
