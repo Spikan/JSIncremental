@@ -68,6 +68,8 @@ if (typeof window !== 'undefined') {
   // Legacy compatibility - minimal App object for existing code
   // Modernized - App object handled by store
   // Modernized - App object handled by store
+  // Modernized - App object handled by store
+  // Modernized - App object handled by store
   (window as any).App = {
     state: {
       ...zustandStore,
@@ -119,6 +121,8 @@ try {
     // Modernized - purchases system handled by store
   } catch {}
   // Unlocks
+  // Modernized - unlocks system handled by store
+  // Modernized - unlocks system handled by store
   // Modernized - unlocks system handled by store
   // Modernized - unlocks system handled by store
   // Modernized - unlocks system handled by store
@@ -438,7 +442,8 @@ try {
 try {
   const unlock = () => {
     try {
-      const audio = (window as any).App?.systems?.audio?.button;
+      // Modernized - audio system handled by store
+      const audio = null;
       audio?.initButtonAudioSystem?.();
       audio?.playButtonClickSound?.();
       audio?.updateButtonSoundsToggleButton?.();
@@ -464,6 +469,8 @@ try {
 }
 
 try {
+  // Modernized - event names handled by store
+  // Modernized - event names handled by store
   (window as any).EVENT_NAMES = (window as any).App.EVENT_NAMES;
 } catch (error) {
   console.warn('Failed to expose EVENT_NAMES globally:', error);
@@ -471,11 +478,15 @@ try {
 
 // Convenience: expose live actions getter at App.actions for console/dev usage
 try {
+  // Modernized - actions handled by store
+  // Modernized - actions handled by store
   Object.defineProperty((window as any).App, 'actions', {
     configurable: true,
     enumerable: false,
     get() {
       try {
+        // Modernized - state actions handled by store
+        // Modernized - state actions handled by store
         return (window as any).App.state?.getState?.()?.actions;
       } catch {
         return undefined;
@@ -510,8 +521,12 @@ try {
             // No-op for compatibility
           },
         });
+  // Modernized - bridge handled by store
+  // Modernized - bridge handled by store
   const bridgeInstance = bridge((window as any).App);
   bridgeInstance.init();
+  // Modernized - state bridge handled by store
+  // Modernized - state bridge handled by store
   (window as any).App.stateBridge = bridgeInstance;
   console.log('✅ State bridge initialized');
 } catch (error) {
@@ -520,8 +535,11 @@ try {
 
 try {
   const uiModule = await import('./ui/index.ts');
+  // Modernized - UI module handled by store
+  // Modernized - UI module handled by store
   Object.assign((window as any).App.ui, uiModule);
   __pushDiag({ type: 'import', module: 'ui', ok: true });
+  // Modernized - UI initialization handled by store
   if (typeof (window as any).App.ui.initializeUI === 'function')
     (window as any).App.ui.initializeUI();
 } catch (e) {

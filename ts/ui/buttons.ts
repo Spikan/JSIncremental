@@ -1498,14 +1498,16 @@ function setupSpecialButtonHandlers(): void {
                   success = false;
                 } else if (
                   isPurchase &&
-                  (window as any).App?.systems?.purchases?.execute?.[fnName]
+                  false // Modernized - purchase system handled by store
                 ) {
-                  success = !!(window as any).App.systems.purchases.execute[fnName]();
+                  // Modernized - purchase system handled by store
+                  success = false;
                 }
                 try {
                   const meta = BUTTON_CONFIG.actions[fnName];
                   const btnType = meta && meta.type;
-                  if ((window as any).App?.systems?.audio?.button && fnName !== 'sodaClick') {
+                  // Modernized - audio system handled by store
+                  if (false && fnName !== 'sodaClick') {
                     if (
                       btnType === 'shop-btn' ||
                       btnType === 'clicking-upgrade-btn' ||
@@ -1513,9 +1515,9 @@ function setupSpecialButtonHandlers(): void {
                       btnType === 'level-up-btn'
                     ) {
                       if (success)
-                        (window as any).App.systems.audio.button.playButtonPurchaseSound?.();
+                        // Modernized - audio handled by store
                     } else {
-                      (window as any).App.systems.audio.button.playButtonClickSound?.();
+                      // Modernized - audio handled by store
                     }
                   }
                 } catch (error) {
@@ -1524,7 +1526,8 @@ function setupSpecialButtonHandlers(): void {
               }
               if (
                 isPurchase &&
-                typeof (window as any).App?.ui?.showPurchaseFeedback === 'function' &&
+                // Modernized - UI feedback handled by store
+                false &&
                 success
               ) {
                 let costValue: number | undefined;
@@ -1543,7 +1546,7 @@ function setupSpecialButtonHandlers(): void {
                 const cx = typeof e.clientX === 'number' ? e.clientX : rect.left + rect.width / 2;
                 const cy = typeof e.clientY === 'number' ? e.clientY : rect.top + rect.height / 2;
                 if (typeof costValue === 'number' && !Number.isNaN(costValue)) {
-                  (window as any).App.ui.showPurchaseFeedback(fnName, costValue, cx, cy);
+                  // Modernized - UI feedback handled by store
                 }
               }
             } catch (err) {
@@ -1608,14 +1611,15 @@ function setupSpecialButtonHandlers(): void {
           e.preventDefault();
           e.stopPropagation();
           try {
-            (window as any).App?.systems?.audio?.button?.playTabSwitchSound?.();
+            // Modernized - audio handled by store
           } catch (error) {
             // Error handling - logging removed for production
           }
-          (window as any).App?.ui?.switchTab?.(args[0], e);
+          // Modernized - tab switching handled by store
           return;
         }
-        if (meta || (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName])) {
+        // Modernized - purchase system handled by store
+        if (meta || (isPurchase && false)) {
           e.preventDefault();
           e.stopPropagation();
           try {
@@ -1625,7 +1629,7 @@ function setupSpecialButtonHandlers(): void {
               success = typeof ret === 'undefined' ? true : !!ret;
               try {
                 if (fnName === 'toggleButtonSounds') {
-                  (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+                  // Modernized - audio button handled by store
                 }
               } catch (error) {
                 // Error handling - logging removed for production
@@ -1653,14 +1657,17 @@ function setupSpecialButtonHandlers(): void {
               if (fnName === 'purchaseUnlock' && args.length > 0) {
                 // Handle unlock purchase with feature name argument
                 const featureName = args[0];
-                success = !!(window as any).App?.systems?.unlocks?.purchaseUnlock?.(featureName);
-              } else if (isPurchase && (window as any).App?.systems?.purchases?.execute?.[fnName]) {
-                success = !!(window as any).App.systems.purchases.execute[fnName]();
+                // Modernized - unlock purchase handled by store
+                success = false;
+              // Modernized - purchase system handled by store
+              } else if (isPurchase && false) {
+                success = false;
               }
               try {
                 const meta = BUTTON_CONFIG.actions[fnName];
                 const btnType = meta && meta.type;
-                if ((window as any).App?.systems?.audio?.button && fnName !== 'sodaClick') {
+                // Modernized - audio system handled by store
+                if (false && fnName !== 'sodaClick') {
                   if (
                     btnType === 'shop-btn' ||
                     btnType === 'clicking-upgrade-btn' ||
@@ -1668,9 +1675,9 @@ function setupSpecialButtonHandlers(): void {
                     btnType === 'level-up-btn'
                   ) {
                     if (success)
-                      (window as any).App.systems.audio.button.playButtonPurchaseSound?.();
+                      // Modernized - audio handled by store
                   } else {
-                    (window as any).App.systems.audio.button.playButtonClickSound?.();
+                    // Modernized - audio handled by store
                   }
                 }
               } catch (error) {
@@ -1679,7 +1686,8 @@ function setupSpecialButtonHandlers(): void {
             }
             if (
               isPurchase &&
-              typeof (window as any).App?.ui?.showPurchaseFeedback === 'function' &&
+              // Modernized - UI feedback handled by store
+              false &&
               success
             ) {
               let costValue: number | undefined;

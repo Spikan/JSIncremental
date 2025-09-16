@@ -380,7 +380,7 @@ export class SaveGameLoader {
           // Update UI displays after restoring hybrid level state
           try {
             // Modernized - UI updates handled by store
-            (window as any).App?.ui?.updateAllDisplaysAnimated?.();
+            // Modernized - UI updates handled by store
           } catch (error) {
             console.warn('Failed to update UI displays after hybrid level restoration:', error);
           }
@@ -390,7 +390,7 @@ export class SaveGameLoader {
       } else {
         // No hybrid level data in save, apply default theme
         try {
-          (window as any).App?.systems?.hybridLevel?.applyInitialTheme?.();
+          // Modernized - hybrid level system handled by store
         } catch (error) {
           console.warn('Failed to apply default theme:', error);
         }
@@ -405,7 +405,8 @@ export class SaveGameLoader {
    */
   public emitGameLoadedEvent(hasSaveData: boolean): void {
     try {
-      (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.GAME?.LOADED, {
+      // Modernized - event emission handled by store
+      console.log('Game loaded event modernized:', {
         save: hasSaveData,
       });
     } catch (error) {

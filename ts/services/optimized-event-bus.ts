@@ -269,6 +269,7 @@ if (typeof window !== 'undefined') {
   try {
     // Modernized - App object initialization handled elsewhere
     // Modernized - App object handled by store
+    // Modernized - App object handled by store
     (window as any).App = (window as any).App || {};
     (window as any).App.events = optimizedEventBus;
   } catch (error) {

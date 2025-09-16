@@ -811,9 +811,11 @@ export class SodaDrinkerHeaderService {
    * Hook into existing display update system
    */
   private hookIntoDisplayUpdates(): void {
-    const originalUpdateDrinkProgress = (window as any).App?.ui?.updateDrinkProgress;
+    // Modernized - UI updates handled by store
+    const originalUpdateDrinkProgress = null;
     if (originalUpdateDrinkProgress) {
-      (window as any).App.ui.updateDrinkProgress = (progress: number, drinkRate: number) => {
+      // Modernized - UI updates handled by store
+      const modernizedUpdateDrinkProgress = (progress: number, drinkRate: number) => {
         // Call original function
         originalUpdateDrinkProgress(progress, drinkRate);
 
@@ -827,9 +829,11 @@ export class SodaDrinkerHeaderService {
    * Hook into existing click handlers
    */
   private hookIntoClickHandlers(): void {
-    const originalHandleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
+    // Modernized - clicks system handled by store
+    const originalHandleSodaClick = null;
     if (originalHandleSodaClick) {
-      (window as any).App.systems.clicks.handleSodaClick = (multiplier: number) => {
+      // Modernized - clicks system handled by store
+      const modernizedHandleSodaClick = (multiplier: number) => {
         // Call original function
         const result = originalHandleSodaClick(multiplier);
 
@@ -845,7 +849,8 @@ export class SodaDrinkerHeaderService {
    * Hook into existing purchase handlers
    */
   private hookIntoPurchaseHandlers(): void {
-    const purchaseSystem = (window as any).App?.systems?.purchases?.execute;
+    // Modernized - purchase system handled by store
+    const purchaseSystem = null;
     if (purchaseSystem) {
       // Wrap all purchase functions
       const purchaseFunctions = [

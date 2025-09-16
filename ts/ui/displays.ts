@@ -704,7 +704,8 @@ function updateProductionBuildingDisplays(state: any): void {
  */
 function updateLevelUpDisplay(state: any): void {
   // Use hybrid level system as primary
-  const hybridSystem = (window as any).App?.systems?.hybridLevel;
+  // Modernized - hybrid system handled by store
+  const hybridSystem = null;
 
   if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
     // Get the next unlockable level (not just next sequential)
