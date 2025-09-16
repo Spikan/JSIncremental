@@ -111,54 +111,57 @@ __pushDiag({ type: 'index', stage: 'app-created' });
 
 // Static wiring of core systems/UI for deterministic bootstrap
 try {
-  // Load critical systems synchronously for production stability
-  console.log('🔧 Loading critical systems...');
-
-  // Load loop system immediately - this is critical for game functionality
-  try {
-    console.log('🔧 About to import loop system...');
-    const loopModule = await Promise.race([
-      import('./core/systems/loop-system.ts'),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Loop system import timeout')), 5000)
-      ),
-    ]);
-    console.log('🔧 Loop system import completed, assigning to App...');
-    Object.assign(App.systems.loop, loopModule);
-    console.log('✅ Loop system loaded');
-  } catch (e) {
-    console.error('❌ Failed to load loop system:', e);
-    console.log('🔧 Creating fallback loop system...');
-    // Create a minimal fallback loop system
-    App.systems.loop = {
-      start: (args: any) => {
-        console.log('🔧 Fallback loop system started');
-        // Minimal fallback implementation
-        const tick = () => {
-          try {
-            if (args.updateDrinkProgress) args.updateDrinkProgress();
-            if (args.processDrink) args.processDrink();
-            if (args.updateUI) args.updateUI();
-            if (args.updateStats) args.updateStats();
-          } catch (error) {
-            console.warn('Fallback loop error:', error);
-          }
-          requestAnimationFrame(tick);
-        };
+  // Create lazy loading system for critical modules
+  console.log('🔧 Setting up lazy loading for critical systems...');
+  
+  // Create lazy-loaded loop system
+  let loopModuleLoaded = false;
+  let loopModulePromise: Promise<any> | null = null;
+  
+  App.systems.loop = {
+    start: async (args: any) => {
+      console.log('🔧 Loop system start called, loading module...');
+      
+      if (!loopModuleLoaded && !loopModulePromise) {
+        loopModulePromise = import('./core/systems/loop-system.ts').then(module => {
+          console.log('✅ Loop system module loaded');
+          loopModuleLoaded = true;
+          return module;
+        }).catch(err => {
+          console.warn('⚠️ Loop system module failed to load:', err.message);
+          return null;
+        });
+      }
+      
+      if (loopModulePromise) {
+        const module = await loopModulePromise;
+        if (module && module.start) {
+          console.log('🔧 Using real loop system');
+          return module.start(args);
+        }
+      }
+      
+      // Fallback implementation
+      console.log('🔧 Using fallback loop system');
+      const tick = () => {
+        try {
+          if (args.updateDrinkProgress) args.updateDrinkProgress();
+          if (args.processDrink) args.processDrink();
+          if (args.updateUI) args.updateUI();
+          if (args.updateStats) args.updateStats();
+        } catch (error) {
+          console.warn('Fallback loop error:', error);
+        }
         requestAnimationFrame(tick);
-      },
-      stop: () => {
-        console.log('🔧 Fallback loop system stopped');
-      },
-    };
-    console.log('✅ Fallback loop system created');
-    __pushDiag({
-      type: 'wire',
-      module: 'loop-critical',
-      ok: false,
-      err: String((e && (e as any).message) || e),
-    });
-  }
+      };
+      requestAnimationFrame(tick);
+    },
+    stop: () => {
+      console.log('🔧 Loop system stopped');
+    },
+  };
+  
+  console.log('✅ Lazy-loaded loop system created');
 
   // Load drink system immediately - also critical
   try {
