@@ -69,13 +69,13 @@ export { ServiceLocator };
 
 // Convenience functions for common services
 export const getApp = () => ServiceLocator.get('App');
-export const getGameConfig = () => ServiceLocator.get('GameConfig');
+export const getGameConfig = () => ServiceLocator.get('GAME_CONFIG');
 export const getDecimal = () => ServiceLocator.get('Decimal');
 
 // Service keys as constants
 export const SERVICE_KEYS = {
   APP: 'App',
-  GAME_CONFIG: 'GameConfig',
+  GAME_CONFIG: 'GAME_CONFIG',
   DECIMAL: 'Decimal',
   STORE: 'Store',
   LOGGER: 'Logger',

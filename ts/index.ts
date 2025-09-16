@@ -118,7 +118,7 @@ try {
   console.log('🔧 About to import loop system...');
   const loopModule = await import('./core/systems/loop-system');
   console.log('🔧 Loop system import completed');
-  
+
   App.systems.loop = {
     start: (args: any) => {
       console.log('🔧 Loop system start called');
@@ -141,22 +141,18 @@ try {
   const drinkModule = await import('./core/systems/drink-system');
   console.log('🔧 Drink system import completed, processing factory...');
   const factory = drinkModule.processDrinkFactory?.({
-    getApp: () => App,
-    getGameConfig: () => (window as any).GAME_CONFIG,
-    getSips: () => (window as any).sips,
-    setSips: (value: any) => {
-      (window as any).sips = value;
-    },
-    getSipsPerDrink: () => (window as any).sipsPerDrink,
-    getDrinkRate: () => (window as any).drinkRate,
-    getLastDrinkTime: () => (window as any).lastDrinkTime,
-    getSpd: () => (window as any).spd,
-    getTotalSipsEarned: () => App?.state?.getState?.()?.totalSipsEarned,
-    getHighestSipsPerSecond: () => App?.state?.getState?.()?.highestSipsPerSecond,
-    getLastAutosaveClockMs: () => (window as any).__lastAutosaveClockMs,
-    setLastAutosaveClockMs: (value: number) => {
-      (window as any).__lastAutosaveClockMs = value;
-    },
+    getApp: () => ServiceLocator.get(SERVICE_KEYS.APP),
+    getGameConfig: () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
+    getSips: () => ServiceLocator.get('sips'),
+    setSips: (value: any) => ServiceLocator.register('sips', value),
+    getSipsPerDrink: () => ServiceLocator.get('sipsPerDrink'),
+    getDrinkRate: () => 1000,
+    getLastDrinkTime: () => 0,
+    getSpd: () => ServiceLocator.get('spd'),
+    getTotalSipsEarned: () => ServiceLocator.get('totalSipsEarned'),
+    getHighestSipsPerSecond: () => ServiceLocator.get('highestSipsPerSecond'),
+    getLastAutosaveClockMs: () => ServiceLocator.get('lastAutosaveClockMs'),
+    setLastAutosaveClockMs: (value: number) => ServiceLocator.register('lastAutosaveClockMs', value),
   });
   if (factory) {
     App.systems.drink.processDrink = factory;
@@ -328,90 +324,8 @@ setTimeout(() => {
       game.style.opacity = '1';
       document.body?.classList?.add('game-started');
       __pushDiag({ type: 'splash', action: 'forced-hide' });
-      // After forced hide, also try to boot the loop
-      try {
-        // Use proper module access instead of window globals
-        let booted = false;
-        const tryBoot2 = () => {
-          try {
-            const loopStart = App?.systems?.loop?.start;
-            if (!booted && typeof loopStart === 'function') {
-              loopStart({
-                updateDrinkProgress: () => {
-                  try {
-                    const st = App?.state?.getState?.() || {};
-                    const now = Date.now();
-                    const last = Number(st.lastDrinkTime ?? 0);
-                    const rate = Number(st.drinkRate ?? 1000);
-                    const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-                    App?.state?.setState?.({ drinkProgress: pct });
-                    App?.ui?.updateDrinkProgress?.(pct, rate);
-                  } catch {}
-                },
-                processDrink: () => {
-                  try {
-                    App?.systems?.drink?.processDrink?.();
-                  } catch {}
-                },
-                updateStats: () => {
-                  try {
-                    App?.ui?.updatePlayTime?.();
-                    App?.ui?.updateLastSaveTime?.();
-                    App?.ui?.updateAllStats?.();
-                    App?.ui?.updatePurchasedCounts?.();
-                    App?.ui?.checkUpgradeAffordability?.();
-                    App?.systems?.unlocks?.checkAllUnlocks?.();
-
-                    // Check for level unlocks
-                    try {
-                      const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
-                      if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
-                        // Import and show notifications for newly unlocked levels
-                        import('./ui/level-selector')
-                          .then(({ levelSelector }) => {
-                            newlyUnlockedLevels.forEach((levelId: number) => {
-                              levelSelector.showUnlockNotification(levelId);
-                            });
-                          })
-                          .catch(error => {
-                            console.warn('Failed to load level selector for notifications:', error);
-                          });
-                      }
-                    } catch (error) {
-                      console.warn('Failed to check level unlocks:', error);
-                    }
-                  } catch {}
-                },
-                updatePlayTime: () => {
-                  try {
-                    App?.ui?.updatePlayTime?.();
-                  } catch {}
-                },
-                updateLastSaveTime: () => {
-                  try {
-                    App?.ui?.updateLastSaveTime?.();
-                  } catch {}
-                },
-                updateUI: () => {
-                  try {
-                    // Update individual header elements
-                    App?.ui?.updateTopSipCounter?.();
-                    App?.ui?.updateTopSipsPerDrink?.();
-                    App?.ui?.updateTopSipsPerSecond?.();
-                  } catch (error) {
-                    console.error('❌ updateUI error (second loop):', error);
-                  }
-                },
-              });
-              booted = true;
-              __pushDiag({ type: 'loop', stage: 'fallback-started-post-hide' });
-              return;
-            }
-          } catch {}
-          setTimeout(tryBoot2, 100);
-        };
-        tryBoot2();
-      } catch {}
+      // Loop system should already be running from tryBoot above
+      console.log('🔄 Splash screen force-hidden, loop should already be running');
     }
   } catch {}
 }, 1000);
@@ -658,9 +572,9 @@ console.log('🔧 Registering services with service locator...');
 ServiceLocator.register(SERVICE_KEYS.APP, App);
 ServiceLocator.register(SERVICE_KEYS.DECIMAL, Decimal);
 ServiceLocator.register(SERVICE_KEYS.GAME_CONFIG, (window as any).GAME_CONFIG);
-ServiceLocator.register('sips', (window as any).sips);
-ServiceLocator.register('sipsPerDrink', (window as any).sipsPerDrink);
-ServiceLocator.register('spd', (window as any).spd);
+ServiceLocator.register('sips', 0);
+ServiceLocator.register('sipsPerDrink', 1);
+ServiceLocator.register('spd', 1);
 ServiceLocator.register('totalSipsEarned', 0);
 ServiceLocator.register('highestSipsPerSecond', 0);
 ServiceLocator.register('lastAutosaveClockMs', 0);
