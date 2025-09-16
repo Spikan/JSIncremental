@@ -7,7 +7,9 @@ const getDecimal = () => {
   if (!_Decimal) {
     _Decimal = (globalThis as any).Decimal;
     if (!_Decimal) {
-      throw new Error('Decimal library not available. Make sure break_eternity.js is loaded before this module.');
+      throw new Error(
+        'Decimal library not available. Make sure break_eternity.js is loaded before this module.'
+      );
     }
   }
   return _Decimal;
@@ -32,7 +34,7 @@ export function isDecimal(value: any): value is DecimalType {
  */
 export function toDecimal(value: NumericValue): DecimalType {
   const Decimal = getDecimal();
-  
+
   if (isDecimal(value)) {
     return value;
   }

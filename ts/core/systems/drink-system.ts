@@ -5,8 +5,8 @@
 // MEMORY: NEVER CONVERT SPD TO JAVASCRIPT NUMBERS - PRESERVE FULL DECIMAL PRECISION
 // MEMORY: DRINK PROGRESSION SHOULD PRODUCE EXPONENTIALLY LARGE VALUES AS INTENDED
 
-import { toDecimal } from '../numbers/simplified';
 // Direct Decimal access - no wrapper needed
+// Removed simplified.ts import to avoid production import issues
 
 export type ProcessDrinkArgs = {
   getNow?: () => number;
@@ -60,7 +60,8 @@ export function processDrinkFactory({
 
       // Add full sips-per-drink (base + production) with Decimal support
       const sipsPerDrink = getSipsPerDrink();
-      const baseSpdVal = toDecimal(
+      const Decimal = (globalThis as any).Decimal;
+      const baseSpdVal = new Decimal(
         state.spd ?? sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
       );
 
@@ -69,22 +70,22 @@ export function processDrinkFactory({
         sipMultiplier: 1.0,
         clickMultiplier: 1.0,
       };
-      const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
+      const spdVal = baseSpdVal.mul(new Decimal(levelBonuses.sipMultiplier));
 
       // Handle sips accumulation with Decimal arithmetic
-      const currentSips = toDecimal(getSips() || 0);
+      const currentSips = new Decimal(getSips() || 0);
       setSips(currentSips.add(spdVal));
 
       // Mirror totals with Decimal support
-      const prevTotal = toDecimal(getTotalSipsEarned() || 0);
-      const prevHigh = toDecimal(getHighestSipsPerSecond() || 0);
-      const spdNum = toDecimal(state.spd ?? getSpd() ?? 0);
+      const prevTotal = new Decimal(getTotalSipsEarned() || 0);
+      const prevHigh = new Decimal(getHighestSipsPerSecond() || 0);
+      const spdNum = new Decimal(state.spd ?? getSpd() ?? 0);
 
       // Calculate current sips per second (keep in Decimal space to preserve precision)
       const rateInSeconds = drinkRate / 1000;
-      const rateInSecondsDecimal = toDecimal(rateInSeconds);
+      const rateInSecondsDecimal = new Decimal(rateInSeconds);
       const currentSipsPerSecond =
-        rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : toDecimal(0);
+        rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : new Decimal(0);
 
       // Compare highest SPS using Decimal operations to preserve extreme values
       const highest = prevHigh.gte(currentSipsPerSecond) ? prevHigh : currentSipsPerSecond;
