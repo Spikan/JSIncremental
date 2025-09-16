@@ -183,14 +183,19 @@ try {
         // Call initGame if present (one-time)
         if (!booted && typeof initGame === 'function') {
           try {
+            console.log('🔧 Calling initGame...');
             initGame();
-          } catch {}
+            console.log('✅ initGame completed successfully');
+          } catch (error) {
+            console.error('❌ initGame failed:', error);
+          }
         }
         const loopStart = App?.systems?.loop?.start;
         console.log('🔧 Checking loop system availability:', !!loopStart);
         console.log('🔧 App.systems.loop:', App?.systems?.loop);
         console.log('🔧 Available methods:', Object.keys(App?.systems?.loop || {}));
         if (!booted && typeof loopStart === 'function') {
+          console.log('🔧 Starting game loop...');
           loopStart({
             updateDrinkProgress: () => {
               try {

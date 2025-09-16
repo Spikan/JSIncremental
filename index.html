@@ -71,14 +71,14 @@
             );
           } else {
             console.log('✅ App object found:', Object.keys(window.App));
-            
+
             // Check if game loop is running
             if (window.App.systems && window.App.systems.loop) {
               console.log('✅ Loop system available:', typeof window.App.systems.loop.start);
             } else {
               console.error('❌ Loop system not available');
             }
-            
+
             // Check if UI is initialized
             if (window.App.ui && typeof window.App.ui.initializeUI === 'function') {
               console.log('✅ UI system available, calling initializeUI...');
