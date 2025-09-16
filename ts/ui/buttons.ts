@@ -1289,7 +1289,8 @@ function setupSpecialButtonHandlers(): void {
             try {
               // Call handleSodaClick
               import('../core/systems/clicks-system')
-                .then(({ handleSodaClick }) => {
+                .then(({ handleSodaClickFactory }) => {
+                  const handleSodaClick = handleSodaClickFactory();
                   handleSodaClick(1.0); // Default multiplier of 1.0
                 })
                 .catch(error => {
@@ -1385,7 +1386,8 @@ function setupSpecialButtonHandlers(): void {
             try {
               // Call handleSodaClick
               import('../core/systems/clicks-system')
-                .then(({ handleSodaClick }) => {
+                .then(({ handleSodaClickFactory }) => {
+                  const handleSodaClick = handleSodaClickFactory();
                   handleSodaClick(1.0); // Default multiplier of 1.0
                 })
                 .catch(error => {
@@ -1426,7 +1428,8 @@ function setupSpecialButtonHandlers(): void {
         try {
           // Button click handling
           import('../core/systems/clicks-system')
-            .then(({ handleSodaClick }) => {
+            .then(({ handleSodaClickFactory }) => {
+              const handleSodaClick = handleSodaClickFactory();
               handleSodaClick(1.0); // Default multiplier of 1.0
             })
             .catch(error => {

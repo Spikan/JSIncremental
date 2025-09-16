@@ -196,8 +196,4 @@ export function handleSodaClickFactory({
   };
 }
 
-// Backward compatibility - create default instances
-export const trackClick = trackClickFactory();
-export const handleSodaClick = handleSodaClickFactory({
-  trackClick: trackClick,
-});
+// No backward compatibility - use proper dependency injection

@@ -230,7 +230,8 @@ export function setupDirectSodaClickHandler(): () => void {
   (window as any).testSodaClick = async () => {
     logger.debug('Testing soda click manually...');
     try {
-      const { handleSodaClick } = await import('../core/systems/clicks-system');
+      const { handleSodaClickFactory } = await import('../core/systems/clicks-system');
+      const handleSodaClick = handleSodaClickFactory();
       await handleSodaClick(1);
       logger.debug('Manual soda click test successful!');
     } catch (error) {
