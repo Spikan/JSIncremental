@@ -223,10 +223,16 @@ try {
 
   // Load drink system immediately - also critical
   console.log('🔧 About to import drink system...');
-  const drinkModule = await import('./core/systems/drink-system');
-  console.log('🔧 Drink system import completed, processing factory...');
-  console.log('🔧 Drink module keys:', Object.keys(drinkModule));
-  console.log('🔧 processDrinkFactory available:', !!drinkModule.processDrinkFactory);
+  let drinkModule: any;
+  try {
+    drinkModule = await import('./core/systems/drink-system');
+    console.log('🔧 Drink system import completed, processing factory...');
+    console.log('🔧 Drink module keys:', Object.keys(drinkModule));
+    console.log('🔧 processDrinkFactory available:', !!drinkModule.processDrinkFactory);
+  } catch (importError) {
+    console.error('❌ CRITICAL: Drink system import failed:', importError);
+    throw importError;
+  }
   const factory = drinkModule.processDrinkFactory?.({
     getApp: () => ServiceLocator.get(SERVICE_KEYS.APP),
     getGameConfig: () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
@@ -392,8 +398,13 @@ try {
   console.log('🔧 App.systems.drink.processDrink available:', !!App?.systems?.drink?.processDrink);
   console.log('🔧 App.systems.loop.start available:', !!App?.systems?.loop?.start);
   console.log('🔧 Calling tryBoot now...');
-  tryBoot();
-  console.log('🔧 tryBoot call completed');
+  try {
+    tryBoot();
+    console.log('🔧 tryBoot call completed');
+  } catch (tryBootError) {
+    console.error('❌ CRITICAL: tryBoot failed:', tryBootError);
+    throw tryBootError;
+  }
 } catch (e) {
   console.error('❌ CRITICAL: Error in critical systems loading:', e);
   __pushDiag({
