@@ -183,7 +183,9 @@ export function processDrinkFactory({
         console.warn('Failed to check upgrade affordability:', error);
       }
     } catch (error) {
-      console.warn('Failed to process drink:', error);
+      console.error('❌ CRITICAL: Failed to process drink:', error);
+      // Re-throw to ensure the error is not silently ignored
+      throw error;
     }
   };
 }

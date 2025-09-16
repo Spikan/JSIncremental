@@ -142,12 +142,16 @@ try {
         try {
           if (updateDrinkProgress) updateDrinkProgress();
         } catch (error) {
-          console.warn('Failed to update drink progress in loop:', error);
+          console.error('❌ CRITICAL: Failed to update drink progress in loop:', error);
+          // Don't continue the loop if drink progress fails - this is core functionality
+          throw error;
         }
         try {
           if (processDrink) processDrink();
         } catch (error) {
-          console.warn('Failed to process drink in loop:', error);
+          console.error('❌ CRITICAL: Failed to process drink in loop:', error);
+          // Don't continue the loop if drink processing fails - this is core functionality
+          throw error;
         }
         try {
           if (updateUI) updateUI();
@@ -391,13 +395,15 @@ try {
   tryBoot();
   console.log('🔧 tryBoot call completed');
 } catch (e) {
-  console.error('❌ Error in critical systems loading:', e);
+  console.error('❌ CRITICAL: Error in critical systems loading:', e);
   __pushDiag({
     type: 'wire',
     module: 'core-static',
     ok: false,
     err: String((e && (e as any).message) || e),
   });
+  // Re-throw to ensure the error is not silently ignored
+  throw e;
 }
 
 // Load async systems before tryBoot
@@ -734,7 +740,9 @@ try {
   };
   setTimeout(seedIfNeeded, 400);
 } catch (error) {
-  console.error('❌ Error in outer tryBoot initialization:', error);
+  console.error('❌ CRITICAL: Error in outer tryBoot initialization:', error);
+  // Re-throw to ensure the error is not silently ignored
+  throw error;
 }
 
 try {
