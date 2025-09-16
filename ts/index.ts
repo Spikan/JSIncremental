@@ -184,6 +184,8 @@ try {
         }
         const loopStart = App?.systems?.loop?.start;
         console.log('🔧 Checking loop system availability:', !!loopStart);
+        console.log('🔧 App.systems.loop:', App?.systems?.loop);
+        console.log('🔧 Available methods:', Object.keys(App?.systems?.loop || {}));
         if (!booted && typeof loopStart === 'function') {
           loopStart({
             updateDrinkProgress: () => {

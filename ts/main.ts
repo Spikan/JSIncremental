@@ -66,6 +66,9 @@ function initGame() {
     // Modernized - unlocks system always available
     if (typeof document === 'undefined' || !domQuery.exists('#sodaButton')) {
       console.log('⏳ Waiting for DOM elements to load...');
+      console.log('🔧 Document ready state:', document?.readyState);
+      console.log('🔧 Soda button exists:', domQuery.exists('#sodaButton'));
+      console.log('🔧 Soda button element:', document?.getElementById('sodaButton'));
       timerManager.setTimeout(initGame, 100, 'Retry initGame - DOM not ready');
       return;
     }
