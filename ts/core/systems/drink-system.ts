@@ -5,8 +5,9 @@
 // MEMORY: NEVER CONVERT SPD TO JAVASCRIPT NUMBERS - PRESERVE FULL DECIMAL PRECISION
 // MEMORY: DRINK PROGRESSION SHOULD PRODUCE EXPONENTIALLY LARGE VALUES AS INTENDED
 
-// Direct Decimal access - no wrapper needed
-// Removed simplified.ts import to avoid production import issues
+// Modern ES6 imports - proper module resolution
+import { toDecimal } from '../numbers/simplified';
+import { ServiceLocator, SERVICE_KEYS } from '../services/service-locator';
 
 export type ProcessDrinkArgs = {
   getNow?: () => number;
@@ -26,23 +27,18 @@ export type ProcessDrinkArgs = {
 
 export function processDrinkFactory({
   getNow = () => Date.now(),
-  getApp = () => (typeof window !== 'undefined' ? (window as any).App : undefined),
-  getGameConfig = () => (typeof window !== 'undefined' ? (window as any).GAME_CONFIG : undefined),
-  getSips = () => (typeof window !== 'undefined' ? (window as any).sips : undefined),
-  setSips = (value: any) => {
-    if (typeof window !== 'undefined') (window as any).sips = value;
-  },
-  getSipsPerDrink = () =>
-    typeof window !== 'undefined' ? (window as any).sipsPerDrink : undefined,
+  getApp = () => ServiceLocator.get(SERVICE_KEYS.APP),
+  getGameConfig = () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
+  getSips = () => ServiceLocator.get('sips'),
+  setSips = (value: any) => ServiceLocator.register('sips', value),
+  getSipsPerDrink = () => ServiceLocator.get('sipsPerDrink'),
   getDrinkRate = () => 1000,
   getLastDrinkTime = () => 0,
-  getSpd = () => undefined,
-  getTotalSipsEarned = () => undefined,
-  getHighestSipsPerSecond = () => undefined,
-  getLastAutosaveClockMs = () => 0,
-  setLastAutosaveClockMs = (value: number) => {
-    if (typeof window !== 'undefined') (window as any).__lastAutosaveClockMs = value;
-  },
+  getSpd = () => ServiceLocator.get('spd'),
+  getTotalSipsEarned = () => ServiceLocator.get('totalSipsEarned'),
+  getHighestSipsPerSecond = () => ServiceLocator.get('highestSipsPerSecond'),
+  getLastAutosaveClockMs = () => ServiceLocator.get('lastAutosaveClockMs'),
+  setLastAutosaveClockMs = (value: number) => ServiceLocator.register('lastAutosaveClockMs', value),
 }: ProcessDrinkArgs = {}) {
   return function processDrink() {
     try {
@@ -60,8 +56,7 @@ export function processDrinkFactory({
 
       // Add full sips-per-drink (base + production) with Decimal support
       const sipsPerDrink = getSipsPerDrink();
-      const Decimal = (globalThis as any).Decimal;
-      const baseSpdVal = new Decimal(
+      const baseSpdVal = toDecimal(
         state.spd ?? sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
       );
 
@@ -70,22 +65,22 @@ export function processDrinkFactory({
         sipMultiplier: 1.0,
         clickMultiplier: 1.0,
       };
-      const spdVal = baseSpdVal.mul(new Decimal(levelBonuses.sipMultiplier));
+      const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
 
       // Handle sips accumulation with Decimal arithmetic
-      const currentSips = new Decimal(getSips() || 0);
+      const currentSips = toDecimal(getSips() || 0);
       setSips(currentSips.add(spdVal));
 
       // Mirror totals with Decimal support
-      const prevTotal = new Decimal(getTotalSipsEarned() || 0);
-      const prevHigh = new Decimal(getHighestSipsPerSecond() || 0);
-      const spdNum = new Decimal(state.spd ?? getSpd() ?? 0);
+      const prevTotal = toDecimal(getTotalSipsEarned() || 0);
+      const prevHigh = toDecimal(getHighestSipsPerSecond() || 0);
+      const spdNum = toDecimal(state.spd ?? getSpd() ?? 0);
 
       // Calculate current sips per second (keep in Decimal space to preserve precision)
       const rateInSeconds = drinkRate / 1000;
-      const rateInSecondsDecimal = new Decimal(rateInSeconds);
+      const rateInSecondsDecimal = toDecimal(rateInSeconds);
       const currentSipsPerSecond =
-        rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : new Decimal(0);
+        rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : toDecimal(0);
 
       // Compare highest SPS using Decimal operations to preserve extreme values
       const highest = prevHigh.gte(currentSipsPerSecond) ? prevHigh : currentSipsPerSecond;

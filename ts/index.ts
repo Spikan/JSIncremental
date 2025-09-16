@@ -9,6 +9,8 @@ import { optimizedEventBus } from './services/optimized-event-bus.ts';
 import { performanceMonitor } from './services/performance.ts';
 import './config.ts';
 import './core/constants.ts';
+import { ServiceLocator, SERVICE_KEYS } from './core/services/service-locator.ts';
+import Decimal from 'break_eternity.js';
 // DOM migration completed - using modern domQuery service
 import './god.ts';
 // Static imports removed - using dynamic imports instead
@@ -711,6 +713,20 @@ try {
 // game-init already loaded early
 
 console.log('✅ App object created and ready');
+
+// Register services with the service locator
+console.log('🔧 Registering services with service locator...');
+ServiceLocator.register(SERVICE_KEYS.APP, App);
+ServiceLocator.register(SERVICE_KEYS.DECIMAL, Decimal);
+ServiceLocator.register(SERVICE_KEYS.GAME_CONFIG, (window as any).GAME_CONFIG);
+ServiceLocator.register('sips', (window as any).sips);
+ServiceLocator.register('sipsPerDrink', (window as any).sipsPerDrink);
+ServiceLocator.register('spd', (window as any).spd);
+ServiceLocator.register('totalSipsEarned', 0);
+ServiceLocator.register('highestSipsPerSecond', 0);
+ServiceLocator.register('lastAutosaveClockMs', 0);
+console.log('✅ Services registered successfully');
+
 console.log('🔧 index.ts finished loading, App object created:', !!App);
 __pushDiag({ type: 'index', stage: 'end' });
 

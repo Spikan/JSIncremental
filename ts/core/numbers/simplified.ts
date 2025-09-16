@@ -1,22 +1,11 @@
 // Simplified Number System - Direct break_eternity.js Usage
 // Removes abstraction layers while maintaining functionality
 
-// Direct break_eternity.js access - lazy loading to avoid production issues
-let _Decimal: any = null;
-const getDecimal = () => {
-  if (!_Decimal) {
-    _Decimal = (globalThis as any).Decimal;
-    if (!_Decimal) {
-      throw new Error(
-        'Decimal library not available. Make sure break_eternity.js is loaded before this module.'
-      );
-    }
-  }
-  return _Decimal;
-};
+// Modern ES6 import - proper module resolution
+import Decimal from 'break_eternity.js';
 
 // Export Decimal for direct use
-export { getDecimal as Decimal };
+export { Decimal };
 export type DecimalType = any; // break_eternity.js Decimal type
 
 // Type for any numeric value that can be converted to Decimal
@@ -26,15 +15,13 @@ export type NumericValue = number | string | DecimalType | any;
  * Check if a value is a Decimal object
  */
 export function isDecimal(value: any): value is DecimalType {
-  return value && typeof value === 'object' && value.constructor === getDecimal();
+  return value && typeof value === 'object' && value.constructor === Decimal;
 }
 
 /**
  * Convert any value to Decimal - simplified version
  */
 export function toDecimal(value: NumericValue): DecimalType {
-  const Decimal = getDecimal();
-
   if (isDecimal(value)) {
     return value;
   }
