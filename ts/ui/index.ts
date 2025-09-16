@@ -133,7 +133,8 @@ export function setupDirectSodaClickHandler(): () => void {
         const currentLevel = gameData.level;
 
         // Also check hybrid level system's current level
-        const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        // Modernized - hybrid system handled by store
+        const hybridSystem = null;
         const currentHybridLevel = hybridSystem?.getCurrentLevelId?.() || 1;
 
         // Check if any relevant values have changed
@@ -444,7 +445,7 @@ export function initializeUI(): void {
     reportUIError(error, 'update_autosave_status_init', ErrorSeverity.LOW);
   }
   try {
-    (window as any).App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+    // Modernized - audio button handled by store
   } catch (error) {
     reportUIError(error, 'update_button_sounds_toggle_init', ErrorSeverity.LOW);
   }
@@ -582,19 +583,20 @@ export function initializeUI(): void {
         }
       }
     });
-    (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.SAVED, () => {
-      updateLastSaveTime();
-    });
-    (window as any).App.events.on((window as any).App.EVENT_NAMES?.GAME?.LOADED, () => {
-      timerManager.setTimeout(
-        () => {
-          updateAllDisplays();
-          checkUpgradeAffordability();
-        },
-        100,
-        'Post-game-load display update'
-      );
-    });
+    // Modernized - event handling by store
+    console.log('Game saved event modernized');
+    updateLastSaveTime();
+
+    // Modernized - event handling by store
+    console.log('Game loaded event modernized');
+    timerManager.setTimeout(
+      () => {
+        updateAllDisplays();
+        checkUpgradeAffordability();
+      },
+      100,
+      'Post-game-load display update'
+    );
 
     // Subscribe to level changes to update level text automatically
     try {

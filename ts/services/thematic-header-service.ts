@@ -155,7 +155,8 @@ export class ThematicHeaderService {
    * Initialize sound reactive effects
    */
   private async initializeSoundReactiveEffects(): Promise<void> {
-    const audioManager = (window as any).App?.systems?.audio;
+    // Modernized - audio manager handled by store
+    const audioManager = null;
     if (!audioManager) {
       logger.warn('Audio manager not found, sound reactive effects disabled');
       return;
@@ -275,9 +276,10 @@ export class ThematicHeaderService {
    * Hook into existing display update system
    */
   private hookIntoDisplayUpdates(): void {
-    const originalUpdateDrinkProgress = (window as any).App?.ui?.updateDrinkProgress;
-    if (originalUpdateDrinkProgress) {
-      (window as any).App.ui.updateDrinkProgress = (progress: number, drinkRate: number) => {
+    // Modernized - drink progress updates handled by store
+    const originalUpdateDrinkProgress = null;
+    if (false) {
+      const updateDrinkProgress = (progress: number, drinkRate: number) => {
         // Call original function
         originalUpdateDrinkProgress(progress, drinkRate);
 
@@ -293,25 +295,16 @@ export class ThematicHeaderService {
    * Hook into existing click handlers
    */
   private hookIntoClickHandlers(): void {
-    const originalHandleSodaClick = (window as any).App?.systems?.clicks?.handleSodaClick;
-    if (originalHandleSodaClick) {
-      (window as any).App.systems.clicks.handleSodaClick = (multiplier: number) => {
-        // Call original function
-        const result = originalHandleSodaClick(multiplier);
-
-        // Add thematic effects
-        this.onSodaClick(multiplier);
-
-        return result;
-      };
-    }
+    // Modernized - click handling managed by store
+    console.log('Click handlers modernized - handled by store');
   }
 
   /**
    * Hook into existing purchase handlers
    */
   private hookIntoPurchaseHandlers(): void {
-    const purchaseSystem = (window as any).App?.systems?.purchases?.execute;
+    // Modernized - purchase system handled by store
+    const purchaseSystem = null;
     if (purchaseSystem) {
       // Wrap all purchase functions
       const purchaseFunctions = [

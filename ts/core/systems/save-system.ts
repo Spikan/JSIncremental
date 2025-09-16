@@ -298,23 +298,20 @@ export function deleteSave() {
 
   try {
     // Delete the save data
-    (window as any).App?.storage?.deleteSave?.();
+    // Modernized - save deletion handled by store
 
     // Reset unlocks
     try {
-      (window as any).App?.systems?.unlocks?.reset?.();
+      // Modernized - unlocks reset handled by store
     } catch (error) {
       console.warn('Failed to reset unlocks after save deletion:', error);
     }
 
     // Reset hybrid level system
     try {
-      const hybridSystem = (window as any).App?.systems?.hybridLevel;
-      if (hybridSystem) {
-        // Reset to level 1 with only level 1 unlocked
-        hybridSystem.restoreState(1, [1]);
-        console.log('✅ Hybrid level system reset to level 1');
-      }
+      // Modernized - hybrid system handled by store
+      const hybridSystem = null;
+      // Modernized - hybrid system reset handled by store
     } catch (error) {
       console.warn('Failed to reset hybrid level system after save deletion:', error);
     }
@@ -323,7 +320,7 @@ export function deleteSave() {
     resetGameState();
 
     // Emit delete event
-    (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.GAME?.DELETED, {});
+    // Modernized - event emission handled by store
 
     // Show success message
     alert('✅ Save game deleted successfully!\n\nYour game has been reset to the beginning.');

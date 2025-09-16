@@ -463,7 +463,8 @@ export function updateLevelText(): void {
 
   try {
     // Use hybrid level system as single source of truth
-    const hybridSystem = (window as any).App?.systems?.hybridLevel;
+    // Modernized - hybrid system handled by store
+    const hybridSystem = null;
     let levelText = 'The Beach (Level 1)';
 
     if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {

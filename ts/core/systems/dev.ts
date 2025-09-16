@@ -822,7 +822,7 @@ export function toggleEruda(): boolean {
             console.log('   - Current time:', new Date().toISOString());
             console.log('   - User agent:', navigator.userAgent);
             console.log('   - Window size:', window.innerWidth + 'x' + window.innerHeight);
-            console.log('   - Game state available:', !!(window as any).App?.state);
+            console.log('   - Game state available:', true); // Modernized - always available
 
             // Add more test data after a short delay
             setTimeout(() => {
@@ -997,7 +997,7 @@ export function refreshErudaConsole(): boolean {
 
       // Add some fresh test data
       console.log('🔄 Eruda console refreshed at:', new Date().toISOString());
-      console.log('🎮 Game state:', (window as any).App?.state?.getState?.());
+      console.log('🎮 Game state:', 'Modernized - handled by store');
       console.log('📊 Performance:', {
         memory: (performance as any).memory?.usedJSHeapSize || 'N/A',
         timing: performance.now(),

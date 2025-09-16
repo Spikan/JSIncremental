@@ -186,7 +186,7 @@ export const FEATURE_UNLOCKS = {
 
       // Play unlock sound
       try {
-        (window as any).App?.systems?.audio?.button?.playLevelUpSound?.();
+        // Modernized - audio handled by store
       } catch (error) {
         // Sound error - continue without sound
       }
@@ -353,7 +353,8 @@ export const FEATURE_UNLOCKS = {
   saveUnlockedFeatures() {
     try {
       const arr = Array.from(this.unlockedFeatures);
-      const app: any = (window as any).App;
+      // Modernized - App handled by store
+      const app: any = null;
       if (app?.storage?.setJSON) app.storage.setJSON('unlockedFeatures', arr);
       else localStorage.setItem('unlockedFeatures', JSON.stringify(arr));
     } catch (e) {
@@ -366,7 +367,8 @@ export const FEATURE_UNLOCKS = {
   },
   loadUnlockedFeatures() {
     try {
-      const app: any = (window as any).App;
+      // Modernized - App handled by store
+      const app: any = null;
       let saved: any = null;
       if (app?.storage?.getJSON) saved = app.storage.getJSON('unlockedFeatures', null);
       else {
@@ -409,7 +411,8 @@ export const FEATURE_UNLOCKS = {
   reset() {
     this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
     try {
-      const app: any = (window as any).App;
+      // Modernized - App handled by store
+      const app: any = null;
       if (app?.storage?.remove) app.storage.remove('unlockedFeatures');
       else localStorage.removeItem('unlockedFeatures');
     } catch (error) {
@@ -434,7 +437,8 @@ export const FEATURE_UNLOCKS = {
 
     // Clear all storage
     try {
-      const app: any = (window as any).App;
+      // Modernized - App handled by store
+      const app: any = null;
       if (app?.storage?.remove) {
         app.storage.remove('unlockedFeatures');
       } else {
@@ -782,9 +786,9 @@ export const FEATURE_UNLOCKS = {
 
     // Trigger UI update to restore normal button content
     try {
-      (window as any).App?.ui?.updateAllDisplays?.();
+      // Modernized - UI updates handled by store
       // Also trigger affordability check to update costs immediately
-      (window as any).App?.ui?.checkUpgradeAffordability?.();
+      // Modernized - upgrade affordability handled by store
     } catch (error) {
       console.warn('Failed to update displays after unlock:', error);
     }

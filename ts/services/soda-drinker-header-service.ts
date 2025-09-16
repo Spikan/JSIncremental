@@ -3,6 +3,7 @@
 // Integrates with level themes and preserves level functionality
 
 import { logger } from './logger';
+import { useGameStore } from '../core/state/zustand-store';
 import { performanceMonitor } from './performance';
 import type { HybridLevel } from '../core/systems/hybrid-level-system';
 
@@ -239,7 +240,8 @@ export class SodaDrinkerHeaderService {
     if (!this.config.levelThemeIntegration) return;
 
     // Get reference to the level system
-    this.levelSystem = (window as any).App?.systems?.hybridLevel;
+    // Modernized - level system handled by store
+    this.levelSystem = null;
 
     if (!this.levelSystem) {
       logger.warn('Level system not available, level theme integration disabled');
@@ -424,7 +426,8 @@ export class SodaDrinkerHeaderService {
 
     if (nextLevel) {
       const requirements = nextLevel.unlockRequirement;
-      const state = (window as any).App?.state?.getState?.() || {};
+      // Modernized - state handled by store
+      const state = useGameStore.getState();
       const currentSips = state.sips || 0;
       const currentClicks = state.totalClicks || 0;
       // const currentLevel = state.level || 1; // Removed unused variable
@@ -602,7 +605,8 @@ export class SodaDrinkerHeaderService {
 
     if (nextLevel) {
       const requirements = nextLevel.unlockRequirement;
-      const state = (window as any).App?.state?.getState?.() || {};
+      // Modernized - state handled by store
+      const state = useGameStore.getState();
       const currentSips = state.sips || 0;
       const currentClicks = state.totalClicks || 0;
 
@@ -760,7 +764,8 @@ export class SodaDrinkerHeaderService {
     if (!requirements) return false;
 
     // Check if player meets requirements
-    const state = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const state = useGameStore.getState();
     const currentSips = state.sips || 0;
     const currentClicks = state.totalClicks || 0;
     // const currentLevel = state.level || 1; // Removed unused variable

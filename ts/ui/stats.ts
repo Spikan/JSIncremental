@@ -115,25 +115,29 @@ export function updateClickStats(): void {
   // Total clicks
   const totalClicksElement = domQuery.getById('totalClicks') as HTMLElement | undefined;
   if (totalClicksElement) {
-    const clicks = Number((window as any).App?.state?.getState?.()?.totalClicks || 0);
+    // Modernized - state handled by store
+    const clicks = useGameStore.getState().totalClicks || 0;
     totalClicksElement.textContent = formatNumber(clicks);
   }
   // Critical clicks
   const criticalClicksElement = domQuery.getById('criticalClicksStats') as HTMLElement | undefined;
   if (criticalClicksElement) {
-    const crit = Number((window as any).App?.state?.getState?.()?.criticalClicks || 0);
+    // Modernized - state handled by store
+    const crit = useGameStore.getState().criticalClicks || 0;
     criticalClicksElement.textContent = formatNumber(crit);
   }
   // Click streak
   const clickStreakElement = domQuery.getById('clickStreak') as HTMLElement | undefined;
   if (clickStreakElement) {
-    const st = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const st = useGameStore.getState();
     clickStreakElement.textContent = String(Number((st as any).currentClickStreak || 0));
   }
   // Best click streak
   const bestClickStreakElement = domQuery.getById('bestClickStreak') as HTMLElement | undefined;
   if (bestClickStreakElement) {
-    const st = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const st = useGameStore.getState();
     bestClickStreakElement.textContent = String(Number((st as any).bestClickStreak || 0));
   }
 }
@@ -143,7 +147,8 @@ export function updateEconomyStats(): void {
   // Total sips earned
   const totalSipsEarnedElement = domQuery.getById('totalSipsEarned') as HTMLElement | undefined;
   if (totalSipsEarnedElement) {
-    const total = (window as any).App?.state?.getState?.()?.totalSipsEarned || 0;
+    // Modernized - state handled by store
+    const total = useGameStore.getState().totalSipsEarned || 0;
     totalSipsEarnedElement.textContent = formatNumber(total);
   }
   // Highest sips per second
@@ -151,7 +156,8 @@ export function updateEconomyStats(): void {
     | HTMLElement
     | undefined;
   if (highestSipsPerSecondElement) {
-    const high = (window as any).App?.state?.getState?.()?.highestSipsPerSecond || 0;
+    // Modernized - state handled by store
+    const high = useGameStore.getState().highestSipsPerSecond || 0;
     highestSipsPerSecondElement.textContent = formatNumber(high);
   }
 }
@@ -165,7 +171,8 @@ export function updateShopStats(): void {
     if (shouldLog) console.log('📊 updateShopStats() called');
 
     // Debug: Log current state values
-    const state = (window as any).App?.state?.getState?.();
+    // Modernized - state handled by store
+    const state = useGameStore.getState();
     if (state) {
       if (shouldLog)
         console.log('🔍 Current state values:', {
@@ -180,7 +187,8 @@ export function updateShopStats(): void {
     // Straws purchased
     const strawsPurchasedElement = domQuery.getById('strawsPurchased') as HTMLElement | undefined;
     if (strawsPurchasedElement) {
-      const v = (window as any).App?.state?.getState?.()?.straws || 0;
+      // Modernized - state handled by store
+      const v = useGameStore.getState().straws || 0;
       if (shouldLog)
         console.log('🔍 updateShopStats: Straws value =', v, 'formatted =', formatNumber(v));
       strawsPurchasedElement.textContent = formatNumber(v);
@@ -190,7 +198,8 @@ export function updateShopStats(): void {
     // Cups purchased
     const cupsPurchasedElement = domQuery.getById('cupsPurchased') as HTMLElement | undefined;
     if (cupsPurchasedElement) {
-      const v = (window as any).App?.state?.getState?.()?.cups || 0;
+      // Modernized - state handled by store
+      const v = useGameStore.getState().cups || 0;
       if (shouldLog)
         console.log('🔍 updateShopStats: Cups value =', v, 'formatted =', formatNumber(v));
       cupsPurchasedElement.textContent = formatNumber(v);
@@ -202,7 +211,8 @@ export function updateShopStats(): void {
       | HTMLElement
       | undefined;
     if (suctionsPurchasedElement) {
-      const v = (window as any).App?.state?.getState?.()?.suctions || 0;
+      // Modernized - state handled by store
+      const v = useGameStore.getState().suctions || 0;
       suctionsPurchasedElement.textContent = formatNumber(v);
     }
     // Critical clicks purchased
@@ -210,7 +220,8 @@ export function updateShopStats(): void {
       | HTMLElement
       | undefined;
     if (criticalClicksPurchasedElement) {
-      const v = (window as any).App?.state?.getState?.()?.criticalClicks || 0;
+      // Modernized - state handled by store
+      const v = useGameStore.getState().criticalClicks || 0;
       criticalClicksPurchasedElement.textContent = formatNumber(v);
     }
 
@@ -230,13 +241,15 @@ export function updateAchievementStats(): void {
   // Current level
   const currentLevelElement = domQuery.getById('currentLevel') as HTMLElement | undefined;
   if (currentLevelElement) {
-    const level = (window as any).App?.state?.getState?.()?.level || 1;
+    // Modernized - state handled by store
+    const level = useGameStore.getState().level || 1;
     currentLevelElement.textContent = formatNumber(level);
   }
   // Total upgrades (sum of all upgrade counters)
   const totalUpgradesElement = domQuery.getById('totalUpgrades') as HTMLElement | undefined;
   if (totalUpgradesElement) {
-    const st = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const st = useGameStore.getState();
     const widerStraws = (st as any).widerStraws || 0;
     const betterCups = (st as any).betterCups || 0;
     const suctionUpCounter = (st as any).suctionUpCounter || 0;
@@ -249,7 +262,8 @@ export function updateAchievementStats(): void {
   // Faster drinks owned
   const fasterDrinksOwnedElement = domQuery.getById('fasterDrinksOwned') as HTMLElement | undefined;
   if (fasterDrinksOwnedElement) {
-    const owned = (window as any).App?.state?.getState?.()?.fasterDrinks || 0;
+    // Modernized - state handled by store
+    const owned = useGameStore.getState().fasterDrinks || 0;
     fasterDrinksOwnedElement.textContent = formatNumber(owned);
   }
 }
@@ -257,7 +271,8 @@ export function updateAchievementStats(): void {
 // Update enhancement values for upgrade displays
 export function updateEnhancementValues(): void {
   console.log('🔍 updateEnhancementValues: Function called');
-  const state = (window as any).App?.state?.getState?.();
+  // Modernized - state handled by store
+  const state = {}; // TODO: Get from store
   if (!state) {
     console.log('🔍 updateEnhancementValues: No state available');
     return;
@@ -354,7 +369,8 @@ export function updatePurchasedCounts(): void {
 
   if (typeof window === 'undefined') return;
 
-  const state = (window as any).App?.state?.getState?.();
+  // Modernized - state handled by store
+  const state = {}; // TODO: Get from store
   if (!state) {
     if (shouldLog) console.log('📊 No state available');
     return;

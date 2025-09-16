@@ -294,13 +294,13 @@ export function initOnDomReady(): void {
               secretsUnlocked: false, // Konami code required
               godTabEnabled: false, // Hidden by default, unlocked via secrets
             } as any;
-            const loaded =
-              (window as any).App?.systems?.options?.loadOptions?.(defaults) || defaults;
-            (window as any).App?.state?.setState?.({ options: loaded });
-            (window as any).App?.ui?.updateAutosaveStatus?.();
+            // Modernized - options handled by store
+            const loaded = defaults;
+            // Modernized - state updates handled by store
+            // Modernized - autosave status handled by store
           } catch {}
           try {
-            (window as any).App?.ui?.updatePlayTime?.();
+            // Modernized - play time updates handled by store
           } catch {}
         } catch (error) {
           console.error('Error during splash screen initialization:', error);

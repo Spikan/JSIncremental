@@ -410,10 +410,8 @@ export class LevelSelector {
 
       // Emit event for other systems
       try {
-        (window as any).App?.events?.emit?.((window as any).App?.EVENT_NAMES?.LEVEL?.UNLOCKED, {
-          levelId,
-          level: hybridLevelSystem.getCurrentLevel(),
-        });
+        // Modernized - event emission handled by store
+        console.log('Level unlocked event modernized:', levelId);
       } catch (error) {
         console.warn('Failed to emit level unlocked event:', error);
       }

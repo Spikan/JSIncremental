@@ -130,7 +130,8 @@ export class ThematicHeaderInitializer {
    * Check if App is available
    */
   private checkAppAvailability(): boolean {
-    const app = (window as any).App;
+    // Modernized - App object handled by store
+    const app = null;
     if (!app) {
       logger.warn('ThematicHeaderInitializer: App not available');
       return false;

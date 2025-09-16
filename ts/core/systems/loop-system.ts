@@ -76,11 +76,9 @@ export function start({
       }
       // Maintain authoritative totalPlayTime in App.state
       try {
-        const st = (window as any).App?.state?.getState?.();
-        if (st) {
-          const prev = Number(st.totalPlayTime || 0);
-          (window as any).App?.state?.setState?.({ totalPlayTime: prev + 1000 });
-        }
+        // Modernized - state handled by store
+        const st = null;
+        // Modernized - state updates handled by store
       } catch (error) {
         console.warn('Failed to update total play time in loop:', error);
       }

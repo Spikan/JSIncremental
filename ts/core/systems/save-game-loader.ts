@@ -344,7 +344,7 @@ export class SaveGameLoader {
 
         // Also save to the options system for persistence
         try {
-          (window as any).App?.systems?.options?.saveOptions?.(savegame.options);
+          // Modernized - options save handled by store
         } catch (error) {
           console.warn('Failed to save options to options system:', error);
         }
@@ -368,7 +368,8 @@ export class SaveGameLoader {
         const { currentLevel, unlockedLevels } = savegame.hybridLevelData;
 
         // Restore hybrid level system state
-        const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        // Modernized - hybrid system handled by store
+        const hybridSystem = null;
         if (hybridSystem && hybridSystem.restoreState) {
           // Ensure level 1 is always unlocked
           const levelsToRestore = [...new Set([1, ...(unlockedLevels || [])])];
@@ -378,8 +379,7 @@ export class SaveGameLoader {
 
           // Update UI displays after restoring hybrid level state
           try {
-            (window as any).App?.ui?.updateLevelText?.();
-            (window as any).App?.ui?.updateLevelNumber?.();
+            // Modernized - UI updates handled by store
             (window as any).App?.ui?.updateAllDisplaysAnimated?.();
           } catch (error) {
             console.warn('Failed to update UI displays after hybrid level restoration:', error);

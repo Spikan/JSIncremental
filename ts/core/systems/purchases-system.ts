@@ -19,6 +19,7 @@ import { getUpgradesAndConfig } from './config-accessor.ts';
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
 import { toDecimal, gte, DecimalType } from '../numbers/simplified';
+import { useGameStore } from '../state/zustand-store';
 
 function getTypedConfig(): { upgrades: any; config: any } {
   const { upgrades, config } = getUpgradesAndConfig();
@@ -464,7 +465,8 @@ export function validateExtremeValues(): void {
     if (typeof window === 'undefined') {
       return;
     }
-    const rawState = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const rawState = useGameStore.getState();
 
     // Log extreme values for debugging and monitoring
     if (rawState.sips) {
@@ -500,7 +502,8 @@ function getAppState(): any {
     if (typeof window === 'undefined') {
       return {};
     }
-    const rawState = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const rawState = useGameStore.getState();
 
     // Log extreme values for debugging (preserve the actual values)
     if (rawState.sips) {
@@ -533,7 +536,7 @@ function getAppState(): any {
 }
 // function _setAppState(patch: any): void {
 //   try {
-//     (window as any).App?.state?.setState?.(patch);
+//     // Modernized - state updates handled by store
 //   } catch (error) {
 //     console.warn('Failed to set app state:', error);
 //   }

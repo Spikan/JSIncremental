@@ -1,6 +1,8 @@
 // Hybrid Level System - Combines SDP authentic levels with incremental mechanics
 // Integrates 100+ real Soda Drinker Pro levels with our progression system
 
+import { useGameStore } from '../state/zustand-store';
+
 export interface HybridLevel {
   id: number;
   name: string;
@@ -369,7 +371,7 @@ export class HybridLevelSystem {
 
     // Also update the level text display
     try {
-      (window as any).App?.ui?.updateLevelText?.();
+      // Modernized - level text updates handled by store
     } catch (error) {
       console.warn('Failed to update level text during initialization:', error);
     }
@@ -381,7 +383,8 @@ export class HybridLevelSystem {
 
   getNextUnlockableLevel(): HybridLevel | null {
     const allLevels = this.getAllLevels();
-    const state = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const state = useGameStore.getState();
     const sips = state.sips || new Decimal(0);
     const clicks = state.totalClicks || 0;
 
@@ -412,7 +415,8 @@ export class HybridLevelSystem {
       return false;
     }
 
-    const state = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const state = useGameStore.getState();
     const sips = state.sips || new Decimal(0);
     const clicks = state.totalClicks || 0;
 
@@ -839,7 +843,8 @@ export class HybridLevelSystem {
     }
 
     const newlyUnlocked: number[] = [];
-    const state = (window as any).App?.state?.getState?.() || {};
+    // Modernized - state handled by store
+    const state = useGameStore.getState();
     const sips = state.sips || new Decimal(0);
     const clicks = state.totalClicks || 0;
 

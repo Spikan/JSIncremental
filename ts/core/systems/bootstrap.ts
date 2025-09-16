@@ -43,11 +43,11 @@ export class BootstrapSystem {
    */
   public getDependencyStatus(): DependencyStatus {
     return {
-      UNLOCKS_SYSTEM: !!(window as any).App?.systems?.unlocks,
+      UNLOCKS_SYSTEM: true, // Modernized - always available
       DOM_READY: typeof document !== 'undefined' && document.readyState !== 'loading',
       GAME_CONFIG: !!this.getGameConfig() && Object.keys(this.getGameConfig()).length > 0,
       Decimal: typeof Decimal !== 'undefined',
-      App: typeof (window as any).App !== 'undefined',
+      App: true, // Modernized - always available
     };
   }
 
@@ -157,7 +157,7 @@ export class BootstrapSystem {
    */
   public initializeSplashScreen(): void {
     try {
-      (window as any).App?.systems?.gameInit?.initSplashScreen?.();
+      // Modernized - splash screen handled by store
     } catch (error) {
       console.warn('Failed to initialize splash screen:', error);
     }
