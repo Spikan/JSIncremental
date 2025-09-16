@@ -149,6 +149,7 @@ try {
 }
 
 // Ensure a default, non-blocking initOnDomReady exists even if early imports stall
+console.log('🔧 About to start tryBoot initialization...');
 try {
   // Simplified initialization - using proper module imports instead of complex nested structure
   console.log('🔧 Starting tryBoot initialization...');
@@ -160,8 +161,8 @@ try {
     let retryCount = 0;
     const maxRetries = 50; // 5 seconds max
     const tryBoot = () => {
+      console.log(`🔧 tryBoot called (attempt ${retryCount + 1}/${maxRetries})`);
       try {
-        console.log(`🔧 tryBoot called (attempt ${retryCount + 1}/${maxRetries})`);
         if (retryCount >= maxRetries) {
           console.error('❌ Max retries reached for loop system initialization');
           return;
@@ -276,7 +277,9 @@ try {
       setTimeout(tryBoot, 100);
     };
     tryBoot();
-  } catch {}
+  } catch (error) {
+    console.error('❌ Error in outer tryBoot wrapper:', error);
+  }
 
   // After 1s, force-show game content to avoid being stuck on splash
   setTimeout(() => {
