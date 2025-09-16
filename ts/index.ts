@@ -29,7 +29,6 @@ function __pushDiag(_marker: any): void {
 }
 
 console.log('🔧 index.ts starting App initialization...');
-const startedAt = Date.now();
 __pushDiag({ type: 'index', stage: 'start' });
 // Report resolved base for dynamic imports
 try {
@@ -285,14 +284,16 @@ try {
   } catch {}
 
   // After 1s, force-show game content to avoid being stuck on splash
-  if (Date.now() - startedAt > 1000) {
+  setTimeout(() => {
     try {
       const splash = document.getElementById('splashScreen') as any;
       const game = document.getElementById('gameContent') as any;
-      if (splash && game) {
+      if (splash && game && splash.style.display !== 'none') {
+        console.log('🔄 Force-hiding splash screen after timeout');
         splash.style.display = 'none';
         splash.style.visibility = 'hidden';
         splash.style.pointerEvents = 'none';
+        if (splash.parentNode) splash.parentNode.removeChild(splash);
         game.style.display = 'block';
         game.style.visibility = 'visible';
         game.style.opacity = '1';
@@ -387,8 +388,7 @@ try {
         } catch {}
       }
     } catch {}
-  }
-  setTimeout(() => {}, 100);
+  }, 1000);
 } catch {}
 
 __pushDiag({ type: 'wire', module: 'initOnDomReady-default' });

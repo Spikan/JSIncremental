@@ -9,7 +9,8 @@
     <link rel="stylesheet" type="text/css" href="css/style-header-fixed.css" />
     <link rel="stylesheet" type="text/css" href="css/soda-drinker-header-v2.css" />
     <link rel="stylesheet" type="text/css" href="css/theme-system.css" />
-    <link rel="icon" type="image/png" href="images/regSoda.png" />
+    <link rel="icon" href="images/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="images/apple-touch-icon-180x180.png" />
     <!-- Ensure Decimal/Zod are available before any modules execute (prod places module in head) -->
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
@@ -389,6 +390,16 @@
               </button>
             </div>
           </div>
+        </div>
+
+        <!-- PWA Status Indicators -->
+        <div class="pwa-indicators">
+          <div id="offline-indicator" class="offline-indicator" style="display: none">
+            📴 Offline - Game continues with cached data
+          </div>
+          <button id="pwa-install-button" class="pwa-install-button" style="display: none">
+            📱 Install App
+          </button>
         </div>
       </div>
       <!-- Main Game Content -->
@@ -847,7 +858,7 @@
                 <div class="dev-input-row">
                   <input type="number" id="devCustomSips" placeholder="Amount" class="dev-input" />
                   <button
-                    onclick="const input = document.getElementById('devCustomSips'); const amount = input.value; if(amount) { const btn = document.querySelector('[data-action=devAddSips]'); if(btn) { btn.setAttribute('data-args', amount); btn.click(); input.value = ''; } }"
+                    onclick="const sipsInput = document.getElementById('devCustomSips'); const amount = sipsInput.value; if(amount) { const btn = document.querySelector('[data-action=devAddSips]'); if(btn) { btn.setAttribute('data-args', amount); btn.click(); sipsInput.value = ''; } }"
                     class="dev-btn"
                   >
                     ➕ Add
@@ -859,7 +870,7 @@
                 <div class="dev-input-row">
                   <input type="number" id="devCustomTime" placeholder="Hours" class="dev-input" />
                   <button
-                    onclick="const input = document.getElementById('devCustomTime'); const hours = input.value; if(hours) { const ms = hours * 60 * 60 * 1000; const btn = document.querySelector('[data-action=devAddTime]'); if(btn) { btn.setAttribute('data-args', ms); btn.click(); input.value = ''; } }"
+                    onclick="const timeInput = document.getElementById('devCustomTime'); const hours = timeInput.value; if(hours) { const ms = hours * 60 * 60 * 1000; const btn = document.querySelector('[data-action=devAddTime]'); if(btn) { btn.setAttribute('data-args', ms); btn.click(); timeInput.value = ''; } }"
                     class="dev-btn"
                   >
                     ➕ Add

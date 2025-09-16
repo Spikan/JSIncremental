@@ -29,12 +29,20 @@ export class BootstrapSystem {
       .filter(([, ok]) => !ok)
       .map(([k]) => k);
 
-    if (missing.length > 0) {
-      console.log('⏳ Waiting for dependencies:', missing.join(', '));
+    // Only block on critical dependencies, not all of them
+    const criticalDependencies = ['DOM_READY', 'Decimal'];
+    const criticalMissing = missing.filter(dep => criticalDependencies.includes(dep));
+
+    if (criticalMissing.length > 0) {
+      console.log('⏳ Waiting for critical dependencies:', criticalMissing.join(', '));
       return false;
     }
 
-    console.log('✅ All dependencies are ready');
+    if (missing.length > 0) {
+      console.log('⚠️ Some non-critical dependencies missing:', missing.join(', '), '- proceeding anyway');
+    }
+
+    console.log('✅ Critical dependencies are ready');
     return true;
   }
 
@@ -55,7 +63,46 @@ export class BootstrapSystem {
    * Get game configuration
    */
   public getGameConfig(): any {
-    return (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
+    // Try to get config from window first (for legacy compatibility)
+    if (typeof window !== 'undefined' && (window as any).GAME_CONFIG) {
+      return (window as any).GAME_CONFIG;
+    }
+    
+    // Fallback: return a minimal config to prevent initialization blocking
+    console.warn('GAME_CONFIG not available on window, using fallback config');
+    return {
+      BALANCE: {
+        STRAW_BASE_COST: 25,
+        STRAW_SCALING: 1.12,
+        CUP_BASE_COST: 100,
+        CUP_SCALING: 1.15,
+        SUCTION_BASE_COST: 10,
+        SUCTION_SCALING: 1.1,
+        FASTER_DRINKS_BASE_COST: 80,
+        FASTER_DRINKS_SCALING: 1.1,
+        WIDER_STRAWS_BASE_COST: 150,
+        WIDER_STRAWS_SCALING: 1.12,
+        BETTER_CUPS_BASE_COST: 400,
+        BETTER_CUPS_SCALING: 1.12,
+        STRAW_BASE_SPD: 2.0,
+        CUP_BASE_SPD: 5.0,
+        SUCTION_CLICK_BONUS: 1.0,
+        BASE_SIPS_PER_DRINK: 1,
+        WIDER_STRAWS_MULTIPLIER: 0.5,
+        BETTER_CUPS_MULTIPLIER: 0.4,
+      },
+      TIMING: {
+        DEFAULT_DRINK_RATE: 5000,
+        MIN_SAVE_INTERVAL: 1000,
+        AUTOSAVE_INTERVAL: 10,
+        DOM_READY_DELAY: 100,
+      },
+      LIMITS: {
+        MAX_CLICK_TIMES: 100,
+        TARGET_FPS: 60,
+        STATS_UPDATE_INTERVAL: 1000,
+      },
+    };
   }
 
   /**
@@ -76,13 +123,19 @@ export class BootstrapSystem {
   /**
    * Wait for dependencies to be ready
    */
-  public waitForDependencies(onGameReady: () => void): void {
+  public waitForDependencies(onGameReady: () => void, maxRetries = 50): void {
+    const retryCount = (window as any).__bootstrapRetryCount || 0;
+    
     if (this.areDependenciesReady()) {
       console.log('🚀 All dependencies ready, initializing game...');
       onGameReady();
+    } else if (retryCount < maxRetries) {
+      console.log(`⏳ Dependencies not ready, retrying in 100ms... (${retryCount + 1}/${maxRetries})`);
+      (window as any).__bootstrapRetryCount = retryCount + 1;
+      setTimeout(() => this.waitForDependencies(onGameReady, maxRetries), 100);
     } else {
-      console.log('⏳ Dependencies not ready, retrying in 100ms...');
-      setTimeout(() => this.waitForDependencies(onGameReady), 100);
+      console.warn('⚠️ Max retries reached, initializing game anyway with available dependencies');
+      onGameReady();
     }
   }
 

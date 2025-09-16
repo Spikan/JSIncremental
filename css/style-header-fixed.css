@@ -1084,28 +1084,31 @@ body {
   font-size: clamp(0.8rem, 3vw, 14px);
   margin: 0;
 }
-from {
-  opacity: 0;
-  text-shadow:
-    3px 3px 0px #000,
-    0 0 10px #ff3d02;
-  transform: translateY(10px);
-  filter: brightness(1);
-}
-to {
-  opacity: 1;
-  text-shadow:
-    3px 3px 0px #000,
-    0 0 20px #ff3d02,
-    0 0 30px #ff3d02;
-  transform: translateY(0);
-  filter: brightness(1.2);
-}
-50% {
-  opacity: 0.9;
-  transform: translateY(-20px) scale(1.1);
-  background: linear-gradient(135deg, #00d97f, #00b36b);
-  box-shadow: 0 3px 12px rgba(16, 185, 129, 0.6);
+
+@keyframes splashTitleAnimation {
+  from {
+    opacity: 0;
+    text-shadow:
+      3px 3px 0px #000,
+      0 0 10px #ff3d02;
+    transform: translateY(10px);
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-20px) scale(1.1);
+    background: linear-gradient(135deg, #00d97f, #00b36b);
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.6);
+  }
+  to {
+    opacity: 1;
+    text-shadow:
+      3px 3px 0px #000,
+      0 0 20px #ff3d02,
+      0 0 30px #ff3d02;
+    transform: translateY(0);
+    filter: brightness(1.2);
+  }
 }
 .game-content {
   width: 100%;
@@ -1213,19 +1216,22 @@ to {
   animation: ripple 0.6s ease-out;
   border: 3px solid #10b981;
 }
-0% {
-  opacity: 1;
-  transform: scale(0.8);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #00b36b, #00d97f);
-  background-position: -200% 0;
-}
-100% {
-  opacity: 0;
-  transform: scale(1.2);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(135deg, #00b36b, #00d97f);
-  background-position: 200% 0;
+
+@keyframes ripple {
+  0% {
+    opacity: 1;
+    transform: scale(0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #00b36b, #00d97f);
+    background-position: -200% 0;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #00b36b, #00d97f);
+    background-position: 200% 0;
+  }
 }
 .soda-stats {
   display: grid;
@@ -2877,11 +2883,23 @@ to {
   transition: all 0.2s ease;
   font-weight: 500;
 }
-70% {
-  box-shadow: 0 0 0 20px rgba(188, 0, 255, 0);
-  opacity: 0.8;
-  transform: translateY(-25px) scale(1.05);
+
+@keyframes clickFeedback {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(188, 0, 255, 0);
+    opacity: 0.8;
+    transform: translateY(-25px) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(1.1);
+  }
 }
+
 .click-feedback {
   animation: clickFeedback 1s ease-out forwards;
   pointer-events: none;
@@ -3861,33 +3879,44 @@ button:hover {
     0 0 8px rgba(188, 0, 255, 0.5);
   animation: purchaseFeedback 2s ease-out forwards;
 }
-25% {
-  opacity: 1;
-  transform: translateY(-10px) scale(1.2);
-}
-75% {
-  opacity: 0.7;
-  transform: translateY(-30px) scale(1.15);
-}
-20% {
-  opacity: 1;
-  transform: translateY(-15px) scale(1.3);
-}
-40% {
-  opacity: 1;
-  transform: translateY(-10px);
-}
-60% {
-  opacity: 0.9;
-  transform: translateY(-5px);
-}
-80% {
-  opacity: 0.7;
-  transform: translateY(-45px) scale(1.1);
-}
-30% {
-  opacity: 1;
-  transform: translateY(-15px) scale(1.1);
+
+@keyframes purchaseFeedback {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-15px) scale(1.3);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.2);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-15px) scale(1.1);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+  60% {
+    opacity: 0.9;
+    transform: translateY(-5px);
+  }
+  75% {
+    opacity: 0.7;
+    transform: translateY(-30px) scale(1.15);
+  }
+  80% {
+    opacity: 0.7;
+    transform: translateY(-45px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(1.2);
+  }
 }
 .soda-button canvas {
   border-radius: 20px;
@@ -5864,4 +5893,79 @@ p {
   text-align: right;
   font-weight: bold;
   color: #4a9eff;
+}
+
+/* PWA Indicators */
+.pwa-indicators {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.offline-indicator {
+  background: rgba(255, 193, 7, 0.9);
+  color: #000;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+.pwa-install-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.pwa-install-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.pwa-install-button:active {
+  transform: translateY(0);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Mobile adjustments for PWA indicators */
+@media (max-width: 768px) {
+  .pwa-indicators {
+    top: 5px;
+    right: 5px;
+  }
+
+  .offline-indicator {
+    font-size: 10px;
+    padding: 6px 10px;
+  }
+
+  .pwa-install-button {
+    font-size: 10px;
+    padding: 6px 12px;
+  }
 }

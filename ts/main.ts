@@ -13,6 +13,7 @@
 import { domQuery } from './services/dom-query';
 import { timerManager } from './services/timer-manager';
 import { useGameStore } from './core/state/zustand-store';
+import { pwaService } from './services/pwa-service';
 
 import { config as GC } from './config';
 // Decimal is declared in global types
@@ -60,6 +61,7 @@ export { initGame };
 function initGame() {
   try {
     // Starting game initialization
+    console.log('🔧 Starting game initialization...');
     console.log('🔧 Unlocks system available:', true); // Modernized - always available
     // Modernized - unlocks system always available
     if (typeof document === 'undefined' || !domQuery.exists('#sodaButton')) {
@@ -67,15 +69,49 @@ function initGame() {
       timerManager.setTimeout(initGame, 100, 'Retry initGame - DOM not ready');
       return;
     }
+
+    // Initialize PWA service
+    try {
+      pwaService.getStatus(); // This initializes the service
+      console.log('📱 PWA service initialized');
+
+      // Add install button click handler
+      const installButton = document.getElementById('pwa-install-button');
+      if (installButton) {
+        installButton.addEventListener('click', async () => {
+          const success = await pwaService.installApp();
+          if (success) {
+            console.log('✅ PWA installed successfully');
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('PWA service initialization failed:', error);
+    }
     if (!GC || (typeof GC === 'object' && Object.keys(GC).length === 0)) {
       console.log('⏳ Waiting for GAME_CONFIG to load...');
-      timerManager.setTimeout(initGame, 100, 'Retry initGame - unlocks system');
-      return;
+      // Don't retry indefinitely - use fallback config after a few attempts
+      const retryCount = (window as any).__initGameRetryCount || 0;
+      if (retryCount < 10) {
+        (window as any).__initGameRetryCount = retryCount + 1;
+        timerManager.setTimeout(initGame, 100, 'Retry initGame - GAME_CONFIG');
+        return;
+      } else {
+        console.warn('⚠️ GAME_CONFIG not available after 10 retries, using fallback values');
+      }
     }
 
     const CONF = GC || {};
-    const BAL = CONF.BALANCE || {};
-    const TIMING = CONF.TIMING || {};
+    const BAL = CONF.BALANCE || {
+      STRAW_BASE_SPD: 2.0,
+      CUP_BASE_SPD: 5.0,
+      BASE_SIPS_PER_DRINK: 1,
+      WIDER_STRAWS_MULTIPLIER: 0.5,
+      BETTER_CUPS_MULTIPLIER: 0.4,
+    };
+    const TIMING = CONF.TIMING || {
+      DEFAULT_DRINK_RATE: 5000,
+    };
 
     // Initialize state through Zustand store instead of legacy globals
     // All state is now managed through App.state
@@ -365,14 +401,50 @@ function initGame() {
     }
   } catch (error) {
     console.error('Error in initGame:', error);
+    
+    // Always try to show the game even if initialization fails
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     if (splashScreen && gameContent) {
-      splashScreen.style.display = 'none';
-      gameContent.style.display = 'block';
+      try {
+        splashScreen.style.display = 'none';
+        splashScreen.style.visibility = 'hidden';
+        splashScreen.style.pointerEvents = 'none';
+        if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
+      } catch (e) {
+        console.warn('Failed to hide splash screen:', e);
+      }
+      
+      try {
+        gameContent.style.display = 'block';
+        gameContent.style.visibility = 'visible';
+        gameContent.style.opacity = '1';
+        gameContent.classList?.add('active');
+        document.body?.classList?.add('game-started');
+      } catch (e) {
+        console.warn('Failed to show game content:', e);
+      }
 
       // DOM elements are already available, no reinitialization needed
       console.log('🔄 Game content is visible, DOM elements are ready');
+      
+      // Try to start a minimal game loop even if initGame failed
+      try {
+        const w = window as any;
+        if (w.App?.systems?.loop?.start) {
+          w.App.systems.loop.start({
+            updateDrinkProgress: () => {},
+            processDrink: () => {},
+            updateStats: () => {},
+            updateUI: () => {},
+            updatePlayTime: () => {},
+            updateLastSaveTime: () => {},
+          });
+          console.log('🔄 Minimal game loop started as fallback');
+        }
+      } catch (e) {
+        console.warn('Failed to start minimal game loop:', e);
+      }
     }
   }
 }

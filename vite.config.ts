@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // Helper function to get base path for deployment
 function getBasePath(): string {
@@ -63,6 +64,76 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: getBasePath(),
+
+    plugins: [
+      VitePWA({
+        registerType: 'autoUpdate',
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3,glb,ttf}'],
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/cdn\.jsdelivr\.net/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'cdn-cache',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/unpkg\.com/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'unpkg-cache',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                },
+              },
+            },
+          ],
+        },
+        manifest: {
+          name: 'Soda Clicker Pro',
+          short_name: 'SodaClicker',
+          description: 'The Ultimate Soda Drinking Experience - An incremental idle game',
+          theme_color: '#1a1a2e',
+          background_color: '#16213e',
+          display: 'standalone',
+          orientation: 'portrait',
+          start_url: '/',
+          scope: '/',
+          icons: [
+            {
+              src: 'images/pwa-64x64.png',
+              sizes: '64x64',
+              type: 'image/png',
+            },
+            {
+              src: 'images/pwa-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+            },
+            {
+              src: 'images/pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+            },
+            {
+              src: 'images/maskable-icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable',
+            },
+          ],
+          categories: ['games', 'entertainment'],
+          lang: 'en',
+          dir: 'ltr',
+        },
+      }),
+    ],
 
     build: {
       target: 'esnext',
