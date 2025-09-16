@@ -115,12 +115,41 @@ try {
   // Load loop system immediately - this is critical for game functionality
   try {
     console.log('🔧 About to import loop system...');
-    const loopModule = await import('./core/systems/loop-system.ts');
+    const loopModule = await Promise.race([
+      import('./core/systems/loop-system.ts'),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Loop system import timeout')), 5000)
+      ),
+    ]);
     console.log('🔧 Loop system import completed, assigning to App...');
     Object.assign(App.systems.loop, loopModule);
     console.log('✅ Loop system loaded');
   } catch (e) {
     console.error('❌ Failed to load loop system:', e);
+    console.log('🔧 Creating fallback loop system...');
+    // Create a minimal fallback loop system
+    App.systems.loop = {
+      start: (args: any) => {
+        console.log('🔧 Fallback loop system started');
+        // Minimal fallback implementation
+        const tick = () => {
+          try {
+            if (args.updateDrinkProgress) args.updateDrinkProgress();
+            if (args.processDrink) args.processDrink();
+            if (args.updateUI) args.updateUI();
+            if (args.updateStats) args.updateStats();
+          } catch (error) {
+            console.warn('Fallback loop error:', error);
+          }
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      },
+      stop: () => {
+        console.log('🔧 Fallback loop system stopped');
+      },
+    };
+    console.log('✅ Fallback loop system created');
     __pushDiag({
       type: 'wire',
       module: 'loop-critical',
@@ -132,7 +161,12 @@ try {
   // Load drink system immediately - also critical
   try {
     console.log('🔧 About to import drink system...');
-    const drinkModule = await import('./core/systems/drink-system.ts');
+    const drinkModule = await Promise.race([
+      import('./core/systems/drink-system.ts'),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Drink system import timeout')), 5000)
+      ),
+    ]) as any;
     console.log('🔧 Drink system import completed, processing factory...');
     const factory = drinkModule.processDrinkFactory?.();
     if (factory) {
@@ -141,6 +175,34 @@ try {
     }
   } catch (e) {
     console.warn('⚠️ Failed to load drink system:', e);
+    console.log('🔧 Creating fallback drink system...');
+    // Create a minimal fallback drink system
+    App.systems.drink = {
+      processDrink: () => {
+        console.log('🔧 Fallback drink system called');
+        // Minimal fallback implementation
+        try {
+          const w: any = window;
+          const state = w.App?.state?.getState?.() || {};
+          const drinkRate = Number(state.drinkRate ?? 1000);
+          const lastDrinkTime = Number(state.lastDrinkTime ?? 0);
+          const now = Date.now();
+
+          if (now - lastDrinkTime >= drinkRate) {
+            const spd = Number(state.spd ?? 1);
+            w.sips = (w.sips || 0) + spd;
+            w.App?.state?.setState?.({
+              sips: w.sips,
+              lastDrinkTime: now,
+              drinkProgress: 0,
+            });
+          }
+        } catch (error) {
+          console.warn('Fallback drink error:', error);
+        }
+      },
+    };
+    console.log('✅ Fallback drink system created');
   }
 
   // Other systems can load asynchronously
