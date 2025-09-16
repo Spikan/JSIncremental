@@ -2,7 +2,6 @@
 
 console.log('🚀 ts/index.ts module loading...');
 console.log('🔧 Module execution started');
-alert('TypeScript module is executing!');
 (window as any).__tsIndexLoaded = true;
 
 import { useGameStore } from './core/state/zustand-store.ts';

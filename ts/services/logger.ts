@@ -17,8 +17,8 @@ class Logger {
   constructor() {
     this.isProduction = import.meta.env.PROD;
     this.config = {
-      level: this.isProduction ? 'warn' : 'debug',
-      enableInProduction: false,
+      level: this.isProduction ? 'debug' : 'debug', // Enable debug logging in production for debugging
+      enableInProduction: true, // Enable logging in production for debugging
       enableTimestamps: !this.isProduction,
       enableCallerInfo: !this.isProduction,
     };

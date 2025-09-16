@@ -143,12 +143,9 @@ export default defineConfig(({ mode }) => {
       minify: isAnalyze ? false : 'terser',
       terserOptions: {
         compress: {
-          drop_console: mode === 'production' && !isAnalyze,
+          drop_console: false, // Temporarily disable console removal for debugging
           drop_debugger: true,
-          pure_funcs:
-            mode === 'production'
-              ? ['console.log', 'console.info', 'console.debug', 'console.trace']
-              : [],
+          pure_funcs: [], // Temporarily disable function removal for debugging
         },
       },
       reportCompressedSize: true,
