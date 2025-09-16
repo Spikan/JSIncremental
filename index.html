@@ -600,8 +600,24 @@
     <script
       type="module"
       src="ts/index.ts"
-      onerror="console.error('❌ Failed to load TypeScript module:', this.src)"
+      onerror="console.error('❌ Failed to load TypeScript module:', this.src, 'Error:', event)"
     ></script>
+    <script type="module">
+      // Test if the module is actually loading
+      console.log('🔧 Testing module import...');
+      try {
+        // Try to access the global variable set by the module
+        setTimeout(() => {
+          if (window.__tsIndexLoaded) {
+            console.log('✅ Module loaded successfully - __tsIndexLoaded found');
+          } else {
+            console.error('❌ Module not loaded - __tsIndexLoaded not found');
+          }
+        }, 100);
+      } catch (error) {
+        console.error('❌ Error testing module load:', error);
+      }
+    </script>
     <script>
       // Ensure Decimal is available globally before loading main.js
       if (typeof Decimal === 'undefined') {
