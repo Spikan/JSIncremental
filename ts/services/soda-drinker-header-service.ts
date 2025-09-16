@@ -355,7 +355,7 @@ export class SodaDrinkerHeaderService {
       this.lightenColor(level.visualTheme.backgroundColor, 0.3)
     );
 
-    // Also set the SDP-specific variables for compatibility
+    // Set the SDP-specific variables
     root.style.setProperty('--sdp-primary', level.visualTheme.backgroundColor);
     root.style.setProperty('--sdp-accent', level.visualTheme.accentColor);
 

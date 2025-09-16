@@ -226,18 +226,7 @@ export class BootstrapSystem {
 // Export singleton instance
 export const bootstrapSystem = BootstrapSystem.getInstance();
 
-// Legacy functions for backward compatibility
-export function areDependenciesReady(): boolean {
-  return bootstrapSystem.areDependenciesReady();
-}
-
-export function initializeGameWhenReady(onGameReady: () => void): void {
-  return bootstrapSystem.initializeGameWhenReady(onGameReady);
-}
-
-export function waitForDependencies(onGameReady: () => void): void {
-  return bootstrapSystem.waitForDependencies(onGameReady);
-}
+// Legacy wrapper functions removed - use bootstrapSystem directly
 
 export function initSplashScreen(): void {
   return bootstrapSystem.initializeSplashScreen();

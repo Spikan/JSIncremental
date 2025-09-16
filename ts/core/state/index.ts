@@ -1,4 +1,4 @@
-// State store exports - now using Zustand with legacy compatibility
+// State store exports - using Zustand
 // The old createStore implementation has been replaced with Zustand for better performance
 
 // Export the new Zustand store and related utilities
@@ -14,9 +14,9 @@ export {
   useActions,
 } from './zustand-store';
 
-// Legacy compatibility layer removed - use Zustand store directly
+// Use Zustand store directly
 
-// Legacy type exports for backward compatibility
+// Type exports
 export type Unsubscribe = () => void;
 export type Listener<T> = (_state: T) => void;
 export interface Store<T extends object> {

@@ -510,37 +510,7 @@ export const getDefaultSoda3DConfig = (): Soda3DConfig => ({
   // clickAnimationDuration removed
 });
 
-// Keep the old export for backward compatibility - but delay initialization
-export const defaultSoda3DConfig = {
-  get containerSelector() {
-    return getDefaultSoda3DConfig().containerSelector;
-  },
-  get modelPath() {
-    return getDefaultSoda3DConfig().modelPath;
-  },
-  get size() {
-    return getDefaultSoda3DConfig().size;
-  },
-  get width() {
-    return getDefaultSoda3DConfig().width;
-  },
-  get height() {
-    return getDefaultSoda3DConfig().height;
-  },
-  get rotationSpeed() {
-    return getDefaultSoda3DConfig().rotationSpeed;
-  },
-  get hoverSpeedMultiplier() {
-    return getDefaultSoda3DConfig().hoverSpeedMultiplier;
-  },
-  get performanceMode() {
-    return getDefaultSoda3DConfig().performanceMode;
-  },
-  get frameRateLimit() {
-    return getDefaultSoda3DConfig().frameRateLimit;
-  },
-  // clickAnimationDuration removed
-};
+// Backward compatibility export removed - use getDefaultSoda3DConfig() directly
 
 // Export factory function for easy initialization
 export function createSoda3DButton(config: Partial<Soda3DConfig> = {}): Soda3DButton {

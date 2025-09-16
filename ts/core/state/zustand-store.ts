@@ -277,7 +277,7 @@ export const useGameStore = create<GameStore>()(
   )
 );
 
-// Export store instance for legacy compatibility
+// Export store instance
 export const gameStore = useGameStore;
 
 // Optimized selectors with memoization and proper error handling

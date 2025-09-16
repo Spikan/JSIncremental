@@ -673,34 +673,7 @@ export function updateSPDFromResources(
   }
 }
 
-/**
- * Recalculate SPD (Sips Per Drink) based on current resources
- * This is needed when dev tools add resources but don't trigger SPD recalculation
- * @deprecated Use updateSPDFromResources() instead for better reliability
- */
-export function recalculateSPD(): boolean {
-  try {
-    const w = window as Win;
-    console.log('🔄 Recalculating SPD based on current resources...');
-
-    // Get current resource values from state
-    const state = w.App?.state?.getState?.();
-    if (!state) {
-      console.warn('Could not get game state for SPD recalculation');
-      return false;
-    }
-
-    return updateSPDFromResources(
-      state.straws || 0,
-      state.cups || 0,
-      state.widerStraws || 0,
-      state.betterCups || 0
-    );
-  } catch (error) {
-    console.warn('SPD recalculation failed:', error);
-    return false;
-  }
-}
+// Deprecated recalculateSPD function removed - use updateSPDFromResources() directly
 
 // Expose dev functions globally for console access
 try {
@@ -711,7 +684,7 @@ try {
     (window as any).addExtremeResources = addExtremeResources;
     (window as any).testScientificNotation = testScientificNotation;
     (window as any).resetAllResources = resetAllResources;
-    (window as any).recalculateSPD = recalculateSPD;
+    // recalculateSPD removed - use updateSPDFromResources() directly
     (window as any).updateSPDFromResources = updateSPDFromResources;
     (window as any).testNumberFormatting = testNumberFormatting;
     console.log('🔧 Dev tools exposed globally - try: addMassiveSips()');
