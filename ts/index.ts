@@ -171,7 +171,7 @@ try {
     const drinkModule = (await Promise.race([
       import('./core/systems/drink-system'),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Drink system import timeout')), 5000)
+        setTimeout(() => reject(new Error('Drink system import timeout')), 10000)
       ),
     ])) as any;
     console.log('🔧 Drink system import completed, processing factory...');
@@ -718,6 +718,7 @@ try {
 
 // Load hybrid level system
 try {
+  console.log('🔧 About to import hybrid level system...');
   const hybridLevel = await import('./core/systems/hybrid-level-system');
   App.systems.hybridLevel = hybridLevel.hybridLevelSystem;
   console.log('✅ Hybrid level system loaded');
