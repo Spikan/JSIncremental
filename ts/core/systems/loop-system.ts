@@ -53,17 +53,8 @@ export function start({
         console.warn('Failed to update stats in loop:', error);
       }
       // Validate extreme values periodically for monitoring
-      try {
-        import('./purchases-system.ts')
-          .then(module => {
-            module.validateExtremeValues?.();
-          })
-          .catch(error => {
-            console.warn('Failed to validate extreme values in loop:', error);
-          });
-      } catch (error) {
-        console.warn('Failed to trigger extreme value validation in loop:', error);
-      }
+      // Note: Removed circular import to prevent hanging in production
+      // Extreme value validation will be handled by the purchases system directly
       try {
         if (updatePlayTime) updatePlayTime();
       } catch (error) {
