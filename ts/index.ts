@@ -161,14 +161,31 @@ try {
   // Load drink system immediately - also critical
   try {
     console.log('🔧 About to import drink system...');
-    const drinkModule = await Promise.race([
+    const drinkModule = (await Promise.race([
       import('./core/systems/drink-system.ts'),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Drink system import timeout')), 5000)
       ),
-    ]) as any;
+    ])) as any;
     console.log('🔧 Drink system import completed, processing factory...');
-    const factory = drinkModule.processDrinkFactory?.();
+    const factory = drinkModule.processDrinkFactory?.({
+      getApp: () => App,
+      getGameConfig: () => (window as any).GAME_CONFIG,
+      getSips: () => (window as any).sips,
+      setSips: (value: any) => {
+        (window as any).sips = value;
+      },
+      getSipsPerDrink: () => (window as any).sipsPerDrink,
+      getDrinkRate: () => (window as any).drinkRate,
+      getLastDrinkTime: () => (window as any).lastDrinkTime,
+      getSpd: () => (window as any).spd,
+      getTotalSipsEarned: () => App?.state?.getState?.()?.totalSipsEarned,
+      getHighestSipsPerSecond: () => App?.state?.getState?.()?.highestSipsPerSecond,
+      getLastAutosaveClockMs: () => (window as any).__lastAutosaveClockMs,
+      setLastAutosaveClockMs: (value: number) => {
+        (window as any).__lastAutosaveClockMs = value;
+      },
+    });
     if (factory) {
       App.systems.drink.processDrink = factory;
       console.log('✅ Drink system loaded');

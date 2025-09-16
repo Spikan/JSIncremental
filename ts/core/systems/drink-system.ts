@@ -10,42 +10,75 @@ import { toDecimal } from '../numbers/simplified';
 
 export type ProcessDrinkArgs = {
   getNow?: () => number;
+  getApp?: () => any;
+  getGameConfig?: () => any;
+  getSips?: () => any;
+  setSips?: (value: any) => void;
+  getSipsPerDrink?: () => any;
+  getDrinkRate?: () => number;
+  getLastDrinkTime?: () => number;
+  getSpd?: () => any;
+  getTotalSipsEarned?: () => any;
+  getHighestSipsPerSecond?: () => any;
+  getLastAutosaveClockMs?: () => number;
+  setLastAutosaveClockMs?: (value: number) => void;
 };
 
-export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkArgs = {}) {
+export function processDrinkFactory({
+  getNow = () => Date.now(),
+  getApp = () => (typeof window !== 'undefined' ? (window as any).App : undefined),
+  getGameConfig = () => (typeof window !== 'undefined' ? (window as any).GAME_CONFIG : undefined),
+  getSips = () => (typeof window !== 'undefined' ? (window as any).sips : undefined),
+  setSips = (value: any) => {
+    if (typeof window !== 'undefined') (window as any).sips = value;
+  },
+  getSipsPerDrink = () =>
+    typeof window !== 'undefined' ? (window as any).sipsPerDrink : undefined,
+  getDrinkRate = () => 1000,
+  getLastDrinkTime = () => 0,
+  getSpd = () => undefined,
+  getTotalSipsEarned = () => undefined,
+  getHighestSipsPerSecond = () => undefined,
+  getLastAutosaveClockMs = () => 0,
+  setLastAutosaveClockMs = (value: number) => {
+    if (typeof window !== 'undefined') (window as any).__lastAutosaveClockMs = value;
+  },
+}: ProcessDrinkArgs = {}) {
   return function processDrink() {
     try {
-      const w: any = (typeof window !== 'undefined' ? window : {}) as any;
-      const BAL = w.GAME_CONFIG?.BALANCE || {};
-      const state = w.App?.state?.getState?.() || {};
+      const App = getApp();
+      const GAME_CONFIG = getGameConfig();
+      const BAL = GAME_CONFIG?.BALANCE || {};
+      const state = App?.state?.getState?.() || {};
 
       // Required state from legacy globals (kept during migration)
-      const drinkRate: number = Number(state.drinkRate ?? w.drinkRate ?? 1000);
-      const lastDrinkTime: number = Number(state.lastDrinkTime ?? w.lastDrinkTime ?? 0);
+      const drinkRate: number = Number(state.drinkRate ?? getDrinkRate());
+      const lastDrinkTime: number = Number(state.lastDrinkTime ?? getLastDrinkTime());
 
       const now = getNow();
       if (now - lastDrinkTime < drinkRate) return;
 
       // Add full sips-per-drink (base + production) with Decimal support
+      const sipsPerDrink = getSipsPerDrink();
       const baseSpdVal = toDecimal(
-        state.spd ?? w.sipsPerDrink?.toNumber?.() ?? w.sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
+        state.spd ?? sipsPerDrink?.toNumber?.() ?? sipsPerDrink ?? BAL.BASE_SIPS_PER_DRINK ?? 1
       );
 
       // Apply level bonuses from hybrid level system
-      const levelBonuses = w.App?.systems?.hybridLevel?.getCurrentLevelBonuses?.() || {
+      const levelBonuses = App?.systems?.hybridLevel?.getCurrentLevelBonuses?.() || {
         sipMultiplier: 1.0,
         clickMultiplier: 1.0,
       };
       const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
 
       // Handle sips accumulation with Decimal arithmetic
-      const currentSips = toDecimal(w.sips || 0);
-      w.sips = currentSips.add(spdVal);
+      const currentSips = toDecimal(getSips() || 0);
+      setSips(currentSips.add(spdVal));
 
       // Mirror totals with Decimal support
-      const prevTotal = toDecimal(w.App?.state?.getState?.()?.totalSipsEarned || 0);
-      const prevHigh = toDecimal(w.App?.state?.getState?.()?.highestSipsPerSecond || 0);
-      const spdNum = toDecimal(state.spd ?? 0);
+      const prevTotal = toDecimal(getTotalSipsEarned() || 0);
+      const prevHigh = toDecimal(getHighestSipsPerSecond() || 0);
+      const spdNum = toDecimal(state.spd ?? getSpd() ?? 0);
 
       // Calculate current sips per second (keep in Decimal space to preserve precision)
       const rateInSeconds = drinkRate / 1000;
@@ -64,12 +97,12 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       const nextProgress = 0;
 
       try {
-        w.App?.stateBridge?.setLastDrinkTime?.(nextLast);
+        App?.stateBridge?.setLastDrinkTime?.(nextLast);
       } catch (error) {
         console.warn('Failed to set last drink time via bridge:', error);
       }
       try {
-        w.App?.stateBridge?.setDrinkProgress?.(nextProgress);
+        App?.stateBridge?.setDrinkProgress?.(nextProgress);
       } catch (error) {
         console.warn('Failed to set drink progress via bridge:', error);
       }
@@ -79,8 +112,8 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
         // Always use string representation to avoid precision loss with extreme values
         const highestForUI = highest.toString();
 
-        w.App?.state?.setState?.({
-          sips: w.sips,
+        App?.state?.setState?.({
+          sips: getSips(),
           totalSipsEarned: newTotalEarned,
           highestSipsPerSecond: highestForUI,
           lastDrinkTime: nextLast,
@@ -91,23 +124,23 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
       }
 
       try {
-        w.App?.ui?.updateDrinkProgress?.(nextProgress, drinkRate);
+        App?.ui?.updateDrinkProgress?.(nextProgress, drinkRate);
       } catch (error) {
         console.warn('Failed to update drink progress UI:', error);
       }
       // Update top counters immediately after awarding sips
       try {
-        w.App?.ui?.updateTopSipsPerDrink?.();
+        App?.ui?.updateTopSipsPerDrink?.();
       } catch (error) {
         console.warn('Failed to update top sips per drink display:', error);
       }
       try {
-        w.App?.ui?.updateTopSipsPerSecond?.();
+        App?.ui?.updateTopSipsPerSecond?.();
       } catch (error) {
         console.warn('Failed to update top sips per second display:', error);
       }
       try {
-        w.App?.ui?.updateTopSipCounter?.();
+        App?.ui?.updateTopSipCounter?.();
       } catch (error) {
         console.warn('Failed to update top sip counter display:', error);
       }
@@ -118,24 +151,24 @@ export function processDrinkFactory({ getNow = () => Date.now() }: ProcessDrinkA
         const intervalSec = Number(state?.options?.autosaveInterval || 10);
         if (enabled) {
           const nowMs = Date.now();
-          const last = Number(w.__lastAutosaveClockMs || 0);
+          const last = Number(getLastAutosaveClockMs() || 0);
           const intervalMs = Math.max(0, intervalSec * 1000);
           if (!last) {
-            w.__lastAutosaveClockMs = nowMs;
+            setLastAutosaveClockMs(nowMs);
           } else if (nowMs - last >= intervalMs) {
             try {
-              w.App?.systems?.save?.performSaveSnapshot?.();
+              App?.systems?.save?.performSaveSnapshot?.();
             } catch (error) {
               console.warn('Failed to perform autosave snapshot:', error);
             }
-            w.__lastAutosaveClockMs = nowMs;
+            setLastAutosaveClockMs(nowMs);
           }
         }
       } catch (error) {
         console.warn('Failed to handle wall-clock autosave:', error);
       }
       try {
-        w.App?.ui?.checkUpgradeAffordability?.();
+        App?.ui?.checkUpgradeAffordability?.();
       } catch (error) {
         console.warn('Failed to check upgrade affordability:', error);
       }
