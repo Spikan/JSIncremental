@@ -225,12 +225,18 @@ try {
   console.log('🔧 About to import drink system...');
   let drinkModule: any;
   try {
+    console.log('🔧 Attempting to import drink system module...');
     drinkModule = await import('./core/systems/drink-system');
     console.log('🔧 Drink system import completed, processing factory...');
     console.log('🔧 Drink module keys:', Object.keys(drinkModule));
     console.log('🔧 processDrinkFactory available:', !!drinkModule.processDrinkFactory);
   } catch (importError) {
     console.error('❌ CRITICAL: Drink system import failed:', importError);
+    console.error('❌ Import error details:', {
+      message: (importError as any)?.message,
+      stack: (importError as any)?.stack,
+      name: (importError as any)?.name,
+    });
     throw importError;
   }
   const factory = drinkModule.processDrinkFactory?.({
@@ -407,6 +413,12 @@ try {
   }
 } catch (e) {
   console.error('❌ CRITICAL: Error in critical systems loading:', e);
+  console.error('❌ Critical systems error details:', {
+    message: (e as any)?.message,
+    stack: (e as any)?.stack,
+    name: (e as any)?.name,
+    type: typeof e,
+  });
   __pushDiag({
     type: 'wire',
     module: 'core-static',
