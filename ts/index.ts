@@ -114,7 +114,9 @@ try {
 
   // Load loop system immediately - this is critical for game functionality
   try {
+    console.log('🔧 About to import loop system...');
     const loopModule = await import('./core/systems/loop-system.ts');
+    console.log('🔧 Loop system import completed, assigning to App...');
     Object.assign(App.systems.loop, loopModule);
     console.log('✅ Loop system loaded');
   } catch (e) {
@@ -129,7 +131,9 @@ try {
 
   // Load drink system immediately - also critical
   try {
+    console.log('🔧 About to import drink system...');
     const drinkModule = await import('./core/systems/drink-system.ts');
+    console.log('🔧 Drink system import completed, processing factory...');
     const factory = drinkModule.processDrinkFactory?.();
     if (factory) {
       App.systems.drink.processDrink = factory;
