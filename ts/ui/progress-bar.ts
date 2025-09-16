@@ -47,10 +47,10 @@ export class ProgressBar {
     // Add enhanced styling to existing progress bar instead of replacing it
     this.container.classList.add('enhanced-progress-container');
 
-    // Find existing progress elements
-    const existingFill = this.container.querySelector('.drink-progress-fill') as HTMLElement;
-    const existingLabel = this.container.querySelector('.drink-label') as HTMLElement;
-    const existingCountdown = this.container.querySelector('.drink-countdown') as HTMLElement;
+    // Find existing progress elements - look for the actual classes in the HTML
+    const existingFill = this.container.querySelector('.progress-fill-minimal, .progress-fill-main') as HTMLElement;
+    const existingLabel = this.container.querySelector('.level-name-minimal, .countdown-minimal') as HTMLElement;
+    const existingCountdown = this.container.querySelector('.countdown-minimal') as HTMLElement;
 
     if (existingFill) {
       // Add enhanced classes to existing fill
@@ -76,7 +76,7 @@ export class ProgressBar {
     `;
 
     // Insert info container after the existing progress bar
-    const progressBar = this.container.querySelector('.drink-progress-bar');
+    const progressBar = this.container.querySelector('.progress-bar-minimal, .progress-bar-main');
     if (progressBar && progressBar.parentNode) {
       progressBar.parentNode.insertBefore(infoContainer, progressBar.nextSibling);
     }
