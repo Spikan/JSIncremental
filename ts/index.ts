@@ -479,9 +479,13 @@ try {
     try {
       // initOnDomReady call removed
       __pushDiag({ type: 'initOnDomReady', used: 'default-invoked' });
-    } catch {}
+    } catch (error) {
+      console.error('Failed to push diagnostic info:', error);
+    }
   }, 0);
-} catch {}
+} catch (error) {
+  console.error('Failed to initialize diagnostic system:', error);
+}
 
 // Remove early dynamic imports; core is now statically wired above for stability
 
@@ -500,7 +504,9 @@ try {
     try {
       // Modernized - audio system handled by store
       // Audio system initialization removed - using proper module imports
-    } catch {}
+    } catch (error) {
+      console.error('Failed to initialize audio system:', error);
+    }
     try {
       document.removeEventListener('pointerdown', unlock, true);
       document.removeEventListener('touchstart', unlock, true);
@@ -508,7 +514,9 @@ try {
       document.removeEventListener('keydown', unlock, true);
       document.removeEventListener('mousedown', unlock, true);
       document.removeEventListener('touchend', unlock, true);
-    } catch {}
+    } catch (error) {
+      console.error('Failed to remove event listeners:', error);
+    }
   };
   document.addEventListener('pointerdown', unlock, { capture: true, once: true } as any);
   document.addEventListener('touchstart', unlock, { capture: true, once: true } as any);

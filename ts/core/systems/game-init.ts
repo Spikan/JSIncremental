@@ -2,7 +2,9 @@
 try {
   (window as any).__diag = Array.isArray((window as any).__diag) ? (window as any).__diag : [];
   (window as any).__diag.push({ type: 'module', module: 'game-init', stage: 'eval-start' });
-} catch {}
+} catch (error) {
+  console.error('Failed to initialize diagnostics:', error);
+}
 
 export function initSplashScreen(): void {
   try {
@@ -16,7 +18,9 @@ export function initSplashScreen(): void {
     // maybeStartLoop function removed - use proper loop system instead
 
     // Inline fallback system removed - use startGameCore() directly
-  } catch {}
+  } catch (error) {
+    console.error('Failed to initialize splash screen:', error);
+  }
 }
 
 export function startGameCore(): void {
@@ -27,14 +31,18 @@ export function startGameCore(): void {
       try {
         (window as any).__GAME_STARTED__ = true;
         document.body.classList?.add('game-started');
-      } catch {}
+      } catch (error) {
+        console.error('Failed to set game started state:', error);
+      }
       // Robustly remove/disable splash overlay
       try {
         splashScreen.style.display = 'none';
         splashScreen.style.visibility = 'hidden';
         (splashScreen as HTMLElement).style.pointerEvents = 'none';
         if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
-      } catch {}
+      } catch (error) {
+        console.error('Failed to hide splash screen:', error);
+      }
       // Force-show game content
       try {
         gameContent.style.display = 'block';
@@ -44,7 +52,9 @@ export function startGameCore(): void {
 
         // DOM elements are already available, no reinitialization needed
         console.log('🔄 Game content is visible, DOM elements are ready');
-      } catch {}
+      } catch (error) {
+        console.error('Failed to show game content:', error);
+      }
       // Initialize game
       try {
         (window as any).initGame?.();
@@ -67,12 +77,16 @@ export function startGameCore(): void {
                 const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
                 w.App?.state?.setState?.({ drinkProgress: pct });
                 w.App?.ui?.updateDrinkProgress?.(pct, rate);
-              } catch {}
+              } catch (error) {
+                console.error('Failed to update drink progress:', error);
+              }
             },
             processDrink: () => {
               try {
                 w.App?.systems?.drink?.processDrink?.();
-              } catch {}
+              } catch (error) {
+                console.error('Failed to process drink:', error);
+              }
             },
             updateStats: () => {
               try {
@@ -81,7 +95,9 @@ export function startGameCore(): void {
                 w.App?.ui?.updateAllStats?.();
                 w.App?.ui?.checkUpgradeAffordability?.();
                 w.App?.systems?.unlocks?.checkAllUnlocks?.();
-              } catch {}
+              } catch (error) {
+                console.error('Failed to update stats:', error);
+              }
             },
             updateUI: () => {
               try {
@@ -97,21 +113,29 @@ export function startGameCore(): void {
             updatePlayTime: () => {
               try {
                 w.App?.ui?.updatePlayTime?.();
-              } catch {}
+              } catch (error) {
+                console.error('Failed to update play time:', error);
+              }
             },
             updateLastSaveTime: () => {
               try {
                 w.App?.ui?.updateLastSaveTime?.();
-              } catch {}
+              } catch (error) {
+                console.error('Failed to update last save time:', error);
+              }
             },
           });
         };
         restart();
-      } catch {}
+      } catch (error) {
+        console.error('Failed to start game loop:', error);
+      }
     } else {
       console.error('Could not find splash or game elements');
     }
-  } catch {}
+  } catch (error) {
+    console.error('Failed to start game core:', error);
+  }
 }
 
 // Initialize splash and basic options when DOM is ready
@@ -120,7 +144,9 @@ export function initOnDomReady(): void {
     const boot = () => {
       try {
         (window as any).loadWordBank?.();
-      } catch {}
+      } catch (error) {
+        console.error('Failed to load word bank:', error);
+      }
       const config: any = (window as any).GAME_CONFIG?.TIMING || {};
       const domReadyDelay: number = Number(config.DOM_READY_DELAY || 0);
       setTimeout(() => {
@@ -140,10 +166,14 @@ export function initOnDomReady(): void {
             // const loaded = defaults; // Unused - modernized to store
             // Modernized - state updates handled by store
             // Modernized - autosave status handled by store
-          } catch {}
+          } catch (error) {
+            console.error('Failed to initialize options:', error);
+          }
           try {
             // Modernized - play time updates handled by store
-          } catch {}
+          } catch (error) {
+            console.error('Failed to initialize play time updates:', error);
+          }
         } catch (error) {
           console.error('Error during splash screen initialization:', error);
           const splashScreen = document.getElementById('splashScreen');
@@ -153,7 +183,9 @@ export function initOnDomReady(): void {
             gameContent.style.display = 'block';
             try {
               (window as any).initGame?.();
-            } catch {}
+            } catch (error) {
+              console.error('Failed to initialize game in fallback:', error);
+            }
           }
         }
       }, domReadyDelay);
@@ -164,7 +196,9 @@ export function initOnDomReady(): void {
     } else {
       boot();
     }
-  } catch {}
+  } catch (error) {
+    console.error('Failed to initialize on DOM ready:', error);
+  }
 }
 
 // Best-effort wiring to global App if available (helps when import timing is odd on Pages)
@@ -178,11 +212,17 @@ try {
     });
     try {
       (w.__diag || []).push({ type: 'wire', module: 'game-init', method: 'direct-assign' });
-    } catch {}
+    } catch (error) {
+      console.error('Failed to push diagnostic info:', error);
+    }
   }
-} catch {}
+} catch (error) {
+  console.error('Failed to wire game init to global App:', error);
+}
 
 try {
   (window as any).__diag &&
     (window as any).__diag.push({ type: 'module', module: 'game-init', stage: 'eval-end' });
-} catch {}
+} catch (error) {
+  console.error('Failed to push final diagnostic info:', error);
+}
