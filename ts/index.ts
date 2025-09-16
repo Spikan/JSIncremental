@@ -243,19 +243,28 @@ try {
 
   // Modernized drink system using only Zustand store
   console.log('🔧 Using modernized drink system...');
-  const { processDrink } = await import('./core/systems/drink-system');
-  console.log('🔧 processDrink function:', typeof processDrink);
-  App.systems.drink.processDrink = processDrink;
-  console.log('✅ Drink system loaded');
+  console.log('🔧 About to import drink-system module...');
+  try {
+    const { processDrink } = await import('./core/systems/drink-system');
+    console.log('🔧 processDrink function:', typeof processDrink);
+    App.systems.drink.processDrink = processDrink;
+    console.log('✅ Drink system loaded');
+  } catch (error) {
+    console.error('❌ Failed to import drink system:', error);
+    throw error;
+  }
 
   // Load hybrid level system early so UI can access it
   console.log('🔧 Loading hybrid level system...');
+  console.log('🔧 About to import hybrid-level-system module...');
   try {
     const hybridLevel = await import('./core/systems/hybrid-level-system');
+    console.log('🔧 hybridLevel imported:', typeof hybridLevel);
     App.systems.hybridLevel = hybridLevel.hybridLevelSystem;
     console.log('✅ Hybrid level system loaded');
   } catch (e) {
-    console.warn('⚠️ hybrid level system load failed:', e);
+    console.error('❌ hybrid level system load failed:', e);
+    throw e;
   }
 
   App.systems.loop = loopSystem;
