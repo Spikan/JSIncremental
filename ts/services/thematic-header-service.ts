@@ -446,7 +446,4 @@ export class ThematicHeaderService {
 // Export singleton instance
 export const thematicHeaderService = ThematicHeaderService.getInstance();
 
-// Export for legacy window access
-if (typeof window !== 'undefined') {
-  (window as any).thematicHeaderService = thematicHeaderService;
-}
+// Legacy window access removed - use proper imports

@@ -622,10 +622,4 @@ export const useSubscribeToSPD = (callback: (spd: number) => void) => {
 // Export store actions for direct access (useful in tests and non-React contexts)
 export const getStoreActions = () => useGameStore.getState().actions;
 
-// Export for legacy window access
-try {
-  (window as any).useGameStore = useGameStore;
-  (window as any).gameStore = gameStore;
-} catch (error) {
-  console.warn('Failed to expose Zustand store globally:', error);
-}
+// Legacy window access removed - use proper imports

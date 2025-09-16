@@ -3,7 +3,7 @@
 
 import { animate } from 'framer-motion';
 import { logger } from './logger';
-import { timerManager } from './timer-manager';
+// timerManager import removed - no longer needed after fallback removal
 
 // Animation configuration types
 export interface AnimationConfig {
@@ -177,9 +177,7 @@ class AnimationService {
       return animId;
     } catch (error) {
       logger.error('Failed to create click feedback animation:', error);
-      // Fallback to your existing system
-      this.fallbackClickFeedback(config);
-      return animId;
+      throw error; // Fail fast instead of using fallback
     }
   }
 
@@ -438,59 +436,12 @@ class AnimationService {
     return icons[type as keyof typeof icons] || '✨';
   }
 
-  /**
-   * Fallback to existing animation system if Framer Motion fails
-   */
-  private fallbackClickFeedback(config: ClickFeedbackConfig): void {
-    logger.warn('Using fallback animation system');
-
-    const feedback = document.createElement('div');
-    feedback.textContent = `+${this.formatValue(config.value)}`;
-    feedback.style.cssText = `
-      position: fixed;
-      left: ${config.startX}px;
-      top: ${config.startY}px;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 1000;
-      font-weight: bold;
-      color: ${config.isCritical ? '#ff6b35' : '#4CAF50'};
-      animation: fallbackFloat 2s ease-out forwards;
-    `;
-
-    // Add fallback CSS animation if not exists
-    if (!document.querySelector('#fallback-animation-styles')) {
-      const style = document.createElement('style');
-      style.id = 'fallback-animation-styles';
-      style.textContent = `
-        @keyframes fallbackFloat {
-          0% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
-          100% { opacity: 0; transform: translate(-50%, -50%) translateY(-60px); }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-
-    document.body.appendChild(feedback);
-
-    timerManager.setTimeout(
-      () => {
-        if (feedback.parentNode) {
-          feedback.parentNode.removeChild(feedback);
-        }
-      },
-      2000,
-      'Remove fallback feedback'
-    );
-  }
+  // Fallback system removed - fail fast instead
 }
 
 // Create singleton instance
 export const animationService = new AnimationService();
 
-// Export for legacy window access
-if (typeof window !== 'undefined') {
-  (window as any).animationService = animationService;
-}
+// Legacy window access removed - use proper imports
 
 // Types are exported via interface declarations above

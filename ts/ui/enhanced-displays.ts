@@ -373,7 +373,4 @@ export const setDisplayAnimationDuration = (duration: number) =>
 export const resetDisplayState = () => enhancedDisplayManager.resetState();
 export const getDisplayStats = () => enhancedDisplayManager.getStats();
 
-// Export for legacy window access
-if (typeof window !== 'undefined') {
-  (window as any).enhancedDisplayManager = enhancedDisplayManager;
-}
+// Legacy window access removed - use proper imports

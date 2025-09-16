@@ -280,7 +280,4 @@ export class ThematicHeaderInitializer {
 // Create and export singleton instance
 export const thematicHeaderInitializer = new ThematicHeaderInitializer();
 
-// Export for legacy window access
-if (typeof window !== 'undefined') {
-  (window as any).thematicHeaderInitializer = thematicHeaderInitializer;
-}
+// Legacy window access removed - use proper imports

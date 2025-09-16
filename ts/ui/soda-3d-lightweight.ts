@@ -4,8 +4,7 @@
 // Import the 3D model asset so Vite can process it
 import sodaModelUrl from '../../res/Soda.glb?url';
 
-// Fallback path for production compatibility
-const FALLBACK_MODEL_PATH = './res/Soda.glb';
+// Fallback path removed - fail fast instead
 
 // ModelViewerElement will be available globally from the CDN script
 declare global {
@@ -95,8 +94,7 @@ export class Soda3DButton {
       this.container = document.querySelector(this.config.containerSelector);
       if (!this.container) {
         console.error('❌ Container not found:', this.config.containerSelector);
-        this.showFallback();
-        return;
+        throw new Error('3D model failed to load - no fallback available');
       }
 
       console.log('✅ Container found, waiting for model-viewer...');
@@ -133,7 +131,7 @@ export class Soda3DButton {
     } catch (error) {
       console.error('❌ Failed to initialize 3D model:', error);
       console.log('🔄 Falling back to CSS 3D effect...');
-      this.showFallback();
+      throw new Error('3D model failed to load - no fallback available');
     }
   }
 
@@ -223,7 +221,7 @@ export class Soda3DButton {
 
     this.modelViewer.addEventListener('error', (event: any) => {
       console.error('❌ Failed to load 3D model:', event.detail);
-      this.showFallback();
+      throw new Error('3D model failed to load - no fallback available');
     });
 
     // Click events - DISABLED to prevent double clicks
@@ -247,7 +245,7 @@ export class Soda3DButton {
       console.log('🔄 Starting model load process...');
       console.log('📍 Model path:', this.config.modelPath);
       console.log('📍 Imported URL:', sodaModelUrl);
-      console.log('📍 Fallback path:', FALLBACK_MODEL_PATH);
+      // Fallback path removed
       console.log('🔍 Model viewer element:', this.modelViewer);
 
       // Test if model file exists
@@ -267,40 +265,13 @@ export class Soda3DButton {
       // The model-viewer will trigger 'load' or 'error' events
     } catch (error) {
       console.error('❌ Failed to load model file:', error);
-      this.showFallback();
+      throw new Error('3D model failed to load - no fallback available');
     }
   }
 
   // handleClick method removed - button events handle clicks now
 
-  private showFallback() {
-    if (!this.container) return;
-
-    console.error('❌ 3D model failed to load - no fallback available');
-
-    // Clear container first
-    this.container.innerHTML = '';
-
-    // Show error message instead of CSS fallback
-    const errorDiv = document.createElement('div');
-    errorDiv.style.width = `${this.config.width || this.config.size}px`;
-    errorDiv.style.height = `${this.config.height || this.config.size}px`;
-    errorDiv.style.display = 'flex';
-    errorDiv.style.alignItems = 'center';
-    errorDiv.style.justifyContent = 'center';
-    errorDiv.style.backgroundColor = '#f8d7da';
-    errorDiv.style.color = '#721c24';
-    errorDiv.style.border = '2px solid #f5c6cb';
-    errorDiv.style.borderRadius = '10px';
-    errorDiv.style.textAlign = 'center';
-    errorDiv.style.padding = '20px';
-    errorDiv.style.fontSize = '14px';
-    errorDiv.innerHTML = '3D Model<br>Failed to Load';
-
-    // Add error message to container
-    this.container.appendChild(errorDiv);
-    console.log('❌ 3D model error displayed');
-  }
+  // showFallback method removed - fail fast instead
 
   // Public API methods
   addClickHandler(handler: () => void) {
@@ -528,7 +499,7 @@ export class Soda3DButton {
 // Export default configuration - use function to avoid hoisting issues
 export const getDefaultSoda3DConfig = (): Soda3DConfig => ({
   containerSelector: '#sodaButton',
-  modelPath: sodaModelUrl || FALLBACK_MODEL_PATH, // Use Vite-processed asset URL with fallback
+  modelPath: sodaModelUrl, // Use Vite-processed asset URL
   size: 200,
   width: 200,
   height: 200,

@@ -1110,7 +1110,4 @@ export class SodaDrinkerHeaderService {
 // Export singleton instance
 export const sodaDrinkerHeaderService = SodaDrinkerHeaderService.getInstance();
 
-// Export for legacy window access
-if (typeof window !== 'undefined') {
-  (window as any).sodaDrinkerHeaderService = sodaDrinkerHeaderService;
-}
+// Legacy window access removed - use proper imports

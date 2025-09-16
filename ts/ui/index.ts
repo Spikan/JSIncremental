@@ -464,13 +464,8 @@ export function initializeUI(): void {
         updateTopInfoBar(); // Update the header with new sips total
         checkUpgradeAffordabilityOptimized();
       } catch (error) {
-        // Fallback to original system if enhanced displays fail
-        console.error('❌ Main update: Enhanced displays failed, using fallback:', error);
-        logger.warn('Enhanced displays failed, using fallback:', error);
-        updateAllDisplaysOptimized();
-        updateClickValueDisplay();
-        updateTopInfoBar();
-        checkUpgradeAffordabilityOptimized();
+        console.error('❌ Main update: Enhanced displays failed:', error);
+        throw error; // Fail fast instead of fallback
       }
 
       // Add visual feedback for soda click (using existing CSS system)
@@ -508,14 +503,8 @@ export function initializeUI(): void {
             clickData.clickY
           );
         } catch (error) {
-          // Fallback to original system if enhanced fails
-          logger.warn('Enhanced click feedback failed, using fallback:', error);
-          showClickFeedback(
-            clickData.gained,
-            clickData.critical,
-            clickData.clickX,
-            clickData.clickY
-          );
+          logger.error('Enhanced click feedback failed:', error);
+          throw error; // Fail fast instead of fallback
         }
       }
     });
@@ -567,20 +556,8 @@ export function initializeUI(): void {
             true // success
           );
         } catch (error) {
-          // Fallback to original system
-          logger.warn('Enhanced purchase feedback failed, using fallback:', error);
-          if (
-            purchaseData.cost &&
-            typeof purchaseData.clickX === 'number' &&
-            typeof purchaseData.clickY === 'number'
-          ) {
-            showPurchaseFeedback(
-              purchaseData.item,
-              Number(purchaseData.cost),
-              purchaseData.clickX,
-              purchaseData.clickY
-            );
-          }
+          logger.error('Enhanced purchase feedback failed:', error);
+          throw error; // Fail fast instead of fallback
         }
       }
     });
@@ -864,13 +841,8 @@ export const safeUpdateAllDisplays = withErrorBoundary(
   'update_all_displays',
   ErrorSeverity.HIGH,
   () => {
-    // Fallback: try to update basic displays only with optimized versions
-    try {
-      updateAllDisplaysOptimized();
-      updateDrinkSpeedDisplayOptimized();
-    } catch (fallbackError) {
-      reportUIError(fallbackError, 'basic_display_fallback', ErrorSeverity.CRITICAL);
-    }
+    // No fallback - fail fast instead
+    throw new Error('Display update failed - no fallback available');
   }
 );
 

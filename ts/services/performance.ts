@@ -348,7 +348,4 @@ class PerformanceMonitor {
 // Create singleton instance
 export const performanceMonitor = new PerformanceMonitor();
 
-// Export for legacy window access
-if (typeof window !== 'undefined') {
-  (window as any).performanceMonitor = performanceMonitor;
-}
+// Legacy window access removed - use proper imports
