@@ -44,17 +44,16 @@ export class ProgressBar {
   private createProgressBarStructure(): void {
     if (!this.container) return;
 
-    // Add enhanced styling to existing progress bar instead of replacing it
-    this.container.classList.add('enhanced-progress-container');
-
-    // Find existing progress elements - look for the actual classes in the HTML
-    const existingFill = this.container.querySelector('.progress-fill-minimal, .progress-fill-main') as HTMLElement;
-    const existingLabel = this.container.querySelector('.level-name-minimal, .countdown-minimal') as HTMLElement;
+    // Find existing progress elements - just find them, don't modify them
+    const existingFill = this.container.querySelector(
+      '.progress-fill-minimal, .progress-fill-main'
+    ) as HTMLElement;
+    const existingLabel = this.container.querySelector(
+      '.level-name-minimal, .countdown-minimal'
+    ) as HTMLElement;
     const existingCountdown = this.container.querySelector('.countdown-minimal') as HTMLElement;
 
     if (existingFill) {
-      // Add enhanced classes to existing fill
-      existingFill.classList.add('enhanced-progress-fill');
       this.progressFill = existingFill;
     }
 
@@ -66,26 +65,7 @@ export class ProgressBar {
       this.progressTime = existingCountdown;
     }
 
-    // Add enhanced info display
-    const infoContainer = document.createElement('div');
-    infoContainer.className = 'enhanced-progress-info';
-    infoContainer.innerHTML = `
-      <span class="progress-percentage" id="progressPercentage">0%</span>
-      <span class="progress-separator">•</span>
-      <span class="progress-rate" id="progressRate">0/s</span>
-    `;
-
-    // Insert info container after the existing progress bar
-    const progressBar = this.container.querySelector('.progress-bar-minimal, .progress-bar-main');
-    if (progressBar && progressBar.parentNode) {
-      progressBar.parentNode.insertBefore(infoContainer, progressBar.nextSibling);
-    }
-
-    // Cache enhanced elements
-    this.progressPercentage = document.getElementById('progressPercentage');
-    this.progressRate = document.getElementById('progressRate');
-
-    console.log('✅ Enhanced progress bar structure created');
+    console.log('✅ Progress bar structure found (no modifications)');
   }
 
   public update(data: ProgressBarData): void {
