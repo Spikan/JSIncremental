@@ -74,11 +74,11 @@ function initGame() {
     try {
       pwaService.getStatus(); // This initializes the service
       console.log('📱 PWA service initialized');
-      
+
       // Check PWA installability
       const isInstallable = pwaService.checkInstallability();
       console.log('📱 PWA installable:', isInstallable);
-      
+
       if (!isInstallable) {
         const status = pwaService.getDetailedStatus();
         console.log('📱 PWA status:', status);

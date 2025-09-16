@@ -71,14 +71,14 @@ export class PWAService {
     // Check if running in standalone mode (installed)
     this.status.isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     this.status.isInstalled = this.status.isStandalone;
-    
+
     // Also check for other indicators of PWA installation
     if (!this.status.isStandalone) {
       // Check if running in fullscreen mode (another indicator of PWA)
       this.status.isStandalone = window.matchMedia('(display-mode: fullscreen)').matches;
       this.status.isInstalled = this.status.isStandalone;
     }
-    
+
     // Check if the app was launched from home screen (iOS)
     if (!this.status.isStandalone && (window.navigator as any).standalone === true) {
       this.status.isStandalone = true;
@@ -194,8 +194,11 @@ export class PWAService {
       hasIcons: !!document.querySelector('link[rel="icon"]'),
       isHttps: location.protocol === 'https:' || location.hostname === 'localhost',
       userAgent: navigator.userAgent,
-      displayMode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 
-                  window.matchMedia('(display-mode: fullscreen)').matches ? 'fullscreen' : 'browser',
+      displayMode: window.matchMedia('(display-mode: standalone)').matches
+        ? 'standalone'
+        : window.matchMedia('(display-mode: fullscreen)').matches
+          ? 'fullscreen'
+          : 'browser',
     };
   }
 }

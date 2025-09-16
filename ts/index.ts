@@ -105,7 +105,7 @@ __pushDiag({ type: 'index', stage: 'app-created' });
 try {
   // Load critical systems synchronously for production stability
   console.log('🔧 Loading critical systems...');
-  
+
   // Load loop system immediately - this is critical for game functionality
   try {
     const loopModule = await import('./core/systems/loop-system.ts');
@@ -120,7 +120,7 @@ try {
       err: String((e && (e as any).message) || e),
     });
   }
-  
+
   // Load drink system immediately - also critical
   try {
     const drinkModule = await import('./core/systems/drink-system.ts');
@@ -132,10 +132,10 @@ try {
   } catch (e) {
     console.warn('⚠️ Failed to load drink system:', e);
   }
-  
+
   // Other systems can load asynchronously
   console.log('🔧 Critical systems loaded, continuing with async systems...');
-  
+
   __pushDiag({ type: 'wire', module: 'core-static', ok: true });
 } catch (e) {
   __pushDiag({

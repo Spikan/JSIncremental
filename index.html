@@ -6,7 +6,7 @@
     <title>Soda Clicker Pro</title>
     <meta name="description" content="Soda Clicker Pro - The Ultimate Soda Drinking Experience" />
     <meta name="author" content="Spikan" />
-    
+
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#1a1a2e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -14,15 +14,15 @@
     <meta name="apple-mobile-web-app-title" content="Soda Clicker Pro" />
     <meta name="msapplication-TileColor" content="#1a1a2e" />
     <meta name="msapplication-tap-highlight" content="no" />
-    
+
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.webmanifest" />
-    
+
     <!-- Stylesheets -->
     <link rel="stylesheet" type="text/css" href="css/style-header-fixed.css" />
     <link rel="stylesheet" type="text/css" href="css/soda-drinker-header-v2.css" />
     <link rel="stylesheet" type="text/css" href="css/theme-system.css" />
-    
+
     <!-- Icons -->
     <link rel="icon" href="images/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="images/apple-touch-icon-180x180.png" />
@@ -58,22 +58,8 @@
       })();
       // Safety check to ensure functions are available - moved to after main.js loads
       window.addEventListener('load', function () {
-        // Wait for modules to load and APIs to be available
-        function checkFunctionsLoaded() {
-          var hasSwitchTab = !!(
-            window.App &&
-            window.App.ui &&
-            typeof window.App.ui.switchTab === 'function'
-          );
-          if (!hasSwitchTab) {
-            console.log('⏳ Waiting for App.ui.switchTab...');
-            setTimeout(checkFunctionsLoaded, 200);
-            return;
-          }
-          console.log('✅ App.ui.switchTab is available');
-        }
-        // Start checking after a brief initial delay
-        setTimeout(checkFunctionsLoaded, 1000);
+        // Game initialization is handled by main.js
+        console.log('✅ Page loaded, main.js will handle initialization');
         // HTML-level splash fallback: ensure any interaction starts the game
         try {
           var manualStart = function () {
