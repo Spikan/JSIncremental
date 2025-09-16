@@ -206,7 +206,7 @@ try {
   ServiceLocator.register(SERVICE_KEYS.APP, App);
   ServiceLocator.register(SERVICE_KEYS.DECIMAL, Decimal);
   ServiceLocator.register(SERVICE_KEYS.GAME_CONFIG, (window as any).GAME_CONFIG);
-  
+
   // Initialize sips with proper Decimal value
   const initialSips = toDecimal((window as any).sips || 0);
   ServiceLocator.register('sips', initialSips);
@@ -221,6 +221,8 @@ try {
   console.log('🔧 About to import drink system...');
   const drinkModule = await import('./core/systems/drink-system');
   console.log('🔧 Drink system import completed, processing factory...');
+  console.log('🔧 Drink module keys:', Object.keys(drinkModule));
+  console.log('🔧 processDrinkFactory available:', !!drinkModule.processDrinkFactory);
   const factory = drinkModule.processDrinkFactory?.({
     getApp: () => ServiceLocator.get(SERVICE_KEYS.APP),
     getGameConfig: () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
@@ -383,10 +385,13 @@ try {
 
   // Now that critical systems are loaded, call tryBoot
   console.log('🔧 About to call tryBoot function...');
+  console.log('🔧 App.systems.drink.processDrink available:', !!App?.systems?.drink?.processDrink);
+  console.log('🔧 App.systems.loop.start available:', !!App?.systems?.loop?.start);
   console.log('🔧 Calling tryBoot now...');
   tryBoot();
   console.log('🔧 tryBoot call completed');
 } catch (e) {
+  console.error('❌ Error in critical systems loading:', e);
   __pushDiag({
     type: 'wire',
     module: 'core-static',
