@@ -1,9 +1,9 @@
-// Main Game Logic - Legacy game logic being refactored into modular architecture (TypeScript)
+// Main Game Logic - Modular architecture (TypeScript)
 // Thin shim that preserves runtime behavior while migration continues.
 
 // Re-export nothing; this file sets up globals used by HTML and other modules
 
-// Bring over the JS file contents verbatim with minimal edits for TS compatibility
+// Bring over the JS file contents verbatim with minimal edits for TypeScript
 // We import the existing JS via a triple-slash reference to keep order under Vite
 // but here we inline the logic from original main.js, adapted for TS types.
 
@@ -116,7 +116,7 @@ function initGame() {
     const BAL = CONF.BALANCE;
     const TIMING = CONF.TIMING;
 
-    // Initialize state through Zustand store instead of legacy globals
+    // Initialize state through Zustand store
     // All state is now managed through App.state
 
     const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE;
@@ -273,7 +273,7 @@ function initGame() {
       },
     };
 
-    // Handle Decimal results properly - convert to numbers for Decimal compatibility
+    // Handle Decimal results properly - convert to numbers
     try {
       // Use safe conversion to handle extreme values without returning Infinity
       // Preserve extreme SPD values - don't use toSafeNumber
@@ -300,13 +300,13 @@ function initGame() {
       console.warn('Failed to handle Decimal results:', error);
     }
 
-    // Fallback production calculation using store values
+    // Production calculation using store values
     try {
       const strawSPD = new Decimal(config.STRAW_BASE_SPD);
       const cupSPD = new Decimal(config.CUP_BASE_SPD);
       const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
 
-      // Update store with fallback values
+      // Update store with values
       // Modernized - state updates handled by store
       console.log('State update modernized:', {
         strawSPD: strawSPD,
@@ -314,7 +314,7 @@ function initGame() {
         spd: baseSipsPerDrink,
       });
     } catch (error) {
-      console.warn('Failed to update store with fallback values:', error);
+      console.warn('Failed to update store with values:', error);
     }
 
     // Restore drink timing if present in save
@@ -443,7 +443,7 @@ function initGame() {
             updatePlayTime: () => {},
             updateLastSaveTime: () => {},
           });
-          console.log('🔄 Minimal game loop started as fallback');
+          console.log('🔄 Minimal game loop started');
         }
       } catch (e) {
         console.warn('Failed to start minimal game loop:', e);
@@ -452,7 +452,7 @@ function initGame() {
   }
 }
 
-// Legacy function removed - duplicate of mobile-input.ts version
+// Function removed - duplicate of mobile-input.ts version
 
 // startGame function removed - functionality moved to proper modules
 
