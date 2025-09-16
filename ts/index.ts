@@ -116,9 +116,9 @@ try {
 
   // Inline loop system to avoid import hanging issues in production
   console.log('🔧 Creating inline loop system...');
-  
+
   let rafId: number | null = null;
-  
+
   const loopSystem = {
     start: ({
       updateDrinkProgress,
@@ -200,9 +200,6 @@ try {
     },
   };
 
-  App.systems.loop = loopSystem;
-  console.log('✅ Inline loop system created');
-
   // Load drink system immediately - also critical
   console.log('🔧 About to import drink system...');
   const drinkModule = await import('./core/systems/drink-system');
@@ -226,6 +223,9 @@ try {
     App.systems.drink.processDrink = factory;
     console.log('✅ Drink system loaded');
   }
+
+  App.systems.loop = loopSystem;
+  console.log('✅ Inline loop system created');
 
   // Other systems can load asynchronously
   console.log('🔧 Critical systems loaded, continuing with async systems...');
