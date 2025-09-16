@@ -72,7 +72,8 @@ export function formatNumber(value: NumericValue): string {
     if (num >= 1e3) {
       return (num / 1e3).toFixed(1) + 'K';
     }
-    return num.toFixed(1);
+    // For small numbers, only show decimal if not a whole number
+    return num % 1 === 0 ? num.toString() : num.toFixed(1);
   }
 
   const num = Number(value) || 0;
@@ -85,7 +86,8 @@ export function formatNumber(value: NumericValue): string {
   if (num >= 1e3) {
     return (num / 1e3).toFixed(1) + 'K';
   }
-  return num.toFixed(1);
+  // For small numbers, only show decimal if not a whole number
+  return num % 1 === 0 ? num.toString() : num.toFixed(1);
 }
 
 /**
