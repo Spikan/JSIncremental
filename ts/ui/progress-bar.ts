@@ -171,5 +171,5 @@ export class ProgressBar {
 }
 
 // Global instances for different progress bars
-export const drinkProgressBar = new ProgressBar('drinkProgressContainer');
-export const levelProgressBar = new ProgressBar('levelProgressContainer');
+export const drinkProgressBar = new ProgressBar('drinkProgressBar');
+export const levelProgressBar = new ProgressBar('levelProgressBar');
