@@ -154,27 +154,12 @@ try {
 
 // Ensure a default, non-blocking initOnDomReady exists even if early imports stall
 console.log('🔧 About to start tryBoot initialization...');
-try {
-  // Simplified initialization - using proper module imports instead of complex nested structure
-  console.log('🔧 Starting tryBoot initialization...');
-  try {
-    console.log('🔧 App object available:', !!App);
-    console.log('🔧 GC available:', !!GC);
-  } catch (error) {
-    console.error('❌ Error checking App/GC availability:', error);
-  }
-  try {
-    __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
-  } catch (error) {
-    console.error('❌ Error calling __pushDiag:', error);
-  }
-  try {
-    // Kick game progression after splash via loop once available
-    // Use proper module access instead of window globals
-    let booted = false;
-    let retryCount = 0;
-    const maxRetries = 50; // 5 seconds max
-    const tryBoot = () => {
+
+// Define tryBoot function outside of try block so it can run independently
+let booted = false;
+let retryCount = 0;
+const maxRetries = 50; // 5 seconds max
+const tryBoot = () => {
       console.log(`🔧 tryBoot called (attempt ${retryCount + 1}/${maxRetries})`);
       try {
         if (retryCount >= maxRetries) {
@@ -290,13 +275,16 @@ try {
       }
       setTimeout(tryBoot, 100);
     };
-    tryBoot();
-  } catch (error) {
-    console.error('❌ Error in outer tryBoot wrapper:', error);
-  }
 
-  // After 1s, force-show game content to avoid being stuck on splash
-  setTimeout(() => {
+// Call tryBoot outside of any try block to ensure it runs
+try {
+  tryBoot();
+} catch (error) {
+  console.error('❌ Error calling tryBoot:', error);
+}
+
+// After 1s, force-show game content to avoid being stuck on splash
+setTimeout(() => {
     try {
       const splash = document.getElementById('splashScreen') as any;
       const game = document.getElementById('gameContent') as any;
@@ -401,7 +389,6 @@ try {
       }
     } catch {}
   }, 1000);
-} catch {}
 
 __pushDiag({ type: 'wire', module: 'initOnDomReady-default' });
 try {
