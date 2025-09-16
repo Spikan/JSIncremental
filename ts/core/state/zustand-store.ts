@@ -110,6 +110,9 @@ const defaultState: GameState = {
 
   // Click systems
   suctionClickBonus: toDecimal(0),
+  criticalClicks: toDecimal(0),
+  widerStrawsSPD: toDecimal(0),
+  betterCupsSPD: toDecimal(0),
 
   // Options
   options: {

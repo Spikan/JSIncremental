@@ -134,7 +134,7 @@ export function setupDirectSodaClickHandler(): () => void {
 
         // Also check hybrid level system's current level
         // Modernized - hybrid system handled by store
-        const hybridSystem = null;
+        const hybridSystem = (window as any).App?.systems?.hybridLevel;
         const currentHybridLevel = hybridSystem?.getCurrentLevelId?.() || 1;
 
         // Check if any relevant values have changed

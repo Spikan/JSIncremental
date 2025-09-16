@@ -464,7 +464,7 @@ export function updateLevelText(): void {
   try {
     // Use hybrid level system as single source of truth
     // Modernized - hybrid system handled by store
-    const hybridSystem = null;
+    const hybridSystem = (window as any).App?.systems?.hybridLevel;
     let levelText = 'The Beach (Level 1)';
 
     if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
@@ -705,7 +705,7 @@ function updateProductionBuildingDisplays(state: any): void {
 function updateLevelUpDisplay(state: any): void {
   // Use hybrid level system as primary
   // Modernized - hybrid system handled by store
-  const hybridSystem = null;
+  const hybridSystem = (window as any).App?.systems?.hybridLevel;
 
   if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
     // Get the next unlockable level (not just next sequential)

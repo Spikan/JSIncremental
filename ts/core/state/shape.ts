@@ -52,6 +52,9 @@ export type GameState = {
 
   // Click systems (migrate from globals)
   suctionClickBonus: NumericValue;
+  criticalClicks: NumericValue;
+  widerStrawsSPD: NumericValue;
+  betterCupsSPD: NumericValue;
 
   // Options
   options: GameOptions;
@@ -91,6 +94,9 @@ export const defaultState: GameState = {
 
   // Click systems
   suctionClickBonus: new Decimal(0),
+  criticalClicks: new Decimal(0),
+  widerStrawsSPD: new Decimal(0),
+  betterCupsSPD: new Decimal(0),
 
   // Options
   options: {

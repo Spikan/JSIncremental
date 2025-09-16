@@ -77,7 +77,7 @@ export function start({
       // Maintain authoritative totalPlayTime in App.state
       try {
         // Modernized - state handled by store
-        const st = null;
+        // const st = null; // Unused - modernized to store
         // Modernized - state updates handled by store
       } catch (error) {
         console.warn('Failed to update total play time in loop:', error);

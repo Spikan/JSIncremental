@@ -85,8 +85,8 @@ export class SodaDrinkerHeaderService {
       // Setup polygon animations
       this.setupPolygonAnimations();
 
-      // Setup level integration
-      this.setupLevelIntegration();
+      // Setup level integration (delayed to ensure hybrid system is loaded)
+      this.setupLevelIntegrationWithRetry();
 
       // Setup level dropdown functionality
       this.setupLevelDropdown();
@@ -234,15 +234,38 @@ export class SodaDrinkerHeaderService {
   }
 
   /**
-   * Setup level integration
+   * Setup level integration with retry mechanism
    */
-  private setupLevelIntegration(): void {
+  private setupLevelIntegrationWithRetry(): void {
     if (!this.config.levelThemeIntegration) return;
 
-    // Get reference to the level system
-    // Modernized - level system handled by store
-    this.levelSystem = null;
+    let retryCount = 0;
+    const maxRetries = 10;
+    const retryDelay = 200;
 
+    const trySetup = () => {
+      const w = window as any;
+      if (w.App?.systems?.hybridLevel) {
+        this.levelSystem = w.App.systems.hybridLevel;
+        this.continueLevelIntegration();
+        return;
+      }
+
+      retryCount++;
+      if (retryCount < maxRetries) {
+        setTimeout(trySetup, retryDelay);
+      } else {
+        logger.warn('Level system not available after retries, level theme integration disabled');
+      }
+    };
+
+    trySetup();
+  }
+
+  /**
+   * Continue level integration after system is loaded
+   */
+  private continueLevelIntegration(): void {
     if (!this.levelSystem) {
       logger.warn('Level system not available, level theme integration disabled');
       return;
@@ -306,6 +329,33 @@ export class SodaDrinkerHeaderService {
 
     // Update CSS custom properties for level theme
     const root = document.documentElement;
+
+    // Set the CSS variables that are actually used by the stylesheets
+    root.style.setProperty('--primary-blue', level.visualTheme.backgroundColor);
+    root.style.setProperty('--primary-green', level.visualTheme.accentColor);
+    root.style.setProperty(
+      '--primary-blue-dark',
+      this.darkenColor(level.visualTheme.backgroundColor, 0.2)
+    );
+    root.style.setProperty(
+      '--primary-green-light',
+      this.lightenColor(level.visualTheme.accentColor, 0.3)
+    );
+    root.style.setProperty('--neutral-white', '#ffffff');
+    root.style.setProperty(
+      '--neutral-dark',
+      this.darkenColor(level.visualTheme.backgroundColor, 0.4)
+    );
+    root.style.setProperty(
+      '--neutral-medium',
+      this.darkenColor(level.visualTheme.backgroundColor, 0.2)
+    );
+    root.style.setProperty(
+      '--neutral-light',
+      this.lightenColor(level.visualTheme.backgroundColor, 0.3)
+    );
+
+    // Also set the SDP-specific variables for compatibility
     root.style.setProperty('--sdp-primary', level.visualTheme.backgroundColor);
     root.style.setProperty('--sdp-accent', level.visualTheme.accentColor);
 
@@ -314,6 +364,19 @@ export class SodaDrinkerHeaderService {
     } else {
       root.style.setProperty('--sdp-background', level.visualTheme.backgroundColor);
     }
+
+    // Force body background with !important to override CSS
+    document.body.style.setProperty(
+      'background',
+      level.visualTheme.backgroundImage || level.visualTheme.backgroundColor,
+      'important'
+    );
+    document.body.style.setProperty(
+      'background-color',
+      level.visualTheme.backgroundColor,
+      'important'
+    );
+    document.body.style.setProperty('background-attachment', 'fixed', 'important');
 
     // Update level name in header
     const levelNameElement = document.getElementById('currentLevelName');
@@ -334,6 +397,39 @@ export class SodaDrinkerHeaderService {
     header.className = `soda-drinker-header level-${level.id} performance-${this.config.performanceMode}`;
 
     logger.info(`Applied level theme: ${level.name} (Level ${level.id})`);
+  }
+
+  /**
+   * Darken a color by a percentage
+   */
+  private darkenColor(color: string, amount: number): string {
+    // Simple color darkening - convert hex to RGB, darken, convert back
+    const hex = color.replace('#', '');
+    const r = Math.max(0, parseInt(hex.substr(0, 2), 16) * (1 - amount));
+    const g = Math.max(0, parseInt(hex.substr(2, 2), 16) * (1 - amount));
+    const b = Math.max(0, parseInt(hex.substr(4, 2), 16) * (1 - amount));
+    return `#${Math.floor(r).toString(16).padStart(2, '0')}${Math.floor(g).toString(16).padStart(2, '0')}${Math.floor(b).toString(16).padStart(2, '0')}`;
+  }
+
+  /**
+   * Lighten a color by a percentage
+   */
+  private lightenColor(color: string, amount: number): string {
+    // Simple color lightening - convert hex to RGB, lighten, convert back
+    const hex = color.replace('#', '');
+    const r = Math.min(
+      255,
+      parseInt(hex.substr(0, 2), 16) + (255 - parseInt(hex.substr(0, 2), 16)) * amount
+    );
+    const g = Math.min(
+      255,
+      parseInt(hex.substr(2, 2), 16) + (255 - parseInt(hex.substr(2, 2), 16)) * amount
+    );
+    const b = Math.min(
+      255,
+      parseInt(hex.substr(4, 2), 16) + (255 - parseInt(hex.substr(4, 2), 16)) * amount
+    );
+    return `#${Math.floor(r).toString(16).padStart(2, '0')}${Math.floor(g).toString(16).padStart(2, '0')}${Math.floor(b).toString(16).padStart(2, '0')}`;
   }
 
   /**
@@ -492,13 +588,18 @@ export class SodaDrinkerHeaderService {
    * Setup settings level selector
    */
   private setupSettingsLevelSelector(): void {
+    console.log('🔧 Setting up settings level selector...');
     const levelList = document.getElementById('settingsLevelList');
     const currentLevelName = document.getElementById('settingsCurrentLevelName');
     const currentLevelNumber = document.getElementById('settingsCurrentLevelNumber');
     const levelRequirements = document.getElementById('settingsLevelRequirements');
 
-    if (!levelList || !currentLevelName || !currentLevelNumber || !levelRequirements) return;
+    if (!levelList || !currentLevelName || !currentLevelNumber || !levelRequirements) {
+      console.warn('❌ Required elements not found for level selector');
+      return;
+    }
 
+    console.log('✅ All elements found, populating level list...');
     // Populate level list
     this.populateSettingsLevelList();
 
@@ -514,7 +615,23 @@ export class SodaDrinkerHeaderService {
    */
   private populateSettingsLevelList(): void {
     const levelList = document.getElementById('settingsLevelList');
-    if (!levelList || !this.levelSystem) return;
+    if (!levelList) {
+      console.warn('❌ Level list element not found');
+      return;
+    }
+
+    if (!this.levelSystem) {
+      console.warn('❌ Level system not available, trying to get it...');
+      // Try to get the level system again
+      const w = window as any;
+      if (w.App?.systems?.hybridLevel) {
+        this.levelSystem = w.App.systems.hybridLevel;
+        console.log('✅ Level system found and set');
+      } else {
+        console.warn('❌ Level system still not available');
+        return;
+      }
+    }
 
     // Clear existing items
     levelList.innerHTML = '';
@@ -687,12 +804,45 @@ export class SodaDrinkerHeaderService {
    */
   private switchToLevel(levelId: number): void {
     if (!this.levelSystem) {
-      console.warn('❌ Level system not available');
-      return;
+      console.warn('❌ Level system not available, trying to get it...');
+      // Try to get the level system again
+      const w = window as any;
+      if (w.App?.systems?.hybridLevel) {
+        this.levelSystem = w.App.systems.hybridLevel;
+        console.log('✅ Level system found and set');
+      } else {
+        console.warn('❌ Level system still not available');
+        return;
+      }
     }
 
     try {
       console.log('🔄 Attempting to switch to level:', levelId);
+
+      // Check if level is unlocked first
+      const isUnlocked = this.levelSystem.isLevelUnlocked(levelId);
+      console.log(`🔍 Level ${levelId} unlocked status:`, isUnlocked);
+
+      // Check for unlocks first
+      console.log('🔍 Checking for level unlocks...');
+      console.log('🔍 Level system initialized:', this.levelSystem.isSystemInitialized);
+      console.log(
+        '🔍 Current unlocked levels:',
+        Array.from(this.levelSystem.unlockedLevelsSet || new Set())
+      );
+      console.log('🔍 Current level:', this.levelSystem.currentLevel);
+
+      const newlyUnlocked = this.levelSystem.checkForUnlocks();
+      console.log('🔍 Newly unlocked levels:', newlyUnlocked);
+
+      // Check if level can be unlocked
+      const canUnlock = this.canUnlockLevel(levelId);
+      console.log(`🔍 Level ${levelId} can unlock status:`, canUnlock);
+
+      // Re-check if level is now unlocked after checkForUnlocks
+      const isUnlockedAfterCheck = this.levelSystem.isLevelUnlocked(levelId);
+      console.log(`🔍 Level ${levelId} unlocked status after check:`, isUnlockedAfterCheck);
+
       const success = this.levelSystem.switchToLevel(levelId);
       if (success) {
         console.log('✅ Successfully switched to level:', levelId);
@@ -758,20 +908,34 @@ export class SodaDrinkerHeaderService {
    * Check if level can be unlocked
    */
   public canUnlockLevel(levelId: number): boolean {
-    if (!this.levelSystem) return false;
+    if (!this.levelSystem) {
+      console.warn('❌ Level system not available for canUnlockLevel check');
+      return false;
+    }
 
     const requirements = this.getLevelUnlockRequirements(levelId);
-    if (!requirements) return false;
+    if (!requirements) {
+      console.warn('❌ No requirements found for level:', levelId);
+      return false;
+    }
 
     // Check if player meets requirements
     // Modernized - state handled by store
     const state = useGameStore.getState();
     const currentSips = state.sips || 0;
     const currentClicks = state.totalClicks || 0;
-    // const currentLevel = state.level || 1; // Removed unused variable
 
     const sipsMet = currentSips >= requirements.sips;
     const clicksMet = currentClicks >= requirements.clicks;
+
+    console.log(`🔍 Level ${levelId} unlock check:`, {
+      requirements,
+      currentSips,
+      currentClicks,
+      sipsMet,
+      clicksMet,
+      canUnlock: sipsMet && clicksMet,
+    });
 
     return sipsMet && clicksMet;
   }
@@ -811,136 +975,27 @@ export class SodaDrinkerHeaderService {
    * Hook into existing display update system
    */
   private hookIntoDisplayUpdates(): void {
-    // Modernized - UI updates handled by store
-    const originalUpdateDrinkProgress = null;
-    if (originalUpdateDrinkProgress) {
-      // Modernized - UI updates handled by store
-      const modernizedUpdateDrinkProgress = (progress: number, drinkRate: number) => {
-        // Call original function
-        originalUpdateDrinkProgress(progress, drinkRate);
-
-        // Update progress bar
-        this.updateProgressBar('drinkProgressBar', progress);
-      };
-    }
+    // Modernized - UI updates are now handled by the store system
+    // This method is kept for potential future hooking needs
+    logger.debug('Display updates are handled by the store system');
   }
 
   /**
    * Hook into existing click handlers
    */
   private hookIntoClickHandlers(): void {
-    // Modernized - clicks system handled by store
-    const originalHandleSodaClick = null;
-    if (originalHandleSodaClick) {
-      // Modernized - clicks system handled by store
-      const modernizedHandleSodaClick = (multiplier: number) => {
-        // Call original function
-        const result = originalHandleSodaClick(multiplier);
-
-        // Add visual feedback
-        this.onSodaClick(multiplier);
-
-        return result;
-      };
-    }
+    // Modernized - clicks system is now handled by the store system
+    // This method is kept for potential future hooking needs
+    logger.debug('Click handlers are handled by the store system');
   }
 
   /**
    * Hook into existing purchase handlers
    */
   private hookIntoPurchaseHandlers(): void {
-    // Modernized - purchase system handled by store
-    const purchaseSystem = null;
-    if (purchaseSystem) {
-      // Wrap all purchase functions
-      const purchaseFunctions = [
-        'buyStraw',
-        'buyCup',
-        'buyWiderStraws',
-        'buyBetterCups',
-        'buySuction',
-        'buyFasterDrinks',
-      ];
-
-      purchaseFunctions.forEach(funcName => {
-        const originalFunc = purchaseSystem[funcName];
-        if (originalFunc) {
-          purchaseSystem[funcName] = (...args: any[]) => {
-            const result = originalFunc(...args);
-
-            // Add celebration effects on successful purchase
-            if (result) {
-              this.onPurchase(funcName);
-            }
-
-            return result;
-          };
-        }
-      });
-    }
-  }
-
-  /**
-   * Update progress bar
-   */
-  private updateProgressBar(elementId: string, progress: number): void {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    const clampedProgress = Math.max(0, Math.min(100, progress));
-    element.style.setProperty('--drink-progress', `${clampedProgress}%`);
-
-    // Add celebration effect for reaching 100%
-    if (clampedProgress >= 100) {
-      this.addCelebrationEffect(element);
-    }
-  }
-
-  /**
-   * Handle soda click effects
-   */
-  private onSodaClick(_multiplier: number): void {
-    if (!this.config.enabled) return;
-
-    // Add subtle pulse effect to currency display
-    const currencyDisplay = document.querySelector('.currency-polygon-main');
-    if (currencyDisplay) {
-      currencyDisplay.classList.add('click-pulse');
-      setTimeout(() => {
-        currencyDisplay.classList.remove('click-pulse');
-      }, 200);
-    }
-  }
-
-  /**
-   * Handle purchase effects
-   */
-  private onPurchase(_purchaseType: string): void {
-    if (!this.config.enabled) return;
-
-    // Add celebration effect to all polygons
-    const polygons = document.querySelectorAll(
-      '.polygon-shape, .level-polygon, .currency-polygon-main, .stat-polygon, .control-polygon, .upgrade-polygon'
-    );
-
-    polygons.forEach((polygon, index) => {
-      setTimeout(() => {
-        polygon.classList.add('celebration-pulse');
-        setTimeout(() => {
-          polygon.classList.remove('celebration-pulse');
-        }, 500);
-      }, index * 100);
-    });
-  }
-
-  /**
-   * Add celebration effect
-   */
-  private addCelebrationEffect(element: HTMLElement): void {
-    element.classList.add('celebration-pulse');
-    setTimeout(() => {
-      element.classList.remove('celebration-pulse');
-    }, 1000);
+    // Modernized - purchase system is now handled by the store system
+    // This method is kept for potential future hooking needs
+    logger.debug('Purchase handlers are handled by the store system');
   }
 
   /**

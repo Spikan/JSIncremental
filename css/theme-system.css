@@ -2,10 +2,10 @@
 
 /* Root theme variables - these will be set by JavaScript */
 :root {
-  --theme-bg: var(--level-bg-color, #001789);
-  --theme-accent: var(--level-accent-color, #00d97f);
-  --theme-text: var(--level-text-color, #ffffff);
-  --theme-border: var(--level-border-color, #00d97f);
+  --theme-bg: var(--primary-blue, #001789);
+  --theme-accent: var(--primary-green, #00d97f);
+  --theme-text: var(--neutral-white, #ffffff);
+  --theme-border: var(--primary-green, #00d97f);
 }
 
 /* Theme-aware base styles with higher specificity */
@@ -101,20 +101,62 @@ body .game-content .upgrade-btn:hover {
   cursor: not-allowed;
 }
 
-/* Level-specific theming overrides */
-.game-content[data-level='1'] {
-  --theme-bg: #001789;
-  --theme-accent: #00d97f;
+/* Level-specific theming overrides - these are now handled by JavaScript */
+/* The JavaScript will set --primary-blue and --primary-green based on level */
+
+/* Comprehensive theming overrides for hardcoded colors */
+body {
+  background-color: var(--primary-blue) !important;
+  background: var(--primary-blue) !important;
 }
 
-.game-content[data-level='2'] {
-  --theme-bg: #2d5016;
-  --theme-accent: #4ade80;
+/* Override hardcoded colors in main styles */
+.currency-value,
+.currency-display,
+.level-number,
+.level-label,
+.level-text,
+.upgrade-title,
+.upgrade-description {
+  color: var(--neutral-white) !important;
 }
 
-.game-content[data-level='3'] {
-  --theme-bg: #7c2d12;
-  --theme-accent: #f97316;
+/* Override hardcoded border colors */
+.level-box-clickable,
+.upgrade-btn,
+.suction-btn {
+  border-color: var(--primary-green) !important;
+}
+
+/* Override hardcoded background colors */
+.level-box-clickable {
+  background: var(--primary-blue) !important;
+}
+
+.level-box-clickable:hover:not(.disabled) {
+  background: var(--primary-green) !important;
+  color: var(--primary-blue) !important;
+}
+
+/* Override hardcoded gradient backgrounds */
+.level-up-btn {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light)) !important;
+}
+
+.level-up-btn:hover {
+  background: var(--primary-green) !important;
+  color: var(--neutral-white) !important;
+}
+
+/* Override hardcoded text colors */
+.level-up-info h3,
+.level-up-info p {
+  color: var(--neutral-white) !important;
+}
+
+/* Override hardcoded accent colors */
+.level-up-btn .cost-number {
+  color: var(--primary-green) !important;
 }
 
 /* Add more level-specific themes as needed */

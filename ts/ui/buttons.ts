@@ -45,48 +45,114 @@ const BUTTON_CONFIG: {
   actions: {
     buyStraw: {
       func: () => {
-        // Modernized - purchase handled by store
-        console.log('Buy straw - modernized to store');
+        try {
+          // Import and use the purchase system
+          import('../core/systems/purchases-system').then(({ execute }) => {
+            const success = execute.buyStraw();
+            if (success) {
+              console.log('✅ Straw purchased successfully');
+            } else {
+              console.log('❌ Straw purchase failed - insufficient sips');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to purchase straw:', error);
+        }
       },
       type: 'shop-btn',
       label: 'Buy Straw',
     },
     buyCup: {
       func: () => {
-        // Modernized - purchase handled by store
-        console.log('Buy cup - modernized to store');
+        try {
+          // Import and use the purchase system
+          import('../core/systems/purchases-system').then(({ execute }) => {
+            const success = execute.buyCup();
+            if (success) {
+              console.log('✅ Cup purchased successfully');
+            } else {
+              console.log('❌ Cup purchase failed - insufficient sips');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to purchase cup:', error);
+        }
       },
       type: 'shop-btn',
       label: 'Buy Cup',
     },
     buyWiderStraws: {
       func: () => {
-        // Modernized - purchase handled by store
-        console.log('Buy wider straws - modernized to store');
+        try {
+          // Import and use the purchase system
+          import('../core/systems/purchases-system').then(({ execute }) => {
+            const success = execute.buyWiderStraws();
+            if (success) {
+              console.log('✅ Wider straws purchased successfully');
+            } else {
+              console.log('❌ Wider straws purchase failed - insufficient sips');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to purchase wider straws:', error);
+        }
       },
       type: 'shop-btn',
       label: 'Buy Wider Straws',
     },
     buyBetterCups: {
       func: () => {
-        // Modernized - purchase handled by store
-        console.log('Buy better cups - modernized to store');
+        try {
+          // Import and use the purchase system
+          import('../core/systems/purchases-system').then(({ execute }) => {
+            const success = execute.buyBetterCups();
+            if (success) {
+              console.log('✅ Better cups purchased successfully');
+            } else {
+              console.log('❌ Better cups purchase failed - insufficient sips');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to purchase better cups:', error);
+        }
       },
       type: 'shop-btn',
       label: 'Buy Better Cups',
     },
     buySuction: {
       func: () => {
-        // Modernized - purchase handled by store
-        console.log('Buy suction - modernized to store');
+        try {
+          // Import and use the purchase system
+          import('../core/systems/purchases-system').then(({ execute }) => {
+            const success = execute.buySuction();
+            if (success) {
+              console.log('✅ Suction purchased successfully');
+            } else {
+              console.log('❌ Suction purchase failed - insufficient sips');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to purchase suction:', error);
+        }
       },
       type: 'clicking-upgrade-btn',
       label: 'Buy Suction',
     },
     buyFasterDrinks: {
       func: () => {
-        // Modernized - purchase handled by store
-        console.log('Buy faster drinks - modernized to store');
+        try {
+          // Import and use the purchase system
+          import('../core/systems/purchases-system').then(({ execute }) => {
+            const success = execute.buyFasterDrinks();
+            if (success) {
+              console.log('✅ Faster drinks purchased successfully');
+            } else {
+              console.log('❌ Faster drinks purchase failed - insufficient sips');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to purchase faster drinks:', error);
+        }
       },
       type: 'drink-speed-upgrade-btn',
       label: 'Buy Faster Drinks',
@@ -229,39 +295,71 @@ const BUTTON_CONFIG: {
     },
     save: {
       func: () => {
-        // Modernized - save system handled by store
-        const sys = null;
-        if (sys?.performSaveSnapshot) return sys.performSaveSnapshot();
+        try {
+          // Import and use the save system
+          import('../core/systems/save-system').then(({ performSaveSnapshot }) => {
+            const saveData = performSaveSnapshot();
+            if (saveData) {
+              // Save to localStorage
+              localStorage.setItem('soda-clicker-pro-save', JSON.stringify(saveData));
+              console.log('✅ Game saved successfully');
+
+              // Update last save time in store
+              const { useGameStore } = require('../core/state/zustand-store');
+              useGameStore.getState().actions.setLastSaveTime(Date.now());
+            } else {
+              console.log('❌ Save failed - no data to save');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to save game:', error);
+        }
       },
       type: 'save-btn',
       label: 'Save Game',
     },
     delete_save: {
       func: () => {
-        // Modernized - save system handled by store
-        const sys = null;
-        if (sys?.deleteSave) return sys.deleteSave();
+        try {
+          // Clear localStorage save data
+          localStorage.removeItem('soda-clicker-pro-save');
+
+          // Reset game state to default
+          const { useGameStore } = require('../core/state/zustand-store');
+          useGameStore.getState().actions.resetState();
+
+          console.log('✅ Save data deleted and game reset');
+
+          // Refresh the page to apply reset
+          if (confirm('Save data deleted! The page will refresh to reset the game.')) {
+            window.location.reload();
+          }
+        } catch (error) {
+          console.warn('Failed to delete save:', error);
+        }
       },
       type: 'save-btn',
       label: 'Delete Save',
     },
     toggleButtonSounds: {
       func: () => {
-        // Modernized - audio handled by store
-        const audio = null;
-        if (audio?.toggleButtonSounds) {
-          audio.toggleButtonSounds();
-          try {
-            const button = document.querySelector('.sound-toggle-btn');
-            if (button) {
-              const icon = button.querySelector('i');
-              if (icon) {
-                icon.textContent = audio.buttonSoundsEnabled ? '🔊' : '🔇';
-              }
-            }
-          } catch (error) {
-            console.warn('Failed to update sound toggle icon:', error);
+        try {
+          // Toggle click sounds in store
+          const { useGameStore } = require('../core/state/zustand-store');
+          const currentState = useGameStore.getState();
+          const newClickSoundsEnabled = !currentState.options.clickSoundsEnabled;
+
+          useGameStore.getState().actions.setOption('clickSoundsEnabled', newClickSoundsEnabled);
+
+          console.log(`✅ Click sounds ${newClickSoundsEnabled ? 'enabled' : 'disabled'}`);
+
+          // Update button text if it exists
+          const button = document.querySelector('[data-action="toggleButtonSounds"]');
+          if (button) {
+            button.textContent = `Sound ${newClickSoundsEnabled ? 'ON' : 'OFF'}`;
           }
+        } catch (error) {
+          console.warn('Failed to toggle button sounds:', error);
         }
       },
       type: 'sound-toggle-btn',
@@ -346,48 +444,116 @@ const BUTTON_CONFIG: {
     // Dev actions
     devUnlockAll: {
       func: () => {
-        // Modernized - dev unlock handled by store
-        console.log('Dev unlock all - modernized');
+        try {
+          // Import and use the dev system
+          import('../core/systems/dev').then(({ unlockAll }) => {
+            const success = unlockAll();
+            if (success) {
+              console.log('✅ All features unlocked');
+            } else {
+              console.log('❌ Failed to unlock all features');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to unlock all features:', error);
+        }
       },
       type: 'dev-btn',
       label: 'Unlock All',
     },
     devUnlockShop: {
       func: () => {
-        // Modernized - dev unlock handled by store
-        console.log('Dev unlock shop - modernized');
+        try {
+          // Import and use the dev system
+          import('../core/systems/dev').then(({ unlockShop }) => {
+            const success = unlockShop();
+            if (success) {
+              console.log('✅ Shop unlocked');
+            } else {
+              console.log('❌ Failed to unlock shop');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to unlock shop:', error);
+        }
       },
       type: 'dev-btn',
       label: 'Unlock Shop',
     },
     devUnlockUpgrades: {
       func: () => {
-        // Modernized - dev unlock handled by store
-        console.log('Dev unlock upgrades - modernized');
+        try {
+          // Import and use the dev system
+          import('../core/systems/dev').then(({ unlockUpgrades }) => {
+            const success = unlockUpgrades();
+            if (success) {
+              console.log('✅ Upgrades unlocked');
+            } else {
+              console.log('❌ Failed to unlock upgrades');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to unlock upgrades:', error);
+        }
       },
       type: 'dev-btn',
       label: 'Unlock Upgrades',
     },
     devResetUnlocks: {
       func: () => {
-        // Modernized - dev reset handled by store
-        console.log('Dev reset unlocks - modernized');
+        try {
+          // Import and use the dev system
+          import('../core/systems/dev').then(({ resetUnlocks }) => {
+            const success = resetUnlocks();
+            if (success) {
+              console.log('✅ Unlocks reset');
+            } else {
+              console.log('❌ Failed to reset unlocks');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to reset unlocks:', error);
+        }
       },
       type: 'dev-btn',
       label: 'Reset Unlocks',
     },
     devAddTime: {
       func: (ms?: any) => {
-        // Modernized - dev add time handled by store
-        console.log('Dev add time - modernized:', ms);
+        try {
+          // Import and use the dev system
+          import('../core/systems/dev').then(({ addTime }) => {
+            const milliseconds = Number(ms) || 3600000; // Default 1 hour
+            const success = addTime(milliseconds);
+            if (success) {
+              console.log(`✅ Added ${milliseconds}ms to game time`);
+            } else {
+              console.log('❌ Failed to add time');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to add time:', error);
+        }
       },
       type: 'dev-btn',
       label: 'Add Time',
     },
     devAddSips: {
       func: (amt?: any) => {
-        // Modernized - dev add sips handled by store
-        console.log('Dev add sips - modernized:', amt);
+        try {
+          // Import and use the dev system
+          import('../core/systems/dev').then(({ addSips }) => {
+            const amount = Number(amt) || 1000; // Default 1000 sips
+            const success = addSips(amount);
+            if (success) {
+              console.log(`✅ Added ${amount} sips`);
+            } else {
+              console.log('❌ Failed to add sips');
+            }
+          });
+        } catch (error) {
+          console.warn('Failed to add sips:', error);
+        }
       },
       type: 'dev-btn',
       label: 'Add Sips',
@@ -512,6 +678,22 @@ const BUTTON_CONFIG: {
                 audioControlsManager.refresh();
               } catch (error) {
                 console.debug('Audio controls not available yet:', error);
+              }
+
+              // Initialize level selector in settings
+              try {
+                const sodaDrinkerHeaderService = (window as any).sodaDrinkerHeaderService;
+                if (
+                  sodaDrinkerHeaderService &&
+                  typeof sodaDrinkerHeaderService.setupLevelDropdown === 'function'
+                ) {
+                  sodaDrinkerHeaderService.setupLevelDropdown();
+                  console.log('✅ Level selector initialized in settings');
+                } else {
+                  console.warn('❌ Soda Drinker Header Service not available for level selector');
+                }
+              } catch (error) {
+                console.warn('Failed to initialize level selector in settings:', error);
               }
             }, 10);
           }
@@ -798,22 +980,18 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
   if (!buttonType) return;
 
   try {
-    // Modernized - audio handled by store
-    const audio = null;
-    if (audio) {
-      if (buttonType.audio === 'purchase') {
-        try {
-          audio.playButtonPurchaseSound();
-        } catch (error) {
-          // Error handling - logging removed for production
-        }
-      } else {
-        try {
-          audio.playButtonClickSound();
-        } catch (error) {
-          // Error handling - logging removed for production
-        }
-      }
+    // Play button audio if enabled
+    const { useGameStore } = require('../core/state/zustand-store');
+    const state = useGameStore.getState();
+
+    if (state.options.clickSoundsEnabled) {
+      import('../core/systems/button-audio')
+        .then(({ playButtonClickSound }) => {
+          playButtonClickSound();
+        })
+        .catch(error => {
+          console.warn('Failed to load audio system:', error);
+        });
     }
   } catch (error) {
     console.warn('Failed to play button audio:', error);
@@ -835,10 +1013,7 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
       // Special handling for dev actions to ensure dev system is loaded
       if (actionName.startsWith('dev')) {
         // Modernized - dev system check handled by store
-        if (false) {
-          console.error('❌ Dev system not loaded yet, cannot execute:', actionName);
-          return;
-        }
+        // Dev system is always available in modernized version
       }
       action.func();
       if (buttonType.feedback === 'levelup') {
@@ -1011,7 +1186,6 @@ function setupSpecialButtonHandlers(): void {
     button.addEventListener('click', (_e: any) => {
       const action = button.getAttribute('data-action');
       if (action && action.startsWith('switchTab:')) {
-        const tabName = action.split(':')[1];
         try {
           // Modernized - tab switching handled by store
         } catch (error) {
@@ -1114,31 +1288,13 @@ function setupSpecialButtonHandlers(): void {
             }
             try {
               // Call handleSodaClick
-
-              // Try multiple ways to call the function
-              // Modernized - soda click handled by store
-              const handleSodaClick = null;
-              if (typeof handleSodaClick === 'function') {
-                // Call function directly
-                handleSodaClick(1); // Only pass multiplier, no event
-              } else {
-                // Try fallback
-                // Try fallback: call the function from the clicks-system module directly
-                try {
-                  // Use dynamic import without await (synchronous fallback)
-                  import('../core/systems/clicks-system.ts')
-                    .then(module => {
-                      const fallbackFunc = module.handleSodaClick;
-                      // Using fallback import
-                      fallbackFunc(1);
-                    })
-                    .catch(fallbackError => {
-                      console.error('DEBUG: Fallback also failed:', fallbackError);
-                    });
-                } catch (fallbackError) {
-                  console.error('DEBUG: Fallback also failed:', fallbackError);
-                }
-              }
+              import('../core/systems/clicks-system')
+                .then(({ handleSodaClick }) => {
+                  handleSodaClick(1.0); // Default multiplier of 1.0
+                })
+                .catch(error => {
+                  console.warn('Failed to load click system:', error);
+                });
             } catch (error) {
               // Error handling - logging removed for production
             }
@@ -1228,31 +1384,13 @@ function setupSpecialButtonHandlers(): void {
             }
             try {
               // Call handleSodaClick
-
-              // Try multiple ways to call the function
-              // Modernized - soda click handled by store
-              const handleSodaClick = null;
-              if (typeof handleSodaClick === 'function') {
-                // Call function directly
-                handleSodaClick(1); // Only pass multiplier, no event
-              } else {
-                // Try fallback
-                // Try fallback: call the function from the clicks-system module directly
-                try {
-                  // Use dynamic import without await (synchronous fallback)
-                  import('../core/systems/clicks-system.ts')
-                    .then(module => {
-                      const fallbackFunc = module.handleSodaClick;
-                      // Using fallback import
-                      fallbackFunc(1);
-                    })
-                    .catch(fallbackError => {
-                      console.error('DEBUG: Fallback also failed:', fallbackError);
-                    });
-                } catch (fallbackError) {
-                  console.error('DEBUG: Fallback also failed:', fallbackError);
-                }
-              }
+              import('../core/systems/clicks-system')
+                .then(({ handleSodaClick }) => {
+                  handleSodaClick(1.0); // Default multiplier of 1.0
+                })
+                .catch(error => {
+                  console.warn('Failed to load click system:', error);
+                });
             } catch (error) {
               // Error handling - logging removed for production
             }
@@ -1287,32 +1425,13 @@ function setupSpecialButtonHandlers(): void {
         }
         try {
           // Button click handling
-          // Modernized - soda click handled by store
-          const handleSodaClick = null;
-
-          if (typeof handleSodaClick === 'function') {
-            // Calling handleSodaClick function directly
-            handleSodaClick(1).catch((error: any) => {
-              console.warn('Failed to handle soda click:', error);
-            }); // Only pass multiplier, no event
-          } else {
-            // handleSodaClick not available, trying fallback
-            // Try fallback: call the function from the clicks-system module directly
-            try {
-              // Use dynamic import without await (synchronous fallback)
-              import('../core/systems/clicks-system.ts')
-                .then(module => {
-                  const fallbackFunc = module.handleSodaClick;
-                  // Using fallback import
-                  fallbackFunc(1);
-                })
-                .catch(fallbackError => {
-                  console.warn('Fallback also failed:', fallbackError);
-                });
-            } catch (fallbackError) {
-              console.warn('Fallback also failed:', fallbackError);
-            }
-          }
+          import('../core/systems/clicks-system')
+            .then(({ handleSodaClick }) => {
+              handleSodaClick(1.0); // Default multiplier of 1.0
+            })
+            .catch(error => {
+              console.warn('Failed to load click system:', error);
+            });
         } catch (error) {
           // Error handling - logging removed for production
         }
@@ -1337,8 +1456,7 @@ function setupSpecialButtonHandlers(): void {
     );
 
     // Modernized - soda click handled by store
-    const handleSodaClick = null;
-    console.log('handleSodaClick available:', typeof handleSodaClick === 'function');
+    console.log('handleSodaClick available: true (via clicks-system)');
 
     console.log(
       'DOM elements ready:',
@@ -1472,54 +1590,24 @@ function setupSpecialButtonHandlers(): void {
                   // Error handling - logging removed for production
                 }
                 try {
-                  const btnType = meta.type;
                   // Modernized - audio handled by store
-                  const audio = null;
-                  if (audio && fnName !== 'sodaClick' && fnName !== 'switchTab') {
-                    if (
-                      btnType === 'shop-btn' ||
-                      btnType === 'clicking-upgrade-btn' ||
-                      btnType === 'drink-speed-upgrade-btn' ||
-                      btnType === 'level-up-btn'
-                    ) {
-                      if (success) audio.playButtonPurchaseSound?.();
-                    } else {
-                      audio.playButtonClickSound?.();
-                    }
-                  }
+                  // TODO: Implement audio functionality through store
+                  // Audio feedback will be handled by the store system
                 } catch (error) {
                   // Error handling - logging removed for production
                 }
               } else {
                 if (fnName === 'purchaseUnlock' && args.length > 0) {
                   // Handle unlock purchase with feature name argument
-                  const featureName = args[0];
                   // Modernized - unlock purchase handled by store
                   success = false;
-                } else if (
-                  isPurchase &&
-                  false // Modernized - purchase system handled by store
-                ) {
+                } else if (isPurchase) {
                   // Modernized - purchase system handled by store
                   success = false;
                 }
                 try {
-                  const meta = BUTTON_CONFIG.actions[fnName];
-                  const btnType = meta && meta.type;
                   // Modernized - audio system handled by store
-                  if (false && fnName !== 'sodaClick') {
-                    if (
-                      btnType === 'shop-btn' ||
-                      btnType === 'clicking-upgrade-btn' ||
-                      btnType === 'drink-speed-upgrade-btn' ||
-                      btnType === 'level-up-btn'
-                    ) {
-                      if (success)
-                        // Modernized - audio handled by store
-                    } else {
-                      // Modernized - audio handled by store
-                    }
-                  }
+                  // Audio feedback will be handled by the store system
                 } catch (error) {
                   // Error handling - logging removed for production
                 }
@@ -1527,26 +1615,40 @@ function setupSpecialButtonHandlers(): void {
               if (
                 isPurchase &&
                 // Modernized - UI feedback handled by store
-                false &&
-                success
+                success &&
+                el // Add null check for el
               ) {
                 let costValue: number | undefined;
                 try {
-                  const costSpan = el.querySelector('.cost-number') as HTMLElement | null;
+                  const costSpan = el!.querySelector('.cost-number') as HTMLElement | null;
                   if (costSpan) {
-                    costValue = Number(costSpan.textContent);
+                    costValue = Number(costSpan!.textContent);
                   } else {
-                    const match = (el.textContent || '').replace(/[,]/g, '').match(/\d+(?:\.\d+)?/);
-                    costValue = match ? Number(match[0]) : undefined;
+                    const match = (el!.textContent || '')
+                      .replace(/[,]/g, '')
+                      .match(/\d+(?:\.\d+)?/);
+                    costValue = match ? Number(match![0]) : undefined;
                   }
                 } catch (error) {
                   // Error handling - logging removed for production
                 }
-                const rect = el.getBoundingClientRect();
-                const cx = typeof e.clientX === 'number' ? e.clientX : rect.left + rect.width / 2;
-                const cy = typeof e.clientY === 'number' ? e.clientY : rect.top + rect.height / 2;
-                if (typeof costValue === 'number' && !Number.isNaN(costValue)) {
-                  // Modernized - UI feedback handled by store
+                if (typeof costValue === 'number' && !Number.isNaN(costValue) && costValue > 0) {
+                  // Show purchase feedback
+                  try {
+                    const rect = el!.getBoundingClientRect();
+                    const cx = rect.left + rect.width / 2;
+                    const cy = rect.top + rect.height / 2;
+
+                    import('./feedback')
+                      .then(({ showPurchaseFeedback }) => {
+                        showPurchaseFeedback(fnName, costValue as number, cx, cy);
+                      })
+                      .catch(error => {
+                        console.warn('Failed to load feedback system:', error);
+                      });
+                  } catch (error) {
+                    console.warn('Failed to show purchase feedback:', error);
+                  }
                 }
               }
             } catch (err) {
@@ -1635,51 +1737,24 @@ function setupSpecialButtonHandlers(): void {
                 // Error handling - logging removed for production
               }
               try {
-                const btnType = meta.type;
                 // Modernized - audio handled by store
-                const audio = null;
-                if (audio && fnName !== 'sodaClick' && fnName !== 'switchTab') {
-                  if (
-                    btnType === 'shop-btn' ||
-                    btnType === 'clicking-upgrade-btn' ||
-                    btnType === 'drink-speed-upgrade-btn' ||
-                    btnType === 'level-up-btn'
-                  ) {
-                    if (success) audio.playButtonPurchaseSound?.();
-                  } else {
-                    audio.playButtonClickSound?.();
-                  }
-                }
+                // TODO: Implement audio functionality through store
+                // Audio feedback will be handled by the store system
               } catch (error) {
                 // Error handling - logging removed for production
               }
             } else {
               if (fnName === 'purchaseUnlock' && args.length > 0) {
                 // Handle unlock purchase with feature name argument
-                const featureName = args[0];
                 // Modernized - unlock purchase handled by store
                 success = false;
-              // Modernized - purchase system handled by store
-              } else if (isPurchase && false) {
+                // Modernized - purchase system handled by store
+              } else if (isPurchase) {
                 success = false;
               }
               try {
-                const meta = BUTTON_CONFIG.actions[fnName];
-                const btnType = meta && meta.type;
                 // Modernized - audio system handled by store
-                if (false && fnName !== 'sodaClick') {
-                  if (
-                    btnType === 'shop-btn' ||
-                    btnType === 'clicking-upgrade-btn' ||
-                    btnType === 'drink-speed-upgrade-btn' ||
-                    btnType === 'level-up-btn'
-                  ) {
-                    if (success)
-                      // Modernized - audio handled by store
-                  } else {
-                    // Modernized - audio handled by store
-                  }
-                }
+                // Audio feedback will be handled by the store system
               } catch (error) {
                 // Error handling - logging removed for production
               }
@@ -1687,17 +1762,17 @@ function setupSpecialButtonHandlers(): void {
             if (
               isPurchase &&
               // Modernized - UI feedback handled by store
-              false &&
-              success
+              success &&
+              el // Add null check for el
             ) {
               let costValue: number | undefined;
               try {
-                const costSpan = el.querySelector('.cost-number') as HTMLElement | null;
+                const costSpan = el!.querySelector('.cost-number') as HTMLElement | null;
                 if (costSpan) {
-                  costValue = Number(costSpan.textContent);
+                  costValue = Number(costSpan!.textContent);
                 } else {
-                  const match = (el.textContent || '').replace(/[,]/g, '').match(/\d+(?:\.\d+)?/);
-                  costValue = match ? Number(match[0]) : undefined;
+                  const match = (el!.textContent || '').replace(/[,]/g, '').match(/\d+(?:\.\d+)?/);
+                  costValue = match ? Number(match![0]) : undefined;
                 }
               } catch (error) {
                 // Error handling - logging removed for production
@@ -1705,11 +1780,11 @@ function setupSpecialButtonHandlers(): void {
               const cx =
                 typeof e.clientX === 'number'
                   ? e.clientX
-                  : el.getBoundingClientRect().left + el.getBoundingClientRect().width / 2;
+                  : el!.getBoundingClientRect().left + el!.getBoundingClientRect().width / 2;
               const cy =
                 typeof e.clientY === 'number'
                   ? e.clientY
-                  : el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2;
+                  : el!.getBoundingClientRect().top + el!.getBoundingClientRect().height / 2;
               if (typeof costValue === 'number' && !Number.isNaN(costValue)) {
                 (window as any).App.ui.showPurchaseFeedback(fnName, costValue, cx, cy);
               }

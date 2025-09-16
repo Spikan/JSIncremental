@@ -14,7 +14,7 @@ import { domQuery } from './services/dom-query';
 import { timerManager } from './services/timer-manager';
 import { useGameStore } from './core/state/zustand-store';
 
-const GC: any = (typeof window !== 'undefined' && (window as any).GAME_CONFIG) || {};
+import { config as GC } from './config';
 // Decimal is declared in global types
 
 // Test utilities removed - no longer needed
@@ -46,7 +46,7 @@ if (BAL && TIMING && LIMITS) {
 // Import modular systems at the top
 import { saveGameLoader } from './core/systems/save-game-loader';
 import { mobileInputHandler } from './ui/mobile-input';
-import { bootstrapSystem, initSplashScreen } from './core/systems/bootstrap';
+import { bootstrapSystem } from './core/systems/bootstrap';
 import { processOfflineProgression } from './core/systems/offline-progression';
 import { showOfflineModal } from './ui/offline-modal';
 import { sidebarNavigation } from './ui/sidebar-navigation';
@@ -54,7 +54,8 @@ import { sodaDrinkerHeaderService } from './services/soda-drinker-header-service
 // DecimalOps removed - no longer using toSafeNumber
 
 // Export for potential use
-(window as any).initSplashScreen = initSplashScreen;
+// Export initGame for proper module access
+export { initGame };
 
 function initGame() {
   try {
@@ -105,15 +106,7 @@ function initGame() {
       });
     }
 
-    let fasterDrinks = new Decimal(0);
-    (window as any).fasterDrinks = fasterDrinks;
-    const fasterDrinksUpCounter = new Decimal(1);
-    (window as any).fasterDrinksUpCounter = fasterDrinksUpCounter;
-
-    let criticalClickChance = new Decimal(BAL.CRITICAL_CLICK_BASE_CHANCE);
-    (window as any).criticalClickChance = criticalClickChance;
-    let criticalClickMultiplier = new Decimal(BAL.CRITICAL_CLICK_BASE_MULTIPLIER);
-    (window as any).criticalClickMultiplier = criticalClickMultiplier;
+    // Variables removed - using proper state management instead
     // Critical clicks now managed through store
 
     try {
@@ -172,12 +165,8 @@ function initGame() {
     // Load save using modular system
     let savegame: any = null;
     try {
-      const w: any = window as any;
-      if (w.App && w.App.storage && typeof w.App.storage.loadGame === 'function') {
-        savegame = w.App.storage.loadGame();
-      } else {
-        savegame = JSON.parse(localStorage.getItem('save') as any);
-      }
+      // Use localStorage directly for now
+      savegame = JSON.parse(localStorage.getItem('save') as any);
     } catch (e) {
       console.warn('Failed to load save, starting fresh.', e);
       savegame = null;
@@ -230,9 +219,9 @@ function initGame() {
       straws: { baseSPD: config.STRAW_BASE_SPD },
       cups: { baseSPD: config.CUP_BASE_SPD },
       widerStraws: { multiplierPerLevel: config.WIDER_STRAWS_MULTIPLIER },
-      betterCups: { multiplierPerLevel: config.BETTER_CUPS_MULTIPLIER }
+      betterCups: { multiplierPerLevel: config.BETTER_CUPS_MULTIPLIER },
     };
-    
+
     const result = {
       base: {
         strawBaseSPD: up.straws.baseSPD,
@@ -271,7 +260,7 @@ function initGame() {
     } catch (error) {
       console.warn('Failed to handle Decimal results:', error);
     }
-    
+
     // Fallback production calculation using store values
     try {
       const strawSPD = new Decimal(config.STRAW_BASE_SPD);
@@ -390,16 +379,9 @@ function initGame() {
 
 // Legacy function removed - duplicate of mobile-input.ts version
 
-function startGame() {
-  try {
-    // Modernized - game start handled by store
-  } catch (error) {
-    console.error('Error in startGame:', error);
-  }
-}
+// startGame function removed - functionality moved to proper modules
 
-(window as any).initGame = initGame;
-(window as any).startGame = startGame;
+// Debug functions removed - use proper module imports instead
 
 // Initialize game when ready using bootstrap system
 bootstrapSystem.initializeGameWhenReady(initGame);

@@ -285,17 +285,17 @@ export function initOnDomReady(): void {
         try {
           initSplashScreen();
           try {
-            const defaults = {
-              autosaveEnabled: true,
-              autosaveInterval: 10,
-              clickSoundsEnabled: true,
-              musicEnabled: true,
-              devToolsEnabled: false, // Hidden by default
-              secretsUnlocked: false, // Konami code required
-              godTabEnabled: false, // Hidden by default, unlocked via secrets
-            } as any;
+            // const defaults = { // Unused - modernized to store
+            //   autosaveEnabled: true,
+            //   autosaveInterval: 10,
+            //   clickSoundsEnabled: true,
+            //   musicEnabled: true,
+            //   devToolsEnabled: false, // Hidden by default
+            //   secretsUnlocked: false, // Konami code required
+            //   godTabEnabled: false, // Hidden by default, unlocked via secrets
+            // } as any;
             // Modernized - options handled by store
-            const loaded = defaults;
+            // const loaded = defaults; // Unused - modernized to store
             // Modernized - state updates handled by store
             // Modernized - autosave status handled by store
           } catch {}

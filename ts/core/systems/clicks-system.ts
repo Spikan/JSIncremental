@@ -57,6 +57,17 @@ export async function handleSodaClick(multiplier: number = 1) {
   console.log('🍹 handleSodaClick called with multiplier:', multiplier);
   try {
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+
+    // Add momentum to 3D model if available
+    try {
+      const soda3DButton = w.soda3DButton;
+      if (soda3DButton && typeof soda3DButton.addMomentum === 'function') {
+        soda3DButton.addMomentum();
+      }
+    } catch (error) {
+      console.warn('Failed to add momentum to 3D model:', error);
+    }
+
     // Track click via system
     try {
       trackClick();

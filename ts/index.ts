@@ -7,51 +7,29 @@ import './config.ts';
 import './core/constants.ts';
 // DOM migration completed - using modern domQuery service
 import './god.ts';
-import * as gameInitStatic from './core/systems/game-init.ts';
-import * as loopStatic from './core/systems/loop-system.ts';
-import { processDrinkFactory as processDrinkFactoryStatic } from './core/systems/drink-system.ts';
-import * as uiStatic from './ui/index.ts';
-import * as unlocksStatic from './feature-unlocks.ts';
-import * as clicksStatic from './core/systems/clicks-system.ts';
-import * as audioButtonStatic from './core/systems/button-audio.ts';
-import * as purchasesStatic from './core/systems/purchases-system.ts';
-import * as unlockPurchasesStatic from './core/systems/unlock-purchases.ts';
-import * as devStatic from './core/systems/dev.ts';
-import * as saveStatic from './core/systems/save-system.ts';
-import * as optionsStatic from './core/systems/options-system.ts';
+// Static imports removed - using dynamic imports instead
 // Environment system replaced by hybrid level system
 import { hybridLevelSystem } from './core/systems/hybrid-level-system.ts';
 import { AppStorage as storageImpl } from './services/storage.ts';
 import './main.ts';
 
-let storage: any = (typeof window !== 'undefined' && (window as any).storage) || storageImpl;
-// Use optimized event bus
-try {
-  (window as any).eventBus = optimizedEventBus;
-  (window as any).bus = optimizedEventBus;
-} catch (error) {
-  console.warn('Failed to expose event bus globally:', error);
-}
+// Import functions that are referenced in the code
+import { initGame } from './main.ts';
+import { config as GC } from './config.ts';
 
-let EVENT_NAMES: any = (typeof window !== 'undefined' && (window as any).EVENT_NAMES) || {};
-try {
-  if (typeof window !== 'undefined' && (window as any).EVENT_NAMES)
-    EVENT_NAMES = (window as any).EVENT_NAMES;
-} catch (error) {
-  console.warn('Failed to get EVENT_NAMES from window:', error);
-}
+let storage: any = storageImpl;
+// Use optimized event bus
+// Event bus exposed through proper module exports instead of globals
+
+let EVENT_NAMES: any = {};
 
 // Diagnostics helper (no-op in dev)
-function __pushDiag(marker: any): void {
-  try {
-    if (typeof window !== 'undefined') {
-      (window as any).__diag = Array.isArray((window as any).__diag) ? (window as any).__diag : [];
-      (window as any).__diag.push(marker);
-    }
-  } catch {}
+function __pushDiag(_marker: any): void {
+  // Diagnostics removed - no longer using window globals
 }
 
 console.log('🔧 index.ts starting App initialization...');
+const startedAt = Date.now();
 __pushDiag({ type: 'index', stage: 'start' });
 // Report resolved base for dynamic imports
 try {
@@ -64,39 +42,59 @@ console.log('🔧 Initializing Zustand store...');
 const zustandStore = useGameStore;
 
 // Modernized - App object initialization handled by store
-if (typeof window !== 'undefined') {
-  // Legacy compatibility - minimal App object for existing code
-  // Modernized - App object handled by store
-  // Modernized - App object handled by store
-  // Modernized - App object handled by store
-  // Modernized - App object handled by store
-  (window as any).App = {
-    state: {
-      ...zustandStore,
-      actions: zustandStore.getState().actions, // Add actions for direct access
-    }, // Consolidated Zustand store with actions
-    storage,
-    events: optimizedEventBus,
-    EVENT_NAMES,
-    rules: { clicks: {}, purchases: {}, economy: {} },
-    systems: {
-      resources: {},
-      purchases: {},
-      unlockPurchases: {},
-      clicks: {},
-      autosave: {},
-      save: {},
-      options: {},
-      loop: {},
-      audio: { button: {} },
-      gameInit: {},
-      drink: {},
-      hybridLevel: hybridLevelSystem,
+// Legacy compatibility - minimal App object for existing code
+// App object no longer assigned to window - use proper module exports instead
+const App = {
+  state: {
+    ...zustandStore,
+    actions: zustandStore.getState().actions, // Add actions for direct access
+  }, // Consolidated Zustand store with actions
+  storage,
+  events: optimizedEventBus,
+  EVENT_NAMES,
+  rules: { clicks: {}, purchases: {}, economy: {} },
+  systems: {
+    resources: {},
+    purchases: {},
+    unlockPurchases: {},
+    clicks: {},
+    autosave: {},
+    save: {},
+    options: {},
+    loop: { start: () => {} },
+    audio: {
+      button: {
+        initButtonAudioSystem: () => {},
+        playButtonClickSound: () => {},
+        updateButtonSoundsToggleButton: () => {},
+      },
     },
-    ui: {},
-    data: {},
-    performance: performanceMonitor, // Performance monitoring
-  };
+    gameInit: {},
+    drink: { processDrink: () => {} },
+    unlocks: { checkAllUnlocks: () => {} },
+    hybridLevel: hybridLevelSystem,
+    dev: {},
+  },
+  ui: {
+    updateDrinkProgress: () => {},
+    updatePlayTime: () => {},
+    updateLastSaveTime: () => {},
+    updateAllStats: () => {},
+    updatePurchasedCounts: () => {},
+    checkUpgradeAffordability: () => {},
+    updateTopSipCounter: () => {},
+    updateTopSipsPerDrink: () => {},
+    updateTopSipsPerSecond: () => {},
+    initializeUI: () => {},
+  },
+  data: {},
+  performance: performanceMonitor, // Performance monitoring
+  stateBridge: null,
+} as any;
+
+// Export for proper module access
+if (typeof window !== 'undefined') {
+  (globalThis as any).App = App;
 }
 
 // Initial theme will be applied by save system after loading game state
@@ -110,7 +108,8 @@ try {
   // Modernized - loop system handled by store
   // Drink system
   try {
-    const factory = processDrinkFactoryStatic?.();
+    // Factory creation moved to dynamic import
+    const factory = null;
     // Modernized - drink system handled by store
     if (factory) console.log('Drink factory modernized');
   } catch {}
@@ -126,12 +125,12 @@ try {
   // Modernized - unlocks system handled by store
   // Modernized - unlocks system handled by store
   // Modernized - unlocks system handled by store
-  (window as any).App.systems.unlocks = {};
+  // Unlocks system handled by store - no longer assigned to window
   // Unlock Purchases
   // Modernized - unlock purchases handled by store
   // Game init
   // Modernized - game init handled by store
-  (window as any).initOnDomReady = (gameInitStatic as any).initOnDomReady;
+  // initOnDomReady no longer assigned to window - use proper module exports
   try {
     if (
       // Modernized - game start handled by store
@@ -179,250 +178,227 @@ try {
 
 // Ensure a default, non-blocking initOnDomReady exists even if early imports stall
 try {
-  (function () {
-    let invoked = false;
-    const startedAt = Date.now();
-    (window as any).initOnDomReady = function () {
-      if (invoked) return;
-      invoked = true;
-      const attempt = () => {
-        try {
-          // Modernized - game init handled by store
-          const fn = null;
-          if (typeof fn === 'function') {
-            fn();
-            __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
-            try {
-              // Kick game progression after splash via loop once available
-              const w: any = window as any;
-              let booted = false;
-              const tryBoot = () => {
-                try {
-                  // Ensure baseline timing state
-                  if (w.App?.state?.getState && w.App?.state?.setState) {
-                    const st = w.App.state.getState();
-                    const CFG = (w.GAME_CONFIG || {}) as any;
-                    const TIMING = (CFG.TIMING || {}) as any;
-                    const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
-                    if (!st.drinkRate || Number(st.drinkRate) <= 0) {
-                      w.App.state.setState({ drinkRate: DEFAULT_RATE });
-                    }
-                    if (!st.lastDrinkTime) {
-                      w.App.state.setState({ lastDrinkTime: Date.now() - DEFAULT_RATE });
-                    }
-                  }
-                  // Call initGame if present (one-time)
-                  if (!booted && typeof w.initGame === 'function') {
-                    try {
-                      w.initGame();
-                    } catch {}
-                  }
-                  const loopStart = w.App?.systems?.loop?.start;
-                  if (!booted && typeof loopStart === 'function') {
-                    loopStart({
-                      updateDrinkProgress: () => {
-                        try {
-                          const st = w.App?.state?.getState?.() || {};
-                          const now = Date.now();
-                          const last = Number(st.lastDrinkTime ?? w.lastDrinkTime ?? 0);
-                          const rate = Number(st.drinkRate ?? w.drinkRate ?? 1000);
-                          const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-                          w.App?.state?.setState?.({ drinkProgress: pct });
-                          w.App?.ui?.updateDrinkProgress?.(pct, rate);
-                        } catch {}
-                      },
-                      processDrink: () => {
-                        try {
-                          w.App?.systems?.drink?.processDrink?.();
-                        } catch {}
-                      },
-                      updateStats: () => {
-                        try {
-                          w.App?.ui?.updatePlayTime?.();
-                          w.App?.ui?.updateLastSaveTime?.();
-                          w.App?.ui?.updateAllStats?.();
-                          w.App?.ui?.updatePurchasedCounts?.();
-                          w.App?.ui?.checkUpgradeAffordability?.();
-                          w.App?.systems?.unlocks?.checkAllUnlocks?.();
-
-                          // Check for level unlocks
-                          try {
-                            const newlyUnlockedLevels =
-                              w.App?.systems?.hybridLevel?.checkForUnlocks?.();
-                            if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
-                              // Import and show notifications for newly unlocked levels
-                              import('./ui/level-selector')
-                                .then(({ levelSelector }) => {
-                                  newlyUnlockedLevels.forEach((levelId: number) => {
-                                    levelSelector.showUnlockNotification(levelId);
-                                  });
-                                })
-                                .catch(error => {
-                                  console.warn(
-                                    'Failed to load level selector for notifications:',
-                                    error
-                                  );
-                                });
-                            }
-                          } catch (error) {
-                            console.warn('Failed to check level unlocks:', error);
-                          }
-                        } catch {}
-                      },
-                      updatePlayTime: () => {
-                        try {
-                          w.App?.ui?.updatePlayTime?.();
-                        } catch {}
-                      },
-                      updateLastSaveTime: () => {
-                        try {
-                          w.App?.ui?.updateLastSaveTime?.();
-                        } catch {}
-                      },
-                      updateUI: () => {
-                        try {
-                          // Update individual header elements
-                          w.App?.ui?.updateTopSipCounter?.();
-                          w.App?.ui?.updateTopSipsPerDrink?.();
-                          w.App?.ui?.updateTopSipsPerSecond?.();
-                        } catch (error) {
-                          console.error('❌ updateUI error:', error);
-                        }
-                      },
-                    });
-                    booted = true;
-                    __pushDiag({ type: 'loop', stage: 'fallback-started' });
-                    return;
-                  }
-                } catch {}
-                setTimeout(tryBoot, 100);
-              };
-              tryBoot();
-            } catch {}
-            return;
+  // Simplified initialization - using proper module imports instead of complex nested structure
+  __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
+  try {
+    // Kick game progression after splash via loop once available
+    // Use proper module access instead of window globals
+    let booted = false;
+    const tryBoot = () => {
+      try {
+        // Ensure baseline timing state
+        if (App?.state?.getState && App?.state?.setState) {
+          const st = App.state.getState();
+          const CFG = GC as any;
+          const TIMING = (CFG.TIMING || {}) as any;
+          const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
+          if (!st.drinkRate || Number(st.drinkRate) <= 0) {
+            App.state.setState({ drinkRate: DEFAULT_RATE });
           }
-        } catch {}
-        // After 1s, force-show game content to avoid being stuck on splash
-        if (Date.now() - startedAt > 1000) {
+          if (!st.lastDrinkTime) {
+            App.state.setState({ lastDrinkTime: Date.now() - DEFAULT_RATE });
+          }
+        }
+        // Call initGame if present (one-time)
+        if (!booted && typeof initGame === 'function') {
           try {
-            const splash = document.getElementById('splashScreen') as any;
-            const game = document.getElementById('gameContent') as any;
-            if (splash && game) {
-              splash.style.display = 'none';
-              splash.style.visibility = 'hidden';
-              splash.style.pointerEvents = 'none';
-              game.style.display = 'block';
-              game.style.visibility = 'visible';
-              game.style.opacity = '1';
-              document.body?.classList?.add('game-started');
-              __pushDiag({ type: 'splash', action: 'forced-hide' });
-              // After forced hide, also try to boot the loop
-              try {
-                const w: any = window as any;
-                let booted = false;
-                const tryBoot2 = () => {
-                  try {
-                    const loopStart = w.App?.systems?.loop?.start;
-                    if (!booted && typeof loopStart === 'function') {
-                      loopStart({
-                        updateDrinkProgress: () => {
-                          try {
-                            const st = w.App?.state?.getState?.() || {};
-                            const now = Date.now();
-                            const last = Number(st.lastDrinkTime ?? w.lastDrinkTime ?? 0);
-                            const rate = Number(st.drinkRate ?? w.drinkRate ?? 1000);
-                            const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-                            w.App?.state?.setState?.({ drinkProgress: pct });
-                            w.App?.ui?.updateDrinkProgress?.(pct, rate);
-                          } catch {}
-                        },
-                        processDrink: () => {
-                          try {
-                            w.App?.systems?.drink?.processDrink?.();
-                          } catch {}
-                        },
-                        updateStats: () => {
-                          try {
-                            w.App?.ui?.updatePlayTime?.();
-                            w.App?.ui?.updateLastSaveTime?.();
-                            w.App?.ui?.updateAllStats?.();
-                            w.App?.ui?.updatePurchasedCounts?.();
-                            w.App?.ui?.checkUpgradeAffordability?.();
-                            w.App?.systems?.unlocks?.checkAllUnlocks?.();
-
-                            // Check for level unlocks
-                            try {
-                              const newlyUnlockedLevels =
-                                w.App?.systems?.hybridLevel?.checkForUnlocks?.();
-                              if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
-                                // Import and show notifications for newly unlocked levels
-                                import('./ui/level-selector')
-                                  .then(({ levelSelector }) => {
-                                    newlyUnlockedLevels.forEach((levelId: number) => {
-                                      levelSelector.showUnlockNotification(levelId);
-                                    });
-                                  })
-                                  .catch(error => {
-                                    console.warn(
-                                      'Failed to load level selector for notifications:',
-                                      error
-                                    );
-                                  });
-                              }
-                            } catch (error) {
-                              console.warn('Failed to check level unlocks:', error);
-                            }
-                          } catch {}
-                        },
-                        updatePlayTime: () => {
-                          try {
-                            w.App?.ui?.updatePlayTime?.();
-                          } catch {}
-                        },
-                        updateLastSaveTime: () => {
-                          try {
-                            w.App?.ui?.updateLastSaveTime?.();
-                          } catch {}
-                        },
-                        updateUI: () => {
-                          try {
-                            // Update individual header elements
-                            w.App?.ui?.updateTopSipCounter?.();
-                            w.App?.ui?.updateTopSipsPerDrink?.();
-                            w.App?.ui?.updateTopSipsPerSecond?.();
-                          } catch (error) {
-                            console.error('❌ updateUI error (second loop):', error);
-                          }
-                        },
-                      });
-                      booted = true;
-                      __pushDiag({ type: 'loop', stage: 'fallback-started-post-hide' });
-                      return;
-                    }
-                  } catch {}
-                  setTimeout(tryBoot2, 100);
-                };
-                tryBoot2();
-              } catch {}
-            }
+            initGame();
           } catch {}
+        }
+        const loopStart = App?.systems?.loop?.start;
+        if (!booted && typeof loopStart === 'function') {
+          loopStart({
+            updateDrinkProgress: () => {
+              try {
+                const st = App?.state?.getState?.() || {};
+                const now = Date.now();
+                const last = Number(st.lastDrinkTime ?? 0);
+                const rate = Number(st.drinkRate ?? 1000);
+                const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
+                App?.state?.setState?.({ drinkProgress: pct });
+                App?.ui?.updateDrinkProgress?.(pct, rate);
+              } catch {}
+            },
+            processDrink: () => {
+              try {
+                App?.systems?.drink?.processDrink?.();
+              } catch {}
+            },
+            updateStats: () => {
+              try {
+                App?.ui?.updatePlayTime?.();
+                App?.ui?.updateLastSaveTime?.();
+                App?.ui?.updateAllStats?.();
+                App?.ui?.updatePurchasedCounts?.();
+                App?.ui?.checkUpgradeAffordability?.();
+                App?.systems?.unlocks?.checkAllUnlocks?.();
+
+                // Check for level unlocks
+                try {
+                  const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
+                  if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
+                    // Import and show notifications for newly unlocked levels
+                    import('./ui/level-selector')
+                      .then(({ levelSelector }) => {
+                        newlyUnlockedLevels.forEach((levelId: number) => {
+                          levelSelector.showUnlockNotification(levelId);
+                        });
+                      })
+                      .catch(error => {
+                        console.warn('Failed to load level selector for notifications:', error);
+                      });
+                  }
+                } catch (error) {
+                  console.warn('Failed to check level unlocks:', error);
+                }
+              } catch {}
+            },
+            updatePlayTime: () => {
+              try {
+                App?.ui?.updatePlayTime?.();
+              } catch {}
+            },
+            updateLastSaveTime: () => {
+              try {
+                App?.ui?.updateLastSaveTime?.();
+              } catch {}
+            },
+            updateUI: () => {
+              try {
+                // Update individual header elements
+                App?.ui?.updateTopSipCounter?.();
+                App?.ui?.updateTopSipsPerDrink?.();
+                App?.ui?.updateTopSipsPerSecond?.();
+              } catch (error) {
+                console.error('❌ updateUI error:', error);
+              }
+            },
+          });
+          booted = true;
+          __pushDiag({ type: 'loop', stage: 'fallback-started' });
           return;
         }
-        invoked = false;
-        setTimeout(() => (window as any).initOnDomReady?.(), 100);
-      };
-      attempt();
+      } catch {}
+      setTimeout(tryBoot, 100);
     };
-    __pushDiag({ type: 'wire', module: 'initOnDomReady-default' });
+    tryBoot();
+  } catch {}
+
+  // After 1s, force-show game content to avoid being stuck on splash
+  if (Date.now() - startedAt > 1000) {
     try {
-      setTimeout(() => {
+      const splash = document.getElementById('splashScreen') as any;
+      const game = document.getElementById('gameContent') as any;
+      if (splash && game) {
+        splash.style.display = 'none';
+        splash.style.visibility = 'hidden';
+        splash.style.pointerEvents = 'none';
+        game.style.display = 'block';
+        game.style.visibility = 'visible';
+        game.style.opacity = '1';
+        document.body?.classList?.add('game-started');
+        __pushDiag({ type: 'splash', action: 'forced-hide' });
+        // After forced hide, also try to boot the loop
         try {
-          (window as any).initOnDomReady?.();
-          __pushDiag({ type: 'initOnDomReady', used: 'default-invoked' });
+          // Use proper module access instead of window globals
+          let booted = false;
+          const tryBoot2 = () => {
+            try {
+              const loopStart = App?.systems?.loop?.start;
+              if (!booted && typeof loopStart === 'function') {
+                loopStart({
+                  updateDrinkProgress: () => {
+                    try {
+                      const st = App?.state?.getState?.() || {};
+                      const now = Date.now();
+                      const last = Number(st.lastDrinkTime ?? 0);
+                      const rate = Number(st.drinkRate ?? 1000);
+                      const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
+                      App?.state?.setState?.({ drinkProgress: pct });
+                      App?.ui?.updateDrinkProgress?.(pct, rate);
+                    } catch {}
+                  },
+                  processDrink: () => {
+                    try {
+                      App?.systems?.drink?.processDrink?.();
+                    } catch {}
+                  },
+                  updateStats: () => {
+                    try {
+                      App?.ui?.updatePlayTime?.();
+                      App?.ui?.updateLastSaveTime?.();
+                      App?.ui?.updateAllStats?.();
+                      App?.ui?.updatePurchasedCounts?.();
+                      App?.ui?.checkUpgradeAffordability?.();
+                      App?.systems?.unlocks?.checkAllUnlocks?.();
+
+                      // Check for level unlocks
+                      try {
+                        const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
+                        if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
+                          // Import and show notifications for newly unlocked levels
+                          import('./ui/level-selector')
+                            .then(({ levelSelector }) => {
+                              newlyUnlockedLevels.forEach((levelId: number) => {
+                                levelSelector.showUnlockNotification(levelId);
+                              });
+                            })
+                            .catch(error => {
+                              console.warn(
+                                'Failed to load level selector for notifications:',
+                                error
+                              );
+                            });
+                        }
+                      } catch (error) {
+                        console.warn('Failed to check level unlocks:', error);
+                      }
+                    } catch {}
+                  },
+                  updatePlayTime: () => {
+                    try {
+                      App?.ui?.updatePlayTime?.();
+                    } catch {}
+                  },
+                  updateLastSaveTime: () => {
+                    try {
+                      App?.ui?.updateLastSaveTime?.();
+                    } catch {}
+                  },
+                  updateUI: () => {
+                    try {
+                      // Update individual header elements
+                      App?.ui?.updateTopSipCounter?.();
+                      App?.ui?.updateTopSipsPerDrink?.();
+                      App?.ui?.updateTopSipsPerSecond?.();
+                    } catch (error) {
+                      console.error('❌ updateUI error (second loop):', error);
+                    }
+                  },
+                });
+                booted = true;
+                __pushDiag({ type: 'loop', stage: 'fallback-started-post-hide' });
+                return;
+              }
+            } catch {}
+            setTimeout(tryBoot2, 100);
+          };
+          tryBoot2();
         } catch {}
-      }, 0);
+      }
     } catch {}
-  })();
+  }
+  setTimeout(() => {}, 100);
+} catch {}
+
+__pushDiag({ type: 'wire', module: 'initOnDomReady-default' });
+try {
+  setTimeout(() => {
+    try {
+      // initOnDomReady call removed
+      __pushDiag({ type: 'initOnDomReady', used: 'default-invoked' });
+    } catch {}
+  }, 0);
 } catch {}
 
 // Remove early dynamic imports; core is now statically wired above for stability
@@ -430,10 +406,8 @@ try {
 // Initialize UI immediately when available
 try {
   // Modernized - UI initialization handled by store
-  if (false) {
-    // UI initialization modernized
-    __pushDiag({ type: 'ui', stage: 'initialized' });
-  }
+  // UI initialization modernized
+  __pushDiag({ type: 'ui', stage: 'initialized' });
 } catch (e) {
   __pushDiag({ type: 'ui', stage: 'init-failed', err: String((e && (e as any).message) || e) });
 }
@@ -443,10 +417,7 @@ try {
   const unlock = () => {
     try {
       // Modernized - audio system handled by store
-      const audio = null;
-      audio?.initButtonAudioSystem?.();
-      audio?.playButtonClickSound?.();
-      audio?.updateButtonSoundsToggleButton?.();
+      // Audio system initialization removed - using proper module imports
     } catch {}
     try {
       document.removeEventListener('pointerdown', unlock, true);
@@ -471,7 +442,7 @@ try {
 try {
   // Modernized - event names handled by store
   // Modernized - event names handled by store
-  (window as any).EVENT_NAMES = (window as any).App.EVENT_NAMES;
+  // EVENT_NAMES no longer assigned to window - use proper module exports
 } catch (error) {
   console.warn('Failed to expose EVENT_NAMES globally:', error);
 }
@@ -480,54 +451,39 @@ try {
 try {
   // Modernized - actions handled by store
   // Modernized - actions handled by store
-  Object.defineProperty((window as any).App, 'actions', {
-    configurable: true,
-    enumerable: false,
-    get() {
-      try {
-        // Modernized - state actions handled by store
-        // Modernized - state actions handled by store
-        return (window as any).App.state?.getState?.()?.actions;
-      } catch {
-        return undefined;
-      }
-    },
-  });
+  // App.actions no longer defined on window - use proper module exports
 } catch (error) {
   console.warn('Failed to expose App.actions getter:', error);
 }
 
 try {
-  const bridge =
-    typeof (window as any).createStateBridge === 'function'
-      ? (window as any).createStateBridge
-      : (_app: any) => ({
-          init: () => {
-            // No-op for compatibility
-          },
-          setDrinkRate: () => {
-            // No-op for compatibility
-          },
-          setDrinkProgress: () => {
-            // No-op for compatibility
-          },
-          setLastDrinkTime: () => {
-            // No-op for compatibility
-          },
-          setLevel: () => {
-            // No-op for compatibility
-          },
-          autoSync: () => {
-            // No-op for compatibility
-          },
-        });
+  const bridge = (_app: any) => ({
+    init: () => {
+      // No-op for compatibility
+    },
+    setDrinkRate: () => {
+      // No-op for compatibility
+    },
+    setDrinkProgress: () => {
+      // No-op for compatibility
+    },
+    setLastDrinkTime: () => {
+      // No-op for compatibility
+    },
+    setLevel: () => {
+      // No-op for compatibility
+    },
+    autoSync: () => {
+      // No-op for compatibility
+    },
+  });
   // Modernized - bridge handled by store
   // Modernized - bridge handled by store
-  const bridgeInstance = bridge((window as any).App);
+  const bridgeInstance = bridge(App);
   bridgeInstance.init();
   // Modernized - state bridge handled by store
   // Modernized - state bridge handled by store
-  (window as any).App.stateBridge = bridgeInstance;
+  App.stateBridge = bridgeInstance;
   console.log('✅ State bridge initialized');
 } catch (error) {
   console.warn('⚠️ State bridge initialization failed:', error);
@@ -537,11 +493,10 @@ try {
   const uiModule = await import('./ui/index.ts');
   // Modernized - UI module handled by store
   // Modernized - UI module handled by store
-  Object.assign((window as any).App.ui, uiModule);
+  Object.assign(App.ui, uiModule);
   __pushDiag({ type: 'import', module: 'ui', ok: true });
   // Modernized - UI initialization handled by store
-  if (typeof (window as any).App.ui.initializeUI === 'function')
-    (window as any).App.ui.initializeUI();
+  if (typeof App.ui.initializeUI === 'function') App.ui.initializeUI();
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -568,7 +523,7 @@ try {
   const st = await import('./services/storage.ts');
   storage = (st as any).AppStorage ? (st as any).AppStorage : storage;
   try {
-    (window as any).storage = storage;
+    // Storage no longer assigned to window - use proper module exports
   } catch (error) {
     console.warn('Failed to expose storage globally:', error);
   }
@@ -584,7 +539,7 @@ try {
 
 try {
   const res = await import('./core/systems/resources.ts');
-  Object.assign((window as any).App.systems.resources, res);
+  Object.assign(App.systems.resources, res);
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -596,7 +551,7 @@ try {
 }
 try {
   const pur = await import('./core/systems/purchases-system.ts');
-  Object.assign((window as any).App.systems.purchases, pur);
+  Object.assign(App.systems.purchases, pur);
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -608,7 +563,7 @@ try {
 }
 try {
   const loop = await import('./core/systems/loop-system.ts');
-  Object.assign((window as any).App.systems.loop, loop);
+  Object.assign(App.systems.loop, loop);
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -620,7 +575,7 @@ try {
 }
 try {
   const save = await import('./core/systems/save-system.ts');
-  Object.assign((window as any).App.systems.save, save);
+  Object.assign(App.systems.save, save);
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -634,7 +589,7 @@ try {
   const drink = await import('./core/systems/drink-system.ts');
   const factory = (drink as any).processDrinkFactory?.();
   if (factory) {
-    (window as any).App.systems.drink.processDrink = factory;
+    App.systems.drink.processDrink = factory;
   }
 } catch (e) {
   __pushDiag({
@@ -647,7 +602,7 @@ try {
 }
 try {
   const clicks = await import('./core/systems/clicks-system.ts');
-  Object.assign((window as any).App.systems.clicks, clicks);
+  Object.assign(App.systems.clicks, clicks);
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -659,7 +614,7 @@ try {
 }
 try {
   const audio = await import('./core/systems/button-audio.ts');
-  Object.assign((window as any).App.systems.audio.button, audio);
+  Object.assign(App.systems.audio.button, audio);
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -671,7 +626,7 @@ try {
 }
 try {
   const autosave = await import('./core/systems/autosave.ts');
-  Object.assign((window as any).App.systems.autosave, autosave);
+  Object.assign(App.systems.autosave, autosave);
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -683,7 +638,7 @@ try {
 }
 try {
   const dev = await import('./core/systems/dev.ts');
-  (window as any).App.systems.dev = dev as any;
+  App.systems.dev = dev as any;
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -696,28 +651,26 @@ try {
 // game-init already loaded early
 
 console.log('✅ App object created and ready');
-console.log('🔧 index.ts finished loading, App object created:', !!(window as any).App);
+console.log('🔧 index.ts finished loading, App object created:', !!App);
 __pushDiag({ type: 'index', stage: 'end' });
 
 // Pages-only safety: seed minimal state if initGame isn't present soon, so loop can tick
 try {
   const seedIfNeeded = () => {
     try {
-      if (typeof (window as any).initGame === 'function') return;
-      const w: any = window as any;
-      const app = w.App;
+      // Check if game is already initialized
+      if (typeof initGame === 'function') return;
+      const app = App;
       if (!app?.state?.setState) return;
-      const CFG = (w.GAME_CONFIG || {}) as any;
+      const CFG = GC as any;
       const BAL = (CFG.BALANCE || {}) as any;
       const TIMING = (CFG.TIMING || {}) as any;
       const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
       const now = Date.now();
       const lastDrinkTime = now - DEFAULT_RATE;
 
-      w.lastDrinkTime = lastDrinkTime;
-      w.drinkRate = DEFAULT_RATE;
-
-      const DecimalCtor = (w as any).Decimal || Number;
+      // Set last drink time and drink rate through proper state management
+      const DecimalCtor = (globalThis as any).Decimal || Number;
       const toDec = (v: any) =>
         DecimalCtor === Number ? Number(v || 0) : new DecimalCtor(String(v ?? 0));
       const baseSPD = BAL.BASE_SIPS_PER_DRINK ?? 1;
@@ -732,7 +685,7 @@ try {
         widerStraws: toDec(0),
         betterCups: toDec(0),
         fasterDrinks: toDec(0),
-        criticalClicks: toDec(0),
+        // criticalClicks removed - using proper state management
         level: toDec(1),
         spd: toDec(baseSPD),
         strawSPD: toDec(strawBaseSPD),
@@ -750,9 +703,7 @@ try {
 } catch {}
 
 try {
-  if ((window as any).initOnDomReady) {
-    (window as any).initOnDomReady();
-  }
+  // initOnDomReady no longer on window - use proper module exports
 } catch (error) {
   console.warn('⚠️ DOM-ready initialization failed:', error);
 }

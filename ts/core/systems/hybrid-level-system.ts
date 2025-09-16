@@ -346,6 +346,14 @@ export class HybridLevelSystem {
     return this.currentLevel;
   }
 
+  get isSystemInitialized(): boolean {
+    return this.isInitialized;
+  }
+
+  get unlockedLevelsSet(): Set<number> {
+    return this.unlockedLevels;
+  }
+
   getUnlockedLevelIds(): number[] {
     return Array.from(this.unlockedLevels);
   }
@@ -473,10 +481,18 @@ export class HybridLevelSystem {
       root.style.setProperty('--level-bg-image', level.visualTheme.backgroundImage);
     }
 
-    // Also apply background directly to body for immediate effect
-    document.body.style.background =
-      level.visualTheme.backgroundImage || level.visualTheme.backgroundColor;
-    document.body.style.backgroundAttachment = 'fixed';
+    // Also apply background directly to body for immediate effect with !important
+    document.body.style.setProperty(
+      'background',
+      level.visualTheme.backgroundImage || level.visualTheme.backgroundColor,
+      'important'
+    );
+    document.body.style.setProperty('background-attachment', 'fixed', 'important');
+    document.body.style.setProperty(
+      'background-color',
+      level.visualTheme.backgroundColor,
+      'important'
+    );
 
     // Add level-specific particles
     this.addLevelParticles(level);
@@ -489,7 +505,32 @@ export class HybridLevelSystem {
     const root = document.documentElement;
     const gameContent = document.querySelector('.game-content') as HTMLElement;
 
-    // Set global theme variables
+    // Set the CSS variables that are actually used by the stylesheets
+    root.style.setProperty('--primary-blue', level.visualTheme.backgroundColor);
+    root.style.setProperty('--primary-green', level.visualTheme.accentColor);
+    root.style.setProperty(
+      '--primary-blue-dark',
+      this.darkenColor(level.visualTheme.backgroundColor, 0.2)
+    );
+    root.style.setProperty(
+      '--primary-green-light',
+      this.lightenColor(level.visualTheme.accentColor, 0.3)
+    );
+    root.style.setProperty('--neutral-white', '#ffffff');
+    root.style.setProperty(
+      '--neutral-dark',
+      this.darkenColor(level.visualTheme.backgroundColor, 0.4)
+    );
+    root.style.setProperty(
+      '--neutral-medium',
+      this.darkenColor(level.visualTheme.backgroundColor, 0.2)
+    );
+    root.style.setProperty(
+      '--neutral-light',
+      this.lightenColor(level.visualTheme.backgroundColor, 0.3)
+    );
+
+    // Also set the legacy theme variables for compatibility
     root.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
     root.style.setProperty('--theme-accent', level.visualTheme.accentColor);
     root.style.setProperty('--theme-text', '#ffffff');
@@ -500,22 +541,43 @@ export class HybridLevelSystem {
       gameContent.setAttribute('data-level', level.id.toString());
     }
 
-    // Debug: Check if suction button exists and apply theme directly
-    const suctionBtn = document.querySelector('.suction-btn') as HTMLElement;
-    if (suctionBtn) {
-      console.log('🎨 Suction button found, applying theme directly');
-      suctionBtn.style.setProperty('background', level.visualTheme.backgroundColor, 'important');
-      suctionBtn.style.setProperty('border-color', level.visualTheme.accentColor, 'important');
-      suctionBtn.style.setProperty('color', level.visualTheme.accentColor, 'important');
-      suctionBtn.style.setProperty('background-image', 'none', 'important');
-    } else {
-      console.log('🎨 Suction button not found');
-    }
-
-    console.log('🎨 Applied global theme for level:', level.name, {
-      bg: level.visualTheme.backgroundColor,
+    console.log(`🎨 Applied universal theme for level ${level.id}:`, {
+      primary: level.visualTheme.backgroundColor,
       accent: level.visualTheme.accentColor,
     });
+  }
+
+  /**
+   * Darken a color by a percentage
+   */
+  private darkenColor(color: string, amount: number): string {
+    // Simple color darkening - convert hex to RGB, darken, convert back
+    const hex = color.replace('#', '');
+    const r = Math.max(0, parseInt(hex.substr(0, 2), 16) * (1 - amount));
+    const g = Math.max(0, parseInt(hex.substr(2, 2), 16) * (1 - amount));
+    const b = Math.max(0, parseInt(hex.substr(4, 2), 16) * (1 - amount));
+    return `#${Math.floor(r).toString(16).padStart(2, '0')}${Math.floor(g).toString(16).padStart(2, '0')}${Math.floor(b).toString(16).padStart(2, '0')}`;
+  }
+
+  /**
+   * Lighten a color by a percentage
+   */
+  private lightenColor(color: string, amount: number): string {
+    // Simple color lightening - convert hex to RGB, lighten, convert back
+    const hex = color.replace('#', '');
+    const r = Math.min(
+      255,
+      parseInt(hex.substr(0, 2), 16) + (255 - parseInt(hex.substr(0, 2), 16)) * amount
+    );
+    const g = Math.min(
+      255,
+      parseInt(hex.substr(2, 2), 16) + (255 - parseInt(hex.substr(2, 2), 16)) * amount
+    );
+    const b = Math.min(
+      255,
+      parseInt(hex.substr(4, 2), 16) + (255 - parseInt(hex.substr(4, 2), 16)) * amount
+    );
+    return `#${Math.floor(r).toString(16).padStart(2, '0')}${Math.floor(g).toString(16).padStart(2, '0')}${Math.floor(b).toString(16).padStart(2, '0')}`;
   }
 
   /**

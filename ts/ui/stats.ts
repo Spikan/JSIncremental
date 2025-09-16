@@ -272,7 +272,7 @@ export function updateAchievementStats(): void {
 export function updateEnhancementValues(): void {
   console.log('🔍 updateEnhancementValues: Function called');
   // Modernized - state handled by store
-  const state = {}; // TODO: Get from store
+  const state = useGameStore.getState();
   if (!state) {
     console.log('🔍 updateEnhancementValues: No state available');
     return;
@@ -370,7 +370,7 @@ export function updatePurchasedCounts(): void {
   if (typeof window === 'undefined') return;
 
   // Modernized - state handled by store
-  const state = {}; // TODO: Get from store
+  const state = useGameStore.getState();
   if (!state) {
     if (shouldLog) console.log('📊 No state available');
     return;

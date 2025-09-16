@@ -153,6 +153,12 @@ export function applyThemeToBackground(level: number): void {
   // Apply background gradient (with !important to override CSS)
   document.body.style.setProperty('background', theme.backgroundGradient, 'important');
 
+  // Also update the CSS variables for consistency with the hybrid level system
+  const root = document.documentElement;
+  root.style.setProperty('--primary-blue', theme.backgroundGradient);
+  root.style.setProperty('--primary-green', '#00d97f'); // Default accent color
+  root.style.setProperty('--neutral-white', '#ffffff');
+
   // Add theme class for additional styling
   document.body.className = document.body.className
     .replace(/theme-\w+/g, '') // Remove existing theme classes

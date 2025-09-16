@@ -57,7 +57,6 @@ export class Soda3DButton {
   // clickAnimationDuration removed - no longer needed
   private clickHandlers: (() => void)[] = [];
   private rotationAngle = 0;
-  private rotationSpeed = 0.5; // degrees per frame
   private animationId: number | null = null;
   private lastFrameTime = 0;
   private frameInterval = 1000 / 60; // Default 60fps, will be adjusted based on performance mode
@@ -65,6 +64,15 @@ export class Soda3DButton {
   private performanceMonitorStartTime = 0;
   private actualFPS = 0;
   private performanceDegradationCount = 0;
+
+  // Momentum system for click acceleration
+  private momentum = 0; // Current momentum value
+  private maxMomentum = 8.0; // Maximum momentum that can be built up
+  private momentumDecay = 0.12; // How fast momentum decays per frame
+  private clickMomentumBoost = 1.2; // How much momentum each click adds
+  private baseRotationSpeed = 0.5; // Base rotation speed when no momentum
+  private isHovered = false; // Track hover state for speed multiplier
+  private hoverSpeedMultiplier = 2.0; // Speed multiplier when hovered
 
   constructor(private config: Soda3DConfig) {
     // clickAnimationDuration removed
@@ -226,11 +234,11 @@ export class Soda3DButton {
 
     // Hover effects - speed up rotation on hover
     this.modelViewer.addEventListener('mouseenter', () => {
-      this.setRotationSpeed(3.0); // Much faster on hover
+      this.isHovered = true;
     });
 
     this.modelViewer.addEventListener('mouseleave', () => {
-      this.setRotationSpeed(0.5); // Normal speed when not hovering
+      this.isHovered = false;
     });
   }
 
@@ -297,6 +305,8 @@ export class Soda3DButton {
   // Public API methods
   addClickHandler(handler: () => void) {
     this.clickHandlers.push(handler);
+    // Also add momentum on click
+    this.addMomentum();
   }
 
   removeClickHandler(handler: () => void) {
@@ -386,13 +396,23 @@ export class Soda3DButton {
       // Performance monitoring
       this.monitorPerformance(currentTime);
 
-      // Skip animation updates in low performance mode when not hovered
-      if (this.config.performanceMode === 'low' && this.rotationSpeed === 0.5) {
+      // Update momentum system
+      this.updateMomentum();
+
+      // Calculate current rotation speed (base + momentum + hover effect)
+      const hoverMultiplier = this.isHovered ? this.hoverSpeedMultiplier : 1.0;
+      const currentRotationSpeed = (this.baseRotationSpeed + this.momentum) * hoverMultiplier;
+
+      // Skip animation updates in low performance mode when not hovered and no momentum
+      if (
+        this.config.performanceMode === 'low' &&
+        currentRotationSpeed === this.baseRotationSpeed
+      ) {
         this.animationId = requestAnimationFrame(animate);
         return;
       }
 
-      this.rotationAngle += this.rotationSpeed;
+      this.rotationAngle += currentRotationSpeed;
       if (this.rotationAngle >= 360) {
         this.rotationAngle -= 360;
       }
@@ -404,6 +424,16 @@ export class Soda3DButton {
     };
 
     animate(0);
+  }
+
+  private updateMomentum() {
+    // Decay momentum over time
+    this.momentum = Math.max(0, this.momentum - this.momentumDecay);
+  }
+
+  addMomentum() {
+    // Add momentum on click, capped at maximum
+    this.momentum = Math.min(this.maxMomentum, this.momentum + this.clickMomentumBoost);
   }
 
   private monitorPerformance(currentTime: number) {
@@ -449,10 +479,6 @@ export class Soda3DButton {
     // Show user notification
     // Modernized - notifications handled by store
     console.log('3D Model performance set to', this.config.performanceMode);
-  }
-
-  private setRotationSpeed(speed: number) {
-    this.rotationSpeed = speed;
   }
 
   // Performance management methods

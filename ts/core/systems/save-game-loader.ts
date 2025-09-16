@@ -369,8 +369,8 @@ export class SaveGameLoader {
 
         // Restore hybrid level system state
         // Modernized - hybrid system handled by store
-        const hybridSystem = null;
-        if (hybridSystem && hybridSystem.restoreState) {
+        const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        if (hybridSystem && typeof hybridSystem.restoreState === 'function') {
           // Ensure level 1 is always unlocked
           const levelsToRestore = [...new Set([1, ...(unlockedLevels || [])])];
           const levelToRestore = currentLevel || 1;

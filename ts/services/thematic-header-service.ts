@@ -277,18 +277,8 @@ export class ThematicHeaderService {
    */
   private hookIntoDisplayUpdates(): void {
     // Modernized - drink progress updates handled by store
-    const originalUpdateDrinkProgress = null;
-    if (false) {
-      const updateDrinkProgress = (progress: number, drinkRate: number) => {
-        // Call original function
-        originalUpdateDrinkProgress(progress, drinkRate);
-
-        // Update thematic effects
-        if (this.liquidAnimator) {
-          this.liquidAnimator.updateProgress('drinkProgressBar', progress);
-        }
-      };
-    }
+    // Modernized - drink progress updates handled by store
+    // Dead code removed - was causing TypeScript errors
   }
 
   /**
@@ -304,73 +294,14 @@ export class ThematicHeaderService {
    */
   private hookIntoPurchaseHandlers(): void {
     // Modernized - purchase system handled by store
-    const purchaseSystem = null;
-    if (purchaseSystem) {
-      // Wrap all purchase functions
-      const purchaseFunctions = [
-        'buyStraw',
-        'buyCup',
-        'buyWiderStraws',
-        'buyBetterCups',
-        'buySuction',
-        'buyFasterDrinks',
-      ];
-
-      purchaseFunctions.forEach(funcName => {
-        const originalFunc = purchaseSystem[funcName];
-        if (originalFunc) {
-          purchaseSystem[funcName] = (...args: any[]) => {
-            const result = originalFunc(...args);
-
-            // Add celebration effects on successful purchase
-            if (result) {
-              this.onPurchase(funcName);
-            }
-
-            return result;
-          };
-        }
-      });
-    }
+    // Dead code removed - was causing TypeScript errors
   }
 
-  /**
-   * Handle soda click effects
-   */
-  private onSodaClick(multiplier: number): void {
-    if (!this.config.enabled || !this.bubbleSystem) return;
+  // Modernized - soda click effects handled by store
+  // Dead code removed - was causing TypeScript errors
 
-    // Spawn currency bubbles
-    this.bubbleSystem.spawnCurrencyBubble(
-      window.innerWidth / 2,
-      window.innerHeight / 2,
-      `+${multiplier}`
-    );
-
-    // Add liquid ripple effect
-    if (this.liquidAnimator) {
-      this.liquidAnimator.addRippleEffect('drinkProgressBar', 50, 50);
-    }
-  }
-
-  /**
-   * Handle purchase effects
-   */
-  private onPurchase(purchaseType: string): void {
-    if (!this.config.enabled || !this.bubbleSystem) return;
-
-    // Spawn celebration bubbles
-    this.bubbleSystem.spawnCelebrationBubble(
-      Math.random() * window.innerWidth,
-      Math.random() * 100 + 50,
-      purchaseType
-    );
-
-    // Intensify liquid flow
-    if (this.liquidAnimator) {
-      this.liquidAnimator.intensifyFlow(0.8);
-    }
-  }
+  // Modernized - purchase effects handled by store
+  // Dead code removed - was causing TypeScript errors
 
   /**
    * Set performance mode

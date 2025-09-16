@@ -310,7 +310,10 @@ export function deleteSave() {
     // Reset hybrid level system
     try {
       // Modernized - hybrid system handled by store
-      const hybridSystem = null;
+      const hybridSystem = (window as any).App?.systems?.hybridLevel;
+      if (hybridSystem && typeof hybridSystem.reset === 'function') {
+        hybridSystem.reset();
+      }
       // Modernized - hybrid system reset handled by store
     } catch (error) {
       console.warn('Failed to reset hybrid level system after save deletion:', error);
