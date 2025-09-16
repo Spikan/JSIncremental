@@ -100,7 +100,7 @@
             } else {
               console.error('❌ UI system not available or initializeUI not found');
             }
-            
+
             // Check if game loop is actually running
             setTimeout(() => {
               console.log('🔧 Checking game state after 2 seconds...');
@@ -111,7 +111,7 @@
                     sips: state.sips || 0,
                     clicks: state.clicks || 0,
                     drinkProgress: state.drinkProgress || 0,
-                    lastDrinkTime: state.lastDrinkTime || 0
+                    lastDrinkTime: state.lastDrinkTime || 0,
                   });
                 } catch (error) {
                   console.error('❌ Error getting game state:', error);

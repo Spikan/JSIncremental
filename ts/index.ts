@@ -157,6 +157,8 @@ console.log('🔧 About to start tryBoot initialization...');
 try {
   // Simplified initialization - using proper module imports instead of complex nested structure
   console.log('🔧 Starting tryBoot initialization...');
+  console.log('🔧 App object available:', !!App);
+  console.log('🔧 GC available:', !!GC);
   __pushDiag({ type: 'initOnDomReady', used: 'default-fallback' });
   try {
     // Kick game progression after splash via loop once available
