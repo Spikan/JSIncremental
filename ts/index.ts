@@ -1,5 +1,7 @@
 // Entry module providing a small public API surface and environment checks (TypeScript)
 
+console.log('🚀 ts/index.ts module loading...');
+
 import { useGameStore } from './core/state/zustand-store.ts';
 import { optimizedEventBus } from './services/optimized-event-bus.ts';
 import { performanceMonitor } from './services/performance.ts';
