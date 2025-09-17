@@ -4,7 +4,7 @@ console.log('🚀 ts/index.ts module loading...');
 console.log('🔧 Module execution started');
 (window as any).__tsIndexLoaded = true;
 
-import { useGameStore } from './core/state/zustand-store';
+// import { useGameStore } from './core/state/zustand-store'; // Removed - using dynamic import instead
 import { optimizedEventBus } from './services/optimized-event-bus';
 import { performanceMonitor } from './services/performance';
 import './config';
@@ -51,15 +51,13 @@ try {
 
 // Initialize Zustand store
 console.log('🔧 Initializing Zustand store...');
-const zustandStore = useGameStore;
 
 // Modernized - App object initialization handled by store
 // Legacy compatibility - minimal App object for existing code
 // App object no longer assigned to window - use proper module exports instead
 const App = {
   state: {
-    ...zustandStore,
-    actions: zustandStore.getState().actions, // Add actions for direct access
+    // Will be populated after Zustand store is initialized
   }, // Consolidated Zustand store with actions
   storage,
   events: optimizedEventBus,
@@ -248,6 +246,10 @@ try {
     console.log('🔧 setState call completed');
     console.log('🔧 Current store state:', useGameStore.getState());
     console.log('✅ Zustand store initialized');
+    
+    // Update App object with store reference
+    App.state = useGameStore.getState();
+    App.state.actions = useGameStore.getState().actions;
   } catch (error) {
     console.error('❌ Failed to initialize Zustand store:', error);
     throw error;
@@ -325,12 +327,12 @@ try {
       loopStart({
         updateDrinkProgress: () => {
           try {
-            const state = useGameStore.getState();
+            const state = App.state;
             const now = Date.now();
             const last = Number(state.lastDrinkTime ?? 0);
             const rate = Number(state.drinkRate ?? 1000);
             const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-            useGameStore.setState({ drinkProgress: pct });
+            App.state.actions.setState({ drinkProgress: pct });
             App?.ui?.updateDrinkProgress?.(pct, rate);
           } catch (error) {
             console.error('❌ Failed to update drink progress:', error);
@@ -339,10 +341,10 @@ try {
         processDrink: () => {
           try {
             console.log('🔧 Calling processDrink...');
-            const beforeSips = useGameStore.getState().sips;
+            const beforeSips = App.state.sips;
             console.log('🔧 Before processDrink - sips:', beforeSips?.toString?.() || beforeSips);
             App?.systems?.drink?.processDrink?.();
-            const afterSips = useGameStore.getState().sips;
+            const afterSips = App.state.sips;
             console.log('🔧 After processDrink - sips:', afterSips?.toString?.() || afterSips);
             console.log('🔧 processDrink completed');
           } catch (error) {
