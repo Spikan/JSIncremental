@@ -130,6 +130,7 @@ const defaultState: GameState = {
 };
 
 // Create the Zustand store
+console.log('🔧 Creating Zustand store...');
 export const useGameStore = create<GameStore>()(
   devtools(
     persist(
@@ -275,6 +276,7 @@ export const useGameStore = create<GameStore>()(
     }
   )
 );
+console.log('✅ Zustand store created successfully');
 
 // Export store instance
 export const gameStore = useGameStore;
