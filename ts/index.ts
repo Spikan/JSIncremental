@@ -17,6 +17,17 @@ import { toDecimal } from './core/numbers/simplified';
 import './god';
 // Static imports removed - using dynamic imports instead
 import { processDrink } from './core/systems/drink-system';
+import { useGameStore } from './core/state/zustand-store';
+// Add all critical system imports to avoid dynamic import issues
+import * as storageModule from './services/storage';
+import * as resourcesModule from './core/systems/resources';
+import * as purchasesModule from './core/systems/purchases-system';
+import * as saveModule from './core/systems/save-system';
+import * as clicksModule from './core/systems/clicks-system';
+import * as audioModule from './core/systems/button-audio';
+import * as autosaveModule from './core/systems/autosave';
+import * as devModule from './core/systems/dev';
+import * as uiModule from './ui/index';
 
 console.log('🔧 Imports completed, setting up App object...');
 // Environment system replaced by hybrid level system
@@ -216,58 +227,40 @@ try {
 
   // Initialize Zustand store with default values
   console.log('🔧 Initializing Zustand store...');
-  console.log('🔧 About to import zustand-store...');
-  try {
-    // Check if store already exists (from static imports)
-    let useGameStore;
-    if ((window as any).__zustandStore) {
-      console.log('🔧 Using existing zustand store from static import');
-      useGameStore = (window as any).__zustandStore;
-    } else {
-      console.log('🔧 Importing zustand store dynamically');
-      const storeModule = await import('./core/state/zustand-store');
-      useGameStore = storeModule.useGameStore;
-      // Store it globally for future use
-      (window as any).__zustandStore = useGameStore;
-    }
-    console.log('🔧 zustand-store available, useGameStore:', typeof useGameStore);
-    console.log('🔧 useGameStore.getState():', typeof useGameStore.getState);
-    console.log('🔧 useGameStore.setState:', typeof useGameStore.setState);
-    console.log('🔧 About to call useGameStore.setState...');
-    useGameStore.setState({
-      sips: toDecimal(0),
-      spd: toDecimal(1),
-      level: 1,
-      drinkRate: 1000,
-      drinkProgress: 0,
-      lastDrinkTime: Date.now() - 2000, // Set to 2 seconds ago so drinks can process immediately
-      totalClicks: 0,
-      totalSipsEarned: toDecimal(0),
-      highestSipsPerSecond: toDecimal(0),
-      suctionClickBonus: 0,
-      options: {
-        autosaveEnabled: true,
-        autosaveInterval: 30,
-        clickSoundsEnabled: true,
-        musicEnabled: true,
-        devToolsEnabled: false,
-        secretsUnlocked: false,
-        godTabEnabled: false,
-      },
-    });
-    console.log('🔧 setState call completed');
-    console.log('🔧 Current store state:', useGameStore.getState());
-    console.log('✅ Zustand store initialized');
+  console.log('🔧 zustand-store available, useGameStore:', typeof useGameStore);
+  console.log('🔧 useGameStore.getState():', typeof useGameStore.getState);
+  console.log('🔧 useGameStore.setState:', typeof useGameStore.setState);
+  console.log('🔧 About to call useGameStore.setState...');
+  useGameStore.setState({
+    sips: toDecimal(0),
+    spd: toDecimal(1),
+    level: 1,
+    drinkRate: 1000,
+    drinkProgress: 0,
+    lastDrinkTime: Date.now() - 2000, // Set to 2 seconds ago so drinks can process immediately
+    totalClicks: 0,
+    totalSipsEarned: toDecimal(0),
+    highestSipsPerSecond: toDecimal(0),
+    suctionClickBonus: 0,
+    options: {
+      autosaveEnabled: true,
+      autosaveInterval: 30,
+      clickSoundsEnabled: true,
+      musicEnabled: true,
+      devToolsEnabled: false,
+      secretsUnlocked: false,
+      godTabEnabled: false,
+    },
+  });
+  console.log('🔧 setState call completed');
+  console.log('🔧 Current store state:', useGameStore.getState());
+  console.log('✅ Zustand store initialized');
 
-    // Update App object with store reference
-    App.state = useGameStore.getState();
-    App.state.actions = useGameStore.getState().actions;
-    // Store the store itself for getState/setState calls
-    (App as any).store = useGameStore;
-  } catch (error) {
-    console.error('❌ Failed to initialize Zustand store:', error);
-    throw error;
-  }
+  // Update App object with store reference
+  App.state = useGameStore.getState();
+  App.state.actions = useGameStore.getState().actions;
+  // Store the store itself for getState/setState calls
+  (App as any).store = useGameStore;
 
   // Modernized drink system using only Zustand store
   console.log('🔧 Using modernized drink system...');
@@ -277,16 +270,9 @@ try {
 
   // Load hybrid level system early so UI can access it
   console.log('🔧 Loading hybrid level system...');
-  console.log('🔧 About to import hybrid-level-system module...');
-  try {
-    const hybridLevel = await import('./core/systems/hybrid-level-system');
-    console.log('🔧 hybridLevel imported:', typeof hybridLevel);
-    App.systems.hybridLevel = hybridLevel.hybridLevelSystem;
-    console.log('✅ Hybrid level system loaded');
-  } catch (e) {
-    console.error('❌ hybrid level system load failed:', e);
-    throw e;
-  }
+  console.log('🔧 hybridLevel imported:', typeof hybridLevelSystem);
+  App.systems.hybridLevel = hybridLevelSystem;
+  console.log('✅ Hybrid level system loaded');
 
   App.systems.loop = loopSystem;
   console.log('✅ Inline loop system created');
@@ -570,13 +556,7 @@ try {
 // State bridge removed - no longer needed
 
 try {
-  console.log('🔧 Loading UI system with dynamic import...');
-  const uiModule = await Promise.race([
-    import('./ui/index'),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('UI system import timeout after 10 seconds')), 10000)
-    ),
-  ]);
+  console.log('🔧 Loading UI system with static import...');
   console.log('🔧 UI system loaded, initializing...');
   // Modernized - UI module handled by store
   // Modernized - UI module handled by store
@@ -613,7 +593,7 @@ try {
 }
 
 try {
-  const st = await import('./services/storage');
+  const st = storageModule;
   storage = (st as any).AppStorage ? (st as any).AppStorage : storage;
   try {
     // Storage no longer assigned to window - use proper module exports
@@ -631,7 +611,7 @@ try {
 }
 
 try {
-  const res = await import('./core/systems/resources');
+  const res = resourcesModule;
   Object.assign(App.systems.resources, res);
 } catch (e) {
   __pushDiag({
@@ -643,7 +623,7 @@ try {
   console.warn('⚠️ resources system load failed:', e);
 }
 try {
-  const pur = await import('./core/systems/purchases-system');
+  const pur = purchasesModule;
   Object.assign(App.systems.purchases, pur);
 } catch (e) {
   __pushDiag({
@@ -656,7 +636,7 @@ try {
 }
 // Loop system already loaded above - skipping duplicate load
 try {
-  const save = await import('./core/systems/save-system');
+  const save = saveModule;
   Object.assign(App.systems.save, save);
 } catch (e) {
   __pushDiag({
@@ -669,7 +649,7 @@ try {
 }
 // Drink system already loaded above - skipping duplicate load
 try {
-  const clicks = await import('./core/systems/clicks-system');
+  const clicks = clicksModule;
   Object.assign(App.systems.clicks, clicks);
 } catch (e) {
   __pushDiag({
@@ -681,7 +661,7 @@ try {
   console.warn('⚠️ clicks system load failed:', e);
 }
 try {
-  const audio = await import('./core/systems/button-audio');
+  const audio = audioModule;
   Object.assign(App.systems.audio.button, audio);
 } catch (e) {
   __pushDiag({
@@ -693,7 +673,7 @@ try {
   console.warn('⚠️ button-audio system load failed:', e);
 }
 try {
-  const autosave = await import('./core/systems/autosave');
+  const autosave = autosaveModule;
   Object.assign(App.systems.autosave, autosave);
 } catch (e) {
   __pushDiag({
@@ -705,7 +685,7 @@ try {
   console.warn('⚠️ autosave system load failed:', e);
 }
 try {
-  const dev = await import('./core/systems/dev');
+  const dev = devModule;
   App.systems.dev = dev as any;
 } catch (e) {
   __pushDiag({
