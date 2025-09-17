@@ -217,8 +217,19 @@ try {
   console.log('🔧 Initializing Zustand store...');
   console.log('🔧 About to import zustand-store...');
   try {
-    const { useGameStore } = await import('./core/state/zustand-store');
-    console.log('🔧 zustand-store imported successfully, useGameStore:', typeof useGameStore);
+    // Check if store already exists (from static imports)
+    let useGameStore;
+    if ((window as any).__zustandStore) {
+      console.log('🔧 Using existing zustand store from static import');
+      useGameStore = (window as any).__zustandStore;
+    } else {
+      console.log('🔧 Importing zustand store dynamically');
+      const storeModule = await import('./core/state/zustand-store');
+      useGameStore = storeModule.useGameStore;
+      // Store it globally for future use
+      (window as any).__zustandStore = useGameStore;
+    }
+    console.log('🔧 zustand-store available, useGameStore:', typeof useGameStore);
     console.log('🔧 useGameStore.getState():', typeof useGameStore.getState);
     console.log('🔧 useGameStore.setState:', typeof useGameStore.setState);
     console.log('🔧 About to call useGameStore.setState...');
@@ -246,7 +257,7 @@ try {
     console.log('🔧 setState call completed');
     console.log('🔧 Current store state:', useGameStore.getState());
     console.log('✅ Zustand store initialized');
-    
+
     // Update App object with store reference
     App.state = useGameStore.getState();
     App.state.actions = useGameStore.getState().actions;

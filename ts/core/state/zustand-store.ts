@@ -278,6 +278,9 @@ export const useGameStore = create<GameStore>()(
 );
 console.log('✅ Zustand store created successfully');
 
+// Store globally for access from other modules
+(globalThis as any).__zustandStore = useGameStore;
+
 // Export store instance
 export const gameStore = useGameStore;
 
