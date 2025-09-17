@@ -16,6 +16,7 @@ import { toDecimal } from './core/numbers/simplified';
 // DOM migration completed - using modern domQuery service
 import './god';
 // Static imports removed - using dynamic imports instead
+import { processDrink } from './core/systems/drink-system';
 
 console.log('🔧 Imports completed, setting up App object...');
 // Environment system replaced by hybrid level system
@@ -270,42 +271,9 @@ try {
 
   // Modernized drink system using only Zustand store
   console.log('🔧 Using modernized drink system...');
-  console.log('🔧 About to import drink-system module...');
-  try {
-    // Add timeout to prevent hanging
-    const drinkSystemPromise = import('./core/systems/drink-system');
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Drink system import timeout')), 5000)
-    );
-
-    const { processDrink } = (await Promise.race([drinkSystemPromise, timeoutPromise])) as any;
-    console.log('🔧 processDrink function:', typeof processDrink);
-    App.systems.drink.processDrink = processDrink;
-    console.log('✅ Drink system loaded');
-  } catch (error) {
-    console.error('❌ Failed to import drink system:', error);
-    // Create a fallback processDrink function
-    console.log('🔧 Creating fallback processDrink function...');
-    App.systems.drink.processDrink = () => {
-      console.log('🔧 Fallback processDrink called');
-      try {
-        const state = App.state;
-        const now = Date.now();
-        if (now - state.lastDrinkTime >= state.drinkRate) {
-          const newSips = state.sips.add(toDecimal(1));
-          App.state.actions.setState({
-            sips: newSips,
-            lastDrinkTime: now,
-            drinkProgress: 0,
-          });
-          console.log('✅ Fallback drink processed - sips:', newSips.toString());
-        }
-      } catch (err) {
-        console.error('❌ Fallback processDrink error:', err);
-      }
-    };
-    console.log('✅ Fallback drink system created');
-  }
+  console.log('🔧 processDrink function:', typeof processDrink);
+  App.systems.drink.processDrink = processDrink;
+  console.log('✅ Drink system loaded');
 
   // Load hybrid level system early so UI can access it
   console.log('🔧 Loading hybrid level system...');
