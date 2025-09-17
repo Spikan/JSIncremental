@@ -261,6 +261,8 @@ try {
     // Update App object with store reference
     App.state = useGameStore.getState();
     App.state.actions = useGameStore.getState().actions;
+    // Store the store itself for getState/setState calls
+    (App as any).store = useGameStore;
   } catch (error) {
     console.error('❌ Failed to initialize Zustand store:', error);
     throw error;

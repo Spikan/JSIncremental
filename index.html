@@ -106,7 +106,8 @@
               console.log('🔧 Checking game state after 2 seconds...');
               if (window.App && window.App.state) {
                 try {
-                  const state = window.App.state.getState();
+                  // Use the store to get current state, or fallback to App.state
+                  const state = window.App.store ? window.App.store.getState() : window.App.state;
                   console.log('🔧 Current game state:', {
                     sips: state.sips || 0,
                     clicks: state.clicks || 0,
