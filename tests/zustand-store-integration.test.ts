@@ -9,7 +9,8 @@ describe('Zustand Store Integration Test', () => {
 
   beforeEach(() => {
     // Create the exact DOM structure from production
-    dom = new JSDOM(`
+    dom = new JSDOM(
+      `
       <!DOCTYPE html>
       <html>
         <head>
@@ -26,9 +27,11 @@ describe('Zustand Store Integration Test', () => {
           </div>
         </body>
       </html>
-    `, {
-      url: 'https://spikan.github.io/JSIncremental/',
-    });
+    `,
+      {
+        url: 'https://spikan.github.io/JSIncremental/',
+      }
+    );
 
     originalWindow = global.window;
     originalDocument = global.document;
@@ -37,12 +40,12 @@ describe('Zustand Store Integration Test', () => {
     global.document = dom.window.document;
     global.navigator = dom.window.navigator as any;
     global.location = dom.window.location as any;
-    
+
     // Set up GAME_CONFIG for the drink system
     (globalThis as any).GAME_CONFIG = {
       BALANCE: {
-        BASE_SIPS_PER_DRINK: 1
-      }
+        BASE_SIPS_PER_DRINK: 1,
+      },
     };
   });
 
@@ -55,7 +58,7 @@ describe('Zustand Store Integration Test', () => {
   it('should test UI updates with properly initialized Zustand store', async () => {
     // Import the Zustand store
     const { useGameStore } = await import('../ts/core/state/zustand-store');
-    
+
     // Set up the store with test data using real Decimal objects
     const { toDecimal } = await import('../ts/core/numbers/simplified');
     useGameStore.setState({
@@ -72,8 +75,8 @@ describe('Zustand Store Integration Test', () => {
       lastAutosaveClockMs: Date.now(),
       options: {
         autosaveEnabled: true,
-        autosaveInterval: 30
-      }
+        autosaveInterval: 30,
+      },
     });
 
     // Import the UI module
@@ -83,7 +86,7 @@ describe('Zustand Store Integration Test', () => {
     if (uiModule.updateTopSipCounter) {
       const topSipValue = global.document.getElementById('topSipValue');
       expect(topSipValue).toBeTruthy();
-      
+
       uiModule.updateTopSipCounter();
       expect(topSipValue!.textContent).toBe('10');
     }
@@ -92,7 +95,7 @@ describe('Zustand Store Integration Test', () => {
     if (uiModule.updateTopSipsPerDrink) {
       const topSipsPerDrink = global.document.getElementById('topSipsPerDrink');
       expect(topSipsPerDrink).toBeTruthy();
-      
+
       uiModule.updateTopSipsPerDrink();
       expect(topSipsPerDrink!.textContent).toBe('2');
     }
@@ -101,7 +104,7 @@ describe('Zustand Store Integration Test', () => {
     if (uiModule.updateDrinkProgress) {
       const drinkProgressFill = global.document.getElementById('drinkProgressFill');
       expect(drinkProgressFill).toBeTruthy();
-      
+
       uiModule.updateDrinkProgress();
       expect(drinkProgressFill!.style.width).toBe('75.5%');
     }
@@ -110,10 +113,10 @@ describe('Zustand Store Integration Test', () => {
   it('should test the exact production scenario with Zustand store', async () => {
     // This test simulates the exact scenario from the production logs
     console.log('Testing exact production scenario with Zustand store...');
-    
+
     // Import the Zustand store
     const { useGameStore } = await import('../ts/core/state/zustand-store');
-    
+
     // Set up the store with the exact state from production logs using real Decimal objects
     const { toDecimal } = await import('../ts/core/numbers/simplified');
     useGameStore.setState({
@@ -130,8 +133,8 @@ describe('Zustand Store Integration Test', () => {
       lastAutosaveClockMs: Date.now(),
       options: {
         autosaveEnabled: true,
-        autosaveInterval: 30
-      }
+        autosaveInterval: 30,
+      },
     });
 
     // Import the UI module and domQuery
@@ -141,11 +144,14 @@ describe('Zustand Store Integration Test', () => {
     // Test the exact UI update calls from production
     console.log('Calling updateTopSipCounter...');
     if (uiModule.updateTopSipCounter) {
-      console.log('🔧 Before updateTopSipCounter - element textContent:', domQuery.getById('topSipValue')?.textContent);
+      console.log(
+        '🔧 Before updateTopSipCounter - element textContent:',
+        domQuery.getById('topSipValue')?.textContent
+      );
       uiModule.updateTopSipCounter();
       const topSipValue = domQuery.getById('topSipValue');
       console.log('🔧 After updateTopSipCounter - element textContent:', topSipValue?.textContent);
-      
+
       // Check if there are multiple elements with the same ID
       const allTopSipElements = global.document.querySelectorAll('#topSipValue');
       console.log('🔧 Number of elements with ID topSipValue:', allTopSipElements.length);
@@ -153,11 +159,11 @@ describe('Zustand Store Integration Test', () => {
         console.log(`🔧 Element ${index}:`, el.textContent);
         console.log(`🔧 Element ${index} isSameNode:`, el === topSipValue);
       });
-      
+
       // Check if the element we got is the same as the one the function updated
       console.log('🔧 topSipValue element reference:', topSipValue);
       console.log('🔧 topSipValue === allTopSipElements[0]:', topSipValue === allTopSipElements[0]);
-      
+
       expect(topSipValue!.textContent).toBe('1');
     }
 
@@ -181,7 +187,7 @@ describe('Zustand Store Integration Test', () => {
   it('should test state updates and UI synchronization', async () => {
     // Import the Zustand store
     const { useGameStore } = await import('../ts/core/state/zustand-store');
-    
+
     // Import the UI module
     const uiModule = await import('../ts/ui/index');
 
@@ -201,8 +207,8 @@ describe('Zustand Store Integration Test', () => {
       lastAutosaveClockMs: Date.now(),
       options: {
         autosaveEnabled: true,
-        autosaveInterval: 30
-      }
+        autosaveInterval: 30,
+      },
     });
 
     // Import domQuery for consistent element access
@@ -210,7 +216,10 @@ describe('Zustand Store Integration Test', () => {
 
     // Test initial state
     if (uiModule.updateTopSipCounter) {
-      console.log('🔧 Before updateTopSipCounter - element textContent:', domQuery.getById('topSipValue')?.textContent);
+      console.log(
+        '🔧 Before updateTopSipCounter - element textContent:',
+        domQuery.getById('topSipValue')?.textContent
+      );
       uiModule.updateTopSipCounter();
       const topSipValue = domQuery.getById('topSipValue');
       console.log('🔧 After updateTopSipCounter - element textContent:', topSipValue?.textContent);
@@ -229,13 +238,16 @@ describe('Zustand Store Integration Test', () => {
       suctionClickBonus: 0,
       options: {
         autosaveEnabled: true,
-        autosaveInterval: 30
-      }
+        autosaveInterval: 30,
+      },
     });
 
     // Test updated state
     if (uiModule.updateTopSipCounter) {
-      console.log('🔧 Before updateTopSipCounter - element textContent:', domQuery.getById('topSipValue')?.textContent);
+      console.log(
+        '🔧 Before updateTopSipCounter - element textContent:',
+        domQuery.getById('topSipValue')?.textContent
+      );
       uiModule.updateTopSipCounter();
       const topSipValue = domQuery.getById('topSipValue');
       console.log('🔧 After updateTopSipCounter - element textContent:', topSipValue?.textContent);
@@ -255,7 +267,7 @@ describe('Zustand Store Integration Test', () => {
 
   it('should test the complete flow with drink system and UI updates', async () => {
     // This test simulates the complete flow from the production logs
-    
+
     // Import modules
     const { useGameStore } = await import('../ts/core/state/zustand-store');
     const uiModule = await import('../ts/ui/index');
@@ -276,8 +288,8 @@ describe('Zustand Store Integration Test', () => {
       lastAutosaveClockMs: Date.now(),
       options: {
         autosaveEnabled: true,
-        autosaveInterval: 30
-      }
+        autosaveInterval: 30,
+      },
     });
 
     // Import the modernized drink system
@@ -285,22 +297,25 @@ describe('Zustand Store Integration Test', () => {
 
     // Test the complete flow
     console.log('Testing complete flow...');
-    
+
     // Process drink
     processDrink();
-    
+
     // Import domQuery for consistent element access
     const { domQuery } = await import('../ts/services/dom-query');
 
     // Update UI
     if (uiModule.updateTopSipCounter) {
-      console.log('🔧 Before updateTopSipCounter - element textContent:', domQuery.getById('topSipValue')?.textContent);
+      console.log(
+        '🔧 Before updateTopSipCounter - element textContent:',
+        domQuery.getById('topSipValue')?.textContent
+      );
       uiModule.updateTopSipCounter();
       const topSipValue = domQuery.getById('topSipValue');
       console.log('🔧 After updateTopSipCounter - element textContent:', topSipValue?.textContent);
       expect(topSipValue!.textContent).toBe('1');
     }
-    
+
     console.log('Complete flow test passed');
   });
 });

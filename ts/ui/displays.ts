@@ -416,18 +416,27 @@ export function updateTopSipCounter(): void {
   const topSipElement = domQuery.getById('topSipValue');
   console.log('🔧 updateTopSipCounter: Found element:', topSipElement);
   console.log('🔧 updateTopSipCounter: Element ID:', topSipElement?.id);
-  console.log('🔧 updateTopSipCounter: Element textContent before update:', topSipElement?.textContent);
+  console.log(
+    '🔧 updateTopSipCounter: Element textContent before update:',
+    topSipElement?.textContent
+  );
 
   if (topSipElement) {
     try {
       const displayData = getDisplayData();
-      console.log('🔧 updateTopSipCounter: displayData.sips =', displayData.sips?.toString?.() || displayData.sips);
+      console.log(
+        '🔧 updateTopSipCounter: displayData.sips =',
+        displayData.sips?.toString?.() || displayData.sips
+      );
       // Use displayData.sips directly - formatNumber will handle Decimal properly
       const formatted = formatNumber(displayData.sips);
       console.log('🔧 updateTopSipCounter: formatted =', formatted);
       // Silent update - no visual feedback needed
       (topSipElement as HTMLElement).textContent = formatted;
-      console.log('🔧 updateTopSipCounter: Updated element textContent to', topSipElement.textContent);
+      console.log(
+        '🔧 updateTopSipCounter: Updated element textContent to',
+        topSipElement.textContent
+      );
     } catch (error) {
       console.warn('Failed to update display:', error);
     }
