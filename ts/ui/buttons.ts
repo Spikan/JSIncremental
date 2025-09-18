@@ -126,6 +126,9 @@ const BUTTON_CONFIG: {
     buySuction: {
       func: () => {
         console.log('🔧 buySuction button clicked!');
+        console.log('🔧 purchasesSystem available:', !!purchasesSystem);
+        console.log('🔧 purchasesSystem.execute available:', !!(purchasesSystem as any)?.execute);
+        console.log('🔧 purchasesSystem.execute.buySuction available:', !!(purchasesSystem as any)?.execute?.buySuction);
         try {
           // Use the purchase system
           const success = (purchasesSystem as any).execute.buySuction();
