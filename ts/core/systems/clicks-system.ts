@@ -1,7 +1,7 @@
 // Clicks system: centralizes click tracking and streak logic with Decimal support (TypeScript)
 
 import { toDecimal } from '../numbers/simplified';
-import { useGameStore } from '../state/zustand-store';
+import { useGameStore, getStoreActions } from '../state/zustand-store';
 
 export type TrackClickArgs = {
   getApp?: () => any;
@@ -142,7 +142,6 @@ export function handleSodaClickFactory({
           );
           // Try direct store access as fallback
           try {
-            const { getStoreActions } = await import('../state/zustand-store');
             const storeActions = getStoreActions();
             if (storeActions?.setSips) {
               console.log('🍹 Calling setSips via storeActions with:', newSips);

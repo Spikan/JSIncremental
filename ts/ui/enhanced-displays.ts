@@ -1,7 +1,7 @@
 // Enhanced Display System with Animated Number Counters
 // Provides smooth transitions for number changes using Framer Motion
 
-import { animateNumberDisplay } from './enhanced-feedback';
+import { animateNumberDisplay, showEnhancedLevelUpFeedback } from './enhanced-feedback';
 import { formatNumber } from './utils';
 import { getDisplayData } from '../core/state/zustand-store';
 import { domQuery } from '../services/dom-query';
@@ -272,12 +272,10 @@ class EnhancedDisplayManager {
    */
   private celebrateLevelUp(newLevel: number): void {
     try {
-      // Import and trigger level up celebration
-      import('./enhanced-feedback').then(({ showEnhancedLevelUpFeedback }) => {
-        // Calculate bonus (your existing logic)
-        const bonus = newLevel * 1000; // Adjust based on your game logic
-        showEnhancedLevelUpFeedback(bonus);
-      });
+      // Trigger level up celebration
+      // Calculate bonus (your existing logic)
+      const bonus = newLevel * 1000; // Adjust based on your game logic
+      showEnhancedLevelUpFeedback(bonus);
 
       logger.info(`Level up celebrated: ${newLevel}`);
     } catch (error) {

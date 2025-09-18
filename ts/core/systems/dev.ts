@@ -10,6 +10,7 @@
 const Decimal = (globalThis as any).Decimal;
 import { toDecimal, add } from '../numbers/simplified';
 import { recalcProduction } from './resources';
+import * as purchasesSystem from './purchases-system';
 
 type Win = typeof window & {
   Decimal?: any;
@@ -508,13 +509,11 @@ export function addExtremeResources(): boolean {
     }
 
     // Validate extreme values after adding them
-    import('./purchases-system.ts')
-      .then(module => {
-        module.validateExtremeValues?.();
-      })
-      .catch(error => {
-        console.warn('Failed to validate extreme values:', error);
-      });
+    try {
+      (purchasesSystem as any).validateExtremeValues?.();
+    } catch (error) {
+      console.warn('Failed to validate extreme values:', error);
+    }
 
     // Update SPD with the new extreme values
     const state = w.App?.state?.getState?.();
