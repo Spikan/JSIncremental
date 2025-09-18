@@ -22,13 +22,37 @@ export function isDecimal(value: any): value is DecimalType {
  * Convert any value to Decimal - simplified version
  */
 export function toDecimal(value: NumericValue): DecimalType {
+  // Handle null/undefined
+  if (value == null) {
+    return new Decimal(0);
+  }
+
+  // Check if it's already a valid Decimal
   if (isDecimal(value)) {
-    return value;
+    // Validate the Decimal object isn't corrupted
+    try {
+      const test = value.toString();
+      if (test === 'NaN' || test === 'Infinity' || test === '-Infinity') {
+        console.warn('Corrupted Decimal object detected, replacing with 0:', value);
+        return new Decimal(0);
+      }
+      return value;
+    } catch (error) {
+      console.warn('Corrupted Decimal object detected, replacing with 0:', value);
+      return new Decimal(0);
+    }
   }
 
   if (typeof value === 'string') {
     try {
-      return new Decimal(value);
+      const result = new Decimal(value);
+      // Validate the result
+      const test = result.toString();
+      if (test === 'NaN' || test === 'Infinity' || test === '-Infinity') {
+        console.warn('Invalid decimal string result:', value, '->', test);
+        return new Decimal(0);
+      }
+      return result;
     } catch (error) {
       console.warn('Invalid decimal string:', value);
       return new Decimal(0);
@@ -41,6 +65,15 @@ export function toDecimal(value: NumericValue): DecimalType {
       return new Decimal(0);
     }
     return new Decimal(value);
+  }
+
+  // Handle objects that might be corrupted Decimal objects
+  if (typeof value === 'object' && value !== null) {
+    // Check if it looks like a corrupted Decimal object
+    if ('sign' in value && 'mag' in value && 'layer' in value) {
+      console.warn('Corrupted Decimal-like object detected, replacing with 0:', value);
+      return new Decimal(0);
+    }
   }
 
   console.warn('Invalid value type for Decimal conversion:', typeof value, value);

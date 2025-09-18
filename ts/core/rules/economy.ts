@@ -18,12 +18,18 @@ export function computeStrawSPD(
   widerStrawsCount: number | string | DecimalType,
   widerMultiplierPerLevel: number | string | DecimalType = 0
 ): DecimalType {
-  const baseValue = new Decimal(baseSPD);
-  const strawsCount = new Decimal(straws);
+  // Validate inputs before creating Decimal objects
+  const safeStraws = straws == null ? 0 : straws;
+  const safeBaseSPD = baseSPD == null ? 2 : baseSPD;
+  const safeWiderStrawsCount = widerStrawsCount == null ? 0 : widerStrawsCount;
+  const safeWiderMultiplierPerLevel = widerMultiplierPerLevel == null ? 0 : widerMultiplierPerLevel;
+
+  const baseValue = new Decimal(safeBaseSPD);
+  const strawsCount = new Decimal(safeStraws);
 
   // Basic wider straws multiplier
   const upgradeMultiplier = new Decimal(1).add(
-    new Decimal(widerStrawsCount).mul(new Decimal(widerMultiplierPerLevel))
+    new Decimal(safeWiderStrawsCount).mul(new Decimal(safeWiderMultiplierPerLevel))
   );
 
   // Calculate base production: baseSPD * straws * upgradeMultiplier
@@ -51,12 +57,18 @@ export function computeCupSPD(
   betterCupsCount: number | string | DecimalType,
   betterMultiplierPerLevel: number | string | DecimalType = 0
 ): DecimalType {
-  const baseValue = new Decimal(baseSPD);
-  const cupsCount = new Decimal(cups);
+  // Validate inputs before creating Decimal objects
+  const safeCups = cups == null ? 0 : cups;
+  const safeBaseSPD = baseSPD == null ? 5 : baseSPD;
+  const safeBetterCupsCount = betterCupsCount == null ? 0 : betterCupsCount;
+  const safeBetterMultiplierPerLevel = betterMultiplierPerLevel == null ? 0 : betterMultiplierPerLevel;
+
+  const baseValue = new Decimal(safeBaseSPD);
+  const cupsCount = new Decimal(safeCups);
 
   // Basic better cups multiplier
   const upgradeMultiplier = new Decimal(1).add(
-    new Decimal(betterCupsCount).mul(new Decimal(betterMultiplierPerLevel))
+    new Decimal(safeBetterCupsCount).mul(new Decimal(safeBetterMultiplierPerLevel))
   );
 
   // Calculate base production: baseSPD * cups * upgradeMultiplier
