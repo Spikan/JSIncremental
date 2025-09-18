@@ -262,8 +262,20 @@ export const useGameStore = create<GameStore>()(
           // Custom deserialize to restore Decimal objects
           const parsed = JSON.parse(str, (_key, value) => {
             if (value && typeof value === 'object' && value.__largeNumber) {
-              // Restore Decimal from string representation
-              return new Decimal(value.value);
+              // Restore Decimal from string representation with validation
+              try {
+                const decimal = new Decimal(value.value);
+                // Validate the Decimal is not corrupted
+                const test = decimal.toString();
+                if (test === 'NaN' || test === 'Infinity' || test === '-Infinity') {
+                  console.warn('Corrupted Decimal detected during JSON parsing, using 0:', value.value);
+                  return new Decimal(0);
+                }
+                return decimal;
+              } catch (error) {
+                console.warn('Failed to parse Decimal from JSON, using 0:', value.value, error);
+                return new Decimal(0);
+              }
             }
             return value;
           });
@@ -561,9 +573,9 @@ export const useTotalResources = () => {
     suctions: useSuctions(),
     total: (state: GameStore) =>
       state.sips
-        ?.add(state.straws || new Decimal(0))
-        .add(state.cups || new Decimal(0))
-        .add(state.suctions || new Decimal(0))
+        ?.add(state.straws || toDecimal(0))
+        .add(state.cups || toDecimal(0))
+        .add(state.suctions || toDecimal(0))
         .toString() || '0',
   };
 };
@@ -574,7 +586,7 @@ export const useProductionStats = () => {
     strawSPD: useStrawSPD(),
     cupSPD: useCupSPD(),
     totalSPD: (state: GameStore) =>
-      state.strawSPD?.add(state.cupSPD || new Decimal(0)).toString() || '0',
+      state.strawSPD?.add(state.cupSPD || toDecimal(0)).toString() || '0',
   };
 };
 

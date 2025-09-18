@@ -61,7 +61,8 @@ export function computeCupSPD(
   const safeCups = cups == null ? 0 : cups;
   const safeBaseSPD = baseSPD == null ? 5 : baseSPD;
   const safeBetterCupsCount = betterCupsCount == null ? 0 : betterCupsCount;
-  const safeBetterMultiplierPerLevel = betterMultiplierPerLevel == null ? 0 : betterMultiplierPerLevel;
+  const safeBetterMultiplierPerLevel =
+    betterMultiplierPerLevel == null ? 0 : betterMultiplierPerLevel;
 
   const baseValue = new Decimal(safeBaseSPD);
   const cupsCount = new Decimal(safeCups);
