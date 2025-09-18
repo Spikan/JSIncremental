@@ -268,7 +268,10 @@ export const useGameStore = create<GameStore>()(
                 // Validate the Decimal is not corrupted
                 const test = decimal.toString();
                 if (test === 'NaN' || test === 'Infinity' || test === '-Infinity') {
-                  console.warn('Corrupted Decimal detected during JSON parsing, using 0:', value.value);
+                  console.warn(
+                    'Corrupted Decimal detected during JSON parsing, using 0:',
+                    value.value
+                  );
                   return new Decimal(0);
                 }
                 return decimal;
