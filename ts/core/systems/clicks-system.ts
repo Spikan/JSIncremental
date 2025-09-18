@@ -81,6 +81,7 @@ export function handleSodaClickFactory({
   trackClick?: () => void;
 } = {}) {
   return async function handleSodaClick(multiplier: number = 1) {
+    console.log('🔧 handleSodaClick called with multiplier:', multiplier);
     try {
       // Add momentum to 3D model if available
       try {
@@ -108,16 +109,16 @@ export function handleSodaClickFactory({
       console.log('🔧 handleSodaClick: Click calculation:', {
         stateSuctionClickBonus: state.suctionClickBonus?.toString(),
         suctionClickBonus: suctionClickBonus.toString(),
-        multiplier: multiplierValue.toString()
+        multiplier: multiplierValue.toString(),
       });
 
       // Base click value (1 sip) + suction click bonus from store
       const baseClick = toDecimal(1);
       const baseClickValue = baseClick.add(suctionClickBonus).multiply(multiplierValue);
-      
+
       console.log('🔧 handleSodaClick: Base click value:', {
         baseClick: baseClick.toString(),
-        totalBaseClickValue: baseClickValue.toString()
+        totalBaseClickValue: baseClickValue.toString(),
       });
 
       // Apply level bonuses from hybrid level system

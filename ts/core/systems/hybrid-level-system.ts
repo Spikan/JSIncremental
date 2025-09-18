@@ -662,31 +662,20 @@ export class HybridLevelSystem {
       '.shop-btn, .upgrade-btn, .suction-btn, .upgrade-card, .upgrade-polygon, .suction-button-container, .game-sidebar, .sidebar-content, .sidebar-header, .upgrade-header, .upgrade-info, .upgrade-stats, .upgrade-name, .upgrade-description, .upgrade-cost, .upgrade-owned, .upgrade-effect, .suction-info, .suction-name, .suction-cost, .suction-effect, .click-power-display, .click-power-label, .click-power-value, .suction-bonus, .upgrade-icon, .suction-icon'
     );
 
-    console.log('🎨 Applying theme to shop elements:', shopElements.length, 'elements found');
-    console.log('🎨 Theme colors:', {
-      bg: level.visualTheme.backgroundColor,
-      accent: level.visualTheme.accentColor,
-    });
+    // console.log('🎨 Applying theme to shop elements:', shopElements.length, 'elements found');
+    // console.log('🎨 Theme colors:', {
+    //   bg: level.visualTheme.backgroundColor,
+    //   accent: level.visualTheme.accentColor,
+    // });
 
-    shopElements.forEach((element, index) => {
+    shopElements.forEach((element) => {
       const el = element as HTMLElement;
-      const isAffordable = el.classList.contains('affordable');
-      const isUnaffordable = el.classList.contains('unaffordable');
-      const isDisabled = el.classList.contains('disabled');
-
-      console.log(`🎨 Element ${index}:`, el.className, {
-        isAffordable,
-        isUnaffordable,
-        isDisabled,
-      });
 
       // Set theme variables - CSS will handle the actual styling
       el.style.setProperty('--theme-bg', level.visualTheme.backgroundColor);
       el.style.setProperty('--theme-accent', level.visualTheme.accentColor);
       el.style.setProperty('--theme-text', '#ffffff');
       el.style.setProperty('--theme-border', level.visualTheme.accentColor);
-
-      console.log(`🎨 Element ${index}: Set theme variables for`, el.className);
     });
   }
 
