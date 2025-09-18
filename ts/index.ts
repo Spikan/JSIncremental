@@ -1,7 +1,6 @@
 // Entry module providing a small public API surface and environment checks (TypeScript)
 
-console.log('🚀 ts/index.ts module loading...');
-console.log('🔧 Module execution started');
+// Module loading
 (window as any).__tsIndexLoaded = true;
 
 // import { useGameStore } from './core/state/zustand-store'; // Removed - using dynamic import instead
@@ -30,7 +29,7 @@ import * as devModule from './core/systems/dev';
 import * as uiModule from './ui/index';
 import * as levelSelectorModule from './ui/level-selector';
 
-console.log('🔧 Imports completed, setting up App object...');
+// Setting up App object
 // Environment system replaced by hybrid level system
 import { hybridLevelSystem } from './core/systems/hybrid-level-system';
 import { AppStorage as storageImpl } from './services/storage';
@@ -51,11 +50,11 @@ function __pushDiag(_marker: any): void {
   // Diagnostics removed - no longer using window globals
 }
 
-console.log('🔧 index.ts starting App initialization...');
+// Starting App initialization
 __pushDiag({ type: 'index', stage: 'start' });
 // Report resolved base for dynamic imports
 try {
-  console.log('BASE_URL =', import.meta.env.BASE_URL);
+  // BASE_URL = import.meta.env.BASE_URL
   __pushDiag({ type: 'base', base: import.meta.env.BASE_URL, url: import.meta.url });
 } catch (error) {
   console.error('❌ Failed to get base URL:', error);
@@ -251,41 +250,26 @@ try {
       godTabEnabled: false,
     },
   });
-  console.log('🔧 setState call completed');
-  console.log('🔧 Current store state:', useGameStore.getState());
-  console.log('✅ Zustand store initialized');
+  // Zustand store initialized
 
   // Update App object with store reference
-  App.state = useGameStore.getState();
-  App.state.actions = useGameStore.getState().actions;
+  App.state = useGameStore;
   // Store the store itself for getState/setState calls
   (App as any).store = useGameStore;
 
   // Modernized drink system using only Zustand store
-  console.log('🔧 Using modernized drink system...');
-  console.log('🔧 processDrink function:', typeof processDrink);
   App.systems.drink.processDrink = processDrink;
-  console.log('✅ Drink system loaded');
 
   // Load hybrid level system early so UI can access it
-  console.log('🔧 Loading hybrid level system...');
-  console.log('🔧 hybridLevel imported:', typeof hybridLevelSystem);
   App.systems.hybridLevel = hybridLevelSystem;
-  console.log('✅ Hybrid level system loaded');
 
   App.systems.loop = loopSystem;
-  console.log('✅ Inline loop system created');
 
   // Other systems can load asynchronously
-  console.log('🔧 Critical systems loaded, continuing with async systems...');
-  console.log('🔧 About to call __pushDiag...');
-
   __pushDiag({ type: 'wire', module: 'core-static', ok: true });
-  console.log('🔧 __pushDiag completed successfully');
 
   // Define tryBoot function - no retries, fail fast
   const tryBoot = () => {
-    console.log('🔧 tryBoot called');
     try {
       // Ensure baseline timing state
       if (App?.state?.getState && App?.state?.setState) {
@@ -303,9 +287,7 @@ try {
 
       // Call initGame if present
       if (typeof initGame === 'function') {
-        console.log('🔧 Calling initGame...');
         initGame();
-        console.log('✅ initGame completed successfully');
       }
 
       // Check if loop system is available
@@ -314,17 +296,16 @@ try {
         throw new Error('Loop system not available or start method is not a function');
       }
 
-      console.log('🔧 Loop system available, starting game...');
-      console.log('🔧 Starting game loop...');
+      // Starting game loop
       loopStart({
         updateDrinkProgress: () => {
           try {
-            const state = App.state;
+            const state = App.state.getState();
             const now = Date.now();
             const last = Number(state.lastDrinkTime ?? 0);
             const rate = Number(state.drinkRate ?? 1000);
             const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-            App.state.actions.setState({ drinkProgress: pct });
+            App.state.setState({ drinkProgress: pct });
             App?.ui?.updateDrinkProgress?.(pct, rate);
           } catch (error) {
             console.error('❌ Failed to update drink progress:', error);
@@ -398,7 +379,7 @@ try {
           }
         },
       });
-      console.log('✅ Game loop started successfully');
+      // Game loop started successfully
     } catch (error) {
       console.error('❌ Error in tryBoot:', error);
       throw error; // Fail fast, no retries
@@ -406,13 +387,8 @@ try {
   };
 
   // Now that critical systems are loaded, call tryBoot
-  console.log('🔧 About to call tryBoot function...');
-  console.log('🔧 App.systems.drink.processDrink available:', !!App?.systems?.drink?.processDrink);
-  console.log('🔧 App.systems.loop.start available:', !!App?.systems?.loop?.start);
-  console.log('🔧 Calling tryBoot now...');
   try {
     tryBoot();
-    console.log('🔧 tryBoot call completed');
   } catch (tryBootError) {
     console.error('❌ CRITICAL: tryBoot failed:', tryBootError);
     throw tryBootError;
@@ -436,11 +412,7 @@ try {
 }
 
 // Load async systems before tryBoot
-console.log('🔧 Loading async systems...');
-
 // Hybrid level system already loaded above
-
-console.log('🔧 Async systems loaded, starting tryBoot initialization...');
 
 // tryBoot is now called inside the async try block after systems are loaded
 
@@ -450,7 +422,7 @@ setTimeout(() => {
     const splash = document.getElementById('splashScreen') as any;
     const game = document.getElementById('gameContent') as any;
     if (splash && game && splash.style.display !== 'none') {
-      console.log('🔄 Force-hiding splash screen after timeout');
+      // Force-hiding splash screen after timeout
       splash.style.display = 'none';
       splash.style.visibility = 'hidden';
       splash.style.pointerEvents = 'none';
@@ -461,7 +433,7 @@ setTimeout(() => {
       document.body?.classList?.add('game-started');
       __pushDiag({ type: 'splash', action: 'forced-hide' });
       // Loop system should already be running from tryBoot above
-      console.log('🔄 Splash screen force-hidden, loop should already be running');
+      // Splash screen force-hidden, loop should already be running
     }
   } catch (error) {
     console.error('❌ Failed to hide splash screen:', error);
