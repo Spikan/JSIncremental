@@ -165,7 +165,7 @@ export function findButton(buttonId: string): HTMLElement | null {
   return null;
 }
 
-export function updateButtonState(buttonId: string, isAffordable: boolean, cost?: number): void {
+export function updateButtonState(buttonId: string, isAffordable: boolean, cost?: any): void {
   if (typeof window === 'undefined') return;
   const button = findButton(buttonId);
   if (!button || !(button as any).classList) return;
@@ -229,7 +229,7 @@ function updateCompactButtonVariants(buttonId: string, isAffordable: boolean): v
   }
 }
 
-export function updateCostDisplay(elementId: string, cost: number, isAffordable: boolean): void {
+export function updateCostDisplay(elementId: string, cost: any, isAffordable: boolean): void {
   if (typeof window === 'undefined') return;
   const element = findElement(elementId) as HTMLElement | null;
   if (!element || !(element as any).classList) return;

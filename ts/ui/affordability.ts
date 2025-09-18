@@ -53,29 +53,29 @@ export function checkUpgradeAffordability(): void {
   const costs = calculateAllCosts();
 
   // Update button states based on affordability (skip unlock buttons)
-  updateButtonState('buyStraw', canAfford(costs.straw), Number(costs.straw));
-  updateButtonState('buyCup', canAfford(costs.cup), Number(costs.cup));
+  updateButtonState('buyStraw', canAfford(costs.straw), costs.straw);
+  updateButtonState('buyCup', canAfford(costs.cup), costs.cup);
 
   // Only update these buttons if they're not in unlock mode
   if (!isButtonInUnlockMode('buySuction')) {
-    updateButtonState('buySuction', canAfford(costs.suction), Number(costs.suction));
+    updateButtonState('buySuction', canAfford(costs.suction), costs.suction);
   }
   if (!isButtonInUnlockMode('buyFasterDrinks')) {
-    updateButtonState('buyFasterDrinks', canAfford(costs.fasterDrinks), Number(costs.fasterDrinks));
+    updateButtonState('buyFasterDrinks', canAfford(costs.fasterDrinks), costs.fasterDrinks);
   }
 
-  updateButtonState('buyWiderStraws', canAfford(costs.widerStraws), Number(costs.widerStraws));
-  updateButtonState('buyBetterCups', canAfford(costs.betterCups), Number(costs.betterCups));
+  updateButtonState('buyWiderStraws', canAfford(costs.widerStraws), costs.widerStraws);
+  updateButtonState('buyBetterCups', canAfford(costs.betterCups), costs.betterCups);
   // levelUp button is handled by hybrid level system - don't update its state here
   // updateButtonState('levelUp', canAfford(costs.levelUp), costs.levelUp);
 
-  // Cost displays - convert Decimal to number for display
-  updateCostDisplay('strawCost', Number(costs.straw), canAfford(costs.straw));
-  updateCostDisplay('cupCost', Number(costs.cup), canAfford(costs.cup));
-  updateCostDisplay('suctionCost', Number(costs.suction), canAfford(costs.suction));
-  updateCostDisplay('fasterDrinksCost', Number(costs.fasterDrinks), canAfford(costs.fasterDrinks));
-  updateCostDisplay('widerStrawsCost', Number(costs.widerStraws), canAfford(costs.widerStraws));
-  updateCostDisplay('betterCupsCost', Number(costs.betterCups), canAfford(costs.betterCups));
+  // Cost displays - pass Decimal objects directly for proper formatting
+  updateCostDisplay('strawCost', costs.straw, canAfford(costs.straw));
+  updateCostDisplay('cupCost', costs.cup, canAfford(costs.cup));
+  updateCostDisplay('suctionCost', costs.suction, canAfford(costs.suction));
+  updateCostDisplay('fasterDrinksCost', costs.fasterDrinks, canAfford(costs.fasterDrinks));
+  updateCostDisplay('widerStrawsCost', costs.widerStraws, canAfford(costs.widerStraws));
+  updateCostDisplay('betterCupsCost', costs.betterCups, canAfford(costs.betterCups));
   // levelUpCost and levelCost are handled by hybrid level system - don't override them
   // updateCostDisplay('levelUpCost', costs.levelUp, canAfford(costs.levelUp));
 
