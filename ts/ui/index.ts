@@ -157,7 +157,6 @@ export function setupDirectSodaClickHandler(): () => void {
 
           // Update hybrid level system display
           try {
-            console.log('🔄 Value change detected, calling updateAllDisplaysAnimated');
             updateAllDisplaysAnimated();
           } catch (error) {
             console.warn('Failed to call updateAllDisplaysAnimated:', error);
@@ -460,7 +459,6 @@ export function initializeUI(): void {
       const clickData = data as ClickSodaEventData;
       // Use enhanced animated displays for better visual experience
       try {
-        console.log('🔄 Main update: Calling updateAllDisplaysAnimated');
         updateAllDisplaysAnimated();
         updateClickValueDisplay();
         updateTopInfoBar(); // Update the header with new sips total

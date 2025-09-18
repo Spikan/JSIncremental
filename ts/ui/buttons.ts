@@ -1362,16 +1362,12 @@ function setupSpecialButtonHandlers(): void {
           // Button click handling
           console.log('🔧 Soda button clicked!');
           try {
-            console.log('🔧 Click system loaded, calling handleSodaClick...');
             const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
             await handleSodaClick(1.0); // Default multiplier of 1.0
-            console.log('🔧 handleSodaClick completed, triggering UI update...');
 
             // Trigger UI update after click
             if (window.App?.ui?.updateAllDisplays) {
-              console.log('🔧 Calling updateAllDisplays after click...');
               window.App.ui.updateAllDisplays();
-              console.log('🔧 updateAllDisplays completed');
             } else {
               console.warn('🔧 updateAllDisplays not available');
             }
@@ -1926,7 +1922,6 @@ export function switchToLevel(levelId: number): void {
       (window as any).App?.ui?.updateLevelText?.();
       (window as any).App?.ui?.updateLevelNumber?.();
       (window as any).App?.ui?.updateAllDisplaysAnimated?.();
-      console.log('🔄 UI updated');
     } catch (error) {
       console.warn('Failed to update UI:', error);
     }

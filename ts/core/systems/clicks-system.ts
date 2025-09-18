@@ -83,7 +83,6 @@ export function handleSodaClickFactory({
   trackClick?: () => void;
 } = {}) {
   return async function handleSodaClick(multiplier: number = 1) {
-    console.log('🍹 handleSodaClick called with multiplier:', multiplier);
     try {
       // Add momentum to 3D model if available
       try {
@@ -130,12 +129,9 @@ export function handleSodaClickFactory({
       setSips(newSips);
 
       // Update state keeping Decimal
-      console.log('🍹 Before state update - sips:', newSips, 'state sips:', getState()?.sips);
       try {
         if (App?.state?.actions?.setSips) {
-          console.log('🍹 Calling setSips with:', newSips);
           App.state.actions.setSips(newSips);
-          console.log('🍹 After state update - state sips:', getState()?.sips);
         } else {
           console.warn(
             '🍹 setSips action not available via App.state.actions, trying direct store access...'
@@ -144,9 +140,7 @@ export function handleSodaClickFactory({
           try {
             const storeActions = getStoreActions();
             if (storeActions?.setSips) {
-              console.log('🍹 Calling setSips via storeActions with:', newSips);
               storeActions.setSips(newSips);
-              console.log('🍹 After state update via storeActions - state sips:', getState()?.sips);
             } else {
               console.warn('🍹 setSips action not available via storeActions either!');
             }
@@ -160,22 +154,12 @@ export function handleSodaClickFactory({
 
       // Emit soda click and sync totals with Decimal support
       try {
-        console.log('DEBUG: Emitting CLICK.SODA event with data:', {
-          // Preserve extreme values - keep as Decimal
-          value: totalClickValue,
-          // Preserve extreme values - keep as Decimal
-          gained: totalClickValue,
-          eventName: App?.EVENT_NAMES?.CLICK?.SODA,
-          hasEventSystem: !!App?.events,
-          hasEmit: typeof App?.events?.emit === 'function',
-        });
         App?.events?.emit?.(App?.EVENT_NAMES?.CLICK?.SODA, {
           // Preserve extreme values - keep as Decimal
           value: totalClickValue,
           // Preserve extreme values - keep as Decimal
           gained: totalClickValue,
         });
-        console.log('🍹 CLICK.SODA event emitted successfully');
       } catch (error) {
         console.warn('Failed to emit soda click event:', error);
       }
