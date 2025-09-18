@@ -907,6 +907,12 @@ export const execute = {
       console.warn('Failed to update sips after suction purchase:', error);
     }
     try {
+      // Update Zustand store with new suction values
+      w.App?.state?.setState?.({
+        suctions: result.suctions,
+        suctionClickBonus: result.suctionClickBonus,
+      });
+      // Also update global for backward compatibility
       w.suctions = new (w.Decimal || Number)(
         (result.suctions as any).toString?.() ?? String(result.suctions)
       );

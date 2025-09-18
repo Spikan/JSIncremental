@@ -126,15 +126,13 @@ const BUTTON_CONFIG: {
     buySuction: {
       func: () => {
         try {
-          // Import and use the purchase system
-          import('../core/systems/purchases-system').then(({ execute }) => {
-            const success = execute.buySuction();
-            if (success) {
-              console.log('✅ Suction purchased successfully');
-            } else {
-              console.log('❌ Suction purchase failed - insufficient sips');
-            }
-          });
+          // Use the purchase system
+          const success = (purchasesSystem as any).execute.buySuction();
+          if (success) {
+            console.log('✅ Suction purchased successfully');
+          } else {
+            console.log('❌ Suction purchase failed - insufficient sips');
+          }
         } catch (error) {
           console.warn('Failed to purchase suction:', error);
         }
@@ -145,15 +143,13 @@ const BUTTON_CONFIG: {
     buyFasterDrinks: {
       func: () => {
         try {
-          // Import and use the purchase system
-          import('../core/systems/purchases-system').then(({ execute }) => {
-            const success = execute.buyFasterDrinks();
-            if (success) {
-              console.log('✅ Faster drinks purchased successfully');
-            } else {
-              console.log('❌ Faster drinks purchase failed - insufficient sips');
-            }
-          });
+          // Use the purchase system
+          const success = (purchasesSystem as any).execute.buyFasterDrinks();
+          if (success) {
+            console.log('✅ Faster drinks purchased successfully');
+          } else {
+            console.log('❌ Faster drinks purchase failed - insufficient sips');
+          }
         } catch (error) {
           console.warn('Failed to purchase faster drinks:', error);
         }
@@ -615,10 +611,10 @@ const BUTTON_CONFIG: {
 
           // Trigger offline progression check
           const result = (offlineProgression as any).processOfflineProgression({
-                maxOfflineHours: 8,
-                minOfflineMinutes: 0.1, // Show even for short times in dev mode
-                offlineEfficiency: 1.0,
-              });
+            maxOfflineHours: 8,
+            minOfflineMinutes: 0.1, // Show even for short times in dev mode
+            offlineEfficiency: 1.0,
+          });
 
           if (result) {
             (offlineModal as any).showOfflineModal(result, {
@@ -860,18 +856,18 @@ const BUTTON_CONFIG: {
               // Use the proper God response system
               (godModule as any).getGodResponse(message);
 
-                  // Extract the God's response from the temporary container
-                  const godMessages = tempContainer.querySelectorAll('.god-message');
-                  if (godMessages.length > 0) {
-                    const lastGodMessage = godMessages[godMessages.length - 1];
-                    const godResponse =
-                      lastGodMessage?.querySelector('.message-text')?.textContent ||
-                      'Divine wisdom flows...';
+              // Extract the God's response from the temporary container
+              const godMessages = tempContainer.querySelectorAll('.god-message');
+              if (godMessages.length > 0) {
+                const lastGodMessage = godMessages[godMessages.length - 1];
+                const godResponse =
+                  lastGodMessage?.querySelector('.message-text')?.textContent ||
+                  'Divine wisdom flows...';
 
-                    // Add the response to our modal
-                    const godMessage = document.createElement('div');
-                    godMessage.className = 'god-message';
-                    godMessage.innerHTML = `
+                // Add the response to our modal
+                const godMessage = document.createElement('div');
+                godMessage.className = 'god-message';
+                godMessage.innerHTML = `
                       <div class="god-avatar">
                         <img src="images/TempleOS.jpg" alt="God" style="width: 100%; height: 100%; object-fit: cover">
                       </div>
@@ -880,9 +876,9 @@ const BUTTON_CONFIG: {
                         <div class="god-message-content">${godResponse}</div>
                       </div>
                     `;
-                    messagesContainer.appendChild(godMessage);
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                  }
+                messagesContainer.appendChild(godMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+              }
 
               // Clean up temporary container
               tempContainer.remove();
