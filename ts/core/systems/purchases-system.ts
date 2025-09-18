@@ -898,21 +898,21 @@ export const execute = {
     console.log('🔧 buySuction: Current state before purchase:', {
       sips: st.sips?.toString(),
       suctions: st.suctions?.toString(),
-      suctionClickBonus: st.suctionClickBonus?.toString()
+      suctionClickBonus: st.suctionClickBonus?.toString(),
     });
-    
+
     const result = purchaseSuction({
       sips: st.sips,
       suctions: st.suctions,
     });
     if (!result) return false;
-    
+
     console.log('🔧 buySuction: Purchase result:', {
       spent: result.spent?.toString(),
       suctions: result.suctions?.toString(),
-      suctionClickBonus: result.suctionClickBonus?.toString()
+      suctionClickBonus: result.suctionClickBonus?.toString(),
     });
-    
+
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       subtractFromWallet(result.spent);
@@ -923,7 +923,7 @@ export const execute = {
       // Update Zustand store with new suction values
       console.log('🔧 buySuction: About to update store with:', {
         suctions: result.suctions?.toString(),
-        suctionClickBonus: result.suctionClickBonus?.toString()
+        suctionClickBonus: result.suctionClickBonus?.toString(),
       });
       w.App?.state?.setState?.({
         suctions: result.suctions,

@@ -128,7 +128,10 @@ const BUTTON_CONFIG: {
         console.log('🔧 buySuction button clicked!');
         console.log('🔧 purchasesSystem available:', !!purchasesSystem);
         console.log('🔧 purchasesSystem.execute available:', !!(purchasesSystem as any)?.execute);
-        console.log('🔧 purchasesSystem.execute.buySuction available:', !!(purchasesSystem as any)?.execute?.buySuction);
+        console.log(
+          '🔧 purchasesSystem.execute.buySuction available:',
+          !!(purchasesSystem as any)?.execute?.buySuction
+        );
         try {
           // Use the purchase system
           const success = (purchasesSystem as any).execute.buySuction();
@@ -1611,6 +1614,8 @@ function setupSpecialButtonHandlers(): void {
         if (buttonEl && shouldSuppressClick(buttonEl)) return;
         const action = el.getAttribute('data-action');
         console.log(`[DEBUG] Button click detected, data-action:`, action);
+        console.log(`[DEBUG] Button element:`, el);
+        console.log(`[DEBUG] Button classes:`, el.className);
         if (!action) return;
         const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
         console.log(`[DEBUG] Parsed fnName: ${fnName}, argStr: ${argStr}`);
@@ -1826,6 +1831,14 @@ function initButtonSystem(): void {
   function tryInitialize() {
     const appReady = typeof window !== 'undefined' && !!(window as any).App;
     if (appReady) {
+      // Test if suction button exists
+      const suctionButton = document.querySelector('[data-action="buySuction"]');
+      console.log('🔧 Suction button found:', !!suctionButton);
+      if (suctionButton) {
+        console.log('🔧 Suction button element:', suctionButton);
+        console.log('🔧 Suction button classes:', suctionButton.className);
+      }
+
       setupUnifiedButtonSystem();
     } else {
       setTimeout(tryInitialize, 200);
