@@ -5,6 +5,9 @@ import { logger } from '../services/logger';
 import { timerManager } from '../services/timer-manager';
 import { domQuery } from '../services/dom-query';
 import { uiBatcher } from '../services/ui-batcher';
+// Add static imports to replace dynamic imports
+import * as clicksSystem from '../core/systems/clicks-system';
+import * as zustandStore from '../core/state/zustand-store';
 import * as displays from './displays';
 import {
   updateAllDisplaysOptimized,
@@ -230,8 +233,7 @@ export function setupDirectSodaClickHandler(): () => void {
   (window as any).testSodaClick = async () => {
     logger.debug('Testing soda click manually...');
     try {
-      const { handleSodaClickFactory } = await import('../core/systems/clicks-system');
-      const handleSodaClick = handleSodaClickFactory();
+      const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
       await handleSodaClick(1);
       logger.debug('Manual soda click test successful!');
     } catch (error) {
@@ -578,11 +580,9 @@ export function initializeUI(): void {
 
     // Subscribe to level changes to update level text automatically
     try {
-      import('../core/state/zustand-store').then(({ useSubscribeToLevel }) => {
-        useSubscribeToLevel(() => {
-          updateLevelText();
-          updateLevelNumber();
-        });
+      (zustandStore as any).useSubscribeToLevel(() => {
+        updateLevelText();
+        updateLevelNumber();
       });
     } catch (error) {
       logger.warn('Failed to subscribe to level changes:', error);
