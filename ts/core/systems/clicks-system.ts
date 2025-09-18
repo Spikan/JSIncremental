@@ -1,7 +1,7 @@
 // Clicks system: centralizes click tracking and streak logic with Decimal support (TypeScript)
 
 import { toDecimal } from '../numbers/simplified';
-import { ServiceLocator, SERVICE_KEYS } from '../services/service-locator';
+import { useGameStore } from '../state/zustand-store';
 
 export type TrackClickArgs = {
   getApp?: () => any;
@@ -12,10 +12,10 @@ export type TrackClickArgs = {
 };
 
 export function trackClickFactory({
-  getApp = () => ServiceLocator.get(SERVICE_KEYS.APP),
-  getGameConfig = () => ServiceLocator.get(SERVICE_KEYS.GAME_CONFIG),
-  getState = () => getApp()?.state?.getState?.() || {},
-  setState = (state: any) => getApp()?.state?.setState?.(state),
+  getApp = () => (globalThis as any).App,
+  getGameConfig = () => (globalThis as any).GAME_CONFIG,
+  getState = () => useGameStore.getState(),
+  setState = (state: any) => useGameStore.setState(state),
   getNow = () => Date.now(),
 }: TrackClickArgs = {}) {
   return function trackClick() {
@@ -68,11 +68,11 @@ export function trackClickFactory({
 }
 
 export function handleSodaClickFactory({
-  getApp = () => ServiceLocator.get(SERVICE_KEYS.APP),
-  getState = () => getApp()?.state?.getState?.() || {},
-  getSips = () => ServiceLocator.get('sips'),
-  setSips = (value: any) => ServiceLocator.register('sips', value),
-  getSuctions = () => ServiceLocator.get('suctions'),
+  getApp = () => (globalThis as any).App,
+  getState = () => useGameStore.getState(),
+  getSips = () => useGameStore.getState().sips,
+  setSips = (value: any) => useGameStore.setState({ sips: value }),
+  getSuctions = () => useGameStore.getState().suctions,
   getSoda3DButton = () => (globalThis as any).soda3DButton,
   trackClick = () => {}, // Will be injected
 }: TrackClickArgs & {
