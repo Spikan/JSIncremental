@@ -668,7 +668,7 @@ export class HybridLevelSystem {
     //   accent: level.visualTheme.accentColor,
     // });
 
-    shopElements.forEach((element) => {
+    shopElements.forEach(element => {
       const el = element as HTMLElement;
 
       // Set theme variables - CSS will handle the actual styling
