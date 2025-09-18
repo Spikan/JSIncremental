@@ -252,9 +252,14 @@ try {
   });
   // Zustand store initialized
 
-  // Update App object with store reference
-  App.state = useGameStore;
-  // Store the store itself for getState/setState calls
+  // Update App object with store reference - create proper wrapper
+  App.state = {
+    getState: () => useGameStore.getState(),
+    setState: (partial: any) => useGameStore.setState(partial),
+    actions: useGameStore.getState().actions,
+    subscribe: useGameStore.subscribe,
+  };
+  // Store the store itself for direct access if needed
   (App as any).store = useGameStore;
 
   // Modernized drink system using only Zustand store

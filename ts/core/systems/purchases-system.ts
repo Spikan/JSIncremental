@@ -21,6 +21,82 @@ const Decimal = (globalThis as any).Decimal;
 import { toDecimal, gte, DecimalType } from '../numbers/simplified';
 import { useGameStore } from '../state/zustand-store';
 
+// Centralized state update function with proper error handling and sanitization
+function updateGameState(updates: {
+  sips?: any;
+  straws?: any;
+  cups?: any;
+  suctions?: any;
+  widerStraws?: any;
+  betterCups?: any;
+  fasterDrinks?: any;
+  level?: any;
+  strawSPD?: any;
+  cupSPD?: any;
+  spd?: any;
+  drinkRate?: number;
+  suctionClickBonus?: any;
+}) {
+  try {
+    // Try App.state.actions first (preferred)
+    const w = window as any;
+    const actions = w.App?.state?.actions;
+    
+    if (actions) {
+      // Sanitize Decimal values for state updates
+      if (updates.strawSPD) updates.strawSPD = sanitizeDecimal(updates.strawSPD, new Decimal('0.6'));
+      if (updates.cupSPD) updates.cupSPD = sanitizeDecimal(updates.cupSPD, new Decimal('1.2'));
+      if (updates.spd) updates.spd = sanitizeDecimal(updates.spd, new Decimal('1'));
+      
+      // Apply updates
+      if (updates.sips !== undefined) actions.setSips(updates.sips);
+      if (updates.straws !== undefined) actions.setStraws(updates.straws);
+      if (updates.cups !== undefined) actions.setCups(updates.cups);
+      if (updates.suctions !== undefined) actions.setSuctions(updates.suctions);
+      if (updates.widerStraws !== undefined) actions.setWiderStraws(updates.widerStraws);
+      if (updates.betterCups !== undefined) actions.setBetterCups(updates.betterCups);
+      if (updates.fasterDrinks !== undefined) actions.setFasterDrinks(updates.fasterDrinks);
+      if (updates.level !== undefined) actions.setLevel(updates.level);
+      if (updates.strawSPD !== undefined) actions.setStrawSPD(updates.strawSPD);
+      if (updates.cupSPD !== undefined) actions.setCupSPD(updates.cupSPD);
+      if (updates.spd !== undefined) actions.setSPD(updates.spd);
+      if (updates.drinkRate !== undefined) actions.setDrinkRate(updates.drinkRate);
+      if (updates.suctionClickBonus !== undefined) actions.setSuctionClickBonus(updates.suctionClickBonus);
+      
+      return true;
+    } else {
+      // Fallback to direct store access
+      console.warn('App.state.actions not available, using direct store access');
+      const storeActions = useGameStore.getState().actions;
+      
+      // Sanitize Decimal values for state updates
+      if (updates.strawSPD) updates.strawSPD = sanitizeDecimal(updates.strawSPD, new Decimal('0.6'));
+      if (updates.cupSPD) updates.cupSPD = sanitizeDecimal(updates.cupSPD, new Decimal('1.2'));
+      if (updates.spd) updates.spd = sanitizeDecimal(updates.spd, new Decimal('1'));
+      
+      // Apply updates
+      if (updates.sips !== undefined) storeActions.setSips(updates.sips);
+      if (updates.straws !== undefined) storeActions.setStraws(updates.straws);
+      if (updates.cups !== undefined) storeActions.setCups(updates.cups);
+      if (updates.suctions !== undefined) storeActions.setSuctions(updates.suctions);
+      if (updates.widerStraws !== undefined) storeActions.setWiderStraws(updates.widerStraws);
+      if (updates.betterCups !== undefined) storeActions.setBetterCups(updates.betterCups);
+      if (updates.fasterDrinks !== undefined) storeActions.setFasterDrinks(updates.fasterDrinks);
+      if (updates.level !== undefined) storeActions.setLevel(updates.level);
+      if (updates.strawSPD !== undefined) storeActions.setStrawSPD(updates.strawSPD);
+      if (updates.cupSPD !== undefined) storeActions.setCupSPD(updates.cupSPD);
+      if (updates.spd !== undefined) storeActions.setSPD(updates.spd);
+      if (updates.drinkRate !== undefined) storeActions.setDrinkRate(updates.drinkRate);
+      if (updates.suctionClickBonus !== undefined) storeActions.setSuctionClickBonus(updates.suctionClickBonus);
+      
+      return true;
+    }
+  } catch (error) {
+    console.error('Failed to update game state:', error);
+    return false;
+  }
+}
+
 function getTypedConfig(): { upgrades: any; config: any } {
   const { upgrades, config } = getUpgradesAndConfig();
   return { upgrades, config: config as any };
@@ -592,20 +668,17 @@ export const execute = {
     } catch (error) {
       console.warn('Failed to update straws after straw purchase:', error);
     }
-    try {
-      const actions = w.App?.state?.actions;
-      // Use sanitized values for state update
-      const sanitizedStrawSPD = sanitizeDecimal(result.strawSPD, new Decimal('0.6'));
-      const sanitizedCupSPD = sanitizeDecimal(result.cupSPD, new Decimal('1.2'));
-      const sanitizedSPD = sanitizeDecimal(result.sipsPerDrink, new Decimal('1'));
-
-      actions?.setSips?.(w.sips);
-      actions?.setStraws?.(result.straws); // Use original result, sanitization happens in window.straws
-      actions?.setStrawSPD?.(sanitizedStrawSPD);
-      actions?.setCupSPD?.(sanitizedCupSPD);
-      actions?.setSPD?.(sanitizedSPD);
-    } catch (error) {
-      console.warn('Failed to update App.state via actions after straw purchase:', error);
+    // Update state using centralized function
+    const stateUpdated = updateGameState({
+      sips: w.sips,
+      straws: result.straws,
+      strawSPD: result.strawSPD,
+      cupSPD: result.cupSPD,
+      spd: result.sipsPerDrink,
+    });
+    
+    if (!stateUpdated) {
+      console.warn('Failed to update game state after straw purchase');
     }
     // Fallback: ensure state is patched even if actions path failed
     try {
@@ -687,13 +760,24 @@ export const execute = {
       console.warn('Failed to update cups after cup purchase:', error);
     }
     try {
+      // Get fresh actions from App.state
       const actions = w.App?.state?.actions;
-      // Use values as-is for state update
-      actions?.setSips?.(w.sips);
-      actions?.setCups?.(result.cups);
-      actions?.setStrawSPD?.(result.strawSPD);
-      actions?.setCupSPD?.(result.cupSPD);
-      actions?.setSPD?.(result.sipsPerDrink);
+      if (!actions) {
+        console.warn('App.state.actions not available, using direct store access');
+        const storeActions = useGameStore.getState().actions;
+        storeActions.setSips(w.sips);
+        storeActions.setCups(result.cups);
+        storeActions.setStrawSPD(result.strawSPD);
+        storeActions.setCupSPD(result.cupSPD);
+        storeActions.setSPD(result.sipsPerDrink);
+      } else {
+        // Use values as-is for state update
+        actions.setSips(w.sips);
+        actions.setCups(result.cups);
+        actions.setStrawSPD(result.strawSPD);
+        actions.setCupSPD(result.cupSPD);
+        actions.setSPD(result.sipsPerDrink);
+      }
     } catch (error) {
       console.warn('Failed to update App.state via actions after cup purchase:', error);
     }
@@ -763,12 +847,23 @@ export const execute = {
       console.warn('Failed to update wider straws after purchase:', error);
     }
     try {
+      // Get fresh actions from App.state
       const actions = w.App?.state?.actions;
-      actions?.setSips?.(w.sips);
-      actions?.setWiderStraws?.(result.widerStraws);
-      actions?.setStrawSPD?.(result.strawSPD);
-      actions?.setCupSPD?.(result.cupSPD);
-      actions?.setSPD?.(result.sipsPerDrink);
+      if (!actions) {
+        console.warn('App.state.actions not available, using direct store access');
+        const storeActions = useGameStore.getState().actions;
+        storeActions.setSips(w.sips);
+        storeActions.setWiderStraws(result.widerStraws);
+        storeActions.setStrawSPD(result.strawSPD);
+        storeActions.setCupSPD(result.cupSPD);
+        storeActions.setSPD(result.sipsPerDrink);
+      } else {
+        actions.setSips(w.sips);
+        actions.setWiderStraws(result.widerStraws);
+        actions.setStrawSPD(result.strawSPD);
+        actions.setCupSPD(result.cupSPD);
+        actions.setSPD(result.sipsPerDrink);
+      }
     } catch (error) {
       console.warn('Failed to update App.state via actions after wider straws purchase:', error);
     }
@@ -838,12 +933,23 @@ export const execute = {
       console.warn('Failed to update better cups after purchase:', error);
     }
     try {
+      // Get fresh actions from App.state
       const actions = w.App?.state?.actions;
-      actions?.setSips?.(w.sips);
-      actions?.setBetterCups?.(result.betterCups);
-      actions?.setStrawSPD?.(result.strawSPD);
-      actions?.setCupSPD?.(result.cupSPD);
-      actions?.setSPD?.(result.sipsPerDrink);
+      if (!actions) {
+        console.warn('App.state.actions not available, using direct store access');
+        const storeActions = useGameStore.getState().actions;
+        storeActions.setSips(w.sips);
+        storeActions.setBetterCups(result.betterCups);
+        storeActions.setStrawSPD(result.strawSPD);
+        storeActions.setCupSPD(result.cupSPD);
+        storeActions.setSPD(result.sipsPerDrink);
+      } else {
+        actions.setSips(w.sips);
+        actions.setBetterCups(result.betterCups);
+        actions.setStrawSPD(result.strawSPD);
+        actions.setCupSPD(result.cupSPD);
+        actions.setSPD(result.sipsPerDrink);
+      }
     } catch (error) {
       console.warn('Failed to update App.state via actions after better cups purchase:', error);
     }
@@ -995,10 +1101,19 @@ export const execute = {
     const nextRate = Math.max(minMs, Math.round(baseMs * factor));
     // Apply to state (authoritative)
     try {
+      // Get fresh actions from App.state
       const actions = w.App?.state?.actions;
-      actions?.setSips?.(w.sips);
-      actions?.setFasterDrinks?.(result.fasterDrinks);
-      actions?.setDrinkRate?.(nextRate);
+      if (!actions) {
+        console.warn('App.state.actions not available, using direct store access');
+        const storeActions = useGameStore.getState().actions;
+        storeActions.setSips(w.sips);
+        storeActions.setFasterDrinks(result.fasterDrinks);
+        storeActions.setDrinkRate(nextRate);
+      } else {
+        actions.setSips(w.sips);
+        actions.setFasterDrinks(result.fasterDrinks);
+        actions.setDrinkRate(nextRate);
+      }
     } catch (error) {
       console.warn('Failed to update App.state via actions after faster drinks purchase:', error);
     }
@@ -1073,15 +1188,31 @@ export const execute = {
           : new Decimal(curr ?? 0).add(result.sipsGained as any).subtract(result.spent as any);
       w.sips = nextLarge;
       w.level = new Decimal(result.level);
+      // Get fresh actions from App.state
       const actions = w.App?.state?.actions;
-      actions?.setSips?.(nextLarge);
-      actions?.setLevel?.(safeToNumberOrDecimal(result.level));
+      if (!actions) {
+        console.warn('App.state.actions not available, using direct store access');
+        const storeActions = useGameStore.getState().actions;
+        storeActions.setSips(nextLarge);
+        storeActions.setLevel(safeToNumberOrDecimal(result.level));
+      } else {
+        actions.setSips(nextLarge);
+        actions.setLevel(safeToNumberOrDecimal(result.level));
+      }
     } catch (error) {
       console.warn('Failed to update state after level up:', error);
       try {
+        // Get fresh actions from App.state
         const actions = w.App?.state?.actions;
-        actions?.setSips?.(w.sips);
-        actions?.setLevel?.(safeToNumberOrDecimal(result.level));
+        if (!actions) {
+          console.warn('App.state.actions not available, using direct store access');
+          const storeActions = useGameStore.getState().actions;
+          storeActions.setSips(w.sips);
+          storeActions.setLevel(safeToNumberOrDecimal(result.level));
+        } else {
+          actions.setSips(w.sips);
+          actions.setLevel(safeToNumberOrDecimal(result.level));
+        }
         w.level = new Decimal(result.level);
       } catch (error) {
         console.warn('Failed to update state via actions after level up:', error);
