@@ -17,16 +17,7 @@ export function processDrink(): void {
     const now = Date.now();
 
     // Check if enough time has passed since last drink
-    console.log('🔧 Drink system timing check:', {
-      now,
-      lastDrinkTime: state.lastDrinkTime,
-      drinkRate: state.drinkRate,
-      timeSinceLastDrink: now - state.lastDrinkTime,
-      shouldProcess: now - state.lastDrinkTime >= state.drinkRate,
-    });
-
     if (now - state.lastDrinkTime < state.drinkRate) {
-      console.log('🔧 Drink system: too soon, returning early');
       return;
     }
 
@@ -53,23 +44,9 @@ export function processDrink(): void {
         : (state.spd?.toNumber?.() ?? state.spd ?? BAL.BASE_SIPS_PER_DRINK ?? 1)
     );
 
-    console.log('🔧 Drink system calculation:', {
-      stateSpd: state.spd,
-      stateSpdValue,
-      baseSpdVal: baseSpdVal.toString(),
-      levelBonuses,
-      BAL_BASE_SIPS_PER_DRINK: BAL.BASE_SIPS_PER_DRINK,
-    });
-
     const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
     const currentSips = toDecimal(state.sips || 0);
     const newSips = currentSips.add(spdVal);
-
-    console.log('🔧 Drink system sips calculation:', {
-      spdVal: spdVal.toString(),
-      currentSips: currentSips.toString(),
-      newSips: newSips.toString(),
-    });
 
     // Update Zustand store with new values
     useGameStore.setState({
@@ -94,7 +71,7 @@ export function processDrink(): void {
     // Update last autosave clock (this is handled by the autosave system)
     // useGameStore.setState({ lastAutosaveClockMs: now });
 
-    console.log('✅ Drink processed successfully - sips:', newSips.toString());
+    // Drink processed successfully
   } catch (error) {
     console.error('❌ CRITICAL: Failed to process drink:', error);
     throw error;

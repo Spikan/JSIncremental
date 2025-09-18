@@ -334,13 +334,7 @@ try {
         },
         processDrink: () => {
           try {
-            console.log('🔧 Calling processDrink...');
-            const beforeSips = App.state.sips;
-            console.log('🔧 Before processDrink - sips:', beforeSips?.toString?.() || beforeSips);
             App?.systems?.drink?.processDrink?.();
-            const afterSips = App.state.sips;
-            console.log('🔧 After processDrink - sips:', afterSips?.toString?.() || afterSips);
-            console.log('🔧 processDrink completed');
           } catch (error) {
             console.error('❌ processDrink error:', error);
           }

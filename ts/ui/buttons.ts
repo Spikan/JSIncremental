@@ -7,6 +7,18 @@ import { audioControlsManager } from './audio-controls';
 import { useGameStore } from '../core/state/zustand-store';
 import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
 import { updateLevelUpDisplay, updateLevelText } from './displays';
+// Add static imports to replace dynamic imports
+import * as purchasesSystem from '../core/systems/purchases-system';
+import * as saveSystem from '../core/systems/save-system';
+import * as devSystem from '../core/systems/dev';
+import * as offlineProgression from '../core/systems/offline-progression';
+import * as buttonAudio from '../core/systems/button-audio';
+import * as clicksSystem from '../core/systems/clicks-system';
+import * as levelSelector from './level-selector';
+import * as devToolsManager from './dev-tools-manager';
+import * as offlineModal from './offline-modal';
+import * as feedback from './feedback';
+import * as godModule from '../god';
 
 type ButtonActionMeta = { func: (...args: any[]) => any; type: string; label: string };
 type ButtonTypeMeta = {
@@ -46,15 +58,13 @@ const BUTTON_CONFIG: {
     buyStraw: {
       func: () => {
         try {
-          // Import and use the purchase system
-          import('../core/systems/purchases-system').then(({ execute }) => {
-            const success = execute.buyStraw();
-            if (success) {
-              console.log('✅ Straw purchased successfully');
-            } else {
-              console.log('❌ Straw purchase failed - insufficient sips');
-            }
-          });
+          // Use the purchase system
+          const success = (purchasesSystem as any).execute.buyStraw();
+          if (success) {
+            console.log('✅ Straw purchased successfully');
+          } else {
+            console.log('❌ Straw purchase failed - insufficient sips');
+          }
         } catch (error) {
           console.warn('Failed to purchase straw:', error);
         }
@@ -65,15 +75,13 @@ const BUTTON_CONFIG: {
     buyCup: {
       func: () => {
         try {
-          // Import and use the purchase system
-          import('../core/systems/purchases-system').then(({ execute }) => {
-            const success = execute.buyCup();
-            if (success) {
-              console.log('✅ Cup purchased successfully');
-            } else {
-              console.log('❌ Cup purchase failed - insufficient sips');
-            }
-          });
+          // Use the purchase system
+          const success = (purchasesSystem as any).execute.buyCup();
+          if (success) {
+            console.log('✅ Cup purchased successfully');
+          } else {
+            console.log('❌ Cup purchase failed - insufficient sips');
+          }
         } catch (error) {
           console.warn('Failed to purchase cup:', error);
         }
@@ -84,15 +92,13 @@ const BUTTON_CONFIG: {
     buyWiderStraws: {
       func: () => {
         try {
-          // Import and use the purchase system
-          import('../core/systems/purchases-system').then(({ execute }) => {
-            const success = execute.buyWiderStraws();
-            if (success) {
-              console.log('✅ Wider straws purchased successfully');
-            } else {
-              console.log('❌ Wider straws purchase failed - insufficient sips');
-            }
-          });
+          // Use the purchase system
+          const success = (purchasesSystem as any).execute.buyWiderStraws();
+          if (success) {
+            console.log('✅ Wider straws purchased successfully');
+          } else {
+            console.log('❌ Wider straws purchase failed - insufficient sips');
+          }
         } catch (error) {
           console.warn('Failed to purchase wider straws:', error);
         }
@@ -103,15 +109,13 @@ const BUTTON_CONFIG: {
     buyBetterCups: {
       func: () => {
         try {
-          // Import and use the purchase system
-          import('../core/systems/purchases-system').then(({ execute }) => {
-            const success = execute.buyBetterCups();
-            if (success) {
-              console.log('✅ Better cups purchased successfully');
-            } else {
-              console.log('❌ Better cups purchase failed - insufficient sips');
-            }
-          });
+          // Use the purchase system
+          const success = (purchasesSystem as any).execute.buyBetterCups();
+          if (success) {
+            console.log('✅ Better cups purchased successfully');
+          } else {
+            console.log('❌ Better cups purchase failed - insufficient sips');
+          }
         } catch (error) {
           console.warn('Failed to purchase better cups:', error);
         }
@@ -227,13 +231,7 @@ const BUTTON_CONFIG: {
                     console.log('🔄 Switched to level:', nextLevel.id);
 
                     // Show notification
-                    import('./level-selector')
-                      .then(({ levelSelector }) => {
-                        levelSelector.showUnlockNotification(nextLevel.id);
-                      })
-                      .catch(error => {
-                        console.warn('Failed to load level selector for notifications:', error);
-                      });
+                    (levelSelector as any).showUnlockNotification(nextLevel.id);
 
                     // Update the display
                     try {
@@ -296,21 +294,18 @@ const BUTTON_CONFIG: {
     save: {
       func: () => {
         try {
-          // Import and use the save system
-          import('../core/systems/save-system').then(({ performSaveSnapshot }) => {
-            const saveData = performSaveSnapshot();
-            if (saveData) {
-              // Save to localStorage
-              localStorage.setItem('soda-clicker-pro-save', JSON.stringify(saveData));
-              console.log('✅ Game saved successfully');
+          // Use the save system
+          const saveData = (saveSystem as any).performSaveSnapshot();
+          if (saveData) {
+            // Save to localStorage
+            localStorage.setItem('soda-clicker-pro-save', JSON.stringify(saveData));
+            console.log('✅ Game saved successfully');
 
-              // Update last save time in store
-              const { useGameStore } = require('../core/state/zustand-store');
-              useGameStore.getState().actions.setLastSaveTime(Date.now());
-            } else {
-              console.log('❌ Save failed - no data to save');
-            }
-          });
+            // Update last save time in store
+            useGameStore.getState().actions.setLastSaveTime(Date.now());
+          } else {
+            console.log('❌ Save failed - no data to save');
+          }
         } catch (error) {
           console.warn('Failed to save game:', error);
         }
@@ -369,9 +364,7 @@ const BUTTON_CONFIG: {
       func: () => {
         try {
           // Use the dev tools manager for proper handling
-          import('./dev-tools-manager').then(({ devToolsManager }) => {
-            devToolsManager.toggleDevTools();
-          });
+          (devToolsManager as any).toggleDevTools();
         } catch (e) {
           console.warn('Failed to toggle dev tools:', e);
         }
@@ -445,15 +438,13 @@ const BUTTON_CONFIG: {
     devUnlockAll: {
       func: () => {
         try {
-          // Import and use the dev system
-          import('../core/systems/dev').then(({ unlockAll }) => {
-            const success = unlockAll();
-            if (success) {
-              console.log('✅ All features unlocked');
-            } else {
-              console.log('❌ Failed to unlock all features');
-            }
-          });
+          // Use the dev system
+          const success = (devSystem as any).unlockAll();
+          if (success) {
+            console.log('✅ All features unlocked');
+          } else {
+            console.log('❌ Failed to unlock all features');
+          }
         } catch (error) {
           console.warn('Failed to unlock all features:', error);
         }
@@ -464,15 +455,13 @@ const BUTTON_CONFIG: {
     devUnlockShop: {
       func: () => {
         try {
-          // Import and use the dev system
-          import('../core/systems/dev').then(({ unlockShop }) => {
-            const success = unlockShop();
-            if (success) {
-              console.log('✅ Shop unlocked');
-            } else {
-              console.log('❌ Failed to unlock shop');
-            }
-          });
+          // Use the dev system
+          const success = (devSystem as any).unlockShop();
+          if (success) {
+            console.log('✅ Shop unlocked');
+          } else {
+            console.log('❌ Failed to unlock shop');
+          }
         } catch (error) {
           console.warn('Failed to unlock shop:', error);
         }
@@ -483,15 +472,13 @@ const BUTTON_CONFIG: {
     devUnlockUpgrades: {
       func: () => {
         try {
-          // Import and use the dev system
-          import('../core/systems/dev').then(({ unlockUpgrades }) => {
-            const success = unlockUpgrades();
-            if (success) {
-              console.log('✅ Upgrades unlocked');
-            } else {
-              console.log('❌ Failed to unlock upgrades');
-            }
-          });
+          // Use the dev system
+          const success = (devSystem as any).unlockUpgrades();
+          if (success) {
+            console.log('✅ Upgrades unlocked');
+          } else {
+            console.log('❌ Failed to unlock upgrades');
+          }
         } catch (error) {
           console.warn('Failed to unlock upgrades:', error);
         }
@@ -502,15 +489,13 @@ const BUTTON_CONFIG: {
     devResetUnlocks: {
       func: () => {
         try {
-          // Import and use the dev system
-          import('../core/systems/dev').then(({ resetUnlocks }) => {
-            const success = resetUnlocks();
-            if (success) {
-              console.log('✅ Unlocks reset');
-            } else {
-              console.log('❌ Failed to reset unlocks');
-            }
-          });
+          // Use the dev system
+          const success = (devSystem as any).resetUnlocks();
+          if (success) {
+            console.log('✅ Unlocks reset');
+          } else {
+            console.log('❌ Failed to reset unlocks');
+          }
         } catch (error) {
           console.warn('Failed to reset unlocks:', error);
         }
@@ -521,16 +506,14 @@ const BUTTON_CONFIG: {
     devAddTime: {
       func: (ms?: any) => {
         try {
-          // Import and use the dev system
-          import('../core/systems/dev').then(({ addTime }) => {
-            const milliseconds = Number(ms) || 3600000; // Default 1 hour
-            const success = addTime(milliseconds);
-            if (success) {
-              console.log(`✅ Added ${milliseconds}ms to game time`);
-            } else {
-              console.log('❌ Failed to add time');
-            }
-          });
+          // Use the dev system
+          const milliseconds = Number(ms) || 3600000; // Default 1 hour
+          const success = (devSystem as any).addTime(milliseconds);
+          if (success) {
+            console.log(`✅ Added ${milliseconds}ms to game time`);
+          } else {
+            console.log('❌ Failed to add time');
+          }
         } catch (error) {
           console.warn('Failed to add time:', error);
         }
@@ -541,16 +524,14 @@ const BUTTON_CONFIG: {
     devAddSips: {
       func: (amt?: any) => {
         try {
-          // Import and use the dev system
-          import('../core/systems/dev').then(({ addSips }) => {
-            const amount = Number(amt) || 1000; // Default 1000 sips
-            const success = addSips(amount);
-            if (success) {
-              console.log(`✅ Added ${amount} sips`);
-            } else {
-              console.log('❌ Failed to add sips');
-            }
-          });
+          // Use the dev system
+          const amount = Number(amt) || 1000; // Default 1000 sips
+          const success = (devSystem as any).addSips(amount);
+          if (success) {
+            console.log(`✅ Added ${amount} sips`);
+          } else {
+            console.log('❌ Failed to add sips');
+          }
         } catch (error) {
           console.warn('Failed to add sips:', error);
         }
@@ -633,28 +614,24 @@ const BUTTON_CONFIG: {
           w.App?.state?.setState?.({ lastSaveTime: fakeLastSaveTime });
 
           // Trigger offline progression check
-          import('../core/systems/offline-progression').then(({ processOfflineProgression }) => {
-            import('../ui/offline-modal').then(({ showOfflineModal }) => {
-              const result = processOfflineProgression({
+          const result = (offlineProgression as any).processOfflineProgression({
                 maxOfflineHours: 8,
                 minOfflineMinutes: 0.1, // Show even for short times in dev mode
                 offlineEfficiency: 1.0,
               });
 
-              if (result) {
-                showOfflineModal(result, {
-                  showParticles: true,
-                  autoCloseAfter: 0,
-                  playSound: false,
-                });
-                console.log(
-                  `🎉 Offline test: Simulated ${hours}h away, earned ${result.sipsEarned} sips`
-                );
-              } else {
-                console.log('❌ Offline test: No offline progression triggered');
-              }
+          if (result) {
+            (offlineModal as any).showOfflineModal(result, {
+              showParticles: true,
+              autoCloseAfter: 0,
+              playSound: false,
             });
-          });
+            console.log(
+              `🎉 Offline test: Simulated ${hours}h away, earned ${result.sipsEarned} sips`
+            );
+          } else {
+            console.log('❌ Offline test: No offline progression triggered');
+          }
         } catch (error) {
           console.error('Failed to test offline progression:', error);
         }
@@ -727,14 +704,8 @@ const BUTTON_CONFIG: {
     openLevelSelector: {
       func: () => {
         try {
-          // Import and use the level selector
-          import('./level-selector')
-            .then(({ levelSelector }) => {
-              levelSelector.show();
-            })
-            .catch(error => {
-              console.warn('Failed to load level selector:', error);
-            });
+          // Use the level selector
+          (levelSelector as any).show();
         } catch (error) {
           console.warn('Failed to open level selector:', error);
         }
@@ -879,17 +850,15 @@ const BUTTON_CONFIG: {
           // Use the proper God system from god.ts
           setTimeout(() => {
             try {
-              // Import and use the proper God response system
-              import('../god')
-                .then(godModule => {
-                  // Create a temporary container for the God response
-                  const tempContainer = document.createElement('div');
-                  tempContainer.id = 'chatMessages';
-                  tempContainer.style.display = 'none';
-                  document.body.appendChild(tempContainer);
+              // Use the proper God response system
+              // Create a temporary container for the God response
+              const tempContainer = document.createElement('div');
+              tempContainer.id = 'chatMessages';
+              tempContainer.style.display = 'none';
+              document.body.appendChild(tempContainer);
 
-                  // Use the proper God response system
-                  godModule.getGodResponse(message);
+              // Use the proper God response system
+              (godModule as any).getGodResponse(message);
 
                   // Extract the God's response from the temporary container
                   const godMessages = tempContainer.querySelectorAll('.god-message');
@@ -915,26 +884,8 @@ const BUTTON_CONFIG: {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                   }
 
-                  // Clean up temporary container
-                  tempContainer.remove();
-                })
-                .catch(error => {
-                  console.error('Failed to load God module - this needs to be fixed:', error);
-                  // Show error message instead of fallback
-                  const errorMessage = document.createElement('div');
-                  errorMessage.className = 'god-message';
-                  errorMessage.innerHTML = `
-                    <div class="god-avatar">
-                      <img src="images/TempleOS.jpg" alt="God" style="width: 100%; height: 100%; object-fit: cover">
-                    </div>
-                    <div class="god-text">
-                      <div class="god-name">God</div>
-                      <div class="god-message-content">The divine connection has been severed. Please refresh and try again.</div>
-                    </div>
-                  `;
-                  messagesContainer.appendChild(errorMessage);
-                  messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                });
+              // Clean up temporary container
+              tempContainer.remove();
             } catch (error) {
               console.warn('Failed to get God response:', error);
             }
@@ -985,13 +936,11 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
     const state = useGameStore.getState();
 
     if (state.options.clickSoundsEnabled) {
-      import('../core/systems/button-audio')
-        .then(({ playButtonClickSound }) => {
-          playButtonClickSound();
-        })
-        .catch(error => {
-          console.warn('Failed to load audio system:', error);
-        });
+      try {
+        (buttonAudio as any).playButtonClickSound();
+      } catch (error) {
+        console.warn('Failed to load audio system:', error);
+      }
     }
   } catch (error) {
     console.warn('Failed to play button audio:', error);
@@ -1288,14 +1237,8 @@ function setupSpecialButtonHandlers(): void {
             }
             try {
               // Call handleSodaClick
-              import('../core/systems/clicks-system')
-                .then(({ handleSodaClickFactory }) => {
-                  const handleSodaClick = handleSodaClickFactory();
-                  handleSodaClick(1.0); // Default multiplier of 1.0
-                })
-                .catch(error => {
-                  console.warn('Failed to load click system:', error);
-                });
+              const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
+              handleSodaClick(1.0); // Default multiplier of 1.0
             } catch (error) {
               // Error handling - logging removed for production
             }
@@ -1385,14 +1328,8 @@ function setupSpecialButtonHandlers(): void {
             }
             try {
               // Call handleSodaClick
-              import('../core/systems/clicks-system')
-                .then(({ handleSodaClickFactory }) => {
-                  const handleSodaClick = handleSodaClickFactory();
-                  handleSodaClick(1.0); // Default multiplier of 1.0
-                })
-                .catch(error => {
-                  console.warn('Failed to load click system:', error);
-                });
+              const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
+              handleSodaClick(1.0); // Default multiplier of 1.0
             } catch (error) {
               // Error handling - logging removed for production
             }
@@ -1403,7 +1340,7 @@ function setupSpecialButtonHandlers(): void {
       }
 
       // Standard click event handler
-      sodaButton.addEventListener('click', () => {
+      sodaButton.addEventListener('click', async () => {
         if (shouldSuppressClick(sodaButton)) {
           return;
         }
@@ -1428,25 +1365,23 @@ function setupSpecialButtonHandlers(): void {
         try {
           // Button click handling
           console.log('🔧 Soda button clicked!');
-          import('../core/systems/clicks-system')
-            .then(async ({ handleSodaClickFactory }) => {
-              console.log('🔧 Click system loaded, calling handleSodaClick...');
-              const handleSodaClick = handleSodaClickFactory();
-              await handleSodaClick(1.0); // Default multiplier of 1.0
-              console.log('🔧 handleSodaClick completed, triggering UI update...');
+          try {
+            console.log('🔧 Click system loaded, calling handleSodaClick...');
+            const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
+            await handleSodaClick(1.0); // Default multiplier of 1.0
+            console.log('🔧 handleSodaClick completed, triggering UI update...');
 
-              // Trigger UI update after click
-              if (window.App?.ui?.updateAllDisplays) {
-                console.log('🔧 Calling updateAllDisplays after click...');
-                window.App.ui.updateAllDisplays();
-                console.log('🔧 updateAllDisplays completed');
-              } else {
-                console.warn('🔧 updateAllDisplays not available');
-              }
-            })
-            .catch(error => {
-              console.warn('Failed to load click system:', error);
-            });
+            // Trigger UI update after click
+            if (window.App?.ui?.updateAllDisplays) {
+              console.log('🔧 Calling updateAllDisplays after click...');
+              window.App.ui.updateAllDisplays();
+              console.log('🔧 updateAllDisplays completed');
+            } else {
+              console.warn('🔧 updateAllDisplays not available');
+            }
+          } catch (error) {
+            console.warn('Failed to load click system:', error);
+          }
         } catch (error) {
           console.error('Soda click handler error:', error);
         }
@@ -1654,13 +1589,7 @@ function setupSpecialButtonHandlers(): void {
                     const cx = rect.left + rect.width / 2;
                     const cy = rect.top + rect.height / 2;
 
-                    import('./feedback')
-                      .then(({ showPurchaseFeedback }) => {
-                        showPurchaseFeedback(fnName, costValue as number, cx, cy);
-                      })
-                      .catch(error => {
-                        console.warn('Failed to load feedback system:', error);
-                      });
+                    (feedback as any).showPurchaseFeedback(fnName, costValue as number, cx, cy);
                   } catch (error) {
                     console.warn('Failed to show purchase feedback:', error);
                   }
