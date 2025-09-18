@@ -105,9 +105,20 @@ export function handleSodaClickFactory({
       const suctionClickBonus = toDecimal(state.suctionClickBonus ?? 0);
       const multiplierValue = toDecimal(multiplier || 1);
 
+      console.log('🔧 handleSodaClick: Click calculation:', {
+        stateSuctionClickBonus: state.suctionClickBonus?.toString(),
+        suctionClickBonus: suctionClickBonus.toString(),
+        multiplier: multiplierValue.toString()
+      });
+
       // Base click value (1 sip) + suction click bonus from store
       const baseClick = toDecimal(1);
       const baseClickValue = baseClick.add(suctionClickBonus).multiply(multiplierValue);
+      
+      console.log('🔧 handleSodaClick: Base click value:', {
+        baseClick: baseClick.toString(),
+        totalBaseClickValue: baseClickValue.toString()
+      });
 
       // Apply level bonuses from hybrid level system
       const App = getApp();

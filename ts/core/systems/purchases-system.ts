@@ -895,11 +895,24 @@ export const execute = {
   },
   buySuction(): boolean {
     const st = getAppState();
+    console.log('🔧 buySuction: Current state before purchase:', {
+      sips: st.sips?.toString(),
+      suctions: st.suctions?.toString(),
+      suctionClickBonus: st.suctionClickBonus?.toString()
+    });
+    
     const result = purchaseSuction({
       sips: st.sips,
       suctions: st.suctions,
     });
     if (!result) return false;
+    
+    console.log('🔧 buySuction: Purchase result:', {
+      spent: result.spent?.toString(),
+      suctions: result.suctions?.toString(),
+      suctionClickBonus: result.suctionClickBonus?.toString()
+    });
+    
     const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       subtractFromWallet(result.spent);
@@ -908,10 +921,15 @@ export const execute = {
     }
     try {
       // Update Zustand store with new suction values
+      console.log('🔧 buySuction: About to update store with:', {
+        suctions: result.suctions?.toString(),
+        suctionClickBonus: result.suctionClickBonus?.toString()
+      });
       w.App?.state?.setState?.({
         suctions: result.suctions,
         suctionClickBonus: result.suctionClickBonus,
       });
+      console.log('🔧 buySuction: Store updated, new state:', w.App?.state?.getState?.());
       // Also update global for backward compatibility
       w.suctions = new (w.Decimal || Number)(
         (result.suctions as any).toString?.() ?? String(result.suctions)
