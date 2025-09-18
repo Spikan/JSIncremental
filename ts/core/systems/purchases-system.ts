@@ -551,13 +551,9 @@ function subtractFromWallet(spent: number | DecimalType): any {
 
   // For extreme values, subtract directly as Decimal to preserve precision
   let next: DecimalType;
-  if (spent instanceof Decimal) {
-    // Use direct Decimal subtraction for extreme values
-    next = current.subtract(spent);
-  } else {
-    // For regular numbers, convert to Decimal
-    next = current.subtract(new Decimal(spent || 0));
-  }
+  const spentDec = spent instanceof Decimal ? spent : new Decimal(spent || 0);
+  // Use standard break_eternity methods (sub)
+  next = current.sub(spentDec);
 
   w.sips = next;
   return next;

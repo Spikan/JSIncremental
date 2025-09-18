@@ -18,6 +18,44 @@ export function isDecimal(value: any): value is DecimalType {
   return value && typeof value === 'object' && value.constructor === Decimal;
 }
 
+// Polyfill/compatibility layer: align method names used across codebase
+try {
+  const proto: any = (Decimal as any).prototype as any;
+  // Common aliases (decimal.js style)
+  if (typeof proto.plus !== 'function') proto.plus = proto.add;
+  if (typeof proto.minus !== 'function') proto.minus = proto.sub;
+  if (typeof proto.times !== 'function') proto.times = proto.mul;
+  if (typeof proto.dividedBy !== 'function') proto.dividedBy = proto.div;
+  if (typeof proto.toPower !== 'function') proto.toPower = proto.pow;
+  // Additional aliases used in UI/rules
+  if (typeof proto.multiply !== 'function') proto.multiply = proto.mul;
+  if (typeof proto.subtract !== 'function') proto.subtract = proto.sub;
+  if (typeof proto.divide !== 'function') proto.divide = proto.div;
+  // Utility alias to support checks like cost.isFinite()
+  if (typeof proto.isFinite !== 'function') {
+    proto.isFinite = function (): boolean {
+      const n = Number(this.toString());
+      return Number.isFinite(n);
+    };
+  }
+} catch {}
+
+// Rate-limited warning helper to avoid console spam
+let lastWarnTime = 0;
+let warnCount = 0;
+function warnLimited(...args: any[]): void {
+  const now = Date.now();
+  if (now - lastWarnTime > 1000) {
+    lastWarnTime = now;
+    warnCount = 0;
+  }
+  if (warnCount < 5) {
+    // eslint-disable-next-line no-console
+    console.warn.apply(console, args as any);
+    warnCount++;
+  }
+}
+
 /**
  * Convert any value to Decimal - simplified version
  */
@@ -33,12 +71,12 @@ export function toDecimal(value: NumericValue): DecimalType {
     try {
       const test = value.toString();
       if (test === 'NaN' || test === 'Infinity' || test === '-Infinity') {
-        console.warn('Corrupted Decimal object detected, replacing with 0:', value);
+        warnLimited('Corrupted Decimal object detected, replacing with 0:', value);
         return new Decimal(0);
       }
       return value;
     } catch (error) {
-      console.warn('Corrupted Decimal object detected, replacing with 0:', value);
+      warnLimited('Corrupted Decimal object detected, replacing with 0:', value);
       return new Decimal(0);
     }
   }
@@ -49,19 +87,19 @@ export function toDecimal(value: NumericValue): DecimalType {
       // Validate the result
       const test = result.toString();
       if (test === 'NaN' || test === 'Infinity' || test === '-Infinity') {
-        console.warn('Invalid decimal string result:', value, '->', test);
+        warnLimited('Invalid decimal string result:', value, '->', test);
         return new Decimal(0);
       }
       return result;
     } catch (error) {
-      console.warn('Invalid decimal string:', value);
+      warnLimited('Invalid decimal string:', value);
       return new Decimal(0);
     }
   }
 
   if (typeof value === 'number') {
     if (!isFinite(value)) {
-      console.warn('Non-finite number:', value);
+      warnLimited('Non-finite number:', value);
       return new Decimal(0);
     }
     return new Decimal(value);
@@ -71,12 +109,36 @@ export function toDecimal(value: NumericValue): DecimalType {
   if (typeof value === 'object' && value !== null) {
     // Check if it looks like a corrupted Decimal object
     if ('sign' in value && 'mag' in value && 'layer' in value) {
-      console.warn('Corrupted Decimal-like object detected, replacing with 0:', value);
+      const signVal = (value as any).sign;
+      const magVal = (value as any).mag;
+      const layerVal = (value as any).layer;
+      const looksFinite = Number.isFinite(signVal) && Number.isFinite(magVal) && Number.isFinite(layerVal);
+      // Try to salvage via toString if available
+      try {
+        if (typeof (value as any).toString === 'function') {
+          const s = (value as any).toString();
+          const candidate = new Decimal(s);
+          const test = candidate.toString();
+          if (test !== 'NaN' && test !== 'Infinity' && test !== '-Infinity') {
+            return candidate;
+          }
+        }
+      } catch {}
+      if (!looksFinite) {
+        warnLimited('Corrupted Decimal-like object detected, replacing with 0:', value);
+        return new Decimal(0);
+      }
+      // If fields look finite, attempt reconstruction from numeric approximation
+      try {
+        const approx = Number((value as any).toString?.() ?? 0);
+        if (Number.isFinite(approx)) return new Decimal(approx);
+      } catch {}
+      warnLimited('Corrupted Decimal-like object (unsalvageable), replacing with 0:', value);
       return new Decimal(0);
     }
   }
 
-  console.warn('Invalid value type for Decimal conversion:', typeof value, value);
+  warnLimited('Invalid value type for Decimal conversion:', typeof value, value);
   return new Decimal(0);
 }
 

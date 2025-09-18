@@ -111,12 +111,40 @@ export function formatProgressNumber(value: any): string {
 }
 
 /**
- * Post-process a formatted number string to ensure it has at most 2 decimal places
- * Uses intelligent cleanup for trailing decimals and precision artifacts
+ * Post-process a formatted number string to ensure two-decimal precision for UI.
+ * - Plain numbers: force exactly 2 decimals (e.g., 3 -> 3.00, 3.1 -> 3.10)
+ * - Abbreviations (K/M/B/T): ensure 2 decimals before the suffix
+ * - Exponential: ensure mantissa has 2 decimals
+ * Other strings are returned unchanged.
  */
 function postProcessDecimals(formatted: string): string {
-  // Use the intelligent decimal cleanup function for consistency
-  return formatted;
+  try {
+    if (typeof formatted !== 'string') return String(formatted ?? '0');
+    let s = formatted.trim();
+
+    // Handle unit suffixes like K, M, B, T
+    s = s.replace(/^(-?\d+)(?:\.(\d+))?([KMBT])$/i, (_m, intPart, decPart, unit) => {
+      const decimals = String(decPart || '').padEnd(2, '0').slice(0, 2);
+      return `${intPart}.${decimals}${unit}`;
+    });
+
+    // Handle pure numbers (no suffix, no exponent)
+    if (/^-?\d+(?:\.\d+)?$/.test(s)) {
+      const num = Number(s);
+      if (Number.isFinite(num)) return num.toFixed(2);
+      return s;
+    }
+
+    // Handle exponential notation
+    s = s.replace(/^(-?\d+)(?:\.(\d+))?e([+\-]?\d+)$/i, (_m, intPart, decPart, exp) => {
+      const decimals = String(decPart || '').padEnd(2, '0').slice(0, 2);
+      return `${intPart}.${decimals}e${exp}`;
+    });
+
+    return s;
+  } catch {
+    return String(formatted ?? '0');
+  }
 }
 
 export function findElement(elementId: string): HTMLElement | null {

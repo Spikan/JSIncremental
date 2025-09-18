@@ -125,7 +125,7 @@ const BUTTON_CONFIG: {
     },
     buySuction: {
       func: () => {
-        console.log('🔧 buySuction button clicked!');
+        console.log('🔧 buySuction button action called!');
         console.log('🔧 purchasesSystem available:', !!purchasesSystem);
         console.log('🔧 purchasesSystem.execute available:', !!(purchasesSystem as any)?.execute);
         console.log(
@@ -1510,6 +1510,9 @@ function setupSpecialButtonHandlers(): void {
             el.closest && el.closest('button') ? (el.closest('button') as any) : (el as any);
           if (buttonEl) markPointerHandled(buttonEl);
           const meta = (BUTTON_CONFIG.actions as any)[fnName];
+          console.log(`[DEBUG] Looking up button action for fnName:`, fnName);
+          console.log(`[DEBUG] BUTTON_CONFIG.actions[fnName]:`, meta);
+
           // Handle tab switch explicitly (play sound always)
           if (fnName === 'switchTab') {
             e.preventDefault();
