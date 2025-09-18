@@ -28,6 +28,7 @@ import * as audioModule from './core/systems/button-audio';
 import * as autosaveModule from './core/systems/autosave';
 import * as devModule from './core/systems/dev';
 import * as uiModule from './ui/index';
+import * as levelSelectorModule from './ui/level-selector';
 
 console.log('🔧 Imports completed, setting up App object...');
 // Environment system replaced by hybrid level system
@@ -357,16 +358,17 @@ try {
             try {
               const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
               if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
-                // Import and show notifications for newly unlocked levels
-                import('./ui/level-selector')
-                  .then(({ levelSelector }) => {
+                // Show notifications for newly unlocked levels
+                try {
+                  const levelSelector = (levelSelectorModule as any).levelSelector;
+                  if (levelSelector && levelSelector.showUnlockNotification) {
                     newlyUnlockedLevels.forEach((levelId: number) => {
                       levelSelector.showUnlockNotification(levelId);
                     });
-                  })
-                  .catch(error => {
-                    console.warn('Failed to load level selector for notifications:', error);
-                  });
+                  }
+                } catch (error) {
+                  console.warn('Failed to show level unlock notifications:', error);
+                }
               }
             } catch (error) {
               console.warn('Failed to check level unlocks:', error);
