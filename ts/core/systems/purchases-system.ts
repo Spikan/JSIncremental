@@ -920,23 +920,6 @@ export const execute = {
       console.warn('Failed to update suctions after purchase:', error);
     }
     try {
-      const actions = w.App?.state?.actions;
-      actions?.setSips?.(w.sips);
-      actions?.setSuctions?.(result.suctions);
-      actions?.setSuctionClickBonus?.(result.suctionClickBonus);
-    } catch (error) {
-      console.warn('Failed to update App.state via actions after suction purchase:', error);
-    }
-    try {
-      w.App?.state?.setState?.({
-        sips: w.sips,
-        suctions: result.suctions,
-        suctionClickBonus: result.suctionClickBonus,
-      });
-    } catch (error) {
-      console.warn('Failed to fallback setState after suction purchase:', error);
-    }
-    try {
       w.App?.ui?.checkUpgradeAffordability?.();
     } catch (error) {
       console.warn('Failed to check upgrade affordability after suction purchase:', error);

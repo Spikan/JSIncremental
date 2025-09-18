@@ -72,13 +72,11 @@ export function handleSodaClickFactory({
   getState = () => useGameStore.getState(),
   getSips = () => useGameStore.getState().sips,
   setSips = (value: any) => useGameStore.setState({ sips: value }),
-  getSuctions = () => useGameStore.getState().suctions,
   getSoda3DButton = () => (globalThis as any).soda3DButton,
   trackClick = () => {}, // Will be injected
 }: TrackClickArgs & {
   getSips?: () => any;
   setSips?: (value: any) => void;
-  getSuctions?: () => any;
   getSoda3DButton?: () => any;
   trackClick?: () => void;
 } = {}) {
@@ -104,16 +102,12 @@ export function handleSodaClickFactory({
       const state = getState();
 
       // Calculate click value with Decimal support
-      const suctionValue = toDecimal(
-        state.suctions ?? getSuctions()?.toNumber?.() ?? Number(getSuctions()) ?? 0
-      );
+      const suctionClickBonus = toDecimal(state.suctionClickBonus ?? 0);
       const multiplierValue = toDecimal(multiplier || 1);
 
-      // Base click value (1 sip) + suction bonus (from config)
+      // Base click value (1 sip) + suction click bonus from store
       const baseClick = toDecimal(1);
-      const suctionBonusPerLevel = toDecimal(1.0); // Updated from 0.3 to 1.0
-      const suctionBonus = suctionValue.multiply(suctionBonusPerLevel);
-      const baseClickValue = baseClick.add(suctionBonus).multiply(multiplierValue);
+      const baseClickValue = baseClick.add(suctionClickBonus).multiply(multiplierValue);
 
       // Apply level bonuses from hybrid level system
       const App = getApp();
