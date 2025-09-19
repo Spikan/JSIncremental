@@ -1,5 +1,7 @@
 // Typed config export that mirrors previous JS structure
 
+import { errorHandler } from './core/error-handling/error-handler';
+
 export const config = {
   GAME_VERSION: '1.0.0',
   GAME_TITLE: 'Soda Clicker Pro!',
@@ -182,7 +184,7 @@ export const config = {
 try {
   (window as any).GAME_CONFIG = config;
 } catch (error) {
-  console.warn('Failed to expose GAME_CONFIG globally:', error);
+  errorHandler.handleError(error, 'exposeGameConfigGlobally');
 }
 
 export type GameConfig = typeof config;

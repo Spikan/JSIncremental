@@ -2,6 +2,7 @@
 
 import { validateGameOptions, validateGameSave } from '../core/validation/schemas.ts';
 import { errorReporter, ErrorCategory, ErrorSeverity } from './error-overlay';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 const STORAGE_PREFIX = 'game_';
 
@@ -32,7 +33,7 @@ export const AppStorage: StorageAPI = {
       return validated || parsed;
     } catch (e) {
       const errorMessage = 'Error loading game';
-      console.error(errorMessage, e);
+      errorHandler.handleError(e, 'loadGame', { critical: true });
 
       // Report error with context
       errorReporter?.reportError({
@@ -77,7 +78,7 @@ export const AppStorage: StorageAPI = {
       return true;
     } catch (e) {
       const errorMessage = 'Error saving game';
-      console.error(errorMessage, e);
+      errorHandler.handleError(e, 'saveGame', { critical: true });
 
       // Report error with context
       errorReporter?.reportError({
@@ -105,7 +106,7 @@ export const AppStorage: StorageAPI = {
       return true;
     } catch (e) {
       const errorMessage = 'Error deleting save';
-      console.error(errorMessage, e);
+      errorHandler.handleError(e, 'deleteSave', { critical: true });
 
       // Report error with context
       errorReporter?.reportError({
@@ -131,7 +132,7 @@ export const AppStorage: StorageAPI = {
       localStorage.setItem(getKey(key), JSON.stringify(value));
       return true;
     } catch (e) {
-      console.error(`Error setting JSON for ${key}:`, e);
+      errorHandler.handleError(e, 'setJSON', { key });
       return false;
     }
   },
@@ -147,7 +148,7 @@ export const AppStorage: StorageAPI = {
       }
       return parsed;
     } catch (e) {
-      console.error(`Error getting JSON for ${key}:`, e);
+      errorHandler.handleError(e, 'getJSON', { key });
       return defaultValue;
     }
   },
@@ -157,7 +158,7 @@ export const AppStorage: StorageAPI = {
       localStorage.setItem(getKey(key), value ? 'true' : 'false');
       return true;
     } catch (e) {
-      console.error(`Error setting boolean for ${key}:`, e);
+      errorHandler.handleError(e, 'setBoolean', { key });
       return false;
     }
   },
@@ -168,7 +169,7 @@ export const AppStorage: StorageAPI = {
       if (saved === null) return defaultValue;
       return saved === 'true';
     } catch (e) {
-      console.error(`Error getting boolean for ${key}:`, e);
+      errorHandler.handleError(e, 'getBoolean', { key });
       return defaultValue;
     }
   },
@@ -178,7 +179,7 @@ export const AppStorage: StorageAPI = {
       localStorage.removeItem(getKey(key));
       return true;
     } catch (e) {
-      console.error(`Error removing item for ${key}:`, e);
+      errorHandler.handleError(e, 'removeItem', { key });
       return false;
     }
   },
@@ -188,5 +189,5 @@ export const AppStorage: StorageAPI = {
 try {
   (window as any).storage = AppStorage;
 } catch (error) {
-  console.warn('Failed to expose storage globally:', error);
+  errorHandler.handleError(error, 'exposeStorageGlobally');
 }

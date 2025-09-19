@@ -14,6 +14,7 @@ import { domQuery } from './services/dom-query';
 import { timerManager } from './services/timer-manager';
 import { useGameStore } from './core/state/zustand-store';
 import { pwaService } from './services/pwa-service';
+import { errorHandler } from './core/error-handling/error-handler';
 
 import { config as GC } from './config';
 // Decimal is declared in global types
@@ -33,14 +34,18 @@ if (BAL && TIMING && LIMITS) {
 (function ensureDomReady() {
   try {
     if (typeof document === 'undefined') {
-      console.error('Document not available. Please ensure DOM is loaded before main.ts');
+      errorHandler.handleError(new Error('Document not available'), 'checkDOMReadiness', {
+        critical: true,
+      });
       return;
     }
     if (document.readyState === 'loading') {
-      console.warn('DOM still loading, waiting for DOMContentLoaded...');
+      errorHandler.handleError(new Error('DOM still loading'), 'checkDOMReadiness', {
+        severity: 'low',
+      });
     }
   } catch (error) {
-    console.warn('Failed to check DOM readiness:', error);
+    errorHandler.handleError(error, 'checkDOMReadiness');
   }
 })();
 
@@ -99,12 +104,12 @@ function initGame() {
               console.log('❌ PWA installation failed or was dismissed');
             }
           } catch (error) {
-            console.error('❌ PWA installation error:', error);
+            errorHandler.handleError(error, 'pwaInstallation', { action: 'install' });
           }
         });
       }
     } catch (error) {
-      console.warn('PWA service initialization failed:', error);
+      errorHandler.handleError(error, 'pwaServiceInitialization');
     }
     if (!GC || (typeof GC === 'object' && Object.keys(GC).length === 0)) {
       console.log('⏳ Waiting for GAME_CONFIG to load...');
@@ -117,7 +122,7 @@ function initGame() {
     const TIMING = CONF.TIMING;
 
     // Initialize state through Zustand store
-    // All state is now managed through App.state
+    // All state is now managed through Zustand store
 
     const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE;
     const drinkRate = DEFAULT_DRINK_RATE;
@@ -126,7 +131,7 @@ function initGame() {
       useGameStore.getState().actions.setLastDrinkTime(lastDrinkTime);
       useGameStore.getState().actions.setDrinkRate(drinkRate);
     } catch (error) {
-      console.warn('Failed to set drink time state:', error);
+      errorHandler.handleError(error, 'setDrinkTimeState', { lastDrinkTime, drinkRate });
     }
     if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
       Object.defineProperty(window, 'lastDrinkTime', {
@@ -139,7 +144,7 @@ function initGame() {
             // Modernized - use store directly
             useGameStore.getState().actions.setLastDrinkTime(lastDrinkTime);
           } catch (error) {
-            console.warn('Failed to set last drink time via bridge:', error);
+            errorHandler.handleError(error, 'setLastDrinkTimeViaBridge', { lastDrinkTime });
           }
         },
       });
@@ -151,7 +156,7 @@ function initGame() {
     try {
       // Modernized - autosave status updates handled by store
     } catch (error) {
-      console.warn('Failed to update autosave status:', error);
+      errorHandler.handleError(error, 'updateAutosaveStatus');
     }
     const gameStartTime = Date.now();
     let lastSaveTime: any = null;
@@ -161,7 +166,7 @@ function initGame() {
           try {
             return Number(useGameStore.getState().lastSaveTime ?? lastSaveTime ?? 0);
           } catch (error) {
-            console.warn('Failed to get last save time from App state:', error);
+            errorHandler.handleError(error, 'getLastSaveTimeFromAppState');
           }
           return Number(lastSaveTime || 0);
         },
@@ -170,7 +175,7 @@ function initGame() {
           try {
             useGameStore.getState().actions.setLastSaveTime(lastSaveTime);
           } catch (error) {
-            console.warn('Failed to set last save time in App state:', error);
+            errorHandler.handleError(error, 'setLastSaveTimeInAppState', { lastSaveTime });
           }
         },
       });
@@ -179,26 +184,26 @@ function initGame() {
       useGameStore.getState().actions.setSessionStartTime(gameStartTime);
       // totalPlayTime managed by store
     } catch (error) {
-      console.warn('Failed to set session start time:', error);
+      errorHandler.handleError(error, 'setSessionStartTime', { gameStartTime });
     }
 
     let gameStartDate = Date.now();
     try {
       useGameStore.getState().actions.setSessionStartTime(Number(gameStartDate));
     } catch (error) {
-      console.warn('Failed to set game start date:', error);
+      errorHandler.handleError(error, 'setGameStartDate');
     }
     try {
       // Modernized - lastClickTime managed by store
     } catch (error) {
-      console.warn('Failed to set last click time:', error);
+      errorHandler.handleError(error, 'setLastClickTime');
     }
 
     try {
       // DOM is already ready, no initialization needed
       console.log('✅ DOM elements are ready');
     } catch (error) {
-      console.warn('Failed to verify DOM readiness:', error);
+      errorHandler.handleError(error, 'verifyDOMReadiness');
     }
 
     // Load save using modular system
@@ -207,7 +212,7 @@ function initGame() {
       // Use localStorage directly for now
       savegame = JSON.parse(localStorage.getItem('save') as any);
     } catch (e) {
-      console.warn('Failed to load save, starting fresh.', e);
+      errorHandler.handleError(e, 'loadSave', { fallback: 'starting fresh' });
       savegame = null;
     }
 
@@ -218,7 +223,7 @@ function initGame() {
       // Modernized - events handled by store
       console.log('Game loaded:', { save: !!savegame });
     } catch (error) {
-      console.warn('Failed to emit game loaded event:', error);
+      errorHandler.handleError(error, 'emitGameLoadedEvent');
     }
 
     // Check for offline progression if this was a returning player
@@ -246,7 +251,7 @@ function initGame() {
           'Offline progression check'
         );
       } catch (error) {
-        console.warn('Failed to process offline progression:', error);
+        errorHandler.handleError(error, 'processOfflineProgression');
       }
     }
 
@@ -294,10 +299,10 @@ function initGame() {
           spd: spdValue,
         });
       } catch (error) {
-        console.warn('Failed to update store with recalculated SPD values:', error);
+        errorHandler.handleError(error, 'updateStoreWithRecalculatedSPD');
       }
     } catch (error) {
-      console.warn('Failed to handle Decimal results:', error);
+      errorHandler.handleError(error, 'handleDecimalResults');
     }
 
     // Production calculation using store values
@@ -314,7 +319,7 @@ function initGame() {
         spd: baseSipsPerDrink,
       });
     } catch (error) {
-      console.warn('Failed to update store with values:', error);
+      errorHandler.handleError(error, 'updateStoreWithValues');
     }
 
     // Restore drink timing if present in save
@@ -328,15 +333,15 @@ function initGame() {
         }
       }
     } catch (error) {
-      console.warn('Failed to restore drink timing:', error);
+      errorHandler.handleError(error, 'restoreDrinkTiming');
     }
 
-    // Seed App.state snapshot
+    // Seed Zustand store snapshot
     try {
       // State is already managed through the store, no need to seed again
       // The store already contains the loaded/initialized values
     } catch (error) {
-      console.warn('Failed to seed App.state:', error);
+      errorHandler.handleError(error, 'seedZustandStore');
     }
 
     // Update UI displays after ensuring DOM cache is ready
@@ -362,7 +367,7 @@ function initGame() {
     try {
       // Modernized - unlocks system handled by store
     } catch (error) {
-      console.warn('Failed to initialize unlocks system:', error);
+      errorHandler.handleError(error, 'initializeUnlocksSystem');
     }
 
     // Initialize mobile input handling using modular system
@@ -374,7 +379,7 @@ function initGame() {
       sidebarNavigation.forceInitialize();
       console.log('Sidebar navigation initialized:', sidebarNavigation);
     } catch (error) {
-      console.warn('Failed to initialize sidebar navigation:', error);
+      errorHandler.handleError(error, 'initializeSidebarNavigation');
     }
 
     // Initialize Soda Drinker Pro header
@@ -386,24 +391,24 @@ function initGame() {
           console.log('Soda Drinker Pro header initialized');
         })
         .catch(error => {
-          console.warn('Failed to initialize Soda Drinker Pro header:', error);
+          errorHandler.handleError(error, 'initializeSodaDrinkerProHeader');
         });
     } catch (error) {
-      console.warn('Failed to initialize Soda Drinker Pro header:', error);
+      errorHandler.handleError(error, 'initializeSodaDrinkerProHeader');
     }
 
     try {
       // Modernized - audio system handled by store
     } catch (error) {
-      console.warn('Failed to initialize button audio system:', error);
+      errorHandler.handleError(error, 'initializeButtonAudioSystem');
     }
     try {
       // Modernized - audio button handled by store
     } catch (error) {
-      console.warn('Failed to update button sounds toggle:', error);
+      errorHandler.handleError(error, 'updateButtonSoundsToggle');
     }
   } catch (error) {
-    console.error('Error in initGame:', error);
+    errorHandler.handleError(error, 'initGame', { critical: true });
 
     // Always try to show the game even if initialization fails
     const splashScreen = document.getElementById('splashScreen');
@@ -415,7 +420,7 @@ function initGame() {
         splashScreen.style.pointerEvents = 'none';
         if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
       } catch (e) {
-        console.warn('Failed to hide splash screen:', e);
+        errorHandler.handleError(e, 'hideSplashScreen');
       }
 
       try {
@@ -425,7 +430,7 @@ function initGame() {
         gameContent.classList?.add('active');
         document.body?.classList?.add('game-started');
       } catch (e) {
-        console.warn('Failed to show game content:', e);
+        errorHandler.handleError(e, 'showGameContent');
       }
 
       // DOM elements are already available, no reinitialization needed
@@ -433,9 +438,11 @@ function initGame() {
 
       // Try to start a minimal game loop even if initGame failed
       try {
-        const w = window as any;
-        if (w.App?.systems?.loop?.start) {
-          w.App.systems.loop.start({
+        // const w = window as any;
+        // Loop system access modernized - using direct import
+        const { startLoop } = require('./core/systems/loop-system');
+        if (startLoop) {
+          startLoop({
             updateDrinkProgress: () => {},
             processDrink: () => {},
             updateStats: () => {},
@@ -446,7 +453,7 @@ function initGame() {
           console.log('🔄 Minimal game loop started');
         }
       } catch (e) {
-        console.warn('Failed to start minimal game loop:', e);
+        errorHandler.handleError(e, 'startMinimalGameLoop');
       }
     }
   }

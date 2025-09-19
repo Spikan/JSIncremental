@@ -10,6 +10,7 @@ import type { GameOptions, GameState } from './shape';
 // Direct break_eternity.js access
 const Decimal = (globalThis as any).Decimal;
 import { toDecimal, add } from '../numbers/simplified';
+import { errorHandler } from '../error-handling/error-handler';
 
 // Extended state interface with actions
 interface GameStore extends GameState {
@@ -276,7 +277,7 @@ export const useGameStore = create<GameStore>()(
                 }
                 return decimal;
               } catch (error) {
-                console.warn('Failed to parse Decimal from JSON, using 0:', value.value, error);
+                errorHandler.handleError(error, 'parseDecimalFromJSON', { value: value.value });
                 return new Decimal(0);
               }
             }
@@ -326,7 +327,7 @@ const createSelector = <T>(
       const state = useGameStore.getState();
       return selector(state);
     } catch (error) {
-      console.warn(`${selectorName} selector failed, returning default:`, error);
+      errorHandler.handleError(error, 'selectorFailed', { selectorName, defaultValue });
       return defaultValue;
     }
   };

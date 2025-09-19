@@ -4,6 +4,7 @@
 import { isDecimal, DecimalType } from './decimal-utils';
 import { isExtremeValue } from './safe-conversion';
 import { ExtremeValueMonitor } from './error-recovery';
+import { errorHandler } from '../error-handling/error-handler';
 
 /**
  * Memory pool for frequently used Decimal objects
@@ -126,7 +127,7 @@ export class MemoryOptimizer {
           (window as any).gc();
           console.log('🧹 Garbage collection triggered for extreme value optimization');
         } catch (error) {
-          console.warn('Failed to trigger garbage collection:', error);
+          errorHandler.handleError(error, 'triggerGarbageCollection');
         }
       }
       this.lastGC = now;

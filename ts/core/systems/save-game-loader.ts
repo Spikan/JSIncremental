@@ -2,6 +2,7 @@
 // Handles loading and restoring game state from save data
 
 import { getStoreActions } from '../state/zustand-store';
+import { errorHandler } from '../error-handling/error-handler';
 // DecimalOps removed - no longer using toSafeNumber
 
 export interface SaveGameData {
@@ -81,7 +82,7 @@ export class SaveGameLoader {
 
       console.log('✅ Game state loaded successfully');
     } catch (error) {
-      console.error('❌ Error loading game state:', error);
+      errorHandler.handleError(error, 'loadGameState', { savegame });
       throw error;
     }
   }
@@ -135,7 +136,7 @@ export class SaveGameLoader {
         // Global state removed - using Zustand store only
       }
     } catch (error) {
-      console.warn('Failed to load basic resources:', error);
+      errorHandler.handleError(error, 'loadBasicResources', { savegame });
     }
   }
 
@@ -162,7 +163,7 @@ export class SaveGameLoader {
         // Global state removed - using Zustand store only
       }
     } catch (error) {
-      console.warn('Failed to load upgrade levels:', error);
+      errorHandler.handleError(error, 'loadUpgradeLevels', { savegame });
     }
   }
 
@@ -176,7 +177,7 @@ export class SaveGameLoader {
         getStoreActions().setSuctionClickBonus(bonusValue);
       }
     } catch (error) {
-      console.warn('Failed to load critical click system:', error);
+      errorHandler.handleError(error, 'loadCriticalClickSystem', { savegame });
     }
   }
 
@@ -192,7 +193,7 @@ export class SaveGameLoader {
         getStoreActions().setTotalClicks(totalClicksValue);
       }
     } catch (error) {
-      console.warn('Failed to load level and progress:', error);
+      errorHandler.handleError(error, 'loadLevelAndProgress', { savegame });
     }
   }
 
@@ -231,7 +232,7 @@ export class SaveGameLoader {
         getStoreActions().setTotalPlayTime(playTimeNum);
       }
     } catch (error) {
-      console.warn('Failed to load timing data:', error);
+      errorHandler.handleError(error, 'loadTimingData', { savegame });
     }
   }
 
@@ -272,7 +273,10 @@ export class SaveGameLoader {
         // CRITICAL FIX: For extreme values, return the Decimal object itself, don't truncate!
         return value;
       } catch (error) {
-        console.warn('Failed to get number from object:', error);
+        errorHandler.handleError(error, 'parseDecimalValue', {
+          value: value?.toString(),
+          defaultValue,
+        });
         return defaultValue;
       }
     }
@@ -323,7 +327,9 @@ export class SaveGameLoader {
         try {
           // Modernized - options save handled by store
         } catch (error) {
-          console.warn('Failed to save options to options system:', error);
+          errorHandler.handleError(error, 'saveOptionsToOptionsSystem', {
+            options: savegame.options,
+          });
         }
 
         console.log('✅ Options loaded:', {
@@ -332,7 +338,7 @@ export class SaveGameLoader {
         });
       }
     } catch (error) {
-      console.warn('Failed to load options:', error);
+      errorHandler.handleError(error, 'loadOptions', { savegame });
     }
   }
 
@@ -346,7 +352,9 @@ export class SaveGameLoader {
 
         // Restore hybrid level system state
         // Modernized - hybrid system handled by store
-        const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        // Hybrid system access modernized - using direct import
+        const { hybridLevelSystem } = require('./hybrid-level-system');
+        const hybridSystem = hybridLevelSystem;
         if (hybridSystem && typeof hybridSystem.restoreState === 'function') {
           // Ensure level 1 is always unlocked
           const levelsToRestore = [...new Set([1, ...(unlockedLevels || [])])];
@@ -359,21 +367,25 @@ export class SaveGameLoader {
             // Modernized - UI updates handled by store
             // Modernized - UI updates handled by store
           } catch (error) {
-            console.warn('Failed to update UI displays after hybrid level restoration:', error);
+            errorHandler.handleError(error, 'updateUIDisplaysAfterHybridLevelRestoration');
           }
         } else {
-          console.warn('⚠️ Hybrid level system not available for state restoration');
+          errorHandler.handleError(
+            new Error('Hybrid level system not available'),
+            'hybridLevelStateRestoration',
+            { severity: 'low' }
+          );
         }
       } else {
         // No hybrid level data in save, apply default theme
         try {
           // Modernized - hybrid level system handled by store
         } catch (error) {
-          console.warn('Failed to apply default theme:', error);
+          errorHandler.handleError(error, 'applyDefaultTheme');
         }
       }
     } catch (error) {
-      console.warn('Failed to load hybrid level data:', error);
+      errorHandler.handleError(error, 'loadHybridLevelData');
     }
   }
 
@@ -387,7 +399,7 @@ export class SaveGameLoader {
         save: hasSaveData,
       });
     } catch (error) {
-      console.warn('Failed to emit game loaded event:', error);
+      errorHandler.handleError(error, 'emitGameLoadedEvent');
     }
   }
 }

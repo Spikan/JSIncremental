@@ -1,9 +1,17 @@
 // Game Init System: splash and start logic (TypeScript)
+
+import { useGameStore } from '../state/zustand-store';
+import * as ui from '../../ui/index';
+import { start as startLoop } from './loop-system';
+import { processDrink } from './drink-system';
+import { FEATURE_UNLOCKS as unlockSystem } from '../../feature-unlocks';
+import { errorHandler } from '../error-handling/error-handler';
+
 try {
   (window as any).__diag = Array.isArray((window as any).__diag) ? (window as any).__diag : [];
   (window as any).__diag.push({ type: 'module', module: 'game-init', stage: 'eval-start' });
 } catch (error) {
-  console.error('Failed to initialize diagnostics:', error);
+  errorHandler.handleError(error, 'initializeDiagnostics');
 }
 
 export function initSplashScreen(): void {
@@ -11,7 +19,9 @@ export function initSplashScreen(): void {
     const splashScreen = document.getElementById('splashScreen');
     const gameContent = document.getElementById('gameContent');
     if (!splashScreen || !gameContent) {
-      console.error('Splash screen elements not found!');
+      errorHandler.handleError(new Error('Splash screen elements not found'), 'initSplashScreen', {
+        critical: true,
+      });
       return;
     }
 
@@ -19,7 +29,7 @@ export function initSplashScreen(): void {
 
     // Inline fallback system removed - use startGameCore() directly
   } catch (error) {
-    console.error('Failed to initialize splash screen:', error);
+    errorHandler.handleError(error, 'initSplashScreen');
   }
 }
 
@@ -32,7 +42,7 @@ export function startGameCore(): void {
         (window as any).__GAME_STARTED__ = true;
         document.body.classList?.add('game-started');
       } catch (error) {
-        console.error('Failed to set game started state:', error);
+        errorHandler.handleError(error, 'setGameStartedState');
       }
       // Robustly remove/disable splash overlay
       try {
@@ -41,7 +51,7 @@ export function startGameCore(): void {
         (splashScreen as HTMLElement).style.pointerEvents = 'none';
         if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
       } catch (error) {
-        console.error('Failed to hide splash screen:', error);
+        errorHandler.handleError(error, 'hideSplashScreen');
       }
       // Force-show game content
       try {
@@ -53,88 +63,95 @@ export function startGameCore(): void {
         // DOM elements are already available, no reinitialization needed
         console.log('🔄 Game content is visible, DOM elements are ready');
       } catch (error) {
-        console.error('Failed to show game content:', error);
+        errorHandler.handleError(error, 'showGameContent');
       }
       // Initialize game
       try {
         (window as any).initGame?.();
       } catch (error) {
-        console.error('Game init failed, but showing game anyway:', error);
+        errorHandler.handleError(error, 'initGame', { critical: true });
       }
       // Start loop via system (authoritative)
       try {
         const restart = (): void => {
-          const w: any = window as any;
-          const loopStart = w.App?.systems?.loop?.start;
+          // const w: any = window as any;
+          const loopStart = startLoop;
           if (!loopStart) return void setTimeout(restart, 100);
           loopStart({
             updateDrinkProgress: () => {
               try {
-                const st = w.App?.state?.getState?.() || {};
+                const st = useGameStore.getState();
                 const now = Date.now();
-                const last = Number(st.lastDrinkTime ?? w.lastDrinkTime ?? 0);
-                const rate = Number(st.drinkRate ?? w.drinkRate ?? 1000);
+                const last = Number(st.lastDrinkTime ?? 0);
+                const rate = Number(st.drinkRate ?? 1000);
                 const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-                w.App?.state?.setState?.({ drinkProgress: pct });
-                w.App?.ui?.updateDrinkProgress?.(pct, rate);
+                useGameStore.setState({ drinkProgress: pct });
+                ui.updateDrinkProgress?.(pct, rate);
               } catch (error) {
-                console.error('Failed to update drink progress:', error);
+                errorHandler.handleError(error, 'updateDrinkProgress', { critical: true });
               }
             },
             processDrink: () => {
               try {
-                w.App?.systems?.drink?.processDrink?.();
+                processDrink();
               } catch (error) {
-                console.error('Failed to process drink:', error);
+                errorHandler.handleError(error, 'processDrink', { critical: true });
               }
             },
             updateStats: () => {
               try {
-                w.App?.ui?.updatePlayTime?.();
-                w.App?.ui?.updateLastSaveTime?.();
-                w.App?.ui?.updateAllStats?.();
-                w.App?.ui?.checkUpgradeAffordability?.();
-                w.App?.systems?.unlocks?.checkAllUnlocks?.();
+                ui.updatePlayTime?.();
+                ui.updateLastSaveTime?.();
+                ui.updateAllStats?.();
+                ui.checkUpgradeAffordability?.();
+                unlockSystem?.checkAllUnlocks?.();
               } catch (error) {
-                console.error('Failed to update stats:', error);
+                errorHandler.handleError(error, 'updateStats', { critical: true });
               }
             },
             updateUI: () => {
               try {
                 // Update individual header elements instead of the problematic updateTopInfoBar
-                w.App?.ui?.updateTopSipCounter?.();
-                w.App?.ui?.updateTopSipsPerDrink?.();
-                w.App?.ui?.updateTopSipsPerSecond?.();
-                w.App?.ui?.updateEnhancedProgressBars?.();
+                ui.updateTopSipCounter?.();
+                ui.updateTopSipsPerDrink?.();
+                ui.updateTopSipsPerSecond?.();
+                ui.updateEnhancedProgressBars?.();
               } catch (error) {
-                console.error('❌ updateUI error (game-init):', error);
+                errorHandler.handleError(error, 'updateUI', {
+                  context: 'game-init',
+                  critical: true,
+                });
               }
             },
             updatePlayTime: () => {
               try {
-                w.App?.ui?.updatePlayTime?.();
+                ui.updatePlayTime?.();
               } catch (error) {
-                console.error('Failed to update play time:', error);
+                errorHandler.handleError(error, 'updatePlayTime', { context: 'game-init' });
               }
             },
             updateLastSaveTime: () => {
               try {
-                w.App?.ui?.updateLastSaveTime?.();
+                ui.updateLastSaveTime?.();
               } catch (error) {
-                console.error('Failed to update last save time:', error);
+                errorHandler.handleError(error, 'updateLastSaveTime', { context: 'game-init' });
               }
             },
           });
         };
         restart();
       } catch (error) {
-        console.error('Failed to start game loop:', error);
+        errorHandler.handleError(error, 'startGameLoop', { critical: true });
       }
     } else {
-      console.error('Could not find splash or game elements');
+      errorHandler.handleError(
+        new Error('Could not find splash or game elements'),
+        'initSplashScreen',
+        { critical: true }
+      );
     }
   } catch (error) {
-    console.error('Failed to start game core:', error);
+    errorHandler.handleError(error, 'startGameCore', { critical: true });
   }
 }
 
@@ -145,7 +162,7 @@ export function initOnDomReady(): void {
       try {
         (window as any).loadWordBank?.();
       } catch (error) {
-        console.error('Failed to load word bank:', error);
+        errorHandler.handleError(error, 'loadWordBank', { context: 'game-init' });
       }
       const config: any = (window as any).GAME_CONFIG?.TIMING || {};
       const domReadyDelay: number = Number(config.DOM_READY_DELAY || 0);
@@ -167,15 +184,15 @@ export function initOnDomReady(): void {
             // Modernized - state updates handled by store
             // Modernized - autosave status handled by store
           } catch (error) {
-            console.error('Failed to initialize options:', error);
+            errorHandler.handleError(error, 'initializeOptions', { context: 'game-init' });
           }
           try {
             // Modernized - play time updates handled by store
           } catch (error) {
-            console.error('Failed to initialize play time updates:', error);
+            errorHandler.handleError(error, 'initializePlayTimeUpdates', { context: 'game-init' });
           }
         } catch (error) {
-          console.error('Error during splash screen initialization:', error);
+          errorHandler.handleError(error, 'splashScreenInitialization', { context: 'game-init' });
           const splashScreen = document.getElementById('splashScreen');
           const gameContent = document.getElementById('gameContent');
           if (splashScreen && gameContent) {
@@ -184,7 +201,7 @@ export function initOnDomReady(): void {
             try {
               (window as any).initGame?.();
             } catch (error) {
-              console.error('Failed to initialize game in fallback:', error);
+              errorHandler.handleError(error, 'initializeGameFallback', { context: 'game-init' });
             }
           }
         }
@@ -197,32 +214,38 @@ export function initOnDomReady(): void {
       boot();
     }
   } catch (error) {
-    console.error('Failed to initialize on DOM ready:', error);
+    errorHandler.handleError(error, 'initializeOnDOMReady', {
+      context: 'game-init',
+      critical: true,
+    });
   }
 }
 
 // Best-effort wiring to global App if available (helps when import timing is odd on Pages)
 try {
-  const w: any = window as any;
-  if (w.App && w.App.systems && w.App.systems.gameInit) {
-    Object.assign(w.App.systems.gameInit, {
+  // const w: any = window as any;
+  // App object construction - this is the only place where App.* should be used
+  // Game init system access modernized - using direct import
+  const { gameInitSystem } = require('./game-init');
+  if (gameInitSystem) {
+    Object.assign(gameInitSystem, {
       initSplashScreen,
       startGameCore,
       initOnDomReady,
     });
     try {
-      (w.__diag || []).push({ type: 'wire', module: 'game-init', method: 'direct-assign' });
+      // Diagnostic logging removed - no longer needed
     } catch (error) {
-      console.error('Failed to push diagnostic info:', error);
+      errorHandler.handleError(error, 'pushDiagnosticInfo', { context: 'game-init' });
     }
   }
 } catch (error) {
-  console.error('Failed to wire game init to global App:', error);
+  errorHandler.handleError(error, 'wireGameInitToGlobalApp', { critical: true });
 }
 
 try {
   (window as any).__diag &&
     (window as any).__diag.push({ type: 'module', module: 'game-init', stage: 'eval-end' });
 } catch (error) {
-  console.error('Failed to push final diagnostic info:', error);
+  errorHandler.handleError(error, 'pushFinalDiagnosticInfo');
 }

@@ -2,6 +2,8 @@
 // GOD MODULE - Divine Oracle and Sacred Wisdom (TypeScript)
 // ===============================================
 
+import { errorHandler } from './core/error-handling/error-handler';
+
 let lcgSeed: number = Date.now();
 
 function lcgNext(): number {
@@ -54,7 +56,7 @@ export async function loadWordBank(): Promise<string[] | null> {
       bibleWordBank = data.words as string[];
       console.log(`✅ Successfully loaded ${bibleWordBank.length} words from word_bank.json`);
     } catch (error) {
-      console.error('❌ Failed to load word bank:', error);
+      errorHandler.handleError(error, 'loadWordBank', { critical: true });
       bibleWordBank = ['lord', 'god', 'jesus', 'christ', 'spirit', 'holy', 'heaven', 'earth'];
       console.log('Using fallback word bank with', bibleWordBank.length, 'words');
     }
@@ -96,7 +98,7 @@ export function getDivineResponse(_userMessage: string): string {
         }
       })
       .catch(error => {
-        console.error('Failed to load word bank:', error);
+        errorHandler.handleError(error, 'loadWordBankFallback', { critical: true });
         addGodMessage('Divine wisdom is experiencing technical difficulties.');
       });
     return 'Loading divine wisdom...';
@@ -145,7 +147,7 @@ export function getGodResponse(userMessage: string): void {
     const divineResponse = getDivineResponse(userMessage);
     addGodMessage(divineResponse);
   } catch (error) {
-    console.error('Error getting divine response:', error);
+    errorHandler.handleError(error, 'getDivineResponse', { userMessage });
     const errorMessages = [
       'The divine connection is experiencing technical difficulties. Please try again later!',
       'The sacred system is temporarily offline. My apologies for the inconvenience!',
@@ -245,7 +247,7 @@ try {
     try {
       (window as any).getGodResponse?.(message);
     } catch (error) {
-      console.warn('Failed to handle god response:', error);
+      errorHandler.handleError(error, 'handleGodResponse', { message });
     }
   };
   (window as any).addUserMessage = function addUserMessage(message: string): void {
@@ -264,11 +266,11 @@ try {
     try {
       (window as any).scrollToBottom?.();
     } catch (error) {
-      console.warn('Failed to handle god response:', error);
+      errorHandler.handleError(error, 'scrollToBottom', { message });
     }
   };
 } catch (error) {
-  console.warn('Failed to initialize god chat system:', error);
+  errorHandler.handleError(error, 'initializeGodChatSystem');
 }
 
 // Initialize word bank on module load

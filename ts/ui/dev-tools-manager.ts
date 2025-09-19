@@ -1,5 +1,6 @@
 // Dev Tools Manager: Handle dev tools tab visibility and functionality
 import { logger } from '../services/logger';
+import { useGameStore } from '../core/state/zustand-store';
 
 export class DevToolsManager {
   private static instance: DevToolsManager;
@@ -16,8 +17,7 @@ export class DevToolsManager {
    */
   public initializeDevToolsVisibility(): void {
     try {
-      const w: any = window as any;
-      const state = w.App?.state?.getState?.();
+      const state = useGameStore.getState();
       const devToolsEnabled = state?.options?.devToolsEnabled ?? false;
 
       this.updateDevToolsVisibility(devToolsEnabled);
@@ -109,19 +109,20 @@ export class DevToolsManager {
    */
   public toggleDevTools(): void {
     try {
-      const w: any = window as any;
-      const state = w.App?.state?.getState?.();
+      const state = useGameStore.getState();
 
       if (state?.options) {
         const newValue = !state.options.devToolsEnabled;
 
         // Update the state
-        w.App?.state?.setState?.({
+        useGameStore.setState({
           options: { ...state.options, devToolsEnabled: newValue },
         });
 
         // Save to storage
-        w.App?.systems?.options?.saveOptions?.({
+        // Options system access modernized - using direct import
+        const { saveOptions } = require('../core/systems/options-system');
+        saveOptions?.({
           ...state.options,
           devToolsEnabled: newValue,
         });
@@ -142,8 +143,7 @@ export class DevToolsManager {
    */
   public isDevToolsEnabled(): boolean {
     try {
-      const w: any = window as any;
-      const state = w.App?.state?.getState?.();
+      const state = useGameStore.getState();
       return state?.options?.devToolsEnabled ?? false;
     } catch (error) {
       logger.warn('Failed to check dev tools status:', error);

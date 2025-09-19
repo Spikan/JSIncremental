@@ -1,6 +1,8 @@
 // Subscription Manager for UI Components (TypeScript)
 // Centralized subscription management to prevent memory leaks
 
+import { errorHandler } from '../core/error-handling/error-handler';
+
 type SubscriptionCleanup = () => void;
 
 interface SubscriptionEntry {
@@ -43,7 +45,10 @@ class SubscriptionManager {
       try {
         entry.cleanup();
       } catch (error) {
-        console.warn(`SubscriptionManager: Error cleaning up subscription '${key}':`, error);
+        errorHandler.handleError(error, 'cleanupSubscription', {
+          key,
+          subscriptionName: entry.name,
+        });
       }
       this.subscriptions.delete(key);
       return true;

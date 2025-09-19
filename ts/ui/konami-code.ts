@@ -3,6 +3,9 @@
  * Detects the famous ↑↑↓↓←→←→BA sequence
  */
 
+import { useGameStore } from '../core/state/zustand-store';
+import { errorHandler } from '../core/error-handling/error-handler';
+
 // The Konami Code sequence
 const KONAMI_SEQUENCE = [
   'ArrowUp',
@@ -58,8 +61,7 @@ class KonamiCodeDetector {
 
     try {
       // Unlock secrets in the game state
-      const w = window as any;
-      const state = w.App?.state?.getState?.();
+      const state = useGameStore.getState();
       if (state?.options) {
         const newOptions = {
           ...state.options,
@@ -68,10 +70,12 @@ class KonamiCodeDetector {
         };
 
         // Update state
-        w.App?.state?.setState?.({ options: newOptions });
+        useGameStore.setState({ options: newOptions });
 
         // Save to storage
-        w.App?.systems?.options?.saveOptions?.(newOptions);
+        // Options system access modernized - using direct import
+        const { saveOptions } = require('../core/systems/options-system');
+        saveOptions?.(newOptions);
 
         // Show celebration message
         this.showSecretUnlockedMessage();
@@ -83,13 +87,16 @@ class KonamiCodeDetector {
         this.unlockGodTab();
 
         // Refresh navigation to show god tab
-        const navManager = w.App?.ui?.navigationManager || (window as any).navigationManager;
+        const navManager =
+          // Navigation manager access modernized - using direct import
+          require('../ui/sidebar-navigation').navigationManager ||
+          (window as any).navigationManager;
         if (navManager?.refreshNavigation) {
           navManager.refreshNavigation();
         }
       }
     } catch (error) {
-      console.warn('Failed to unlock secrets:', error);
+      errorHandler.handleError(error, 'unlockSecrets');
     }
   }
 
@@ -191,8 +198,7 @@ class KonamiCodeDetector {
 
   public isSecretsUnlocked(): boolean {
     try {
-      const w = window as any;
-      const state = w.App?.state?.getState?.();
+      const state = useGameStore.getState();
       return state?.options?.secretsUnlocked ?? false;
     } catch {
       return false;

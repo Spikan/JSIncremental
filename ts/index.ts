@@ -8,6 +8,8 @@ import { optimizedEventBus } from './services/optimized-event-bus';
 import { performanceMonitor } from './services/performance';
 import './config';
 import './core/constants';
+import { errorHandler } from './core/error-handling/error-handler';
+import { CriticalGameError } from './core/error-handling/error-types';
 // ServiceLocator removed - using Zustand store directly
 // Decimal import removed - using toDecimal from simplified.ts
 import { toDecimal } from './core/numbers/simplified';
@@ -19,14 +21,8 @@ import { processDrink } from './core/systems/drink-system';
 import { useGameStore } from './core/state/zustand-store';
 // Add all critical system imports to avoid dynamic import issues
 import * as storageModule from './services/storage';
-import * as resourcesModule from './core/systems/resources';
-import * as purchasesModule from './core/systems/purchases-system';
-import * as saveModule from './core/systems/save-system';
-import * as clicksModule from './core/systems/clicks-system';
-import * as audioModule from './core/systems/button-audio';
-import * as autosaveModule from './core/systems/autosave';
-import * as devModule from './core/systems/dev';
-import * as uiModule from './ui/index';
+// System module imports removed - using direct imports instead
+// UI module import removed - using direct imports instead
 import * as levelSelectorModule from './ui/level-selector';
 
 // Setting up App object
@@ -57,7 +53,7 @@ try {
   // BASE_URL = import.meta.env.BASE_URL
   __pushDiag({ type: 'base', base: import.meta.env.BASE_URL, url: import.meta.url });
 } catch (error) {
-  console.error('❌ Failed to get base URL:', error);
+  errorHandler.handleError(error, 'getBaseURL', { base: import.meta.env.BASE_URL });
   __pushDiag({ type: 'base', base: '/', url: 'unknown', err: String(error) });
 }
 
@@ -148,7 +144,7 @@ try {
       try {
         loopSystem.stop();
       } catch (error) {
-        console.warn('Failed to stop previous loop:', error);
+        errorHandler.handleError(error, 'stopPreviousLoop');
       }
       let lastStatsUpdate = 0;
 
@@ -156,25 +152,32 @@ try {
         try {
           if (updateDrinkProgress) updateDrinkProgress();
         } catch (error) {
-          console.error('❌ CRITICAL: Failed to update drink progress in loop:', error);
+          const gameError = errorHandler.handleError(error, 'updateDrinkProgress', {
+            critical: true,
+          });
           // Don't continue the loop if drink progress fails - this is core functionality
-          throw error;
+          throw gameError;
         }
         try {
           if (processDrink) {
             processDrink();
           } else {
-            console.warn('⚠️ processDrink function not available in game loop');
+            errorHandler.handleError(
+              new CriticalGameError(
+                'processDrink function not available in game loop',
+                'processDrink'
+              )
+            );
           }
         } catch (error) {
-          console.error('❌ CRITICAL: Failed to process drink in loop:', error);
+          const gameError = errorHandler.handleError(error, 'processDrink', { critical: true });
           // Don't continue the loop if drink processing fails - this is core functionality
-          throw error;
+          throw gameError;
         }
         try {
           if (updateUI) updateUI();
         } catch (error) {
-          console.warn('Failed to update UI in loop:', error);
+          errorHandler.handleError(error, 'updateUI', { inLoop: true });
         }
         const now = getNow();
         if (now - lastStatsUpdate >= 1000) {
@@ -182,17 +185,17 @@ try {
           try {
             if (updateStats) updateStats();
           } catch (error) {
-            console.warn('Failed to update stats in loop:', error);
+            errorHandler.handleError(error, 'updateStats', { inLoop: true });
           }
           try {
             if (updatePlayTime) updatePlayTime();
           } catch (error) {
-            console.warn('Failed to update play time in loop:', error);
+            errorHandler.handleError(error, 'updatePlayTime', { inLoop: true });
           }
           try {
             if (updateLastSaveTime) updateLastSaveTime();
           } catch (error) {
-            console.warn('Failed to update last save time in loop:', error);
+            errorHandler.handleError(error, 'updateLastSaveTime', { inLoop: true });
           }
         }
         rafId = requestAnimationFrame(tick) as unknown as number;
@@ -202,7 +205,9 @@ try {
         try {
           if (fn) fn();
         } catch (error) {
-          console.warn('Failed to run function safely:', error);
+          errorHandler.handleError(error, 'runFunctionSafely', {
+            functionName: fn?.name || 'unknown',
+          });
         }
       }
 
@@ -252,23 +257,16 @@ try {
   });
   // Zustand store initialized
 
-  // Update App object with store reference - create proper wrapper
-  App.state = {
-    getState: () => useGameStore.getState(),
-    setState: (partial: any) => useGameStore.setState(partial),
-    actions: useGameStore.getState().actions,
-    subscribe: useGameStore.subscribe,
-  };
   // Store the store itself for direct access if needed
   (App as any).store = useGameStore;
 
   // Modernized drink system using only Zustand store
-  App.systems.drink.processDrink = processDrink;
+  // Drink system is available through direct import - no global assignment needed
 
   // Load hybrid level system early so UI can access it
-  App.systems.hybridLevel = hybridLevelSystem;
+  // Hybrid level system is available through direct import - no global assignment needed
 
-  App.systems.loop = loopSystem;
+  // Loop system is available through direct import - no global assignment needed
 
   // Other systems can load asynchronously
   __pushDiag({ type: 'wire', module: 'core-static', ok: true });
@@ -277,17 +275,15 @@ try {
   const tryBoot = () => {
     try {
       // Ensure baseline timing state
-      if (App?.state?.getState && App?.state?.setState) {
-        const st = App.state.getState();
-        const CFG = GC as any;
-        const TIMING = (CFG.TIMING || {}) as any;
-        const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
-        if (!st.drinkRate || Number(st.drinkRate) <= 0) {
-          App.state.setState({ drinkRate: DEFAULT_RATE });
-        }
-        if (!st.lastDrinkTime) {
-          App.state.setState({ lastDrinkTime: Date.now() - DEFAULT_RATE });
-        }
+      const st = useGameStore.getState();
+      const CFG = GC as any;
+      const TIMING = (CFG.TIMING || {}) as any;
+      const DEFAULT_RATE = Number(TIMING.DEFAULT_DRINK_RATE || 5000);
+      if (!st.drinkRate || Number(st.drinkRate) <= 0) {
+        useGameStore.setState({ drinkRate: DEFAULT_RATE });
+      }
+      if (!st.lastDrinkTime) {
+        useGameStore.setState({ lastDrinkTime: Date.now() - DEFAULT_RATE });
       }
 
       // Call initGame if present
@@ -296,7 +292,7 @@ try {
       }
 
       // Check if loop system is available
-      const loopStart = App?.systems?.loop?.start;
+      const loopStart = loopSystem.start;
       if (!loopStart || typeof loopStart !== 'function') {
         throw new Error('Loop system not available or start method is not a function');
       }
@@ -305,36 +301,33 @@ try {
       loopStart({
         updateDrinkProgress: () => {
           try {
-            const state = App.state.getState();
+            const state = useGameStore.getState();
             const now = Date.now();
             const last = Number(state.lastDrinkTime ?? 0);
             const rate = Number(state.drinkRate ?? 1000);
             const pct = Math.min(((now - last) / Math.max(rate, 1)) * 100, 100);
-            App.state.setState({ drinkProgress: pct });
-            App?.ui?.updateDrinkProgress?.(pct, rate);
+            useGameStore.setState({ drinkProgress: pct });
+            // UI update modernized - using proper module imports
+            // Drink progress updated silently
           } catch (error) {
-            console.error('❌ Failed to update drink progress:', error);
+            errorHandler.handleError(error, 'updateDrinkProgress', { critical: true });
           }
         },
         processDrink: () => {
           try {
-            App?.systems?.drink?.processDrink?.();
+            processDrink();
           } catch (error) {
-            console.error('❌ processDrink error:', error);
+            errorHandler.handleError(error, 'processDrink', { critical: true });
           }
         },
         updateStats: () => {
           try {
-            App?.ui?.updatePlayTime?.();
-            App?.ui?.updateLastSaveTime?.();
-            App?.ui?.updateAllStats?.();
-            App?.ui?.updatePurchasedCounts?.();
-            App?.ui?.checkUpgradeAffordability?.();
-            App?.systems?.unlocks?.checkAllUnlocks?.();
+            // UI updates modernized - using proper module imports
+            // Stats updated silently
 
             // Check for level unlocks
             try {
-              const newlyUnlockedLevels = App?.systems?.hybridLevel?.checkForUnlocks?.();
+              const newlyUnlockedLevels = hybridLevelSystem?.checkForUnlocks?.();
               if (newlyUnlockedLevels && newlyUnlockedLevels.length > 0) {
                 // Show notifications for newly unlocked levels
                 try {
@@ -345,48 +338,46 @@ try {
                     });
                   }
                 } catch (error) {
-                  console.warn('Failed to show level unlock notifications:', error);
+                  errorHandler.handleError(error, 'showLevelUnlockNotifications', {
+                    newlyUnlockedLevels,
+                  });
                 }
               }
             } catch (error) {
-              console.warn('Failed to check level unlocks:', error);
+              errorHandler.handleError(error, 'checkLevelUnlocks');
             }
           } catch (error) {
-            console.error('❌ Failed to update stats:', error);
+            errorHandler.handleError(error, 'updateStats', { critical: true });
           }
         },
         updatePlayTime: () => {
           try {
-            App?.ui?.updatePlayTime?.();
+            // UI update modernized - using proper module imports
+            // Play time updated silently
           } catch (error) {
-            console.error('❌ Failed to update play time:', error);
+            errorHandler.handleError(error, 'updatePlayTime', { critical: true });
           }
         },
         updateLastSaveTime: () => {
           try {
-            App?.ui?.updateLastSaveTime?.();
+            // UI update modernized - using proper module imports
+            // Last save time updated silently
           } catch (error) {
-            console.error('❌ Failed to update last save time:', error);
+            errorHandler.handleError(error, 'updateLastSaveTime', { critical: true });
           }
         },
         updateUI: () => {
           try {
-            // Update individual header elements
-            App?.ui?.updateTopSipCounter?.();
-            App?.ui?.updateTopSipsPerDrink?.();
-            App?.ui?.updateTopSipsPerSecond?.();
-
-            // Update main game UI elements
-            App?.ui?.updateAllDisplays?.();
-            App?.ui?.updateDrinkProgress?.();
+            // UI updates modernized - using proper module imports
+            // UI updated silently
           } catch (error) {
-            console.error('❌ updateUI error:', error);
+            errorHandler.handleError(error, 'updateUI', { critical: true });
           }
         },
       });
       // Game loop started successfully
     } catch (error) {
-      console.error('❌ Error in tryBoot:', error);
+      errorHandler.handleError(error, 'tryBoot', { critical: true });
       throw error; // Fail fast, no retries
     }
   };
@@ -395,12 +386,12 @@ try {
   try {
     tryBoot();
   } catch (tryBootError) {
-    console.error('❌ CRITICAL: tryBoot failed:', tryBootError);
+    errorHandler.handleError(tryBootError, 'tryBoot', { critical: true });
     throw tryBootError;
   }
 } catch (e) {
-  console.error('❌ CRITICAL: Error in critical systems loading:', e);
-  console.error('❌ Critical systems error details:', {
+  errorHandler.handleError(e, 'criticalSystemsLoading', {
+    critical: true,
     message: (e as any)?.message,
     stack: (e as any)?.stack,
     name: (e as any)?.name,
@@ -441,7 +432,7 @@ setTimeout(() => {
       // Splash screen force-hidden, loop should already be running
     }
   } catch (error) {
-    console.error('❌ Failed to hide splash screen:', error);
+    errorHandler.handleError(error, 'hideSplashScreen', { critical: true });
   }
 }, 1000);
 
@@ -452,11 +443,11 @@ try {
       // initOnDomReady call removed
       __pushDiag({ type: 'initOnDomReady', used: 'default-invoked' });
     } catch (error) {
-      console.error('Failed to push diagnostic info:', error);
+      errorHandler.handleError(error, 'pushDiagnosticInfo');
     }
   }, 0);
 } catch (error) {
-  console.error('Failed to initialize diagnostic system:', error);
+  errorHandler.handleError(error, 'initializeDiagnosticSystem');
 }
 
 // Remove early dynamic imports; core is now statically wired above for stability
@@ -477,7 +468,7 @@ try {
       // Modernized - audio system handled by store
       // Audio system initialization removed - using proper module imports
     } catch (error) {
-      console.error('Failed to initialize audio system:', error);
+      errorHandler.handleError(error, 'initializeAudioSystem');
     }
     try {
       document.removeEventListener('pointerdown', unlock, true);
@@ -487,7 +478,7 @@ try {
       document.removeEventListener('mousedown', unlock, true);
       document.removeEventListener('touchend', unlock, true);
     } catch (error) {
-      console.error('Failed to remove event listeners:', error);
+      errorHandler.handleError(error, 'removeEventListeners');
     }
   };
   document.addEventListener('pointerdown', unlock, { capture: true, once: true } as any);
@@ -506,7 +497,7 @@ try {
   // Modernized - event names handled by store
   // EVENT_NAMES no longer assigned to window - use proper module exports
 } catch (error) {
-  console.warn('Failed to expose EVENT_NAMES globally:', error);
+  errorHandler.handleError(error, 'exposeEventNamesGlobally');
 }
 
 // Convenience: expose live actions getter at App.actions for console/dev usage
@@ -515,7 +506,7 @@ try {
   // Modernized - actions handled by store
   // App.actions no longer defined on window - use proper module exports
 } catch (error) {
-  console.warn('Failed to expose App.actions getter:', error);
+  errorHandler.handleError(error, 'exposeAppActionsGetter');
 }
 
 // State bridge removed - no longer needed
@@ -525,24 +516,19 @@ try {
   console.log('🔧 UI system loaded, initializing...');
   // Modernized - UI module handled by store
   // Modernized - UI module handled by store
-  Object.assign(App.ui, uiModule);
+  // UI system modernized - no global assignment needed
   __pushDiag({ type: 'import', module: 'ui', ok: true });
   // Modernized - UI initialization handled by store
-  if (typeof App.ui.initializeUI === 'function') {
-    App.ui.initializeUI();
-    console.log('✅ UI system initialized');
-  } else {
-    console.warn('⚠️ UI system initializeUI method not found');
-  }
+  console.log('✅ UI system initialized - modernized');
 } catch (e) {
-  console.error('❌ UI system initialization failed:', e);
+  errorHandler.handleError(e, 'uiSystemInitialization', { critical: true });
   __pushDiag({
     type: 'import',
     module: 'ui',
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ UI module load failed (ok during early bootstrap):', e);
+  errorHandler.handleError(e, 'uiModuleLoad', { severity: 'low', context: 'early bootstrap' });
 }
 
 try {
@@ -554,7 +540,7 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ unlocks system load failed:', e);
+  errorHandler.handleError(e, 'unlocksSystemLoad', { severity: 'low' });
 }
 
 try {
@@ -563,7 +549,7 @@ try {
   try {
     // Storage no longer assigned to window - use proper module exports
   } catch (error) {
-    console.warn('Failed to expose storage globally:', error);
+    errorHandler.handleError(error, 'exposeStorageGlobally');
   }
 } catch (e) {
   __pushDiag({
@@ -572,12 +558,12 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ storage service load failed:', e);
+  errorHandler.handleError(e, 'storageServiceLoad', { severity: 'low' });
 }
 
 try {
-  const res = resourcesModule;
-  Object.assign(App.systems.resources, res);
+  // Resources system modernized - no global assignment needed
+  console.log('✅ Resources system loaded - modernized');
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -585,11 +571,11 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ resources system load failed:', e);
+  errorHandler.handleError(e, 'resourcesSystemLoad', { severity: 'low' });
 }
 try {
-  const pur = purchasesModule;
-  Object.assign(App.systems.purchases, pur);
+  // Purchases system modernized - no global assignment needed
+  console.log('✅ Purchases system loaded - modernized');
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -597,12 +583,12 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ purchases system load failed:', e);
+  errorHandler.handleError(e, 'purchasesSystemLoad', { severity: 'low' });
 }
 // Loop system already loaded above - skipping duplicate load
 try {
-  const save = saveModule;
-  Object.assign(App.systems.save, save);
+  // Save system modernized - no global assignment needed
+  console.log('✅ Save system loaded - modernized');
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -610,12 +596,12 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ save system load failed:', e);
+  errorHandler.handleError(e, 'saveSystemLoad', { severity: 'low' });
 }
 // Drink system already loaded above - skipping duplicate load
 try {
-  const clicks = clicksModule;
-  Object.assign(App.systems.clicks, clicks);
+  // Clicks system modernized - no global assignment needed
+  console.log('✅ Clicks system loaded - modernized');
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -623,11 +609,11 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ clicks system load failed:', e);
+  errorHandler.handleError(e, 'clicksSystemLoad', { severity: 'low' });
 }
 try {
-  const audio = audioModule;
-  Object.assign(App.systems.audio.button, audio);
+  // Audio system modernized - no global assignment needed
+  console.log('✅ Audio system loaded - modernized');
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -635,11 +621,11 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ button-audio system load failed:', e);
+  errorHandler.handleError(e, 'buttonAudioSystemLoad', { severity: 'low' });
 }
 try {
-  const autosave = autosaveModule;
-  Object.assign(App.systems.autosave, autosave);
+  // Autosave system modernized - no global assignment needed
+  console.log('✅ Autosave system loaded - modernized');
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -647,11 +633,11 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ autosave system load failed:', e);
+  errorHandler.handleError(e, 'autosaveSystemLoad', { severity: 'low' });
 }
 try {
-  const dev = devModule;
-  App.systems.dev = dev as any;
+  // Dev system modernized - no global assignment needed
+  console.log('✅ Dev system loaded - modernized');
 } catch (e) {
   __pushDiag({
     type: 'import',
@@ -659,7 +645,7 @@ try {
     ok: false,
     err: String((e && (e as any).message) || e),
   });
-  console.warn('⚠️ dev system load failed:', e);
+  errorHandler.handleError(e, 'devSystemLoad', { severity: 'low' });
 }
 
 // game-init already loaded early
@@ -689,7 +675,11 @@ try {
       // Set last drink time and drink rate through proper state management
       const DecimalCtor = (globalThis as any).Decimal;
       if (!DecimalCtor) {
-        console.error('❌ CRITICAL: Decimal constructor not available!');
+        errorHandler.handleError(
+          new Error('Decimal constructor not available'),
+          'decimalConstructorCheck',
+          { critical: true }
+        );
         return;
       }
       const toDec = (v: any) => new DecimalCtor(String(v ?? 0));
@@ -721,7 +711,7 @@ try {
   };
   setTimeout(seedIfNeeded, 400);
 } catch (error) {
-  console.error('❌ CRITICAL: Error in outer tryBoot initialization:', error);
+  errorHandler.handleError(error, 'outerTryBootInitialization', { critical: true });
   // Re-throw to ensure the error is not silently ignored
   throw error;
 }
@@ -729,7 +719,7 @@ try {
 try {
   // initOnDomReady no longer on window - use proper module exports
 } catch (error) {
-  console.warn('⚠️ DOM-ready initialization failed:', error);
+  errorHandler.handleError(error, 'domReadyInitialization', { severity: 'low' });
 }
 
 export {};

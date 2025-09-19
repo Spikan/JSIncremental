@@ -2,6 +2,8 @@
 
 import { unlockPurchases } from './core/systems/unlock-purchases';
 import { formatNumber } from './ui/utils';
+import { useGameStore } from './core/state/zustand-store';
+import { errorHandler } from './core/error-handling/error-handler';
 
 type UnlockCondition = { sips: number; clicks: number };
 type UnlockMap = Record<string, UnlockCondition>;
@@ -79,11 +81,11 @@ export const FEATURE_UNLOCKS = {
         try {
           // Modernized - affordability checks handled by store
         } catch (error) {
-          console.warn('Failed to check upgrade affordability on init:', error);
+          errorHandler.handleError(error, 'checkUpgradeAffordabilityOnInit');
         }
       }, 100);
     } catch (error) {
-      console.error('Failed to initialize FEATURE_UNLOCKS system:', error);
+      errorHandler.handleError(error, 'initializeFEATUREUNLOCKSSystem', { critical: true });
       // Fallback to default state if loading fails
       this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
       // Still update UI even with fallback state
@@ -94,7 +96,7 @@ export const FEATURE_UNLOCKS = {
         try {
           // Modernized - affordability checks handled by store
         } catch (error) {
-          console.warn('Failed to check upgrade affordability on init fallback:', error);
+          errorHandler.handleError(error, 'checkUpgradeAffordabilityOnInitFallback');
         }
       }, 100);
     }
@@ -145,7 +147,7 @@ export const FEATURE_UNLOCKS = {
           feature,
         });
       } catch (error) {
-        console.warn('Failed to emit feature unlocked event:', error);
+        errorHandler.handleError(error, 'emitFeatureUnlockedEvent', { feature });
       }
       return true;
     }
@@ -230,7 +232,7 @@ export const FEATURE_UNLOCKS = {
           try {
             (btn as HTMLElement).classList.remove('locked');
           } catch (error) {
-            console.warn('Failed to remove locked class from button:', error);
+            errorHandler.handleError(error, 'removeLockedClassFromButton', { tabName });
           }
           return;
         }
@@ -242,7 +244,7 @@ export const FEATURE_UNLOCKS = {
           (btn as HTMLElement).classList.toggle('locked', !isUnlocked);
           (btn as HTMLElement).classList.toggle('unlocked', isUnlocked);
         } catch (error) {
-          console.warn('Failed to toggle locked class on button:', error);
+          errorHandler.handleError(error, 'toggleLockedClassOnButton', { tabName, isUnlocked });
         }
 
         // Update button content to show unlock cost if locked
@@ -286,7 +288,7 @@ export const FEATURE_UNLOCKS = {
       });
       this.updateUpgradeVisibility();
     } catch (error) {
-      console.warn('Failed to update feature visibility:', error);
+      errorHandler.handleError(error, 'updateFeatureVisibility');
     } finally {
       this._updatingFeatureVisibility = false;
     }
@@ -359,9 +361,9 @@ export const FEATURE_UNLOCKS = {
       else localStorage.setItem('unlockedFeatures', JSON.stringify(arr));
     } catch (e) {
       try {
-        console.warn('saveUnlockedFeatures failed', e);
+        errorHandler.handleError(e, 'saveUnlockedFeatures');
       } catch (error) {
-        console.warn('Failed to log saveUnlockedFeatures error:', error);
+        errorHandler.handleError(error, 'logSaveUnlockedFeaturesError', { originalError: e });
       }
     }
   },
@@ -401,9 +403,9 @@ export const FEATURE_UNLOCKS = {
       }
     } catch (e) {
       try {
-        console.error('Error loading unlocked features:', e);
+        errorHandler.handleError(e, 'loadUnlockedFeatures', { critical: true });
       } catch (error) {
-        console.warn('Failed to log loadUnlockedFeatures error:', error);
+        errorHandler.handleError(error, 'logLoadUnlockedFeaturesError', { originalError: e });
       }
       this.unlockedFeatures = new Set<string>(['soda', 'options', 'dev']);
     }
@@ -416,7 +418,7 @@ export const FEATURE_UNLOCKS = {
       if (app?.storage?.remove) app.storage.remove('unlockedFeatures');
       else localStorage.removeItem('unlockedFeatures');
     } catch (error) {
-      console.warn('Failed to remove unlocked features from storage:', error);
+      errorHandler.handleError(error, 'removeUnlockedFeaturesFromStorage');
     }
     this.updateFeatureVisibility();
   },
@@ -445,7 +447,7 @@ export const FEATURE_UNLOCKS = {
         localStorage.removeItem('unlockedFeatures');
       }
     } catch (error) {
-      console.warn('Failed to clear unlock storage:', error);
+      errorHandler.handleError(error, 'clearUnlockStorage');
     }
 
     this.saveUnlockedFeatures();
@@ -522,8 +524,7 @@ export const FEATURE_UNLOCKS = {
     this.updateUnlocksProgress();
   },
   updateUnlocksProgress() {
-    const w: any = window as any;
-    const st = w.App?.state?.getState?.() || {};
+    const st = useGameStore.getState();
     if (typeof st.sips === 'undefined' || typeof st.totalClicks === 'undefined') return;
     const total = this.availableFeatures.length;
     const unlocked = this.unlockedFeatures.size - 3; // Subtract soda, options, dev
@@ -790,7 +791,7 @@ export const FEATURE_UNLOCKS = {
       // Also trigger affordability check to update costs immediately
       // Modernized - upgrade affordability handled by store
     } catch (error) {
-      console.warn('Failed to update displays after unlock:', error);
+      errorHandler.handleError(error, 'updateDisplaysAfterUnlock');
     }
   },
 

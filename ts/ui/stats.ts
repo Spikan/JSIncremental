@@ -7,6 +7,7 @@ import { toDecimal } from '../core/numbers';
 import { computeStrawSPD, computeCupSPD } from '../core/rules/economy';
 import { domQuery } from '../services/dom-query';
 import { useGameStore } from '../core/state/zustand-store';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 // Update play time display
 export function updatePlayTime(): void {
@@ -29,7 +30,7 @@ export function updatePlayTime(): void {
       }
     }
   } catch (error) {
-    console.warn('Failed to update stats display:', error);
+    errorHandler.handleError(error, 'updateStatsDisplay', { function: 'updatePlayTime' });
   }
 }
 
@@ -55,7 +56,7 @@ export function updateLastSaveTime(): void {
       }
     }
   } catch (error) {
-    console.warn('Failed to update stats display:', error);
+    errorHandler.handleError(error, 'updateStatsDisplay', { function: 'updateLastSaveTime' });
   }
 }
 
@@ -232,7 +233,7 @@ export function updateShopStats(): void {
     console.log('🔍 updateShopStats: About to call updateEnhancementValues');
     updateEnhancementValues();
   } catch (error) {
-    console.error('🔍 updateShopStats: Error occurred:', error);
+    errorHandler.handleError(error, 'updateShopStats', { critical: true });
   }
 }
 

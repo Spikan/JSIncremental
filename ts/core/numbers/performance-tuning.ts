@@ -3,6 +3,7 @@
 
 import { DecimalType } from './decimal-utils';
 import { memoryOptimizer, performanceOptimizer } from './memory-optimization';
+import { errorHandler } from '../error-handling/error-handler';
 import {
   predictiveCache,
   decimalOperationCache,
@@ -194,7 +195,9 @@ export class PerformanceTuner {
         (window as any).gc();
         console.log('🧹 Memory optimization: Garbage collection triggered');
       } catch (error) {
-        console.warn('Memory optimization: Failed to trigger garbage collection');
+        errorHandler.handleError(error, 'triggerGarbageCollection', {
+          context: 'memory optimization',
+        });
       }
     }
   }

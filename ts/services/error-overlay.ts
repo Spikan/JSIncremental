@@ -1,5 +1,7 @@
 // Enhanced Error Handling System (TypeScript)
 
+import { errorHandler } from '../core/error-handling/error-handler';
+
 declare global {
   interface Window {
     __ERROR_OVERLAY_ATTACHED__?: boolean;
@@ -290,7 +292,7 @@ class ErrorReporter {
 
       recoveryAttempted = true;
     } catch (recoveryError) {
-      console.error('Recovery attempt failed:', recoveryError);
+      errorHandler.handleError(recoveryError, 'recoveryAttempt', { critical: true });
     }
 
     // Update error with recovery info
@@ -456,7 +458,7 @@ if (typeof window !== 'undefined') {
       const msg = (e as ErrorEvent).message || (e as any).error?.message || 'Unknown error';
       show(`Error: ${msg}${src}`);
     } catch (error) {
-      console.warn('Error overlay failed to handle error event:', error);
+      errorHandler.handleError(error, 'handleErrorEvent', { eventType: 'error' });
     }
   });
 
@@ -466,7 +468,9 @@ if (typeof window !== 'undefined') {
       const msg = typeof reason === 'string' ? reason : reason?.message || JSON.stringify(reason);
       show(`Unhandled Promise rejection: ${msg}`);
     } catch (error) {
-      console.warn('Error overlay failed to handle unhandled rejection:', error);
+      errorHandler.handleError(error, 'handleUnhandledRejection', {
+        eventType: 'unhandledrejection',
+      });
     }
   });
 

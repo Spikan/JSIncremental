@@ -2,6 +2,7 @@
 
 import { toDecimal } from '../numbers/simplified';
 import { z } from 'zod';
+import { errorHandler } from '../error-handling/error-handler';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const zod: any =
@@ -182,7 +183,7 @@ export function validateUnlocks(data: any) {
   try {
     return UnlocksSchema.parse(data);
   } catch (error) {
-    console.error('Invalid unlocks data:', error);
+    errorHandler.handleError(error, 'validateUnlocks', { data });
     return null;
   }
 }
@@ -190,7 +191,7 @@ export function validateUpgrades(data: any) {
   try {
     return UpgradesSchema.parse(data);
   } catch (error) {
-    console.error('Invalid upgrades data:', error);
+    errorHandler.handleError(error, 'validateUpgrades', { data });
     return null;
   }
 }
@@ -198,7 +199,7 @@ export function validateGameSave(data: any) {
   try {
     return GameSaveSchema.parse(data);
   } catch (error) {
-    console.error('Invalid game save data:', error);
+    errorHandler.handleError(error, 'validateGameSave', { data });
     return null;
   }
 }
@@ -206,7 +207,7 @@ export function validateGameOptions(data: any) {
   try {
     return GameOptionsSchema.parse(data);
   } catch (error) {
-    console.error('Invalid game options data:', error);
+    errorHandler.handleError(error, 'validateGameOptions', { data });
     return null;
   }
 }

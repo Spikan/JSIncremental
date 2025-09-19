@@ -1,5 +1,7 @@
 // Button Audio System (TypeScript)
 
+import { errorHandler } from '../error-handling/error-handler';
+
 let audioContext: AudioContext | null = null;
 let buttonSoundsEnabled = true;
 
@@ -7,7 +9,7 @@ function ensureContext() {
   try {
     (audioContext as any)?.resume?.();
   } catch (error) {
-    console.warn('Failed to resume audio context:', error);
+    errorHandler.handleError(error, 'resumeAudioContext');
   }
 }
 
@@ -48,7 +50,7 @@ function playTone({
     osc.start(now);
     osc.stop(end);
   } catch (error) {
-    console.warn('Failed to play sound:', error);
+    errorHandler.handleError(error, 'playSound', { freqStart, freqEnd, duration });
   }
 }
 
@@ -60,7 +62,7 @@ function initButtonAudioContext() {
     }
     console.log('Button audio context initialized');
   } catch (error) {
-    console.error('Failed to initialize button audio context:', error);
+    errorHandler.handleError(error, 'initializeButtonAudioContext', { critical: true });
   }
 }
 
@@ -83,7 +85,9 @@ export function toggleButtonSounds() {
   try {
     localStorage.setItem('buttonSoundsEnabled', buttonSoundsEnabled.toString());
   } catch (error) {
-    console.warn('Failed to save button sounds enabled state:', error);
+    errorHandler.handleError(error, 'saveButtonSoundsEnabledState', {
+      enabled: buttonSoundsEnabled,
+    });
   }
   updateButtonSoundsToggleButton();
   console.log('Button sounds:', buttonSoundsEnabled ? 'ON' : 'OFF');
@@ -98,7 +102,7 @@ export function updateButtonSoundsToggleButton() {
     try {
       buttonSoundsToggle.classList.toggle('sounds-off', !buttonSoundsEnabled);
     } catch (error) {
-      console.warn('Failed to toggle button sounds class:', error);
+      errorHandler.handleError(error, 'toggleButtonSoundsClass', { enabled: buttonSoundsEnabled });
     }
   }
 }
@@ -209,6 +213,6 @@ export function playTabSwitchSound() {
       when: 0.04,
     });
   } catch (error) {
-    console.warn('Failed to play tab switch sound:', error);
+    errorHandler.handleError(error, 'playTabSwitchSound');
   }
 }

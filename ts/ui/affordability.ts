@@ -11,6 +11,7 @@ import { toDecimal, gte } from '../core/numbers/simplified';
 import { NumericValue, CostResult } from '../types/app-types';
 import { useGameStore } from '../core/state/zustand-store';
 import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
+import { errorHandler } from '../core/error-handling/error-handler';
 import {
   nextStrawCost,
   nextCupCost,
@@ -83,7 +84,7 @@ export function checkUpgradeAffordability(): void {
   try {
     // Modernized - feature visibility handled by store
   } catch (error) {
-    console.warn('Failed to update feature visibility in affordability check:', error);
+    errorHandler.handleError(error, 'updateFeatureVisibilityInAffordabilityCheck');
   }
 
   // Apply level themes after affordability states are updated
@@ -93,7 +94,7 @@ export function checkUpgradeAffordability(): void {
       hybridSystem.applyCurrentLevelTheme();
     }
   } catch (error) {
-    console.warn('Failed to apply level theme after affordability update:', error);
+    errorHandler.handleError(error, 'applyLevelThemeAfterAffordabilityUpdate');
   }
 }
 

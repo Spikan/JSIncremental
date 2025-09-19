@@ -1,6 +1,8 @@
 // Production-optimized logging utility
 // Replaces console.log calls with conditional logging for better performance
 
+import { errorHandler } from '../core/error-handling/error-handler';
+
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export interface LoggerConfig {
@@ -80,6 +82,8 @@ class Logger {
   error(message: string, ...args: any[]): void {
     if (this.shouldLog('error')) {
       console.error(...this.formatMessage('error', message, ...args));
+      // Also report to error handling system for critical errors
+      errorHandler.handleError(new Error(message), 'loggerError', { args });
     }
   }
 

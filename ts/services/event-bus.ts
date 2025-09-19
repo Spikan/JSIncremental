@@ -1,5 +1,7 @@
 // Typed pub/sub event bus (TypeScript)
 
+import { errorHandler } from '../core/error-handling/error-handler';
+
 export type EventMap = Record<string, unknown>;
 
 export type EventBus<E extends EventMap = Record<string, unknown>> = {
@@ -29,7 +31,7 @@ export function createEventBus<E extends EventMap = Record<string, unknown>>(): 
       try {
         (handler as any)(_payload);
       } catch (e) {
-        console.warn('bus handler error', e);
+        errorHandler.handleError(e, 'busHandlerError', { event, payload: _payload });
       }
     }
   }
@@ -42,15 +44,15 @@ export const bus = createEventBus();
 try {
   (window as any).createEventBus = createEventBus;
 } catch (error) {
-  console.warn('Failed to expose createEventBus globally:', error);
+  errorHandler.handleError(error, 'exposeCreateEventBusGlobally');
 }
 try {
   (window as any).eventBus = bus;
 } catch (error) {
-  console.warn('Failed to expose eventBus globally:', error);
+  errorHandler.handleError(error, 'exposeEventBusGlobally');
 }
 try {
   (window as any).bus = bus;
 } catch (error) {
-  console.warn('Failed to expose bus globally:', error);
+  errorHandler.handleError(error, 'exposeBusGlobally');
 }

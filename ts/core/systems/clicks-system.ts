@@ -2,6 +2,9 @@
 
 import { toDecimal } from '../numbers/simplified';
 import { useGameStore, getStoreActions } from '../state/zustand-store';
+import { EVENT_NAMES } from '../constants';
+import { optimizedEventBus } from '../../services/optimized-event-bus';
+import { errorHandler } from '../error-handling/error-handler';
 
 export type TrackClickArgs = {
   getApp?: () => any;
@@ -50,7 +53,7 @@ export function trackClickFactory({
         // const LIMITS = GAME_CONFIG?.LIMITS || {};
         // const maxClickTimes: number = Number(LIMITS.MAX_CLICK_TIMES || 100);
       } catch (error) {
-        console.warn('Failed to maintain legacy click times array:', error);
+        errorHandler.handleError(error, 'maintainLegacyClickTimesArray');
       }
 
       // Play audio if available
@@ -58,10 +61,10 @@ export function trackClickFactory({
         const App = getApp();
         App?.systems?.audio?.button?.playButtonClickSound?.();
       } catch (error) {
-        console.warn('Failed to play button click sound:', error);
+        errorHandler.handleError(error, 'playButtonClickSound');
       }
     } catch (error) {
-      console.error('❌ Failed to track click:', error);
+      errorHandler.handleError(error, 'trackClick', { critical: true });
       throw error;
     }
   };
@@ -90,14 +93,14 @@ export function handleSodaClickFactory({
           soda3DButton.addMomentum();
         }
       } catch (error) {
-        console.warn('Failed to add momentum to 3D model:', error);
+        errorHandler.handleError(error, 'addMomentumTo3DModel');
       }
 
       // Track click via system
       try {
         trackClick();
       } catch (error) {
-        console.warn('Failed to track click in soda click handler:', error);
+        errorHandler.handleError(error, 'trackClickInSodaClickHandler');
       }
 
       const state = getState();
@@ -134,40 +137,32 @@ export function handleSodaClickFactory({
       const newSips = currentSips.add(totalClickValue);
       setSips(newSips);
 
-      // Update state keeping Decimal
+      // Update state keeping Decimal - use Zustand store directly
       try {
-        if (App?.state?.actions?.setSips) {
-          App.state.actions.setSips(newSips);
+        const storeActions = getStoreActions();
+        if (storeActions?.setSips) {
+          storeActions.setSips(newSips);
         } else {
-          console.warn(
-            '🍹 setSips action not available via App.state.actions, trying direct store access...'
-          );
-          // Try direct store access as fallback
-          try {
-            const storeActions = getStoreActions();
-            if (storeActions?.setSips) {
-              storeActions.setSips(newSips);
-            } else {
-              console.warn('🍹 setSips action not available via storeActions either!');
-            }
-          } catch (storeError) {
-            console.warn('🍹 Failed to import storeActions:', storeError);
-          }
+          console.warn('🍹 setSips action not available via store access');
         }
       } catch (error) {
-        console.warn('Failed to set sips in state:', error);
+        errorHandler.handleError(error, 'setSipsInState', { newSips: newSips?.toString() });
       }
 
       // Emit soda click and sync totals with Decimal support
       try {
-        App?.events?.emit?.(App?.EVENT_NAMES?.CLICK?.SODA, {
-          // Preserve extreme values - keep as Decimal
-          value: totalClickValue,
+        optimizedEventBus.emit(EVENT_NAMES.CLICK.SODA, {
           // Preserve extreme values - keep as Decimal
           gained: totalClickValue,
+          critical: false,
+          clickX: 0,
+          clickY: 0,
+          timestamp: Date.now(),
         });
       } catch (error) {
-        console.warn('Failed to emit soda click event:', error);
+        errorHandler.handleError(error, 'emitSodaClickEvent', {
+          totalClickValue: totalClickValue?.toString(),
+        });
       }
       try {
         App?.stateBridge?.autoSync?.();
@@ -176,10 +171,12 @@ export function handleSodaClickFactory({
         const newTotal = prevTotal.add(totalClickValue);
         App?.state?.actions?.setTotalSipsEarned?.(newTotal);
       } catch (error) {
-        console.warn('Failed to sync state and update total sips earned:', error);
+        errorHandler.handleError(error, 'syncStateAndUpdateTotalSipsEarned', {
+          totalClickValue: totalClickValue?.toString(),
+        });
       }
     } catch (error) {
-      console.error('❌ Failed to handle soda click:', error);
+      errorHandler.handleError(error, 'handleSodaClick', { critical: true });
       throw error;
     }
   };

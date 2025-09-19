@@ -6,6 +6,8 @@ import { logger } from './logger';
 import { useGameStore } from '../core/state/zustand-store';
 import { performanceMonitor } from './performance';
 import type { HybridLevel } from '../core/systems/hybrid-level-system';
+import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 export interface SodaDrinkerHeaderConfig {
   enabled: boolean;
@@ -244,9 +246,10 @@ export class SodaDrinkerHeaderService {
     const retryDelay = 200;
 
     const trySetup = () => {
-      const w = window as any;
-      if (w.App?.systems?.hybridLevel) {
-        this.levelSystem = w.App.systems.hybridLevel;
+      // const w = window as any;
+      // Hybrid system access modernized - using direct import
+      if (hybridLevelSystem) {
+        this.levelSystem = hybridLevelSystem;
         this.continueLevelIntegration();
         return;
       }
@@ -623,9 +626,10 @@ export class SodaDrinkerHeaderService {
     if (!this.levelSystem) {
       console.warn('❌ Level system not available, trying to get it...');
       // Try to get the level system again
-      const w = window as any;
-      if (w.App?.systems?.hybridLevel) {
-        this.levelSystem = w.App.systems.hybridLevel;
+      // const w = window as any;
+      // Hybrid system access modernized - using direct import
+      if (hybridLevelSystem) {
+        this.levelSystem = hybridLevelSystem;
         console.log('✅ Level system found and set');
       } else {
         console.warn('❌ Level system still not available');
@@ -806,9 +810,10 @@ export class SodaDrinkerHeaderService {
     if (!this.levelSystem) {
       console.warn('❌ Level system not available, trying to get it...');
       // Try to get the level system again
-      const w = window as any;
-      if (w.App?.systems?.hybridLevel) {
-        this.levelSystem = w.App.systems.hybridLevel;
+      // const w = window as any;
+      // Hybrid system access modernized - using direct import
+      if (hybridLevelSystem) {
+        this.levelSystem = hybridLevelSystem;
         console.log('✅ Level system found and set');
       } else {
         console.warn('❌ Level system still not available');
@@ -852,11 +857,15 @@ export class SodaDrinkerHeaderService {
         this.updateSettingsCurrentLevel();
         this.updateSettingsRequirements();
       } else {
-        console.warn('❌ Failed to switch to level:', levelId, '- level may not be unlocked');
+        errorHandler.handleError(
+          new Error(`Failed to switch to level: ${levelId} - level may not be unlocked`),
+          'switchToLevel',
+          { levelId, severity: 'low' }
+        );
         logger.warn(`Failed to switch to level ${levelId} - level may not be unlocked`);
       }
     } catch (error) {
-      console.error('❌ Error switching to level:', levelId, error);
+      errorHandler.handleError(error, 'switchToLevel', { levelId, critical: true });
       logger.error(`Failed to switch to level ${levelId}:`, error);
     }
   }

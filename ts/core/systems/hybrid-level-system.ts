@@ -2,6 +2,7 @@
 // Integrates 100+ real Soda Drinker Pro levels with our progression system
 
 import { useGameStore } from '../state/zustand-store';
+import { errorHandler } from '../error-handling/error-handler';
 
 export interface HybridLevel {
   id: number;
@@ -381,7 +382,7 @@ export class HybridLevelSystem {
     try {
       // Modernized - level text updates handled by store
     } catch (error) {
-      console.warn('Failed to update level text during initialization:', error);
+      errorHandler.handleError(error, 'updateLevelTextDuringInitialization');
     }
   }
 
@@ -846,7 +847,7 @@ export class HybridLevelSystem {
       // Don't save here - let the main save system handle it
       // The main save system will call getUnlockedLevelIds() when saving
     } catch (error) {
-      console.warn('Failed to update unlocked levels state:', error);
+      errorHandler.handleError(error, 'updateUnlockedLevelsState');
     }
   }
 
@@ -860,7 +861,7 @@ export class HybridLevelSystem {
         Array.from(this.unlockedLevels)
       );
     } catch (error) {
-      console.warn('Failed to initialize unlocked levels:', error);
+      errorHandler.handleError(error, 'initializeUnlockedLevels');
       this.unlockedLevels = new Set([1]);
     }
   }
@@ -871,7 +872,7 @@ export class HybridLevelSystem {
       // Just initialize with level 1 by default
       this.currentLevel = 1;
     } catch (error) {
-      console.warn('Failed to initialize current level:', error);
+      errorHandler.handleError(error, 'initializeCurrentLevel');
       this.currentLevel = 1;
     }
   }
@@ -882,7 +883,9 @@ export class HybridLevelSystem {
       // The main save system will call getCurrentLevelId() when saving
       console.log('💾 Hybrid system current level updated:', this.currentLevel);
     } catch (error) {
-      console.warn('Failed to update current level state:', error);
+      errorHandler.handleError(error, 'updateCurrentLevelState', {
+        currentLevel: this.currentLevel,
+      });
     }
   }
 

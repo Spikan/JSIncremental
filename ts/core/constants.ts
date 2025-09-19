@@ -1,3 +1,5 @@
+import { errorHandler } from './error-handling/error-handler';
+
 export const EVENT_NAMES = {
   GAME: {
     LOADED: 'game:loaded',
@@ -38,5 +40,5 @@ export const EVENT_NAMES = {
 try {
   (window as any).EVENT_NAMES = EVENT_NAMES;
 } catch (error) {
-  console.warn('Failed to expose EVENT_NAMES globally:', error);
+  errorHandler.handleError(error, 'exposeEventNamesGlobally');
 }

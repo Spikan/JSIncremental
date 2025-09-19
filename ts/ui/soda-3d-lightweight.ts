@@ -3,6 +3,7 @@
 
 // Import the 3D model asset so Vite can process it
 import sodaModelUrl from '../../res/Soda.glb?url';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 // Fallback path removed - fail fast instead
 
@@ -129,7 +130,7 @@ export class Soda3DButton {
       await this.loadModel();
       console.log('✅ Model loading initiated');
     } catch (error) {
-      console.error('❌ Failed to initialize 3D model:', error);
+      errorHandler.handleError(error, 'initialize3DModel', { critical: true });
       console.log('🔄 Falling back to CSS 3D effect...');
       throw new Error('3D model failed to load - no fallback available');
     }
@@ -220,7 +221,10 @@ export class Soda3DButton {
     });
 
     this.modelViewer.addEventListener('error', (event: any) => {
-      console.error('❌ Failed to load 3D model:', event.detail);
+      errorHandler.handleError(new Error('Failed to load 3D model'), 'load3DModel', {
+        detail: event.detail,
+        critical: true,
+      });
       throw new Error('3D model failed to load - no fallback available');
     });
 
@@ -264,7 +268,7 @@ export class Soda3DButton {
       // Don't wait for the model to load - let the event handlers deal with it
       // The model-viewer will trigger 'load' or 'error' events
     } catch (error) {
-      console.error('❌ Failed to load model file:', error);
+      errorHandler.handleError(error, 'loadModelFile', { critical: true });
       throw new Error('3D model failed to load - no fallback available');
     }
   }

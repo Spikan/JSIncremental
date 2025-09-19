@@ -6,11 +6,15 @@
 // MEMORY: PRESERVE FULL DECIMAL PRECISION IN ALL DEV OPERATIONS
 // MEMORY: EXTREME VALUE TESTING IS A CORE FEATURE - DO NOT SANITIZE
 
-// Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal;
+// Import Decimal properly
+import Decimal from 'break_eternity.js';
 import { toDecimal, add } from '../numbers/simplified';
 import { recalcProduction } from './resources';
 import * as purchasesSystem from './purchases-system';
+import { useGameStore } from '../state/zustand-store';
+import * as ui from '../../ui/index';
+import { FEATURE_UNLOCKS as unlockSystem } from '../../feature-unlocks';
+import { errorHandler } from '../error-handling/error-handler';
 
 type Win = typeof window & {
   Decimal?: any;
@@ -29,8 +33,7 @@ type Win = typeof window & {
 
 export function unlockAll(): boolean {
   try {
-    const w = window as Win;
-    const fu = w.App?.systems?.unlocks;
+    const fu = unlockSystem;
     if (!fu) return false;
     const allFeatures = Object.keys(fu.unlockConditions || {});
     allFeatures.forEach(f => fu.unlockedFeatures.add(f));
@@ -46,8 +49,7 @@ export function unlockAll(): boolean {
 
 export function unlockShop(): boolean {
   try {
-    const w = window as Win;
-    const fu = w.App?.systems?.unlocks;
+    const fu = unlockSystem;
     if (!fu) return false;
     fu.unlockedFeatures.add('shop');
     fu.updateFeatureVisibility?.();
@@ -61,8 +63,7 @@ export function unlockShop(): boolean {
 
 export function unlockUpgrades(): boolean {
   try {
-    const w = window as Win;
-    const fu = w.App?.systems?.unlocks;
+    const fu = unlockSystem;
     if (!fu) return false;
     ['widerStraws', 'betterCups', 'fasterDrinks', 'criticalClick', 'suction'].forEach(f =>
       fu.unlockedFeatures.add(f)
@@ -78,8 +79,7 @@ export function unlockUpgrades(): boolean {
 
 export function resetUnlocks(): boolean {
   try {
-    const w = window as Win;
-    const fu = w.App?.systems?.unlocks;
+    const fu = unlockSystem;
     if (!fu) return false;
     fu.unlockedFeatures.clear();
     fu.unlockedFeatures.add('soda');
@@ -99,7 +99,7 @@ export function addTime(milliseconds: number): boolean {
     const w = window as Win;
     const ms = Number(milliseconds) || 0;
     if (!ms) return false;
-    const st = w.App?.state?.getState?.() || {};
+    const st = useGameStore.getState();
     const rate = Number(st.drinkRate || w.drinkRate || 1000);
     const now = Date.now();
     const totalElapsed = ms;
@@ -118,20 +118,20 @@ export function addTime(milliseconds: number): boolean {
       const nextSips = add(currentSips, gainDecimal);
       w.sips = nextSips;
       const prevTotal = Number(st.totalSipsEarned || 0);
-      w.App?.state?.setState?.({ sips: nextSips, totalSipsEarned: prevTotal + gain });
+      useGameStore.setState({ sips: nextSips, totalSipsEarned: prevTotal + gain });
     }
     const nextLast = now - remainder;
     w.lastDrinkTime = nextLast;
     const prevPlay = Number(st.totalPlayTime || 0);
-    w.App?.state?.setState?.({ lastDrinkTime: nextLast, totalPlayTime: prevPlay + ms });
-    w.App?.ui?.updateDrinkProgress?.();
-    w.App?.ui?.updateTopSipCounter?.();
-    w.App?.ui?.updateTopSipsPerSecond?.();
+    useGameStore.setState({ lastDrinkTime: nextLast, totalPlayTime: prevPlay + ms });
+    ui.updateDrinkProgress?.();
+    ui.updateTopSipCounter?.();
+    ui.updateTopSipsPerSecond?.();
     const prevSave = Number(st.lastSaveTime || w.lastSaveTime || Date.now());
     const nextSave = prevSave - ms;
     w.lastSaveTime = nextSave;
-    w.App?.state?.setState?.({ lastSaveTime: nextSave });
-    w.App?.ui?.updateLastSaveTime?.();
+    useGameStore.setState({ lastSaveTime: nextSave });
+    ui.updateLastSaveTime?.();
     return true;
   } catch (error) {
     // Error handling - logging removed for production
@@ -153,12 +153,12 @@ export function addSips(amount: number): boolean {
     }
     // Prefer action to keep Decimal in state when available
     try {
-      w.App?.state?.actions?.setSips?.(w.sips);
+      useGameStore.getState().actions.setSips(w.sips);
     } catch (error) {
-      w.App?.state?.setState?.({ sips: w.sips });
+      useGameStore.setState({ sips: w.sips });
     }
-    w.App?.ui?.updateTopSipCounter?.();
-    w.App?.ui?.checkUpgradeAffordability?.();
+    ui.updateTopSipCounter?.();
+    ui.checkUpgradeAffordability?.();
     return true;
   } catch (error) {
     // Error handling - logging removed for production
@@ -198,7 +198,7 @@ export function showDebugInfo(): boolean {
 export function exportSave(): boolean {
   try {
     const w = window as Win;
-    const st = w.App?.state?.getState?.() || {};
+    const st = useGameStore.getState();
     const saveData: any = {
       sips: String(st.sips ?? w.sips?.toString?.() ?? 0),
       straws: String(st.straws ?? w.straws?.toString?.() ?? 0),
@@ -242,17 +242,17 @@ export function openImportDialog(): boolean {
             w.cups = w.Decimal ? new w.Decimal(saveData.cups) : new w.Decimal(saveData.cups);
           if (saveData.level != null)
             w.level = w.Decimal ? new w.Decimal(saveData.level) : new w.Decimal(saveData.level);
-          // Mirror to App.state minimally - preserve extreme values
-          w.App?.state?.setState?.({
+          // Update Zustand store - preserve extreme values
+          useGameStore.setState({
             sips: w.sips,
             straws: w.straws,
             cups: w.cups,
             level: w.level,
           });
-          w.App?.ui?.updateAllStats?.();
-          w.App?.ui?.checkUpgradeAffordability?.();
+          ui.updateAllStats?.();
+          ui.checkUpgradeAffordability?.();
         } catch (error) {
-          console.warn('Failed to import save data:', error);
+          errorHandler.handleError(error, 'importSaveData', { fileName: file.name });
         }
       };
       reader.readAsText(file);
@@ -296,10 +296,10 @@ export function addMassiveSips(): boolean {
     }
 
     // Update state with Decimal value
-    w.App?.state?.actions?.setSips?.(newSips);
+    useGameStore.getState().actions.setSips(newSips);
 
     // SPD doesn't change with just sips, but ensure state is consistent
-    const state = w.App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (state) {
       updateSPDFromResources(
         state.straws || 0,
@@ -309,9 +309,9 @@ export function addMassiveSips(): boolean {
       );
     }
 
-    w.App?.ui?.updateTopSipCounter?.();
-    w.App?.ui?.checkUpgradeAffordability?.();
-    w.App?.ui?.updateAllDisplays?.();
+    ui.updateTopSipCounter?.();
+    ui.checkUpgradeAffordability?.();
+    ui.updateAllDisplays?.();
 
     // Sips updated successfully
     return true;
@@ -340,7 +340,7 @@ export function addHugeStraws(): boolean {
     const newStraws = add(currentStraws, hugeAmount);
 
     // Always update Zustand state first (this is what UI reads from)
-    w.App?.state?.actions?.setStraws?.(newStraws);
+    useGameStore.getState().actions.setStraws(newStraws);
 
     // Also update window property for compatibility
     try {
@@ -349,11 +349,11 @@ export function addHugeStraws(): boolean {
     } catch (error) {
       // Fallback: just set the Decimal directly
       w.straws = newStraws;
-      console.warn('Failed to set window.straws, using Decimal directly:', error);
+      errorHandler.handleError(error, 'setWindowStraws', { newStraws: newStraws.toString() });
     }
 
     // Update SPD with the new straw values
-    const state = w.App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (state) {
       updateSPDFromResources(
         state.straws || newStraws,
@@ -365,10 +365,10 @@ export function addHugeStraws(): boolean {
 
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
-      w.App?.ui?.updateAllStats?.();
-      w.App?.ui?.updatePurchasedCounts?.();
-      w.App?.ui?.checkUpgradeAffordability?.();
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateAllStats?.();
+      ui.updatePurchasedCounts?.();
+      ui.checkUpgradeAffordability?.();
+      ui.updateAllDisplays?.();
     }, 10);
 
     // Straws updated successfully
@@ -398,7 +398,7 @@ export function addMassiveCups(): boolean {
     const newCups = add(currentCups, massiveAmount);
 
     // Always update Zustand state first (this is what UI reads from)
-    w.App?.state?.actions?.setCups?.(newCups);
+    useGameStore.getState().actions.setCups(newCups);
 
     // Also update window property for compatibility
     try {
@@ -407,11 +407,11 @@ export function addMassiveCups(): boolean {
     } catch (error) {
       // Fallback: just set the Decimal directly
       w.cups = newCups;
-      console.warn('Failed to set window.cups, using Decimal directly:', error);
+      errorHandler.handleError(error, 'setWindowCups', { newCups: newCups.toString() });
     }
 
     // Update SPD with the new cup values
-    const state = w.App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (state) {
       updateSPDFromResources(
         state.straws || 0,
@@ -423,10 +423,10 @@ export function addMassiveCups(): boolean {
 
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
-      w.App?.ui?.updateAllStats?.();
-      w.App?.ui?.updatePurchasedCounts?.();
-      w.App?.ui?.checkUpgradeAffordability?.();
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateAllStats?.();
+      ui.updatePurchasedCounts?.();
+      ui.checkUpgradeAffordability?.();
+      ui.updateAllDisplays?.();
     }, 10);
 
     console.log(`✅ New cups total: ${newCups.toString()}`);
@@ -456,13 +456,15 @@ export function addExtremeResources(): boolean {
           // Preserve extreme values - direct assignment
           w.sips = newSips;
         } catch (error) {
-          console.warn('Error converting sips to safe number:', error);
+          errorHandler.handleError(error, 'convertSipsToSafeNumber', {
+            newSips: newSips.toString(),
+          });
           w.sips = newSips;
         }
       } else {
         w.sips = newSips;
       }
-      w.App?.state?.actions?.setSips?.(newSips);
+      useGameStore.getState().actions.setSips(newSips);
       console.log(`✅ Sips: ${newSips?.toString?.() || 'unknown'}`);
     }
 
@@ -472,7 +474,7 @@ export function addExtremeResources(): boolean {
       const newStraws = add(currentStraws, extremeAmount);
 
       // Always update Zustand state first (this is what UI reads from)
-      w.App?.state?.actions?.setStraws?.(newStraws);
+      useGameStore.getState().actions.setStraws(newStraws);
 
       // Also update window property for compatibility
       try {
@@ -481,7 +483,9 @@ export function addExtremeResources(): boolean {
       } catch (error) {
         // Fallback: just set the Decimal directly
         w.straws = newStraws;
-        console.warn('Failed to set window.straws, using Decimal directly:', error);
+        errorHandler.handleError(error, 'setWindowStrawsExtreme', {
+          newStraws: newStraws.toString(),
+        });
       }
 
       console.log(`✅ Straws: ${newStraws.toString()}`);
@@ -493,7 +497,7 @@ export function addExtremeResources(): boolean {
       const newCups = add(currentCups, extremeAmount);
 
       // Always update Zustand state first (this is what UI reads from)
-      w.App?.state?.actions?.setCups?.(newCups);
+      useGameStore.getState().actions.setCups(newCups);
 
       // Also update window property for compatibility
       try {
@@ -502,7 +506,7 @@ export function addExtremeResources(): boolean {
       } catch (error) {
         // Fallback: just set the Decimal directly
         w.cups = newCups;
-        console.warn('Failed to set window.cups, using Decimal directly:', error);
+        errorHandler.handleError(error, 'setWindowCupsExtreme', { newCups: newCups.toString() });
       }
 
       console.log(`✅ Cups: ${newCups.toString()}`);
@@ -512,11 +516,11 @@ export function addExtremeResources(): boolean {
     try {
       (purchasesSystem as any).validateExtremeValues?.();
     } catch (error) {
-      console.warn('Failed to validate extreme values:', error);
+      errorHandler.handleError(error, 'validateExtremeValues');
     }
 
     // Update SPD with the new extreme values
-    const state = w.App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (state) {
       const finalStraws = state.straws || extremeAmount;
       const finalCups = state.cups || extremeAmount;
@@ -529,10 +533,10 @@ export function addExtremeResources(): boolean {
     // Update UI with a small delay to ensure state is settled
     setTimeout(() => {
       // Updating UI after dev operation
-      w.App?.ui?.updateAllStats?.();
-      w.App?.ui?.updatePurchasedCounts?.();
-      w.App?.ui?.checkUpgradeAffordability?.();
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateAllStats?.();
+      ui.updatePurchasedCounts?.();
+      ui.checkUpgradeAffordability?.();
+      ui.updateAllDisplays?.();
     }, 10);
 
     // Extreme resources added successfully
@@ -567,8 +571,8 @@ export function testScientificNotation(): boolean {
             w.sips = newSips;
           }
 
-          w.App?.state?.actions?.setSips?.(newSips);
-          w.App?.ui?.updateTopSipCounter?.();
+          useGameStore.getState().actions.setSips(newSips);
+          ui.updateTopSipCounter?.();
 
           console.log(`📊 Scientific notation test ${index + 1}: ${newSips.toString()}`);
         }
@@ -592,7 +596,7 @@ export function resetAllResources(): boolean {
     console.log('🔄 Resetting all resources to zero...');
 
     // Always update Zustand state first (this is what UI reads from)
-    w.App?.state?.setState?.({
+    useGameStore.setState({
       sips: new Decimal(0),
       straws: new Decimal(0),
       cups: new Decimal(0),
@@ -609,8 +613,8 @@ export function resetAllResources(): boolean {
       w.cups = 0;
     }
 
-    w.App?.ui?.updateAllStats?.();
-    w.App?.ui?.checkUpgradeAffordability?.();
+    ui.updateAllStats?.();
+    ui.checkUpgradeAffordability?.();
 
     console.log('✅ All resources reset to zero');
     return true;
@@ -643,21 +647,18 @@ export function updateSPDFromResources(
     });
 
     if (!result || !result.sipsPerDrink) {
-      console.warn('SPD calculation failed - no result returned');
+      errorHandler.handleError(
+        new Error('SPD calculation failed - no result returned'),
+        'spdCalculation'
+      );
       return false;
     }
 
-    // Update SPD in state (same pattern as purchase functions)
-    w.App?.state?.actions?.setSPD?.(result.sipsPerDrink);
-    w.App?.state?.actions?.setStrawSPD?.(result.strawSPD);
-    w.App?.state?.actions?.setCupSPD?.(result.cupSPD);
-
-    // Also update via setState as fallback (same pattern as purchase functions)
-    w.App?.state?.setState?.({
-      strawSPD: result.strawSPD,
-      cupSPD: result.cupSPD,
-      spd: result.sipsPerDrink,
-    });
+    // Update SPD in state using Zustand store directly
+    const storeActions = useGameStore.getState().actions;
+    storeActions.setSPD(result.sipsPerDrink);
+    storeActions.setStrawSPD(result.strawSPD);
+    storeActions.setCupSPD(result.cupSPD);
 
     // Update window properties for compatibility
     if (w.Decimal && result.sipsPerDrink) {
@@ -667,7 +668,12 @@ export function updateSPDFromResources(
     console.log(`✅ SPD updated: ${result.sipsPerDrink?.toString?.() || 'unknown'}`);
     return true;
   } catch (error) {
-    console.warn('SPD update failed:', error);
+    errorHandler.handleError(error, 'updateSPDFromResources', {
+      straws,
+      cups,
+      widerStraws,
+      betterCups,
+    });
     return false;
   }
 }
@@ -689,7 +695,7 @@ try {
     console.log('🔧 Dev tools exposed globally - try: addMassiveSips()');
   }
 } catch (error) {
-  console.warn('Failed to expose dev functions globally:', error);
+  errorHandler.handleError(error, 'exposeDevFunctionsGlobally');
 }
 
 /**
@@ -756,11 +762,15 @@ export function toggleEruda(): boolean {
           console.log('🐛 Eruda mobile debug console activated from global instance');
           return true;
         } catch (initError) {
-          console.error('❌ Eruda global initialization failed:', initError);
+          errorHandler.handleError(initError, 'erudaGlobalInitialization', { critical: true });
           return false;
         }
       } else {
-        console.error('❌ Eruda global instance not valid');
+        errorHandler.handleError(
+          new Error('Eruda global instance not valid'),
+          'erudaGlobalInstance',
+          { critical: true }
+        );
         return false;
       }
     }
@@ -805,16 +815,20 @@ export function toggleEruda(): boolean {
               console.log('🔄 Eruda console should now show this data');
             }, 500);
           } catch (initError) {
-            console.error('❌ Eruda initialization failed:', initError);
+            errorHandler.handleError(initError, 'erudaInitialization', { critical: true });
             updateErudaButtonState(false);
           }
         } else {
-          console.error('❌ Eruda not available or invalid:', erudaInstance);
+          errorHandler.handleError(new Error('Eruda not available or invalid'), 'erudaInstance', {
+            critical: true,
+          });
           updateErudaButtonState(false);
         }
       };
       script.onerror = () => {
-        console.error('❌ Failed to load Eruda debug console');
+        errorHandler.handleError(new Error('Failed to load Eruda debug console'), 'erudaLoad', {
+          critical: true,
+        });
         updateErudaButtonState(false);
       };
       document.head.appendChild(script);
@@ -833,12 +847,16 @@ export function toggleEruda(): boolean {
           console.log('🐛 Eruda mobile debug console shown');
         }
       } else {
-        console.warn('⚠️ Eruda instance not available for toggle');
+        errorHandler.handleError(
+          new Error('Eruda instance not available for toggle'),
+          'erudaToggle',
+          { severity: 'low' }
+        );
       }
     }
     return true;
   } catch (error) {
-    console.warn('Failed to toggle Eruda:', error);
+    errorHandler.handleError(error, 'toggleEruda');
     return false;
   }
 }
@@ -851,7 +869,7 @@ export function testDevSystem(): boolean {
     console.log('🧪 Dev system test - this should appear in console');
     return true;
   } catch (error) {
-    console.error('❌ Dev system test failed:', error);
+    errorHandler.handleError(error, 'testDevSystem');
     return false;
   }
 }
@@ -865,7 +883,7 @@ export function clearConsole(): boolean {
     console.log('🧹 Console cleared');
     return true;
   } catch (error) {
-    console.warn('Failed to clear console:', error);
+    errorHandler.handleError(error, 'clearConsole');
     return false;
   }
 }
@@ -875,10 +893,9 @@ export function clearConsole(): boolean {
  */
 export function exportState(): boolean {
   try {
-    const w = window as Win;
-    const state = w.App?.state?.getState?.();
+    const state = useGameStore.getState();
     if (!state) {
-      console.warn('No game state available to export');
+      errorHandler.handleError(new Error('No game state available to export'), 'exportGameState');
       return false;
     }
 
@@ -897,7 +914,7 @@ export function exportState(): boolean {
     console.log('💾 Game state exported successfully');
     return true;
   } catch (error) {
-    console.warn('Failed to export state:', error);
+    errorHandler.handleError(error, 'exportState');
     return false;
   }
 }
@@ -928,7 +945,7 @@ export function performanceTest(): boolean {
 
     return true;
   } catch (error) {
-    console.warn('Performance test failed:', error);
+    errorHandler.handleError(error, 'performanceTest');
     return false;
   }
 }
@@ -952,7 +969,7 @@ function updateErudaButtonState(active: boolean): void {
       }
     }
   } catch (error) {
-    console.warn('Failed to update Eruda button state:', error);
+    errorHandler.handleError(error, 'updateErudaButtonState');
   }
 }
 
@@ -979,7 +996,7 @@ export function refreshErudaConsole(): boolean {
     }
     return false;
   } catch (error) {
-    console.warn('Failed to refresh Eruda console:', error);
+    errorHandler.handleError(error, 'refreshErudaConsole');
     return false;
   }
 }

@@ -16,12 +16,16 @@ import {
 import { safeToNumberOrDecimal } from '../numbers/simplified';
 import { recalcProduction } from './resources.ts';
 import { getUpgradesAndConfig } from './config-accessor.ts';
-// Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal;
+// Import Decimal properly
+import Decimal from 'break_eternity.js';
 import { toDecimal, gte, DecimalType } from '../numbers/simplified';
 import { useGameStore } from '../state/zustand-store';
+import * as ui from '../../ui/index';
+import { optimizedEventBus } from '../../services/optimized-event-bus';
+import { safeStateOperation, errorHandler } from '../error-handling/error-handler';
+import { StateGameError } from '../error-handling/error-types';
 
-// Centralized state update function with proper error handling and sanitization
+// Centralized state update function with standardized error handling
 function updateGameState(updates: {
   sips?: any;
   straws?: any;
@@ -37,64 +41,40 @@ function updateGameState(updates: {
   drinkRate?: number;
   suctionClickBonus?: any;
 }) {
-  try {
-    // Try App.state.actions first (preferred)
-    const w = window as any;
-    const actions = w.App?.state?.actions;
-    
-    if (actions) {
-      // Sanitize Decimal values for state updates
-      if (updates.strawSPD) updates.strawSPD = sanitizeDecimal(updates.strawSPD, new Decimal('0.6'));
-      if (updates.cupSPD) updates.cupSPD = sanitizeDecimal(updates.cupSPD, new Decimal('1.2'));
-      if (updates.spd) updates.spd = sanitizeDecimal(updates.spd, new Decimal('1'));
-      
-      // Apply updates
-      if (updates.sips !== undefined) actions.setSips(updates.sips);
-      if (updates.straws !== undefined) actions.setStraws(updates.straws);
-      if (updates.cups !== undefined) actions.setCups(updates.cups);
-      if (updates.suctions !== undefined) actions.setSuctions(updates.suctions);
-      if (updates.widerStraws !== undefined) actions.setWiderStraws(updates.widerStraws);
-      if (updates.betterCups !== undefined) actions.setBetterCups(updates.betterCups);
-      if (updates.fasterDrinks !== undefined) actions.setFasterDrinks(updates.fasterDrinks);
-      if (updates.level !== undefined) actions.setLevel(updates.level);
-      if (updates.strawSPD !== undefined) actions.setStrawSPD(updates.strawSPD);
-      if (updates.cupSPD !== undefined) actions.setCupSPD(updates.cupSPD);
-      if (updates.spd !== undefined) actions.setSPD(updates.spd);
-      if (updates.drinkRate !== undefined) actions.setDrinkRate(updates.drinkRate);
-      if (updates.suctionClickBonus !== undefined) actions.setSuctionClickBonus(updates.suctionClickBonus);
-      
-      return true;
-    } else {
-      // Fallback to direct store access
-      console.warn('App.state.actions not available, using direct store access');
-      const storeActions = useGameStore.getState().actions;
-      
-      // Sanitize Decimal values for state updates
-      if (updates.strawSPD) updates.strawSPD = sanitizeDecimal(updates.strawSPD, new Decimal('0.6'));
-      if (updates.cupSPD) updates.cupSPD = sanitizeDecimal(updates.cupSPD, new Decimal('1.2'));
-      if (updates.spd) updates.spd = sanitizeDecimal(updates.spd, new Decimal('1'));
-      
-      // Apply updates
-      if (updates.sips !== undefined) storeActions.setSips(updates.sips);
-      if (updates.straws !== undefined) storeActions.setStraws(updates.straws);
-      if (updates.cups !== undefined) storeActions.setCups(updates.cups);
-      if (updates.suctions !== undefined) storeActions.setSuctions(updates.suctions);
-      if (updates.widerStraws !== undefined) storeActions.setWiderStraws(updates.widerStraws);
-      if (updates.betterCups !== undefined) storeActions.setBetterCups(updates.betterCups);
-      if (updates.fasterDrinks !== undefined) storeActions.setFasterDrinks(updates.fasterDrinks);
-      if (updates.level !== undefined) storeActions.setLevel(updates.level);
-      if (updates.strawSPD !== undefined) storeActions.setStrawSPD(updates.strawSPD);
-      if (updates.cupSPD !== undefined) storeActions.setCupSPD(updates.cupSPD);
-      if (updates.spd !== undefined) storeActions.setSPD(updates.spd);
-      if (updates.drinkRate !== undefined) storeActions.setDrinkRate(updates.drinkRate);
-      if (updates.suctionClickBonus !== undefined) storeActions.setSuctionClickBonus(updates.suctionClickBonus);
-      
-      return true;
-    }
-  } catch (error) {
-    console.error('Failed to update game state:', error);
-    return false;
-  }
+  return (
+    safeStateOperation(
+      () => {
+        // Use Zustand store directly - no more dual state management
+        const storeActions = useGameStore.getState().actions;
+
+        // Sanitize Decimal values for state updates
+        if (updates.strawSPD)
+          updates.strawSPD = sanitizeDecimal(updates.strawSPD, new Decimal('0.6'));
+        if (updates.cupSPD) updates.cupSPD = sanitizeDecimal(updates.cupSPD, new Decimal('1.2'));
+        if (updates.spd) updates.spd = sanitizeDecimal(updates.spd, new Decimal('1'));
+
+        // Apply updates
+        if (updates.sips !== undefined) storeActions.setSips(updates.sips);
+        if (updates.straws !== undefined) storeActions.setStraws(updates.straws);
+        if (updates.cups !== undefined) storeActions.setCups(updates.cups);
+        if (updates.suctions !== undefined) storeActions.setSuctions(updates.suctions);
+        if (updates.widerStraws !== undefined) storeActions.setWiderStraws(updates.widerStraws);
+        if (updates.betterCups !== undefined) storeActions.setBetterCups(updates.betterCups);
+        if (updates.fasterDrinks !== undefined) storeActions.setFasterDrinks(updates.fasterDrinks);
+        if (updates.level !== undefined) storeActions.setLevel(updates.level);
+        if (updates.strawSPD !== undefined) storeActions.setStrawSPD(updates.strawSPD);
+        if (updates.cupSPD !== undefined) storeActions.setCupSPD(updates.cupSPD);
+        if (updates.spd !== undefined) storeActions.setSPD(updates.spd);
+        if (updates.drinkRate !== undefined) storeActions.setDrinkRate(updates.drinkRate);
+        if (updates.suctionClickBonus !== undefined)
+          storeActions.setSuctionClickBonus(updates.suctionClickBonus);
+
+        return true;
+      },
+      'updateGameState',
+      { updates: Object.keys(updates) }
+    ) ?? false
+  );
 }
 
 function getTypedConfig(): { upgrades: any; config: any } {
@@ -135,7 +115,9 @@ export function purchaseStraw({
   try {
     // Validate inputs for extreme values
     if (!isFinite(Number(sipsLarge.toString())) || !isFinite(Number(strawsLarge.toString()))) {
-      console.warn('🚫 purchaseStraw: Invalid input values detected');
+      errorHandler.handleError(
+        new StateGameError('Invalid input values detected', 'purchaseStraw', { sips, straws })
+      );
       return null;
     }
 
@@ -143,18 +125,15 @@ export function purchaseStraw({
 
     // Validate cost calculation
     if (!cost || !cost.isFinite() || cost.lte(new Decimal(0))) {
-      console.warn('🚫 purchaseStraw: Invalid cost calculation:', cost.toString());
+      errorHandler.handleError(
+        new StateGameError('Invalid cost calculation', 'purchaseStraw', { cost: cost.toString() })
+      );
       return null;
     }
 
     // Check affordability using Decimal comparison with additional validation
     if (!gte(sipsLarge, cost)) {
-      console.log(
-        '🚫 purchaseStraw: Not affordable - sips:',
-        sipsLarge.toString(),
-        'cost:',
-        cost.toString()
-      );
+      // Not an error - just insufficient funds
       return null;
     }
 
@@ -175,7 +154,9 @@ export function purchaseStraw({
       !isFinite(Number(productionResult.cupSPD?.toString() || 'NaN')) ||
       !isFinite(Number(productionResult.sipsPerDrink?.toString() || 'NaN'))
     ) {
-      console.warn('🚫 purchaseStraw: Invalid production calculation');
+      errorHandler.handleError(
+        new StateGameError('Invalid production calculation', 'purchaseStraw', { productionResult })
+      );
       return null;
     }
 
@@ -183,7 +164,13 @@ export function purchaseStraw({
     cupSPD = productionResult.cupSPD;
     sipsPerDrink = productionResult.sipsPerDrink;
   } catch (error) {
-    console.warn('🚫 purchaseStraw: Error during calculation:', error);
+    errorHandler.handleError(error, 'purchaseStraw', {
+      sips,
+      straws,
+      cups,
+      widerStraws,
+      betterCups,
+    });
     return null;
   }
 
@@ -229,7 +216,10 @@ export function purchaseCup({
   try {
     // Validate inputs for extreme values
     if (!isFinite(Number(sipsLarge.toString())) || !isFinite(Number(cupsLarge.toString()))) {
-      console.warn('🚫 purchaseCup: Invalid input values detected');
+      errorHandler.handleError(new Error('Invalid input values detected'), 'purchaseCup', {
+        sips: sipsLarge?.toString(),
+        cups: cupsLarge?.toString(),
+      });
       return null;
     }
 
@@ -237,18 +227,15 @@ export function purchaseCup({
 
     // Validate cost calculation
     if (!cost || !isFinite(Number(cost.toString())) || cost.lte(new Decimal(0))) {
-      console.warn('🚫 purchaseCup: Invalid cost calculation:', cost?.toString());
+      errorHandler.handleError(new Error('Invalid cost calculation'), 'purchaseCup', {
+        cost: cost?.toString(),
+      });
       return null;
     }
 
     // Check affordability using Decimal comparison with additional validation
     if (!gte(sipsLarge, cost)) {
-      console.log(
-        '🚫 purchaseCup: Not affordable - sips:',
-        sipsLarge.toString(),
-        'cost:',
-        cost.toString()
-      );
+      // Not affordable - this is normal behavior, not an error
       return null;
     }
 
@@ -269,7 +256,10 @@ export function purchaseCup({
       !isFinite(Number(productionResult.cupSPD?.toString() || 'NaN')) ||
       !isFinite(Number(productionResult.sipsPerDrink?.toString() || 'NaN'))
     ) {
-      console.warn('🚫 purchaseCup: Invalid production calculation');
+      errorHandler.handleError(new Error('Invalid production calculation'), 'purchaseCup', {
+        sips: sipsLarge?.toString(),
+        cups: cupsLarge?.toString(),
+      });
       return null;
     }
 
@@ -285,7 +275,7 @@ export function purchaseCup({
       sipsPerDrink,
     };
   } catch (error) {
-    console.warn('🚫 purchaseCup: Error during calculation:', error);
+    errorHandler.handleError(error, 'purchaseCup', { sips, straws, cups, widerStraws, betterCups });
     return null;
   }
 }
@@ -517,18 +507,23 @@ export function levelUp({
   };
 }
 
-// Convenience execute-style helpers that read/update App.state directly
+// Convenience execute-style helpers that read/update Zustand store directly
 // Helper function to sanitize Decimal values
 function sanitizeDecimal(value: DecimalType, fallback: DecimalType): DecimalType {
   if (!value) return fallback;
   try {
     if (!isFinite(Number(value.toString()))) {
-      console.warn('🚫 Sanitizing extreme Decimal value:', value.toString());
+      errorHandler.handleError(new Error('Sanitizing extreme Decimal value'), 'sanitizeDecimal', {
+        value: value?.toString(),
+      });
       return fallback;
     }
     return value;
   } catch (error) {
-    console.warn('🚫 Error sanitizing Decimal, using fallback:', error);
+    errorHandler.handleError(error, 'sanitizeDecimal', {
+      value: value?.toString(),
+      fallback: fallback?.toString(),
+    });
     return fallback;
   }
 }
@@ -548,27 +543,27 @@ export function validateExtremeValues(): void {
     if (rawState.sips) {
       const sipsValue = toDecimal(rawState.sips);
       if (!isFinite(Number(sipsValue.toString()))) {
-        console.log('🔥 validateExtremeValues: Extreme sips detected:', sipsValue.toString());
+        // Extreme sips detected - this is expected behavior in idle games
       }
     }
 
     if (rawState.straws) {
       const strawsValue = toDecimal(rawState.straws);
       if (!isFinite(Number(strawsValue.toString()))) {
-        console.log('🔥 validateExtremeValues: Extreme straws detected:', strawsValue.toString());
+        // Extreme straws detected - this is expected behavior in idle games
       }
     }
 
     if (rawState.cups) {
       const cupsValue = toDecimal(rawState.cups);
       if (!isFinite(Number(cupsValue.toString()))) {
-        console.log('🔥 validateExtremeValues: Extreme cups detected:', cupsValue.toString());
+        // Extreme cups detected - this is expected behavior in idle games
       }
     }
 
-    console.log('🔍 validateExtremeValues: Extreme value validation complete');
+    // Extreme value validation complete
   } catch (error) {
-    console.warn('🚨 validateExtremeValues: Error during validation:', error);
+    errorHandler.handleError(error, 'validateExtremeValues');
   }
 }
 
@@ -606,7 +601,7 @@ function getAppState(): any {
     // Return raw state as-is to preserve extreme values for proper handling
     return rawState;
   } catch (error) {
-    console.warn('Failed to get app state, returning empty object:', error);
+    errorHandler.handleError(error, 'getAppState');
     return {};
   }
 }
@@ -622,8 +617,8 @@ function getAppState(): any {
 // }
 
 function subtractFromWallet(spent: number | DecimalType): any {
-  const w: any = (typeof window !== 'undefined' ? window : {}) as any;
-  const current = toDecimal(w.sips ?? 0);
+  const state = useGameStore.getState();
+  const current = toDecimal(state.sips ?? 0);
 
   // For extreme values, subtract directly as Decimal to preserve precision
   let next: DecimalType;
@@ -631,7 +626,8 @@ function subtractFromWallet(spent: number | DecimalType): any {
   // Use standard break_eternity methods (sub)
   next = current.sub(spentDec);
 
-  w.sips = next;
+  // Update Zustand store directly
+  useGameStore.setState({ sips: next });
   return next;
 }
 
@@ -646,12 +642,15 @@ export const execute = {
       betterCups: st.betterCups,
     });
     if (!result) return false;
-    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       subtractFromWallet(result.spent);
     } catch (error) {
-      console.warn('Failed to update sips after straw purchase:', error);
+      errorHandler.handleError(error, 'updateSipsAfterStrawPurchase', {
+        spent: result.spent?.toString(),
+      });
     }
+    let strawsNum: string | undefined;
     try {
       // Handle Decimal straws with extreme value support
       let strawsValue = result.straws;
@@ -661,69 +660,72 @@ export const execute = {
           console.log('🔥 Extreme straws value detected in state update:', strawsValue.toString());
         }
       }
-      const strawsNum =
+      strawsNum =
         // Preserve extreme values - use string to avoid precision loss
         strawsValue instanceof Decimal ? strawsValue.toString() : String(strawsValue);
-      w.straws = new (w.Decimal || Number)(strawsNum);
+      // Update Zustand store directly
+      useGameStore.setState({ straws: new Decimal(strawsNum) });
     } catch (error) {
-      console.warn('Failed to update straws after straw purchase:', error);
+      errorHandler.handleError(error, 'updateStrawsAfterStrawPurchase', {
+        strawsValue: strawsNum?.toString(),
+      });
     }
     // Update state using centralized function
     const stateUpdated = updateGameState({
-      sips: w.sips,
+      sips: useGameStore.getState().sips,
       straws: result.straws,
       strawSPD: result.strawSPD,
       cupSPD: result.cupSPD,
       spd: result.sipsPerDrink,
     });
-    
+
     if (!stateUpdated) {
-      console.warn('Failed to update game state after straw purchase');
+      errorHandler.handleError(
+        new StateGameError(
+          'Failed to update game state after straw purchase',
+          'updateGameStateAfterStrawPurchase',
+          { result }
+        )
+      );
     }
-    // Fallback: ensure state is patched even if actions path failed
+    // State is now managed directly by Zustand - no fallback needed
     try {
-      w.App?.state?.setState?.({
-        sips: w.sips,
-        straws: result.straws, // Use original result value
-        strawSPD: result.strawSPD,
-        cupSPD: result.cupSPD,
-        spd: result.sipsPerDrink,
-      });
+      ui.checkUpgradeAffordability?.();
     } catch (error) {
-      console.warn('Failed to fallback setState after straw purchase:', error);
-    }
-    try {
-      w.App?.ui?.checkUpgradeAffordability?.();
-    } catch (error) {
-      console.warn('Failed to check upgrade affordability after straw purchase:', error);
+      errorHandler.handleError(error, 'checkUpgradeAffordabilityAfterStrawPurchase');
     }
     try {
-      w.App?.ui?.updateShopButtonStates?.();
+      ui.updateShopButtonStates?.();
     } catch (error) {
-      console.warn('Failed to update shop button states after straw purchase:', error);
+      errorHandler.handleError(error, 'updateShopButtonStatesAfterStrawPurchase');
     }
     try {
-      w.App?.ui?.updateAllStats?.();
+      ui.updateAllStats?.();
     } catch (error) {
-      console.warn('Failed to update all stats after straw purchase:', error);
+      errorHandler.handleError(error, 'updateAllStatsAfterStrawPurchase');
     }
     try {
       console.log('🔍 PURCHASE: About to call updateShopStats for straw');
-      w.App?.ui?.updateShopStats?.();
+      ui.updateShopStats?.();
       console.log('🔍 PURCHASE: updateShopStats called successfully for straw');
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateAllDisplays?.();
     } catch (error) {
-      console.warn('Failed to update shop displays after straw purchase:', error);
+      errorHandler.handleError(error, 'updateShopDisplaysAfterStrawPurchase');
     }
     try {
       console.log('🛒 EMITTING PURCHASE EVENT for straw:', { item: 'straw', cost: result.spent });
-      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
+      optimizedEventBus.emit('economy:purchase', {
         item: 'straw',
         cost: result.spent,
+        quantity: 1,
+        timestamp: Date.now(),
       });
       console.log('🛒 PURCHASE EVENT EMITTED for straw');
     } catch (error) {
-      console.warn('Failed to emit purchase event for straw:', error);
+      errorHandler.handleError(error, 'emitPurchaseEventForStraw', {
+        item: 'straw',
+        cost: result.spent?.toString(),
+      });
     }
     return true;
   },
@@ -737,12 +739,15 @@ export const execute = {
       betterCups: st.betterCups,
     });
     if (!result) return false;
-    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       subtractFromWallet(result.spent);
     } catch (error) {
-      console.warn('Failed to update sips after cup purchase:', error);
+      errorHandler.handleError(error, 'updateSipsAfterCupPurchase', {
+        spent: result.spent?.toString(),
+      });
     }
+    let cupsNum: string | undefined;
     try {
       // Handle Decimal cups with extreme value support
       let cupsValue = result.cups;
@@ -752,74 +757,58 @@ export const execute = {
           console.log('🔥 Extreme cups value detected in state update:', cupsValue.toString());
         }
       }
-      const cupsNum =
+      cupsNum =
         // Preserve extreme values - use string to avoid precision loss
         cupsValue instanceof Decimal ? cupsValue.toString() : String(cupsValue);
-      w.cups = new (w.Decimal || Number)(cupsNum);
+      // Update Zustand store directly
+      useGameStore.setState({ cups: new Decimal(cupsNum) });
     } catch (error) {
-      console.warn('Failed to update cups after cup purchase:', error);
-    }
-    try {
-      // Get fresh actions from App.state
-      const actions = w.App?.state?.actions;
-      if (!actions) {
-        console.warn('App.state.actions not available, using direct store access');
-        const storeActions = useGameStore.getState().actions;
-        storeActions.setSips(w.sips);
-        storeActions.setCups(result.cups);
-        storeActions.setStrawSPD(result.strawSPD);
-        storeActions.setCupSPD(result.cupSPD);
-        storeActions.setSPD(result.sipsPerDrink);
-      } else {
-        // Use values as-is for state update
-        actions.setSips(w.sips);
-        actions.setCups(result.cups);
-        actions.setStrawSPD(result.strawSPD);
-        actions.setCupSPD(result.cupSPD);
-        actions.setSPD(result.sipsPerDrink);
-      }
-    } catch (error) {
-      console.warn('Failed to update App.state via actions after cup purchase:', error);
-    }
-    try {
-      w.App?.state?.setState?.({
-        sips: w.sips,
-        cups: result.cups, // Use original result value
-        strawSPD: result.strawSPD,
-        cupSPD: result.cupSPD,
-        spd: result.sipsPerDrink,
+      errorHandler.handleError(error, 'updateCupsAfterCupPurchase', {
+        cupsValue: cupsNum?.toString(),
       });
-    } catch (error) {
-      console.warn('Failed to fallback setState after cup purchase:', error);
     }
     try {
-      w.App?.ui?.checkUpgradeAffordability?.();
+      // Use Zustand store directly - no more dual state management
+      const storeActions = useGameStore.getState().actions;
+      storeActions.setSips(useGameStore.getState().sips);
+      storeActions.setCups(result.cups);
+      storeActions.setStrawSPD(result.strawSPD);
+      storeActions.setCupSPD(result.cupSPD);
+      storeActions.setSPD(result.sipsPerDrink);
     } catch (error) {
-      console.warn('Failed to check upgrade affordability after cup purchase:', error);
+      errorHandler.handleError(error, 'updateStoreAfterCupPurchase');
+    }
+    // State is now managed directly by Zustand - no fallback needed
+    try {
+      ui.checkUpgradeAffordability?.();
+    } catch (error) {
+      errorHandler.handleError(error, 'checkUpgradeAffordabilityAfterCupPurchase');
     }
     try {
-      w.App?.ui?.updateShopButtonStates?.();
+      ui.updateShopButtonStates?.();
     } catch (error) {
-      console.warn('Failed to update shop button states after cup purchase:', error);
+      errorHandler.handleError(error, 'updateShopButtonStatesAfterCupPurchase');
     }
     try {
-      w.App?.ui?.updateAllStats?.();
+      ui.updateAllStats?.();
     } catch (error) {
-      console.warn('Failed to update all stats after cup purchase:', error);
+      errorHandler.handleError(error, 'updateAllStatsAfterCupPurchase');
     }
     try {
-      w.App?.ui?.updateShopStats?.();
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateShopStats?.();
+      ui.updateAllDisplays?.();
     } catch (error) {
-      console.warn('Failed to update shop displays after cup purchase:', error);
+      errorHandler.handleError(error, 'updateShopDisplaysAfterCupPurchase');
     }
     try {
-      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
+      optimizedEventBus.emit('economy:purchase', {
         item: 'cup',
         cost: result.spent,
+        quantity: 1,
+        timestamp: Date.now(),
       });
     } catch (error) {
-      console.warn('Failed to emit purchase event for cup:', error);
+      errorHandler.handleError(error, 'emitPurchaseEventForCup');
     }
     return true;
   },
@@ -833,79 +822,64 @@ export const execute = {
       betterCups: st.betterCups,
     });
     if (!result) return false;
-    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       subtractFromWallet(result.spent);
     } catch (error) {
-      console.warn('Failed to update sips after wider straws purchase:', error);
+      errorHandler.handleError(error, 'updateSipsAfterWiderStrawsPurchase');
     }
     try {
-      w.widerStraws = new (w.Decimal || Number)(
-        (result.widerStraws as any).toString?.() ?? String(result.widerStraws)
-      );
-    } catch (error) {
-      console.warn('Failed to update wider straws after purchase:', error);
-    }
-    try {
-      // Get fresh actions from App.state
-      const actions = w.App?.state?.actions;
-      if (!actions) {
-        console.warn('App.state.actions not available, using direct store access');
-        const storeActions = useGameStore.getState().actions;
-        storeActions.setSips(w.sips);
-        storeActions.setWiderStraws(result.widerStraws);
-        storeActions.setStrawSPD(result.strawSPD);
-        storeActions.setCupSPD(result.cupSPD);
-        storeActions.setSPD(result.sipsPerDrink);
-      } else {
-        actions.setSips(w.sips);
-        actions.setWiderStraws(result.widerStraws);
-        actions.setStrawSPD(result.strawSPD);
-        actions.setCupSPD(result.cupSPD);
-        actions.setSPD(result.sipsPerDrink);
-      }
-    } catch (error) {
-      console.warn('Failed to update App.state via actions after wider straws purchase:', error);
-    }
-    try {
-      w.App?.state?.setState?.({
-        sips: w.sips,
-        widerStraws: result.widerStraws,
-        strawSPD: result.strawSPD,
-        cupSPD: result.cupSPD,
-        spd: result.sipsPerDrink,
+      // Update Zustand store directly
+      useGameStore.setState({
+        widerStraws: new Decimal(
+          (result.widerStraws as any).toString?.() ?? String(result.widerStraws)
+        ),
       });
     } catch (error) {
-      console.warn('Failed to fallback setState after wider straws purchase:', error);
+      errorHandler.handleError(error, 'updateWiderStrawsAfterPurchase');
     }
     try {
-      w.App?.ui?.checkUpgradeAffordability?.();
+      // Use Zustand store directly - no more dual state management
+      const storeActions = useGameStore.getState().actions;
+      storeActions.setSips(useGameStore.getState().sips);
+      storeActions.setWiderStraws(result.widerStraws);
+      storeActions.setStrawSPD(result.strawSPD);
+      storeActions.setCupSPD(result.cupSPD);
+      storeActions.setSPD(result.sipsPerDrink);
     } catch (error) {
-      console.warn('Failed to check upgrade affordability after wider straws purchase:', error);
+      errorHandler.handleError(error, 'updateStoreAfterWiderStrawsPurchase');
     }
+    // State is now managed directly by Zustand - no fallback needed
     try {
-      w.App?.ui?.updateShopButtonStates?.();
+      ui.checkUpgradeAffordability?.();
     } catch (error) {
-      console.warn('Failed to update shop button states after wider straws purchase:', error);
+      errorHandler.handleError(error, 'checkUpgradeAffordabilityAfterWiderStrawsPurchase');
     }
     try {
-      w.App?.ui?.updateAllStats?.();
+      ui.updateShopButtonStates?.();
     } catch (error) {
-      console.warn('Failed to update all stats after wider straws purchase:', error);
+      errorHandler.handleError(error, 'updateShopButtonStatesAfterWiderStrawsPurchase');
     }
     try {
-      w.App?.ui?.updateShopStats?.();
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateAllStats?.();
     } catch (error) {
-      console.warn('Failed to update shop displays after wider straws purchase:', error);
+      errorHandler.handleError(error, 'updateAllStatsAfterWiderStrawsPurchase');
     }
     try {
-      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
+      ui.updateShopStats?.();
+      ui.updateAllDisplays?.();
+    } catch (error) {
+      errorHandler.handleError(error, 'updateShopDisplaysAfterWiderStrawsPurchase');
+    }
+    try {
+      optimizedEventBus.emit('economy:purchase', {
         item: 'widerStraws',
         cost: result.spent,
+        quantity: 1,
+        timestamp: Date.now(),
       });
     } catch (error) {
-      console.warn('Failed to emit purchase event for wider straws:', error);
+      errorHandler.handleError(error, 'emitPurchaseEventForWiderStraws');
     }
     return true;
   },
@@ -919,79 +893,64 @@ export const execute = {
       betterCups: st.betterCups,
     });
     if (!result) return false;
-    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       subtractFromWallet(result.spent);
     } catch (error) {
-      console.warn('Failed to update sips after better cups purchase:', error);
+      errorHandler.handleError(error, 'updateSipsAfterBetterCupsPurchase');
     }
     try {
-      w.betterCups = new (w.Decimal || Number)(
-        (result.betterCups as any).toString?.() ?? String(result.betterCups)
-      );
-    } catch (error) {
-      console.warn('Failed to update better cups after purchase:', error);
-    }
-    try {
-      // Get fresh actions from App.state
-      const actions = w.App?.state?.actions;
-      if (!actions) {
-        console.warn('App.state.actions not available, using direct store access');
-        const storeActions = useGameStore.getState().actions;
-        storeActions.setSips(w.sips);
-        storeActions.setBetterCups(result.betterCups);
-        storeActions.setStrawSPD(result.strawSPD);
-        storeActions.setCupSPD(result.cupSPD);
-        storeActions.setSPD(result.sipsPerDrink);
-      } else {
-        actions.setSips(w.sips);
-        actions.setBetterCups(result.betterCups);
-        actions.setStrawSPD(result.strawSPD);
-        actions.setCupSPD(result.cupSPD);
-        actions.setSPD(result.sipsPerDrink);
-      }
-    } catch (error) {
-      console.warn('Failed to update App.state via actions after better cups purchase:', error);
-    }
-    try {
-      w.App?.state?.setState?.({
-        sips: w.sips,
-        betterCups: result.betterCups,
-        strawSPD: result.strawSPD,
-        cupSPD: result.cupSPD,
-        spd: result.sipsPerDrink,
+      // Update Zustand store directly
+      useGameStore.setState({
+        betterCups: new Decimal(
+          (result.betterCups as any).toString?.() ?? String(result.betterCups)
+        ),
       });
     } catch (error) {
-      console.warn('Failed to fallback setState after better cups purchase:', error);
+      errorHandler.handleError(error, 'updateBetterCupsAfterPurchase');
     }
     try {
-      w.App?.ui?.checkUpgradeAffordability?.();
+      // Use Zustand store directly - no more dual state management
+      const storeActions = useGameStore.getState().actions;
+      storeActions.setSips(useGameStore.getState().sips);
+      storeActions.setBetterCups(result.betterCups);
+      storeActions.setStrawSPD(result.strawSPD);
+      storeActions.setCupSPD(result.cupSPD);
+      storeActions.setSPD(result.sipsPerDrink);
     } catch (error) {
-      console.warn('Failed to check upgrade affordability after better cups purchase:', error);
+      errorHandler.handleError(error, 'updateStoreAfterBetterCupsPurchase');
     }
+    // State is now managed directly by Zustand - no fallback needed
     try {
-      w.App?.ui?.updateShopButtonStates?.();
+      ui.checkUpgradeAffordability?.();
     } catch (error) {
-      console.warn('Failed to update shop button states after better cups purchase:', error);
+      errorHandler.handleError(error, 'checkUpgradeAffordabilityAfterBetterCupsPurchase');
     }
     try {
-      w.App?.ui?.updateAllStats?.();
+      ui.updateShopButtonStates?.();
     } catch (error) {
-      console.warn('Failed to update all stats after better cups purchase:', error);
+      errorHandler.handleError(error, 'updateShopButtonStatesAfterBetterCupsPurchase');
     }
     try {
-      w.App?.ui?.updateShopStats?.();
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateAllStats?.();
     } catch (error) {
-      console.warn('Failed to update shop displays after better cups purchase:', error);
+      errorHandler.handleError(error, 'updateAllStatsAfterBetterCupsPurchase');
     }
     try {
-      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
+      ui.updateShopStats?.();
+      ui.updateAllDisplays?.();
+    } catch (error) {
+      errorHandler.handleError(error, 'updateShopDisplaysAfterBetterCupsPurchase');
+    }
+    try {
+      optimizedEventBus.emit('economy:purchase', {
         item: 'betterCups',
         cost: result.spent,
+        quantity: 1,
+        timestamp: Date.now(),
       });
     } catch (error) {
-      console.warn('Failed to emit purchase event for better cups:', error);
+      errorHandler.handleError(error, 'emitPurchaseEventForBetterCups');
     }
     return true;
   },
@@ -1015,11 +974,11 @@ export const execute = {
       suctionClickBonus: result.suctionClickBonus?.toString(),
     });
 
-    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       subtractFromWallet(result.spent);
     } catch (error) {
-      console.warn('Failed to update sips after suction purchase:', error);
+      errorHandler.handleError(error, 'updateSipsAfterSuctionPurchase');
     }
     try {
       // Update Zustand store with new suction values
@@ -1027,46 +986,46 @@ export const execute = {
         suctions: result.suctions?.toString(),
         suctionClickBonus: result.suctionClickBonus?.toString(),
       });
-      w.App?.state?.setState?.({
-        suctions: result.suctions,
-        suctionClickBonus: result.suctionClickBonus,
-      });
-      console.log('🔧 buySuction: Store updated, new state:', w.App?.state?.getState?.());
+      // State is now managed directly by Zustand - no fallback needed
+      console.log('🔧 buySuction: Store updated, new state:', useGameStore.getState());
       // Also update global for backward compatibility
-      w.suctions = new (w.Decimal || Number)(
-        (result.suctions as any).toString?.() ?? String(result.suctions)
-      );
+      // Update Zustand store directly
+      useGameStore.setState({
+        suctions: new Decimal((result.suctions as any).toString?.() ?? String(result.suctions)),
+      });
     } catch (error) {
-      console.warn('Failed to update suctions after purchase:', error);
+      errorHandler.handleError(error, 'updateSuctionsAfterPurchase');
     }
     try {
-      w.App?.ui?.checkUpgradeAffordability?.();
+      ui.checkUpgradeAffordability?.();
     } catch (error) {
-      console.warn('Failed to check upgrade affordability after suction purchase:', error);
+      errorHandler.handleError(error, 'checkUpgradeAffordabilityAfterSuctionPurchase');
     }
     try {
-      w.App?.ui?.updateShopButtonStates?.();
+      ui.updateShopButtonStates?.();
     } catch (error) {
-      console.warn('Failed to update shop button states after suction purchase:', error);
+      errorHandler.handleError(error, 'updateShopButtonStatesAfterSuctionPurchase');
     }
     try {
-      w.App?.ui?.updateAllStats?.();
+      ui.updateAllStats?.();
     } catch (error) {
-      console.warn('Failed to update all stats after suction purchase:', error);
+      errorHandler.handleError(error, 'updateAllStatsAfterSuctionPurchase');
     }
     try {
-      w.App?.ui?.updateShopStats?.();
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateShopStats?.();
+      ui.updateAllDisplays?.();
     } catch (error) {
-      console.warn('Failed to update shop displays after suction purchase:', error);
+      errorHandler.handleError(error, 'updateShopDisplaysAfterSuctionPurchase');
     }
     try {
-      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
+      optimizedEventBus.emit('economy:purchase', {
         item: 'suction',
         cost: result.spent,
+        quantity: 1,
+        timestamp: Date.now(),
       });
     } catch (error) {
-      console.warn('Failed to emit purchase event for suction:', error);
+      errorHandler.handleError(error, 'emitPurchaseEventForSuction');
     }
     return true;
   },
@@ -1077,22 +1036,25 @@ export const execute = {
       fasterDrinks: st.fasterDrinks,
     });
     if (!result) return false;
-    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       subtractFromWallet(result.spent);
     } catch (error) {
-      console.warn('Failed to update sips after faster drinks purchase:', error);
+      errorHandler.handleError(error, 'updateSipsAfterFasterDrinksPurchase');
     }
     try {
-      w.fasterDrinks = new (w.Decimal || Number)(
-        (result.fasterDrinks as any).toString?.() ?? String(result.fasterDrinks)
-      );
+      // Update Zustand store directly
+      useGameStore.setState({
+        fasterDrinks: new Decimal(
+          (result.fasterDrinks as any).toString?.() ?? String(result.fasterDrinks)
+        ),
+      });
     } catch (error) {
-      console.warn('Failed to update faster drinks after purchase:', error);
+      errorHandler.handleError(error, 'updateFasterDrinksAfterPurchase');
     }
     // Compute next drink rate based on config and new fasterDrinks count
     const { config } = getTypedConfig();
-    const baseMs = Number(w.GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE ?? 5000);
+    const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE ?? 5000);
     const baseReduction = Number(config.FASTER_DRINKS_REDUCTION_PER_LEVEL ?? 0);
     const minMs = Number(config.MIN_DRINK_RATE ?? 500);
     const effectiveReduction = Math.max(0, baseReduction);
@@ -1101,72 +1063,55 @@ export const execute = {
     const nextRate = Math.max(minMs, Math.round(baseMs * factor));
     // Apply to state (authoritative)
     try {
-      // Get fresh actions from App.state
-      const actions = w.App?.state?.actions;
-      if (!actions) {
-        console.warn('App.state.actions not available, using direct store access');
-        const storeActions = useGameStore.getState().actions;
-        storeActions.setSips(w.sips);
-        storeActions.setFasterDrinks(result.fasterDrinks);
-        storeActions.setDrinkRate(nextRate);
-      } else {
-        actions.setSips(w.sips);
-        actions.setFasterDrinks(result.fasterDrinks);
-        actions.setDrinkRate(nextRate);
-      }
+      // Use Zustand store directly - no more dual state management
+      const storeActions = useGameStore.getState().actions;
+      storeActions.setSips(useGameStore.getState().sips);
+      storeActions.setFasterDrinks(result.fasterDrinks);
+      storeActions.setDrinkRate(nextRate);
     } catch (error) {
-      console.warn('Failed to update App.state via actions after faster drinks purchase:', error);
+      errorHandler.handleError(error, 'updateStoreAfterFasterDrinksPurchase');
+    }
+    // State is now managed directly by Zustand - no fallback needed
+    try {
+      // stateBridge is null, so this call is not needed
+    } catch (error) {
+      errorHandler.handleError(error, 'setDrinkRateViaBridgeAfterFasterDrinksPurchase');
     }
     try {
-      w.App?.state?.setState?.({
-        sips: w.sips,
-        fasterDrinks: result.fasterDrinks,
-        drinkRate: nextRate,
-      });
+      ui.updateCompactDrinkSpeedDisplays?.();
     } catch (error) {
-      console.warn('Failed to fallback setState after faster drinks purchase:', error);
+      errorHandler.handleError(error, 'updateCompactDrinkSpeedDisplaysAfterFasterDrinksPurchase');
     }
     try {
-      w.App?.stateBridge?.setDrinkRate?.(nextRate);
+      ui.checkUpgradeAffordability?.();
     } catch (error) {
-      console.warn('Failed to set drink rate via bridge after faster drinks purchase:', error);
+      errorHandler.handleError(error, 'checkUpgradeAffordabilityAfterFasterDrinksPurchase');
     }
     try {
-      w.App?.ui?.updateCompactDrinkSpeedDisplays?.();
+      ui.updateShopButtonStates?.();
     } catch (error) {
-      console.warn(
-        'Failed to update compact drink speed displays after faster drinks purchase:',
-        error
-      );
+      errorHandler.handleError(error, 'updateShopButtonStatesAfterFasterDrinksPurchase');
     }
     try {
-      w.App?.ui?.checkUpgradeAffordability?.();
+      ui.updateAllStats?.();
     } catch (error) {
-      console.warn('Failed to check upgrade affordability after faster drinks purchase:', error);
+      errorHandler.handleError(error, 'updateAllStatsAfterFasterDrinksPurchase');
     }
     try {
-      w.App?.ui?.updateShopButtonStates?.();
+      ui.updateShopStats?.();
+      ui.updateAllDisplays?.();
     } catch (error) {
-      console.warn('Failed to update shop button states after faster drinks purchase:', error);
+      errorHandler.handleError(error, 'updateShopDisplaysAfterFasterDrinksPurchase');
     }
     try {
-      w.App?.ui?.updateAllStats?.();
-    } catch (error) {
-      console.warn('Failed to update all stats after faster drinks purchase:', error);
-    }
-    try {
-      w.App?.ui?.updateShopStats?.();
-      w.App?.ui?.updateAllDisplays?.();
-    } catch (error) {
-      console.warn('Failed to update shop displays after faster drinks purchase:', error);
-    }
-    try {
-      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
+      optimizedEventBus.emit('economy:purchase', {
         item: 'fasterDrinks',
         cost: result.spent,
+        quantity: 1,
+        timestamp: Date.now(),
       });
     } catch (error) {
-      console.warn('Failed to emit purchase event for faster drinks:', error);
+      errorHandler.handleError(error, 'emitPurchaseEventForFasterDrinks');
     }
     return true;
   },
@@ -1178,7 +1123,7 @@ export const execute = {
       sipsPerDrink: st.spd,
     });
     if (!result) return false;
-    const w: any = (typeof window !== 'undefined' ? window : {}) as any;
+    // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
       // Preserve extreme values - use Decimal operations directly
       const curr = st.sips as any;
@@ -1186,78 +1131,69 @@ export const execute = {
         curr && curr.add && curr.subtract
           ? curr.add(result.sipsGained as any).subtract(result.spent as any)
           : new Decimal(curr ?? 0).add(result.sipsGained as any).subtract(result.spent as any);
-      w.sips = nextLarge;
-      w.level = new Decimal(result.level);
-      // Get fresh actions from App.state
-      const actions = w.App?.state?.actions;
-      if (!actions) {
-        console.warn('App.state.actions not available, using direct store access');
-        const storeActions = useGameStore.getState().actions;
-        storeActions.setSips(nextLarge);
-        storeActions.setLevel(safeToNumberOrDecimal(result.level));
-      } else {
-        actions.setSips(nextLarge);
-        actions.setLevel(safeToNumberOrDecimal(result.level));
-      }
+      // Update Zustand store directly
+      useGameStore.setState({
+        sips: nextLarge,
+        level: new Decimal(result.level),
+      });
+      // Use Zustand store directly - no more dual state management
+      const storeActions = useGameStore.getState().actions;
+      storeActions.setSips(nextLarge);
+      storeActions.setLevel(safeToNumberOrDecimal(result.level));
     } catch (error) {
-      console.warn('Failed to update state after level up:', error);
+      errorHandler.handleError(error, 'updateStateAfterLevelUp');
       try {
-        // Get fresh actions from App.state
-        const actions = w.App?.state?.actions;
-        if (!actions) {
-          console.warn('App.state.actions not available, using direct store access');
-          const storeActions = useGameStore.getState().actions;
-          storeActions.setSips(w.sips);
-          storeActions.setLevel(safeToNumberOrDecimal(result.level));
-        } else {
-          actions.setSips(w.sips);
-          actions.setLevel(safeToNumberOrDecimal(result.level));
-        }
-        w.level = new Decimal(result.level);
+        // Fallback to current sips value
+        const storeActions = useGameStore.getState().actions;
+        storeActions.setSips(useGameStore.getState().sips);
+        storeActions.setLevel(safeToNumberOrDecimal(result.level));
+        // Level already updated in Zustand store above
       } catch (error) {
-        console.warn('Failed to update state via actions after level up:', error);
+        errorHandler.handleError(error, 'updateStateViaFallbackAfterLevelUp');
       }
     }
     try {
-      w.App?.ui?.checkUpgradeAffordability?.();
+      ui.checkUpgradeAffordability?.();
     } catch (error) {
-      console.warn('Failed to check upgrade affordability after level up:', error);
+      errorHandler.handleError(error, 'checkUpgradeAffordabilityAfterLevelUp');
     }
     try {
-      w.App?.ui?.updateAllStats?.();
+      ui.updateAllStats?.();
     } catch (error) {
-      console.warn('Failed to update all stats after level up:', error);
+      errorHandler.handleError(error, 'updateAllStatsAfterLevelUp');
     }
     try {
-      w.App?.ui?.updateShopStats?.();
-      w.App?.ui?.updateAllDisplays?.();
+      ui.updateShopStats?.();
+      ui.updateAllDisplays?.();
     } catch (error) {
-      console.warn('Failed to update displays after level up:', error);
+      errorHandler.handleError(error, 'updateDisplaysAfterLevelUp');
     }
     try {
-      w.App?.ui?.updateLevelText?.();
-      w.App?.ui?.updateLevelNumber?.();
+      ui.updateLevelText?.();
+      ui.updateLevelNumber?.();
     } catch (error) {
-      console.warn('Failed to update level displays after level up:', error);
+      errorHandler.handleError(error, 'updateLevelDisplaysAfterLevelUp');
     }
     try {
-      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.PURCHASE, {
+      optimizedEventBus.emit('economy:purchase', {
         item: 'levelUp',
         cost: result.spent,
-        gained: result.sipsGained,
+        quantity: 1,
+        timestamp: Date.now(),
       });
     } catch (error) {
-      console.warn('Failed to emit purchase event for level up:', error);
+      errorHandler.handleError(error, 'emitPurchaseEventForLevelUp');
     }
     try {
       // Emit specific level up event for theme system and other listeners
-      w.App?.events?.emit?.(w.App?.EVENT_NAMES?.ECONOMY?.LEVEL_UP, {
-        newLevel: result.level,
+      optimizedEventBus.emit('economy:upgrade_purchased', {
+        upgrade: 'level',
+        level: result.level,
         cost: result.spent,
-        gained: result.sipsGained,
+        timestamp: Date.now(),
       });
     } catch (error) {
-      console.warn('Failed to emit level up event:', error);
+      errorHandler.handleError(error, 'emitLevelUpEvent');
     }
     return true;
   },

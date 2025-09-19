@@ -1,6 +1,7 @@
 // Performance monitoring service using web-vitals
 import { onCLS, onFCP, onLCP, onTTFB } from 'web-vitals';
 import { errorReporter, ErrorCategory, ErrorSeverity } from './error-overlay';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 export interface PerformanceMetrics {
   CLS: number | null;
@@ -214,7 +215,7 @@ class PerformanceMonitor {
 
   private handlePerformanceError(operation: string, error: any): void {
     const errorMessage = `Performance monitoring failed: ${operation}`;
-    console.warn(errorMessage, error);
+    errorHandler.handleError(error, 'performanceMonitoring', { operation });
 
     // Report to error handling system
     errorReporter?.reportError({

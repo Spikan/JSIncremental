@@ -3,6 +3,7 @@
 
 import subscriptionManager from './subscription-manager';
 import { domQuery } from '../services/dom-query';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 export interface TouchValidationConfig {
   movementThreshold: number; // Pixels of movement allowed before canceling
@@ -79,7 +80,7 @@ export class MobileInputHandler {
       }
       // Touch handling configured
     } catch (error) {
-      console.warn('Failed to set mobile touch styles:', error);
+      errorHandler.handleError(error, 'setMobileTouchStyles');
     }
 
     // Apply ultra-compact header on mobile
@@ -98,7 +99,7 @@ export class MobileInputHandler {
         console.log('Applied ultra-compact header for mobile');
       }
     } catch (error) {
-      console.warn('Failed to apply ultra-compact header:', error);
+      errorHandler.handleError(error, 'applyUltraCompactHeader');
     }
   }
 
@@ -280,7 +281,7 @@ export class MobileInputHandler {
         });
       }
     } catch (error) {
-      console.warn('Failed to add context menu handler:', error);
+      errorHandler.handleError(error, 'addContextMenuHandler');
     }
   }
 

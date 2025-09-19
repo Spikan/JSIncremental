@@ -1,6 +1,8 @@
 // 🚀 DECIMAL UTILITIES - Direct break_eternity.js integration
 // Essential utilities for working with break_eternity.js Decimal objects
 
+import { errorHandler } from '../error-handling/error-handler';
+
 // Type for break_eternity.js Decimal instances
 export type DecimalType = any;
 
@@ -119,7 +121,7 @@ export const formatDecimal = (value: any): string => {
 
     return rawString;
   } catch (error) {
-    console.warn('formatDecimal: Error processing value:', error);
+    errorHandler.handleError(error, 'formatDecimal', { value: value?.toString() });
     return String(value || 0);
   }
 };

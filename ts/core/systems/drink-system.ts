@@ -8,6 +8,8 @@
 // Modern ES6 imports - proper module resolution
 import { toDecimal } from '../numbers/simplified';
 import { useGameStore } from '../state/zustand-store';
+import { hybridLevelSystem } from './hybrid-level-system';
+import { errorHandler } from '../error-handling/error-handler';
 
 // Modern drink system using only Zustand store
 export function processDrink(): void {
@@ -30,10 +32,11 @@ export function processDrink(): void {
     try {
       const App = (globalThis as any).App;
       if (App?.systems?.hybridLevel?.getCurrentLevelBonuses) {
-        levelBonuses = App.systems.hybridLevel.getCurrentLevelBonuses();
+        // Hybrid system access modernized - using direct import
+        levelBonuses = hybridLevelSystem?.getCurrentLevelBonuses?.();
       }
     } catch (error) {
-      console.warn('⚠️ Failed to get level bonuses, using defaults:', error);
+      errorHandler.handleError(error, 'getLevelBonuses', { fallback: 'using defaults' });
     }
 
     // Calculate base SPD value - handle Decimal 0 properly
@@ -73,7 +76,7 @@ export function processDrink(): void {
 
     // Drink processed successfully
   } catch (error) {
-    console.error('❌ CRITICAL: Failed to process drink:', error);
+    errorHandler.handleError(error, 'processDrink', { critical: true });
     throw error;
   }
 }

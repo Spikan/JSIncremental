@@ -5,6 +5,7 @@
 import { formatNumber, prettify } from './utils';
 import { domQuery } from '../services/dom-query';
 import { timerManager } from '../services/timer-manager';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 // Detect mobile device
 function isMobileDevice(): boolean {
@@ -15,7 +16,7 @@ function isMobileDevice(): boolean {
       (navigator as any).maxTouchPoints > 0
     );
   } catch (error) {
-    console.warn('Failed to detect mobile device:', error);
+    errorHandler.handleError(error, 'detectMobileDevice');
     return false;
   }
 }
@@ -141,7 +142,7 @@ function showMilestoneFeedback(
       'Remove click feedback element'
     );
   } catch (error) {
-    console.warn('Failed to show milestone feedback:', error);
+    errorHandler.handleError(error, 'showMilestoneFeedback', { message, x, y, type });
   }
 }
 
@@ -222,7 +223,9 @@ function showFeedbackAtCoordinates(
       try {
         requestAnimationFrame(animate);
       } catch (error) {
-        console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
+        errorHandler.handleError(error, 'requestAnimationFrameFallback', {
+          operation: 'showPurchaseFeedback',
+        });
         setTimeout(animate, 16);
       }
     }
@@ -292,7 +295,9 @@ function showFeedbackWithContainer(
       try {
         requestAnimationFrame(animate);
       } catch (error) {
-        console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
+        errorHandler.handleError(error, 'requestAnimationFrameFallback', {
+          operation: 'showPurchaseFeedback',
+        });
         setTimeout(animate, 16);
       }
     }
@@ -300,7 +305,7 @@ function showFeedbackWithContainer(
   try {
     requestAnimationFrame(animate);
   } catch (error) {
-    console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
+    errorHandler.handleError(error, 'requestAnimationFrameFallback', { fallback: 'setTimeout' });
     setTimeout(animate, 16);
   }
   timerManager.setTimeout(
@@ -391,7 +396,9 @@ export function showPurchaseFeedback(
       try {
         requestAnimationFrame(animate);
       } catch (error) {
-        console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
+        errorHandler.handleError(error, 'requestAnimationFrameFallback', {
+          operation: 'showPurchaseFeedback',
+        });
         setTimeout(animate, 16);
       }
     }
@@ -399,7 +406,7 @@ export function showPurchaseFeedback(
   try {
     requestAnimationFrame(animate);
   } catch (error) {
-    console.warn('requestAnimationFrame failed, falling back to setTimeout:', error);
+    errorHandler.handleError(error, 'requestAnimationFrameFallback', { fallback: 'setTimeout' });
     setTimeout(animate, 16);
   }
   const config = (window as any).GAME_CONFIG?.TIMING || {};

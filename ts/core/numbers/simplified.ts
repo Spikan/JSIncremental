@@ -112,7 +112,8 @@ export function toDecimal(value: NumericValue): DecimalType {
       const signVal = (value as any).sign;
       const magVal = (value as any).mag;
       const layerVal = (value as any).layer;
-      const looksFinite = Number.isFinite(signVal) && Number.isFinite(magVal) && Number.isFinite(layerVal);
+      const looksFinite =
+        Number.isFinite(signVal) && Number.isFinite(magVal) && Number.isFinite(layerVal);
       // Try to salvage via toString if available
       try {
         if (typeof (value as any).toString === 'function') {

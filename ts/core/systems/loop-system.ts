@@ -1,5 +1,7 @@
 // Loop system: centralizes requestAnimationFrame game loop (TypeScript)
 
+import { errorHandler } from '../error-handling/error-handler';
+
 let rafId: number | null = null;
 
 type StartArgs = {
@@ -24,7 +26,7 @@ export function start({
   try {
     stop();
   } catch (error) {
-    console.warn('Failed to stop previous loop:', error);
+    errorHandler.handleError(error, 'stopPreviousLoop');
   }
   let lastStatsUpdate = 0;
 
@@ -32,17 +34,17 @@ export function start({
     try {
       if (updateDrinkProgress) updateDrinkProgress();
     } catch (error) {
-      console.warn('Failed to update drink progress in loop:', error);
+      errorHandler.handleError(error, 'updateDrinkProgressInLoop');
     }
     try {
       if (processDrink) processDrink();
     } catch (error) {
-      console.warn('Failed to process drink in loop:', error);
+      errorHandler.handleError(error, 'processDrinkInLoop');
     }
     try {
       if (updateUI) updateUI();
     } catch (error) {
-      console.warn('Failed to update UI in loop:', error);
+      errorHandler.handleError(error, 'updateUIInLoop');
     }
     const now = getNow();
     if (now - lastStatsUpdate >= 1000) {
@@ -50,7 +52,7 @@ export function start({
       try {
         if (updateStats) updateStats();
       } catch (error) {
-        console.warn('Failed to update stats in loop:', error);
+        errorHandler.handleError(error, 'updateStatsInLoop');
       }
       // Validate extreme values periodically for monitoring
       // Note: Removed circular import to prevent hanging in production
@@ -58,12 +60,12 @@ export function start({
       try {
         if (updatePlayTime) updatePlayTime();
       } catch (error) {
-        console.warn('Failed to update play time in loop:', error);
+        errorHandler.handleError(error, 'updatePlayTimeInLoop');
       }
       try {
         if (updateLastSaveTime) updateLastSaveTime();
       } catch (error) {
-        console.warn('Failed to update last save time in loop:', error);
+        errorHandler.handleError(error, 'updateLastSaveTimeInLoop');
       }
       // Maintain authoritative totalPlayTime in App.state
       try {
@@ -71,7 +73,7 @@ export function start({
         // const st = null; // Unused - modernized to store
         // Modernized - state updates handled by store
       } catch (error) {
-        console.warn('Failed to update total play time in loop:', error);
+        errorHandler.handleError(error, 'updateTotalPlayTimeInLoop');
       }
     }
     rafId = requestAnimationFrame(tick) as unknown as number;
@@ -97,6 +99,6 @@ function runOnceSafely(fn: (() => void) | undefined) {
   try {
     if (fn) fn();
   } catch (error) {
-    console.warn('Failed to run function safely:', error);
+    errorHandler.handleError(error, 'runFunctionSafely', { functionName: fn?.name || 'unknown' });
   }
 }

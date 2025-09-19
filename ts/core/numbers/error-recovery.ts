@@ -3,6 +3,7 @@
 
 import { isDecimal, DecimalType } from './decimal-utils';
 import { isValidDecimalString } from './safe-conversion';
+import { errorHandler } from '../error-handling/error-handler';
 
 /**
  * Handles Decimal conversion errors with recovery strategies
@@ -12,7 +13,11 @@ export class DecimalErrorRecovery {
    * Attempts to recover from a conversion error
    */
   static handleConversionError(value: any, context: string): DecimalType {
-    console.error(`Decimal conversion error in ${context}:`, value);
+    errorHandler.handleError(
+      new Error(`Decimal conversion error in ${context}`),
+      'handleConversionError',
+      { value: value?.toString(), context }
+    );
 
     // Attempt recovery strategies
     if (typeof value === 'string') {
@@ -49,7 +54,11 @@ export class DecimalErrorRecovery {
     }
 
     // Fallback to safe default
-    console.warn(`Using fallback value 0 for ${context}`);
+    errorHandler.handleError(
+      new Error(`Using fallback value 0 for ${context}`),
+      'decimalConversionError',
+      { context, severity: 'low' }
+    );
     return new (globalThis as any).Decimal(0);
   }
 
@@ -58,7 +67,10 @@ export class DecimalErrorRecovery {
    */
   static validateCalculation(result: DecimalType, operation: string): boolean {
     if (!isDecimal(result)) {
-      console.error(`Invalid result from ${operation}:`, result);
+      errorHandler.handleError(new Error(`Invalid result from ${operation}`), 'arithmeticError', {
+        operation,
+        result: String(result),
+      });
       return false;
     }
 
@@ -67,12 +79,20 @@ export class DecimalErrorRecovery {
       const num = result.toNumber();
       // Allow extreme values (Infinity) as they are acceptable in this context
       if (!isFinite(num)) {
-        console.warn(`Non-finite result from ${operation}:`, result.toString());
+        errorHandler.handleError(
+          new Error(`Non-finite result from ${operation}`),
+          'arithmeticError',
+          { operation, result: result?.toString(), severity: 'low' }
+        );
         return true; // Extreme values are acceptable
       }
       return true;
     } catch {
-      console.warn(`Extreme result from ${operation}:`, result.toString());
+      errorHandler.handleError(new Error(`Extreme result from ${operation}`), 'arithmeticError', {
+        operation,
+        result: result?.toString(),
+        severity: 'low',
+      });
       return true; // Extreme values are acceptable
     }
   }
@@ -96,7 +116,11 @@ export class DecimalErrorRecovery {
     }
 
     if (issues.length > 0) {
-      console.warn(`Input validation failed for ${operation}:`, issues.join(', '));
+      errorHandler.handleError(
+        new Error(`Input validation failed for ${operation}`),
+        'arithmeticError',
+        { operation, issues: issues.join(', '), severity: 'low' }
+      );
       return false;
     }
 
@@ -107,8 +131,11 @@ export class DecimalErrorRecovery {
    * Attempts to recover from arithmetic operation errors
    */
   static handleArithmeticError(a: any, b: any, operation: string, error: any): DecimalType {
-    console.error(`Arithmetic error in ${operation}:`, error);
-    console.error('Operands:', { a, b });
+    errorHandler.handleError(error, 'arithmeticError', { operation });
+    errorHandler.handleError(new Error('Invalid operands'), 'arithmeticError', {
+      a: a?.toString(),
+      b: b?.toString(),
+    });
 
     // Try to convert operands to safe values
     const safeA = this.convertToSafeDecimal(a);
@@ -128,7 +155,10 @@ export class DecimalErrorRecovery {
           return new (globalThis as any).Decimal(0);
       }
     } catch (recoveryError) {
-      console.error(`Recovery failed for ${operation}:`, recoveryError);
+      errorHandler.handleError(recoveryError, 'arithmeticError', {
+        operation,
+        context: 'recovery failed',
+      });
       return new (globalThis as any).Decimal(0);
     }
   }
@@ -197,7 +227,10 @@ export class ExtremeValueMonitor {
           const warning = `High extreme value usage detected: ${this.extremeValueCount} operations`;
           if (!this.performanceWarnings.includes(warning)) {
             this.performanceWarnings.push(warning);
-            console.warn(warning, 'Operation:', operation);
+            errorHandler.handleError(new Error(warning), 'arithmeticError', {
+              operation,
+              severity: 'low',
+            });
           }
         }
       }
@@ -252,7 +285,7 @@ export function setupGlobalErrorHandling(): void {
       message.includes('toNumber') ||
       message.includes('Infinity')
     ) {
-      console.warn('Decimal-related error detected:', message);
+      errorHandler.handleError(new Error(message), 'decimalRelatedError');
 
       // Log to performance monitor
       ExtremeValueMonitor.getInstance().checkPerformance(

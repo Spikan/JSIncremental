@@ -3,6 +3,7 @@
 import { hybridLevelSystem, HybridLevel } from '../core/systems/hybrid-level-system';
 import { formatNumber } from './utils';
 import { updateLevelText } from './displays';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 export class LevelSelector {
   private container: HTMLElement | null = null;
@@ -387,7 +388,7 @@ export class LevelSelector {
         // Modernized - level number updates handled by store
         // Modernized - display updates handled by store
       } catch (error) {
-        console.warn('Failed to update main UI displays:', error);
+        errorHandler.handleError(error, 'updateMainUIDisplays', { levelId });
       }
 
       // Emit event for other systems
@@ -398,7 +399,7 @@ export class LevelSelector {
           level: hybridLevelSystem.getCurrentLevel(),
         });
       } catch (error) {
-        console.warn('Failed to emit level changed event:', error);
+        errorHandler.handleError(error, 'emitLevelChangedEvent', { levelId });
       }
     }
   }
@@ -413,7 +414,7 @@ export class LevelSelector {
         // Modernized - event emission handled by store
         console.log('Level unlocked event modernized:', levelId);
       } catch (error) {
-        console.warn('Failed to emit level unlocked event:', error);
+        errorHandler.handleError(error, 'emitLevelUnlockedEvent', { levelId });
       }
     }
   }

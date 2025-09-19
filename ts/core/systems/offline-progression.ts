@@ -1,6 +1,8 @@
 // Offline Progression System: Calculate and award offline earnings
 import { toDecimal } from '../numbers/simplified';
 import { logger } from '../../services/logger';
+import { useGameStore } from '../state/zustand-store';
+import * as ui from '../../ui/index';
 
 export interface OfflineProgressionResult {
   timeAway: number;
@@ -26,7 +28,7 @@ export function calculateOfflineProgression(
 
   try {
     const w: any = window as any;
-    const state = w.App?.state?.getState?.() || {};
+    const state = useGameStore.getState();
 
     // Get current time and last save time
     const now = Date.now();
@@ -107,7 +109,7 @@ export function applyOfflineProgression(result: OfflineProgressionResult): boole
 
   try {
     const w: any = window as any;
-    const state = w.App?.state?.getState?.() || {};
+    const state = useGameStore.getState();
 
     // Add offline sips to current sips
     const currentSips = toDecimal(w.sips || 0);
@@ -122,16 +124,16 @@ export function applyOfflineProgression(result: OfflineProgressionResult): boole
     const newTotal = currentTotal.add(offlineSips);
 
     // Update state
-    w.App?.state?.setState?.({
+    useGameStore.setState({
       sips: newSips,
       totalSipsEarned: newTotal,
       lastSaveTime: Date.now(), // Update last save time to prevent double-counting
     });
 
     // Update UI displays
-    w.App?.ui?.updateTopSipsPerDrink?.();
-    w.App?.ui?.updateTopSipsPerSecond?.();
-    w.App?.ui?.updateAllStats?.();
+    ui.updateTopSipsPerDrink?.();
+    ui.updateTopSipsPerSecond?.();
+    ui.updateAllStats?.();
 
     logger.info(`Applied offline progression: +${result.sipsEarned} sips`);
     return true;

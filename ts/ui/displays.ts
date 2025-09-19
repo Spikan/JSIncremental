@@ -10,6 +10,7 @@ import { checkUpgradeAffordability } from './affordability';
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { domQuery } from '../services/dom-query';
 import { uiBatcher } from '../services/ui-batcher';
+import { errorHandler } from '../core/error-handling/error-handler';
 // Logger import removed - not used in this file
 import {
   nextStrawCost,
@@ -142,7 +143,7 @@ export function updateTopSipsPerDrink(): void {
       topSipsPerDrinkElement.innerHTML = formatted;
     }
   } catch (error) {
-    console.warn('Failed to update topSipsPerDrink:', error);
+    errorHandler.handleError(error, 'updateTopSipsPerDrink');
   }
 }
 
@@ -205,7 +206,7 @@ export function updateTopSipsPerSecond(): void {
       topSipsPerSecondElement.innerHTML = formatted;
     }
   } catch (error) {
-    console.warn('Failed to update top sips per second:', error);
+    errorHandler.handleError(error, 'updateTopSipsPerSecond');
   }
 }
 
@@ -227,7 +228,7 @@ export function updateClickValueDisplay(): void {
       clickValueElement.textContent = totalClickValue.toFixed(1);
     }
   } catch (error) {
-    console.warn('Failed to update click value display:', error);
+    errorHandler.handleError(error, 'updateClickValueDisplay');
   }
 }
 
@@ -268,7 +269,7 @@ export function updateProductionSummary(): void {
       }
     }
   } catch (error) {
-    console.warn('Failed to update production summary:', error);
+    errorHandler.handleError(error, 'updateProductionSummary');
   }
 }
 
@@ -310,7 +311,7 @@ export function updateDrinkSpeedDisplay(): void {
       drinkSpeedBonusCompact.textContent = `${Math.round(bonusPct)}%`;
     }
   } catch (error) {
-    console.warn('Failed to update display:', error);
+    errorHandler.handleError(error, 'updateDrinkSpeedDisplay');
   }
 }
 
@@ -334,7 +335,7 @@ export function updateAutosaveStatus(): void {
         try {
           checkbox.checked = !!opts.autosaveEnabled;
         } catch (error) {
-          console.warn('Failed to update display:', error);
+          errorHandler.handleError(error, 'updateAutosaveCheckbox');
         }
       }
       if (select) {
@@ -342,12 +343,12 @@ export function updateAutosaveStatus(): void {
           const val = String(opts.autosaveInterval ?? '10');
           if (select.value !== val) select.value = val;
         } catch (error) {
-          console.warn('Failed to update display:', error);
+          errorHandler.handleError(error, 'updateAutosaveSelect');
         }
       }
     }
   } catch (error) {
-    console.warn('Failed to update display:', error);
+    errorHandler.handleError(error, 'updateAutosaveStatus');
   }
 }
 
@@ -371,7 +372,7 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
         currentDrinkRate = safeToNumberOrDecimal(displayData.drinkRate || 0);
     }
   } catch (error) {
-    console.warn('Failed to update display:', error);
+    errorHandler.handleError(error, 'updateDrinkProgress');
   }
   const progressFill = domQuery.getById('drinkProgressFill');
   const countdown = domQuery.getById('drinkCountdown');
@@ -422,7 +423,7 @@ export function updateTopSipCounter(): void {
       // Silent update - no visual feedback needed
       (topSipElement as HTMLElement).textContent = formatted;
     } catch (error) {
-      console.warn('Failed to update display:', error);
+      errorHandler.handleError(error, 'updateDisplay');
     }
   }
 }
@@ -442,7 +443,7 @@ export function updateLevelNumber(): void {
         throw new Error('Hybrid level system not available - cannot update level display');
       }
     } catch (error) {
-      console.warn('Failed to update display:', error);
+      errorHandler.handleError(error, 'updateDisplay');
     }
   }
 }
@@ -453,7 +454,9 @@ export function updateLevelText(): void {
   try {
     // Use hybrid level system as single source of truth
     // Modernized - hybrid system handled by store
-    const hybridSystem = (window as any).App?.systems?.hybridLevel;
+    // Hybrid system access modernized - using direct import
+    const { hybridLevelSystem } = require('../core/systems/hybrid-level-system');
+    const hybridSystem = hybridLevelSystem;
     let levelText = 'The Beach (Level 1)';
 
     if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
@@ -470,7 +473,7 @@ export function updateLevelText(): void {
       currentLevelNameEl.textContent = levelText;
     }
   } catch (error) {
-    console.warn('Failed to update level text:', error);
+    errorHandler.handleError(error, 'updateLevelText');
   }
 }
 
@@ -491,7 +494,7 @@ export function updateDrinkRate(): void {
       drinkRateElement.textContent = `${formatNumber(drinkRateSeconds)}s`;
     }
   } catch (error) {
-    console.warn('Failed to update display:', error);
+    errorHandler.handleError(error, 'updateDisplay');
   }
 }
 
@@ -533,7 +536,7 @@ export function updateCompactDrinkSpeedDisplays(): void {
       drinkSpeedBonusCompact.textContent = `${Math.round(bonusPct)}%`;
     }
   } catch (error) {
-    console.warn('Failed to update display:', error);
+    errorHandler.handleError(error, 'updateDisplay');
   }
   const compactDisplays = document.querySelectorAll('[id*="Compact"]');
   compactDisplays.forEach(display => {
@@ -551,7 +554,7 @@ export function updateCompactDrinkSpeedDisplays(): void {
         (display as HTMLElement).textContent = `${formatNumber(drinkRateSeconds)}s`;
       }
     } catch (error) {
-      console.warn('Failed to update display:', error);
+      errorHandler.handleError(error, 'updateDisplay');
     }
   });
 }
@@ -581,7 +584,7 @@ export const updateAllDisplaysOptimized = () => {
         // Update cost displays and button states
         checkUpgradeAffordability();
       } catch (error) {
-        console.warn('Error in optimized display update:', error);
+        errorHandler.handleError(error, 'optimizedDisplayUpdate');
       }
     },
     'high'
@@ -595,7 +598,7 @@ function updateUpgradeDisplays(): void {
   try {
     const displayData = getDisplayData();
     if (!displayData) {
-      console.warn('No state available for upgrade displays update');
+      errorHandler.handleError(new Error('No state available'), 'upgradeDisplaysUpdate');
       return;
     }
 
@@ -617,7 +620,7 @@ function updateUpgradeDisplays(): void {
     // Update soda stats
     updateSodaStats(displayData);
   } catch (error) {
-    console.warn('Error updating upgrade displays:', error);
+    errorHandler.handleError(error, 'updateUpgradeDisplays');
   }
 }
 
@@ -694,7 +697,9 @@ function updateProductionBuildingDisplays(state: any): void {
 function updateLevelUpDisplay(state: any): void {
   // Use hybrid level system as primary
   // Modernized - hybrid system handled by store
-  const hybridSystem = (window as any).App?.systems?.hybridLevel;
+  // Hybrid system access modernized - using direct import
+  const { hybridLevelSystem } = require('../core/systems/hybrid-level-system');
+  const hybridSystem = hybridLevelSystem;
 
   if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
     // Get the next unlockable level (not just next sequential)
@@ -814,7 +819,7 @@ export const checkUpgradeAffordabilityOptimized = debounceManager.throttle(
       // Call the actual affordability check directly
       checkUpgradeAffordability();
     } catch (error) {
-      console.warn('Error in optimized affordability check:', error);
+      errorHandler.handleError(error, 'optimizedAffordabilityCheck');
     }
   },
   UPDATE_INTERVALS.NORMAL,
@@ -831,7 +836,7 @@ export const updatePurchasedCountsOptimized = debounceManager.debounce(
       // Call the actual stats update directly
       updatePurchasedCounts();
     } catch (error) {
-      console.warn('Error in optimized purchased counts update:', error);
+      errorHandler.handleError(error, 'optimizedPurchasedCountsUpdate');
     }
   },
   UPDATE_INTERVALS.SLOW,
@@ -847,7 +852,7 @@ export const updateDrinkSpeedDisplayOptimized = debounceManager.throttle(
     try {
       updateDrinkSpeedDisplay();
     } catch (error) {
-      console.warn('Error in optimized drink speed display update:', error);
+      errorHandler.handleError(error, 'optimizedDrinkSpeedDisplayUpdate');
     }
   },
   UPDATE_INTERVALS.NORMAL,
@@ -863,7 +868,7 @@ export const updateAutosaveStatusOptimized = debounceManager.throttle(
     try {
       updateAutosaveStatus();
     } catch (error) {
-      console.warn('Error in optimized autosave status update:', error);
+      errorHandler.handleError(error, 'optimizedAutosaveStatusUpdate');
     }
   },
   UPDATE_INTERVALS.SLOW,
@@ -880,7 +885,7 @@ export const updateLastSaveTimeOptimized = debounceManager.throttle(
       // Call the actual stats update directly
       updateLastSaveTime();
     } catch (error) {
-      console.warn('Error in optimized last save time update:', error);
+      errorHandler.handleError(error, 'optimizedLastSaveTimeUpdate');
     }
   },
   UPDATE_INTERVALS.SLOW,

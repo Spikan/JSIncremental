@@ -7,6 +7,7 @@ export type DecimalLike = {
 
 import { formatNumber as formatDecimal } from '../core/numbers/simplified';
 import { useGameStore } from '../core/state/zustand-store';
+import { errorHandler } from '../core/error-handling/error-handler';
 
 /**
  * Enhanced number formatting system following idle game best practices
@@ -18,7 +19,7 @@ export function formatNumber(value: any): string {
     const formatted = formatDecimal(value);
     return postProcessDecimals(formatted);
   } catch (error) {
-    console.warn('Failed to format with Decimal, falling back:', error);
+    errorHandler.handleError(error, 'formatWithDecimal', { value: value?.toString() });
   }
 
   // Legacy formatting removed - use modern formatNumber instead
@@ -36,7 +37,7 @@ export function formatNumber(value: any): string {
         return postProcessDecimals((value as DecimalLike).toString!());
       }
     } catch (error) {
-      console.warn('Failed to convert decimal to number:', error);
+      errorHandler.handleError(error, 'convertDecimalToNumber', { value: value?.toString() });
       // If toNumber fails but toString works, use toString
       if (typeof (value as DecimalLike).toString === 'function') {
         return postProcessDecimals((value as DecimalLike).toString!());
@@ -124,7 +125,9 @@ function postProcessDecimals(formatted: string): string {
 
     // Handle unit suffixes like K, M, B, T
     s = s.replace(/^(-?\d+)(?:\.(\d+))?([KMBT])$/i, (_m, intPart, decPart, unit) => {
-      const decimals = String(decPart || '').padEnd(2, '0').slice(0, 2);
+      const decimals = String(decPart || '')
+        .padEnd(2, '0')
+        .slice(0, 2);
       return `${intPart}.${decimals}${unit}`;
     });
 
@@ -137,7 +140,9 @@ function postProcessDecimals(formatted: string): string {
 
     // Handle exponential notation
     s = s.replace(/^(-?\d+)(?:\.(\d+))?e([+\-]?\d+)$/i, (_m, intPart, decPart, exp) => {
-      const decimals = String(decPart || '').padEnd(2, '0').slice(0, 2);
+      const decimals = String(decPart || '')
+        .padEnd(2, '0')
+        .slice(0, 2);
       return `${intPart}.${decimals}e${exp}`;
     });
 
@@ -210,7 +215,7 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
     (button as any).classList.toggle('unaffordable', !isAffordable);
     (button as any).classList.toggle('disabled', !isAffordable);
   } catch (error) {
-    console.warn('Failed to update button classes:', error);
+    errorHandler.handleError(error, 'updateButtonClasses', { buttonId: button?.id, isAffordable });
   }
   try {
     const costSpan = (button as HTMLElement).querySelector('.cost') as HTMLElement | null;
@@ -218,7 +223,10 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
       costSpan.textContent = formatNumber(cost);
     }
   } catch (error) {
-    console.warn('Failed to update cost display:', error);
+    errorHandler.handleError(error, 'updateCostDisplay', {
+      buttonId: button?.id,
+      cost: cost?.toString(),
+    });
   }
   const formattedCost = formatCostNumber(cost as any);
   let currentSips = '0';
@@ -227,7 +235,7 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
     // Use sips directly - formatNumber will handle Decimal properly
     currentSips = formatStatNumber(st?.sips || 0);
   } catch (error) {
-    console.warn('Failed to get current sips for button title:', error);
+    errorHandler.handleError(error, 'getCurrentSipsForButtonTitle', { buttonId: button?.id });
   }
   (button as any).title = isAffordable
     ? `Click to purchase for ${formattedCost} Sips`
@@ -253,7 +261,7 @@ function updateCompactButtonVariants(buttonId: string, isAffordable: boolean): v
       el.classList.toggle('disabled', !isAffordable);
     });
   } catch (error) {
-    console.warn('Failed to update compact button variants:', error);
+    errorHandler.handleError(error, 'updateCompactButtonVariants', { buttonId });
   }
 }
 
@@ -268,7 +276,11 @@ export function updateCostDisplay(elementId: string, cost: any, isAffordable: bo
     element.classList.toggle('affordable', isAffordable);
     element.classList.toggle('unaffordable', !isAffordable);
   } catch (error) {
-    console.warn('Failed to update cost display classes:', error);
+    errorHandler.handleError(error, 'updateCostDisplayClasses', {
+      elementId,
+      cost: cost?.toString(),
+      isAffordable,
+    });
   }
 }
 

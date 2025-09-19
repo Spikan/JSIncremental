@@ -5,6 +5,9 @@ import { logger } from '../services/logger';
 import { timerManager } from '../services/timer-manager';
 import { domQuery } from '../services/dom-query';
 import { uiBatcher } from '../services/ui-batcher';
+import { optimizedEventBus } from '../services/optimized-event-bus';
+import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
+import { errorHandler } from '../core/error-handling/error-handler';
 // Add static imports to replace dynamic imports
 import * as clicksSystem from '../core/systems/clicks-system';
 import * as zustandStore from '../core/state/zustand-store';
@@ -109,7 +112,7 @@ export function setupDirectSodaClickHandler(): () => void {
   logger.debug('Setting up direct soda click handler...');
 
   // Set up debounced monitoring for top bar updates
-  let lastValues = { sips: null, spd: null, level: null, hybridLevel: null };
+  let lastValues = { sips: null, spd: null, level: null, hybridLevel: null as number | null };
   let updateTimeout: string = '';
   let valueCheckInterval: string = '';
 
@@ -137,7 +140,8 @@ export function setupDirectSodaClickHandler(): () => void {
 
         // Also check hybrid level system's current level
         // Modernized - hybrid system handled by store
-        const hybridSystem = (window as any).App?.systems?.hybridLevel;
+        // Hybrid system access modernized - using direct import
+        const hybridSystem = hybridLevelSystem;
         const currentHybridLevel = hybridSystem?.getCurrentLevelId?.() || 1;
 
         // Check if any relevant values have changed
@@ -159,7 +163,7 @@ export function setupDirectSodaClickHandler(): () => void {
           try {
             updateAllDisplaysAnimated();
           } catch (error) {
-            console.warn('Failed to call updateAllDisplaysAnimated:', error);
+            errorHandler.handleError(error, 'updateAllDisplaysAnimated');
           }
         }
       }
@@ -452,10 +456,9 @@ export function initializeUI(): void {
     reportUIError(error, 'update_button_sounds_toggle_init', ErrorSeverity.LOW);
   }
   // Check event system availability
-
-  if (window.App?.events) {
+  try {
     // Set up CLICK.SODA event listener
-    window.App.events.on(window.App.EVENT_NAMES?.CLICK?.SODA!, (data: unknown) => {
+    optimizedEventBus.on('click:soda', (data: unknown) => {
       const clickData = data as ClickSodaEventData;
       // Use enhanced animated displays for better visual experience
       try {
@@ -464,7 +467,7 @@ export function initializeUI(): void {
         updateTopInfoBar(); // Update the header with new sips total
         checkUpgradeAffordabilityOptimized();
       } catch (error) {
-        console.error('❌ Main update: Enhanced displays failed:', error);
+        errorHandler.handleError(error, 'mainUpdateEnhancedDisplays', { critical: true });
         throw error; // Fail fast instead of fallback
       }
 
@@ -508,7 +511,7 @@ export function initializeUI(): void {
         }
       }
     });
-    window.App.events.on(window.App.EVENT_NAMES?.ECONOMY?.PURCHASE!, (data: unknown) => {
+    optimizedEventBus.on('economy:purchase', (data: unknown) => {
       const purchaseData = data as PurchaseEventData;
       // Use optimized batch update for better performance
       updateAllDisplaysOptimized();
@@ -561,7 +564,12 @@ export function initializeUI(): void {
         }
       }
     });
-    // Modernized - event handling by store
+  } catch (error) {
+    reportUIError(error, 'event_listener_setup', ErrorSeverity.HIGH);
+  }
+
+  // Modernized - event handling by store
+  try {
     console.log('Game saved event modernized');
     updateLastSaveTime();
 
@@ -585,6 +593,8 @@ export function initializeUI(): void {
     } catch (error) {
       logger.warn('Failed to subscribe to level changes:', error);
     }
+  } catch (error) {
+    reportUIError(error, 'event_listener_setup', ErrorSeverity.HIGH);
   }
 
   // Initialize enhanced UI components

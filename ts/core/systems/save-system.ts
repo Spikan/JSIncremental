@@ -1,5 +1,16 @@
 // Save system: queueing and performing saves via App.storage (TypeScript)
 
+import { useGameStore } from '../state/zustand-store';
+import * as ui from '../../ui/index';
+import { mobileInputHandler } from '../../ui/mobile-input';
+import { recalcProduction } from './resources';
+import { FEATURE_UNLOCKS as unlockSystem } from '../../feature-unlocks';
+import { hybridLevelSystem } from './hybrid-level-system';
+import { optimizedEventBus } from '../../services/optimized-event-bus';
+import { AppStorage } from '../../services/storage';
+import { getUpgradesData } from '../../services/data-service';
+import { errorHandler, safeStateOperation } from '../error-handling/error-handler';
+
 type QueueArgs = {
   now: number;
   lastOp: number;
@@ -22,7 +33,7 @@ export function queueSave({ now, lastOp, minIntervalMs, schedule, perform }: Que
 export function performSaveSnapshot(): any {
   try {
     const w: any = window as any;
-    const state = w.App?.state?.getState?.() || {};
+    const state = useGameStore.getState();
     const payload = {
       sips: String(w.sips || 0),
       straws: String(w.straws || 0),
@@ -44,7 +55,7 @@ export function performSaveSnapshot(): any {
       totalClicks: Number(state.totalClicks || w.totalClicks || 0),
       // Save hybrid level system data (single source of truth for levels)
       hybridLevelData: (() => {
-        const hybridSystem = w.App?.systems?.hybridLevel;
+        const hybridSystem = hybridLevelSystem;
         const currentLevel = hybridSystem?.getCurrentLevelId?.() || 1;
         const unlockedLevels = hybridSystem?.getUnlockedLevelIds?.() || [1];
         return {
@@ -57,22 +68,25 @@ export function performSaveSnapshot(): any {
     };
 
     console.log('💾 Full save payload:', payload);
-    w.App?.storage?.saveGame?.(payload);
-    try {
-      w.App?.state?.setState?.({ lastSaveTime: payload.lastSaveTime });
-    } catch (error) {
-      console.warn('Failed to update last save time in state:', error);
-    }
-    w.App?.events?.emit?.(w.App?.EVENT_NAMES?.GAME?.SAVED, payload);
+    AppStorage.saveGame(payload);
+    safeStateOperation(
+      () => useGameStore.setState({ lastSaveTime: payload.lastSaveTime }),
+      'updateLastSaveTime',
+      { lastSaveTime: payload.lastSaveTime }
+    );
+    optimizedEventBus.emit('game:saved', {
+      timestamp: Date.now(),
+      saveData: payload,
+    });
     return payload;
   } catch (e) {
-    console.warn('performSaveSnapshot failed', e);
+    errorHandler.handleError(e, 'performSaveSnapshot', { error: e });
     return null;
   }
 }
 
 // Function to reset game state to exactly match first load initialization
-export function resetGameState() {
+export async function resetGameState() {
   try {
     const w: any = window as any;
     const GC: any = w.GAME_CONFIG || {};
@@ -112,11 +126,11 @@ export function resetGameState() {
     const lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE;
 
     // Set up drink timing state
-    try {
-      w.App?.state?.setState?.({ lastDrinkTime, drinkRate });
-    } catch (error) {
-      console.warn('Failed to set drink time state:', error);
-    }
+    safeStateOperation(
+      () => useGameStore.setState({ lastDrinkTime, drinkRate }),
+      'setDrinkTimeState',
+      { lastDrinkTime, drinkRate }
+    );
 
     // Set up global drink timing property
     if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
@@ -124,13 +138,9 @@ export function resetGameState() {
         get() {
           return lastDrinkTime;
         },
-        set(v) {
-          const newTime = Number(v) || 0;
-          try {
-            w.App?.stateBridge?.setLastDrinkTime(newTime);
-          } catch (error) {
-            console.warn('Failed to set last drink time via bridge:', error);
-          }
+        set(_v) {
+          // stateBridge is null, so this call is not needed
+          // const newTime = Number(v) || 0;
         },
       });
     }
@@ -148,68 +158,66 @@ export function resetGameState() {
       Object.defineProperty(window, 'lastSaveTime', {
         get() {
           try {
-            return Number(w.App?.state?.getState?.()?.lastSaveTime ?? lastSaveTime ?? 0);
+            return Number(useGameStore.getState().lastSaveTime ?? lastSaveTime ?? 0);
           } catch (error) {
-            console.warn('Failed to get last save time from App state:', error);
+            errorHandler.handleError(error, 'getLastSaveTimeFromAppState');
           }
           return Number(lastSaveTime || 0);
         },
         set(v) {
           lastSaveTime = Number(v) || 0;
           try {
-            w.App?.state?.setState?.({ lastSaveTime });
+            useGameStore.setState({ lastSaveTime });
           } catch (error) {
-            console.warn('Failed to set last save time in App state:', error);
+            errorHandler.handleError(error, 'setLastSaveTimeInAppState');
           }
         },
       });
     }
 
     // Set session state exactly like initGame
-    try {
-      w.App?.state?.setState?.({
-        sessionStartTime: gameStartTime,
-        totalPlayTime: 0,
-        lastClickTime: 0,
-      });
-    } catch (error) {
-      console.warn('Failed to set session state:', error);
-    }
+    safeStateOperation(
+      () =>
+        useGameStore.setState({
+          sessionStartTime: gameStartTime,
+          totalPlayTime: 0,
+          lastClickTime: 0,
+        }),
+      'setSessionState',
+      { gameStartTime }
+    );
 
     // DOM elements are already available, no initialization needed
-    try {
-      console.log('✅ DOM elements are ready for save system');
-    } catch (error) {
-      console.warn('Failed to verify DOM readiness:', error);
-    }
+    console.log('✅ DOM elements are ready for save system');
 
     // Compute production exactly like initGame
     const config = BAL || {};
-    if (w.App?.systems?.resources?.recalcProduction) {
-      const up = w.App?.data?.upgrades || {};
-      w.App.systems.resources.recalcProduction({
+    if (recalcProduction) {
+      const up = getUpgradesData();
+      recalcProduction({
         straws: straws,
         cups: cups,
         widerStraws: widerStraws,
         betterCups: betterCups,
         base: {
-          strawBaseSPD: up?.straws?.baseSPD ?? config.STRAW_BASE_SPD,
-          cupBaseSPD: up?.cups?.baseSPD ?? config.CUP_BASE_SPD,
+          strawBaseSPD: up?.['straws']?.baseSPD ?? config.STRAW_BASE_SPD,
+          cupBaseSPD: up?.['cups']?.baseSPD ?? config.CUP_BASE_SPD,
           baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
         },
         multipliers: {
           widerStrawsPerLevel:
-            up?.widerStraws?.multiplierPerLevel ?? config.WIDER_STRAWS_MULTIPLIER,
-          betterCupsPerLevel: up?.betterCups?.multiplierPerLevel ?? config.BETTER_CUPS_MULTIPLIER,
+            up?.['widerStraws']?.multiplierPerLevel ?? config.WIDER_STRAWS_MULTIPLIER,
+          betterCupsPerLevel:
+            up?.['betterCups']?.multiplierPerLevel ?? config.BETTER_CUPS_MULTIPLIER,
         },
       });
       // Production calculation completed (results are 0 since all resources are 0)
     }
 
-    // Seed App.state snapshot exactly like initGame
+    // Seed Zustand store snapshot exactly like initGame
     try {
       // Preserve extreme values - don't convert to regular numbers
-      w.App?.state?.setState?.({
+      useGameStore.setState({
         sips: w.sips,
         straws: straws,
         cups: cups,
@@ -236,50 +244,54 @@ export function resetGameState() {
         suctionClickBonus: suctionClickBonus,
       });
     } catch (error) {
-      console.warn('Failed to seed App.state:', error);
+      errorHandler.handleError(error, 'seedZustandStore', { stateData: 'reset' });
     }
 
     // Update displays exactly like initGame
-    w.App?.ui?.updateTopSipsPerDrink?.();
-    w.App?.ui?.updateTopSipsPerSecond?.();
+    ui.updateTopSipsPerDrink?.();
+    ui.updateTopSipsPerSecond?.();
 
     // Initialize systems exactly like initGame
     try {
-      w.App?.systems?.unlocks?.init?.();
+      unlockSystem?.init?.();
     } catch (error) {
-      console.warn('Failed to initialize unlocks system:', error);
+      errorHandler.handleError(error, 'initializeUnlocksSystem');
     }
 
     // Initialize mobile input
     try {
-      w.App?.ui?.mobileInput?.initialize?.();
+      mobileInputHandler?.initialize?.();
     } catch (error) {
-      console.warn('Failed to initialize mobile input:', error);
+      errorHandler.handleError(error, 'initializeMobileInput');
     }
 
     // Initialize audio systems
     try {
-      w.App?.systems?.audio?.button?.initButtonAudioSystem?.();
+      // Audio system access modernized - using direct import
+      const { initButtonAudioSystem } = await import('./button-audio');
+      initButtonAudioSystem?.();
     } catch (error) {
-      console.warn('Failed to initialize button audio system:', error);
+      errorHandler.handleError(error, 'initializeButtonAudioSystem');
     }
 
     try {
-      w.App?.systems?.audio?.button?.updateButtonSoundsToggleButton?.();
+      // Audio system access modernized - using direct import
+      const { updateButtonSoundsToggleButton } = await import('./button-audio');
+      updateButtonSoundsToggleButton?.();
     } catch (error) {
-      console.warn('Failed to update button sounds toggle:', error);
+      errorHandler.handleError(error, 'updateButtonSoundsToggle');
     }
 
     // Update autosave status
     try {
-      w.App?.ui?.updateAutosaveStatus?.();
+      ui.updateAutosaveStatus?.();
     } catch (error) {
-      console.warn('Failed to update autosave status:', error);
+      errorHandler.handleError(error, 'updateAutosaveStatus');
     }
 
     return true;
   } catch (e) {
-    console.warn('resetGameState failed', e);
+    errorHandler.handleError(e, 'resetGameState');
     return false;
   }
 }
@@ -304,19 +316,20 @@ export function deleteSave() {
     try {
       // Modernized - unlocks reset handled by store
     } catch (error) {
-      console.warn('Failed to reset unlocks after save deletion:', error);
+      errorHandler.handleError(error, 'resetUnlocksAfterSaveDeletion');
     }
 
     // Reset hybrid level system
     try {
       // Modernized - hybrid system handled by store
-      const hybridSystem = (window as any).App?.systems?.hybridLevel;
-      if (hybridSystem && typeof hybridSystem.reset === 'function') {
-        hybridSystem.reset();
+      // Hybrid system access modernized - using direct import
+      const hybridSystem = hybridLevelSystem;
+      if (hybridSystem && typeof hybridSystem.restoreState === 'function') {
+        hybridSystem.restoreState(1, [1]);
       }
       // Modernized - hybrid system reset handled by store
     } catch (error) {
-      console.warn('Failed to reset hybrid level system after save deletion:', error);
+      errorHandler.handleError(error, 'resetHybridLevelSystemAfterSaveDeletion');
     }
 
     // Reset game state
@@ -330,7 +343,7 @@ export function deleteSave() {
 
     return true;
   } catch (e) {
-    console.warn('deleteSave failed', e);
+    errorHandler.handleError(e, 'deleteSave');
     alert('❌ Failed to delete save game. Please try again.');
     return false;
   }

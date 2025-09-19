@@ -331,8 +331,10 @@ export function showOfflineModal(
     if (playSound) {
       try {
         // Try to play a welcome sound (if audio system is available)
-        const w: any = window as any;
-        w.App?.systems?.audio?.playWelcomeSound?.();
+        // const w: any = window as any;
+        // Audio system access modernized - using direct import
+        const { playWelcomeSound } = require('../core/systems/button-audio');
+        playWelcomeSound?.();
       } catch (error) {
         // Sound failed, but that's okay
         logger.debug('Welcome sound failed to play:', error);

@@ -1,6 +1,8 @@
 // Bootstrap System
 // Handles dependency checking and game initialization coordination
 
+import { errorHandler } from '../error-handling/error-handler';
+
 interface DependencyStatus {
   UNLOCKS_SYSTEM: boolean;
   DOM_READY: boolean;
@@ -183,7 +185,7 @@ export class BootstrapSystem {
     try {
       // Modernized - splash screen handled by store
     } catch (error) {
-      console.warn('Failed to initialize splash screen:', error);
+      errorHandler.handleError(error, 'initializeSplashScreen');
     }
   }
 }
