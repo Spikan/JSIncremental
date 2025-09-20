@@ -31,7 +31,7 @@ export function createEventBus<E extends EventMap = Record<string, unknown>>(): 
       try {
         (handler as any)(_payload);
       } catch (e) {
-        errorHandler.handleError(e, 'busHandlerError', { event, payload: _payload });
+        errorHandler.handleError(e, 'busHandlerError', { event: _event, payload: _payload });
       }
     }
   }

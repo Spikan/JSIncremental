@@ -23,9 +23,9 @@ import {
 import Decimal from 'break_eternity.js';
 
 // Cost calculation function (copied from affordability.ts)
-function calculateAllCosts(): any {
+function calculateAllCosts(): Record<string, Decimal> {
   const { upgrades: dataUp, config } = getUpgradesAndConfig();
-  const costs = {} as any;
+  const costs: Record<string, Decimal> = {} as Record<string, Decimal>;
 
   // Get all resource counts in one optimized call
   const resourceData = getCostCalculationData();
@@ -34,17 +34,17 @@ function calculateAllCosts(): any {
   const strawBaseCost = toDecimal(dataUp?.straws?.baseCost ?? config.STRAW_BASE_COST ?? 5);
   const strawScaling = toDecimal(dataUp?.straws?.scaling ?? config.STRAW_SCALING ?? 1.08);
   const strawCount = toDecimal(resourceData.straws || 0);
-  costs.straw = nextStrawCost(strawCount, strawBaseCost, strawScaling);
+  costs['straw'] = nextStrawCost(strawCount, strawBaseCost, strawScaling);
 
   const cupBaseCost = toDecimal(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
   const cupScaling = toDecimal(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
   const cupCount = toDecimal(resourceData.cups || 0);
-  costs.cup = nextCupCost(cupCount, cupBaseCost, cupScaling);
+  costs['cup'] = nextCupCost(cupCount, cupBaseCost, cupScaling);
 
   const suctionBaseCost = toDecimal(dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40);
   const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
   const suctionCount = toDecimal(resourceData.suctions || 0);
-  costs.suction = suctionBaseCost.multiply(suctionScaling.pow(suctionCount));
+  costs['suction'] = suctionBaseCost.multiply(suctionScaling.pow(suctionCount));
 
   const fasterDrinksBaseCost = toDecimal(
     dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST ?? 80
@@ -53,7 +53,9 @@ function calculateAllCosts(): any {
     dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.1
   );
   const fasterDrinksCount = toDecimal(resourceData.fasterDrinks || 0);
-  costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksCount));
+  costs['fasterDrinks'] = fasterDrinksBaseCost.multiply(
+    fasterDrinksScaling.pow(fasterDrinksCount)
+  );
 
   const widerStrawsBaseCost = toDecimal(
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
@@ -62,7 +64,7 @@ function calculateAllCosts(): any {
     dataUp?.widerStraws?.scaling ?? config.WIDER_STRAWS_SCALING ?? 1.2
   );
   const widerStrawsCount = toDecimal(resourceData.widerStraws || 0);
-  costs.widerStraws = nextWiderStrawsCost(
+  costs['widerStraws'] = nextWiderStrawsCost(
     widerStrawsCount,
     widerStrawsBaseCost,
     widerStrawsScaling
@@ -75,12 +77,16 @@ function calculateAllCosts(): any {
     dataUp?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.25
   );
   const betterCupsCount = toDecimal(resourceData.betterCups || 0);
-  costs.betterCups = nextBetterCupsCost(betterCupsCount, betterCupsBaseCost, betterCupsScaling);
+  costs['betterCups'] = nextBetterCupsCost(
+    betterCupsCount,
+    betterCupsBaseCost,
+    betterCupsScaling
+  );
 
   const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
   const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);
   const levelCount = toDecimal(resourceData.level || 1);
-  costs.levelUp = levelUpBaseCost.multiply(levelUpScaling.pow(levelCount));
+  costs['levelUp'] = levelUpBaseCost.multiply(levelUpScaling.pow(levelCount));
 
   return costs;
 }
@@ -282,7 +288,10 @@ export function updateDrinkSpeedDisplay(): void {
       }
     }
     if (drinkSpeedBonusCompact && displayData) {
-      const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
+      const baseMs = Number(
+        (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } }).GAME_CONFIG?.TIMING?.['DEFAULT_DRINK_RATE'] ||
+          5000
+      );
       const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || baseMs);
       const currMs =
         typeof drinkRateMs === 'number'
@@ -309,10 +318,10 @@ export function updateAutosaveStatus(): void {
     if (status && opts) {
       if (opts.autosaveEnabled) {
         status.textContent = `Autosave: ON (${opts.autosaveInterval}s)`;
-        (status as any).className = 'autosave-on';
+        (status as HTMLElement).className = 'autosave-on';
       } else {
         status.textContent = 'Autosave: OFF';
-        (status as any).className = 'autosave-off';
+        (status as HTMLElement).className = 'autosave-off';
       }
       if (checkbox) {
         try {
@@ -497,7 +506,10 @@ export function updateCompactDrinkSpeedDisplays(): void {
       }
     }
     if (drinkSpeedBonusCompact && displayData) {
-      const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE || 5000);
+      const baseMs = Number(
+        (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } }).GAME_CONFIG?.TIMING?.['DEFAULT_DRINK_RATE'] ||
+          5000
+      );
       const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || baseMs);
       const currMs =
         typeof drinkRateMs === 'number'
@@ -621,10 +633,11 @@ function updateDrinkSpeedUpgradeDisplays(state: any): void {
 
   // Faster Drinks upgrade
   const currentDrinkSpeed = state.drinkRate || 5000;
-  const canAffordFasterDrinks = state.sips >= costs.fasterDrinks;
+  const fasterCost = costs['fasterDrinks'] ?? new Decimal(0);
+  const canAffordFasterDrinks = state.sips >= fasterCost;
 
-  updateCostDisplay('fasterDrinksCostCompact', costs.fasterDrinks, canAffordFasterDrinks);
-  updateCostDisplay('fasterDrinksCost', costs.fasterDrinks, canAffordFasterDrinks);
+  updateCostDisplay('fasterDrinksCostCompact', fasterCost, canAffordFasterDrinks);
+  updateCostDisplay('fasterDrinksCost', fasterCost, canAffordFasterDrinks);
   updateStatDisplay('currentDrinkSpeedCompact', (currentDrinkSpeed / 1000).toFixed(2) + 's');
 
   // Update the new faster drinks button display

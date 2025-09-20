@@ -59,6 +59,7 @@ import './main';
 // Import functions that are referenced in the code
 import { initGame } from './main';
 import { config as GC } from './config';
+import { installDomReadyBootstrap } from './core/systems/bootstrap';
 
 let storage: any = storageImpl;
 // Use optimized event bus
@@ -66,20 +67,14 @@ let storage: any = storageImpl;
 
 let EVENT_NAMES: any = {};
 
-// Diagnostics helper (no-op in dev)
-function __pushDiag(_marker: any): void {
-  // Diagnostics removed - no longer using window globals
-}
+// Diagnostics removed
 
 // Starting App initialization
-__pushDiag({ type: 'index', stage: 'start' });
 // Report resolved base for dynamic imports
 try {
   // BASE_URL = import.meta.env.BASE_URL
-  __pushDiag({ type: 'base', base: import.meta.env.BASE_URL, url: import.meta.url });
 } catch (error) {
   errorHandler.handleError(error, 'getBaseURL', { base: import.meta.env.BASE_URL });
-  __pushDiag({ type: 'base', base: '/', url: 'unknown', err: String(error) });
 }
 
 // Initialize Zustand store
@@ -143,7 +138,7 @@ if (typeof window !== 'undefined') {
 // Initial theme will be applied by save system after loading game state
 // This prevents theme conflicts during initialization
 
-__pushDiag({ type: 'index', stage: 'app-created' });
+// App created
 
 // Static wiring of core systems/UI for deterministic bootstrap
 try {
@@ -232,7 +227,7 @@ try {
   // Loop system is available through direct import - no global assignment needed
 
   // Other systems can load asynchronously
-  __pushDiag({ type: 'wire', module: 'core-static', ok: true });
+  // Core static wiring ok
 
   // Initialize all systems with loading screen
   const initializeGame = async () => {
@@ -403,12 +398,7 @@ try {
     name: (e as any)?.name,
     type: typeof e,
   });
-  __pushDiag({
-    type: 'wire',
-    module: 'core-static',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // core-static wiring failed
   // Re-throw to ensure the error is not silently ignored
   throw e;
 }
@@ -436,7 +426,7 @@ try {
           game.style.visibility = 'visible';
           game.style.opacity = '1';
           document.body?.classList?.add('game-started');
-          __pushDiag({ type: 'splash', action: 'forced-hide' });
+          // forced-hide splash
         }
       } catch (error) {
         errorHandler.handleError(error, 'hideSplashScreen', { critical: true });
@@ -445,14 +435,14 @@ try {
   }
 } catch {}
 
-__pushDiag({ type: 'wire', module: 'initOnDomReady-default' });
+// initOnDomReady diagnostics removed
 try {
   const isTestEnv = typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true;
   if (!isTestEnv) {
     setTimeout(() => {
       try {
         // initOnDomReady call removed
-        __pushDiag({ type: 'initOnDomReady', used: 'default-invoked' });
+        // initOnDomReady default invoked
       } catch (error) {
         errorHandler.handleError(error, 'pushDiagnosticInfo');
       }
@@ -468,9 +458,16 @@ try {
 try {
   // Modernized - UI initialization handled by store
   // UI initialization modernized
-  __pushDiag({ type: 'ui', stage: 'initialized' });
+  // UI initialized
 } catch (e) {
-  __pushDiag({ type: 'ui', stage: 'init-failed', err: String((e && (e as any).message) || e) });
+  // UI init failed
+}
+
+// Install unified DOMContentLoaded bootstrap
+try {
+  installDomReadyBootstrap();
+} catch (error) {
+  errorHandler.handleError(error, 'installDomReadyBootstrap');
 }
 
 // Initialize button audio system on first user interaction (prevents autoplay warnings)
@@ -500,12 +497,12 @@ try {
     document.addEventListener('keydown', unlock, { capture: true, once: true } as any);
     document.addEventListener('mousedown', unlock, { capture: true, once: true } as any);
     document.addEventListener('touchend', unlock, { capture: true, once: true } as any);
-    __pushDiag({ type: 'audio', stage: 'initialized' });
+    // audio init setup installed
   } else {
-    __pushDiag({ type: 'audio', stage: 'skipped-test-env' });
+    // audio init skipped in test
   }
 } catch (e) {
-  __pushDiag({ type: 'audio', stage: 'init-failed', err: String((e && (e as any).message) || e) });
+  // audio init failed
 }
 
 try {
@@ -531,7 +528,7 @@ try {
   // Modernized - UI module handled by store
   // Modernized - UI module handled by store
   // UI system modernized - no global assignment needed
-  __pushDiag({ type: 'import', module: 'ui', ok: true });
+  // ui import ok
   // Initialize UI system
   try {
     const isTestEnv = typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true;
@@ -541,24 +538,11 @@ try {
   } catch {}
 } catch (e) {
   errorHandler.handleError(e, 'uiSystemInitialization', { critical: true });
-  __pushDiag({
-    type: 'import',
-    module: 'ui',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
-  errorHandler.handleError(e, 'uiModuleLoad', { severity: 'low', context: 'early bootstrap' });
 }
 
 try {
   // unlocks already loaded early
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'unlocks',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
   errorHandler.handleError(e, 'unlocksSystemLoad', { severity: 'low' });
 }
 
@@ -571,99 +555,59 @@ try {
     errorHandler.handleError(error, 'exposeStorageGlobally');
   }
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'storage',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // storage import failed
   errorHandler.handleError(e, 'storageServiceLoad', { severity: 'low' });
 }
 
 try {
   // Resources system modernized - no global assignment needed
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'resources',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // resources import failed
   errorHandler.handleError(e, 'resourcesSystemLoad', { severity: 'low' });
 }
 try {
   // Purchases system modernized - no global assignment needed
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'purchases',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // purchases import failed
   errorHandler.handleError(e, 'purchasesSystemLoad', { severity: 'low' });
 }
 // Loop system already loaded above - skipping duplicate load
 try {
   // Save system modernized - no global assignment needed
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'save',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // save import failed
   errorHandler.handleError(e, 'saveSystemLoad', { severity: 'low' });
 }
 // Drink system already loaded above - skipping duplicate load
 try {
   // Clicks system modernized - no global assignment needed
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'clicks',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // clicks import failed
   errorHandler.handleError(e, 'clicksSystemLoad', { severity: 'low' });
 }
 try {
   // Audio system modernized - no global assignment needed
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'button-audio',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // button-audio import failed
   errorHandler.handleError(e, 'buttonAudioSystemLoad', { severity: 'low' });
 }
 try {
   // Autosave system modernized - no global assignment needed
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'autosave',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // autosave import failed
   errorHandler.handleError(e, 'autosaveSystemLoad', { severity: 'low' });
 }
 try {
   // Dev system modernized - no global assignment needed
 } catch (e) {
-  __pushDiag({
-    type: 'import',
-    module: 'dev',
-    ok: false,
-    err: String((e && (e as any).message) || e),
-  });
+  // dev import failed
   errorHandler.handleError(e, 'devSystemLoad', { severity: 'low' });
 }
 
 // game-init already loaded early
 
 // Services already registered earlier
-__pushDiag({ type: 'index', stage: 'end' });
+// index end
 
 // Pages-only safety: seed minimal state if initGame isn't present soon, so loop can tick
 try {
@@ -712,9 +656,9 @@ try {
         drinkProgress: 0,
         lastDrinkTime: lastDrinkTime,
       });
-      __pushDiag({ type: 'seed', ok: true });
+      // seed ok
     } catch (e) {
-      __pushDiag({ type: 'seed', ok: false, err: String((e && (e as any).message) || e) });
+      // seed failed
     }
   };
   try {

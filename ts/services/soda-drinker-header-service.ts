@@ -5,6 +5,8 @@
 import { logger } from './logger';
 import { useGameStore } from '../core/state/zustand-store';
 import { performanceMonitor } from './performance';
+import { HeaderPerformanceController, PerformanceMode } from './header/performance';
+import { HeaderAccessibilityController } from './header/accessibility';
 import type { HybridLevel } from '../core/systems/hybrid-level-system';
 import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
 import { errorHandler } from '../core/error-handling/error-handler';
@@ -29,12 +31,12 @@ export class SodaDrinkerHeaderService {
   private config: SodaDrinkerHeaderConfig;
   private isInitialized: boolean = false;
   private animationId: number | null = null;
-  private frameCount: number = 0;
-  private lastFrameTime: number = 0;
-  private currentFPS: number = 60;
+  // Moved to HeaderPerformanceController
   private currentLevel: HybridLevel | null = null;
   private levelSystem: any = null;
-  private performanceIntervalId: NodeJS.Timeout | null = null;
+  // Moved to HeaderPerformanceController
+  private perfController: HeaderPerformanceController | null = null;
+  private a11yController: HeaderAccessibilityController | null = null;
 
   constructor() {
     this.config = {
@@ -45,7 +47,14 @@ export class SodaDrinkerHeaderService {
       levelThemeIntegration: true,
     };
 
-    this.setupAccessibility();
+    // Install accessibility controller
+    this.a11yController = new HeaderAccessibilityController({
+      respectReducedMotion: this.config.respectReducedMotion,
+      onReducedMotionChange: (enabled: boolean) => {
+        this.setEnabled(enabled);
+        logger.info('Motion preference changed, effects:', enabled);
+      },
+    });
 
     // Reference unused methods to prevent TypeScript warnings
     this.toggleLevelDropdown = this.toggleLevelDropdown.bind(this);
@@ -109,22 +118,13 @@ export class SodaDrinkerHeaderService {
    * Check if effects should be enabled based on accessibility and performance
    */
   private shouldEnableEffects(): boolean {
-    // Check reduced motion preference
-    if (
-      this.config.respectReducedMotion &&
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return false;
-    }
+    // Accessibility gate
+    if (this.a11yController && !this.a11yController.shouldEnableForAccessibility()) return false;
 
-    // Check if we're in a low-performance environment
+    // Performance gate
     if (performanceMonitor) {
       const score = performanceMonitor.getPerformanceScore();
-      if (score < 40) {
-        return false;
-      }
+      if (score < 40) return false;
     }
 
     // Disable effects in environments without RAF
@@ -137,96 +137,11 @@ export class SodaDrinkerHeaderService {
    * Setup performance monitoring
    */
   private setupPerformanceMonitoring(): void {
-    if (!performanceMonitor) return;
-
-    // Guard in non-browser/test environments
-    const hasRAF = typeof requestAnimationFrame === 'function';
-
-    // Monitor performance every 5 seconds
-    this.performanceIntervalId = setInterval(() => {
-      this.checkPerformanceAndAdjust();
-    }, 5000);
-
-    // Monitor frame rate
-    if (hasRAF) {
-      this.startFrameRateMonitoring();
-    }
-  }
-
-  /**
-   * Start frame rate monitoring
-   */
-  private startFrameRateMonitoring(): void {
-    if (typeof requestAnimationFrame !== 'function') return;
-
-    const measureFrameRate = (currentTime: number) => {
-      this.frameCount++;
-
-      if (currentTime - this.lastFrameTime >= 1000) {
-        const timeDiff = currentTime - this.lastFrameTime;
-        this.currentFPS = timeDiff > 0 ? Math.round((this.frameCount * 1000) / timeDiff) : 60;
-
-        // Adjust performance mode based on FPS
-        if (this.currentFPS < 30) {
-          this.setPerformanceMode('low');
-        } else if (this.currentFPS < 45) {
-          this.setPerformanceMode('medium');
-        } else if (this.currentFPS >= 55) {
-          this.setPerformanceMode('high');
-        }
-
-        this.frameCount = 0;
-        this.lastFrameTime = currentTime;
-      }
-
-      this.animationId = requestAnimationFrame(measureFrameRate);
-    };
-
-    this.animationId = requestAnimationFrame(measureFrameRate);
-  }
-
-  /**
-   * Check performance and adjust settings accordingly
-   */
-  private checkPerformanceAndAdjust(): void {
-    if (!performanceMonitor) return;
-
-    const score = performanceMonitor.getPerformanceScore();
-    const memoryUsage = performanceMonitor.getMemoryUsage();
-
-    // Adjust based on performance score
-    if (score < 60) {
-      this.setPerformanceMode('low');
-    } else if (score < 80) {
-      this.setPerformanceMode('medium');
-    } else {
-      this.setPerformanceMode('high');
-    }
-
-    // Adjust based on memory usage
-    if (memoryUsage) {
-      const usedMB = memoryUsage.usedJSHeapSize / 1024 / 1024;
-      if (usedMB > 150) {
-        this.setPerformanceMode('low');
-      } else if (usedMB > 100) {
-        this.setPerformanceMode('medium');
-      }
-    }
-  }
-
-  /**
-   * Setup accessibility features
-   */
-  private setupAccessibility(): void {
-    // Listen for changes in motion preference
-    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-      const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-      motionQuery.addEventListener('change', e => {
-        this.config.respectReducedMotion = true;
-        this.setEnabled(!e.matches);
-        logger.info('Motion preference changed, effects:', !e.matches);
-      });
-    }
+    if (typeof window === 'undefined') return;
+    this.perfController = new HeaderPerformanceController({
+      onModeChange: (mode: PerformanceMode) => this.setPerformanceMode(mode),
+    });
+    this.perfController.start();
   }
 
   /**
@@ -1080,12 +995,9 @@ export class SodaDrinkerHeaderService {
     fps: number;
     memoryUsage: number | null;
   } {
+    if (this.perfController) return this.perfController.getMetrics();
     const memoryUsage = performanceMonitor?.getMemoryUsage();
-
-    return {
-      fps: this.currentFPS,
-      memoryUsage: memoryUsage ? memoryUsage.usedJSHeapSize / 1024 / 1024 : null,
-    };
+    return { fps: 60, memoryUsage: memoryUsage ? memoryUsage.usedJSHeapSize / 1024 / 1024 : null };
   }
 
   /**
@@ -1095,14 +1007,9 @@ export class SodaDrinkerHeaderService {
     this.stop();
     this.isInitialized = false;
 
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
-
-    if (this.performanceIntervalId) {
-      clearInterval(this.performanceIntervalId);
-      this.performanceIntervalId = null;
+    if (this.perfController) {
+      this.perfController.stop();
+      this.perfController = null;
     }
 
     logger.info('SodaDrinkerHeaderService cleaned up');

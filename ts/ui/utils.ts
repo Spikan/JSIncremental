@@ -187,7 +187,7 @@ export function findButton(buttonId: string): HTMLElement | null {
 export function updateButtonState(buttonId: string, isAffordable: boolean, cost?: any): void {
   if (typeof window === 'undefined') return;
   const button = findButton(buttonId);
-  if (!button || !(button as any).classList) return;
+  if (!button || !(button as HTMLElement).classList) return;
 
   // Skip buttons that are in unlock mode (have data-action starting with "purchaseUnlock:")
   const dataAction = (button as HTMLElement).getAttribute('data-action');
@@ -197,11 +197,12 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
 
   (button as HTMLButtonElement).disabled = !isAffordable;
   try {
-    (button as any).classList.toggle('affordable', isAffordable);
-    (button as any).classList.toggle('unaffordable', !isAffordable);
-    (button as any).classList.toggle('disabled', !isAffordable);
+    const cls = (button as HTMLElement).classList;
+    cls.toggle('affordable', isAffordable);
+    cls.toggle('unaffordable', !isAffordable);
+    cls.toggle('disabled', !isAffordable);
   } catch (error) {
-    errorHandler.handleError(error, 'updateButtonClasses', { buttonId: button?.id, isAffordable });
+    errorHandler.handleError(error, 'updateButtonClasses', { buttonId: (button as HTMLElement)?.id, isAffordable });
   }
   try {
     const costSpan = (button as HTMLElement).querySelector('.cost') as HTMLElement | null;
@@ -223,7 +224,7 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
   } catch (error) {
     errorHandler.handleError(error, 'getCurrentSipsForButtonTitle', { buttonId: button?.id });
   }
-  (button as any).title = isAffordable
+  (button as HTMLElement).title = isAffordable
     ? `Click to purchase for ${formattedCost} Sips`
     : `Costs ${formattedCost} Sips (You have ${currentSips})`;
   updateCompactButtonVariants(buttonId, isAffordable);
@@ -255,13 +256,14 @@ export function updateCostDisplay(elementId: string, cost: any, isAffordable: bo
   if (typeof window === 'undefined') return;
   const element = findElement(elementId) as HTMLElement | null;
 
-  if (!element || !(element as any).classList) return;
+  if (!element || !(element as HTMLElement).classList) return;
 
   const formattedCost = formatCostNumber(cost);
   element.innerHTML = formattedCost;
   try {
-    element.classList.toggle('affordable', isAffordable);
-    element.classList.toggle('unaffordable', !isAffordable);
+    const cls = element.classList;
+    cls.toggle('affordable', isAffordable);
+    cls.toggle('unaffordable', !isAffordable);
   } catch (error) {
     errorHandler.handleError(error, 'updateCostDisplayClasses', {
       elementId,

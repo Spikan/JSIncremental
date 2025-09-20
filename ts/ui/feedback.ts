@@ -13,7 +13,7 @@ function isMobileDevice(): boolean {
     return (
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
       'ontouchstart' in window ||
-      (navigator as any).maxTouchPoints > 0
+      (navigator as unknown as { maxTouchPoints?: number })?.maxTouchPoints! > 0
     );
   } catch (error) {
     errorHandler.handleError(error, 'detectMobileDevice');
@@ -262,9 +262,10 @@ function showFeedbackWithContainer(
       ? `Critical hit! Gained ${formatNumber(sipsGained)} sips`
       : `Gained ${formatNumber(sipsGained)} sips`
   );
-  const config = (window as any).GAME_CONFIG?.LIMITS || {};
-  const rangeX = (config as any).CLICK_FEEDBACK_RANGE_X || 100;
-  const rangeY = (config as any).CLICK_FEEDBACK_RANGE_Y || 80;
+  const configLimits = (window as unknown as { GAME_CONFIG?: { LIMITS?: Record<string, number> } })
+    .GAME_CONFIG?.LIMITS;
+  const rangeX = (configLimits?.['CLICK_FEEDBACK_RANGE_X'] as number) || 100;
+  const rangeY = (configLimits?.['CLICK_FEEDBACK_RANGE_Y'] as number) || 80;
   const position = getSafePosition(sodaContainer, rangeX, rangeY);
   const isMobile = isMobileDevice();
   const fontSize = isMobile ? (isCritical ? '1.3em' : '1.1em') : isCritical ? '1.5em' : '1.2em';
@@ -415,12 +416,13 @@ export function showPurchaseFeedback(
     errorHandler.handleError(error, 'requestAnimationFrameFallback', { fallback: 'setTimeout' });
     setTimeout(animate, 16);
   }
-  const config = (window as any).GAME_CONFIG?.TIMING || {};
+  const configTiming = (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } })
+    .GAME_CONFIG?.TIMING;
   setTimeout(
     () => {
       if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
     },
-    (config as any).PURCHASE_FEEDBACK_DURATION || 2000
+    (configTiming?.['PURCHASE_FEEDBACK_DURATION'] as number) || 2000
   );
 }
 
@@ -455,12 +457,13 @@ export function showLevelUpFeedback(sipsGained: number): void {
         box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
     `;
   document.body.appendChild(feedback);
-  const config = (window as any).GAME_CONFIG?.TIMING || {};
+  const configTiming2 = (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } })
+    .GAME_CONFIG?.TIMING;
   setTimeout(
     () => {
       if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
     },
-    (config as any).LEVELUP_FEEDBACK_DURATION || 3000
+    (configTiming2?.['LEVELUP_FEEDBACK_DURATION'] as number) || 3000
   );
 }
 

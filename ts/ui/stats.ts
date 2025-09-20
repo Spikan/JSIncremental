@@ -14,9 +14,9 @@ export function updatePlayTime(): void {
   if (typeof window === 'undefined') return;
   const playTimeElement = domQuery.getById('playTime') as HTMLElement | undefined;
   try {
-    const state = useGameStore.getState() as any; // TODO: Fix type definitions
+    const state = useGameStore.getState();
     if (playTimeElement && state) {
-      const totalMs = Number(state.totalPlayTime || (window as any).totalPlayTime || 0);
+      const totalMs = Number(state.totalPlayTime || 0);
       const totalSeconds = Math.floor(totalMs / 1000);
       const hours = Math.floor(totalSeconds / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -38,9 +38,7 @@ export function updatePlayTime(): void {
 export function updateLastSaveTime(): void {
   const lastSaveElement = domQuery.getById('lastSaveTime') as HTMLElement | undefined;
   try {
-    const lastSaveMs = Number(
-      useGameStore.getState().lastSaveTime || (window as any).lastSaveTime || 0
-    );
+    const lastSaveMs = Number(useGameStore.getState().lastSaveTime || 0);
     if (lastSaveElement && lastSaveMs) {
       const now = new Date();
       const lastSave = new Date(lastSaveMs);
@@ -130,14 +128,14 @@ export function updateClickStats(): void {
   if (clickStreakElement) {
     // Modernized - state handled by store
     const st = useGameStore.getState();
-    clickStreakElement.textContent = String(Number((st as any).currentClickStreak || 0));
+    clickStreakElement.textContent = String(Number(st.currentClickStreak || 0));
   }
   // Best click streak
   const bestClickStreakElement = domQuery.getById('bestClickStreak') as HTMLElement | undefined;
   if (bestClickStreakElement) {
     // Modernized - state handled by store
     const st = useGameStore.getState();
-    bestClickStreakElement.textContent = String(Number((st as any).bestClickStreak || 0));
+    bestClickStreakElement.textContent = String(Number(st.bestClickStreak || 0));
   }
 }
 

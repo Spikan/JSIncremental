@@ -10,7 +10,11 @@ export type PointerPosition = {
 
 let lastPointerPosition: PointerPosition | null = null;
 
-export function setLastPointerPosition(x: number, y: number, kind?: 'mouse' | 'touch' | 'pen'): void {
+export function setLastPointerPosition(
+  x: number,
+  y: number,
+  kind?: 'mouse' | 'touch' | 'pen'
+): void {
   // Guard against NaN
   if (!Number.isFinite(x) || !Number.isFinite(y)) return;
   const base = { x, y, t: Date.now() };
@@ -22,5 +26,3 @@ export function getLastPointerPosition(maxAgeMs: number = 1500): PointerPosition
   if (Date.now() - lastPointerPosition.t > maxAgeMs) return null;
   return lastPointerPosition;
 }
-
-

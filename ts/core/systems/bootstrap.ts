@@ -1,3 +1,36 @@
+// Lifecycle orchestrator: single DOMContentLoaded entrypoint
+
+import { initOnDomReady } from './game-init';
+import { initButtonSystem } from '../../ui/buttons';
+import { errorHandler } from '../error-handling/error-handler';
+
+let initialized = false;
+
+export function initializeAppOnce(): void {
+  if (initialized) return;
+  initialized = true;
+  try {
+    initOnDomReady();
+  } catch (error) {
+    errorHandler.handleError(error, 'initOnDomReady');
+  }
+  try {
+    initButtonSystem();
+  } catch (error) {
+    errorHandler.handleError(error, 'initButtonSystem');
+  }
+}
+
+export function installDomReadyBootstrap(): void {
+  if (typeof document === 'undefined') return;
+  const boot = () => initializeAppOnce();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true } as any);
+  } else {
+    boot();
+  }
+}
+
 // Bootstrap System
 // Handles dependency checking and game initialization coordination
 

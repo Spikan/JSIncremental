@@ -10,6 +10,9 @@ import { errorHandler } from '../error-handling/error-handler';
 // Create the processDrink function using the factory
 const processDrink = processDrinkFactory();
 
+// Idempotent guards (module-local)
+let __domReadyInitialized = false;
+
 try {
   (window as any).__diag = Array.isArray((window as any).__diag) ? (window as any).__diag : [];
   (window as any).__diag.push({ type: 'module', module: 'game-init', stage: 'eval-start' });
@@ -162,6 +165,8 @@ export function startGameCore(): void {
 export function initOnDomReady(): void {
   try {
     const boot = () => {
+      if (__domReadyInitialized) return;
+      __domReadyInitialized = true;
       try {
         (window as any).loadWordBank?.();
       } catch (error) {

@@ -34,6 +34,7 @@ Follow Conventional Commits:
 - `chore`: tooling/infra
 
 Examples:
+
 - `feat(clicks): add critical hit multiplier`
 - `fix(save): handle invalid JSON gracefully`
 

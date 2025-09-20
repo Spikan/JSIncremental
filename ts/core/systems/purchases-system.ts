@@ -631,7 +631,17 @@ function subtractFromWallet(spent: number | DecimalType): any {
   return next;
 }
 
-export const execute = {
+export interface PurchasesExecuteApi {
+  buyStraw(): boolean;
+  buyCup(): boolean;
+  buyWiderStraws(): boolean;
+  buyBetterCups(): boolean;
+  buySuction(): boolean;
+  buyFasterDrinks(): boolean;
+  levelUp(): boolean;
+}
+
+export const execute: PurchasesExecuteApi = {
   buyStraw(): boolean {
     const st = getAppState();
 
