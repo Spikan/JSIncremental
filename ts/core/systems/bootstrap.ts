@@ -34,8 +34,6 @@ export function installDomReadyBootstrap(): void {
 // Bootstrap System
 // Handles dependency checking and game initialization coordination
 
-import { errorHandler } from '../error-handling/error-handler';
-
 interface DependencyStatus {
   UNLOCKS_SYSTEM: boolean;
   DOM_READY: boolean;

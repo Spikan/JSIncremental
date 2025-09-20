@@ -15,9 +15,8 @@ const MOVEMENT_THRESHOLD = 15;
 export async function setupSodaButtonGestures(): Promise<void> {
   // Try to ensure button exists
   const sodaDomCacheBtn = domQuery.getById('sodaButton') as HTMLElement | null | undefined;
-  const sodaButton = (sodaDomCacheBtn || document.getElementById('sodaButton')) as
-    | HTMLElement
-    | null;
+  const sodaButton = (sodaDomCacheBtn ||
+    document.getElementById('sodaButton')) as HTMLElement | null;
   if (!sodaButton) {
     errorHandler.handleError(new Error('Soda button not found'), 'sodaButtonNotFound', {
       critical: true,
@@ -50,7 +49,7 @@ export async function setupSodaButtonGestures(): Promise<void> {
       sx = e.clientX || 0;
       sy = e.clientY || 0;
       try {
-        setLastPointerPosition(sx, sy, (e.pointerType as unknown) as 'mouse' | 'touch' | 'pen');
+        setLastPointerPosition(sx, sy, e.pointerType as unknown as 'mouse' | 'touch' | 'pen');
       } catch {}
       scrollStartYMap.set(sodaButton, window.scrollY);
       try {
@@ -68,7 +67,7 @@ export async function setupSodaButtonGestures(): Promise<void> {
         setLastPointerPosition(
           e.clientX || sx,
           e.clientY || sy,
-          (e.pointerType as unknown) as 'mouse' | 'touch' | 'pen'
+          e.pointerType as unknown as 'mouse' | 'touch' | 'pen'
         );
       } catch {}
     });
@@ -81,13 +80,7 @@ export async function setupSodaButtonGestures(): Promise<void> {
       const scrollDelta = Math.abs(window.scrollY - startY);
       const isScroll =
         mobileInputHandler.isActive() &&
-        mobileInputHandler.isLikelyScroll(
-          sx,
-          sy,
-          e.clientX || sx,
-          e.clientY || sy,
-          scrollDelta
-        );
+        mobileInputHandler.isLikelyScroll(sx, sy, e.clientX || sx, e.clientY || sy, scrollDelta);
       if (!moved && !isScroll) {
         markPointerHandled(sodaButton);
         touchHandled = true;
@@ -95,7 +88,7 @@ export async function setupSodaButtonGestures(): Promise<void> {
           setLastPointerPosition(
             e.clientX || sx,
             e.clientY || sy,
-            (e.pointerType as unknown) as 'mouse' | 'touch' | 'pen'
+            e.pointerType as unknown as 'mouse' | 'touch' | 'pen'
           );
         } catch {}
         try {
@@ -254,5 +247,3 @@ export async function setupSodaButtonGestures(): Promise<void> {
     }
   });
 }
-
-

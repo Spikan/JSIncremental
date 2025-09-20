@@ -53,9 +53,7 @@ function calculateAllCosts(): Record<string, Decimal> {
     dataUp?.fasterDrinks?.scaling ?? config.FASTER_DRINKS_SCALING ?? 1.1
   );
   const fasterDrinksCount = toDecimal(resourceData.fasterDrinks || 0);
-  costs['fasterDrinks'] = fasterDrinksBaseCost.multiply(
-    fasterDrinksScaling.pow(fasterDrinksCount)
-  );
+  costs['fasterDrinks'] = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksCount));
 
   const widerStrawsBaseCost = toDecimal(
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
@@ -77,11 +75,7 @@ function calculateAllCosts(): Record<string, Decimal> {
     dataUp?.betterCups?.scaling ?? config.BETTER_CUPS_SCALING ?? 1.25
   );
   const betterCupsCount = toDecimal(resourceData.betterCups || 0);
-  costs['betterCups'] = nextBetterCupsCost(
-    betterCupsCount,
-    betterCupsBaseCost,
-    betterCupsScaling
-  );
+  costs['betterCups'] = nextBetterCupsCost(betterCupsCount, betterCupsBaseCost, betterCupsScaling);
 
   const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
   const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);
@@ -289,8 +283,8 @@ export function updateDrinkSpeedDisplay(): void {
     }
     if (drinkSpeedBonusCompact && displayData) {
       const baseMs = Number(
-        (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } }).GAME_CONFIG?.TIMING?.['DEFAULT_DRINK_RATE'] ||
-          5000
+        (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } }).GAME_CONFIG
+          ?.TIMING?.['DEFAULT_DRINK_RATE'] || 5000
       );
       const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || baseMs);
       const currMs =
@@ -507,8 +501,8 @@ export function updateCompactDrinkSpeedDisplays(): void {
     }
     if (drinkSpeedBonusCompact && displayData) {
       const baseMs = Number(
-        (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } }).GAME_CONFIG?.TIMING?.['DEFAULT_DRINK_RATE'] ||
-          5000
+        (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } }).GAME_CONFIG
+          ?.TIMING?.['DEFAULT_DRINK_RATE'] || 5000
       );
       const drinkRateMs = safeToNumberOrDecimal(displayData.drinkRate || baseMs);
       const currMs =

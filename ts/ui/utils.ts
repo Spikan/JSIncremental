@@ -202,7 +202,10 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
     cls.toggle('unaffordable', !isAffordable);
     cls.toggle('disabled', !isAffordable);
   } catch (error) {
-    errorHandler.handleError(error, 'updateButtonClasses', { buttonId: (button as HTMLElement)?.id, isAffordable });
+    errorHandler.handleError(error, 'updateButtonClasses', {
+      buttonId: (button as HTMLElement)?.id,
+      isAffordable,
+    });
   }
   try {
     const costSpan = (button as HTMLElement).querySelector('.cost') as HTMLElement | null;

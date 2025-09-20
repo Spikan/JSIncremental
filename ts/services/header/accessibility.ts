@@ -2,7 +2,10 @@ export class HeaderAccessibilityController {
   private respectReducedMotion: boolean;
   private onReducedMotionChange: (enabled: boolean) => void;
 
-  constructor(options: { respectReducedMotion: boolean; onReducedMotionChange: (enabled: boolean) => void }) {
+  constructor(options: {
+    respectReducedMotion: boolean;
+    onReducedMotionChange: (enabled: boolean) => void;
+  }) {
     this.respectReducedMotion = options.respectReducedMotion;
     this.onReducedMotionChange = options.onReducedMotionChange;
   }
@@ -22,5 +25,3 @@ export class HeaderAccessibilityController {
     });
   }
 }
-
-

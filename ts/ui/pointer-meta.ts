@@ -17,5 +17,3 @@ export function shouldSuppressClick(element: Element, suppressMs = 300): boolean
   if (!ts) return false;
   return Date.now() - ts < suppressMs;
 }
-
-

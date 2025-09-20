@@ -42,13 +42,6 @@ let __buttonSystemInitialized = false;
 
 type ButtonActionMeta = { func: (...args: any[]) => any; type: string; label: string };
 // ButtonTypeMeta moved to button-config.ts
-type PurchaseActionName =
-  | 'buyStraw'
-  | 'buyCup'
-  | 'buyWiderStraws'
-  | 'buyBetterCups'
-  | 'buySuction'
-  | 'buyFasterDrinks';
 
 const BUTTON_CONFIG: {
   types: Record<string, ConfigButtonTypeMeta>;
@@ -1077,7 +1070,9 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
     const state = useGameStore.getState();
 
     if (state.options.clickSoundsEnabled) {
-      try { playButtonClickSound(); } catch (error) {
+      try {
+        playButtonClickSound();
+      } catch (error) {
         errorHandler.handleError(error, 'loadAudioSystem');
       }
     }

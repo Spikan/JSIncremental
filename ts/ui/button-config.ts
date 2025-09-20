@@ -29,5 +29,3 @@ export const BUTTON_TYPES: Record<string, ButtonTypeMeta> = {
   // Environment system replaced by hybrid level system
   'level-btn': { audio: 'click', feedback: 'info', className: 'level-btn' },
 };
-
-
