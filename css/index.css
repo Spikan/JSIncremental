@@ -61,7 +61,7 @@
     height: min(200px, 30vh) !important;
     aspect-ratio: 1;
   }
-  
+
   .soda-main-section {
     min-height: calc(35vh) !important;
   }
@@ -72,12 +72,12 @@
     width: min(160px, 50vw) !important;
     height: min(160px, 25vh) !important;
   }
-  
+
   .soda-main-section {
     min-height: calc(30vh) !important;
     padding: var(--space-1) !important;
   }
-  
+
   .action-buttons,
   .suction-button-container {
     gap: var(--space-1) !important;
@@ -385,25 +385,25 @@
     height: 95vh;
     margin: 0;
   }
-  
+
   .settings-modal-tabs {
     overflow-x: auto;
     scrollbar-width: none;
   }
-  
+
   .settings-modal-tabs::-webkit-scrollbar {
     display: none;
   }
-  
+
   .settings-tab-btn {
     padding: var(--space-3) var(--space-4);
     min-width: 120px;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .level-list {
     grid-template-columns: 1fr;
   }
@@ -446,10 +446,18 @@
 /* Minimal compatibility layer for existing code */
 
 /* Map old class names to new component system */
-.soda-drinker-header { /* Already handled in layout */ }
-.header-main-content { /* Already handled in layout */ }
-.main-game-content { /* Already handled in layout */ }
-.game-sidebar { /* Already handled in layout */ }
+.soda-drinker-header {
+  /* Already handled in layout */
+}
+.header-main-content {
+  /* Already handled in layout */
+}
+.main-game-content {
+  /* Already handled in layout */
+}
+.game-sidebar {
+  /* Already handled in layout */
+}
 
 /* Ensure critical game elements work */
 #gameContent {

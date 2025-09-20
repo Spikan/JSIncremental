@@ -149,7 +149,9 @@
     box-shadow: 0 0 10px var(--color-success);
   }
   50% {
-    box-shadow: 0 0 30px var(--color-success), 0 0 60px var(--color-success);
+    box-shadow:
+      0 0 30px var(--color-success),
+      0 0 60px var(--color-success);
   }
   100% {
     box-shadow: 0 0 10px var(--color-success);
@@ -236,10 +238,8 @@
   }
   100% {
     opacity: 0;
-    transform: translate(
-      calc(-50% + var(--particle-x, 0px)),
-      calc(-50% + var(--particle-y, 0px))
-    ) scale(0.3);
+    transform: translate(calc(-50% + var(--particle-x, 0px)), calc(-50% + var(--particle-y, 0px)))
+      scale(0.3);
   }
 }
 
@@ -333,7 +333,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -346,7 +347,8 @@
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(-25%);
     animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }
@@ -395,12 +397,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   animation: progressPulse 2s infinite;
 }
 
@@ -419,13 +416,21 @@
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateX(-2px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateX(2px);
   }
 }
@@ -435,13 +440,21 @@
 }
 
 @keyframes shakeVertical {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateY(-2px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateY(2px);
   }
 }
@@ -496,7 +509,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .pulse,
   .bounce,
   .spin,
@@ -534,12 +547,24 @@
   animation: slideInUp var(--duration-300) var(--ease-out) forwards;
 }
 
-.stagger-in > *:nth-child(1) { animation-delay: 0ms; }
-.stagger-in > *:nth-child(2) { animation-delay: 50ms; }
-.stagger-in > *:nth-child(3) { animation-delay: 100ms; }
-.stagger-in > *:nth-child(4) { animation-delay: 150ms; }
-.stagger-in > *:nth-child(5) { animation-delay: 200ms; }
-.stagger-in > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-in > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-in > *:nth-child(2) {
+  animation-delay: 50ms;
+}
+.stagger-in > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+.stagger-in > *:nth-child(4) {
+  animation-delay: 150ms;
+}
+.stagger-in > *:nth-child(5) {
+  animation-delay: 200ms;
+}
+.stagger-in > *:nth-child(6) {
+  animation-delay: 250ms;
+}
 
 /* ===== CUSTOM PROPERTIES FOR DYNAMIC ANIMATIONS ===== */
 :root {

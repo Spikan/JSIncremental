@@ -3,7 +3,13 @@
 
 /* ===== BASE LAYOUT ===== */
 html {
-  font-family: 'gillsans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    'gillsans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   font-size: 16px;
   line-height: var(--leading-normal);
   scroll-behavior: smooth;
@@ -160,7 +166,7 @@ body {
     grid-template-columns: 1fr 400px;
     gap: var(--space-12);
   }
-  
+
   .soda-container {
     width: min(320px, 80vw); /* Smaller on large screens too */
   }
@@ -173,24 +179,24 @@ body {
     gap: var(--space-3); /* Further reduced gap */
     text-align: center;
   }
-  
+
   .main-game-content {
     grid-template-columns: 1fr;
     gap: var(--space-4); /* Reduced gap */
     padding: var(--space-2); /* Minimal padding */
     min-height: calc(100vh - 60px); /* Adjust for smaller header */
   }
-  
+
   .game-sidebar {
     position: static;
     max-height: none;
     order: 2;
   }
-  
+
   .main-content-area {
     order: 1;
   }
-  
+
   .soda-main-section {
     min-height: calc(60vh); /* Ensure soda button area gets priority */
     justify-content: center; /* Center content in available space */
@@ -202,25 +208,25 @@ body {
   .soda-drinker-header {
     padding: var(--space-1) var(--space-3); /* Even more compact on mobile */
   }
-  
+
   .main-game-content {
     padding: var(--space-2);
     gap: var(--space-3);
     min-height: calc(100vh - 50px); /* Account for compact header */
   }
-  
+
   .soda-main-section {
     padding: var(--space-1) var(--space-2); /* Minimal padding on mobile */
     gap: var(--space-3);
     min-height: calc(50vh); /* Half viewport for soda button priority */
     justify-content: center;
   }
-  
+
   .soda-container {
     width: min(240px, 70vw); /* More compact on mobile */
     margin: var(--space-1) 0;
   }
-  
+
   .action-buttons,
   .suction-button-container {
     grid-template-columns: 1fr;
@@ -233,20 +239,20 @@ body {
   .soda-drinker-header {
     padding: var(--space-1) var(--space-2); /* Ultra-compact header */
   }
-  
+
   .main-game-content {
     padding: var(--space-1);
     gap: var(--space-2);
     min-height: calc(100vh - 40px); /* Maximum available space */
   }
-  
+
   .soda-main-section {
     padding: var(--space-1); /* Absolute minimum padding */
     gap: var(--space-2);
     min-height: calc(45vh); /* Prioritize soda button visibility */
     justify-content: flex-start;
   }
-  
+
   .soda-container {
     width: min(200px, 65vw); /* Compact on small screens */
     margin: 0; /* No extra margin on tiny screens */
@@ -277,15 +283,31 @@ body {
   display: grid;
 }
 
-.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
 
-.col-span-1 { grid-column: span 1 / span 1; }
-.col-span-2 { grid-column: span 2 / span 2; }
-.col-span-3 { grid-column: span 3 / span 3; }
-.col-span-full { grid-column: 1 / -1; }
+.col-span-1 {
+  grid-column: span 1 / span 1;
+}
+.col-span-2 {
+  grid-column: span 2 / span 2;
+}
+.col-span-3 {
+  grid-column: span 3 / span 3;
+}
+.col-span-full {
+  grid-column: 1 / -1;
+}
 
 /* Auto-fit grids for responsive layouts */
 .grid-auto-fit {
@@ -344,15 +366,15 @@ body {
   .safe-top {
     padding-top: max(var(--space-4), env(safe-area-inset-top));
   }
-  
+
   .safe-bottom {
     padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
   }
-  
+
   .safe-left {
     padding-left: max(var(--space-4), env(safe-area-inset-left));
   }
-  
+
   .safe-right {
     padding-right: max(var(--space-4), env(safe-area-inset-right));
   }
@@ -364,11 +386,11 @@ body {
   .game-sidebar {
     display: none;
   }
-  
+
   .main-game-content {
     grid-template-columns: 1fr;
   }
-  
+
   * {
     background: transparent !important;
     color: black !important;
