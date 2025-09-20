@@ -20,39 +20,49 @@ export function isThreeSodaEnabled(): boolean {
 
 export async function createThreeSodaButton(targetSelector: string): Promise<ThreeSodaAPI> {
   // Consolidate all dynamic imports at the top level for better production build compatibility
-  const [
-    {
-      Scene,
-      PerspectiveCamera,
-      WebGLRenderer,
-      sRGBEncoding,
-      Clock,
-      Box3,
-      Vector3,
-      MathUtils,
-      CylinderGeometry,
-      CircleGeometry,
-      BoxGeometry,
-      SphereGeometry,
-      PlaneGeometry,
-      TorusGeometry,
-      Mesh,
-      MeshStandardMaterial,
-      MeshBasicMaterial,
-      Group,
-      AmbientLight,
-      DirectionalLight,
-      HemisphereLight,
-      CanvasTexture,
-      DoubleSide,
-      BackSide,
-    },
-    { GLTFLoader },
-  ] = await Promise.all([import('three'), import('three/examples/jsm/loaders/GLTFLoader.js')]);
+  let Scene: any, PerspectiveCamera: any, WebGLRenderer: any, sRGBEncoding: any, Clock: any;
+  let Box3: any, Vector3: any, MathUtils: any, CylinderGeometry: any, CircleGeometry: any;
+  let BoxGeometry: any, SphereGeometry: any, PlaneGeometry: any, TorusGeometry: any, Mesh: any;
+  let MeshStandardMaterial: any, MeshBasicMaterial: any, Group: any, AmbientLight: any;
+  let DirectionalLight: any, HemisphereLight: any, CanvasTexture: any, DoubleSide: any;
+  let BackSide: any, SpriteMaterial: any, Sprite: any, AdditiveBlending: any;
+  let GLTFLoader: any, sodaGlbUrl: string;
 
-  // Load GLB URL with proper fallback
-  const sodaGlbUrl =
-    ((await import('../../res/Soda.glb?url')).default as string) || '/res/Soda.glb';
+  try {
+    const [
+      threeModule,
+      { GLTFLoader: LoaderClass },
+      sodaGlbModule,
+    ] = await Promise.all([
+      import('three'), 
+      import('three/examples/jsm/loaders/GLTFLoader.js'),
+      import('../../res/Soda.glb?url').catch(() => ({ default: '/res/Soda.glb' }))
+    ]);
+
+    // Extract all Three.js classes
+    ({
+      Scene, PerspectiveCamera, WebGLRenderer, sRGBEncoding, Clock,
+      Box3, Vector3, MathUtils, CylinderGeometry, CircleGeometry,
+      BoxGeometry, SphereGeometry, PlaneGeometry, TorusGeometry, Mesh,
+      MeshStandardMaterial, MeshBasicMaterial, Group, AmbientLight,
+      DirectionalLight, HemisphereLight, CanvasTexture, DoubleSide,
+      BackSide, SpriteMaterial, Sprite, AdditiveBlending,
+    } = threeModule);
+
+    GLTFLoader = LoaderClass;
+    sodaGlbUrl = (sodaGlbModule.default as string) || '/res/Soda.glb';
+  } catch (importError) {
+    console.error('Failed to load Three.js dependencies:', importError);
+    // Return a fallback API that doesn't crash
+    return {
+      mount: async () => {},
+      unmount: () => {},
+      updateProgress: () => {},
+      spawnBubble: () => {},
+      setPaused: () => {},
+      setReducedMotion: () => {},
+    };
+  }
 
   // Runtime locals
   let container: HTMLElement | null = null;
@@ -449,7 +459,6 @@ export async function createThreeSodaButton(targetSelector: string): Promise<Thr
       }
       const tex = new CanvasTexture(canvas);
       tex.needsUpdate = true;
-      const { SpriteMaterial } = await import('three');
       const mat = new SpriteMaterial({
         map: tex,
         color: 0xffffff,
@@ -457,9 +466,8 @@ export async function createThreeSodaButton(targetSelector: string): Promise<Thr
         depthTest: false,
         depthWrite: false,
         opacity: 0.0,
-        blending: (await import('three')).AdditiveBlending,
+        blending: AdditiveBlending,
       });
-      const { Sprite } = await import('three');
       impactSprite = new Sprite(mat);
       impactSprite.renderOrder = 2000; // under glass (2001+) but above surface/stream
       impactSprite.scale.set(0.14, 0.14, 1);

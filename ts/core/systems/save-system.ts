@@ -213,19 +213,17 @@ export async function resetGameState() {
 
     // Initialize audio systems
     try {
-      // Audio system access modernized - using direct import
-      const { initButtonAudioSystem } = await import('./button-audio');
+      // Audio system access - using single import for production compatibility
+      const buttonAudioModule = await import('./button-audio').catch(() => {
+        console.warn('Button audio module failed to load, audio features will be disabled');
+        return { initButtonAudioSystem: () => {}, updateButtonSoundsToggleButton: () => {} };
+      });
+      
+      const { initButtonAudioSystem, updateButtonSoundsToggleButton } = buttonAudioModule;
       initButtonAudioSystem?.();
-    } catch (error) {
-      errorHandler.handleError(error, 'initializeButtonAudioSystem');
-    }
-
-    try {
-      // Audio system access modernized - using direct import
-      const { updateButtonSoundsToggleButton } = await import('./button-audio');
       updateButtonSoundsToggleButton?.();
     } catch (error) {
-      errorHandler.handleError(error, 'updateButtonSoundsToggle');
+      errorHandler.handleError(error, 'initializeButtonAudioSystem');
     }
 
     // Update autosave status
