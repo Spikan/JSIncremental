@@ -21,7 +21,12 @@ export function showEnhancedClickFeedback(
     // Use provided coordinates or find soda button position
     let finalX: number, finalY: number;
 
-    if (clickX !== null && clickY !== null) {
+    if (
+      clickX !== null &&
+      clickY !== null &&
+      Number.isFinite(clickX as number) &&
+      Number.isFinite(clickY as number)
+    ) {
       // Use exact click coordinates
       finalX = clickX;
       finalY = clickY;

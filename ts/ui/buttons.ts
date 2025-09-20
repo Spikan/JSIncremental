@@ -25,6 +25,7 @@ import { addExtremeResources, resetAllResources } from '../core/systems/dev';
 import { sodaDrinkerHeaderService } from '../services/soda-drinker-header-service';
 import { errorHandler } from '../core/error-handling/error-handler';
 import { toDecimal } from '../core/numbers/simplified';
+import { setLastPointerPosition } from '../services/pointer-tracker';
 
 type ButtonActionMeta = { func: (...args: any[]) => any; type: string; label: string };
 type ButtonTypeMeta = {
@@ -1360,6 +1361,9 @@ function setupSpecialButtonHandlers(): void {
           moved = false;
           sx = e.clientX || 0;
           sy = e.clientY || 0;
+          try {
+            setLastPointerPosition(sx, sy, e.pointerType);
+          } catch {}
 
           // Store scroll position for scroll detection
           (sodaButton as any).__touchStartScrollY = window.scrollY;
@@ -1376,6 +1380,9 @@ function setupSpecialButtonHandlers(): void {
           const dx = (e.clientX || 0) - sx;
           const dy = (e.clientY || 0) - sy;
           if (Math.abs(dx) > MOVEMENT_THRESHOLD || Math.abs(dy) > MOVEMENT_THRESHOLD) moved = true;
+          try {
+            setLastPointerPosition(e.clientX || sx, e.clientY || sy, e.pointerType);
+          } catch {}
         });
         sodaButton.addEventListener('pointerup', (e: any) => {
           if (!active || !e || e.pointerType === 'mouse') {
@@ -1400,6 +1407,9 @@ function setupSpecialButtonHandlers(): void {
           if (!moved && !isScroll) {
             markPointerHandled(sodaButton);
             touchHandled = true; // Mark that touch handled the click
+            try {
+              setLastPointerPosition(e.clientX || sx, e.clientY || sy, e.pointerType);
+            } catch {}
 
             // Remove visual feedback (was added on press)
             try {
@@ -1444,6 +1454,9 @@ function setupSpecialButtonHandlers(): void {
             moved = false;
             sx = e.touches[0].clientX || 0;
             sy = e.touches[0].clientY || 0;
+            try {
+              setLastPointerPosition(sx, sy, 'touch');
+            } catch {}
 
             // Store scroll position for scroll detection
             (sodaButton as any).__touchStartScrollY =
@@ -1466,6 +1479,9 @@ function setupSpecialButtonHandlers(): void {
             const dy = (e.touches[0].clientY || 0) - sy;
             if (Math.abs(dx) > MOVEMENT_THRESHOLD || Math.abs(dy) > MOVEMENT_THRESHOLD)
               moved = true;
+            try {
+              setLastPointerPosition(e.touches[0].clientX || sx, e.touches[0].clientY || sy, 'touch');
+            } catch {}
           },
           { passive: true }
         );
@@ -1492,6 +1508,13 @@ function setupSpecialButtonHandlers(): void {
           if (!moved && !isScroll) {
             markPointerHandled(sodaButton);
             touchHandled = true; // Mark that touch handled the click
+            try {
+              setLastPointerPosition(
+                e.changedTouches[0]?.clientX || sx,
+                e.changedTouches[0]?.clientY || sy,
+                'touch'
+              );
+            } catch {}
 
             // Remove visual feedback (was added on touch start)
             try {
@@ -1514,7 +1537,7 @@ function setupSpecialButtonHandlers(): void {
       }
 
       // Standard click event handler
-      sodaButton.addEventListener('click', async () => {
+      sodaButton.addEventListener('click', async (e: any) => {
         if (shouldSuppressClick(sodaButton)) {
           return;
         }
@@ -1525,6 +1548,11 @@ function setupSpecialButtonHandlers(): void {
           return;
         }
         try {
+          try {
+            if (e && Number.isFinite(e.clientX) && Number.isFinite(e.clientY)) {
+              setLastPointerPosition(e.clientX, e.clientY, 'mouse');
+            }
+          } catch {}
           (sodaButton as any).classList.add('soda-clicked');
           setTimeout(() => {
             try {

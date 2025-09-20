@@ -9,7 +9,6 @@ import { performanceMonitor } from './services/performance';
 import './config';
 import './core/constants';
 import { errorHandler } from './core/error-handling/error-handler';
-import { CriticalGameError } from './core/error-handling/error-types';
 // ServiceLocator removed - using Zustand store directly
 // Decimal import removed - using toDecimal from simplified.ts
 import { toDecimal } from './core/numbers/simplified';
@@ -151,10 +150,6 @@ try {
   // Create lazy loading system for critical modules
 
   // Inline loop system to avoid import hanging issues in production
-
-  // Test environment flag to guard side effects
-  const isTestEnv =
-    typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true;
 
   // Initialize Zustand store with default values
   useGameStore.setState({

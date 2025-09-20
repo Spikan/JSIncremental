@@ -45,9 +45,15 @@ export function formatNumber(value: any): string {
     return String(value);
   } catch (error) {
     // Last-resort: never recurse from error handler; return a safe string
-    errorHandler.handleError(error, 'formatWithDecimal', { value: (() => {
-      try { return value?.toString?.(); } catch { return '<unprintable>'; }
-    })() });
+    errorHandler.handleError(error, 'formatWithDecimal', {
+      value: (() => {
+        try {
+          return value?.toString?.();
+        } catch {
+          return '<unprintable>';
+        }
+      })(),
+    });
     try {
       if (typeof value === 'number') return formatLargeNumber(value);
       return String(value ?? '0');

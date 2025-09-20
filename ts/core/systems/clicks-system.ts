@@ -7,6 +7,7 @@ import { optimizedEventBus } from '../../services/optimized-event-bus';
 import { errorHandler } from '../error-handling/error-handler';
 import { hybridLevelSystem } from './hybrid-level-system';
 import { showClickFeedback } from '../../ui/feedback';
+import { getLastPointerPosition } from '../../services/pointer-tracker';
 
 export type TrackClickArgs = {
   getApp?: () => any;
@@ -129,8 +130,13 @@ export function handleSodaClickFactory({
 
       // Show popup feedback
       try {
-        // Provide numeric defaults for coordinates in non-pointer contexts
-        showClickFeedback(totalClickValue, false, 0, 0);
+        // Use last pointer position if available; otherwise let UI pick container-based position
+        const last = getLastPointerPosition();
+        if (last) {
+          showClickFeedback(totalClickValue, false, last.x, last.y);
+        } else {
+          showClickFeedback(totalClickValue, false, null as any, null as any);
+        }
       } catch (error) {
         errorHandler.handleError(error, 'showClickFeedback', {
           totalClickValue: totalClickValue?.toString(),
@@ -139,12 +145,13 @@ export function handleSodaClickFactory({
 
       // Emit soda click and sync totals with Decimal support
       try {
+        const last = getLastPointerPosition();
         optimizedEventBus.emit(EVENT_NAMES.CLICK.SODA, {
           // Preserve extreme values - keep as Decimal
           gained: totalClickValue,
           critical: false,
-          clickX: 0,
-          clickY: 0,
+          clickX: last ? last.x : 0,
+          clickY: last ? last.y : 0,
           timestamp: Date.now(),
         });
       } catch (error) {

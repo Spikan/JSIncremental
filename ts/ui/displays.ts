@@ -114,7 +114,7 @@ const UPDATE_INTERVALS = {
 // Optimized display update functions using subscribeWithSelector
 export function updateTopSipsPerDrink(): void {
   if (typeof window === 'undefined') return;
-  
+
   const topSipsPerDrinkElement: HTMLElement | null = domQuery.getById('topSipsPerDrink');
 
   if (!topSipsPerDrinkElement) {
@@ -141,7 +141,7 @@ export function updateTopSipsPerDrink(): void {
 
 export function updateTopSipsPerSecond(): void {
   if (typeof window === 'undefined') return;
-  
+
   const topSipsPerSecondElement: HTMLElement | null = domQuery.getById('topSipsPerSecond');
 
   if (!topSipsPerSecondElement) {
@@ -386,7 +386,7 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
 
 export function updateTopSipCounter(): void {
   if (typeof window === 'undefined') return;
-  
+
   const topSipElement = domQuery.getById('topSipValue');
 
   if (topSipElement) {

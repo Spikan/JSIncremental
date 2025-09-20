@@ -141,7 +141,6 @@ export class SodaDrinkerHeaderService {
 
     // Guard in non-browser/test environments
     const hasRAF = typeof requestAnimationFrame === 'function';
-    const hasClearInterval = typeof clearInterval === 'function';
 
     // Monitor performance every 5 seconds
     this.performanceIntervalId = setInterval(() => {
