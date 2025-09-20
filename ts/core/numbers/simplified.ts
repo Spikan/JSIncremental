@@ -153,6 +153,14 @@ export function toString(value: NumericValue): string {
   return String(value || 0);
 }
 
+// Helper: truncate a number to a fixed number of decimals (no rounding)
+function truncateToDecimals(value: number, decimals: number): number {
+  if (!isFinite(value)) return 0;
+  const factor = Math.pow(10, decimals);
+  // Math.trunc keeps sign and truncates toward zero
+  return Math.trunc(value * factor) / factor;
+}
+
 /**
  * Format number for display - simplified
  */
@@ -175,10 +183,12 @@ export function formatNumber(value: NumericValue): string {
       return value.toExponential(2);
     }
     if (Math.abs(num) >= 1e6) {
-      return (num / 1e6).toFixed(0) + 'M';
+      const scaled = truncateToDecimals(num / 1e6, 2);
+      return scaled.toFixed(2) + 'M';
     }
     if (Math.abs(num) >= 1e3) {
-      return (num / 1e3).toFixed(0) + 'K';
+      const scaled = truncateToDecimals(num / 1e3, 2);
+      return scaled.toFixed(2) + 'K';
     }
     // Prefer integer string for exact integers
     if (Number.isInteger(num)) return num.toString();
@@ -195,10 +205,12 @@ export function formatNumber(value: NumericValue): string {
     return num.toExponential(2);
   }
   if (Math.abs(num) >= 1e6) {
-    return (num / 1e6).toFixed(0) + 'M';
+    const scaled = truncateToDecimals(num / 1e6, 2);
+    return scaled.toFixed(2) + 'M';
   }
   if (Math.abs(num) >= 1e3) {
-    return (num / 1e3).toFixed(0) + 'K';
+    const scaled = truncateToDecimals(num / 1e3, 2);
+    return scaled.toFixed(2) + 'K';
   }
   // Prefer integer string for exact integers
   if (Number.isInteger(num)) return num.toString();

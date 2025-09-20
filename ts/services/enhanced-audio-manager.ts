@@ -49,11 +49,15 @@ export class EnhancedAudioManager {
    */
   private initializeAudio(): void {
     try {
-      // Set global Howler settings
-      Howler.volume(this.masterVolume);
+      // Set global Howler settings (music disabled; keep SFX)
+      try {
+        Howler.volume(this.masterVolume);
+      } catch {}
 
-      // Load existing music files
-      this.loadBackgroundMusic();
+      // Skip loading background music entirely
+      this.titleMusic = null;
+      this.gameplayMusic = null;
+      this.currentTrack = null;
 
       // Create procedural sound effects
       this.createProceduralSounds();
@@ -61,89 +65,6 @@ export class EnhancedAudioManager {
       logger.info('Enhanced audio manager initialized');
     } catch (error) {
       logger.error('Failed to initialize enhanced audio manager:', error);
-    }
-  }
-
-  /**
-   * Load background music from existing files
-   */
-  private loadBackgroundMusic(): void {
-    try {
-      // Load title music (plays once)
-      this.titleMusic = new Howl({
-        src: ['res/Soda Drinker Title Music.mp3'],
-        loop: false, // Don't loop title music
-        volume: this.musicVolume * this.masterVolume * this.titleMusicVolumeAdjustment,
-        autoplay: false,
-        html5: false, // Use Web Audio for better control
-        preload: true,
-        onload: () => {
-          logger.debug('Title music loaded successfully');
-        },
-        onend: () => {
-          logger.debug('Title music ended, transitioning to gameplay music');
-          this.titleMusicPlayed = true;
-          // Add small delay to ensure smooth transition
-          setTimeout(() => {
-            this.transitionToGameplayMusic();
-          }, 100);
-        },
-        onloaderror: (_, error) => {
-          logger.warn('Failed to load title music:', error);
-        },
-      });
-
-      // Load gameplay music (loops continuously with optimized settings)
-      this.gameplayMusic = new Howl({
-        src: ['res/Between Level Music.mp3'],
-        loop: false, // We'll handle looping manually to avoid dead air
-        volume: this.musicVolume * this.masterVolume * this.gameplayMusicVolumeAdjustment,
-        autoplay: false,
-        html5: true, // Use HTML5 for simpler approach
-        preload: true,
-        onload: () => {
-          logger.debug('Gameplay music loaded successfully');
-        },
-        onplay: () => {
-          logger.debug('Gameplay music started playing');
-          // Set a timer to restart before the dead air
-          const duration = this.gameplayMusic?.duration() || 0;
-          const loopPoint = Math.max(0, (duration - 5) * 1000); // 5 seconds before end
-
-          if (loopPoint > 0) {
-            setTimeout(() => {
-              if (this.musicEnabled && !this.muted && this.currentTrack === 'gameplay') {
-                logger.debug('Restarting gameplay music before dead air');
-                this.gameplayMusic?.stop();
-                setTimeout(() => {
-                  if (this.gameplayMusic && this.currentTrack === 'gameplay') {
-                    this.gameplayMusic.play();
-                  }
-                }, 100);
-              }
-            }, loopPoint);
-          }
-        },
-        onend: () => {
-          // Fallback restart if the timer approach fails
-          if (this.musicEnabled && !this.muted && this.currentTrack === 'gameplay') {
-            logger.debug('Gameplay music ended, restarting...');
-            setTimeout(() => {
-              if (this.gameplayMusic && !this.gameplayMusic.playing()) {
-                this.gameplayMusic.play();
-              }
-            }, 100);
-          }
-        },
-        onloaderror: (_, error) => {
-          logger.warn('Failed to load gameplay music:', error);
-        },
-      });
-
-      // Set initial current track to title music
-      this.currentTrack = 'title';
-    } catch (error) {
-      logger.warn('Failed to create background music:', error);
     }
   }
 
@@ -448,6 +369,10 @@ export class EnhancedAudioManager {
    * Start background music (smart selection based on state)
    */
   public startBackgroundMusic(): void {
+    // Music disabled (temporary): guard to prevent auto start
+    try {
+      if ((window as any).__DISABLE_MUSIC__) return;
+    } catch {}
     if (!this.musicEnabled || this.muted) return;
 
     try {
@@ -548,7 +473,11 @@ export class EnhancedAudioManager {
       Howler.volume(0);
       this.stopBackgroundMusic();
     } else {
-      Howler.volume(this.masterVolume);
+      try {
+        Howler.volume(this.masterVolume);
+      } catch (e) {
+        logger.warn('Howler volume set failed:', e);
+      }
       if (this.musicEnabled) {
         this.startBackgroundMusic();
       }

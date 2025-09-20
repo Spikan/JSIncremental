@@ -53,14 +53,14 @@ export class TopInfoBar {
     // Update primary stat (total sips) - using the correct ID from our new layout
     const primarySipsDisplay = document.getElementById('topSipValue');
     if (primarySipsDisplay) {
-      const formattedSips = formatStatNumber(data.totalSips);
+      const formattedSips = formatStatNumber(toDecimal(data.totalSips));
       primarySipsDisplay.textContent = formattedSips;
     }
 
     // Update secondary stats - using the correct IDs from our new layout
     const perDrinkDisplay = document.getElementById('topSipsPerDrink');
     if (perDrinkDisplay) {
-      const formattedPerDrink = formatStatNumber(data.perDrink);
+      const formattedPerDrink = formatStatNumber(toDecimal(data.perDrink));
       perDrinkDisplay.textContent = formattedPerDrink;
     }
 

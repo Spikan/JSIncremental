@@ -22,6 +22,177 @@
     <link rel="stylesheet" type="text/css" href="css/style-header-fixed.css" />
     <link rel="stylesheet" type="text/css" href="css/soda-drinker-header-v2.css" />
     <link rel="stylesheet" type="text/css" href="css/theme-system.css" />
+    <style>
+      /* Local UI polish for action buttons */
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+        align-items: stretch;
+        flex-wrap: wrap;
+      }
+      .action-buttons .suction-btn {
+        min-width: 240px;
+        flex: 1 1 280px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 12px;
+      }
+      .action-buttons .suction-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+      }
+      .action-buttons .suction-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .action-buttons .suction-name {
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      .action-buttons .suction-cost {
+        opacity: 0.9;
+      }
+      .action-buttons .suction-effect {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-left: auto;
+        text-align: right;
+      }
+      .action-buttons .click-power-display {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      /* Modern incremental layout */
+      .main-game-content {
+        display: grid;
+        grid-template-columns: minmax(320px, 1fr) 360px;
+        gap: 20px;
+        align-items: start;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 16px;
+      }
+      @media (max-width: 900px) {
+        .main-game-content {
+          grid-template-columns: 1fr;
+        }
+        .game-sidebar {
+          order: 2;
+        }
+        .main-content-area {
+          order: 1;
+        }
+      }
+      .soda-main-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .soda-container {
+        width: min(420px, 90vw);
+        margin: 0 auto;
+      }
+      .soda-button {
+        border-radius: 14px;
+      }
+
+      /* Sidebar cards spacing */
+      .game-sidebar .upgrade-card {
+        margin-bottom: 12px;
+      }
+
+      /* Header compaction & alignment */
+      .soda-drinker-header .header-main-content {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 16px;
+        padding: 8px 12px;
+      }
+      .soda-drinker-header .currency-display-section {
+        justify-self: center;
+      }
+      .soda-drinker-header .controls-section {
+        justify-self: end;
+        display: flex;
+        gap: 8px;
+      }
+      .soda-drinker-header .control-polygon {
+        padding: 8px 10px;
+        border-radius: 10px;
+      }
+      .soda-drinker-header .currency-value-main {
+        font-weight: 800;
+      }
+      .soda-drinker-header .secondary-stats-minimal {
+        gap: 8px;
+      }
+
+      /* Upgrade cards polish */
+      .game-sidebar .upgrade-card {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      }
+      .game-sidebar .upgrade-card .upgrade-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .game-sidebar .upgrade-card .upgrade-icon {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        font-size: 18px;
+      }
+      .game-sidebar .upgrade-card .upgrade-info h4 {
+        margin: 0;
+        font-size: 1rem;
+      }
+      .game-sidebar .upgrade-card .upgrade-info p {
+        margin: 2px 0 0;
+        opacity: 0.85;
+        font-size: 0.85rem;
+      }
+      .game-sidebar .upgrade-btn {
+        margin-top: 8px;
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+        font-weight: 700;
+      }
+      .game-sidebar .upgrade-btn:disabled,
+      .game-sidebar .upgrade-card.is-disabled .upgrade-btn {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .game-sidebar .upgrade-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 0.85rem;
+        opacity: 0.9;
+      }
+    </style>
 
     <!-- Icons -->
     <link rel="icon" href="images/favicon.ico" sizes="any" />
@@ -129,21 +300,10 @@
           </div>
         </div>
 
-        <!-- Progress Section -->
-        <div class="progress-section">
-          <div class="progress-container-minimal">
-            <div class="progress-bar-main" id="drinkProgressBar">
-              <div class="progress-fill-main" id="drinkProgressFill"></div>
-            </div>
-            <div class="progress-info-minimal">
-              <span class="countdown-minimal" id="drinkCountdown">5.0s</span>
-              <button class="upgrade-polygon" data-action="buyFasterDrinks" title="Faster Drinks">
-                <span class="upgrade-icon">⚡</span>
-                <span class="upgrade-text" id="currentDrinkSpeed">5.00s</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <!-- Fountain Panel (showcase area placed under header) -->
+        <div id="fountainPanel" class="fountain-panel"></div>
+
+        <!-- Progress Section removed (replaced by integrated soda-button progress) -->
 
         <!-- PWA Status Indicators -->
         <div class="pwa-indicators">
@@ -183,8 +343,8 @@
                 <div class="click-ripple"></div>
               </div>
             </div>
-            <!-- Suction Button with Click Power Display -->
-            <div class="suction-button-container">
+            <!-- Suction and Faster Drinks buttons -->
+            <div class="suction-button-container action-buttons">
               <button class="suction-btn" data-action="buySuction">
                 <div class="suction-icon">💨</div>
                 <div class="suction-info">
@@ -198,6 +358,27 @@
                   </div>
                   <div class="suction-bonus">
                     +<span id="suctionClickBonus">1.0</span> per click
+                  </div>
+                </div>
+              </button>
+
+              <button
+                class="suction-btn"
+                data-action="buyFasterDrinks"
+                aria-label="Buy Faster Drinks"
+              >
+                <div class="suction-icon">⚡</div>
+                <div class="suction-info">
+                  <div class="suction-name">Faster Drinks</div>
+                  <div class="suction-cost"><span id="fasterDrinksCost">200</span> Sips</div>
+                </div>
+                <div class="suction-effect">
+                  <div class="click-power-display">
+                    <span class="click-power-label">Drink Time:</span>
+                    <span class="click-power-value" id="currentDrinkSpeed">5.00s</span>
+                  </div>
+                  <div class="suction-bonus">
+                    <span id="drinkSpeedBonusCompact">0%</span> faster
                   </div>
                 </div>
               </button>
@@ -406,21 +587,7 @@
                   <span id="masterVolumeValue" class="volume-value">70%</span>
                 </div>
               </div>
-              <div class="audio-control">
-                <label for="musicVolumeSlider">🎵 Music Volume</label>
-                <div class="volume-slider-container">
-                  <input
-                    type="range"
-                    id="musicVolumeSlider"
-                    class="volume-slider"
-                    min="0"
-                    max="100"
-                    value="25"
-                    step="5"
-                  />
-                  <span id="musicVolumeValue" class="volume-value">25%</span>
-                </div>
-              </div>
+              <!-- Music volume removed -->
               <div class="audio-control">
                 <label for="sfxVolumeSlider">🔔 SFX Volume</label>
                 <div class="volume-slider-container">

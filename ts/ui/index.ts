@@ -48,6 +48,8 @@ import {
 import { addThemeStyles } from './soda-drinker-pro-themes';
 import { initializeAuthenticSDP } from './authentic-sdp';
 import { createSoda3DButton } from './soda-3d-lightweight';
+import { isThreeSodaEnabled, createThreeSodaButton } from './soda-3d-three';
+import { initFPSMeter } from './fps-meter';
 import { konamiCodeDetector } from './konami-code';
 // import { runFullLayoutValidation } from './layout-validation'; // Disabled - sections removed
 
@@ -483,6 +485,13 @@ export function initializeUI(): void {
           120,
           'Remove soda-clicked class'
         );
+        // Spawn a small bubble inside the Three.js liquid if available
+        try {
+          const threeApi = (window as any).sodaThree;
+          if (threeApi && typeof threeApi.spawnBubble === 'function') {
+            threeApi.spawnBubble();
+          }
+        } catch {}
       }
 
       if (clickData && clickData.gained) {
@@ -621,18 +630,50 @@ export function initializeUI(): void {
 
     // Initialize lightweight 3D soda button with performance optimization
     try {
-      const soda3DButton = createSoda3DButton({
-        containerSelector: '#sodaButton',
-        size: 200,
-        rotationSpeed: 1.0,
-        hoverSpeedMultiplier: 2.0,
-        performanceMode: 'medium', // Start with balanced performance
-        frameRateLimit: 30, // 30fps default
-        // clickAnimationDuration removed
-      });
-
-      // Store reference for performance management
-      (window as any).soda3DButton = soda3DButton;
+      if (isThreeSodaEnabled()) {
+        createThreeSodaButton('#sodaButton')
+          .then(api => {
+            (window as any).sodaThree = api;
+            api.mount();
+            // Pause 3D when offscreen
+            try {
+              const btn = document.getElementById('sodaButton');
+              if (btn && 'IntersectionObserver' in window) {
+                const io = new IntersectionObserver(
+                  entries => {
+                    const e = entries[0];
+                    if (!e) return;
+                    api.setPaused?.(!e.isIntersecting);
+                  },
+                  { threshold: 0.01 }
+                );
+                io.observe(btn);
+              }
+            } catch {}
+          })
+          .catch(err => {
+            logger.error('Failed to initialize Three.js soda button, falling back:', err);
+            const soda3DButton = createSoda3DButton({
+              containerSelector: '#sodaButton',
+              size: 200,
+              rotationSpeed: 1.0,
+              hoverSpeedMultiplier: 2.0,
+              performanceMode: 'medium',
+              frameRateLimit: 30,
+            });
+            (window as any).soda3DButton = soda3DButton;
+          });
+      } else {
+        const soda3DButton = createSoda3DButton({
+          containerSelector: '#sodaButton',
+          size: 200,
+          rotationSpeed: 1.0,
+          hoverSpeedMultiplier: 2.0,
+          performanceMode: 'medium', // Start with balanced performance
+          frameRateLimit: 30, // 30fps default
+        });
+        (window as any).soda3DButton = soda3DButton;
+      }
 
       // Click handler is now built into the 3D button
       // No need to add additional handlers
@@ -649,6 +690,40 @@ export function initializeUI(): void {
     } catch (error) {
       logger.warn('Failed to initialize displays:', error);
     }
+
+    // Initialize FPS meter
+    try {
+      initFPSMeter();
+    } catch (error) {
+      logger.warn('Failed to initialize FPS meter:', error);
+    }
+
+    // Keyboard shortcuts: Space = soda click; 1-5 buy upgrades if available
+    try {
+      window.addEventListener('keydown', async (e: KeyboardEvent) => {
+        // prevent typing fields
+        if (
+          (e.target as HTMLElement)?.tagName === 'INPUT' ||
+          (e.target as HTMLElement)?.tagName === 'TEXTAREA'
+        )
+          return;
+        if (e.code === 'Space') {
+          e.preventDefault();
+          try {
+            const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
+            await handleSodaClick(1);
+          } catch {}
+          return;
+        }
+        const num = Number(e.key);
+        if (num >= 1 && num <= 5) {
+          const selectors = ['buyStraw', 'buyCup', 'buyWiderStraws', 'buyBetterCups', 'buySuction'];
+          const action = selectors[num - 1];
+          const el = document.querySelector(`[data-action="${action}"]`) as HTMLElement | null;
+          if (el) el.click();
+        }
+      });
+    } catch {}
 
     // Layout validation disabled - sections were intentionally removed
     // try {
@@ -674,8 +749,10 @@ function initializeEnhancedUIComponents(): void {
     // Initialize dev tools manager
     devToolsManager.initialize();
 
-    // Initialize enhanced audio manager
-    enhancedAudioManager.startBackgroundMusic();
+    // Initialize enhanced audio manager (music disabled by request)
+    try {
+      enhancedAudioManager.stopBackgroundMusic?.();
+    } catch {}
 
     // Initialize audio controls manager
     audioControlsManager.initialize();

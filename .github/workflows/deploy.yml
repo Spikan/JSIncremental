@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Quality checks
+        run: npm run quality
+
       - name: Set Vite base path
         run: |
           # Derive base from repo name (owner/repo)

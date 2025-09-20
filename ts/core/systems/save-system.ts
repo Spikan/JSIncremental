@@ -52,6 +52,8 @@ export function performSaveSnapshot(): any {
       lastSaveTime: Date.now(),
       totalPlayTime: Number(state.totalPlayTime || 0),
       totalClicks: Number(state.totalClicks || 0),
+      // Click system state
+      suctionClickBonus: String(state.suctionClickBonus || 0),
       // Save hybrid level system data (single source of truth for levels)
       hybridLevelData: (() => {
         const hybridSystem = hybridLevelSystem;

@@ -162,12 +162,13 @@ function initGame() {
       errorHandler.handleError(error, 'verifyDOMReadiness');
     }
 
-    // Load save using modular system
+    // Load save using storage service (validated)
     let savegame: any = null;
     try {
-      // Use localStorage directly for now
-      const saveData = localStorage.getItem('save');
-      savegame = JSON.parse(saveData as any);
+      // top-level import to avoid await in non-async
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { AppStorage } = require('./services/storage');
+      savegame = AppStorage.loadGame();
     } catch (e) {
       errorHandler.handleError(e, 'loadSave', { fallback: 'starting fresh' });
       savegame = null;

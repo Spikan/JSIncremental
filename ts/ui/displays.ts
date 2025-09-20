@@ -9,6 +9,10 @@ import { updateLastSaveTime, updatePurchasedCounts } from './stats';
 import { checkUpgradeAffordability } from './affordability';
 import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { domQuery } from '../services/dom-query';
+import { isFountainEnabled, createFountainProgress } from './fountain-progress';
+import { isSodaButtonProgressEnabled, createSodaButtonProgress } from './soda-button-progress';
+import { isThreeSodaEnabled } from './soda-3d-three';
+import { createSodaButtonIndicator } from './soda-button-indicator';
 import { uiBatcher } from '../services/ui-batcher';
 import { errorHandler } from '../core/error-handling/error-handler';
 // Logger import removed - not used in this file
@@ -114,6 +118,10 @@ const UPDATE_INTERVALS = {
 // Optimized display update functions using subscribeWithSelector
 export function updateTopSipsPerDrink(): void {
   if (typeof window === 'undefined') return;
+  // If enhanced TopInfoBar is present, avoid duplicate writes
+  try {
+    if (document.querySelector('.currency-display-section')) return;
+  } catch {}
 
   const topSipsPerDrinkElement: HTMLElement | null = domQuery.getById('topSipsPerDrink');
 
@@ -141,6 +149,10 @@ export function updateTopSipsPerDrink(): void {
 
 export function updateTopSipsPerSecond(): void {
   if (typeof window === 'undefined') return;
+  // If enhanced TopInfoBar is present, avoid duplicate writes
+  try {
+    if (document.querySelector('.currency-display-section')) return;
+  } catch {}
 
   const topSipsPerSecondElement: HTMLElement | null = domQuery.getById('topSipsPerSecond');
 
@@ -203,12 +215,23 @@ export function updateClickValueDisplay(): void {
     // Get current click value from game state
     const displayData = getDisplayData();
     if (displayData) {
-      // Calculate total click value (base + suction bonuses)
-      let baseClickValue = 1;
-      const suctionBonus = Number(displayData.suctionClickBonus || 0);
-      const totalClickValue = baseClickValue + suctionBonus;
-
-      clickValueElement.textContent = totalClickValue.toFixed(1);
+      // Calculate total click value (base + suction bonuses) using Decimal-safe math
+      const DecimalCtor = (window as any).Decimal;
+      if (DecimalCtor) {
+        const base = new DecimalCtor(1);
+        const bonus =
+          displayData.suctionClickBonus &&
+          typeof (displayData.suctionClickBonus as any).toString === 'function'
+            ? new DecimalCtor((displayData.suctionClickBonus as any).toString())
+            : new DecimalCtor(Number(displayData.suctionClickBonus || 0));
+        const total = base.add(bonus);
+        clickValueElement.textContent = total.toFixed(1);
+      } else {
+        const baseClickValue = 1;
+        const suctionBonus = Number(displayData.suctionClickBonus || 0);
+        const totalClickValue = baseClickValue + suctionBonus;
+        clickValueElement.textContent = totalClickValue.toFixed(1);
+      }
     }
   } catch (error) {
     errorHandler.handleError(error, 'updateClickValueDisplay');
@@ -362,9 +385,87 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
   }
   const progressFill = domQuery.getById('drinkProgressFill');
   const countdown = domQuery.getById('drinkCountdown');
+
+  // Soda button progress overlay (highest priority)
+  try {
+    if (isThreeSodaEnabled()) {
+      // Feed Three.js button if present
+      const api = (window as any).sodaThree;
+      if (api && typeof currentProgress === 'number') {
+        try {
+          api.updateProgress(currentProgress);
+        } catch {}
+      }
+      // Ring indicator overlay
+      const sodaBtnA = document.getElementById('sodaButton') as HTMLElement | null;
+      if (sodaBtnA) {
+        let indicatorA: any = (sodaBtnA as any).__sodaIndicator;
+        if (!indicatorA) {
+          indicatorA = createSodaButtonIndicator(sodaBtnA);
+          indicatorA.mount();
+          (sodaBtnA as any).__sodaIndicator = indicatorA;
+        }
+        if (typeof currentProgress === 'number') indicatorA.update(currentProgress);
+      }
+    } else if (isSodaButtonProgressEnabled()) {
+      const sodaBtn = document.getElementById('sodaButton') as HTMLElement | null;
+      if (sodaBtn) {
+        let overlay: any = (sodaBtn as any).__sodaProgress;
+        if (!overlay) {
+          overlay = createSodaButtonProgress(sodaBtn);
+          overlay.mount();
+          (sodaBtn as any).__sodaProgress = overlay;
+        }
+        if (typeof currentProgress === 'number') overlay.update(currentProgress);
+        // Ring indicator as well
+        let indicator: any = (sodaBtn as any).__sodaIndicator;
+        if (!indicator) {
+          indicator = createSodaButtonIndicator(sodaBtn);
+          indicator.mount();
+          (sodaBtn as any).__sodaIndicator = indicator;
+        }
+        if (typeof currentProgress === 'number') indicator.update(currentProgress);
+      }
+    } else if (isFountainEnabled()) {
+      const panel = document.getElementById('fountainPanel') as HTMLElement | null;
+      const host = (panel || document.getElementById('drinkProgressBar')) as HTMLElement | null;
+      if (host) {
+        // Ensure singleton instance per container
+        let instance: any = (host as any).__fountain;
+        if (!instance) {
+          instance = createFountainProgress(host, {
+            reducedMotion:
+              window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+            ariaLabel: 'Drink progress',
+          });
+          instance.mount();
+          (host as any).__fountain = instance;
+          try {
+            if (host.id === 'drinkProgressBar') host.classList.add('fountain-host');
+          } catch {}
+        }
+        if (typeof currentProgress === 'number') {
+          instance.update(
+            currentProgress,
+            typeof currentDrinkRate === 'number' ? currentDrinkRate : undefined
+          );
+        }
+        // Hide legacy fill to avoid visual overlap
+        if (host.id === 'drinkProgressBar') {
+          const legacyFill = progressFill as HTMLElement | null;
+          if (legacyFill) legacyFill.style.visibility = 'hidden';
+        }
+      }
+    }
+  } catch (e) {
+    // Fail safely to legacy bar if anything goes wrong
+  }
   if (progressFill && typeof currentProgress === 'number') {
     const clampedProgress = Math.min(Math.max(currentProgress, 0), 100);
-    (progressFill as HTMLElement).style.width = `${clampedProgress}%`;
+    // If modern UIs are enabled, hide legacy width update; else update it
+    if (!isFountainEnabled() && !isSodaButtonProgressEnabled()) {
+      (progressFill as HTMLElement).style.width = `${clampedProgress}%`;
+    }
     if (clampedProgress >= 100) {
       (progressFill as HTMLElement).classList?.add?.('progress-complete');
     } else {
@@ -389,6 +490,10 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
 
 export function updateTopSipCounter(): void {
   if (typeof window === 'undefined') return;
+  // If enhanced TopInfoBar is present, avoid duplicate writes
+  try {
+    if (document.querySelector('.currency-display-section')) return;
+  } catch {}
 
   const topSipElement = domQuery.getById('topSipValue');
 
