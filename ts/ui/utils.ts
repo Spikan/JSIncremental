@@ -77,21 +77,31 @@ export function formatLargeNumber(num: number): string {
     return num.toExponential(2);
   }
 
+  // Helper: truncate to two decimals without rounding
+  const trunc2 = (value: number) => {
+    const factor = 100;
+    return Math.trunc(value * factor) / factor;
+  };
+
   // Handle normal range with abbreviations
   if (absNum >= 1e15) {
     return num.toExponential(2);
   } else if (absNum >= 1e12) {
-    return (num / 1e12).toFixed(2) + 'T';
+    const scaled = trunc2(num / 1e12);
+    return scaled.toFixed(2) + 'T';
   } else if (absNum >= 1e9) {
-    return (num / 1e9).toFixed(2) + 'B';
+    const scaled = trunc2(num / 1e9);
+    return scaled.toFixed(2) + 'B';
   } else if (absNum >= 1e6) {
-    return (num / 1e6).toFixed(2) + 'M';
+    const scaled = trunc2(num / 1e6);
+    return scaled.toFixed(2) + 'M';
   } else if (absNum >= 1e3) {
-    return (num / 1e3).toFixed(2) + 'K';
+    const scaled = trunc2(num / 1e3);
+    return scaled.toFixed(2) + 'K';
   } else if (absNum >= 1) {
-    return num.toFixed(2);
+    return trunc2(num).toFixed(2);
   } else {
-    return num.toFixed(2);
+    return trunc2(num).toFixed(2);
   }
 }
 
@@ -131,7 +141,42 @@ function postProcessDecimals(formatted: string): string {
   try {
     if (typeof formatted !== 'string') return String(formatted ?? '0');
     const s = formatted.trim();
-    // Do not force decimal places; trust upstream formatter
+
+    // Helper: ensure exactly two decimals without rounding (truncate/pad)
+    const ensureTwoDecimalsNoRound = (numString: string): string => {
+      const negative = numString.startsWith('-');
+      const core = negative ? numString.slice(1) : numString;
+      const parts = core.split('.');
+      const integerPart = parts[0] || '0';
+      const decimalPart = (parts[1] || '').slice(0, 2).padEnd(2, '0');
+      const result = `${integerPart}.${decimalPart}`;
+      return negative ? `-${result}` : result;
+    };
+
+    // Handle K/M/B/T suffixes: ensure two decimals before the suffix
+    const suffixMatch = s.match(/^(-?\d+(?:\.\d+)?)([KMBT])$/i);
+    if (suffixMatch) {
+      const numPart = (suffixMatch[1] ?? '0') as string;
+      const suffix = (suffixMatch[2] || '') as string;
+      // Truncate/pad without rounding to avoid crossing thresholds visually
+      const normalized = ensureTwoDecimalsNoRound(numPart);
+      return normalized + suffix.toUpperCase();
+    }
+
+    // Handle exponential notation: normalize to two-decimal mantissa
+    if (/^-?\d+(?:\.\d+)?e[+\-]?\d+$/i.test(s)) {
+      const n = Number(s);
+      if (!Number.isFinite(n)) return s;
+      return n.toExponential(2);
+    }
+
+    // Handle plain numeric strings: force exactly two decimals
+    if (/^-?\d+(?:\.\d+)?$/.test(s)) {
+      // Truncate/pad to two decimals without rounding
+      return ensureTwoDecimalsNoRound(s);
+    }
+
+    // Otherwise, return unchanged
     return s;
   } catch {
     return String(formatted ?? '0');
@@ -202,7 +247,10 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
     cls.toggle('unaffordable', !isAffordable);
     cls.toggle('disabled', !isAffordable);
   } catch (error) {
-    errorHandler.handleError(error, 'updateButtonClasses', { buttonId: (button as HTMLElement)?.id, isAffordable });
+    errorHandler.handleError(error, 'updateButtonClasses', {
+      buttonId: (button as HTMLElement)?.id,
+      isAffordable,
+    });
   }
   try {
     const costSpan = (button as HTMLElement).querySelector('.cost') as HTMLElement | null;

@@ -5,6 +5,17 @@ import { errorHandler } from './core/error-handling/error-handler';
 export const config = {
   GAME_VERSION: '1.0.0',
   GAME_TITLE: 'Soda Clicker Pro!',
+  UI: {
+    FOUNTAIN_SODA_PROGRESS: true,
+    SODA_BUTTON_PROGRESS: true,
+    USE_THREE_SODA_BUTTON: true,
+    USE_PROCEDURAL_CUP: true,
+    EXPERIMENTAL_FLUID: false,
+    EXPERIMENTAL_FLUID_SURFACE: false,
+    STREAM_RIBBON_NOISE: true,
+    STREAM_IMPACT_GLINT: true,
+    SURFACE_HIGHLIGHT: true,
+  },
   BALANCE: {
     STRAW_BASE_COST: 25,
     STRAW_SCALING: 1.12,

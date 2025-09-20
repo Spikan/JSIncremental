@@ -22,12 +22,23 @@ export const BUTTON_TYPES: Record<string, ButtonTypeMeta> = {
   'save-btn': { audio: 'click', feedback: 'info', className: 'save-btn' },
   'sound-toggle-btn': { audio: 'click', feedback: 'info', className: 'sound-toggle-btn' },
   'dev-btn': { audio: 'click', feedback: 'info', className: 'dev-btn' },
+  // Additional button type classes used across the UI
+  'dev-toggle-btn': { audio: 'click', feedback: 'info', className: 'dev-toggle-btn' },
+  'god-toggle-btn': { audio: 'click', feedback: 'info', className: 'god-toggle-btn' },
   'chat-send-btn': { audio: 'click', feedback: 'info', className: 'chat-send-btn' },
-  'splash-start-btn': { audio: 'click', feedback: 'info', className: 'splash-start-btn' },
   'audio-btn': { audio: 'click', feedback: 'info', className: 'audio-btn' },
   'settings-modal-btn': { audio: 'click', feedback: 'info', className: 'settings-modal-btn' },
+  'switch-dropdown-btn': {
+    audio: 'click',
+    feedback: 'info',
+    className: 'switch-dropdown-btn',
+  },
+  'unlock-btn': { audio: 'click', feedback: 'levelup', className: 'unlock-btn' },
+  'offline-modal-btn': {
+    audio: 'click',
+    feedback: 'info',
+    className: 'offline-modal-btn',
+  },
   // Environment system replaced by hybrid level system
   'level-btn': { audio: 'click', feedback: 'info', className: 'level-btn' },
 };
-
-

@@ -5,10 +5,8 @@ import { logger } from '../services/logger';
 export class AudioControlsManager {
   private static instance: AudioControlsManager;
   private masterSlider: HTMLInputElement | null = null;
-  private musicSlider: HTMLInputElement | null = null;
   private sfxSlider: HTMLInputElement | null = null;
   private masterValue: HTMLSpanElement | null = null;
-  private musicValue: HTMLSpanElement | null = null;
   private sfxValue: HTMLSpanElement | null = null;
 
   public static getInstance(): AudioControlsManager {
@@ -37,10 +35,8 @@ export class AudioControlsManager {
    */
   private findElements(): void {
     this.masterSlider = document.getElementById('masterVolumeSlider') as HTMLInputElement;
-    this.musicSlider = document.getElementById('musicVolumeSlider') as HTMLInputElement;
     this.sfxSlider = document.getElementById('sfxVolumeSlider') as HTMLInputElement;
     this.masterValue = document.getElementById('masterVolumeValue') as HTMLSpanElement;
-    this.musicValue = document.getElementById('musicVolumeValue') as HTMLSpanElement;
     this.sfxValue = document.getElementById('sfxVolumeValue') as HTMLSpanElement;
   }
 
@@ -55,12 +51,7 @@ export class AudioControlsManager {
       });
     }
 
-    if (this.musicSlider) {
-      this.musicSlider.addEventListener('input', e => {
-        const value = parseInt((e.target as HTMLInputElement).value);
-        this.handleMusicVolumeChange(value);
-      });
-    }
+    // music slider removed
 
     if (this.sfxSlider) {
       this.sfxSlider.addEventListener('input', e => {
@@ -94,28 +85,7 @@ export class AudioControlsManager {
   /**
    * Handle music volume change
    */
-  private handleMusicVolumeChange(value: number): void {
-    try {
-      const volume = value / 100;
-      enhancedAudioManager.setMusicVolume(volume);
-
-      if (this.musicValue) {
-        this.musicValue.textContent = `${value}%`;
-      }
-
-      // Update slider visual progress
-      this.updateSliderProgress(this.musicSlider, value);
-
-      // If music is off but user is adjusting, start it
-      if (value > 0 && !enhancedAudioManager.getAudioState().musicPlaying) {
-        enhancedAudioManager.startBackgroundMusic();
-      }
-
-      logger.debug(`Music volume set to ${value}%`);
-    } catch (error) {
-      logger.warn('Failed to set music volume:', error);
-    }
-  }
+  // music volume handler removed
 
   /**
    * Handle SFX volume change
@@ -169,15 +139,7 @@ export class AudioControlsManager {
         this.masterValue.textContent = `${masterPercent}%`;
       }
 
-      // Update music volume
-      const musicPercent = Math.round(state.musicVolume * 100);
-      if (this.musicSlider) {
-        this.musicSlider.value = musicPercent.toString();
-        this.updateSliderProgress(this.musicSlider, musicPercent);
-      }
-      if (this.musicValue) {
-        this.musicValue.textContent = `${musicPercent}%`;
-      }
+      // music slider removed
 
       // Update SFX volume
       const sfxPercent = Math.round(state.sfxVolume * 100);

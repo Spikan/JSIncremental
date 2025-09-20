@@ -408,32 +408,7 @@ try {
 
 // tryBoot is now called inside the async try block after systems are loaded
 
-// After 1s, force-show game content to avoid being stuck on splash
-try {
-  const isTestEnv = typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true;
-  if (!isTestEnv) {
-    setTimeout(() => {
-      try {
-        const splash = document.getElementById('splashScreen') as any;
-        const game = document.getElementById('gameContent') as any;
-        if (splash && game && splash.style.display !== 'none') {
-          // Force-hiding splash screen after timeout
-          splash.style.display = 'none';
-          splash.style.visibility = 'hidden';
-          splash.style.pointerEvents = 'none';
-          if (splash.parentNode) splash.parentNode.removeChild(splash);
-          game.style.display = 'block';
-          game.style.visibility = 'visible';
-          game.style.opacity = '1';
-          document.body?.classList?.add('game-started');
-          // forced-hide splash
-        }
-      } catch (error) {
-        errorHandler.handleError(error, 'hideSplashScreen', { critical: true });
-      }
-    }, 1000);
-  }
-} catch {}
+// Legacy forced splash fallback removed: loading screen has its own watchdog Continue button
 
 // initOnDomReady diagnostics removed
 try {

@@ -23,6 +23,8 @@ export class LoadingScreen {
   private container: HTMLElement | null = null;
   private state: LoadingScreenState;
   private updateCallback?: (state: LoadingScreenState) => void;
+  private watchdogTimerId: number | null = null;
+  private readonly watchdogMs: number = 3000;
 
   constructor() {
     this.state = {
@@ -123,6 +125,24 @@ export class LoadingScreen {
       // Add CSS styles
       this.addStyles();
 
+      // Accessibility: mark busy
+      try {
+        document.body.setAttribute('aria-busy', 'true');
+      } catch {}
+
+      // Wire Continue button
+      try {
+        const continueBtn = this.container.querySelector(
+          '#loadingContinueBtn'
+        ) as HTMLButtonElement | null;
+        if (continueBtn) {
+          continueBtn.addEventListener('click', () => this.handleContinue());
+        }
+      } catch {}
+
+      // Start watchdog to reveal Continue button if things take too long
+      this.startWatchdog();
+
       return this.container;
     } catch (error) {
       errorHandler.handleError(error, 'createLoadingScreen', { critical: true });
@@ -132,21 +152,21 @@ export class LoadingScreen {
 
   private getHTML(): string {
     return `
-      <div class="loading-overlay">
+      <div class="loading-overlay" role="dialog" aria-modal="true" aria-labelledby="loadingTitle">
         <div class="loading-content">
           <!-- Header -->
           <div class="loading-header">
-            <h1 class="loading-title">SODA CLICKER PRO</h1>
+            <h1 class="loading-title" id="loadingTitle">SODA CLICKER PRO</h1>
             <h2 class="loading-subtitle">Loading Game Systems...</h2>
           </div>
 
           <!-- Progress Section -->
           <div class="loading-progress-section">
-            <div class="progress-container">
-              <div class="progress-bar">
+            <div class="progress-container" aria-live="polite">
+              <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Overall loading progress">
                 <div class="progress-fill" id="overallProgressFill"></div>
               </div>
-              <div class="progress-text">
+              <div class="progress-text" id="progressLiveText" role="status" aria-live="polite">
                 <span id="progressPercentage">0%</span>
                 <span id="progressStep">Initializing...</span>
               </div>
@@ -154,9 +174,9 @@ export class LoadingScreen {
           </div>
 
           <!-- Steps List -->
-          <div class="loading-steps">
-            <div class="steps-title">System Status</div>
-            <div class="steps-list" id="stepsList">
+          <div class="loading-steps" role="region" aria-labelledby="stepsTitle">
+            <div class="steps-title" id="stepsTitle">System Status</div>
+            <div class="steps-list" id="stepsList" role="list">
               ${this.state.steps.map(step => this.getStepHTML(step)).join('')}
             </div>
           </div>
@@ -185,6 +205,7 @@ export class LoadingScreen {
           <div class="loading-footer">
             <p class="loading-version">v1.0 - Inspired by Soda Drinker Pro</p>
             <p class="loading-time" id="loadingTime">Loading...</p>
+            <button id="loadingContinueBtn" class="loading-continue-btn" style="display:none" aria-label="Continue to game">Continue</button>
           </div>
         </div>
       </div>
@@ -196,7 +217,7 @@ export class LoadingScreen {
     const statusClass = step.completed ? 'completed' : step.error ? 'error' : 'pending';
 
     return `
-      <div class="step-item ${statusClass}" data-step="${step.id}">
+      <div class="step-item ${statusClass}" data-step="${step.id}" role="listitem" aria-label="${step.name} ${step.completed ? 'completed' : step.error ? 'error' : 'in progress'}">
         <div class="step-icon">${statusIcon}</div>
         <div class="step-content">
           <div class="step-name">${step.name}</div>
@@ -225,12 +246,12 @@ export class LoadingScreen {
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        background: linear-gradient(135deg, #001789 0%, #0024b3 50%, #001f9e 100%);
         z-index: 10000;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Arial', sans-serif;
+        font-family: gillsans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         color: #ffffff;
       }
 
@@ -247,13 +268,10 @@ export class LoadingScreen {
 
       .loading-title {
         font-size: 3rem;
-        font-weight: bold;
+        font-weight: 800;
         margin: 0 0 0.5rem 0;
-        background: linear-gradient(45deg, #00d4ff, #ff6b6b);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        color: #ff3d02;
+        text-shadow: 3px 3px 0px #000;
       }
 
       .loading-subtitle {
@@ -285,7 +303,7 @@ export class LoadingScreen {
 
       .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, #00d4ff, #ff6b6b);
+        background: linear-gradient(90deg, #00d97f, #ff3d02);
         border-radius: 4px;
         transition: width 0.3s ease;
         width: 0%;
@@ -331,13 +349,13 @@ export class LoadingScreen {
       }
 
       .step-item.completed {
-        border-left-color: #00d4ff;
-        background: rgba(0, 212, 255, 0.1);
+        border-left-color: #00d97f;
+        background: rgba(0, 217, 127, 0.1);
       }
 
       .step-item.error {
-        border-left-color: #ff6b6b;
-        background: rgba(255, 107, 107, 0.1);
+        border-left-color: #ff3d02;
+        background: rgba(255, 61, 2, 0.1);
       }
 
       .step-item.pending {
@@ -439,7 +457,7 @@ export class LoadingScreen {
       .bottle-body {
         width: 40px;
         height: 50px;
-        background: linear-gradient(45deg, #00d4ff, #0099cc);
+        background: linear-gradient(45deg, #00d97f, #00b36b);
         border-radius: 20px 20px 5px 5px;
         position: absolute;
         bottom: 0;
@@ -450,7 +468,7 @@ export class LoadingScreen {
       .bottle-neck {
         width: 15px;
         height: 20px;
-        background: linear-gradient(45deg, #00d4ff, #0099cc);
+        background: linear-gradient(45deg, #00d97f, #00b36b);
         border-radius: 7px 7px 0 0;
         position: absolute;
         top: 0;
@@ -461,7 +479,7 @@ export class LoadingScreen {
       .bottle-cap {
         width: 20px;
         height: 8px;
-        background: #ff6b6b;
+        background: #ff3d02;
         border-radius: 10px 10px 0 0;
         position: absolute;
         top: -8px;
@@ -477,7 +495,7 @@ export class LoadingScreen {
       .loading-dots span {
         width: 8px;
         height: 8px;
-        background: #00d4ff;
+        background: #00d97f;
         border-radius: 50%;
         animation: pulse 1.5s ease-in-out infinite;
       }
@@ -503,6 +521,28 @@ export class LoadingScreen {
         margin: 0;
         font-size: 0.8rem;
         color: #999999;
+      }
+
+      .loading-continue-btn {
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #ffffff;
+        background: linear-gradient(135deg, #008f5a, #00b36b);
+        border: 2px solid #00d97f;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .loading-continue-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(0, 217, 127, 0.35);
+      }
+
+      .loading-continue-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 3px 10px rgba(0, 217, 127, 0.25);
       }
 
       @keyframes float {
@@ -531,6 +571,16 @@ export class LoadingScreen {
         
         .step-item {
           padding: 0.5rem;
+        }
+      }
+
+      /* Reduced motion support */
+      @media (prefers-reduced-motion: reduce) {
+        .progress-fill, .step-progress-fill {
+          transition: none !important;
+        }
+        .loading-dots span, .soda-bottle {
+          animation: none !important;
         }
       }
     `;
@@ -601,6 +651,11 @@ export class LoadingScreen {
         // Add game-started class to body
         document.body.classList.add('game-started');
 
+        // Accessibility: no longer busy
+        try {
+          document.body.setAttribute('aria-busy', 'false');
+        } catch {}
+
         console.log('✅ Game content shown after loading completion');
       } else {
         console.warn('⚠️ Game content element not found');
@@ -612,6 +667,8 @@ export class LoadingScreen {
 
   public hide(): void {
     try {
+      // Stop watchdog
+      this.clearWatchdog();
       if (this.container) {
         this.container.style.opacity = '0';
         this.container.style.transition = 'opacity 0.5s ease';
@@ -653,6 +710,14 @@ export class LoadingScreen {
       if (progressFill) {
         progressFill.style.width = `${this.state.overallProgress}%`;
       }
+
+      // Update progressbar aria-valuenow
+      try {
+        const progressBar = this.container.querySelector('.progress-bar') as HTMLElement | null;
+        if (progressBar) {
+          progressBar.setAttribute('aria-valuenow', String(Math.round(this.state.overallProgress)));
+        }
+      } catch {}
 
       if (progressPercentage) {
         progressPercentage.textContent = `${Math.round(this.state.overallProgress)}%`;
@@ -704,6 +769,39 @@ export class LoadingScreen {
 
   public getState(): LoadingScreenState {
     return { ...this.state };
+  }
+
+  private startWatchdog(): void {
+    this.clearWatchdog();
+    try {
+      this.watchdogTimerId = window.setTimeout(() => {
+        try {
+          const btn = this.container?.querySelector('#loadingContinueBtn') as HTMLElement | null;
+          if (btn) {
+            btn.style.display = 'inline-block';
+          }
+        } catch {}
+      }, this.watchdogMs);
+    } catch {}
+  }
+
+  private clearWatchdog(): void {
+    if (this.watchdogTimerId) {
+      try {
+        clearTimeout(this.watchdogTimerId);
+      } catch {}
+      this.watchdogTimerId = null;
+    }
+  }
+
+  private handleContinue(): void {
+    try {
+      // Immediate reveal path
+      this.showGameContent();
+      this.hide();
+    } catch (error) {
+      errorHandler.handleError(error, 'handleContinueLoading');
+    }
   }
 }
 

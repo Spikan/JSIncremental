@@ -954,24 +954,33 @@ export class HybridLevelSystem {
   }
 }
 
-// CSS for floating animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(180deg); }
+// CSS for floating animation (guarded for non-DOM environments like tests/SSR)
+try {
+  if (
+    typeof document !== 'undefined' &&
+    typeof document.createElement === 'function' &&
+    document.head &&
+    typeof document.head.appendChild === 'function'
+  ) {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+      }
+      
+      .level-particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+      }
+    `;
+    document.head.appendChild(style);
   }
-  
-  .level-particles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-  }
-`;
-document.head.appendChild(style);
+} catch {}
 
 export const hybridLevelSystem = new HybridLevelSystem();

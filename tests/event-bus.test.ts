@@ -23,5 +23,3 @@ describe('event-bus', () => {
     expect(good).toHaveBeenCalledWith(1);
   });
 });
-
-

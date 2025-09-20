@@ -63,26 +63,10 @@ class EnhancedDisplayManager {
       const displayData = getDisplayData();
       if (!displayData?.sips) return;
 
-      const currentSips = displayData.sips.toString();
-      const previousSips = this.previousState.sips;
-
-      // Only animate if value changed and animation is enabled
-      if (this.animationEnabled && previousSips && previousSips !== currentSips) {
-        const fromValue = parseFloat(previousSips) || 0;
-        const toValue = parseFloat(currentSips) || 0;
-
-        // Skip animation for very small changes
-        if (Math.abs(toValue - fromValue) > 1) {
-          animateNumberDisplay(topSipValue, fromValue, toValue, value => formatNumber(value));
-        } else {
-          topSipValue.textContent = formatNumber(currentSips);
-        }
-      } else {
-        // First load or animation disabled - immediate update
-        topSipValue.textContent = formatNumber(currentSips);
-      }
-
-      this.previousState.sips = currentSips;
+      const currentSips = displayData.sips; // pass Decimal/number directly
+      // Disable animation for sips to avoid visible counting; immediate update only
+      topSipValue.textContent = formatNumber(currentSips);
+      this.previousState.sips = currentSips?.toString?.() ?? String(currentSips);
     } catch (error) {
       logger.error('Failed to update animated sips counter:', error);
     }
@@ -99,23 +83,10 @@ class EnhancedDisplayManager {
       const displayData = getDisplayData();
       if (!displayData?.spd) return;
 
-      const currentSPD = displayData.spd.toString();
-      const previousSPD = this.previousState.spd;
-
-      if (this.animationEnabled && previousSPD && previousSPD !== currentSPD) {
-        const fromValue = parseFloat(previousSPD) || 0;
-        const toValue = parseFloat(currentSPD) || 0;
-
-        if (Math.abs(toValue - fromValue) > 0.1) {
-          animateNumberDisplay(spdElement, fromValue, toValue, value => formatNumber(value));
-        } else {
-          spdElement.textContent = formatNumber(currentSPD);
-        }
-      } else {
-        spdElement.textContent = formatNumber(currentSPD);
-      }
-
-      this.previousState.spd = currentSPD;
+      const currentSPD = displayData.spd; // pass Decimal/number directly
+      // Disable animation for spd; immediate update only for visual stability
+      spdElement.textContent = formatNumber(currentSPD);
+      this.previousState.spd = currentSPD?.toString?.() ?? String(currentSPD);
     } catch (error) {
       logger.error('Failed to update animated SPD display:', error);
     }

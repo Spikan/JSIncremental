@@ -61,9 +61,10 @@ function createAssetFileNames(assetInfo: any): string {
 
 export default defineConfig(({ mode }) => {
   const isAnalyze = mode === 'analyze';
+  const base = getBasePath();
 
   return {
-    base: getBasePath(),
+    base,
 
     plugins: [
       VitePWA({
@@ -103,8 +104,8 @@ export default defineConfig(({ mode }) => {
           background_color: '#16213e',
           display: 'standalone',
           orientation: 'portrait',
-          start_url: '/',
-          scope: '/',
+          start_url: base,
+          scope: base,
           icons: [
             {
               src: 'images/pwa-64x64.png',
@@ -159,7 +160,7 @@ export default defineConfig(({ mode }) => {
         plugins: [
           visualizer({
             filename: 'dist/stats.html',
-            open: true,
+            open: isAnalyze ? true : false,
             gzipSize: true,
             brotliSize: true,
           }),

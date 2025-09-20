@@ -42,13 +42,6 @@ let __buttonSystemInitialized = false;
 
 type ButtonActionMeta = { func: (...args: any[]) => any; type: string; label: string };
 // ButtonTypeMeta moved to button-config.ts
-type PurchaseActionName =
-  | 'buyStraw'
-  | 'buyCup'
-  | 'buyWiderStraws'
-  | 'buyBetterCups'
-  | 'buySuction'
-  | 'buyFasterDrinks';
 
 const BUTTON_CONFIG: {
   types: Record<string, ConfigButtonTypeMeta>;
@@ -440,33 +433,6 @@ const BUTTON_CONFIG: {
       },
       type: 'god-toggle-btn',
       label: 'Toggle God Tab',
-    },
-    startGame: {
-      func: () => {
-        try {
-          // Hide splash screen and show game content
-          const splashScreen = document.getElementById('splashScreen');
-          const gameContent = document.getElementById('gameContent');
-
-          if (splashScreen && gameContent) {
-            splashScreen.style.display = 'none';
-            splashScreen.style.visibility = 'hidden';
-            splashScreen.style.pointerEvents = 'none';
-            if (splashScreen.parentNode) {
-              splashScreen.parentNode.removeChild(splashScreen);
-            }
-
-            gameContent.style.display = 'block';
-            gameContent.style.visibility = 'visible';
-            gameContent.style.opacity = '1';
-            document.body?.classList?.add('game-started');
-          }
-        } catch (error) {
-          errorHandler.handleError(error, 'startGame', { action: 'splashStart' });
-        }
-      },
-      type: 'splash-start-btn',
-      label: 'Start Game',
     },
     sendChat: {
       func: () => {
@@ -1077,7 +1043,9 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
     const state = useGameStore.getState();
 
     if (state.options.clickSoundsEnabled) {
-      try { playButtonClickSound(); } catch (error) {
+      try {
+        playButtonClickSound();
+      } catch (error) {
         errorHandler.handleError(error, 'loadAudioSystem');
       }
     }
@@ -1103,7 +1071,19 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
         // Modernized - dev system check handled by store
         // Dev system is always available in modernized version
       }
-      action.func();
+      // Extract optional args from data-args attribute
+      let args: unknown[] = [];
+      try {
+        const rawArgs = button.getAttribute('data-args');
+        if (rawArgs && rawArgs.length > 0) {
+          // Split on commas, trim whitespace
+          args = rawArgs
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s.length > 0);
+        }
+      } catch {}
+      (action.func as any)(...args);
       if (buttonType.feedback === 'levelup') {
         try {
           // Modernized - level up feedback handled by store
@@ -1143,6 +1123,7 @@ function setupUnifiedButtonSystem(): void {
   }
 
   // Setting up modern button event handler system
+  // 1) Support legacy inline onclick attributes on <button>
   const allButtons = document.querySelectorAll('button');
   allButtons.forEach((button: any) => {
     const onclick = button.getAttribute('onclick');
@@ -1200,6 +1181,64 @@ function setupUnifiedButtonSystem(): void {
           // Button configured successfully
         }
       }
+    }
+  });
+
+  // 2) Primary binding path: elements with data-action (buttons and other clickable elements)
+  const actionElements = document.querySelectorAll('[data-action]');
+  actionElements.forEach((el: Element) => {
+    const element = el as HTMLElement;
+    // Skip sodaButton; it's handled by soda-button-gestures/3D component
+    if (element.id === 'sodaButton') return;
+    // Avoid double-binding
+    if (element.getAttribute('data-bound') === '1') return;
+
+    const actionName = element.getAttribute('data-action') || '';
+    if (!actionName) return;
+    const action = BUTTON_CONFIG.actions[actionName];
+    if (!action) return; // Unknown action; ignore
+
+    // Mark as bound
+    element.setAttribute('data-bound', '1');
+
+    if ((window as any).PointerEvent) {
+      element.addEventListener('pointerdown', (e: any) => {
+        if (e && e.pointerType && e.pointerType !== 'mouse') {
+          element.classList.add('button-clicked');
+        }
+      });
+      element.addEventListener('pointerup', (e: any) => {
+        if (e && e.pointerType && e.pointerType !== 'mouse') {
+          markPointerHandled(element);
+          handleButtonClick(e, element, actionName);
+        }
+      });
+    } else if ('ontouchstart' in window) {
+      element.addEventListener(
+        'touchstart',
+        () => {
+          element.classList.add('button-clicked');
+        },
+        { passive: true }
+      );
+      element.addEventListener(
+        'touchend',
+        (e: any) => {
+          markPointerHandled(element);
+          handleButtonClick(e, element, actionName);
+        },
+        { passive: true }
+      );
+    }
+    element.addEventListener('click', (e: any) => {
+      if (shouldSuppressClick(element)) return;
+      handleButtonClick(e, element, actionName);
+    });
+
+    if ((action as any).type) {
+      try {
+        element.classList.add((action as any).type);
+      } catch {}
     }
   });
 
@@ -1287,96 +1326,8 @@ function setupSpecialButtonHandlers(): void {
       }
     });
   }
-  const splashStartBtn =
-    typeof document !== 'undefined' && document.querySelector
-      ? (document.querySelector('.splash-start-btn') as HTMLElement | null)
-      : null;
-  if (splashStartBtn && splashStartBtn.addEventListener) {
-    if ((window as unknown as { PointerEvent?: unknown }).PointerEvent) {
-      splashStartBtn.addEventListener('pointerdown', (e: PointerEvent) => {
-        const anyEvent = e as unknown as { pointerType?: string };
-        if (anyEvent?.pointerType === 'mouse') return;
-        markPointerHandled(splashStartBtn);
-        e.preventDefault();
-        e.stopPropagation();
-        try {
-          // Start game functionality - modernized
-          console.log('Start game - modernized');
-        } catch (error) {
-          errorHandler.handleError(error, 'startGame');
-        }
-      });
-    } else if ('ontouchstart' in window) {
-      splashStartBtn.addEventListener(
-        'touchstart',
-        (_e: TouchEvent) => {
-          markPointerHandled(splashStartBtn);
-          try {
-            // Start game functionality - modernized
-            console.log('Start game - modernized');
-          } catch (error) {
-            errorHandler.handleError(error, 'startGame');
-          }
-        },
-        { passive: true } as AddEventListenerOptions
-      );
-    }
-    splashStartBtn.addEventListener('click', (e: MouseEvent) => {
-      if (shouldSuppressClick(splashStartBtn)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      try {
-        // Start game functionality - modernized
-        console.log('Start game - modernized');
-      } catch (error) {
-        errorHandler.handleError(error, 'startGame');
-      }
-    });
-  }
-  if (document && document.body && document.body.addEventListener) {
-    if ((window as unknown as { PointerEvent?: unknown }).PointerEvent) {
-      document.body.addEventListener(
-        'pointerdown',
-        (e: PointerEvent) => {
-          const target = e.target as Element | null;
-          if (!(target instanceof HTMLElement)) return;
-          const startEl = target.closest('.splash-start-btn') as HTMLElement | null;
-          if (!startEl) return;
-          const anyEvent = e as unknown as { pointerType?: string };
-          if (anyEvent?.pointerType === 'mouse') return;
-          markPointerHandled(startEl);
-          e.preventDefault();
-          e.stopPropagation();
-          try {
-            // Start game functionality - modernized
-            console.log('Start game - modernized');
-          } catch (err) {
-            errorHandler.handleError(err, 'startGame');
-          }
-        },
-        { capture: true } as AddEventListenerOptions
-      );
-    }
-    document.body.addEventListener(
-      'click',
-      (e: MouseEvent) => {
-        const target = e.target as Element | null;
-        if (!(target instanceof HTMLElement)) return;
-        const startEl = target.closest('.splash-start-btn') as HTMLElement | null;
-        if (!startEl) return;
-        if (shouldSuppressClick(startEl)) return;
-        e.preventDefault();
-        e.stopPropagation();
-        try {
-          // Start game functionality - modernized
-          console.log('Start game - modernized');
-        } catch (err) {
-          errorHandler.handleError(err, 'startGame');
-        }
-      },
-      { capture: true } as AddEventListenerOptions
-    );
-  }
+  // Legacy splash-start button removed
+  // Legacy delegated listeners for splash-start removed
 }
 
 function initButtonSystem(): void {

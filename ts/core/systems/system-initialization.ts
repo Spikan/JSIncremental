@@ -26,7 +26,7 @@ export class SystemInitializationManager {
       description: 'Initializing error management system',
       initialize: async () => {
         // Error handling is already initialized when this runs
-        await this.delay(100); // Simulate initialization time
+        await this.delay(15);
       },
     });
 
@@ -37,7 +37,7 @@ export class SystemInitializationManager {
       dependencies: ['error-handling'],
       initialize: async () => {
         // Store is already initialized when this runs
-        await this.delay(200);
+        await this.delay(25);
       },
     });
 
@@ -48,7 +48,7 @@ export class SystemInitializationManager {
       dependencies: ['error-handling'],
       initialize: async () => {
         // Event bus is already initialized when this runs
-        await this.delay(150);
+        await this.delay(20);
       },
     });
 
@@ -59,7 +59,7 @@ export class SystemInitializationManager {
       dependencies: ['error-handling', 'store'],
       initialize: async () => {
         // Storage is already initialized when this runs
-        await this.delay(300);
+        await this.delay(30);
       },
     });
 
@@ -70,7 +70,7 @@ export class SystemInitializationManager {
       dependencies: ['error-handling', 'store', 'event-bus'],
       initialize: async () => {
         // UI systems are already initialized when this runs
-        await this.delay(400);
+        await this.delay(40);
       },
     });
 
@@ -81,7 +81,7 @@ export class SystemInitializationManager {
       dependencies: ['error-handling'],
       initialize: async () => {
         // Audio system is already initialized when this runs
-        await this.delay(250);
+        await this.delay(25);
       },
     });
 
@@ -92,7 +92,7 @@ export class SystemInitializationManager {
       dependencies: ['error-handling', 'store', 'event-bus', 'ui'],
       initialize: async () => {
         // Game loop is already initialized when this runs
-        await this.delay(200);
+        await this.delay(20);
       },
     });
 
@@ -103,7 +103,7 @@ export class SystemInitializationManager {
       dependencies: ['error-handling', 'store', 'storage'],
       initialize: async () => {
         // Save system is already initialized when this runs
-        await this.delay(350);
+        await this.delay(35);
       },
     });
 
@@ -114,7 +114,7 @@ export class SystemInitializationManager {
       dependencies: ['error-handling'],
       initialize: async () => {
         // Performance monitoring is already initialized when this runs
-        await this.delay(100);
+        await this.delay(15);
       },
     });
   }
@@ -209,8 +209,8 @@ export class SystemInitializationManager {
   }
 
   private async initializeWithProgress(initializer: SystemInitializer): Promise<void> {
-    const steps = 10; // Number of progress steps
-    const stepDuration = 50; // ms per step
+    const steps = 4; // Number of progress steps (reduced)
+    const stepDuration = 10; // ms per step (faster)
 
     for (let i = 0; i < steps; i++) {
       try {
