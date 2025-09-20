@@ -12,7 +12,7 @@
 
 import { domQuery } from './services/dom-query';
 import { timerManager } from './services/timer-manager';
-import { useGameStore } from './core/state/zustand-store';
+import { getStoreActions } from './core/state/zustand-store';
 import { pwaService } from './services/pwa-service';
 import { errorHandler } from './core/error-handling/error-handler';
 
@@ -57,6 +57,7 @@ import { processOfflineProgression } from './core/systems/offline-progression';
 import { showOfflineModal } from './ui/offline-modal';
 import { sidebarNavigation } from './ui/sidebar-navigation';
 import { sodaDrinkerHeaderService } from './services/soda-drinker-header-service';
+import { start as startLoop } from './core/systems/loop-system';
 // DecimalOps removed - no longer using toSafeNumber
 
 // Export for potential use
@@ -66,53 +67,40 @@ export { initGame };
 function initGame() {
   try {
     // Starting game initialization
-    console.log('🔧 Starting game initialization...');
-    console.log('🔧 Unlocks system available:', true); // Modernized - always available
     // Modernized - unlocks system always available
     if (typeof document === 'undefined' || !domQuery.exists('#sodaButton')) {
-      console.log('⏳ Waiting for DOM elements to load...');
-      console.log('🔧 Document ready state:', document?.readyState);
-      console.log('🔧 Soda button exists:', domQuery.exists('#sodaButton'));
-      console.log('🔧 Soda button element:', document?.getElementById('sodaButton'));
       timerManager.setTimeout(initGame, 100, 'Retry initGame - DOM not ready');
       return;
     }
 
-    // Initialize PWA service
+    // Initialize PWA service (skip in tests)
     try {
-      pwaService.getStatus(); // This initializes the service
-      console.log('📱 PWA service initialized');
+      if (!(typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true)) {
+        pwaService.getStatus(); // This initializes the service
 
-      // Check PWA installability
-      const isInstallable = pwaService.checkInstallability();
-      console.log('📱 PWA installable:', isInstallable);
+        // Check PWA installability
+        const isInstallable = pwaService.checkInstallability();
 
-      if (!isInstallable) {
-        const status = pwaService.getDetailedStatus();
-        console.log('📱 PWA status:', status);
-      }
+        if (!isInstallable) {
+          pwaService.getDetailedStatus();
+        }
 
-      // Add install button click handler
-      const installButton = document.getElementById('pwa-install-button');
-      if (installButton) {
-        installButton.addEventListener('click', async () => {
-          try {
-            const success = await pwaService.installApp();
-            if (success) {
-              console.log('✅ PWA installed successfully');
-            } else {
-              console.log('❌ PWA installation failed or was dismissed');
+        // Add install button click handler
+        const installButton = document.getElementById('pwa-install-button');
+        if (installButton) {
+          installButton.addEventListener('click', async () => {
+            try {
+              await pwaService.installApp();
+            } catch (error) {
+              errorHandler.handleError(error, 'pwaInstallation', { action: 'install' });
             }
-          } catch (error) {
-            errorHandler.handleError(error, 'pwaInstallation', { action: 'install' });
-          }
-        });
+          });
+        }
       }
     } catch (error) {
       errorHandler.handleError(error, 'pwaServiceInitialization');
     }
     if (!GC || (typeof GC === 'object' && Object.keys(GC).length === 0)) {
-      console.log('⏳ Waiting for GAME_CONFIG to load...');
       // GAME_CONFIG must be available - fail fast if not
       throw new Error('GAME_CONFIG not available - configuration must be loaded before initGame');
     }
@@ -128,27 +116,13 @@ function initGame() {
     const drinkRate = DEFAULT_DRINK_RATE;
     let lastDrinkTime = Date.now() - DEFAULT_DRINK_RATE;
     try {
-      useGameStore.getState().actions.setLastDrinkTime(lastDrinkTime);
-      useGameStore.getState().actions.setDrinkRate(drinkRate);
+      const actions = getStoreActions();
+      actions.setLastDrinkTime(lastDrinkTime);
+      actions.setDrinkRate(drinkRate);
     } catch (error) {
       errorHandler.handleError(error, 'setDrinkTimeState', { lastDrinkTime, drinkRate });
     }
-    if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
-      Object.defineProperty(window, 'lastDrinkTime', {
-        get() {
-          return lastDrinkTime;
-        },
-        set(v) {
-          lastDrinkTime = Number(v) || 0;
-          try {
-            // Modernized - use store directly
-            useGameStore.getState().actions.setLastDrinkTime(lastDrinkTime);
-          } catch (error) {
-            errorHandler.handleError(error, 'setLastDrinkTimeViaBridge', { lastDrinkTime });
-          }
-        },
-      });
-    }
+    // Legacy global property bridge removed - use store directly
 
     // Variables removed - using proper state management instead
     // Critical clicks now managed through store
@@ -159,29 +133,11 @@ function initGame() {
       errorHandler.handleError(error, 'updateAutosaveStatus');
     }
     const gameStartTime = Date.now();
-    let lastSaveTime: any = null;
-    if (!Object.getOwnPropertyDescriptor(window, 'lastSaveTime')) {
-      Object.defineProperty(window, 'lastSaveTime', {
-        get() {
-          try {
-            return Number(useGameStore.getState().lastSaveTime ?? lastSaveTime ?? 0);
-          } catch (error) {
-            errorHandler.handleError(error, 'getLastSaveTimeFromAppState');
-          }
-          return Number(lastSaveTime || 0);
-        },
-        set(v) {
-          lastSaveTime = Number(v) || 0;
-          try {
-            useGameStore.getState().actions.setLastSaveTime(lastSaveTime);
-          } catch (error) {
-            errorHandler.handleError(error, 'setLastSaveTimeInAppState', { lastSaveTime });
-          }
-        },
-      });
-    }
+    // let lastSaveTime: any = null; // Legacy variable removed
+    // Legacy global property bridge removed - use store directly
     try {
-      useGameStore.getState().actions.setSessionStartTime(gameStartTime);
+      const actions = getStoreActions();
+      actions.setSessionStartTime(gameStartTime);
       // totalPlayTime managed by store
     } catch (error) {
       errorHandler.handleError(error, 'setSessionStartTime', { gameStartTime });
@@ -189,7 +145,8 @@ function initGame() {
 
     let gameStartDate = Date.now();
     try {
-      useGameStore.getState().actions.setSessionStartTime(Number(gameStartDate));
+      const actions = getStoreActions();
+      actions.setSessionStartTime(Number(gameStartDate));
     } catch (error) {
       errorHandler.handleError(error, 'setGameStartDate');
     }
@@ -201,7 +158,6 @@ function initGame() {
 
     try {
       // DOM is already ready, no initialization needed
-      console.log('✅ DOM elements are ready');
     } catch (error) {
       errorHandler.handleError(error, 'verifyDOMReadiness');
     }
@@ -210,7 +166,8 @@ function initGame() {
     let savegame: any = null;
     try {
       // Use localStorage directly for now
-      savegame = JSON.parse(localStorage.getItem('save') as any);
+      const saveData = localStorage.getItem('save');
+      savegame = JSON.parse(saveData as any);
     } catch (e) {
       errorHandler.handleError(e, 'loadSave', { fallback: 'starting fresh' });
       savegame = null;
@@ -221,13 +178,12 @@ function initGame() {
 
     try {
       // Modernized - events handled by store
-      console.log('Game loaded:', { save: !!savegame });
     } catch (error) {
       errorHandler.handleError(error, 'emitGameLoadedEvent');
     }
 
     // Check for offline progression if this was a returning player
-    if (savegame) {
+    if (savegame && !(typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true)) {
       try {
         // Delay offline progression check to ensure state is fully loaded
         timerManager.setTimeout(
@@ -259,45 +215,21 @@ function initGame() {
     // Get current state from store
     // Compute production
     const config = BAL || {};
-    const up = {
-      straws: { baseSPD: config.STRAW_BASE_SPD },
-      cups: { baseSPD: config.CUP_BASE_SPD },
-      widerStraws: { multiplierPerLevel: config.WIDER_STRAWS_MULTIPLIER },
-      betterCups: { multiplierPerLevel: config.BETTER_CUPS_MULTIPLIER },
-    };
 
-    const result = {
-      base: {
-        strawBaseSPD: up.straws.baseSPD,
-        cupBaseSPD: up.cups.baseSPD,
-        baseSipsPerDrink: config.BASE_SIPS_PER_DRINK,
-      },
-      multipliers: {
-        widerStrawsPerLevel: up.widerStraws.multiplierPerLevel,
-        betterCupsPerLevel: up.betterCups.multiplierPerLevel,
-      },
-    };
+    // Configuration values are used for state updates through the store system
 
     // Handle Decimal results properly - convert to numbers
     try {
       // Use safe conversion to handle extreme values without returning Infinity
       // Preserve extreme SPD values - don't use toSafeNumber
       // Modernized - use actual values from store
-      const strawSPDValue = result.base.strawBaseSPD;
-      const cupSPDValue = result.base.cupBaseSPD;
-      // Preserve extreme SPD values - don't use toSafeNumber
-      const spdValue = result.base.baseSipsPerDrink;
+      // Values are used for state updates but not directly referenced
 
       // Store values directly in Zustand store instead of local variables
 
       // Update Zustand store with recalculated values
       try {
         // Modernized - state updates handled by store
-        console.log('State update modernized:', {
-          strawSPD: strawSPDValue,
-          cupSPD: cupSPDValue,
-          spd: spdValue,
-        });
       } catch (error) {
         errorHandler.handleError(error, 'updateStoreWithRecalculatedSPD');
       }
@@ -307,17 +239,13 @@ function initGame() {
 
     // Production calculation using store values
     try {
-      const strawSPD = new Decimal(config.STRAW_BASE_SPD);
-      const cupSPD = new Decimal(config.CUP_BASE_SPD);
-      const baseSipsPerDrink = new Decimal(config.BASE_SIPS_PER_DRINK);
+      // Create Decimal values for configuration
+      new Decimal(config.STRAW_BASE_SPD);
+      new Decimal(config.CUP_BASE_SPD);
+      new Decimal(config.BASE_SIPS_PER_DRINK);
 
       // Update store with values
       // Modernized - state updates handled by store
-      console.log('State update modernized:', {
-        strawSPD: strawSPD,
-        cupSPD: cupSPD,
-        spd: baseSipsPerDrink,
-      });
     } catch (error) {
       errorHandler.handleError(error, 'updateStoreWithValues');
     }
@@ -347,11 +275,7 @@ function initGame() {
     // Update UI displays after ensuring DOM cache is ready
     const updateDisplaysWhenReady = () => {
       // DOM cache replaced with domQuery service
-      if (
-        !domQuery.exists('#sodaButton') ||
-        !domQuery.exists('#shopTab') ||
-        !domQuery.exists('#topSipValue')
-      ) {
+      if (!domQuery.exists('#sodaButton') || !domQuery.exists('#topSipValue')) {
         // Waiting for DOM elements
         timerManager.setTimeout(
           updateDisplaysWhenReady,
@@ -375,20 +299,17 @@ function initGame() {
 
     // Initialize sidebar navigation
     try {
-      console.log('Initializing sidebar navigation...');
       sidebarNavigation.forceInitialize();
-      console.log('Sidebar navigation initialized:', sidebarNavigation);
     } catch (error) {
       errorHandler.handleError(error, 'initializeSidebarNavigation');
     }
 
     // Initialize Soda Drinker Pro header
     try {
-      console.log('Initializing Soda Drinker Pro header...');
       sodaDrinkerHeaderService
         .initialize()
         .then(() => {
-          console.log('Soda Drinker Pro header initialized');
+          // Header initialized successfully
         })
         .catch(error => {
           errorHandler.handleError(error, 'initializeSodaDrinkerProHeader');
@@ -434,13 +355,11 @@ function initGame() {
       }
 
       // DOM elements are already available, no reinitialization needed
-      console.log('🔄 Game content is visible, DOM elements are ready');
 
       // Try to start a minimal game loop even if initGame failed
       try {
         // const w = window as any;
         // Loop system access modernized - using direct import
-        const { startLoop } = require('./core/systems/loop-system');
         if (startLoop) {
           startLoop({
             updateDrinkProgress: () => {},
@@ -450,7 +369,6 @@ function initGame() {
             updatePlayTime: () => {},
             updateLastSaveTime: () => {},
           });
-          console.log('🔄 Minimal game loop started');
         }
       } catch (e) {
         errorHandler.handleError(e, 'startMinimalGameLoop');

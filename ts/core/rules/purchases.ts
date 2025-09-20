@@ -1,8 +1,6 @@
 // Pure cost and stat calculation for purchases with Decimal support (TypeScript)
 
-// DecimalOps removed - no longer using toSafeNumber
-// Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal;
+import Decimal from 'break_eternity.js';
 import { DecimalType } from '../numbers/simplified';
 
 export function nextStrawCost(
@@ -23,7 +21,8 @@ export function nextStrawCost(
   const milestoneCost = base.multiply(new Decimal(10).pow(milestoneCount));
 
   // Linear scaling within milestone (much more affordable)
-  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
+  // Use Decimal arithmetic throughout - no conversion to JavaScript numbers
+  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone));
 
   return milestoneCost.multiply(withinMilestoneCost).div(base);
 }
@@ -46,7 +45,8 @@ export function nextCupCost(
   const milestoneCost = base.multiply(new Decimal(10).pow(milestoneCount));
 
   // Linear scaling within milestone (much more affordable)
-  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
+  // Use Decimal arithmetic throughout - no conversion to JavaScript numbers
+  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone));
 
   return milestoneCost.multiply(withinMilestoneCost).div(base);
 }
@@ -68,7 +68,8 @@ export function nextWiderStrawsCost(
   const milestoneCost = base.multiply(new Decimal(10).pow(milestoneCount));
 
   // Linear scaling within milestone (much more affordable)
-  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
+  // Use Decimal arithmetic throughout - no conversion to JavaScript numbers
+  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone));
 
   return milestoneCost.multiply(withinMilestoneCost).div(base);
 }
@@ -90,7 +91,8 @@ export function nextBetterCupsCost(
   const milestoneCost = base.multiply(new Decimal(10).pow(milestoneCount));
 
   // Linear scaling within milestone (much more affordable)
-  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone.toNumber() || 0));
+  // Use Decimal arithmetic throughout - no conversion to JavaScript numbers
+  const withinMilestoneCost = base.multiply(scale.pow(withinMilestone));
 
   return milestoneCost.multiply(withinMilestoneCost).div(base);
 }

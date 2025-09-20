@@ -6,6 +6,8 @@ export type UpgradesConfigTuple = { upgrades: any; config: any };
 
 export function getUpgradesAndConfig(): UpgradesConfigTuple {
   const upgrades = getUpgradesData();
-  const config = (window as any).GAME_CONFIG?.BALANCE || {};
+  // Try multiple ways to access the config
+  const gameConfig = (window as any).GAME_CONFIG;
+  const config = gameConfig?.BALANCE || gameConfig || {};
   return { upgrades, config };
 }

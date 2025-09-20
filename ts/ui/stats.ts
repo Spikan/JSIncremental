@@ -62,14 +62,12 @@ export function updateLastSaveTime(): void {
 
 // Update all statistics (main coordinator function)
 export function updateAllStats(): void {
-  // Only update stats if the stats tab is active and elements exist
-  if (domQuery.getById('statsTab')?.classList?.contains('active')) {
-    updateTimeStats();
-    updateClickStats();
-    updateEconomyStats();
-    updateShopStats();
-    updateAchievementStats();
-  }
+  // Always update stats - no tab checking needed
+  updateTimeStats();
+  updateClickStats();
+  updateEconomyStats();
+  updateShopStats();
+  updateAchievementStats();
 }
 
 // Update time-related statistics
@@ -165,72 +163,28 @@ export function updateEconomyStats(): void {
 
 // Update shop-related statistics
 export function updateShopStats(): void {
-  // console.log('🔍 updateShopStats: Function called');
   try {
-    // Debug logging disabled for cleaner console
-    const shouldLog = false;
-    if (shouldLog) console.log('📊 updateShopStats() called');
-
-    // Debug: Log current state values
-    // Modernized - state handled by store
-    const state = useGameStore.getState() as any; // TODO: Fix type definitions
-    if (state) {
-      if (shouldLog)
-        console.log('🔍 Current state values:', {
-          straws: state.straws,
-          cups: state.cups,
-          sips: state.sips,
-        });
-    }
-
     // Always call updatePurchasedCounts regardless of tab state
     updatePurchasedCounts();
     // Straws purchased
-    const strawsPurchasedElement = domQuery.getById('strawsPurchased') as HTMLElement | undefined;
+    const strawsPurchasedElement = domQuery.getById('straws') as HTMLElement | undefined;
     if (strawsPurchasedElement) {
       // Modernized - state handled by store
       const v = useGameStore.getState().straws || 0;
-      if (shouldLog)
-        console.log('🔍 updateShopStats: Straws value =', v, 'formatted =', formatNumber(v));
       strawsPurchasedElement.textContent = formatNumber(v);
-    } else {
-      console.warn('🚫 updateShopStats: strawsPurchasedElement not found');
     }
     // Cups purchased
-    const cupsPurchasedElement = domQuery.getById('cupsPurchased') as HTMLElement | undefined;
+    const cupsPurchasedElement = domQuery.getById('cups') as HTMLElement | undefined;
     if (cupsPurchasedElement) {
       // Modernized - state handled by store
       const v = useGameStore.getState().cups || 0;
-      if (shouldLog)
-        console.log('🔍 updateShopStats: Cups value =', v, 'formatted =', formatNumber(v));
       cupsPurchasedElement.textContent = formatNumber(v);
-    } else {
-      console.warn('🚫 updateShopStats: cupsPurchasedElement not found');
-    }
-    // Suctions purchased
-    const suctionsPurchasedElement = domQuery.getById('suctionsPurchased') as
-      | HTMLElement
-      | undefined;
-    if (suctionsPurchasedElement) {
-      // Modernized - state handled by store
-      const v = useGameStore.getState().suctions || 0;
-      suctionsPurchasedElement.textContent = formatNumber(v);
-    }
-    // Critical clicks purchased
-    const criticalClicksPurchasedElement = domQuery.getById('criticalClicksPurchased') as
-      | HTMLElement
-      | undefined;
-    if (criticalClicksPurchasedElement) {
-      // Modernized - state handled by store
-      const v = useGameStore.getState().totalClicks || 0; // Using totalClicks as fallback
-      criticalClicksPurchasedElement.textContent = formatNumber(v);
     }
 
     // Update purchased item counts in shop displays
     updatePurchasedCounts();
 
     // Update enhancement values for upgrade displays
-    console.log('🔍 updateShopStats: About to call updateEnhancementValues');
     updateEnhancementValues();
   } catch (error) {
     errorHandler.handleError(error, 'updateShopStats', { critical: true });
@@ -271,24 +225,14 @@ export function updateAchievementStats(): void {
 
 // Update enhancement values for upgrade displays
 export function updateEnhancementValues(): void {
-  console.log('🔍 updateEnhancementValues: Function called');
   // Modernized - state handled by store
   const state = useGameStore.getState();
   if (!state) {
-    console.log('🔍 updateEnhancementValues: No state available');
     return;
   }
 
-  console.log('🔍 updateEnhancementValues: State available', {
-    straws: state.straws,
-    cups: state.cups,
-    widerStraws: state.widerStraws,
-    betterCups: state.betterCups,
-  });
-
   // Update base production values to show what you actually get
   const strawSPDElement = domQuery.getById('strawSPD') as HTMLElement | undefined;
-  console.log('🔍 strawSPDElement found:', !!strawSPDElement);
   if (strawSPDElement) {
     const straws = state.straws || 0;
     const widerStraws = state.widerStraws || 0;
@@ -298,21 +242,10 @@ export function updateEnhancementValues(): void {
     // Use actual game logic with all bonuses
     const actualStrawSPD = computeStrawSPD(straws, baseSPD, widerStraws, widerMultiplierPerLevel);
 
-    console.log('🔍 Straw production calculation (with bonuses):', {
-      straws,
-      widerStraws,
-      baseSPD,
-      widerMultiplierPerLevel,
-      actualStrawSPD: actualStrawSPD.toString(),
-      formatted: formatNumber(actualStrawSPD.toString()),
-    });
     strawSPDElement.textContent = formatNumber(actualStrawSPD.toString());
-  } else {
-    console.log('🔍 strawSPDElement not found');
   }
 
   const cupSPDElement = domQuery.getById('cupSPD') as HTMLElement | undefined;
-  console.log('🔍 cupSPDElement found:', !!cupSPDElement);
   if (cupSPDElement) {
     const cups = state.cups || 0;
     const betterCups = state.betterCups || 0;
@@ -322,17 +255,7 @@ export function updateEnhancementValues(): void {
     // Use actual game logic with all bonuses
     const actualCupSPD = computeCupSPD(cups, baseSPD, betterCups, betterMultiplierPerLevel);
 
-    console.log('🔍 Cup production calculation (with bonuses):', {
-      cups,
-      betterCups,
-      baseSPD,
-      betterMultiplierPerLevel,
-      actualCupSPD: actualCupSPD.toString(),
-      formatted: formatNumber(actualCupSPD.toString()),
-    });
     cupSPDElement.textContent = formatNumber(actualCupSPD.toString());
-  } else {
-    console.log('🔍 cupSPDElement not found');
   }
 
   // Update Wider Straws enhancement display
@@ -366,69 +289,38 @@ export function updateEnhancementValues(): void {
 export function updatePurchasedCounts(): void {
   // Reduce console logging frequency to optimize memory usage
   const shouldLog = false; // Debug logging disabled
-  if (shouldLog) console.log('📊 updatePurchasedCounts() called');
 
   if (typeof window === 'undefined') return;
 
   // Modernized - state handled by store
   const state = useGameStore.getState();
   if (!state) {
-    if (shouldLog) console.log('📊 No state available');
     return;
   }
-  if (shouldLog) console.log('📊 Current state:', { straws: state.straws, cups: state.cups });
+
+  // Silent state check - no logging needed
 
   // Check DOM availability
   if (typeof document === 'undefined') {
-    if (shouldLog) console.log('📊 Document not available');
     return;
   }
 
   // Update straws purchased count
-  const strawsPurchasedElement = domQuery.getById('strawsPurchased') as HTMLElement | undefined;
-  if (shouldLog)
-    console.log(
-      '🔍 strawsPurchasedElement:',
-      strawsPurchasedElement,
-      'exists:',
-      !!strawsPurchasedElement
-    );
+  const strawsPurchasedElement = domQuery.getById('straws') as HTMLElement | undefined;
   if (strawsPurchasedElement) {
     const straws = state.straws || 0;
-    if (shouldLog) console.log('🔍 Raw straws value:', straws, 'type:', typeof straws);
     const strawsValue = typeof straws === 'object' && straws.toString ? straws.toString() : straws;
-    if (shouldLog) console.log('🔍 Processed straws value:', strawsValue);
     const formattedStraws = formatNumber(strawsValue);
-    if (shouldLog) console.log('🔍 Formatted straws:', formattedStraws);
     strawsPurchasedElement.textContent = formattedStraws;
-    if (shouldLog)
-      console.log('✅ Updated straws:', strawsValue, 'element:', strawsPurchasedElement);
-  } else {
-    if (shouldLog) console.log('❌ strawsPurchased element not found');
   }
 
   // Update cups purchased count
-  const cupsPurchasedElement = domQuery.getById('cupsPurchased') as HTMLElement | undefined;
-  if (shouldLog)
-    if (shouldLog)
-      console.log(
-        '🔍 cupsPurchasedElement:',
-        cupsPurchasedElement,
-        'exists:',
-        !!cupsPurchasedElement
-      );
+  const cupsPurchasedElement = domQuery.getById('cups') as HTMLElement | undefined;
   if (cupsPurchasedElement) {
     const cups = state.cups || 0;
-    if (shouldLog) if (shouldLog) console.log('🔍 Raw cups value:', cups, 'type:', typeof cups);
     const cupsValue = typeof cups === 'object' && cups.toString ? cups.toString() : cups;
-    if (shouldLog) if (shouldLog) console.log('🔍 Processed cups value:', cupsValue);
     const formattedCups = formatNumber(cupsValue);
-    if (shouldLog) if (shouldLog) console.log('🔍 Formatted cups:', formattedCups);
     cupsPurchasedElement.textContent = formattedCups;
-    if (shouldLog)
-      if (shouldLog) console.log('✅ Updated cups:', cupsValue, 'element:', cupsPurchasedElement);
-  } else {
-    if (shouldLog) if (shouldLog) console.log('❌ cupsPurchased element not found');
   }
 
   // Update wider straws purchased count
@@ -440,8 +332,6 @@ export function updatePurchasedCounts(): void {
         ? widerStraws.toString()
         : widerStraws;
     widerStrawsElement.textContent = formatNumber(widerStrawsValue);
-    if (shouldLog)
-      console.log('✅ Updated widerStraws:', widerStrawsValue, 'element:', widerStrawsElement);
   } else {
     if (shouldLog) console.log('❌ widerStraws element not found');
   }
@@ -453,159 +343,13 @@ export function updatePurchasedCounts(): void {
     const betterCupsValue =
       typeof betterCups === 'object' && betterCups.toString ? betterCups.toString() : betterCups;
     betterCupsElement.textContent = formatNumber(betterCupsValue);
-    if (shouldLog)
-      console.log('✅ Updated betterCups:', betterCupsValue, 'element:', betterCupsElement);
   } else {
     if (shouldLog) console.log('❌ betterCups element not found');
   }
 
   // Note: Shop display elements are the same as the purchased elements above
 
-  // Update total production indicators
-  const totalStrawSPDElement = domQuery.getById('totalStrawSPD') as HTMLElement | undefined;
-  if (totalStrawSPDElement) {
-    const straws = state.straws || 0;
-    const strawSPD = state.strawSPD || 0;
-
-    // Use toDecimal helper for better memory efficiency
-    const strawsLarge = toDecimal(straws);
-    const strawSPDLarge = toDecimal(strawSPD);
-    const totalStrawProduction = strawsLarge.multiply(strawSPDLarge);
-    const totalStrawValue = totalStrawProduction.toString();
-    totalStrawSPDElement.textContent = formatNumber(totalStrawValue);
-    if (shouldLog)
-      console.log('✅ Updated totalStrawSPD:', totalStrawValue, 'element:', totalStrawSPDElement);
-  } else {
-    if (shouldLog) console.log('❌ totalStrawSPD element not found');
-  }
-
-  const totalWiderStrawsSPDElement = domQuery.getById('totalWiderStrawsSPD') as
-    | HTMLElement
-    | undefined;
-  if (totalWiderStrawsSPDElement) {
-    const widerStraws = state.widerStraws || 0;
-    const widerStrawsSPD = state.widerStrawsSPD || 0;
-    const widerStrawsLarge = toDecimal(widerStraws);
-    const widerStrawsSPDLarge = toDecimal(widerStrawsSPD);
-    const totalWiderStrawsProduction = widerStrawsLarge.multiply(widerStrawsSPDLarge);
-    totalWiderStrawsSPDElement.textContent = formatNumber(totalWiderStrawsProduction.toString());
-    if (shouldLog)
-      console.log(
-        '✅ Updated totalWiderStrawsSPD:',
-        totalWiderStrawsProduction.toString(),
-        'element:',
-        totalWiderStrawsSPDElement
-      );
-  } else {
-    if (shouldLog) console.log('❌ totalWiderStrawsSPD element not found');
-  }
-
-  const totalCupSPDElement = domQuery.getById('totalCupSPD') as HTMLElement | undefined;
-  if (totalCupSPDElement) {
-    const cups = state.cups || 0;
-    const cupSPD = state.cupSPD || 0;
-
-    // Use toDecimal helper for better memory efficiency
-    const cupsLarge = toDecimal(cups);
-    const cupSPDLarge = toDecimal(cupSPD);
-    const totalCupProduction = cupsLarge.multiply(cupSPDLarge);
-    const totalCupValue = totalCupProduction.toString();
-    totalCupSPDElement.textContent = formatNumber(totalCupValue);
-    if (shouldLog)
-      console.log('✅ Updated totalCupSPD:', totalCupValue, 'element:', totalCupSPDElement);
-  } else {
-    if (shouldLog) console.log('❌ totalCupSPD element not found');
-  }
-
-  const totalBetterCupsSPDElement = domQuery.getById('totalBetterCupsSPD') as
-    | HTMLElement
-    | undefined;
-  if (totalBetterCupsSPDElement) {
-    const betterCups = state.betterCups || 0;
-    const betterCupsSPD = state.betterCupsSPD || 0;
-    const betterCupsLarge = toDecimal(betterCups);
-    const betterCupsSPDLarge = toDecimal(betterCupsSPD);
-    const totalBetterCupsProduction = betterCupsLarge.multiply(betterCupsSPDLarge);
-    totalBetterCupsSPDElement.textContent = formatNumber(totalBetterCupsProduction.toString());
-    if (shouldLog)
-      console.log(
-        '✅ Updated totalBetterCupsSPD:',
-        totalBetterCupsProduction.toString(),
-        'element:',
-        totalBetterCupsSPDElement
-      );
-  } else {
-    if (shouldLog) console.log('❌ totalBetterCupsSPD element not found');
-  }
-
-  // Update suctions purchased count
-  const suctionsPurchasedElement = domQuery.getById('suctionsPurchased') as HTMLElement | undefined;
-  if (suctionsPurchasedElement) {
-    const suctions = state.suctions || 0;
-    const suctionsValue =
-      typeof suctions === 'object' && suctions.toString ? suctions.toString() : suctions;
-    suctionsPurchasedElement.textContent = formatNumber(suctionsValue);
-    if (shouldLog)
-      console.log('✅ Updated suctions:', suctionsValue, 'element:', suctionsPurchasedElement);
-  } else {
-    if (shouldLog) console.log('❌ suctionsPurchased element not found');
-  }
-
-  // Update shop display elements for suctions and criticalClicks (if they exist)
-  const shopSuctionsElement = domQuery.getById('suctions') as HTMLElement | undefined;
-  if (shopSuctionsElement) {
-    const suctions = state.suctions || 0;
-    const suctionsValue =
-      typeof suctions === 'object' && suctions.toString ? suctions.toString() : suctions;
-    shopSuctionsElement.textContent = formatNumber(suctionsValue);
-    if (shouldLog)
-      console.log('✅ Updated shop suctions:', suctionsValue, 'element:', shopSuctionsElement);
-  } else {
-    if (shouldLog) console.log('❌ shop suctions element not found (expected for this item)');
-  }
-
-  const shopCriticalClicksElement = domQuery.getById('criticalClicks') as HTMLElement | undefined;
-  if (shopCriticalClicksElement) {
-    const criticalClicks = state.criticalClicks || 0;
-    const criticalClicksValue =
-      typeof criticalClicks === 'object' && criticalClicks.toString
-        ? criticalClicks.toString()
-        : criticalClicks;
-    shopCriticalClicksElement.textContent = formatNumber(criticalClicksValue);
-    if (shouldLog)
-      console.log(
-        '✅ Updated shop criticalClicks:',
-        criticalClicksValue,
-        'element:',
-        shopCriticalClicksElement
-      );
-  } else {
-    if (shouldLog) console.log('❌ shop criticalClicks element not found (expected for this item)');
-  }
-
-  // Update critical clicks purchased count
-  const criticalClicksPurchasedElement = domQuery.getById('criticalClicksPurchased') as
-    | HTMLElement
-    | undefined;
-  if (criticalClicksPurchasedElement) {
-    const criticalClicks = state.criticalClicks || 0;
-    const criticalClicksValue =
-      typeof criticalClicks === 'object' && criticalClicks.toString
-        ? criticalClicks.toString()
-        : criticalClicks;
-    criticalClicksPurchasedElement.textContent = formatNumber(criticalClicksValue);
-    if (shouldLog)
-      console.log(
-        '✅ Updated criticalClicks:',
-        criticalClicksValue,
-        'element:',
-        criticalClicksPurchasedElement
-      );
-  } else {
-    if (shouldLog) console.log('❌ criticalClicksPurchased element not found');
-  }
-
-  if (shouldLog) console.log('🎉 updatePurchasedCounts completed');
+  // Silent completion - no logging needed
 
   // Make function available globally for testing
   if (typeof window !== 'undefined') {

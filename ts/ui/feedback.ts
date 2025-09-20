@@ -253,6 +253,7 @@ function showFeedbackWithContainer(
   const feedback = document.createElement('div');
   feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
   feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
+
   feedback.setAttribute('role', 'status');
   feedback.setAttribute('aria-live', 'polite');
   feedback.setAttribute(
@@ -328,9 +329,14 @@ export function showClickFeedback(
     showFeedbackAtCoordinates(sipsGained, isCritical, clickX, clickY);
     return;
   }
+
   const sodaContainer = (domQuery.getById('sodaButton')?.parentNode ||
     document.getElementById('sodaButton')?.parentNode) as HTMLElement | null;
-  if (!sodaContainer) return;
+
+  if (!sodaContainer) {
+    return;
+  }
+
   showFeedbackWithContainer(sipsGained, isCritical, sodaContainer);
 }
 

@@ -776,11 +776,7 @@ export function updateAllDisplays(): void {
   // Update all displays
 
   // Check if critical elements are ready before updating
-  if (
-    !domQuery.exists('#sodaButton') ||
-    !domQuery.exists('#shopTab') ||
-    !domQuery.exists('#topSipValue')
-  ) {
+  if (!domQuery.exists('#sodaButton') || !domQuery.exists('#topSipValue')) {
     // Critical elements not ready, retry
     timerManager.setTimeout(updateAllDisplays, 100, 'Retry display update');
     return;
@@ -879,12 +875,8 @@ export function performBatchUIUpdate(): void {
     updateTopSipsPerSecond();
     updateTopSipCounter();
     updatePlayTime();
-    if (
-      typeof window !== 'undefined' &&
-      domQuery.getById('statsTab')?.classList?.contains('active')
-    ) {
-      updateAllStats();
-    }
+    // Always update stats - no tab checking needed
+    updateAllStats();
     if (Math.random() < 0.1) {
       checkUpgradeAffordability();
     }

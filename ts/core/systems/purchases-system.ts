@@ -19,7 +19,7 @@ import { getUpgradesAndConfig } from './config-accessor.ts';
 // Import Decimal properly
 import Decimal from 'break_eternity.js';
 import { toDecimal, gte, DecimalType } from '../numbers/simplified';
-import { useGameStore } from '../state/zustand-store';
+import { useGameStore, getStoreActions } from '../state/zustand-store';
 import * as ui from '../../ui/index';
 import { optimizedEventBus } from '../../services/optimized-event-bus';
 import { safeStateOperation, errorHandler } from '../error-handling/error-handler';
@@ -27,19 +27,19 @@ import { StateGameError } from '../error-handling/error-types';
 
 // Centralized state update function with standardized error handling
 function updateGameState(updates: {
-  sips?: any;
-  straws?: any;
-  cups?: any;
-  suctions?: any;
-  widerStraws?: any;
-  betterCups?: any;
-  fasterDrinks?: any;
-  level?: any;
-  strawSPD?: any;
-  cupSPD?: any;
-  spd?: any;
+  sips?: DecimalType;
+  straws?: DecimalType;
+  cups?: DecimalType;
+  suctions?: DecimalType;
+  widerStraws?: DecimalType;
+  betterCups?: DecimalType;
+  fasterDrinks?: DecimalType;
+  level?: DecimalType;
+  strawSPD?: DecimalType;
+  cupSPD?: DecimalType;
+  spd?: DecimalType;
   drinkRate?: number;
-  suctionClickBonus?: any;
+  suctionClickBonus?: DecimalType;
 }) {
   return (
     safeStateOperation(
@@ -113,8 +113,8 @@ export function purchaseStraw({
   let sipsPerDrink: DecimalType;
 
   try {
-    // Validate inputs for extreme values
-    if (!isFinite(Number(sipsLarge.toString())) || !isFinite(Number(strawsLarge.toString()))) {
+    // Validate inputs for extreme values using Decimal methods
+    if (!sipsLarge.isFinite() || !strawsLarge.isFinite()) {
       errorHandler.handleError(
         new StateGameError('Invalid input values detected', 'purchaseStraw', { sips, straws })
       );
@@ -147,12 +147,12 @@ export function purchaseStraw({
       betterCups: betterCupsLarge,
     });
 
-    // Validate production results
+    // Validate production results using Decimal methods
     if (
       !productionResult ||
-      !isFinite(Number(productionResult.strawSPD?.toString() || 'NaN')) ||
-      !isFinite(Number(productionResult.cupSPD?.toString() || 'NaN')) ||
-      !isFinite(Number(productionResult.sipsPerDrink?.toString() || 'NaN'))
+      !productionResult.strawSPD?.isFinite() ||
+      !productionResult.cupSPD?.isFinite() ||
+      !productionResult.sipsPerDrink?.isFinite()
     ) {
       errorHandler.handleError(
         new StateGameError('Invalid production calculation', 'purchaseStraw', { productionResult })
@@ -214,8 +214,8 @@ export function purchaseCup({
   let sipsPerDrink: DecimalType;
 
   try {
-    // Validate inputs for extreme values
-    if (!isFinite(Number(sipsLarge.toString())) || !isFinite(Number(cupsLarge.toString()))) {
+    // Validate inputs for extreme values using Decimal methods
+    if (!sipsLarge.isFinite() || !cupsLarge.isFinite()) {
       errorHandler.handleError(new Error('Invalid input values detected'), 'purchaseCup', {
         sips: sipsLarge?.toString(),
         cups: cupsLarge?.toString(),
@@ -225,8 +225,8 @@ export function purchaseCup({
 
     cost = nextCupCost(cupsLarge, baseCost, scaling);
 
-    // Validate cost calculation
-    if (!cost || !isFinite(Number(cost.toString())) || cost.lte(new Decimal(0))) {
+    // Validate cost calculation using Decimal methods
+    if (!cost || !cost.isFinite() || cost.lte(new Decimal(0))) {
       errorHandler.handleError(new Error('Invalid cost calculation'), 'purchaseCup', {
         cost: cost?.toString(),
       });
@@ -249,12 +249,12 @@ export function purchaseCup({
       betterCups: betterCupsLarge,
     });
 
-    // Validate production results
+    // Validate production results using Decimal methods
     if (
       !productionResult ||
-      !isFinite(Number(productionResult.strawSPD?.toString() || 'NaN')) ||
-      !isFinite(Number(productionResult.cupSPD?.toString() || 'NaN')) ||
-      !isFinite(Number(productionResult.sipsPerDrink?.toString() || 'NaN'))
+      !productionResult.strawSPD?.isFinite() ||
+      !productionResult.cupSPD?.isFinite() ||
+      !productionResult.sipsPerDrink?.isFinite()
     ) {
       errorHandler.handleError(new Error('Invalid production calculation'), 'purchaseCup', {
         sips: sipsLarge?.toString(),
@@ -512,7 +512,7 @@ export function levelUp({
 function sanitizeDecimal(value: DecimalType, fallback: DecimalType): DecimalType {
   if (!value) return fallback;
   try {
-    if (!isFinite(Number(value.toString()))) {
+    if (!value.isFinite()) {
       errorHandler.handleError(new Error('Sanitizing extreme Decimal value'), 'sanitizeDecimal', {
         value: value?.toString(),
       });
@@ -542,21 +542,21 @@ export function validateExtremeValues(): void {
     // Log extreme values for debugging and monitoring
     if (rawState.sips) {
       const sipsValue = toDecimal(rawState.sips);
-      if (!isFinite(Number(sipsValue.toString()))) {
+      if (!sipsValue.isFinite()) {
         // Extreme sips detected - this is expected behavior in idle games
       }
     }
 
     if (rawState.straws) {
       const strawsValue = toDecimal(rawState.straws);
-      if (!isFinite(Number(strawsValue.toString()))) {
+      if (!strawsValue.isFinite()) {
         // Extreme straws detected - this is expected behavior in idle games
       }
     }
 
     if (rawState.cups) {
       const cupsValue = toDecimal(rawState.cups);
-      if (!isFinite(Number(cupsValue.toString()))) {
+      if (!cupsValue.isFinite()) {
         // Extreme cups detected - this is expected behavior in idle games
       }
     }
@@ -579,21 +579,21 @@ function getAppState(): any {
     // Log extreme values for debugging (preserve the actual values)
     if (rawState.sips) {
       const sipsValue = toDecimal(rawState.sips);
-      if (!isFinite(Number(sipsValue.toString()))) {
+      if (!sipsValue.isFinite()) {
         console.log('🔥 getAppState: Extreme sips detected:', sipsValue.toString());
       }
     }
 
     if (rawState.straws) {
       const strawsValue = toDecimal(rawState.straws);
-      if (!isFinite(Number(strawsValue.toString()))) {
+      if (!strawsValue.isFinite()) {
         console.log('🔥 getAppState: Extreme straws detected:', strawsValue.toString());
       }
     }
 
     if (rawState.cups) {
       const cupsValue = toDecimal(rawState.cups);
-      if (!isFinite(Number(cupsValue.toString()))) {
+      if (!cupsValue.isFinite()) {
         console.log('🔥 getAppState: Extreme cups detected:', cupsValue.toString());
       }
     }
@@ -634,6 +634,7 @@ function subtractFromWallet(spent: number | DecimalType): any {
 export const execute = {
   buyStraw(): boolean {
     const st = getAppState();
+
     const result = purchaseStraw({
       sips: st.sips,
       straws: st.straws,
@@ -641,6 +642,7 @@ export const execute = {
       widerStraws: st.widerStraws,
       betterCups: st.betterCups,
     });
+
     if (!result) return false;
     // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
@@ -656,7 +658,7 @@ export const execute = {
       let strawsValue = result.straws;
       if (strawsValue instanceof Decimal) {
         // Log extreme values but preserve them
-        if (!isFinite(Number(strawsValue.toString()))) {
+        if (!strawsValue.isFinite()) {
           console.log('🔥 Extreme straws value detected in state update:', strawsValue.toString());
         }
       }
@@ -705,22 +707,18 @@ export const execute = {
       errorHandler.handleError(error, 'updateAllStatsAfterStrawPurchase');
     }
     try {
-      console.log('🔍 PURCHASE: About to call updateShopStats for straw');
       ui.updateShopStats?.();
-      console.log('🔍 PURCHASE: updateShopStats called successfully for straw');
       ui.updateAllDisplays?.();
     } catch (error) {
       errorHandler.handleError(error, 'updateShopDisplaysAfterStrawPurchase');
     }
     try {
-      console.log('🛒 EMITTING PURCHASE EVENT for straw:', { item: 'straw', cost: result.spent });
       optimizedEventBus.emit('economy:purchase', {
         item: 'straw',
         cost: result.spent,
         quantity: 1,
         timestamp: Date.now(),
       });
-      console.log('🛒 PURCHASE EVENT EMITTED for straw');
     } catch (error) {
       errorHandler.handleError(error, 'emitPurchaseEventForStraw', {
         item: 'straw',
@@ -753,7 +751,7 @@ export const execute = {
       let cupsValue = result.cups;
       if (cupsValue instanceof Decimal) {
         // Log extreme values but preserve them
-        if (!isFinite(Number(cupsValue.toString()))) {
+        if (!cupsValue.isFinite()) {
           console.log('🔥 Extreme cups value detected in state update:', cupsValue.toString());
         }
       }
@@ -768,13 +766,12 @@ export const execute = {
       });
     }
     try {
-      // Use Zustand store directly - no more dual state management
-      const storeActions = useGameStore.getState().actions;
-      storeActions.setSips(useGameStore.getState().sips);
-      storeActions.setCups(result.cups);
-      storeActions.setStrawSPD(result.strawSPD);
-      storeActions.setCupSPD(result.cupSPD);
-      storeActions.setSPD(result.sipsPerDrink);
+      // Use Zustand store directly - atomic state update
+      const actions = getStoreActions();
+      actions.setCups(result.cups);
+      actions.setStrawSPD(result.strawSPD);
+      actions.setCupSPD(result.cupSPD);
+      actions.setSPD(result.sipsPerDrink);
     } catch (error) {
       errorHandler.handleError(error, 'updateStoreAfterCupPurchase');
     }
@@ -839,13 +836,12 @@ export const execute = {
       errorHandler.handleError(error, 'updateWiderStrawsAfterPurchase');
     }
     try {
-      // Use Zustand store directly - no more dual state management
-      const storeActions = useGameStore.getState().actions;
-      storeActions.setSips(useGameStore.getState().sips);
-      storeActions.setWiderStraws(result.widerStraws);
-      storeActions.setStrawSPD(result.strawSPD);
-      storeActions.setCupSPD(result.cupSPD);
-      storeActions.setSPD(result.sipsPerDrink);
+      // Use Zustand store directly - atomic state update
+      const actions = getStoreActions();
+      actions.setWiderStraws(result.widerStraws);
+      actions.setStrawSPD(result.strawSPD);
+      actions.setCupSPD(result.cupSPD);
+      actions.setSPD(result.sipsPerDrink);
     } catch (error) {
       errorHandler.handleError(error, 'updateStoreAfterWiderStrawsPurchase');
     }
@@ -910,13 +906,12 @@ export const execute = {
       errorHandler.handleError(error, 'updateBetterCupsAfterPurchase');
     }
     try {
-      // Use Zustand store directly - no more dual state management
-      const storeActions = useGameStore.getState().actions;
-      storeActions.setSips(useGameStore.getState().sips);
-      storeActions.setBetterCups(result.betterCups);
-      storeActions.setStrawSPD(result.strawSPD);
-      storeActions.setCupSPD(result.cupSPD);
-      storeActions.setSPD(result.sipsPerDrink);
+      // Use Zustand store directly - atomic state update
+      const actions = getStoreActions();
+      actions.setBetterCups(result.betterCups);
+      actions.setStrawSPD(result.strawSPD);
+      actions.setCupSPD(result.cupSPD);
+      actions.setSPD(result.sipsPerDrink);
     } catch (error) {
       errorHandler.handleError(error, 'updateStoreAfterBetterCupsPurchase');
     }
@@ -956,23 +951,11 @@ export const execute = {
   },
   buySuction(): boolean {
     const st = getAppState();
-    console.log('🔧 buySuction: Current state before purchase:', {
-      sips: st.sips?.toString(),
-      suctions: st.suctions?.toString(),
-      suctionClickBonus: st.suctionClickBonus?.toString(),
-    });
-
     const result = purchaseSuction({
       sips: st.sips,
       suctions: st.suctions,
     });
     if (!result) return false;
-
-    console.log('🔧 buySuction: Purchase result:', {
-      spent: result.spent?.toString(),
-      suctions: result.suctions?.toString(),
-      suctionClickBonus: result.suctionClickBonus?.toString(),
-    });
 
     // const w: any = (typeof window !== 'undefined' ? window : {}) as any;
     try {
@@ -982,16 +965,11 @@ export const execute = {
     }
     try {
       // Update Zustand store with new suction values
-      console.log('🔧 buySuction: About to update store with:', {
-        suctions: result.suctions?.toString(),
-        suctionClickBonus: result.suctionClickBonus?.toString(),
-      });
-      // State is now managed directly by Zustand - no fallback needed
-      console.log('🔧 buySuction: Store updated, new state:', useGameStore.getState());
-      // Also update global for backward compatibility
-      // Update Zustand store directly
       useGameStore.setState({
         suctions: new Decimal((result.suctions as any).toString?.() ?? String(result.suctions)),
+        suctionClickBonus: new Decimal(
+          (result.suctionClickBonus as any).toString?.() ?? String(result.suctionClickBonus)
+        ),
       });
     } catch (error) {
       errorHandler.handleError(error, 'updateSuctionsAfterPurchase');
@@ -1057,17 +1035,24 @@ export const execute = {
     const baseMs = Number((window as any).GAME_CONFIG?.TIMING?.DEFAULT_DRINK_RATE ?? 5000);
     const baseReduction = Number(config.FASTER_DRINKS_REDUCTION_PER_LEVEL ?? 0);
     const minMs = Number(config.MIN_DRINK_RATE ?? 500);
-    const effectiveReduction = Math.max(0, baseReduction);
+    const effectiveReduction = Math.max(0, Math.min(0.99, baseReduction)); // Cap at 99% to prevent issues
     const effectiveLevels = Number(result.fasterDrinks || 0);
-    const factor = Math.pow(1 - effectiveReduction, effectiveLevels);
+
+    // Safe Math.pow with validation
+    let factor = 1;
+    if (isFinite(effectiveLevels) && effectiveLevels >= 0 && effectiveLevels < 1000) {
+      const base = 1 - effectiveReduction;
+      const result = Math.pow(base, effectiveLevels);
+      factor = isFinite(result) ? result : 1;
+    }
+
     const nextRate = Math.max(minMs, Math.round(baseMs * factor));
     // Apply to state (authoritative)
     try {
-      // Use Zustand store directly - no more dual state management
-      const storeActions = useGameStore.getState().actions;
-      storeActions.setSips(useGameStore.getState().sips);
-      storeActions.setFasterDrinks(result.fasterDrinks);
-      storeActions.setDrinkRate(nextRate);
+      // Use Zustand store directly - atomic state update
+      const actions = getStoreActions();
+      actions.setFasterDrinks(result.fasterDrinks);
+      actions.setDrinkRate(nextRate);
     } catch (error) {
       errorHandler.handleError(error, 'updateStoreAfterFasterDrinksPurchase');
     }
@@ -1136,17 +1121,18 @@ export const execute = {
         sips: nextLarge,
         level: new Decimal(result.level),
       });
-      // Use Zustand store directly - no more dual state management
-      const storeActions = useGameStore.getState().actions;
-      storeActions.setSips(nextLarge);
-      storeActions.setLevel(safeToNumberOrDecimal(result.level));
+      // Use Zustand store directly - atomic state update
+      const actions = getStoreActions();
+      actions.setSips(nextLarge);
+      actions.setLevel(safeToNumberOrDecimal(result.level));
     } catch (error) {
       errorHandler.handleError(error, 'updateStateAfterLevelUp');
       try {
         // Fallback to current sips value
-        const storeActions = useGameStore.getState().actions;
-        storeActions.setSips(useGameStore.getState().sips);
-        storeActions.setLevel(safeToNumberOrDecimal(result.level));
+        const actions = getStoreActions();
+        const currentState = useGameStore.getState();
+        actions.setSips(currentState.sips);
+        actions.setLevel(safeToNumberOrDecimal(result.level));
         // Level already updated in Zustand store above
       } catch (error) {
         errorHandler.handleError(error, 'updateStateViaFallbackAfterLevelUp');

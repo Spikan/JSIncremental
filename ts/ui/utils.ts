@@ -15,43 +15,46 @@ import { errorHandler } from '../core/error-handling/error-handler';
  */
 export function formatNumber(value: any): string {
   try {
-    // Try using the new Decimal formatting first, but post-process to ensure 2 decimal places
-    const formatted = formatDecimal(value);
-    return postProcessDecimals(formatted);
+    // Fast-path null/undefined
+    if (value == null) return '0';
+
+    // If this looks like a Decimal (has toNumber), use core formatter directly
+    if (value && typeof (value as DecimalLike).toNumber === 'function') {
+      const formatted = formatDecimal(value);
+      return postProcessDecimals(formatted);
+    }
+
+    // Plain numbers
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return formatLargeNumber(value);
+    }
+
+    // Strings: do NOT run through core formatter to avoid recursion on exotic values
+    if (typeof value === 'string') {
+      return postProcessDecimals(value);
+    }
+
+    // Fallback: try to stringify non-Decimal objects safely
+    if (value && typeof (value as any).toString === 'function') {
+      const s = String((value as any).toString());
+      const n = Number(s);
+      if (Number.isFinite(n)) return formatLargeNumber(n);
+      return postProcessDecimals(s);
+    }
+
+    return String(value);
   } catch (error) {
-    errorHandler.handleError(error, 'formatWithDecimal', { value: value?.toString() });
-  }
-
-  // Legacy formatting removed - use modern formatNumber instead
-
-  if (value == null) return '0';
-
-  if (value && typeof (value as DecimalLike).toNumber === 'function') {
+    // Last-resort: never recurse from error handler; return a safe string
+    errorHandler.handleError(error, 'formatWithDecimal', { value: (() => {
+      try { return value?.toString?.(); } catch { return '<unprintable>'; }
+    })() });
     try {
-      // Only convert to number if it's within safe range to preserve extreme values
-      const numValue = (value as DecimalLike).toNumber!();
-      if (isFinite(numValue) && Math.abs(numValue) < 1e15) {
-        value = numValue;
-      } else {
-        // For extreme values, use toString() directly on the Decimal object
-        return postProcessDecimals((value as DecimalLike).toString!());
-      }
-    } catch (error) {
-      errorHandler.handleError(error, 'convertDecimalToNumber', { value: value?.toString() });
-      // If toNumber fails but toString works, use toString
-      if (typeof (value as DecimalLike).toString === 'function') {
-        return postProcessDecimals((value as DecimalLike).toString!());
-      }
+      if (typeof value === 'number') return formatLargeNumber(value);
+      return String(value ?? '0');
+    } catch {
+      return '0';
     }
   }
-
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return formatLargeNumber(value);
-  }
-
-  if (typeof value === 'string') return postProcessDecimals(value);
-  if (value && typeof value.toString === 'function') return postProcessDecimals(value.toString());
-  return String(value);
 }
 
 /**
@@ -121,31 +124,8 @@ export function formatProgressNumber(value: any): string {
 function postProcessDecimals(formatted: string): string {
   try {
     if (typeof formatted !== 'string') return String(formatted ?? '0');
-    let s = formatted.trim();
-
-    // Handle unit suffixes like K, M, B, T
-    s = s.replace(/^(-?\d+)(?:\.(\d+))?([KMBT])$/i, (_m, intPart, decPart, unit) => {
-      const decimals = String(decPart || '')
-        .padEnd(2, '0')
-        .slice(0, 2);
-      return `${intPart}.${decimals}${unit}`;
-    });
-
-    // Handle pure numbers (no suffix, no exponent)
-    if (/^-?\d+(?:\.\d+)?$/.test(s)) {
-      const num = Number(s);
-      if (Number.isFinite(num)) return num.toFixed(2);
-      return s;
-    }
-
-    // Handle exponential notation
-    s = s.replace(/^(-?\d+)(?:\.(\d+))?e([+\-]?\d+)$/i, (_m, intPart, decPart, exp) => {
-      const decimals = String(decPart || '')
-        .padEnd(2, '0')
-        .slice(0, 2);
-      return `${intPart}.${decimals}e${exp}`;
-    });
-
+    const s = formatted.trim();
+    // Do not force decimal places; trust upstream formatter
     return s;
   } catch {
     return String(formatted ?? '0');
@@ -268,6 +248,7 @@ function updateCompactButtonVariants(buttonId: string, isAffordable: boolean): v
 export function updateCostDisplay(elementId: string, cost: any, isAffordable: boolean): void {
   if (typeof window === 'undefined') return;
   const element = findElement(elementId) as HTMLElement | null;
+
   if (!element || !(element as any).classList) return;
 
   const formattedCost = formatCostNumber(cost);
@@ -288,7 +269,7 @@ export const GameState = {
   get sips(): number | any {
     if (typeof window === 'undefined') return 0;
     const st = useGameStore.getState();
-    const sipsValue = st && typeof st.sips !== 'undefined' ? st.sips : (window as any).sips;
+    const sipsValue = st && typeof st.sips !== 'undefined' ? st.sips : 0;
     // CRITICAL FIX: Don't truncate extreme values to 0 - return the Decimal for proper formatting
     if (sipsValue && typeof sipsValue.toNumber === 'function') {
       const rawNumber = sipsValue.toNumber();
@@ -304,14 +285,12 @@ export const GameState = {
   get level(): number {
     if (typeof window === 'undefined') return 1;
     const st = useGameStore.getState();
-    return st && typeof st.level !== 'undefined'
-      ? Number(st.level || 1)
-      : Number((window as any).level || 1);
+    return st && typeof st.level !== 'undefined' ? Number(st.level || 1) : 1;
   },
   get spd(): number | any {
     if (typeof window === 'undefined') return 0;
     const st = useGameStore.getState();
-    const spdValue = st && typeof st.spd !== 'undefined' ? st.spd : (window as any).spd;
+    const spdValue = st && typeof st.spd !== 'undefined' ? st.spd : 0;
     // CRITICAL FIX: Don't truncate extreme values to 0 - return the Decimal for proper formatting
     if (spdValue && typeof spdValue.toNumber === 'function') {
       const numValue = spdValue.toNumber();
@@ -327,7 +306,7 @@ export const GameState = {
   get drinkRate(): number {
     if (typeof window === 'undefined') return 0;
     const st = useGameStore.getState();
-    return st && typeof st.drinkRate !== 'undefined' ? st.drinkRate : (window as any).drinkRate;
+    return st && typeof st.drinkRate !== 'undefined' ? st.drinkRate : 0;
   },
 };
 

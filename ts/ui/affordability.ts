@@ -46,9 +46,22 @@ export function checkUpgradeAffordability(): void {
 
   // Function to check affordability using Decimal comparison
   const canAfford = (cost: NumericValue): boolean => {
-    const costLarge = toDecimal(cost);
-    const effectiveSips = currentSipsLarge;
-    return gte(effectiveSips, costLarge);
+    try {
+      const costLarge = toDecimal(cost);
+      const effectiveSips = currentSipsLarge;
+
+      // Validate that cost is not NaN
+      const costStr = costLarge.toString();
+      if (costStr === 'NaN' || costStr === 'Infinity' || costStr === '-Infinity') {
+        console.warn('Invalid cost detected in affordability check:', cost);
+        return false;
+      }
+
+      return gte(effectiveSips, costLarge);
+    } catch (error) {
+      errorHandler.handleError(error, 'canAffordCheck', { cost: cost?.toString() });
+      return false;
+    }
   };
 
   const costs = calculateAllCosts();
@@ -103,9 +116,10 @@ export function updateShopButtonStates(): void {
   checkUpgradeAffordability();
 }
 
-// Direct cost calculation using break_eternity.js - no safety nets
+// Direct cost calculation using break_eternity.js - with NaN validation
 function calculateAllCosts(): CostResult {
   const { upgrades: dataUp, config } = getUpgradesAndConfig();
+
   const costs = {} as CostResult;
 
   // Use the new improved cost calculation functions
@@ -114,15 +128,33 @@ function calculateAllCosts(): CostResult {
   const strawCount = toDecimal(useGameStore.getState().straws || 0);
   costs.straw = nextStrawCost(strawCount, strawBaseCost, strawScaling);
 
+  // Validate straw cost
+  if (costs.straw.toString() === 'NaN') {
+    console.warn('Straw cost calculation resulted in NaN, using fallback');
+    costs.straw = toDecimal(5); // Fallback to base cost
+  }
+
   const cupBaseCost = toDecimal(dataUp?.cups?.baseCost ?? config.CUP_BASE_COST ?? 15);
   const cupScaling = toDecimal(dataUp?.cups?.scaling ?? config.CUP_SCALING ?? 1.15);
   const cupCount = toDecimal(useGameStore.getState().cups || 0);
   costs.cup = nextCupCost(cupCount, cupBaseCost, cupScaling);
 
+  // Validate cup cost
+  if (costs.cup.toString() === 'NaN') {
+    console.warn('Cup cost calculation resulted in NaN, using fallback');
+    costs.cup = toDecimal(15); // Fallback to base cost
+  }
+
   const suctionBaseCost = toDecimal(dataUp?.suction?.baseCost ?? config.SUCTION_BASE_COST ?? 40);
   const suctionScaling = toDecimal(dataUp?.suction?.scaling ?? config.SUCTION_SCALING ?? 1.12);
   const suctionCount = toDecimal(useGameStore.getState().suctions || 0);
   costs.suction = suctionBaseCost.multiply(suctionScaling.pow(suctionCount));
+
+  // Validate suction cost
+  if (costs.suction.toString() === 'NaN') {
+    console.warn('Suction cost calculation resulted in NaN, using fallback');
+    costs.suction = toDecimal(40); // Fallback to base cost
+  }
 
   const fasterDrinksBaseCost = toDecimal(
     dataUp?.fasterDrinks?.baseCost ?? config.FASTER_DRINKS_BASE_COST ?? 80
@@ -132,6 +164,12 @@ function calculateAllCosts(): CostResult {
   );
   const fasterDrinksCount = toDecimal(useGameStore.getState().fasterDrinks || 0);
   costs.fasterDrinks = fasterDrinksBaseCost.multiply(fasterDrinksScaling.pow(fasterDrinksCount));
+
+  // Validate faster drinks cost
+  if (costs.fasterDrinks.toString() === 'NaN') {
+    console.warn('Faster drinks cost calculation resulted in NaN, using fallback');
+    costs.fasterDrinks = toDecimal(80); // Fallback to base cost
+  }
 
   const widerStrawsBaseCost = toDecimal(
     dataUp?.widerStraws?.baseCost ?? config.WIDER_STRAWS_BASE_COST ?? 150
@@ -146,6 +184,12 @@ function calculateAllCosts(): CostResult {
     widerStrawsScaling
   );
 
+  // Validate wider straws cost
+  if (costs.widerStraws.toString() === 'NaN') {
+    console.warn('Wider straws cost calculation resulted in NaN, using fallback');
+    costs.widerStraws = toDecimal(150); // Fallback to base cost
+  }
+
   const betterCupsBaseCost = toDecimal(
     dataUp?.betterCups?.baseCost ?? config.BETTER_CUPS_BASE_COST ?? 400
   );
@@ -155,10 +199,22 @@ function calculateAllCosts(): CostResult {
   const betterCupsCount = toDecimal(useGameStore.getState().betterCups || 0);
   costs.betterCups = nextBetterCupsCost(betterCupsCount, betterCupsBaseCost, betterCupsScaling);
 
+  // Validate better cups cost
+  if (costs.betterCups.toString() === 'NaN') {
+    console.warn('Better cups cost calculation resulted in NaN, using fallback');
+    costs.betterCups = toDecimal(400); // Fallback to base cost
+  }
+
   const levelUpBaseCost = toDecimal(config.LEVEL_UP_BASE_COST ?? 3000);
   const levelUpScaling = toDecimal(config.LEVEL_UP_SCALING ?? 1.15);
   const levelCount = toDecimal(useGameStore.getState().level || 1);
   costs.levelUp = levelUpBaseCost.multiply(levelUpScaling.pow(levelCount));
+
+  // Validate level up cost
+  if (costs.levelUp.toString() === 'NaN') {
+    console.warn('Level up cost calculation resulted in NaN, using fallback');
+    costs.levelUp = toDecimal(3000); // Fallback to base cost
+  }
 
   return costs;
 }

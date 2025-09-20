@@ -147,8 +147,7 @@ export function getThemeForLevel(level: number): ThemeData {
 export function applyThemeToBackground(level: number): void {
   const theme = getThemeForLevel(level);
 
-  console.log(`🎨 Applying theme for level ${level}:`, theme);
-  console.log('🎨 Current body background before:', document.body.style.background);
+  // Theme applied silently
 
   // Apply background gradient (with !important to override CSS)
   document.body.style.setProperty('background', theme.backgroundGradient, 'important');
@@ -174,7 +173,7 @@ export function applyThemeToBackground(level: number): void {
 export function showLocationFlavorText(level: number): void {
   const theme = getThemeForLevel(level);
 
-  console.log(`🍃 Showing flavor text for level ${level}:`, theme.flavorText);
+  // Flavor text displayed silently
 
   // Find or create flavor text element
   let flavorElement = document.querySelector('.location-flavor-text') as HTMLElement;
@@ -350,7 +349,7 @@ export function showAbsurdNotification(): void {
  * Initialize the Soda Drinker Pro theme system
  */
 export function initializeSodaDrinkerProThemes(): void {
-  console.log('🥤 Initializing Soda Drinker Pro theme system...');
+  // Initializing Soda Drinker Pro theme system
 
   // Apply initial theme
   const state = useGameStore.getState();
@@ -361,7 +360,7 @@ export function initializeSodaDrinkerProThemes(): void {
         ? state.level.toNumber()
         : Number(state.level || 1);
 
-  console.log('🥤 Applying initial theme for level:', initialLevel);
+  // Applying initial theme
   applyThemeToBackground(initialLevel);
   showLocationFlavorText(initialLevel);
 
@@ -377,7 +376,7 @@ export function initializeSodaDrinkerProThemes(): void {
             ? level.toNumber()
             : Number(level || 1);
 
-      console.log('🥤 Level changed, applying theme for level:', levelNum);
+      // Level changed, applying theme
       applyThemeToBackground(levelNum);
       showLocationFlavorText(levelNum);
     },
@@ -399,7 +398,7 @@ export function initializeSodaDrinkerProThemes(): void {
   // Start the notification system after 30 seconds
   setTimeout(showRandomNotification, 30000);
 
-  console.log('✅ Soda Drinker Pro theme system initialized');
+  // Soda Drinker Pro theme system initialized
 
   // Expose debug functions globally for testing
   if (typeof window !== 'undefined') {

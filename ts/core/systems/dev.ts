@@ -11,7 +11,7 @@ import Decimal from 'break_eternity.js';
 import { toDecimal, add } from '../numbers/simplified';
 import { recalcProduction } from './resources';
 import * as purchasesSystem from './purchases-system';
-import { useGameStore } from '../state/zustand-store';
+import { useGameStore, getStoreActions } from '../state/zustand-store';
 import * as ui from '../../ui/index';
 import { FEATURE_UNLOCKS as unlockSystem } from '../../feature-unlocks';
 import { errorHandler } from '../error-handling/error-handler';
@@ -113,24 +113,25 @@ export function addTime(milliseconds: number): boolean {
           : Number(config.BASE_SIPS_PER_DRINK || 1);
       const gain = spdVal * drinks;
       // Preserve extreme values - don't convert to regular numbers
-      const currentSips = toDecimal(w.sips);
+      const currentSips = st.sips || toDecimal(0);
       const gainDecimal = toDecimal(gain);
       const nextSips = add(currentSips, gainDecimal);
-      w.sips = nextSips;
-      const prevTotal = Number(st.totalSipsEarned || 0);
-      useGameStore.setState({ sips: nextSips, totalSipsEarned: prevTotal + gain });
+      const prevTotal = st.totalSipsEarned || toDecimal(0);
+      const newTotal = add(prevTotal, gainDecimal);
+      useGameStore.setState({ sips: nextSips, totalSipsEarned: newTotal });
     }
     const nextLast = now - remainder;
-    w.lastDrinkTime = nextLast;
     const prevPlay = Number(st.totalPlayTime || 0);
-    useGameStore.setState({ lastDrinkTime: nextLast, totalPlayTime: prevPlay + ms });
+    const prevSave = Number(st.lastSaveTime || Date.now());
+    const nextSave = prevSave - ms;
+    useGameStore.setState({
+      lastDrinkTime: nextLast,
+      totalPlayTime: prevPlay + ms,
+      lastSaveTime: nextSave,
+    });
     ui.updateDrinkProgress?.();
     ui.updateTopSipCounter?.();
     ui.updateTopSipsPerSecond?.();
-    const prevSave = Number(st.lastSaveTime || w.lastSaveTime || Date.now());
-    const nextSave = prevSave - ms;
-    w.lastSaveTime = nextSave;
-    useGameStore.setState({ lastSaveTime: nextSave });
     ui.updateLastSaveTime?.();
     return true;
   } catch (error) {
@@ -141,22 +142,14 @@ export function addTime(milliseconds: number): boolean {
 
 export function addSips(amount: number): boolean {
   try {
-    const w = window as Win;
-    if (typeof w.sips === 'undefined' || w.sips === null) return false;
-    // Preserve extreme values - use Decimal arithmetic
-    if (w.sips.plus) {
-      w.sips = w.sips.plus(amount);
-    } else {
-      const currentSips = toDecimal(w.sips);
-      const gainDecimal = toDecimal(amount);
-      w.sips = add(currentSips, gainDecimal);
-    }
-    // Prefer action to keep Decimal in state when available
-    try {
-      useGameStore.getState().actions.setSips(w.sips);
-    } catch (error) {
-      useGameStore.setState({ sips: w.sips });
-    }
+    const st = useGameStore.getState();
+    const currentSips = st.sips || toDecimal(0);
+    const gainDecimal = toDecimal(amount);
+    const newSips = add(currentSips, gainDecimal);
+
+    // Use store actions for proper state management
+    const actions = getStoreActions();
+    actions.setSips(newSips);
     ui.updateTopSipCounter?.();
     ui.checkUpgradeAffordability?.();
     return true;
@@ -223,7 +216,6 @@ export function exportSave(): boolean {
 
 export function openImportDialog(): boolean {
   try {
-    const w = window as Win;
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json,application/json';
@@ -234,21 +226,15 @@ export function openImportDialog(): boolean {
       reader.onload = function (ev: any) {
         try {
           const saveData = JSON.parse(ev?.target?.result || '{}');
-          if (saveData.sips != null)
-            w.sips = w.Decimal ? new w.Decimal(saveData.sips) : new w.Decimal(saveData.sips);
-          if (saveData.straws != null)
-            w.straws = w.Decimal ? new w.Decimal(saveData.straws) : new w.Decimal(saveData.straws);
-          if (saveData.cups != null)
-            w.cups = w.Decimal ? new w.Decimal(saveData.cups) : new w.Decimal(saveData.cups);
-          if (saveData.level != null)
-            w.level = w.Decimal ? new w.Decimal(saveData.level) : new w.Decimal(saveData.level);
-          // Update Zustand store - preserve extreme values
-          useGameStore.setState({
-            sips: w.sips,
-            straws: w.straws,
-            cups: w.cups,
-            level: w.level,
-          });
+          const loadedState: any = {};
+
+          if (saveData.sips != null) loadedState.sips = new Decimal(saveData.sips);
+          if (saveData.straws != null) loadedState.straws = new Decimal(saveData.straws);
+          if (saveData.cups != null) loadedState.cups = new Decimal(saveData.cups);
+          if (saveData.level != null) loadedState.level = new Decimal(saveData.level);
+
+          // Update Zustand store only - single source of truth
+          useGameStore.setState(loadedState);
           ui.updateAllStats?.();
           ui.checkUpgradeAffordability?.();
         } catch (error) {
@@ -283,29 +269,22 @@ export function addMassiveSips(): boolean {
     // Adding massive amount of sips
 
     // Add to current sips using Decimal system
-    const currentSips = toDecimal(w.sips);
+    const state = useGameStore.getState();
+    const currentSips = state.sips || toDecimal(0);
     const newSips = add(currentSips, massiveAmount);
 
-    // Update the sips value - keep as Decimal for proper handling
-    if (w.Decimal) {
-      // Preserve extreme values - always use Decimal directly for sips
-      w.sips = newSips;
-    } else {
-      // For extremely large numbers, store the Decimal directly
-      w.sips = newSips;
-    }
-
-    // Update state with Decimal value
-    useGameStore.getState().actions.setSips(newSips);
+    // Update state with Decimal value - single source of truth
+    const actions = getStoreActions();
+    actions.setSips(newSips);
 
     // SPD doesn't change with just sips, but ensure state is consistent
-    const state = useGameStore.getState();
-    if (state) {
+    const currentState = useGameStore.getState();
+    if (currentState) {
       updateSPDFromResources(
-        state.straws || 0,
-        state.cups || 0,
-        state.widerStraws || 0,
-        state.betterCups || 0
+        currentState.straws || 0,
+        currentState.cups || 0,
+        currentState.widerStraws || 0,
+        currentState.betterCups || 0
       );
     }
 
@@ -336,30 +315,22 @@ export function addHugeStraws(): boolean {
     // Adding huge amount of straws
 
     // Add to current straws using Decimal system
-    const currentStraws = toDecimal(w.straws);
+    const state = useGameStore.getState();
+    const currentStraws = state.straws || toDecimal(0);
     const newStraws = add(currentStraws, hugeAmount);
 
-    // Always update Zustand state first (this is what UI reads from)
-    useGameStore.getState().actions.setStraws(newStraws);
-
-    // Also update window property for compatibility
-    try {
-      // Preserve extreme values - direct assignment
-      w.straws = newStraws;
-    } catch (error) {
-      // Fallback: just set the Decimal directly
-      w.straws = newStraws;
-      errorHandler.handleError(error, 'setWindowStraws', { newStraws: newStraws.toString() });
-    }
+    // Update Zustand state - single source of truth
+    const actions = getStoreActions();
+    actions.setStraws(newStraws);
 
     // Update SPD with the new straw values
-    const state = useGameStore.getState();
-    if (state) {
+    const currentState = useGameStore.getState();
+    if (currentState) {
       updateSPDFromResources(
-        state.straws || newStraws,
-        state.cups || 0,
-        state.widerStraws || 0,
-        state.betterCups || 0
+        currentState.straws || newStraws,
+        currentState.cups || 0,
+        currentState.widerStraws || 0,
+        currentState.betterCups || 0
       );
     }
 
@@ -394,30 +365,22 @@ export function addMassiveCups(): boolean {
     console.log(`Adding ${massiveAmount.toString()} cups`);
 
     // Add to current cups using Decimal system
-    const currentCups = toDecimal(w.cups);
+    const state = useGameStore.getState();
+    const currentCups = state.cups || toDecimal(0);
     const newCups = add(currentCups, massiveAmount);
 
-    // Always update Zustand state first (this is what UI reads from)
-    useGameStore.getState().actions.setCups(newCups);
-
-    // Also update window property for compatibility
-    try {
-      // Preserve extreme values - direct assignment
-      w.cups = newCups;
-    } catch (error) {
-      // Fallback: just set the Decimal directly
-      w.cups = newCups;
-      errorHandler.handleError(error, 'setWindowCups', { newCups: newCups.toString() });
-    }
+    // Update Zustand state - single source of truth
+    const actions = getStoreActions();
+    actions.setCups(newCups);
 
     // Update SPD with the new cup values
-    const state = useGameStore.getState();
-    if (state) {
+    const currentState = useGameStore.getState();
+    if (currentState) {
       updateSPDFromResources(
-        state.straws || 0,
-        state.cups || newCups,
-        state.widerStraws || 0,
-        state.betterCups || 0
+        currentState.straws || 0,
+        currentState.cups || newCups,
+        currentState.widerStraws || 0,
+        currentState.betterCups || 0
       );
     }
 
@@ -442,75 +405,29 @@ export function addMassiveCups(): boolean {
  */
 export function addExtremeResources(): boolean {
   try {
-    const w = window as Win;
     console.log('🚀 Adding extreme resources (1e2000 each)...');
 
     const extremeAmount = new Decimal('1e2000');
 
-    // Add sips
-    if (typeof w.sips !== 'undefined') {
-      const currentSips = toDecimal(w.sips);
-      const newSips = add(currentSips, extremeAmount);
-      if (w.Decimal && newSips) {
-        try {
-          // Preserve extreme values - direct assignment
-          w.sips = newSips;
-        } catch (error) {
-          errorHandler.handleError(error, 'convertSipsToSafeNumber', {
-            newSips: newSips.toString(),
-          });
-          w.sips = newSips;
-        }
-      } else {
-        w.sips = newSips;
-      }
-      useGameStore.getState().actions.setSips(newSips);
-      console.log(`✅ Sips: ${newSips?.toString?.() || 'unknown'}`);
-    }
+    // Add sips, straws, and cups atomically
+    const state = useGameStore.getState();
+    const currentSips = state.sips || toDecimal(0);
+    const newSips = add(currentSips, extremeAmount);
+    const currentStraws = state.straws || toDecimal(0);
+    const newStraws = add(currentStraws, extremeAmount);
+    const currentCups = state.cups || toDecimal(0);
+    const newCups = add(currentCups, extremeAmount);
 
-    // Add straws
-    if (typeof w.straws !== 'undefined') {
-      const currentStraws = toDecimal(w.straws);
-      const newStraws = add(currentStraws, extremeAmount);
+    // Atomic state update - all three resources updated together
+    useGameStore.setState({
+      sips: newSips,
+      straws: newStraws,
+      cups: newCups,
+    });
 
-      // Always update Zustand state first (this is what UI reads from)
-      useGameStore.getState().actions.setStraws(newStraws);
-
-      // Also update window property for compatibility
-      try {
-        // Preserve extreme values - direct assignment
-        w.straws = newStraws;
-      } catch (error) {
-        // Fallback: just set the Decimal directly
-        w.straws = newStraws;
-        errorHandler.handleError(error, 'setWindowStrawsExtreme', {
-          newStraws: newStraws.toString(),
-        });
-      }
-
-      console.log(`✅ Straws: ${newStraws.toString()}`);
-    }
-
-    // Add cups
-    if (typeof w.cups !== 'undefined') {
-      const currentCups = toDecimal(w.cups);
-      const newCups = add(currentCups, extremeAmount);
-
-      // Always update Zustand state first (this is what UI reads from)
-      useGameStore.getState().actions.setCups(newCups);
-
-      // Also update window property for compatibility
-      try {
-        // Preserve extreme values - direct assignment
-        w.cups = newCups;
-      } catch (error) {
-        // Fallback: just set the Decimal directly
-        w.cups = newCups;
-        errorHandler.handleError(error, 'setWindowCupsExtreme', { newCups: newCups.toString() });
-      }
-
-      console.log(`✅ Cups: ${newCups.toString()}`);
-    }
+    console.log(`✅ Sips: ${newSips?.toString?.() || 'unknown'}`);
+    console.log(`✅ Straws: ${newStraws.toString()}`);
+    console.log(`✅ Cups: ${newCups.toString()}`);
 
     // Validate extreme values after adding them
     try {
@@ -520,12 +437,12 @@ export function addExtremeResources(): boolean {
     }
 
     // Update SPD with the new extreme values
-    const state = useGameStore.getState();
-    if (state) {
-      const finalStraws = state.straws || extremeAmount;
-      const finalCups = state.cups || extremeAmount;
-      const finalWiderStraws = state.widerStraws || 0;
-      const finalBetterCups = state.betterCups || 0;
+    const finalState = useGameStore.getState();
+    if (finalState) {
+      const finalStraws = finalState.straws || extremeAmount;
+      const finalCups = finalState.cups || extremeAmount;
+      const finalWiderStraws = finalState.widerStraws || 0;
+      const finalBetterCups = finalState.betterCups || 0;
 
       updateSPDFromResources(finalStraws, finalCups, finalWiderStraws, finalBetterCups);
     }
@@ -552,30 +469,22 @@ export function addExtremeResources(): boolean {
  */
 export function testScientificNotation(): boolean {
   try {
-    const w = window as Win;
     console.log('🧪 Testing scientific notation display...');
 
     const testAmounts = ['1e100', '1e500', '1e1000', '1e2000', '1e5000'];
 
     testAmounts.forEach((amount, index) => {
       setTimeout(() => {
-        if (w.sips) {
-          const largeAmount = new Decimal(amount);
-          const currentSips = toDecimal(w.sips);
-          const newSips = add(currentSips, largeAmount);
+        const state = useGameStore.getState();
+        const largeAmount = new Decimal(amount);
+        const currentSips = state.sips || toDecimal(0);
+        const newSips = add(currentSips, largeAmount);
 
-          if (w.Decimal) {
-            // Preserve extreme values - direct assignment
-            w.sips = newSips;
-          } else {
-            w.sips = newSips;
-          }
+        const actions = getStoreActions();
+        actions.setSips(newSips);
+        ui.updateTopSipCounter?.();
 
-          useGameStore.getState().actions.setSips(newSips);
-          ui.updateTopSipCounter?.();
-
-          console.log(`📊 Scientific notation test ${index + 1}: ${newSips.toString()}`);
-        }
+        console.log(`📊 Scientific notation test ${index + 1}: ${newSips.toString()}`);
       }, index * 1000); // Stagger the additions
     });
 
@@ -592,26 +501,14 @@ export function testScientificNotation(): boolean {
  */
 export function resetAllResources(): boolean {
   try {
-    const w = window as Win;
     console.log('🔄 Resetting all resources to zero...');
 
-    // Always update Zustand state first (this is what UI reads from)
+    // Update Zustand state - single source of truth
     useGameStore.setState({
       sips: new Decimal(0),
       straws: new Decimal(0),
       cups: new Decimal(0),
     });
-
-    // Also update window properties for compatibility
-    if (w.Decimal) {
-      w.sips = new w.Decimal(0);
-      w.straws = new w.Decimal(0);
-      w.cups = new w.Decimal(0);
-    } else {
-      w.sips = 0;
-      w.straws = 0;
-      w.cups = 0;
-    }
 
     ui.updateAllStats?.();
     ui.checkUpgradeAffordability?.();

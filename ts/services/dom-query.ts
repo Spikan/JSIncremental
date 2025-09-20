@@ -24,6 +24,9 @@ class DOMQueryService {
       return null;
     }
 
+    // Environment guards
+    if (typeof document === 'undefined') return null;
+
     const { cache = true, timeout = 1000, retries = 3 } = options;
 
     // Check cache first
@@ -39,14 +42,20 @@ class DOMQueryService {
       this.cache.set(selector, element);
     }
 
-    // If element not found and retries > 0, retry after timeout
-    if (!element && retries > 0) {
-      const retryId = window.setTimeout(() => {
-        this.query(selector, { ...options, retries: retries - 1 });
-        this.queryTimeouts.delete(selector);
-      }, timeout);
+    // If element not found and retries > 0, retry after timeout (only in browser and if not destroyed)
+    if (!element && retries > 0 && !this.isDestroyed) {
+      if (typeof window !== 'undefined' && typeof window.setTimeout === 'function') {
+        const retryId = window.setTimeout(() => {
+          if (this.isDestroyed || typeof document === 'undefined') {
+            this.queryTimeouts.delete(selector);
+            return;
+          }
+          this.query(selector, { ...options, retries: retries - 1 });
+          this.queryTimeouts.delete(selector);
+        }, timeout);
 
-      this.queryTimeouts.set(selector, retryId);
+        this.queryTimeouts.set(selector, retryId);
+      }
     }
 
     return element;
@@ -59,9 +68,9 @@ class DOMQueryService {
     selector: string,
     _options: DOMQueryOptions = {}
   ): NodeListOf<T> {
-    if (this.isDestroyed) {
-      console.warn('DOMQueryService: Cannot query all - service is destroyed');
-      return document.querySelectorAll('') as NodeListOf<T>;
+    if (this.isDestroyed || typeof document === 'undefined') {
+      console.warn('DOMQueryService: Cannot query all - service is destroyed or no document');
+      return [] as unknown as NodeListOf<T>;
     }
 
     return document.querySelectorAll(selector) as NodeListOf<T>;
@@ -112,24 +121,29 @@ class DOMQueryService {
         return;
       }
 
-      const observer = new MutationObserver(() => {
-        const element = this.query<T>(selector, { cache: false });
-        if (element) {
+      if (typeof MutationObserver === 'function' && typeof document !== 'undefined') {
+        const observer = new MutationObserver(() => {
+          const element = this.query<T>(selector, { cache: false });
+          if (element) {
+            observer.disconnect();
+            resolve(element);
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+
+        // Timeout fallback
+        setTimeout(() => {
           observer.disconnect();
-          resolve(element);
-        }
-      });
-
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-      });
-
-      // Timeout fallback
-      setTimeout(() => {
-        observer.disconnect();
-        resolve(null);
-      }, timeout);
+          resolve(null);
+        }, timeout);
+      } else {
+        // Environment lacks MutationObserver; simple timeout fallback
+        setTimeout(() => resolve(this.query<T>(selector, { cache: false })), timeout);
+      }
     });
   }
 
@@ -149,7 +163,7 @@ class DOMQueryService {
    */
   clearTimeouts(): void {
     for (const timeoutId of this.queryTimeouts.values()) {
-      clearTimeout(timeoutId);
+      if (typeof clearTimeout === 'function') clearTimeout(timeoutId);
     }
     this.queryTimeouts.clear();
   }

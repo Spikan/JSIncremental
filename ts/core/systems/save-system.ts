@@ -32,27 +32,26 @@ export function queueSave({ now, lastOp, minIntervalMs, schedule, perform }: Que
 
 export function performSaveSnapshot(): any {
   try {
-    const w: any = window as any;
     const state = useGameStore.getState();
     const payload = {
-      sips: String(w.sips || 0),
-      straws: String(w.straws || 0),
-      cups: String(w.cups || 0),
-      widerStraws: String(w.widerStraws || 0),
-      betterCups: String(w.betterCups || 0),
-      suctions: String(w.suctions || 0),
-      fasterDrinks: String(w.fasterDrinks || 0),
-      totalSipsEarned: String(w.totalSipsEarned || 0),
+      sips: String(state.sips || 0),
+      straws: String(state.straws || 0),
+      cups: String(state.cups || 0),
+      widerStraws: String(state.widerStraws || 0),
+      betterCups: String(state.betterCups || 0),
+      suctions: String(state.suctions || 0),
+      fasterDrinks: String(state.fasterDrinks || 0),
+      totalSipsEarned: String(state.totalSipsEarned || 0),
       // Save SPD values to preserve extreme values
-      spd: String(state.spd || w.spd || 0),
-      strawSPD: String(state.strawSPD || w.strawSPD || 0),
-      cupSPD: String(state.cupSPD || w.cupSPD || 0),
-      drinkRate: Number(w.drinkRate || 0),
-      lastDrinkTime: Number(w.lastDrinkTime || 0),
-      drinkProgress: Number(w.drinkProgress || 0),
+      spd: String(state.spd || 0),
+      strawSPD: String(state.strawSPD || 0),
+      cupSPD: String(state.cupSPD || 0),
+      drinkRate: Number(state.drinkRate || 0),
+      lastDrinkTime: Number(state.lastDrinkTime || 0),
+      drinkProgress: Number(state.drinkProgress || 0),
       lastSaveTime: Date.now(),
       totalPlayTime: Number(state.totalPlayTime || 0),
-      totalClicks: Number(state.totalClicks || w.totalClicks || 0),
+      totalClicks: Number(state.totalClicks || 0),
       // Save hybrid level system data (single source of truth for levels)
       hybridLevelData: (() => {
         const hybridSystem = hybridLevelSystem;
@@ -93,31 +92,20 @@ export async function resetGameState() {
     const BAL = GC.BALANCE || {};
     const TIMING = GC.TIMING || {};
 
-    // Initialize Decimal objects exactly like initGame does
-    w.sips = new Decimal(0);
-    const straws = new Decimal(0);
-    const cups = new Decimal(0);
-    w.straws = straws;
-    w.cups = cups;
-    const suctions = new Decimal(0);
-    w.suctions = suctions;
-
-    // Initialize production variables
-    const strawSPD = new Decimal(0);
-    const cupSPD = new Decimal(0);
-
-    // Calculate spd (sips per drink) - base amount since all resources are 0
-    const baseSipsPerDrink = new Decimal(BAL.BASE_SIPS_PER_DRINK || 1);
-    const passiveSipsPerDrink = strawSPD.times(straws).plus(cupSPD.times(cups));
-    const spd = baseSipsPerDrink.plus(passiveSipsPerDrink); // Will be baseSipsPerDrink since resources are 0
-
-    const suctionClickBonus = new Decimal(0);
-    const widerStraws = new Decimal(0);
-    w.widerStraws = widerStraws;
-    const betterCups = new Decimal(0);
-    w.betterCups = betterCups;
-    const level = new Decimal(1);
-    w.level = level;
+    // Initialize game state in Zustand store - single source of truth
+    const defaultGameState = {
+      sips: new Decimal(0),
+      straws: new Decimal(0),
+      cups: new Decimal(0),
+      suctions: new Decimal(0),
+      widerStraws: new Decimal(0),
+      betterCups: new Decimal(0),
+      level: new Decimal(1),
+      spd: new Decimal(BAL.BASE_SIPS_PER_DRINK || 1),
+      strawSPD: new Decimal(0),
+      cupSPD: new Decimal(0),
+      suctionClickBonus: new Decimal(0),
+    };
 
     // Set up drink timing exactly like initGame
     const DEFAULT_DRINK_RATE = TIMING.DEFAULT_DRINK_RATE || 1000;
@@ -132,48 +120,16 @@ export async function resetGameState() {
       { lastDrinkTime, drinkRate }
     );
 
-    // Set up global drink timing property
-    if (!Object.getOwnPropertyDescriptor(window, 'lastDrinkTime')) {
-      Object.defineProperty(window, 'lastDrinkTime', {
-        get() {
-          return lastDrinkTime;
-        },
-        set(_v) {
-          // stateBridge is null, so this call is not needed
-          // const newTime = Number(v) || 0;
-        },
-      });
-    }
+    // Legacy global property bridge removed - use store directly
 
     // Initialize upgrade variables exactly like initGame
     const fasterDrinks = new Decimal(0);
-    w.fasterDrinks = fasterDrinks;
 
     // Set up session timing exactly like initGame
     const gameStartTime = Date.now();
-    let lastSaveTime: any = null;
+    // let lastSaveTime: any = null; // Legacy variable removed
 
-    // Set up lastSaveTime property
-    if (!Object.getOwnPropertyDescriptor(window, 'lastSaveTime')) {
-      Object.defineProperty(window, 'lastSaveTime', {
-        get() {
-          try {
-            return Number(useGameStore.getState().lastSaveTime ?? lastSaveTime ?? 0);
-          } catch (error) {
-            errorHandler.handleError(error, 'getLastSaveTimeFromAppState');
-          }
-          return Number(lastSaveTime || 0);
-        },
-        set(v) {
-          lastSaveTime = Number(v) || 0;
-          try {
-            useGameStore.setState({ lastSaveTime });
-          } catch (error) {
-            errorHandler.handleError(error, 'setLastSaveTimeInAppState');
-          }
-        },
-      });
-    }
+    // Legacy global property bridge removed - use store directly
 
     // Set session state exactly like initGame
     safeStateOperation(
@@ -195,10 +151,10 @@ export async function resetGameState() {
     if (recalcProduction) {
       const up = getUpgradesData();
       recalcProduction({
-        straws: straws,
-        cups: cups,
-        widerStraws: widerStraws,
-        betterCups: betterCups,
+        straws: defaultGameState.straws,
+        cups: defaultGameState.cups,
+        widerStraws: defaultGameState.widerStraws,
+        betterCups: defaultGameState.betterCups,
         base: {
           strawBaseSPD: up?.['straws']?.baseSPD ?? config.STRAW_BASE_SPD,
           cupBaseSPD: up?.['cups']?.baseSPD ?? config.CUP_BASE_SPD,
@@ -214,34 +170,22 @@ export async function resetGameState() {
       // Production calculation completed (results are 0 since all resources are 0)
     }
 
-    // Seed Zustand store snapshot exactly like initGame
+    // Initialize Zustand store with default state
     try {
-      // Preserve extreme values - don't convert to regular numbers
       useGameStore.setState({
-        sips: w.sips,
-        straws: straws,
-        cups: cups,
-        suctions: suctions,
-        widerStraws: widerStraws,
-        betterCups: betterCups,
+        ...defaultGameState,
         fasterDrinks: fasterDrinks,
-        level: level,
-        spd: spd,
-        strawSPD: strawSPD,
-        cupSPD: cupSPD,
         drinkRate: Number(drinkRate || 0),
         drinkProgress: Number(drinkProgress || 0),
         lastDrinkTime: Number(lastDrinkTime || 0),
         lastSaveTime: 0,
         sessionStartTime: gameStartTime,
         totalPlayTime: 0,
-        totalSipsEarned: 0,
-        totalClicks: 0,
-        highestSipsPerSecond: 0,
+        totalSipsEarned: new Decimal(0),
+        totalClicks: new Decimal(0),
+        highestSipsPerSecond: new Decimal(0),
         currentClickStreak: 0,
         bestClickStreak: 0,
-        // Preserve extreme values for click bonuses and counters
-        suctionClickBonus: suctionClickBonus,
       });
     } catch (error) {
       errorHandler.handleError(error, 'seedZustandStore', { stateData: 'reset' });

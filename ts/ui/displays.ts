@@ -20,7 +20,7 @@ import {
 } from '../core/rules/purchases';
 
 // Direct break_eternity.js Decimal access (consistent with core systems)
-const Decimal = (globalThis as any).Decimal;
+import Decimal from 'break_eternity.js';
 
 // Cost calculation function (copied from affordability.ts)
 function calculateAllCosts(): any {
@@ -114,16 +114,7 @@ const UPDATE_INTERVALS = {
 // Optimized display update functions using subscribeWithSelector
 export function updateTopSipsPerDrink(): void {
   if (typeof window === 'undefined') return;
-
-  // Check if critical elements are ready
-  if (
-    !domQuery.exists('#sodaButton') ||
-    !domQuery.exists('#shopTab') ||
-    !domQuery.exists('#topSipValue')
-  ) {
-    return;
-  }
-
+  
   const topSipsPerDrinkElement: HTMLElement | null = domQuery.getById('topSipsPerDrink');
 
   if (!topSipsPerDrinkElement) {
@@ -138,6 +129,7 @@ export function updateTopSipsPerDrink(): void {
   try {
     // Get current state and update immediately
     const displayData = getDisplayData();
+
     if (displayData && displayData.spd !== undefined) {
       const formatted = formatNumber(displayData.spd);
       topSipsPerDrinkElement.innerHTML = formatted;
@@ -149,16 +141,7 @@ export function updateTopSipsPerDrink(): void {
 
 export function updateTopSipsPerSecond(): void {
   if (typeof window === 'undefined') return;
-
-  // Check if critical elements are ready
-  if (
-    !domQuery.exists('#sodaButton') ||
-    !domQuery.exists('#shopTab') ||
-    !domQuery.exists('#topSipValue')
-  ) {
-    return;
-  }
-
+  
   const topSipsPerSecondElement: HTMLElement | null = domQuery.getById('topSipsPerSecond');
 
   if (!topSipsPerSecondElement) {
@@ -403,16 +386,7 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
 
 export function updateTopSipCounter(): void {
   if (typeof window === 'undefined') return;
-
-  // Check if critical elements are ready
-  if (
-    !domQuery.exists('#sodaButton') ||
-    !domQuery.exists('#shopTab') ||
-    !domQuery.exists('#topSipValue')
-  ) {
-    return;
-  }
-
+  
   const topSipElement = domQuery.getById('topSipValue');
 
   if (topSipElement) {
@@ -455,7 +429,6 @@ export function updateLevelText(): void {
     // Use hybrid level system as single source of truth
     // Modernized - hybrid system handled by store
     // Hybrid system access modernized - using direct import
-    const { hybridLevelSystem } = require('../core/systems/hybrid-level-system');
     const hybridSystem = hybridLevelSystem;
     let levelText = 'The Beach (Level 1)';
 
@@ -698,7 +671,6 @@ function updateLevelUpDisplay(state: any): void {
   // Use hybrid level system as primary
   // Modernized - hybrid system handled by store
   // Hybrid system access modernized - using direct import
-  const { hybridLevelSystem } = require('../core/systems/hybrid-level-system');
   const hybridSystem = hybridLevelSystem;
 
   if (hybridSystem && typeof hybridSystem.getCurrentLevel === 'function') {
@@ -708,13 +680,9 @@ function updateLevelUpDisplay(state: any): void {
     if (nextLevel) {
       const sips = state.sips || new Decimal(0);
       const clicks = state.totalClicks || 0;
-      const currentLevel = hybridSystem.getCurrentLevel();
-      const currentLevelNum = currentLevel?.id || 1;
 
       const canUnlock =
-        sips.gte(nextLevel.unlockRequirement.sips) &&
-        clicks >= nextLevel.unlockRequirement.clicks &&
-        currentLevelNum >= (nextLevel.unlockRequirement.level || 1);
+        sips.gte(nextLevel.unlockRequirement.sips) && clicks >= nextLevel.unlockRequirement.clicks;
 
       // Update the next level name
       const nextLevelNameEl = document.getElementById('nextLevelName');
@@ -728,9 +696,6 @@ function updateLevelUpDisplay(state: any): void {
         const sipsText = formatNumber(nextLevel.unlockRequirement.sips);
 
         let requirementsText = `${sipsText} sips, ${nextLevel.unlockRequirement.clicks.toLocaleString()} clicks`;
-        if (nextLevel.unlockRequirement.level) {
-          requirementsText += `, level ${nextLevel.unlockRequirement.level}`;
-        }
 
         requirementsEl.textContent = requirementsText;
         requirementsEl.style.color = canUnlock ? '#2ecc71' : '#ffffff';

@@ -36,7 +36,12 @@ class UIBatcher {
 
     // Schedule RAF if not already scheduled
     if (this.rafId === null) {
-      this.rafId = requestAnimationFrame(() => this.flush());
+      if (typeof requestAnimationFrame === 'function') {
+        this.rafId = requestAnimationFrame(() => this.flush());
+      } else {
+        // Fallback for non-browser/test environments
+        setTimeout(() => this.flush(), this.maxUpdateInterval);
+      }
     }
   }
 
@@ -69,7 +74,11 @@ class UIBatcher {
 
     // Throttle updates to maintain performance
     if (now - this.lastUpdateTime < this.maxUpdateInterval) {
-      this.rafId = requestAnimationFrame(() => this.flush());
+      if (typeof requestAnimationFrame === 'function') {
+        this.rafId = requestAnimationFrame(() => this.flush());
+      } else {
+        setTimeout(() => this.flush(), this.maxUpdateInterval);
+      }
       return;
     }
 
@@ -130,7 +139,7 @@ class UIBatcher {
 
     this.isDestroyed = true;
 
-    if (this.rafId !== null) {
+    if (this.rafId !== null && typeof cancelAnimationFrame === 'function') {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
@@ -144,7 +153,7 @@ class UIBatcher {
 export const uiBatcher = new UIBatcher();
 
 // Cleanup on page unload
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
   window.addEventListener('beforeunload', () => {
     uiBatcher.destroy();
   });

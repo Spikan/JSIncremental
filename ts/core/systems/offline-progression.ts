@@ -32,7 +32,7 @@ export function calculateOfflineProgression(
 
     // Get current time and last save time
     const now = Date.now();
-    const lastSaveTime = Number(state.lastSaveTime || w.lastSaveTime || now);
+    const lastSaveTime = Number(state.lastSaveTime || now);
     const timeAway = Math.max(0, now - lastSaveTime);
 
     // Convert to minutes for easier comparison
@@ -108,19 +108,15 @@ export function applyOfflineProgression(result: OfflineProgressionResult): boole
   }
 
   try {
-    const w: any = window as any;
     const state = useGameStore.getState();
 
     // Add offline sips to current sips
-    const currentSips = toDecimal(w.sips || 0);
+    const currentSips = state.sips || toDecimal(0);
     const offlineSips = toDecimal(result.sipsEarned);
     const newSips = currentSips.add(offlineSips);
 
-    // Update global sips
-    w.sips = newSips;
-
     // Update total sips earned
-    const currentTotal = toDecimal(state.totalSipsEarned || 0);
+    const currentTotal = state.totalSipsEarned || toDecimal(0);
     const newTotal = currentTotal.add(offlineSips);
 
     // Update state

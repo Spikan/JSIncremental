@@ -3,6 +3,7 @@
 
 import { getStoreActions } from '../state/zustand-store';
 import { errorHandler } from '../error-handling/error-handler';
+import { hybridLevelSystem } from './hybrid-level-system';
 // DecimalOps removed - no longer using toSafeNumber
 
 export interface SaveGameData {
@@ -52,13 +53,10 @@ export class SaveGameLoader {
    */
   public loadGameState(savegame: SaveGameData | null): void {
     if (!savegame || typeof savegame.sips === 'undefined' || savegame.sips === null) {
-      console.log('No save game data found, starting fresh');
       return;
     }
 
     try {
-      console.log('Loading game state from save data...');
-
       // Load basic resources
       this.loadBasicResources(savegame);
 
@@ -353,7 +351,6 @@ export class SaveGameLoader {
         // Restore hybrid level system state
         // Modernized - hybrid system handled by store
         // Hybrid system access modernized - using direct import
-        const { hybridLevelSystem } = require('./hybrid-level-system');
         const hybridSystem = hybridLevelSystem;
         if (hybridSystem && typeof hybridSystem.restoreState === 'function') {
           // Ensure level 1 is always unlocked

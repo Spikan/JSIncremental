@@ -60,7 +60,6 @@ describe('UI Fixes', () => {
       'widerStraws',
       'betterCups',
       'fasterDrinks',
-      'criticalClickChance',
       'suctionClickBonus',
     ];
 

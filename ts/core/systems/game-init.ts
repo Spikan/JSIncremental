@@ -3,9 +3,12 @@
 import { useGameStore } from '../state/zustand-store';
 import * as ui from '../../ui/index';
 import { start as startLoop } from './loop-system';
-import { processDrink } from './drink-system';
+import { processDrinkFactory } from './drink-system';
 import { FEATURE_UNLOCKS as unlockSystem } from '../../feature-unlocks';
 import { errorHandler } from '../error-handling/error-handler';
+
+// Create the processDrink function using the factory
+const processDrink = processDrinkFactory();
 
 try {
   (window as any).__diag = Array.isArray((window as any).__diag) ? (window as any).__diag : [];

@@ -67,7 +67,7 @@ export function start({
       } catch (error) {
         errorHandler.handleError(error, 'updateLastSaveTimeInLoop');
       }
-      // Maintain authoritative totalPlayTime in App.state
+      // Maintain authoritative totalPlayTime in store
       try {
         // Modernized - state handled by store
         // const st = null; // Unused - modernized to store

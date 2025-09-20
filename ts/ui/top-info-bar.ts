@@ -4,6 +4,7 @@
  */
 
 import { formatStatNumber } from './utils';
+import { toDecimal } from '../core/numbers/simplified';
 import { useGameStore } from '../core/state/zustand-store';
 
 export interface TopInfoBarData {
@@ -15,7 +16,6 @@ export interface TopInfoBarData {
 
 export class TopInfoBar {
   private container: HTMLElement | null = null;
-  private levelDiv: HTMLElement | null = null;
   private statsContainer: HTMLElement | null = null;
 
   constructor() {
@@ -24,8 +24,7 @@ export class TopInfoBar {
 
   public initializeElements(): void {
     // Look for the currency display container in the new layout
-    this.container = document.querySelector('.currency-display-compact') as HTMLElement;
-    this.levelDiv = document.querySelector('.level-display') as HTMLElement;
+    this.container = document.querySelector('.currency-display-section') as HTMLElement;
 
     // The stats container is the currency display itself
     this.statsContainer = this.container;
@@ -39,12 +38,16 @@ export class TopInfoBar {
       return;
     }
 
-    // Update level information (if level display exists)
-    if (this.levelDiv) {
-      this.levelDiv.innerHTML = `
-        <h2>Level ${data.level}</h2>
-        <h3>${data.title}</h3>
-      `;
+    // Update level information using the specific elements
+    const levelNumber = document.getElementById('levelNumber');
+    const currentLevelName = document.getElementById('currentLevelName');
+
+    if (levelNumber) {
+      levelNumber.textContent = data.level.toString();
+    }
+
+    if (currentLevelName) {
+      currentLevelName.textContent = data.title;
     }
 
     // Update primary stat (total sips) - using the correct ID from our new layout
@@ -63,12 +66,15 @@ export class TopInfoBar {
 
     const perSecondDisplay = document.getElementById('topSipsPerSecond');
     if (perSecondDisplay) {
-      // Calculate sips per second from current state
+      // Calculate sips per second using Decimal math to preserve precision
       try {
         const state = useGameStore.getState();
         const drinkRate = state?.drinkRate || 1000;
-        const sipsPerSecond = data.perDrink / (drinkRate / 1000) || 0;
-        const formattedPerSecond = formatStatNumber(sipsPerSecond);
+        const perDrinkDecimal = toDecimal(data.perDrink || 0);
+        const rateSecondsDecimal = toDecimal(drinkRate / 1000);
+        const sipsPerSecondDecimal =
+          drinkRate > 0 ? perDrinkDecimal.div(rateSecondsDecimal) : toDecimal(0);
+        const formattedPerSecond = formatStatNumber(sipsPerSecondDecimal);
         perSecondDisplay.textContent = formattedPerSecond;
       } catch (error) {
         perSecondDisplay.textContent = '0';

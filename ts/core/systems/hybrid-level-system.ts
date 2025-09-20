@@ -3,6 +3,7 @@
 
 import { useGameStore } from '../state/zustand-store';
 import { errorHandler } from '../error-handling/error-handler';
+import { toDecimal } from '../numbers/simplified';
 
 export interface HybridLevel {
   id: number;
@@ -380,7 +381,20 @@ export class HybridLevelSystem {
 
     // Also update the level text display
     try {
-      // Modernized - level text updates handled by store
+      // Update level text display
+      const currentLevel = this.getCurrentLevel();
+      if (currentLevel) {
+        const levelTextElement = document.getElementById('levelText');
+        if (levelTextElement) {
+          levelTextElement.textContent = `Level ${currentLevel.id}: ${currentLevel.name}`;
+        }
+
+        // Update level description if available
+        const levelDescElement = document.getElementById('levelDescription');
+        if (levelDescElement && currentLevel.description) {
+          levelDescElement.textContent = currentLevel.description;
+        }
+      }
     } catch (error) {
       errorHandler.handleError(error, 'updateLevelTextDuringInitialization');
     }
@@ -394,7 +408,7 @@ export class HybridLevelSystem {
     const allLevels = this.getAllLevels();
     // Modernized - state handled by store
     const state = useGameStore.getState();
-    const sips = state.sips || new Decimal(0);
+    const sips = state.sips || toDecimal(0);
     const clicks = state.totalClicks || 0;
 
     // Find the next level that can be unlocked
@@ -426,7 +440,7 @@ export class HybridLevelSystem {
 
     // Modernized - state handled by store
     const state = useGameStore.getState();
-    const sips = state.sips || new Decimal(0);
+    const sips = state.sips || toDecimal(0);
     const clicks = state.totalClicks || 0;
 
     const sipsMet = sips.gte
@@ -542,10 +556,7 @@ export class HybridLevelSystem {
       gameContent.setAttribute('data-level', level.id.toString());
     }
 
-    console.log(`🎨 Applied universal theme for level ${level.id}:`, {
-      primary: level.visualTheme.backgroundColor,
-      accent: level.visualTheme.accentColor,
-    });
+    // Theme applied silently
   }
 
   /**
@@ -610,7 +621,6 @@ export class HybridLevelSystem {
   public applyCurrentLevelTheme(): void {
     const currentLevel = this.getCurrentLevel();
     if (currentLevel) {
-      console.log('🎨 Applying current level theme:', currentLevel.name);
       this.applyThemeToUIElements(currentLevel);
     }
   }
@@ -619,7 +629,6 @@ export class HybridLevelSystem {
    * Force theme application (for debugging and manual calls)
    */
   public forceThemeApplication(): void {
-    console.log('🎨 Force applying theme...');
     this.applyCurrentLevelTheme();
 
     // Also force apply to specific problematic elements
@@ -652,7 +661,7 @@ export class HybridLevelSystem {
       });
     });
 
-    console.log('🎨 Force applied theme to problematic elements');
+    // Theme force applied to problematic elements
   }
 
   /**
@@ -899,7 +908,7 @@ export class HybridLevelSystem {
     const newlyUnlocked: number[] = [];
     // Modernized - state handled by store
     const state = useGameStore.getState();
-    const sips = state.sips || new Decimal(0);
+    const sips = state.sips || toDecimal(0);
     const clicks = state.totalClicks || 0;
 
     this.getAllLevels().forEach(level => {

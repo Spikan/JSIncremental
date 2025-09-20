@@ -1,10 +1,12 @@
 // Clicks system: centralizes click tracking and streak logic with Decimal support (TypeScript)
 
 import { toDecimal } from '../numbers/simplified';
-import { useGameStore, getStoreActions } from '../state/zustand-store';
+import { useGameStore } from '../state/zustand-store';
 import { EVENT_NAMES } from '../constants';
 import { optimizedEventBus } from '../../services/optimized-event-bus';
 import { errorHandler } from '../error-handling/error-handler';
+import { hybridLevelSystem } from './hybrid-level-system';
+import { showClickFeedback } from '../../ui/feedback';
 
 export type TrackClickArgs = {
   getApp?: () => any;
@@ -15,7 +17,7 @@ export type TrackClickArgs = {
 };
 
 export function trackClickFactory({
-  getApp = () => (globalThis as any).App,
+  getApp = () => null, // No longer using App object
   getGameConfig = () => (globalThis as any).GAME_CONFIG,
   getState = () => useGameStore.getState(),
   setState = (state: any) => useGameStore.setState(state),
@@ -71,7 +73,6 @@ export function trackClickFactory({
 }
 
 export function handleSodaClickFactory({
-  getApp = () => (globalThis as any).App,
   getState = () => useGameStore.getState(),
   getSips = () => useGameStore.getState().sips,
   setSips = (value: any) => useGameStore.setState({ sips: value }),
@@ -84,7 +85,6 @@ export function handleSodaClickFactory({
   trackClick?: () => void;
 } = {}) {
   return async function handleSodaClick(multiplier: number = 1) {
-    console.log('🔧 handleSodaClick called with multiplier:', multiplier);
     try {
       // Add momentum to 3D model if available
       try {
@@ -109,24 +109,12 @@ export function handleSodaClickFactory({
       const suctionClickBonus = toDecimal(state.suctionClickBonus ?? 0);
       const multiplierValue = toDecimal(multiplier || 1);
 
-      console.log('🔧 handleSodaClick: Click calculation:', {
-        stateSuctionClickBonus: state.suctionClickBonus?.toString(),
-        suctionClickBonus: suctionClickBonus.toString(),
-        multiplier: multiplierValue.toString(),
-      });
-
       // Base click value (1 sip) + suction click bonus from store
       const baseClick = toDecimal(1);
       const baseClickValue = baseClick.add(suctionClickBonus).multiply(multiplierValue);
 
-      console.log('🔧 handleSodaClick: Base click value:', {
-        baseClick: baseClick.toString(),
-        totalBaseClickValue: baseClickValue.toString(),
-      });
-
       // Apply level bonuses from hybrid level system
-      const App = getApp();
-      const levelBonuses = App?.systems?.hybridLevel?.getCurrentLevelBonuses?.() || {
+      const levelBonuses = hybridLevelSystem?.getCurrentLevelBonuses?.() || {
         sipMultiplier: 1.0,
         clickMultiplier: 1.0,
       };
@@ -135,18 +123,18 @@ export function handleSodaClickFactory({
       // Add to sips with Decimal arithmetic
       const currentSips = toDecimal(getSips() || 0);
       const newSips = currentSips.add(totalClickValue);
+
+      // Update state using the provided setSips function (which uses useGameStore.setState)
       setSips(newSips);
 
-      // Update state keeping Decimal - use Zustand store directly
+      // Show popup feedback
       try {
-        const storeActions = getStoreActions();
-        if (storeActions?.setSips) {
-          storeActions.setSips(newSips);
-        } else {
-          console.warn('🍹 setSips action not available via store access');
-        }
+        // Provide numeric defaults for coordinates in non-pointer contexts
+        showClickFeedback(totalClickValue, false, 0, 0);
       } catch (error) {
-        errorHandler.handleError(error, 'setSipsInState', { newSips: newSips?.toString() });
+        errorHandler.handleError(error, 'showClickFeedback', {
+          totalClickValue: totalClickValue?.toString(),
+        });
       }
 
       // Emit soda click and sync totals with Decimal support
@@ -165,11 +153,11 @@ export function handleSodaClickFactory({
         });
       }
       try {
-        App?.stateBridge?.autoSync?.();
         const st = getState();
         const prevTotal = toDecimal(st.totalSipsEarned || 0);
         const newTotal = prevTotal.add(totalClickValue);
-        App?.state?.actions?.setTotalSipsEarned?.(newTotal);
+        // Update total sips earned via Zustand store
+        useGameStore.setState({ totalSipsEarned: newTotal });
       } catch (error) {
         errorHandler.handleError(error, 'syncStateAndUpdateTotalSipsEarned', {
           totalClickValue: totalClickValue?.toString(),

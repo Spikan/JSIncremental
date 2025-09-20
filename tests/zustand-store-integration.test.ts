@@ -72,10 +72,14 @@ describe('Zustand Store Integration Test', () => {
       totalSipsEarned: toDecimal(10),
       highestSipsPerSecond: toDecimal(0),
       suctionClickBonus: 0,
-      lastAutosaveClockMs: Date.now(),
       options: {
         autosaveEnabled: true,
         autosaveInterval: 30,
+        clickSoundsEnabled: true,
+        musicEnabled: true,
+        devToolsEnabled: false,
+        secretsUnlocked: false,
+        godTabEnabled: false,
       },
     });
 
@@ -88,7 +92,7 @@ describe('Zustand Store Integration Test', () => {
       expect(topSipValue).toBeTruthy();
 
       uiModule.updateTopSipCounter();
-      expect(topSipValue!.textContent).toBe('10');
+      expect(topSipValue!.textContent).toBe('10.00');
     }
 
     // Test updateTopSipsPerDrink
@@ -97,7 +101,7 @@ describe('Zustand Store Integration Test', () => {
       expect(topSipsPerDrink).toBeTruthy();
 
       uiModule.updateTopSipsPerDrink();
-      expect(topSipsPerDrink!.textContent).toBe('2');
+      expect(topSipsPerDrink!.textContent).toBe('2.00');
     }
 
     // Test updateDrinkProgress
@@ -130,10 +134,14 @@ describe('Zustand Store Integration Test', () => {
       totalSipsEarned: toDecimal(1),
       highestSipsPerSecond: toDecimal(0),
       suctionClickBonus: 0,
-      lastAutosaveClockMs: Date.now(),
       options: {
         autosaveEnabled: true,
         autosaveInterval: 30,
+        clickSoundsEnabled: true,
+        musicEnabled: true,
+        devToolsEnabled: false,
+        secretsUnlocked: false,
+        godTabEnabled: false,
       },
     });
 
@@ -164,14 +172,14 @@ describe('Zustand Store Integration Test', () => {
       console.log('🔧 topSipValue element reference:', topSipValue);
       console.log('🔧 topSipValue === allTopSipElements[0]:', topSipValue === allTopSipElements[0]);
 
-      expect(topSipValue!.textContent).toBe('1');
+      expect(topSipValue!.textContent).toBe('1.00');
     }
 
     console.log('Calling updateTopSipsPerDrink...');
     if (uiModule.updateTopSipsPerDrink) {
       const topSipsPerDrink = domQuery.getById('topSipsPerDrink');
       uiModule.updateTopSipsPerDrink();
-      expect(topSipsPerDrink!.textContent).toBe('1');
+      expect(topSipsPerDrink!.textContent).toBe('1.00');
     }
 
     console.log('Calling updateDrinkProgress...');
@@ -204,10 +212,14 @@ describe('Zustand Store Integration Test', () => {
       totalSipsEarned: toDecimal(0),
       highestSipsPerSecond: toDecimal(0),
       suctionClickBonus: 0,
-      lastAutosaveClockMs: Date.now(),
       options: {
         autosaveEnabled: true,
         autosaveInterval: 30,
+        clickSoundsEnabled: true,
+        musicEnabled: true,
+        devToolsEnabled: false,
+        secretsUnlocked: false,
+        godTabEnabled: false,
       },
     });
 
@@ -223,7 +235,7 @@ describe('Zustand Store Integration Test', () => {
       uiModule.updateTopSipCounter();
       const topSipValue = domQuery.getById('topSipValue');
       console.log('🔧 After updateTopSipCounter - element textContent:', topSipValue?.textContent);
-      expect(topSipValue!.textContent).toBe('0');
+      expect(topSipValue!.textContent).toBe('0.00');
     }
 
     // Update state with real Decimal objects
@@ -239,6 +251,11 @@ describe('Zustand Store Integration Test', () => {
       options: {
         autosaveEnabled: true,
         autosaveInterval: 30,
+        clickSoundsEnabled: true,
+        musicEnabled: true,
+        devToolsEnabled: false,
+        secretsUnlocked: false,
+        godTabEnabled: false,
       },
     });
 
@@ -251,12 +268,12 @@ describe('Zustand Store Integration Test', () => {
       uiModule.updateTopSipCounter();
       const topSipValue = domQuery.getById('topSipValue');
       console.log('🔧 After updateTopSipCounter - element textContent:', topSipValue?.textContent);
-      expect(topSipValue!.textContent).toBe('5');
+      expect(topSipValue!.textContent).toBe('5.00');
     }
 
     if (uiModule.updateTopSipsPerDrink) {
       uiModule.updateTopSipsPerDrink();
-      expect(domQuery.getById('topSipsPerDrink')!.textContent).toBe('2');
+      expect(domQuery.getById('topSipsPerDrink')!.textContent).toBe('2.00');
     }
 
     if (uiModule.updateDrinkProgress) {
@@ -285,10 +302,14 @@ describe('Zustand Store Integration Test', () => {
       totalSipsEarned: toDecimal(0),
       highestSipsPerSecond: toDecimal(0),
       suctionClickBonus: 0,
-      lastAutosaveClockMs: Date.now(),
       options: {
         autosaveEnabled: true,
         autosaveInterval: 30,
+        clickSoundsEnabled: true,
+        musicEnabled: true,
+        devToolsEnabled: false,
+        secretsUnlocked: false,
+        godTabEnabled: false,
       },
     });
 
@@ -313,7 +334,7 @@ describe('Zustand Store Integration Test', () => {
       uiModule.updateTopSipCounter();
       const topSipValue = domQuery.getById('topSipValue');
       console.log('🔧 After updateTopSipCounter - element textContent:', topSipValue?.textContent);
-      expect(topSipValue!.textContent).toBe('1');
+      expect(topSipValue!.textContent).toBe('1.00');
     }
 
     console.log('Complete flow test passed');

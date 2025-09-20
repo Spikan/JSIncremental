@@ -94,7 +94,7 @@ export function showEnhancedPurchaseFeedback(
       feedbackY = clickY;
     } else {
       // Find the purchase button or use shop area
-      const shopArea = domQuery.getById('shopTab') || document.querySelector('.game-sidebar');
+      const shopArea = document.querySelector('.game-sidebar');
       if (shopArea) {
         const rect = shopArea.getBoundingClientRect();
         feedbackX = rect.left + rect.width / 2 + 100; // Offset to the right

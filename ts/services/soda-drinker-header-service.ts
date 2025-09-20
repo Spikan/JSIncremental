@@ -34,6 +34,7 @@ export class SodaDrinkerHeaderService {
   private currentFPS: number = 60;
   private currentLevel: HybridLevel | null = null;
   private levelSystem: any = null;
+  private performanceIntervalId: NodeJS.Timeout | null = null;
 
   constructor() {
     this.config = {
@@ -111,6 +112,8 @@ export class SodaDrinkerHeaderService {
     // Check reduced motion preference
     if (
       this.config.respectReducedMotion &&
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
       return false;
@@ -124,6 +127,9 @@ export class SodaDrinkerHeaderService {
       }
     }
 
+    // Disable effects in environments without RAF
+    if (typeof requestAnimationFrame !== 'function') return false;
+
     return this.config.enabled;
   }
 
@@ -133,24 +139,33 @@ export class SodaDrinkerHeaderService {
   private setupPerformanceMonitoring(): void {
     if (!performanceMonitor) return;
 
+    // Guard in non-browser/test environments
+    const hasRAF = typeof requestAnimationFrame === 'function';
+    const hasClearInterval = typeof clearInterval === 'function';
+
     // Monitor performance every 5 seconds
-    setInterval(() => {
+    this.performanceIntervalId = setInterval(() => {
       this.checkPerformanceAndAdjust();
     }, 5000);
 
     // Monitor frame rate
-    this.startFrameRateMonitoring();
+    if (hasRAF) {
+      this.startFrameRateMonitoring();
+    }
   }
 
   /**
    * Start frame rate monitoring
    */
   private startFrameRateMonitoring(): void {
+    if (typeof requestAnimationFrame !== 'function') return;
+
     const measureFrameRate = (currentTime: number) => {
       this.frameCount++;
 
       if (currentTime - this.lastFrameTime >= 1000) {
-        this.currentFPS = Math.round((this.frameCount * 1000) / (currentTime - this.lastFrameTime));
+        const timeDiff = currentTime - this.lastFrameTime;
+        this.currentFPS = timeDiff > 0 ? Math.round((this.frameCount * 1000) / timeDiff) : 60;
 
         // Adjust performance mode based on FPS
         if (this.currentFPS < 30) {
@@ -205,7 +220,7 @@ export class SodaDrinkerHeaderService {
    */
   private setupAccessibility(): void {
     // Listen for changes in motion preference
-    if (window.matchMedia) {
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
       const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
       motionQuery.addEventListener('change', e => {
         this.config.respectReducedMotion = true;
@@ -220,6 +235,8 @@ export class SodaDrinkerHeaderService {
    */
   private setupPolygonAnimations(): void {
     // Add subtle hover effects to block elements
+    if (typeof document === 'undefined') return;
+
     const blocks = document.querySelectorAll(
       '.polygon-shape, .level-polygon, .currency-polygon-main, .stat-polygon, .control-polygon, .upgrade-polygon, .level-switch-polygon, .level-unlock-polygon'
     );
@@ -591,7 +608,6 @@ export class SodaDrinkerHeaderService {
    * Setup settings level selector
    */
   private setupSettingsLevelSelector(): void {
-    console.log('🔧 Setting up settings level selector...');
     const levelList = document.getElementById('settingsLevelList');
     const currentLevelName = document.getElementById('settingsCurrentLevelName');
     const currentLevelNumber = document.getElementById('settingsCurrentLevelNumber');
@@ -601,8 +617,6 @@ export class SodaDrinkerHeaderService {
       console.warn('❌ Required elements not found for level selector');
       return;
     }
-
-    console.log('✅ All elements found, populating level list...');
     // Populate level list
     this.populateSettingsLevelList();
 
@@ -630,7 +644,6 @@ export class SodaDrinkerHeaderService {
       // Hybrid system access modernized - using direct import
       if (hybridLevelSystem) {
         this.levelSystem = hybridLevelSystem;
-        console.log('✅ Level system found and set');
       } else {
         console.warn('❌ Level system still not available');
         return;
@@ -822,35 +835,20 @@ export class SodaDrinkerHeaderService {
     }
 
     try {
-      console.log('🔄 Attempting to switch to level:', levelId);
-
       // Check if level is unlocked first
-      const isUnlocked = this.levelSystem.isLevelUnlocked(levelId);
-      console.log(`🔍 Level ${levelId} unlocked status:`, isUnlocked);
+      this.levelSystem.isLevelUnlocked(levelId);
 
       // Check for unlocks first
-      console.log('🔍 Checking for level unlocks...');
-      console.log('🔍 Level system initialized:', this.levelSystem.isSystemInitialized);
-      console.log(
-        '🔍 Current unlocked levels:',
-        Array.from(this.levelSystem.unlockedLevelsSet || new Set())
-      );
-      console.log('🔍 Current level:', this.levelSystem.currentLevel);
-
-      const newlyUnlocked = this.levelSystem.checkForUnlocks();
-      console.log('🔍 Newly unlocked levels:', newlyUnlocked);
+      this.levelSystem.checkForUnlocks();
 
       // Check if level can be unlocked
-      const canUnlock = this.canUnlockLevel(levelId);
-      console.log(`🔍 Level ${levelId} can unlock status:`, canUnlock);
+      this.canUnlockLevel(levelId);
 
       // Re-check if level is now unlocked after checkForUnlocks
-      const isUnlockedAfterCheck = this.levelSystem.isLevelUnlocked(levelId);
-      console.log(`🔍 Level ${levelId} unlocked status after check:`, isUnlockedAfterCheck);
+      this.levelSystem.isLevelUnlocked(levelId);
 
       const success = this.levelSystem.switchToLevel(levelId);
       if (success) {
-        console.log('✅ Successfully switched to level:', levelId);
         logger.info(`Switched to level ${levelId}`);
         // Refresh the settings display
         this.populateSettingsLevelList();
@@ -936,15 +934,6 @@ export class SodaDrinkerHeaderService {
 
     const sipsMet = currentSips >= requirements.sips;
     const clicksMet = currentClicks >= requirements.clicks;
-
-    console.log(`🔍 Level ${levelId} unlock check:`, {
-      requirements,
-      currentSips,
-      currentClicks,
-      sipsMet,
-      clicksMet,
-      canUnlock: sipsMet && clicksMet,
-    });
 
     return sipsMet && clicksMet;
   }
@@ -1110,6 +1099,11 @@ export class SodaDrinkerHeaderService {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
+    }
+
+    if (this.performanceIntervalId) {
+      clearInterval(this.performanceIntervalId);
+      this.performanceIntervalId = null;
     }
 
     logger.info('SodaDrinkerHeaderService cleaned up');

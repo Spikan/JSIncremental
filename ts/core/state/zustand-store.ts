@@ -7,8 +7,7 @@
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import type { GameOptions, GameState } from './shape';
-// Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal;
+import Decimal from 'break_eternity.js';
 import { toDecimal, add } from '../numbers/simplified';
 import { errorHandler } from '../error-handling/error-handler';
 
@@ -88,7 +87,7 @@ const defaultState: GameState = {
   level: toDecimal(1),
 
   // Production stats
-  spd: toDecimal(0), // sips per drink (renamed from sps for clarity)
+  spd: toDecimal(1), // sips per drink - start with base value
   strawSPD: toDecimal(0),
   cupSPD: toDecimal(0),
 
@@ -131,7 +130,6 @@ const defaultState: GameState = {
 };
 
 // Create the Zustand store
-console.log('🔧 Creating Zustand store...');
 export const useGameStore = create<GameStore>()(
   devtools(
     persist(
@@ -292,7 +290,6 @@ export const useGameStore = create<GameStore>()(
     }
   )
 );
-console.log('✅ Zustand store created successfully');
 
 // Store globally for access from other modules
 (globalThis as any).__zustandStore = useGameStore;
@@ -617,5 +614,41 @@ export const useSubscribeToSPD = (callback: (spd: number) => void) => {
 
 // Export store actions for direct access (useful in tests and non-React contexts)
 export const getStoreActions = () => useGameStore.getState().actions;
+
+// Legacy compatibility functions for tests
+export function createLegacyStore(initialState: any = {}) {
+  return {
+    getState: () => ({ ...defaultState, ...initialState }),
+    setState: (partial: any) => useGameStore.setState(partial),
+    subscribe: (callback: any) => useGameStore.subscribe(callback),
+  };
+}
+
+export const appStore = {
+  getState: () => useGameStore.getState(),
+  setState: (partial: any) => useGameStore.setState(partial),
+  subscribe: (callback: any) => useGameStore.subscribe(callback),
+};
+
+export const selectors = {
+  sips: (state: any) => state.sips,
+  straws: (state: any) => state.straws,
+  cups: (state: any) => state.cups,
+  level: (state: any) => state.level,
+  spd: (state: any) => state.spd,
+};
+
+export function migrateToZustand(oldState: any) {
+  // Convert old state format to new Zustand format
+  const newState = {
+    sips: toDecimal(oldState.sips || 0),
+    straws: toDecimal(oldState.straws || 0),
+    cups: toDecimal(oldState.cups || 0),
+    level: toDecimal(oldState.level || 1),
+    spd: toDecimal(oldState.spd || 1),
+  };
+
+  useGameStore.setState(newState);
+}
 
 // Legacy window access removed - use proper imports

@@ -10,73 +10,83 @@ import { toDecimal } from '../numbers/simplified';
 import { useGameStore } from '../state/zustand-store';
 import { hybridLevelSystem } from './hybrid-level-system';
 import { errorHandler } from '../error-handling/error-handler';
+import { recalcProduction } from './resources';
 
-// Modern drink system using only Zustand store
-export function processDrink(): void {
-  try {
-    // Get current state from Zustand store
-    const state = useGameStore.getState();
-    const now = Date.now();
-
-    // Check if enough time has passed since last drink
-    if (now - state.lastDrinkTime < state.drinkRate) {
-      return;
-    }
-
-    // Get game config from global (this is the only global we need)
-    const GAME_CONFIG = (globalThis as any).GAME_CONFIG;
-    const BAL = GAME_CONFIG?.BALANCE || {};
-
-    // Apply level bonuses from hybrid level system (defensive access)
-    let levelBonuses = { sipMultiplier: 1.0, clickMultiplier: 1.0 };
+// Factory function for dependency injection (for tests)
+export function processDrinkFactory({
+  getNow = () => Date.now(),
+  getState = () => useGameStore.getState(),
+  setState = (state: any) => useGameStore.setState(state),
+}: {
+  getNow?: () => number;
+  getState?: () => any;
+  setState?: (state: any) => void;
+} = {}) {
+  return function processDrink(): void {
     try {
-      const App = (globalThis as any).App;
-      if (App?.systems?.hybridLevel?.getCurrentLevelBonuses) {
-        // Hybrid system access modernized - using direct import
-        levelBonuses = hybridLevelSystem?.getCurrentLevelBonuses?.();
+      // Get current state
+      const state = getState();
+      const now = getNow();
+
+      // Apply level bonuses from hybrid level system (defensive access)
+      let levelBonuses = { sipMultiplier: 1.0, clickMultiplier: 1.0 };
+      try {
+        if (hybridLevelSystem?.getCurrentLevelBonuses) {
+          levelBonuses = hybridLevelSystem.getCurrentLevelBonuses();
+        }
+      } catch (error) {
+        errorHandler.handleError(error, 'getLevelBonuses', { fallback: 'using defaults' });
       }
+
+      // Recalculate SPD based on current resources
+      const productionResult = recalcProduction({
+        straws: state.straws || 0,
+        cups: state.cups || 0,
+        widerStraws: state.widerStraws || 0,
+        betterCups: state.betterCups || 0,
+      });
+
+      const baseSpdVal = productionResult.sipsPerDrink;
+      const spdVal = toDecimal(baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier)).toString());
+
+      // Always update SPD in store so UI stays in sync even during cooldown
+      setState({ spd: spdVal });
+
+      // Only process a drink if enough time has passed
+      if (now - state.lastDrinkTime >= state.drinkRate) {
+        const currentSips = toDecimal(state.sips || 0);
+        const newSips = currentSips.add(spdVal);
+
+        // Update state with new values
+        setState({
+          sips: newSips,
+          totalSipsEarned: toDecimal(state.totalSipsEarned || 0).add(spdVal),
+          lastDrinkTime: now,
+          drinkProgress: 0,
+        });
+      }
+
+      // Calculate sips per second for tracking using the EFFECTIVE SPD (with multipliers)
+      const spdNum = spdVal;
+      const rateInSeconds = state.drinkRate / 1000;
+      const rateInSecondsDecimal = toDecimal(rateInSeconds);
+      const currentSipsPerSecond =
+        rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : toDecimal(0);
+
+      // Update highest sips per second if needed
+      if (currentSipsPerSecond.gt(toDecimal(state.highestSipsPerSecond || 0))) {
+        setState({ highestSipsPerSecond: currentSipsPerSecond });
+      }
+
+      // Drink processed successfully
     } catch (error) {
-      errorHandler.handleError(error, 'getLevelBonuses', { fallback: 'using defaults' });
+      errorHandler.handleError(error, 'processDrink', { critical: true });
+      // Don't throw - this would crash the game loop
+      // Instead, log the error and continue with a safe fallback
+      console.error('Drink processing failed, continuing with safe fallback:', error);
     }
-
-    // Calculate base SPD value - handle Decimal 0 properly
-    const stateSpdValue = state.spd?.toNumber?.() ?? state.spd ?? 0;
-    const baseSpdVal = toDecimal(
-      stateSpdValue > 0
-        ? stateSpdValue
-        : (state.spd?.toNumber?.() ?? state.spd ?? BAL.BASE_SIPS_PER_DRINK ?? 1)
-    );
-
-    const spdVal = baseSpdVal.mul(toDecimal(levelBonuses.sipMultiplier));
-    const currentSips = toDecimal(state.sips || 0);
-    const newSips = currentSips.add(spdVal);
-
-    // Update Zustand store with new values
-    useGameStore.setState({
-      sips: newSips,
-      totalSipsEarned: toDecimal(state.totalSipsEarned || 0).add(spdVal),
-      lastDrinkTime: now,
-      drinkProgress: 0,
-    });
-
-    // Calculate sips per second for tracking
-    const spdNum = toDecimal(state.spd || 0);
-    const rateInSeconds = state.drinkRate / 1000;
-    const rateInSecondsDecimal = toDecimal(rateInSeconds);
-    const currentSipsPerSecond =
-      rateInSeconds > 0 ? spdNum.div(rateInSecondsDecimal) : toDecimal(0);
-
-    // Update highest sips per second if needed
-    if (currentSipsPerSecond.gt(toDecimal(state.highestSipsPerSecond || 0))) {
-      useGameStore.setState({ highestSipsPerSecond: currentSipsPerSecond });
-    }
-
-    // Update last autosave clock (this is handled by the autosave system)
-    // useGameStore.setState({ lastAutosaveClockMs: now });
-
-    // Drink processed successfully
-  } catch (error) {
-    errorHandler.handleError(error, 'processDrink', { critical: true });
-    throw error;
-  }
+  };
 }
+
+// Unified modern drink system export - delegate to factory implementation
+export const processDrink = processDrinkFactory();

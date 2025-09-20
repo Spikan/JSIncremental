@@ -395,6 +395,9 @@ export const mockDOMCache = {
 export function expectDecimalToEqual(received: MockDecimal | any, expected: number): void {
   if (received instanceof MockDecimal) {
     expect(received.toNumber()).toBe(expected);
+  } else if (received && typeof received === 'object' && received.constructor?.name === 'Decimal') {
+    // Handle real Decimal objects from break_eternity.js
+    expect(received.toNumber()).toBe(expected);
   } else {
     expect(received).toBe(expected);
   }
@@ -405,6 +408,9 @@ export function expectDecimalToEqual(received: MockDecimal | any, expected: numb
  */
 export function expectDecimalToEqualString(received: MockDecimal | any, expected: string): void {
   if (received instanceof MockDecimal) {
+    expect(received.toString()).toBe(expected);
+  } else if (received && typeof received === 'object' && received.constructor?.name === 'Decimal') {
+    // Handle real Decimal objects from break_eternity.js
     expect(received.toString()).toBe(expected);
   } else {
     expect(received).toBe(expected);

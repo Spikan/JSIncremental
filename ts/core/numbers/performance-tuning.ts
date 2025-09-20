@@ -20,6 +20,7 @@ export class PerformanceTuner {
   private tuningEnabled = true;
   private lastTuningTime = Date.now();
   private tuningInterval = 5 * 60 * 1000; // 5 minutes
+  private tuningIntervalId: NodeJS.Timeout | null = null;
   private performanceThresholds = {
     operationTime: 50, // 50ms
     memoryUsage: 50 * 1024 * 1024, // 50MB
@@ -55,7 +56,7 @@ export class PerformanceTuner {
    * Schedule periodic performance tuning
    */
   private scheduleTuning(): void {
-    setInterval(() => {
+    this.tuningIntervalId = setInterval(() => {
       this.performTuning();
     }, this.tuningInterval);
   }
@@ -123,6 +124,7 @@ export class PerformanceTuner {
       const stats = cacheStats as any;
       if (
         stats.hitRate &&
+        !isNaN(parseFloat(stats.hitRate)) &&
         parseFloat(stats.hitRate) < this.performanceThresholds.cacheHitRate * 100
       ) {
         analysis.needsCacheOptimization = true;
@@ -133,7 +135,11 @@ export class PerformanceTuner {
     // Check operation performance
     for (const [operation, opStats] of Object.entries(metrics.performance)) {
       const stats = opStats as any;
-      if (stats.average && parseFloat(stats.average) > this.performanceThresholds.operationTime) {
+      if (
+        stats.average &&
+        !isNaN(parseFloat(stats.average)) &&
+        parseFloat(stats.average) > this.performanceThresholds.operationTime
+      ) {
         analysis.needsPerformanceOptimization = true;
         analysis.recommendations.push(
           `Slow operation detected: ${operation} (${stats.average}ms avg)`
@@ -248,6 +254,17 @@ export class PerformanceTuner {
       nextTuning: this.lastTuningTime + this.tuningInterval,
       thresholds: this.performanceThresholds,
     };
+  }
+
+  /**
+   * Cleanup resources and stop tuning
+   */
+  cleanup(): void {
+    if (this.tuningIntervalId) {
+      clearInterval(this.tuningIntervalId);
+      this.tuningIntervalId = null;
+    }
+    this.tuningEnabled = false;
   }
 }
 

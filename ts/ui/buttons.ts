@@ -4,7 +4,7 @@ import { mobileInputHandler } from './mobile-input';
 import { domQuery } from '../services/dom-query';
 import { enhancedAudioManager } from '../services/enhanced-audio-manager';
 import { audioControlsManager } from './audio-controls';
-import { useGameStore } from '../core/state/zustand-store';
+import { useGameStore, getStoreActions } from '../core/state/zustand-store';
 import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
 import { updateLevelUpDisplay, updateLevelText, updateAllDisplaysOptimized } from './displays';
 // Add static imports to replace dynamic imports
@@ -19,10 +19,12 @@ import * as devToolsManager from './dev-tools-manager';
 import * as offlineModal from './offline-modal';
 import * as feedback from './feedback';
 import * as godModule from '../god';
+import * as unlockPurchases from '../core/systems/unlock-purchases';
 import { saveOptions } from '../core/systems/options-system';
 import { addExtremeResources, resetAllResources } from '../core/systems/dev';
 import { sodaDrinkerHeaderService } from '../services/soda-drinker-header-service';
 import { errorHandler } from '../core/error-handling/error-handler';
+import { toDecimal } from '../core/numbers/simplified';
 
 type ButtonActionMeta = { func: (...args: any[]) => any; type: string; label: string };
 type ButtonTypeMeta = {
@@ -183,7 +185,7 @@ const BUTTON_CONFIG: {
 
             if (nextLevel) {
               const state = useGameStore.getState();
-              const sips = state.sips || new Decimal(0);
+              const sips = state.sips || toDecimal(0);
               const clicks = state.totalClicks || 0;
               // Use hybrid system's current level instead of old system's level
               const currentHybridLevel = currentLevel.id;
@@ -296,8 +298,19 @@ const BUTTON_CONFIG: {
     },
     purchaseUnlock: {
       func: (featureName: string) => {
-        // Modernized - unlock purchase handled by store
-        console.log('Unlock purchase modernized:', featureName);
+        try {
+          // Use the unlock purchases system
+          const success = (unlockPurchases as any).execute?.purchaseUnlock?.(featureName);
+          if (success) {
+            // Unlock purchased successfully
+            console.log('Unlock purchased:', featureName);
+          } else {
+            // Unlock purchase failed - insufficient resources or already unlocked
+            console.log('Unlock purchase failed:', featureName);
+          }
+        } catch (error) {
+          errorHandler.handleError(error, 'purchaseUnlock', { featureName });
+        }
       },
       type: 'shop-btn',
       label: 'Purchase Unlock',
@@ -313,7 +326,8 @@ const BUTTON_CONFIG: {
             // Game saved successfully
 
             // Update last save time in store
-            useGameStore.getState().actions.setLastSaveTime(Date.now());
+            const actions = getStoreActions();
+            actions.setLastSaveTime(Date.now());
           } else {
             // Save failed - no data to save
           }
@@ -331,8 +345,8 @@ const BUTTON_CONFIG: {
           localStorage.removeItem('soda-clicker-pro-save');
 
           // Reset game state to default
-          // useGameStore already imported
-          useGameStore.getState().actions.resetState();
+          const actions = getStoreActions();
+          actions.resetState();
 
           // Save data deleted and game reset
 
@@ -355,7 +369,8 @@ const BUTTON_CONFIG: {
           const currentState = useGameStore.getState();
           const newClickSoundsEnabled = !currentState.options.clickSoundsEnabled;
 
-          useGameStore.getState().actions.setOption('clickSoundsEnabled', newClickSoundsEnabled);
+          const actions = getStoreActions();
+          actions.setOption('clickSoundsEnabled', newClickSoundsEnabled);
 
           // Click sounds enabled/disabled
 
@@ -434,7 +449,23 @@ const BUTTON_CONFIG: {
     startGame: {
       func: () => {
         try {
-          // Modernized - splash screen handled by store
+          // Hide splash screen and show game content
+          const splashScreen = document.getElementById('splashScreen');
+          const gameContent = document.getElementById('gameContent');
+
+          if (splashScreen && gameContent) {
+            splashScreen.style.display = 'none';
+            splashScreen.style.visibility = 'hidden';
+            splashScreen.style.pointerEvents = 'none';
+            if (splashScreen.parentNode) {
+              splashScreen.parentNode.removeChild(splashScreen);
+            }
+
+            gameContent.style.display = 'block';
+            gameContent.style.visibility = 'visible';
+            gameContent.style.opacity = '1';
+            document.body?.classList?.add('game-started');
+          }
         } catch (error) {
           errorHandler.handleError(error, 'startGame', { action: 'splashStart' });
         }
@@ -580,16 +611,61 @@ const BUTTON_CONFIG: {
     },
     devExportState: {
       func: () => {
-        // Modernized - dev export state handled by store
-        console.log('Dev export state - modernized');
+        try {
+          // Export current game state
+          const state = useGameStore.getState();
+          const stateData = {
+            sips: state.sips?.toString() || '0',
+            straws: state.straws?.toString() || '0',
+            cups: state.cups?.toString() || '0',
+            suctions: state.suctions?.toString() || '0',
+            level: state.level?.toString() || '1',
+            spd: state.spd?.toString() || '0',
+            totalClicks: state.totalClicks || 0,
+            totalSipsEarned: state.totalSipsEarned?.toString() || '0',
+            options: state.options || {},
+          };
+
+          const dataStr = JSON.stringify(stateData, null, 2);
+          const dataBlob = new Blob([dataStr], { type: 'application/json' });
+          const url = URL.createObjectURL(dataBlob);
+
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `soda-clicker-state-${Date.now()}.json`;
+          link.click();
+
+          URL.revokeObjectURL(url);
+          console.log('State exported successfully');
+        } catch (error) {
+          errorHandler.handleError(error, 'devExportState');
+        }
       },
       type: 'dev-btn',
       label: 'Export State',
     },
     devPerformanceTest: {
       func: () => {
-        // Modernized - dev performance test handled by store
-        console.log('Dev performance test - modernized');
+        try {
+          // Run performance test
+          const startTime = performance.now();
+          const iterations = 1000;
+
+          // Test state updates
+          for (let i = 0; i < iterations; i++) {
+            useGameStore.setState({ totalClicks: i });
+          }
+
+          const endTime = performance.now();
+          const duration = endTime - startTime;
+
+          console.log(`Performance Test Results:`);
+          console.log(`- ${iterations} state updates in ${duration.toFixed(2)}ms`);
+          console.log(`- Average: ${(duration / iterations).toFixed(4)}ms per update`);
+          console.log(`- Rate: ${((iterations / duration) * 1000).toFixed(0)} updates/second`);
+        } catch (error) {
+          errorHandler.handleError(error, 'devPerformanceTest');
+        }
       },
       type: 'dev-btn',
       label: 'Performance Test',
@@ -597,8 +673,26 @@ const BUTTON_CONFIG: {
 
     devExportSave: {
       func: () => {
-        // Modernized - dev export save handled by store
-        console.log('Dev export save - modernized');
+        try {
+          // Export save data
+          const saveData = localStorage.getItem('soda-clicker-pro-save');
+          if (saveData) {
+            const dataBlob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `soda-clicker-save-${Date.now()}.json`;
+            link.click();
+
+            URL.revokeObjectURL(url);
+            console.log('Save data exported successfully');
+          } else {
+            console.log('No save data found to export');
+          }
+        } catch (error) {
+          errorHandler.handleError(error, 'devExportSave');
+        }
       },
       type: 'save-btn',
       label: 'Export Save',
@@ -633,8 +727,35 @@ const BUTTON_CONFIG: {
     },
     devImportSave: {
       func: () => {
-        // Modernized - dev import dialog handled by store
-        console.log('Dev import dialog - modernized');
+        try {
+          // Create file input for save import
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = '.json';
+          input.onchange = event => {
+            const file = (event.target as HTMLInputElement).files?.[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = e => {
+                try {
+                  const saveData = e.target?.result as string;
+                  if (saveData) {
+                    localStorage.setItem('soda-clicker-pro-save', saveData);
+                    console.log('Save data imported successfully');
+                    // Reload the page to apply the imported save
+                    window.location.reload();
+                  }
+                } catch (error) {
+                  errorHandler.handleError(error, 'devImportSave');
+                }
+              };
+              reader.readAsText(file);
+            }
+          };
+          input.click();
+        } catch (error) {
+          errorHandler.handleError(error, 'devImportSave');
+        }
       },
       type: 'save-btn',
       label: 'Import Save',
@@ -646,11 +767,10 @@ const BUTTON_CONFIG: {
           const millisecondsAway = hours * 60 * 60 * 1000;
 
           // Set lastSaveTime to simulate being away
-          const w: any = window as any;
+          // const w: any = window as any; // Legacy global removed
           const fakeLastSaveTime = Date.now() - millisecondsAway;
 
           // Update the save time
-          w.lastSaveTime = fakeLastSaveTime;
           useGameStore.setState({ lastSaveTime: fakeLastSaveTime });
 
           // Trigger offline progression check
@@ -1031,6 +1151,12 @@ function handleButtonClick(event: Event, button: HTMLElement, actionName: string
 }
 
 function setupUnifiedButtonSystem(): void {
+  // Prevent multiple setup
+  if ((window as any).__BUTTON_SYSTEM_SETUP__) {
+    return;
+  }
+  (window as any).__BUTTON_SYSTEM_SETUP__ = true;
+
   // Initialize mobile input handler for enhanced touch validation
   try {
     mobileInputHandler.initialize();
@@ -1129,7 +1255,6 @@ function setupUnifiedButtonSystem(): void {
     });
   }
   setupSpecialButtonHandlers();
-  // Button system setup complete
 }
 
 function setupSpecialButtonHandlers(): void {
@@ -1141,14 +1266,6 @@ function setupSpecialButtonHandlers(): void {
 
       const checkClicksSystem = () => {
         attempts++;
-        // Only log every 10th attempt to reduce spam
-        if (attempts % 10 === 1 || attempts <= 3) {
-          console.log(`Checking clicks system (attempt ${attempts}/${maxAttempts})`, {
-            hasClicks: true, // Modernized - clicks always available
-            sodaButtonExists: domQuery.exists('#sodaButton'),
-            timestamp: Date.now(),
-          });
-        }
 
         // Check if we're in a test environment and window is not available
         if (typeof window === 'undefined') {
@@ -1162,7 +1279,6 @@ function setupSpecialButtonHandlers(): void {
         const isDomReady = domQuery.exists('#sodaButton'); // Only need soda button for soda button setup
 
         if (hasClicksSystem && isDomReady) {
-          // Clicks system and DOM ready!
           resolve();
         } else if (attempts >= maxAttempts) {
           errorHandler.handleError(
@@ -1292,8 +1408,9 @@ function setupSpecialButtonHandlers(): void {
               errorHandler.handleError(error, 'removeVisualFeedback');
             }
             try {
-              // Call handleSodaClick
-              const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
+              // Call handleSodaClick with proper trackClick injection
+              const trackClick = (clicksSystem as any).trackClickFactory();
+              const handleSodaClick = (clicksSystem as any).handleSodaClickFactory({ trackClick });
               handleSodaClick(1.0); // Default multiplier of 1.0
             } catch (error) {
               // Error handling - logging removed for production
@@ -1383,8 +1500,9 @@ function setupSpecialButtonHandlers(): void {
               errorHandler.handleError(error, 'removeVisualFeedback');
             }
             try {
-              // Call handleSodaClick
-              const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
+              // Call handleSodaClick with proper trackClick injection
+              const trackClick = (clicksSystem as any).trackClickFactory();
+              const handleSodaClick = (clicksSystem as any).handleSodaClickFactory({ trackClick });
               handleSodaClick(1.0); // Default multiplier of 1.0
             } catch (error) {
               // Error handling - logging removed for production
@@ -1420,9 +1538,9 @@ function setupSpecialButtonHandlers(): void {
         }
         try {
           // Button click handling
-          console.log('🔧 Soda button clicked!');
           try {
-            const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
+            const trackClick = (clicksSystem as any).trackClickFactory();
+            const handleSodaClick = (clicksSystem as any).handleSodaClickFactory({ trackClick });
             await handleSodaClick(1.0); // Default multiplier of 1.0
 
             // Trigger UI update after click
@@ -1461,10 +1579,7 @@ function setupSpecialButtonHandlers(): void {
     // Modernized - soda click handled by store
     console.log('handleSodaClick available: true (via clicks-system)');
 
-    console.log(
-      'DOM elements ready:',
-      domQuery.exists('#sodaButton') && domQuery.exists('#shopTab')
-    );
+    console.log('DOM elements ready:', domQuery.exists('#sodaButton'));
     console.log('=== END SODA BUTTON DEBUG ===');
   };
   const chatInput = document.getElementById('chatInput') as any;
@@ -1580,15 +1695,48 @@ function setupSpecialButtonHandlers(): void {
             e.preventDefault();
             e.stopPropagation();
             try {
-              // Modernized - audio handled by store
+              // Play tab switch sound if enabled
+              const state = useGameStore.getState();
+              if (state.options.clickSoundsEnabled) {
+                buttonAudio.playButtonClickSound?.();
+              }
             } catch (error) {
-              // Error handling - logging removed for production
+              errorHandler.handleError(error, 'playTabSwitchSound');
             }
-            // Modernized - tab switching handled by store
+            // Handle tab switching
+            const tabName = fnName.replace('switchTab:', '');
+            if (tabName) {
+              try {
+                // Hide all tabs
+                const allTabs = document.querySelectorAll('.tab-content');
+                allTabs.forEach(tab => {
+                  (tab as HTMLElement).style.display = 'none';
+                });
+
+                // Show target tab
+                const targetTab = document.getElementById(`${tabName}Tab`);
+                if (targetTab) {
+                  targetTab.style.display = 'block';
+                }
+
+                // Update active tab button
+                const allButtons = document.querySelectorAll('.tab-btn');
+                allButtons.forEach(btn => {
+                  btn.classList.remove('active');
+                });
+
+                const activeButton = document.querySelector(`[data-action="switchTab:${tabName}"]`);
+                if (activeButton) {
+                  activeButton.classList.add('active');
+                }
+              } catch (error) {
+                errorHandler.handleError(error, 'switchTab', { tabName });
+              }
+            }
             return;
           }
           // Modernized - purchase system handled by store
-          if (meta || (isPurchase && false)) {
+          if (meta || isPurchase) {
             e.preventDefault();
             e.stopPropagation();
             try {
@@ -1598,32 +1746,65 @@ function setupSpecialButtonHandlers(): void {
                 success = typeof ret === 'undefined' ? true : !!ret;
                 try {
                   if (fnName === 'toggleButtonSounds') {
-                    // Modernized - audio button handled by store
+                    // Toggle button sounds in store
+                    const currentState = useGameStore.getState();
+                    const newValue = !currentState.options.clickSoundsEnabled;
+                    const actions = getStoreActions();
+                    actions.setOption('clickSoundsEnabled', newValue);
                   }
                 } catch (error) {
-                  // Error handling - logging removed for production
+                  errorHandler.handleError(error, 'toggleButtonSounds');
                 }
                 try {
-                  // Modernized - audio handled by store
-                  // TODO: Implement audio functionality through store
-                  // Audio feedback will be handled by the store system
+                  // Play button click sound if enabled
+                  const state = useGameStore.getState();
+                  if (state.options.clickSoundsEnabled) {
+                    buttonAudio.playButtonClickSound?.();
+                  }
                 } catch (error) {
-                  // Error handling - logging removed for production
+                  errorHandler.handleError(error, 'playButtonClickSound');
                 }
               } else {
                 if (fnName === 'purchaseUnlock' && args.length > 0) {
                   // Handle unlock purchase with feature name argument
-                  // Modernized - unlock purchase handled by store
-                  success = false;
+                  try {
+                    const success = (unlockPurchases as any).execute?.purchaseUnlock?.(args[0]);
+                    if (success) {
+                      console.log('Unlock purchased:', args[0]);
+                    } else {
+                      console.log('Unlock purchase failed:', args[0]);
+                    }
+                  } catch (error) {
+                    errorHandler.handleError(error, 'purchaseUnlock', { featureName: args[0] });
+                  }
                 } else if (isPurchase) {
-                  // Modernized - purchase system handled by store
-                  success = false;
+                  // Handle purchase actions through the purchase system
+                  try {
+                    const purchaseActions = {
+                      buyStraw: () => (purchasesSystem as any).execute.buyStraw(),
+                      buyCup: () => (purchasesSystem as any).execute.buyCup(),
+                      buyWiderStraws: () => (purchasesSystem as any).execute.buyWiderStraws(),
+                      buyBetterCups: () => (purchasesSystem as any).execute.buyBetterCups(),
+                      buySuction: () => (purchasesSystem as any).execute.buySuction(),
+                      buyFasterDrinks: () => (purchasesSystem as any).execute.buyFasterDrinks(),
+                    };
+                    const purchaseAction = purchaseActions[fnName as keyof typeof purchaseActions];
+                    if (purchaseAction) {
+                      success = purchaseAction();
+                    }
+                  } catch (error) {
+                    errorHandler.handleError(error, 'purchaseAction', { action: fnName });
+                    success = false;
+                  }
                 }
                 try {
-                  // Modernized - audio system handled by store
-                  // Audio feedback will be handled by the store system
+                  // Play purchase sound if enabled
+                  const state = useGameStore.getState();
+                  if (state.options.clickSoundsEnabled && success) {
+                    buttonAudio.playButtonClickSound?.();
+                  }
                 } catch (error) {
-                  // Error handling - logging removed for production
+                  errorHandler.handleError(error, 'playPurchaseSound');
                 }
               }
               if (
@@ -1678,12 +1859,9 @@ function setupSpecialButtonHandlers(): void {
           el.closest && el.closest('button') ? (el.closest('button') as any) : (el as any);
         if (buttonEl && shouldSuppressClick(buttonEl)) return;
         const action = el.getAttribute('data-action');
-        console.log(`[DEBUG] Button click detected, data-action:`, action);
-        console.log(`[DEBUG] Button element:`, el);
-        console.log(`[DEBUG] Button classes:`, el.className);
         if (!action) return;
         const [fnName, argStr] = action.includes(':') ? action.split(':') : [action, ''];
-        console.log(`[DEBUG] Parsed fnName: ${fnName}, argStr: ${argStr}`);
+
         if (!fnName) return;
         const argsAttr = el.getAttribute('data-args') || argStr;
         let args: any[] = [];
@@ -1723,15 +1901,48 @@ function setupSpecialButtonHandlers(): void {
           e.preventDefault();
           e.stopPropagation();
           try {
-            // Modernized - audio handled by store
+            // Play tab switch sound if enabled
+            const state = useGameStore.getState();
+            if (state.options.clickSoundsEnabled) {
+              buttonAudio.playButtonClickSound?.();
+            }
           } catch (error) {
-            // Error handling - logging removed for production
+            errorHandler.handleError(error, 'playTabSwitchSound');
           }
-          // Modernized - tab switching handled by store
+          // Handle tab switching
+          const tabName = fnName.replace('switchTab:', '');
+          if (tabName) {
+            try {
+              // Hide all tabs
+              const allTabs = document.querySelectorAll('.tab-content');
+              allTabs.forEach(tab => {
+                (tab as HTMLElement).style.display = 'none';
+              });
+
+              // Show target tab
+              const targetTab = document.getElementById(`${tabName}Tab`);
+              if (targetTab) {
+                targetTab.style.display = 'block';
+              }
+
+              // Update active tab button
+              const allButtons = document.querySelectorAll('.tab-btn');
+              allButtons.forEach(btn => {
+                btn.classList.remove('active');
+              });
+
+              const activeButton = document.querySelector(`[data-action="switchTab:${tabName}"]`);
+              if (activeButton) {
+                activeButton.classList.add('active');
+              }
+            } catch (error) {
+              errorHandler.handleError(error, 'switchTab', { tabName });
+            }
+          }
           return;
         }
         // Modernized - purchase system handled by store
-        if (meta || (isPurchase && false)) {
+        if (meta || isPurchase) {
           e.preventDefault();
           e.stopPropagation();
           try {
@@ -1741,32 +1952,65 @@ function setupSpecialButtonHandlers(): void {
               success = typeof ret === 'undefined' ? true : !!ret;
               try {
                 if (fnName === 'toggleButtonSounds') {
-                  // Modernized - audio button handled by store
+                  // Toggle button sounds in store
+                  const currentState = useGameStore.getState();
+                  const newValue = !currentState.options.clickSoundsEnabled;
+                  const actions = getStoreActions();
+                  actions.setOption('clickSoundsEnabled', newValue);
                 }
               } catch (error) {
-                // Error handling - logging removed for production
+                errorHandler.handleError(error, 'toggleButtonSounds');
               }
               try {
-                // Modernized - audio handled by store
-                // TODO: Implement audio functionality through store
-                // Audio feedback will be handled by the store system
+                // Play button click sound if enabled
+                const state = useGameStore.getState();
+                if (state.options.clickSoundsEnabled) {
+                  buttonAudio.playButtonClickSound?.();
+                }
               } catch (error) {
-                // Error handling - logging removed for production
+                errorHandler.handleError(error, 'playButtonClickSound');
               }
             } else {
               if (fnName === 'purchaseUnlock' && args.length > 0) {
                 // Handle unlock purchase with feature name argument
-                // Modernized - unlock purchase handled by store
-                success = false;
-                // Modernized - purchase system handled by store
+                try {
+                  const success = (unlockPurchases as any).execute?.purchaseUnlock?.(args[0]);
+                  if (success) {
+                    console.log('Unlock purchased:', args[0]);
+                  } else {
+                    console.log('Unlock purchase failed:', args[0]);
+                  }
+                } catch (error) {
+                  errorHandler.handleError(error, 'purchaseUnlock', { featureName: args[0] });
+                }
               } else if (isPurchase) {
-                success = false;
+                // Handle purchase actions through the purchase system
+                try {
+                  const purchaseActions = {
+                    buyStraw: () => (purchasesSystem as any).execute.buyStraw(),
+                    buyCup: () => (purchasesSystem as any).execute.buyCup(),
+                    buyWiderStraws: () => (purchasesSystem as any).execute.buyWiderStraws(),
+                    buyBetterCups: () => (purchasesSystem as any).execute.buyBetterCups(),
+                    buySuction: () => (purchasesSystem as any).execute.buySuction(),
+                    buyFasterDrinks: () => (purchasesSystem as any).execute.buyFasterDrinks(),
+                  };
+                  const purchaseAction = purchaseActions[fnName as keyof typeof purchaseActions];
+                  if (purchaseAction) {
+                    success = purchaseAction();
+                  }
+                } catch (error) {
+                  errorHandler.handleError(error, 'purchaseAction', { action: fnName });
+                  success = false;
+                }
               }
               try {
-                // Modernized - audio system handled by store
-                // Audio feedback will be handled by the store system
+                // Play purchase sound if enabled
+                const state = useGameStore.getState();
+                if (state.options.clickSoundsEnabled && success) {
+                  buttonAudio.playButtonClickSound?.();
+                }
               } catch (error) {
-                // Error handling - logging removed for production
+                errorHandler.handleError(error, 'playPurchaseSound');
               }
             }
             if (
@@ -1790,7 +2034,6 @@ function setupSpecialButtonHandlers(): void {
               if (typeof costValue === 'number' && !Number.isNaN(costValue)) {
                 try {
                   // Purchase feedback - modernized
-                  console.log('Purchase feedback - modernized');
                 } catch (error) {
                   errorHandler.handleError(error, 'showPurchaseFeedback');
                 }
@@ -1920,14 +2163,6 @@ function initButtonSystem(): void {
     // App readiness check modernized - using direct imports
     const appReady = true; // All systems now use direct imports
     if (appReady) {
-      // Test if suction button exists
-      const suctionButton = document.querySelector('[data-action="buySuction"]');
-      console.log('🔧 Suction button found:', !!suctionButton);
-      if (suctionButton) {
-        console.log('🔧 Suction button element:', suctionButton);
-        console.log('🔧 Suction button classes:', suctionButton.className);
-      }
-
       setupUnifiedButtonSystem();
     } else {
       setTimeout(tryInitialize, 200);

@@ -1,9 +1,8 @@
 // Economy formulas for SPD and totals with direct Decimal support (TypeScript)
 // Maximum performance with direct break_eternity.js operations
 
-// Direct break_eternity.js access
-const Decimal = (globalThis as any).Decimal;
-import { pow, DecimalType } from '../numbers/simplified';
+// Use Decimal via module import (no globals)
+import { Decimal, pow, DecimalType } from '../numbers/simplified';
 
 // ===== Safe numeric helpers =====
 // No artificial numeric helpers needed - break_eternity.js handles all scaling naturally
@@ -34,6 +33,12 @@ export function computeStrawSPD(
 
   // Calculate base production: baseSPD * straws * upgradeMultiplier
   let totalSPD = baseValue.mul(strawsCount).mul(upgradeMultiplier);
+  console.log('🔍 computeStrawSPD calculation:', {
+    baseValue: baseValue.toString(),
+    strawsCount: strawsCount.toString(),
+    upgradeMultiplier: upgradeMultiplier.toString(),
+    totalSPD: totalSPD.toString(),
+  });
 
   // Milestone bonuses: Every 10 straws = 2x production
   const milestoneCount = new Decimal(strawsCount).div(10).floor();

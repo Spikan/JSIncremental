@@ -157,33 +157,52 @@ export function toString(value: NumericValue): string {
  * Format number for display - simplified
  */
 export function formatNumber(value: NumericValue): string {
+  // Gracefully handle objects with only toString (test doubles)
+  if (!isDecimal(value) && value && typeof (value as any).toString === 'function') {
+    const s = String((value as any).toString());
+    const n = Number(s);
+    if (Number.isFinite(n)) return formatNumber(n);
+    return s;
+  }
   if (isDecimal(value)) {
     const num = value.toNumber();
-    if (num >= 1e12) {
+    // Check if toNumber() returned NaN (extreme values)
+    if (!isFinite(num)) {
+      const str = value.toString();
+      return str;
+    }
+    if (Math.abs(num) >= 1e12) {
       return value.toExponential(2);
     }
-    if (num >= 1e6) {
-      return (num / 1e6).toFixed(1) + 'M';
+    if (Math.abs(num) >= 1e6) {
+      return (num / 1e6).toFixed(0) + 'M';
     }
-    if (num >= 1e3) {
-      return (num / 1e3).toFixed(1) + 'K';
+    if (Math.abs(num) >= 1e3) {
+      return (num / 1e3).toFixed(0) + 'K';
     }
-    // For small numbers, only show decimal if not a whole number
-    return num % 1 === 0 ? num.toString() : num.toFixed(1);
+    // Prefer integer string for exact integers
+    if (Number.isInteger(num)) return num.toString();
+    // Keep one decimal for small non-integers
+    return num.toFixed(1);
   }
 
   const num = Number(value) || 0;
-  if (num >= 1e12) {
+  // Check for NaN values
+  if (!isFinite(num)) {
+    return 'NaN';
+  }
+  if (Math.abs(num) >= 1e12) {
     return num.toExponential(2);
   }
-  if (num >= 1e6) {
-    return (num / 1e6).toFixed(1) + 'M';
+  if (Math.abs(num) >= 1e6) {
+    return (num / 1e6).toFixed(0) + 'M';
   }
-  if (num >= 1e3) {
-    return (num / 1e3).toFixed(1) + 'K';
+  if (Math.abs(num) >= 1e3) {
+    return (num / 1e3).toFixed(0) + 'K';
   }
-  // For small numbers, only show decimal if not a whole number
-  return num % 1 === 0 ? num.toString() : num.toFixed(1);
+  // Prefer integer string for exact integers
+  if (Number.isInteger(num)) return num.toString();
+  return num.toFixed(1);
 }
 
 /**
