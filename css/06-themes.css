@@ -1,0 +1,529 @@
+/* Dynamic Theme System */
+/* Level-based themes with smooth transitions */
+
+/* ===== THEME TRANSITION SYSTEM ===== */
+:root {
+  /* Theme transition duration */
+  --theme-transition-duration: var(--duration-500);
+  
+  /* Default theme values (will be overridden dynamically) */
+  --theme-primary: var(--color-primary);
+  --theme-accent: var(--color-accent);
+  --theme-background: var(--color-background);
+  
+  /* Theme-aware component colors */
+  --themed-surface: var(--color-surface);
+  --themed-border: var(--color-border);
+  --themed-text: var(--color-text-primary);
+}
+
+/* Smooth theme transitions */
+body,
+.card,
+.btn,
+.upgrade-card,
+.suction-btn,
+.currency-polygon-main,
+.level-polygon,
+.stat-polygon,
+.control-polygon,
+.form-input,
+.form-select,
+.modal-content {
+  transition: 
+    background-color var(--theme-transition-duration) var(--ease-out),
+    border-color var(--theme-transition-duration) var(--ease-out),
+    color var(--theme-transition-duration) var(--ease-out),
+    box-shadow var(--theme-transition-duration) var(--ease-out);
+}
+
+/* ===== AUTHENTIC SODA DRINKER PRO LEVEL THEMES ===== */
+/* Based on the actual SDP level system with authentic colors */
+
+/* Level 1: The Beach */
+.theme-beach {
+  --color-primary: #87ceeb; /* Sky blue from SDP */
+  --color-primary-light: #98fb98; /* Light green */
+  --color-primary-dark: #5f9ea0; /* Cadet blue */
+  --color-accent: #ffd700; /* Gold from SDP */
+  --color-accent-light: #ffed4e; /* Light gold */
+  --color-accent-dark: #daa520; /* Goldenrod */
+  --color-background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%);
+  --color-surface: rgba(255, 215, 0, 0.15);
+  --color-border: rgba(255, 215, 0, 0.3);
+  
+  /* Beach-specific effects */
+  --shadow-glow: 0 0 30px rgba(255, 215, 0, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(160%) hue-rotate(10deg);
+}
+
+/* Level 2: The Park */
+.theme-park {
+  --color-primary: #90ee90; /* Light green from SDP */
+  --color-primary-light: #98fb98; /* Pale green */
+  --color-primary-dark: #32cd32; /* Lime green */
+  --color-accent: #228b22; /* Forest green from SDP */
+  --color-accent-light: #32cd32; /* Lime green */
+  --color-accent-dark: #006400; /* Dark green */
+  --color-background: linear-gradient(135deg, #90ee90 0%, #32cd32 100%);
+  --color-surface: rgba(34, 139, 34, 0.15);
+  --color-border: rgba(34, 139, 34, 0.3);
+  
+  /* Park-specific effects */
+  --shadow-glow: 0 0 30px rgba(34, 139, 34, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(140%) hue-rotate(-20deg);
+}
+
+/* Level 3: Weird Room */
+.theme-weird-room {
+  --color-primary: #dda0dd; /* Plum from SDP */
+  --color-primary-light: #da70d6; /* Orchid */
+  --color-primary-dark: #8b008b; /* Dark magenta */
+  --color-accent: #8b008b; /* Dark magenta from SDP */
+  --color-accent-light: #da70d6; /* Orchid */
+  --color-accent-dark: #4b0082; /* Indigo */
+  --color-background: linear-gradient(135deg, #dda0dd 0%, #da70d6 100%);
+  --color-surface: rgba(139, 0, 139, 0.15);
+  --color-border: rgba(139, 0, 139, 0.3);
+  
+  /* Weird Room-specific effects */
+  --shadow-glow: 0 0 30px rgba(139, 0, 139, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(180%) hue-rotate(30deg);
+}
+
+/* Level 4: in SPACE */
+.theme-space {
+  --color-primary: #000080; /* Navy from SDP */
+  --color-primary-light: #191970; /* Midnight blue */
+  --color-primary-dark: #000040; /* Darker navy */
+  --color-accent: #00ffff; /* Cyan from SDP */
+  --color-accent-light: #87ceeb; /* Sky blue */
+  --color-accent-dark: #008b8b; /* Dark cyan */
+  --color-background: linear-gradient(135deg, #000080 0%, #191970 100%);
+  --color-surface: rgba(0, 255, 255, 0.15);
+  --color-border: rgba(0, 255, 255, 0.3);
+  
+  /* Space-specific effects */
+  --shadow-glow: 0 0 30px rgba(0, 255, 255, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(200%) brightness(120%);
+}
+
+/* Level 5: In a Castle */
+.theme-castle {
+  --color-primary: #8b4513; /* Saddle brown from SDP */
+  --color-primary-light: #a0522d; /* Sienna */
+  --color-primary-dark: #654321; /* Dark brown */
+  --color-accent: #ffd700; /* Gold from SDP */
+  --color-accent-light: #ffed4e; /* Light gold */
+  --color-accent-dark: #daa520; /* Goldenrod */
+  --color-background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  --color-surface: rgba(255, 215, 0, 0.15);
+  --color-border: rgba(255, 215, 0, 0.3);
+  
+  /* Castle-specific effects */
+  --shadow-glow: 0 0 30px rgba(255, 215, 0, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(140%) sepia(20%);
+}
+
+/* Level 6: Inside a Mouth */
+.theme-mouth {
+  --color-primary: #ffb6c1; /* Light pink from SDP */
+  --color-primary-light: #ffc0cb; /* Pink */
+  --color-primary-dark: #ff69b4; /* Hot pink */
+  --color-accent: #ff69b4; /* Hot pink from SDP */
+  --color-accent-light: #ffc0cb; /* Pink */
+  --color-accent-dark: #c71585; /* Medium violet red */
+  --color-background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 100%);
+  --color-surface: rgba(255, 105, 180, 0.15);
+  --color-border: rgba(255, 105, 180, 0.3);
+  
+  /* Mouth-specific effects */
+  --shadow-glow: 0 0 30px rgba(255, 105, 180, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(160%) hue-rotate(-10deg);
+}
+
+/* Level 7: Before a convention */
+.theme-convention {
+  --color-primary: #708090; /* Slate gray from SDP */
+  --color-primary-light: #2f4f4f; /* Dark slate gray */
+  --color-primary-dark: #2f2f2f; /* Dark gray */
+  --color-accent: #ffd700; /* Gold from SDP */
+  --color-accent-light: #ffed4e; /* Light gold */
+  --color-accent-dark: #daa520; /* Goldenrod */
+  --color-background: linear-gradient(135deg, #708090 0%, #2f4f4f 100%);
+  --color-surface: rgba(255, 215, 0, 0.15);
+  --color-border: rgba(255, 215, 0, 0.3);
+  
+  /* Convention-specific effects */
+  --shadow-glow: 0 0 30px rgba(255, 215, 0, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(110%) contrast(120%);
+}
+
+/* Level 8: Empty Pool */
+.theme-empty-pool {
+  --color-primary: #00ced1; /* Dark turquoise from SDP */
+  --color-primary-light: #20b2aa; /* Light sea green */
+  --color-primary-dark: #008b8b; /* Dark cyan */
+  --color-accent: #ff69b4; /* Hot pink from SDP */
+  --color-accent-light: #ffc0cb; /* Pink */
+  --color-accent-dark: #c71585; /* Medium violet red */
+  --color-background: linear-gradient(135deg, #00ced1 0%, #20b2aa 100%);
+  --color-surface: rgba(255, 105, 180, 0.15);
+  --color-border: rgba(255, 105, 180, 0.3);
+  
+  /* Empty Pool-specific effects */
+  --shadow-glow: 0 0 30px rgba(255, 105, 180, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(160%) hue-rotate(-30deg);
+}
+
+/* Level 9: Dark Woods */
+.theme-dark-woods {
+  --color-primary: #2f4f2f; /* Dark slate gray from SDP */
+  --color-primary-light: #000000; /* Black */
+  --color-primary-dark: #1a1a1a; /* Very dark gray */
+  --color-accent: #8b0000; /* Dark red from SDP */
+  --color-accent-light: #dc143c; /* Crimson */
+  --color-accent-dark: #660000; /* Dark dark red */
+  --color-background: linear-gradient(135deg, #2f4f2f 0%, #000000 100%);
+  --color-surface: rgba(139, 0, 0, 0.15);
+  --color-border: rgba(139, 0, 0, 0.3);
+  --color-text-primary: #ffffff;
+  
+  /* Dark Woods-specific effects */
+  --shadow-glow: 0 0 30px rgba(139, 0, 0, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(120%) brightness(80%);
+}
+
+/* Level 10: County Fair */
+.theme-county-fair {
+  --color-primary: #ff6347; /* Tomato from SDP */
+  --color-primary-light: #ff4500; /* Orange red */
+  --color-primary-dark: #dc143c; /* Crimson */
+  --color-accent: #ffd700; /* Gold from SDP */
+  --color-accent-light: #ffed4e; /* Light gold */
+  --color-accent-dark: #daa520; /* Goldenrod */
+  --color-background: linear-gradient(135deg, #ff6347 0%, #ff4500 100%);
+  --color-surface: rgba(255, 215, 0, 0.15);
+  --color-border: rgba(255, 215, 0, 0.3);
+  
+  /* County Fair-specific effects */
+  --shadow-glow: 0 0 30px rgba(255, 215, 0, 0.4);
+  --glass-backdrop-filter: blur(20px) saturate(180%) brightness(110%);
+}
+
+/* ===== THEME APPLICATION ===== */
+/* Apply theme colors to all components */
+
+/* Update background */
+body {
+  background: var(--color-background);
+  background-attachment: fixed;
+}
+
+/* Component theming */
+.currency-polygon-main {
+  background: var(--color-accent) !important;
+  color: var(--color-primary) !important;
+}
+
+.level-polygon {
+  background: var(--color-accent) !important;
+  color: var(--color-primary) !important;
+}
+
+.btn-primary,
+.upgrade-btn {
+  background: var(--color-accent) !important;
+  color: var(--color-primary) !important;
+  border-color: var(--color-accent) !important;
+}
+
+.btn-primary:hover,
+.upgrade-btn:hover {
+  background: var(--color-accent-light) !important;
+  border-color: var(--color-accent-light) !important;
+}
+
+.stat-value,
+.upgrade-effect,
+.click-power-value,
+.suction-bonus {
+  color: var(--color-accent) !important;
+}
+
+.level-name-minimal,
+.currency-label-main {
+  color: var(--color-accent) !important;
+}
+
+/* Progress bars */
+.progress-fill,
+.progress-fill-minimal {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light)) !important;
+}
+
+/* Borders and surfaces */
+.card,
+.upgrade-card,
+.level-polygon-container,
+.stat-polygon {
+  border-color: var(--color-border) !important;
+  background: var(--color-surface) !important;
+}
+
+/* Focus states */
+:focus-visible {
+  outline-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 3px rgba(var(--color-accent-rgb, 0, 217, 127), 0.3) !important;
+}
+
+/* ===== THEME-SPECIFIC ANIMATIONS ===== */
+/* Authentic SDP level animations */
+
+.theme-beach .currency-icon-polygon {
+  animation: beachPulse 3s ease-in-out infinite;
+}
+
+@keyframes beachPulse {
+  0%, 100% { 
+    filter: hue-rotate(0deg) brightness(1); 
+  }
+  50% { 
+    filter: hue-rotate(10deg) brightness(1.1); 
+  }
+}
+
+.theme-park .level-polygon {
+  animation: parkGrow 2s ease-in-out infinite;
+}
+
+@keyframes parkGrow {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.05); 
+  }
+}
+
+.theme-weird-room .control-polygon {
+  animation: weirdRoomPulse 2s ease-in-out infinite;
+}
+
+@keyframes weirdRoomPulse {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  50% { 
+    transform: scale(1.05) rotate(5deg);
+    filter: hue-rotate(30deg);
+  }
+}
+
+.theme-space .progress-fill {
+  animation: spaceShimmer 2s linear infinite;
+}
+
+@keyframes spaceShimmer {
+  0% { 
+    background-position: -100% 0;
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+  100% { 
+    background-position: 100% 0;
+    filter: brightness(1);
+  }
+}
+
+.theme-castle .card {
+  animation: castleFloat 4s ease-in-out infinite;
+}
+
+@keyframes castleFloat {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-1px); 
+  }
+}
+
+.theme-mouth .soda-button {
+  animation: mouthPulse 3s ease-in-out infinite;
+}
+
+@keyframes mouthPulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: saturate(1);
+  }
+  50% { 
+    transform: scale(1.02);
+    filter: saturate(1.2);
+  }
+}
+
+.theme-convention .upgrade-card {
+  animation: conventionFlicker 5s ease-in-out infinite;
+}
+
+@keyframes conventionFlicker {
+  0%, 100% { 
+    box-shadow: var(--shadow-md); 
+  }
+  50% { 
+    box-shadow: var(--shadow-lg), 0 0 15px var(--color-accent); 
+  }
+}
+
+.theme-empty-pool .currency-polygon-main {
+  animation: poolRipple 4s ease-in-out infinite;
+}
+
+@keyframes poolRipple {
+  0%, 100% { 
+    transform: scale(1);
+    filter: hue-rotate(0deg);
+  }
+  25% { 
+    transform: scale(1.02);
+    filter: hue-rotate(-5deg);
+  }
+  75% { 
+    transform: scale(1.02);
+    filter: hue-rotate(5deg);
+  }
+}
+
+.theme-dark-woods .level-polygon {
+  animation: darkWoodsGlow 3s ease-in-out infinite;
+}
+
+@keyframes darkWoodsGlow {
+  0%, 100% { 
+    box-shadow: var(--shadow-md);
+    filter: brightness(1);
+  }
+  50% { 
+    box-shadow: var(--shadow-lg), 0 0 20px var(--color-accent);
+    filter: brightness(1.2);
+  }
+}
+
+.theme-county-fair .stat-polygon {
+  animation: fairSpin 6s linear infinite;
+}
+
+@keyframes fairSpin {
+  0% { 
+    transform: rotate(0deg);
+  }
+  100% { 
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== THEME TRANSITION EFFECTS ===== */
+.theme-transition {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-transition::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: themeTransitionSweep var(--theme-transition-duration) var(--ease-out);
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes themeTransitionSweep {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ===== ACCESSIBILITY IN THEMES ===== */
+/* Ensure sufficient contrast in all themes */
+@media (prefers-contrast: high) {
+  .theme-beach,
+  .theme-park,
+  .theme-city,
+  .theme-desert,
+  .theme-mountain,
+  .theme-ocean {
+    --color-surface: rgba(0, 0, 0, 0.8);
+    --color-border: rgba(255, 255, 255, 0.8);
+    --color-text-primary: #ffffff;
+    --color-text-secondary: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* ===== REDUCED MOTION THEME SUPPORT ===== */
+@media (prefers-reduced-motion: reduce) {
+  .theme-beach .currency-icon-polygon,
+  .theme-park .level-polygon,
+  .theme-weird-room .control-polygon,
+  .theme-space .progress-fill,
+  .theme-castle .card,
+  .theme-mouth .soda-button,
+  .theme-convention .upgrade-card,
+  .theme-empty-pool .currency-polygon-main,
+  .theme-dark-woods .level-polygon,
+  .theme-county-fair .stat-polygon {
+    animation: none;
+  }
+  
+  .theme-transition::before {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ===== DARK MODE VARIANTS ===== */
+/* For users who prefer dark mode, increase contrast */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --glass-backdrop-filter: blur(20px) saturate(180%) brightness(0.8);
+    --color-surface: rgba(255, 255, 255, 0.08);
+    --color-border: rgba(255, 255, 255, 0.15);
+  }
+}
+
+/* ===== THEME UTILITIES ===== */
+.theme-bg { background: var(--color-background) !important; }
+.theme-surface { background: var(--color-surface) !important; }
+.theme-primary { color: var(--color-primary) !important; }
+.theme-accent { color: var(--color-accent) !important; }
+.theme-text { color: var(--color-text-primary) !important; }
+.theme-border { border-color: var(--color-border) !important; }
+
+/* Force theme colors (use sparingly) */
+.force-theme-accent {
+  background: var(--color-accent) !important;
+  color: var(--color-primary) !important;
+  border-color: var(--color-accent) !important;
+}
+
+.force-theme-surface {
+  background: var(--color-surface) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}

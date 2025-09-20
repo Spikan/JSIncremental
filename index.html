@@ -3,211 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Soda Clicker Pro</title>
+    <title>Soda Clicker Pro - Modern UI</title>
     <meta name="description" content="Soda Clicker Pro - The Ultimate Soda Drinking Experience" />
     <meta name="author" content="Spikan" />
 
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#1a1a2e" />
+    <meta name="theme-color" content="#001789" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Soda Clicker Pro" />
-    <meta name="msapplication-TileColor" content="#1a1a2e" />
+    <meta name="msapplication-TileColor" content="#001789" />
     <meta name="msapplication-tap-highlight" content="no" />
 
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" type="text/css" href="css/style-header-fixed.css" />
-    <link rel="stylesheet" type="text/css" href="css/soda-drinker-header-v2.css" />
-    <link rel="stylesheet" type="text/css" href="css/theme-system.css" />
-    <style>
-      /* Local UI polish for action buttons */
-      .action-buttons {
-        display: flex;
-        gap: 12px;
-        align-items: stretch;
-        flex-wrap: wrap;
-      }
-      .action-buttons .suction-btn {
-        min-width: 240px;
-        flex: 1 1 280px;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        padding: 10px 12px;
-      }
-      .action-buttons .suction-icon {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-      }
-      .action-buttons .suction-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-      .action-buttons .suction-name {
-        font-weight: 700;
-        letter-spacing: 0.2px;
-      }
-      .action-buttons .suction-cost {
-        opacity: 0.9;
-      }
-      .action-buttons .suction-effect {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        margin-left: auto;
-        text-align: right;
-      }
-      .action-buttons .click-power-display {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-      }
-
-      /* Modern incremental layout */
-      .main-game-content {
-        display: grid;
-        grid-template-columns: minmax(320px, 1fr) 360px;
-        gap: 20px;
-        align-items: start;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 16px;
-      }
-      @media (max-width: 900px) {
-        .main-game-content {
-          grid-template-columns: 1fr;
-        }
-        .game-sidebar {
-          order: 2;
-        }
-        .main-content-area {
-          order: 1;
-        }
-      }
-      .soda-main-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-      }
-      .soda-container {
-        width: min(420px, 90vw);
-        margin: 0 auto;
-      }
-      .soda-button {
-        border-radius: 14px;
-      }
-
-      /* Sidebar cards spacing */
-      .game-sidebar .upgrade-card {
-        margin-bottom: 12px;
-      }
-
-      /* Header compaction & alignment */
-      .soda-drinker-header .header-main-content {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        align-items: center;
-        gap: 16px;
-        padding: 8px 12px;
-      }
-      .soda-drinker-header .currency-display-section {
-        justify-self: center;
-      }
-      .soda-drinker-header .controls-section {
-        justify-self: end;
-        display: flex;
-        gap: 8px;
-      }
-      .soda-drinker-header .control-polygon {
-        padding: 8px 10px;
-        border-radius: 10px;
-      }
-      .soda-drinker-header .currency-value-main {
-        font-weight: 800;
-      }
-      .soda-drinker-header .secondary-stats-minimal {
-        gap: 8px;
-      }
-
-      /* Upgrade cards polish */
-      .game-sidebar .upgrade-card {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-      }
-      .game-sidebar .upgrade-card .upgrade-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .game-sidebar .upgrade-card .upgrade-icon {
-        width: 34px;
-        height: 34px;
-        display: grid;
-        place-items: center;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        font-size: 18px;
-      }
-      .game-sidebar .upgrade-card .upgrade-info h4 {
-        margin: 0;
-        font-size: 1rem;
-      }
-      .game-sidebar .upgrade-card .upgrade-info p {
-        margin: 2px 0 0;
-        opacity: 0.85;
-        font-size: 0.85rem;
-      }
-      .game-sidebar .upgrade-btn {
-        margin-top: 8px;
-        width: 100%;
-        padding: 8px 10px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
-        font-weight: 700;
-      }
-      .game-sidebar .upgrade-btn:disabled,
-      .game-sidebar .upgrade-card.is-disabled .upgrade-btn {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .game-sidebar .upgrade-stats {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 6px;
-        font-size: 0.85rem;
-        opacity: 0.9;
-      }
-    </style>
+    <!-- Modern CSS System (replaces 50,000+ lines of legacy CSS) -->
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
 
     <!-- Icons -->
     <link rel="icon" href="images/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="images/apple-touch-icon-180x180.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png" />
-    <!-- Ensure Decimal/Zod are available before any modules execute (prod places module in head) -->
+    
+    <!-- External Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
     <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
-    <!-- Model Viewer for lightweight 3D -->
     <script
       type="module"
       src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
     ></script>
+    
     <script>
-      // Diagnostics + start shims for production
+      // Error handling
       (function () {
         try {
           window.__diag = Array.isArray(window.__diag) ? window.__diag : [];
@@ -227,69 +54,60 @@
           });
         } catch {}
       })();
-      // Game initialization is handled by TypeScript loading screen system
+      
+      // Game initialization
       window.addEventListener('load', function () {
-        console.log('✅ Page loaded, TypeScript loading screen will handle initialization');
+        console.log('✅ Modern UI loaded, TypeScript will handle initialization');
       });
     </script>
   </head>
-  <body>
-    <!-- Loading Screen will be created by TypeScript -->
-    <!-- Main Game Content -->
-    <div id="gameContent" class="game-content mobile-content-padding" style="display: none">
-      <!-- Consolidated Game Header -->
-      <!-- Soda Drinker Pro Thematic Header -->
-      <div class="soda-drinker-header" id="sodaDrinkerHeader">
-        <!-- Low-Poly Background Elements -->
-        <div class="header-polygon-bg">
-          <div class="polygon-shape polygon-1"></div>
-          <div class="polygon-shape polygon-2"></div>
-          <div class="polygon-shape polygon-3"></div>
-          <div class="polygon-shape polygon-4"></div>
-        </div>
+  <body class="theme-beach">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading Soda Clicker Pro...</div>
+    </div>
 
-        <!-- Main Header Content -->
+    <!-- Main Game Content -->
+    <div id="gameContent" class="game-content" style="display: none">
+      <!-- Modern Game Header -->
+      <header class="soda-drinker-header" id="sodaDrinkerHeader">
         <div class="header-main-content">
-          <!-- Left: Level Display -->
+          <!-- Level Display -->
           <div class="level-display-section">
-            <div class="level-polygon-container">
-              <div class="level-polygon" id="levelPolygon">
+            <div class="level-polygon-container hover-lift">
+              <div class="level-polygon">
                 <span class="level-number" id="levelNumber">1</span>
               </div>
               <div class="level-info-minimal">
                 <div class="level-name-minimal" id="currentLevelName">THE BEACH</div>
-                <div class="level-progress-minimal">
-                  <div class="progress-bar-minimal" id="levelProgressBar">
-                    <div class="progress-fill-minimal" id="levelProgressFill"></div>
-                  </div>
-                </div>
                 <div class="unlock-requirements" id="unlockRequirements">
-                  <div class="requirement-text">Next: 100 sips, 25 clicks</div>
+                  <div class="requirement-text text-xs">Next: 100 sips, 25 clicks</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Center: Currency Display -->
+          <!-- Currency Display -->
           <div class="currency-display-section">
-            <div class="currency-polygon-main">
+            <div class="currency-polygon-main hover-scale">
               <div class="currency-icon-polygon">💧</div>
               <div class="currency-value-main" id="topSipValue">0</div>
               <div class="currency-label-main">SIPS</div>
             </div>
             <div class="secondary-stats-minimal">
-              <div class="stat-polygon" id="sipsPerDrinkStat">
+              <div class="stat-polygon hover-lift" id="sipsPerDrinkStat">
                 <span class="stat-value" id="topSipsPerDrink">1</span>
                 <span class="stat-label">/DRINK</span>
               </div>
-              <div class="stat-polygon" id="sipsPerSecondStat">
+              <div class="stat-polygon hover-lift" id="sipsPerSecondStat">
                 <span class="stat-value" id="topSipsPerSecond">1</span>
                 <span class="stat-label">/SEC</span>
               </div>
             </div>
           </div>
 
-          <!-- Right: Controls -->
+          <!-- Controls -->
           <div class="controls-section">
             <button class="control-polygon" data-action="openSettings" aria-label="Open Settings">
               <span class="control-icon">⚙</span>
@@ -300,12 +118,10 @@
           </div>
         </div>
 
-        <!-- Fountain Panel (showcase area placed under header) -->
+        <!-- Fountain Panel -->
         <div id="fountainPanel" class="fountain-panel"></div>
 
-        <!-- Progress Section removed (replaced by integrated soda-button progress) -->
-
-        <!-- PWA Status Indicators -->
+        <!-- PWA Indicators -->
         <div class="pwa-indicators">
           <div id="offline-indicator" class="offline-indicator" style="display: none">
             📴 Offline - Game continues with cached data
@@ -314,38 +130,38 @@
             📱 Install App
           </button>
         </div>
-      </div>
+      </header>
+
       <!-- Main Game Content -->
-      <div id="mainGameContent" class="main-game-content">
-        <!-- Main Content Area (Left Side) -->
-        <div class="main-content-area">
+      <main id="mainGameContent" class="main-game-content">
+        <!-- Main Content Area -->
+        <section class="main-content-area">
           <!-- Soda Clicking Section -->
           <div class="soda-main-section">
             <div class="soda-container">
-              <div
+              <button
                 id="sodaButton"
                 data-action="sodaClick"
                 data-args="1"
-                class="soda-button"
+                class="soda-button hover-scale will-change-transform"
                 role="button"
                 tabindex="0"
                 aria-label="Click to drink soda"
               >
-                <!-- 3D model will be inserted here, fallback image for loading -->
                 <img
                   src="images/regSoda.png"
                   alt="a picture of soda for you to click"
                   class="soda-fallback"
-                  style="width: 100%; height: 100%; object-fit: contain"
                 />
-              </div>
+              </button>
               <div class="click-indicator" id="clickIndicator">
                 <div class="click-ripple"></div>
               </div>
             </div>
-            <!-- Suction and Faster Drinks buttons -->
-            <div class="suction-button-container action-buttons">
-              <button class="suction-btn" data-action="buySuction">
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons stagger-in">
+              <button class="suction-btn hover-lift" data-action="buySuction">
                 <div class="suction-icon">💨</div>
                 <div class="suction-info">
                   <div class="suction-name">Suction</div>
@@ -362,11 +178,7 @@
                 </div>
               </button>
 
-              <button
-                class="suction-btn"
-                data-action="buyFasterDrinks"
-                aria-label="Buy Faster Drinks"
-              >
+              <button class="suction-btn hover-lift" data-action="buyFasterDrinks" aria-label="Buy Faster Drinks">
                 <div class="suction-icon">⚡</div>
                 <div class="suction-info">
                   <div class="suction-name">Faster Drinks</div>
@@ -384,443 +196,290 @@
               </button>
             </div>
           </div>
-        </div>
-        <!-- Sidebar (Right Side) -->
-        <div class="game-sidebar">
-          <!-- Sidebar Header -->
-          <div class="sidebar-header">
-            <h2 class="sidebar-title">Shop</h2>
-            <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close Shop">
+        </section>
+
+        <!-- Sidebar -->
+        <aside class="game-sidebar">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Shop</h2>
+              <button class="btn btn-ghost" id="sidebarCloseBtn" aria-label="Close Shop">
+                <span class="close-icon">×</span>
+              </button>
+            </div>
+            
+            <div class="stagger-in">
+              <!-- Straw Production -->
+              <div class="upgrade-card hover-lift">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">🥤</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Extra Straw</h4>
+                    <p class="upgrade-description">Generate sips per drink</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="buyStraw">
+                  <span class="upgrade-cost"><span id="strawCost">5</span> Sips</span>
+                  <span>Buy</span>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-owned">Owned: <span id="straws">0</span></div>
+                  <div class="upgrade-effect">+<span id="strawSPD">0</span> per drink</div>
+                </div>
+              </div>
+
+              <!-- Cup Production -->
+              <div class="upgrade-card hover-lift">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">☕</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Bigger Cup</h4>
+                    <p class="upgrade-description">Higher capacity production</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="buyCup">
+                  <span class="upgrade-cost"><span id="cupCost">15</span> Sips</span>
+                  <span>Buy</span>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-owned">Owned: <span id="cups">0</span></div>
+                  <div class="upgrade-effect">+<span id="cupSPD">0</span> per drink</div>
+                </div>
+              </div>
+
+              <!-- Wider Straws Enhancement -->
+              <div class="upgrade-card hover-lift enhancement">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">🔧</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Wider Straws</h4>
+                    <p class="upgrade-description">Enhance straw efficiency</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="buyWiderStraws">
+                  <span class="upgrade-cost"><span id="widerStrawsCost">150</span> Sips</span>
+                  <span>Buy</span>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-owned">Owned: <span id="widerStraws">0</span></div>
+                  <div class="upgrade-effect">+<span id="widerStrawsSPD">0</span>% boost</div>
+                </div>
+              </div>
+
+              <!-- Better Cups Enhancement -->
+              <div class="upgrade-card hover-lift enhancement">
+                <div class="upgrade-header">
+                  <div class="upgrade-icon">🔧</div>
+                  <div class="upgrade-info">
+                    <h4 class="upgrade-name">Better Cups</h4>
+                    <p class="upgrade-description">Enhance cup efficiency</p>
+                  </div>
+                </div>
+                <button class="upgrade-btn" data-action="buyBetterCups">
+                  <span class="upgrade-cost"><span id="betterCupsCost">400</span> Sips</span>
+                  <span>Buy</span>
+                </button>
+                <div class="upgrade-stats">
+                  <div class="upgrade-owned">Owned: <span id="betterCups">0</span></div>
+                  <div class="upgrade-effect">+<span id="betterCupsSPD">0</span>% boost</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="settings-modal" style="display: none">
+      <div class="modal-overlay" data-action="closeSettings">
+        <div class="settings-modal-content" onclick="event.stopPropagation()">
+          <div class="settings-modal-header">
+            <h2 class="settings-modal-title">
+              <span class="settings-icon">⚙️</span>
+              Settings & Statistics
+            </h2>
+            <button class="settings-modal-close" data-action="closeSettings" aria-label="Close Settings">
               <span class="close-icon">×</span>
             </button>
           </div>
-          <!-- Sidebar Content -->
-          <div class="sidebar-content">
-            <!-- Straw Production -->
-            <div class="upgrade-card">
-              <div class="upgrade-header">
-                <div class="upgrade-icon">🥤</div>
-                <div class="upgrade-info">
-                  <h4 class="upgrade-name">Extra Straw</h4>
-                  <p class="upgrade-description">Generate sips per drink</p>
+
+          <!-- Tab Navigation -->
+          <div class="settings-modal-tabs">
+            <button class="settings-tab-btn active" data-tab="settings" data-action="switchSettingsTab" data-args="settings">
+              <span class="tab-icon">⚙️</span>
+              <span class="tab-label">Settings</span>
+            </button>
+            <button class="settings-tab-btn" data-tab="levels" data-action="switchSettingsTab" data-args="levels">
+              <span class="tab-icon">🎮</span>
+              <span class="tab-label">Levels</span>
+            </button>
+            <button class="settings-tab-btn" data-tab="statistics" data-action="switchSettingsTab" data-args="statistics">
+              <span class="tab-icon">📊</span>
+              <span class="tab-label">Statistics</span>
+            </button>
+          </div>
+
+          <div class="settings-modal-body">
+            <!-- Settings Tab -->
+            <div class="settings-tab-content active" id="settings-tab">
+              <div class="settings-group">
+                <h4 class="settings-group-title">Audio</h4>
+                <div class="audio-control">
+                  <label for="masterVolumeSlider">🔊 Master Volume</label>
+                  <div class="volume-slider-container">
+                    <input
+                      type="range"
+                      id="masterVolumeSlider"
+                      class="volume-slider"
+                      min="0"
+                      max="100"
+                      value="70"
+                      step="5"
+                    />
+                    <span id="masterVolumeValue" class="volume-value">70%</span>
+                  </div>
                 </div>
+                <div class="audio-control">
+                  <label for="sfxVolumeSlider">🔔 SFX Volume</label>
+                  <div class="volume-slider-container">
+                    <input
+                      type="range"
+                      id="sfxVolumeSlider"
+                      class="volume-slider"
+                      min="0"
+                      max="100"
+                      value="60"
+                      step="5"
+                    />
+                    <span id="sfxVolumeValue" class="volume-value">60%</span>
+                  </div>
+                </div>
+                <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="settings-btn">
+                  🔊 Button Sounds ON
+                </button>
               </div>
-              <button class="upgrade-btn" data-action="buyStraw">
-                <div class="upgrade-cost"><span id="strawCost">5</span> Sips</div>
-              </button>
-              <div class="upgrade-stats">
-                <div class="upgrade-owned">Owned: <span id="straws">0</span></div>
-                <div class="upgrade-effect">+<span id="strawSPD">0</span> per drink</div>
+              
+              <div class="settings-group">
+                <h4 class="settings-group-title">Save & Load</h4>
+                <button data-action="save" class="settings-btn btn-primary">Save Game</button>
+                <button data-action="delete_save" class="settings-btn btn-secondary">Delete Save</button>
               </div>
             </div>
-            <!-- Cup Production -->
-            <div class="upgrade-card">
-              <div class="upgrade-header">
-                <div class="upgrade-icon">☕</div>
-                <div class="upgrade-info">
-                  <h4 class="upgrade-name">Bigger Cup</h4>
-                  <p class="upgrade-description">Higher capacity production</p>
+
+            <!-- Statistics Tab -->
+            <div class="settings-tab-content" id="statistics-tab">
+              <div class="settings-group">
+                <h4 class="settings-group-title">Game Statistics</h4>
+                <div class="stats-grid">
+                  <div class="stat-card">
+                    <div class="stat-icon">👆</div>
+                    <div class="stat-content">
+                      <p class="stat-label">Total Clicks</p>
+                      <p class="stat-value" id="totalClicks">0</p>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon">⏰</div>
+                    <div class="stat-content">
+                      <p class="stat-label">Play Time</p>
+                      <p class="stat-value" id="totalPlayTime">0:00:00</p>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon">💧</div>
+                    <div class="stat-content">
+                      <p class="stat-label">Total Sips</p>
+                      <p class="stat-value" id="totalSipsEarned">0</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <button class="upgrade-btn" data-action="buyCup">
-                <div class="upgrade-cost"><span id="cupCost">15</span> Sips</div>
-              </button>
-              <div class="upgrade-stats">
-                <div class="upgrade-owned">Owned: <span id="cups">0</span></div>
-                <div class="upgrade-effect">+<span id="cupSPD">0</span> per drink</div>
-              </div>
-            </div>
-            <!-- Wider Straws Enhancement -->
-            <div class="upgrade-card enhancement">
-              <div class="upgrade-header">
-                <div class="upgrade-icon">🔧</div>
-                <div class="upgrade-info">
-                  <h4 class="upgrade-name">Wider Straws</h4>
-                  <p class="upgrade-description">Enhance straw efficiency</p>
-                </div>
-              </div>
-              <button class="upgrade-btn" data-action="buyWiderStraws">
-                <div class="upgrade-cost"><span id="widerStrawsCost">150</span> Sips</div>
-              </button>
-              <div class="upgrade-stats">
-                <div class="upgrade-owned">Owned: <span id="widerStraws">0</span></div>
-                <div class="upgrade-effect">+<span id="widerStrawsSPD">0</span>% boost</div>
-              </div>
-            </div>
-            <!-- Better Cups Enhancement -->
-            <div class="upgrade-card enhancement">
-              <div class="upgrade-header">
-                <div class="upgrade-icon">🔧</div>
-                <div class="upgrade-info">
-                  <h4 class="upgrade-name">Better Cups</h4>
-                  <p class="upgrade-description">Enhance cup efficiency</p>
-                </div>
-              </div>
-              <button class="upgrade-btn" data-action="buyBetterCups">
-                <div class="upgrade-cost"><span id="betterCupsCost">400</span> Sips</div>
-              </button>
-              <div class="upgrade-stats">
-                <div class="upgrade-owned">Owned: <span id="betterCups">0</span></div>
-                <div class="upgrade-effect">+<span id="betterCupsSPD">0</span>% boost</div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Single entry: ts/index.ts will import all other modules -->
-    <script
-      type="module"
-      src="ts/index.ts"
-      onerror="console.error('❌ Failed to load TypeScript module:', this.src, 'Error:', event)"
-    ></script>
-    <script type="module">
-      // Test if the module is actually loading
-      console.log('🔧 Testing module import...');
-      try {
-        // Try to access the global variable set by the module
-        setTimeout(() => {
-          if (window.__tsIndexLoaded) {
-            console.log('✅ Module loaded successfully - __tsIndexLoaded found');
-          } else {
-            console.error('❌ Module not loaded - __tsIndexLoaded not found');
-          }
-        }, 100);
-      } catch (error) {
-        console.error('❌ Error testing module load:', error);
-      }
-    </script>
+
+    <!-- TypeScript Entry Point -->
+    <script type="module" src="ts/index.ts"></script>
+    
     <script>
-      // Ensure Decimal is available globally before loading main.js
-      if (typeof Decimal === 'undefined') {
-        console.error('❌ Decimal library not loaded! Game will not work properly.');
-      } else {
-        console.log('✅ Decimal library loaded successfully');
-      }
-      // Let main.js handle the script loading since the modular files are now working
-      console.log('🔧 Core scripts loaded, main.js will handle the rest...');
+      // Initialize modern UI enhancements
+      document.addEventListener('DOMContentLoaded', function() {
+        // Hide loading screen after content loads
+        setTimeout(() => {
+          const loadingScreen = document.getElementById('loadingScreen');
+          const gameContent = document.getElementById('gameContent');
+          
+          if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+              loadingScreen.style.display = 'none';
+              if (gameContent) {
+                gameContent.style.display = 'block';
+                gameContent.style.opacity = '0';
+                requestAnimationFrame(() => {
+                  gameContent.style.transition = 'opacity 0.5s ease-out';
+                  gameContent.style.opacity = '1';
+                });
+              }
+            }, 300);
+          }
+        }, 1000);
+
+        // Add theme transition effects
+        let currentTheme = 'theme-beach';
+        
+        // Authentic SDP theme switching (integrate with your hybrid level system)
+        window.switchTheme = function(newTheme) {
+          document.body.classList.add('theme-transition');
+          document.body.classList.remove(currentTheme);
+          document.body.classList.add(newTheme);
+          currentTheme = newTheme;
+          
+          setTimeout(() => {
+            document.body.classList.remove('theme-transition');
+          }, 500);
+        };
+        
+        // Example: Switch to different authentic SDP levels
+        // Available: theme-beach, theme-park, theme-weird-room, theme-space, 
+        // theme-castle, theme-mouth, theme-convention, theme-empty-pool, 
+        // theme-dark-woods, theme-county-fair
+
+        // Add click ripple effects
+        document.addEventListener('click', function(e) {
+          const button = e.target.closest('.btn, .suction-btn, .upgrade-btn, .soda-button');
+          if (button && !button.disabled) {
+            const ripple = document.createElement('div');
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.className = 'click-ripple';
+            ripple.style.cssText = `
+              width: ${size}px;
+              height: ${size}px;
+              left: ${x}px;
+              top: ${y}px;
+            `;
+            
+            button.style.position = 'relative';
+            button.style.overflow = 'hidden';
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+              if (ripple.parentNode) {
+                ripple.parentNode.removeChild(ripple);
+              }
+            }, 700);
+          }
+        });
+
+        console.log('✅ Modern UI initialized with enhanced interactions');
+      });
     </script>
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="settings-modal" style="display: none">
-      <div class="settings-modal-overlay" data-action="closeSettings"></div>
-      <div class="settings-modal-content">
-        <div class="settings-modal-header">
-          <h2 class="settings-modal-title">
-            <span class="settings-icon">⚙️</span>
-            Settings & Statistics
-          </h2>
-          <button
-            class="settings-modal-close"
-            data-action="closeSettings"
-            aria-label="Close Settings"
-          >
-            <span class="close-icon">×</span>
-          </button>
-        </div>
-        <!-- Tab Navigation -->
-        <div class="settings-modal-tabs">
-          <button
-            class="settings-tab-btn active"
-            data-tab="settings"
-            data-action="switchSettingsTab"
-            data-args="settings"
-          >
-            <span class="tab-icon">⚙️</span>
-            <span class="tab-label">Settings</span>
-          </button>
-          <button
-            class="settings-tab-btn"
-            data-tab="levels"
-            data-action="switchSettingsTab"
-            data-args="levels"
-          >
-            <span class="tab-icon">🎮</span>
-            <span class="tab-label">Levels</span>
-          </button>
-          <button
-            class="settings-tab-btn"
-            data-tab="statistics"
-            data-action="switchSettingsTab"
-            data-args="statistics"
-          >
-            <span class="tab-icon">📊</span>
-            <span class="tab-label">Statistics</span>
-          </button>
-          <button
-            class="settings-tab-btn dev-tab"
-            data-tab="dev"
-            data-action="switchSettingsTab"
-            data-args="dev"
-            style="display: none"
-          >
-            <span class="tab-icon">🔧</span>
-            <span class="tab-label">Dev Tools</span>
-          </button>
-          <button
-            class="settings-tab-btn god-tab"
-            data-tab="god"
-            data-action="switchSettingsTab"
-            data-args="god"
-            style="display: none"
-          >
-            <span class="tab-icon">🙏</span>
-            <span class="tab-label">Talk to God</span>
-          </button>
-        </div>
-        <div class="settings-modal-body">
-          <!-- Settings Tab Content -->
-          <div class="settings-tab-content active" id="settings-tab">
-            <div class="settings-group">
-              <h4 class="settings-group-title">Audio</h4>
-              <div class="audio-control">
-                <label for="masterVolumeSlider">🔊 Master Volume</label>
-                <div class="volume-slider-container">
-                  <input
-                    type="range"
-                    id="masterVolumeSlider"
-                    class="volume-slider"
-                    min="0"
-                    max="100"
-                    value="70"
-                    step="5"
-                  />
-                  <span id="masterVolumeValue" class="volume-value">70%</span>
-                </div>
-              </div>
-              <!-- Music volume removed -->
-              <div class="audio-control">
-                <label for="sfxVolumeSlider">🔔 SFX Volume</label>
-                <div class="volume-slider-container">
-                  <input
-                    type="range"
-                    id="sfxVolumeSlider"
-                    class="volume-slider"
-                    min="0"
-                    max="100"
-                    value="60"
-                    step="5"
-                  />
-                  <span id="sfxVolumeValue" class="volume-value">60%</span>
-                </div>
-              </div>
-              <button id="buttonSoundsToggle" data-action="toggleButtonSounds" class="settings-btn">
-                🔊 Button Sounds ON
-              </button>
-            </div>
-            <div class="settings-group">
-              <h4 class="settings-group-title">Save & Load</h4>
-              <button data-action="save" class="settings-btn">Save Game</button>
-              <button data-action="delete_save" class="settings-btn">Delete Save</button>
-            </div>
-            <div class="settings-group">
-              <h4 class="settings-group-title">Performance</h4>
-              <div class="performance-control">
-                <label for="modelPerformanceMode">🎮 3D Model Performance</label>
-                <select id="modelPerformanceMode" class="performance-select">
-                  <option value="low">Low (15fps) - Best for slow devices</option>
-                  <option value="medium" selected>Medium (30fps) - Balanced</option>
-                  <option value="high">High (60fps) - Best quality</option>
-                </select>
-              </div>
-            </div>
-            <div class="settings-group">
-              <h4 class="settings-group-title">Dev Tools</h4>
-              <button id="devToolsToggle" data-action="toggleDevTools" class="settings-btn">
-                🔧 Dev Tools OFF
-              </button>
-            </div>
-          </div>
-          <!-- Levels Tab Content -->
-          <div class="settings-tab-content" id="levels-tab">
-            <div class="settings-group">
-              <h4 class="settings-group-title">Level Selection</h4>
-              <div class="level-selector-container">
-                <div class="current-level-display">
-                  <div class="current-level-info">
-                    <span class="current-level-name" id="settingsCurrentLevelName">The Beach</span>
-                    <span class="current-level-number"
-                      >Level <span id="settingsCurrentLevelNumber">1</span></span
-                    >
-                  </div>
-                </div>
-                <div class="level-list" id="settingsLevelList">
-                  <!-- Populated dynamically -->
-                </div>
-              </div>
-            </div>
-            <div class="settings-group">
-              <h4 class="settings-group-title">Level Requirements</h4>
-              <div class="level-requirements-display" id="settingsLevelRequirements">
-                <!-- Populated dynamically -->
-              </div>
-            </div>
-          </div>
-          <!-- Statistics Tab Content -->
-          <div class="settings-tab-content" id="statistics-tab">
-            <div class="settings-group">
-              <h4 class="settings-group-title">Game Statistics</h4>
-              <div class="stats-grid">
-                <div class="stat-card">
-                  <div class="stat-icon">👆</div>
-                  <div class="stat-content">
-                    <div class="stat-label">Total Clicks</div>
-                    <div class="stat-value" id="totalClicks">0</div>
-                  </div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-icon">⏰</div>
-                  <div class="stat-content">
-                    <div class="stat-label">Play Time</div>
-                    <div class="stat-value" id="totalPlayTime">0:00:00</div>
-                  </div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-icon">💧</div>
-                  <div class="stat-content">
-                    <div class="stat-label">Total Sips</div>
-                    <div class="stat-value" id="totalSipsEarned">0</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- God Tab Content -->
-          <div class="settings-tab-content" id="god-tab">
-            <div class="settings-group">
-              <h4 class="settings-group-title">Divine Conversation</h4>
-              <div class="god-chat-container">
-                <div class="god-chat-messages" id="godChatMessages">
-                  <div class="god-message">
-                    <div class="god-avatar">
-                      <img
-                        src="images/TempleOS.jpg"
-                        alt="God"
-                        style="width: 100%; height: 100%; object-fit: cover"
-                      />
-                    </div>
-                    <div class="god-text">
-                      <div class="god-name">God</div>
-                      <div class="god-message-content">
-                        Welcome, mortal. I sense your dedication to the art of soda consumption.
-                        What wisdom do you seek?
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="god-chat-input-container">
-                  <input
-                    type="text"
-                    id="godChatInput"
-                    class="god-chat-input"
-                    placeholder="Ask God for guidance..."
-                    maxlength="200"
-                    onkeypress="if(event.key==='Enter') { const btn = document.querySelector('[data-action=sendGodMessage]'); if(btn) btn.click(); }"
-                  />
-                  <button class="god-chat-send" data-action="sendGodMessage">
-                    <span class="send-icon">📤</span>
-                  </button>
-                </div>
-                <div class="god-chat-hint">
-                  <small>💡 Try asking about upgrades, strategies, or secrets...</small>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Dev Tools Tab Content -->
-          <div class="settings-tab-content" id="dev-tab">
-            <div class="settings-group">
-              <h4 class="settings-group-title">Resource Management</h4>
-              <div class="dev-buttons-grid">
-                <button data-action="devAddSips" data-args="1000" class="dev-btn">
-                  💧 +1K Sips
-                </button>
-                <button data-action="devAddSips" data-args="1000000" class="dev-btn">
-                  💧 +1M Sips
-                </button>
-                <button data-action="devAddTime" data-args="3600000" class="dev-btn">
-                  ⏰ +1 Hour
-                </button>
-                <button data-action="devAddTime" data-args="86400000" class="dev-btn">
-                  ⏰ +1 Day
-                </button>
-              </div>
-            </div>
-            <div class="settings-group">
-              <h4 class="settings-group-title">Unlocks & Features</h4>
-              <div class="dev-buttons-grid">
-                <button data-action="devUnlockAll" class="dev-btn">🔓 Unlock All</button>
-                <button data-action="devUnlockShop" class="dev-btn">🏪 Unlock Shop</button>
-                <button data-action="devUnlockUpgrades" class="dev-btn">⬆️ Unlock Upgrades</button>
-                <button data-action="devResetUnlocks" class="dev-btn">🔒 Reset Unlocks</button>
-              </div>
-            </div>
-            <div class="settings-group">
-              <h4 class="settings-group-title">Testing & Debug</h4>
-              <div class="dev-buttons-grid">
-                <button data-action="devTestOffline" data-args="2" class="dev-btn">
-                  🌙 Test Offline (2h)
-                </button>
-                <button data-action="forceGameplayMusic" class="dev-btn">
-                  🎵 Switch to Gameplay Music
-                </button>
-                <button data-action="testVolumeBalance" class="dev-btn">
-                  🔊 Test Volume Balance
-                </button>
-                <button data-action="testMusicLooping" class="dev-btn">🔄 Test Trimmed Loop</button>
-                <button data-action="devTestOffline" data-args="8" class="dev-btn">
-                  🌙 Test Offline (8h)
-                </button>
-                <button data-action="devPerformanceTest" class="dev-btn">
-                  📊 Performance Test
-                </button>
-                <button data-action="devClearConsole" class="dev-btn">🧹 Clear Console</button>
-              </div>
-            </div>
-            <div class="settings-group">
-              <h4 class="settings-group-title">Data Management</h4>
-              <div class="dev-buttons-grid">
-                <button data-action="devExportState" class="dev-btn">📤 Export State</button>
-                <button data-action="devImportSave" class="dev-btn">📥 Import Save</button>
-                <button data-action="devExportSave" class="dev-btn">💾 Export Save</button>
-                <button
-                  data-action="largeNumberTest"
-                  data-args="addExtremeResources"
-                  class="dev-btn"
-                >
-                  🔢 Add Extreme Numbers
-                </button>
-              </div>
-            </div>
-            <div class="settings-group">
-              <h4 class="settings-group-title">Quick Actions</h4>
-              <div class="dev-input-group">
-                <label for="devCustomSips">Add Custom Sips:</label>
-                <div class="dev-input-row">
-                  <input type="number" id="devCustomSips" placeholder="Amount" class="dev-input" />
-                  <button
-                    onclick="const sipsInput = document.getElementById('devCustomSips'); const amount = sipsInput.value; if(amount) { const btn = document.querySelector('[data-action=devAddSips]'); if(btn) { btn.setAttribute('data-args', amount); btn.click(); sipsInput.value = ''; } }"
-                    class="dev-btn"
-                  >
-                    ➕ Add
-                  </button>
-                </div>
-              </div>
-              <div class="dev-input-group">
-                <label for="devCustomTime">Add Custom Time (hours):</label>
-                <div class="dev-input-row">
-                  <input type="number" id="devCustomTime" placeholder="Hours" class="dev-input" />
-                  <button
-                    onclick="const timeInput = document.getElementById('devCustomTime'); const hours = timeInput.value; if(hours) { const ms = hours * 60 * 60 * 1000; const btn = document.querySelector('[data-action=devAddTime]'); if(btn) { btn.setAttribute('data-args', ms); btn.click(); timeInput.value = ''; } }"
-                    class="dev-btn"
-                  >
-                    ➕ Add
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </body>
 </html>
