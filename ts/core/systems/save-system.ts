@@ -10,6 +10,7 @@ import { optimizedEventBus } from '../../services/optimized-event-bus';
 import { AppStorage } from '../../services/storage';
 import { getUpgradesData } from '../../services/data-service';
 import { errorHandler, safeStateOperation } from '../error-handling/error-handler';
+import { initButtonAudioSystem, updateButtonSoundsToggleButton } from './button-audio';
 
 type QueueArgs = {
   now: number;
@@ -211,15 +212,8 @@ export async function resetGameState() {
       errorHandler.handleError(error, 'initializeMobileInput');
     }
 
-    // Initialize audio systems
+    // Initialize audio systems - using static import for GitHub Pages compatibility
     try {
-      // Audio system access - using single import for production compatibility
-      const buttonAudioModule = await import('./button-audio').catch(() => {
-        console.warn('Button audio module failed to load, audio features will be disabled');
-        return { initButtonAudioSystem: () => {}, updateButtonSoundsToggleButton: () => {} };
-      });
-
-      const { initButtonAudioSystem, updateButtonSoundsToggleButton } = buttonAudioModule;
       initButtonAudioSystem?.();
       updateButtonSoundsToggleButton?.();
     } catch (error) {

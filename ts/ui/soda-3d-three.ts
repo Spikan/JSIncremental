@@ -18,96 +18,42 @@ export function isThreeSodaEnabled(): boolean {
   }
 }
 
+// Static imports for GitHub Pages compatibility
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import sodaGlbUrl from '../../res/Soda.glb?url';
+
 export async function createThreeSodaButton(targetSelector: string): Promise<ThreeSodaAPI> {
-  // Consolidate all dynamic imports at the top level for better production build compatibility
-  let Scene: any, PerspectiveCamera: any, WebGLRenderer: any, sRGBEncoding: any, Clock: any;
-  let Box3: any, Vector3: any, MathUtils: any, CylinderGeometry: any, CircleGeometry: any;
-  let BoxGeometry: any, SphereGeometry: any, PlaneGeometry: any, TorusGeometry: any, Mesh: any;
-  let MeshStandardMaterial: any, MeshBasicMaterial: any, Group: any, AmbientLight: any;
-  let DirectionalLight: any, HemisphereLight: any, CanvasTexture: any, DoubleSide: any;
-  let BackSide: any, SpriteMaterial: any, Sprite: any, AdditiveBlending: any;
-  let GLTFLoader: any, sodaGlbUrl: string;
-
-  try {
-    // Import Three.js with more explicit error handling for production
-    const threeModule = await import('three').catch(error => {
-      console.error('Failed to load Three.js:', error);
-      throw new Error('Three.js module failed to load');
-    });
-
-    const gltfModule = await import('three/examples/jsm/loaders/GLTFLoader.js').catch(error => {
-      console.error('Failed to load GLTFLoader:', error);
-      throw new Error('GLTFLoader module failed to load');
-    });
-
-    // Handle asset URL import with proper fallback
-    const sodaGlbModule = await import('../../res/Soda.glb?url').catch(error => {
-      console.warn('Failed to load Soda.glb URL, using fallback:', error);
-      return { default: '/res/Soda.glb' };
-    });
-
-    // Extract all Three.js classes with explicit error checking
-    if (!threeModule || typeof threeModule !== 'object') {
-      throw new Error('Three.js module is invalid');
-    }
-
-    // Validate that essential classes are available
-    const requiredClasses = ['Scene', 'PerspectiveCamera', 'WebGLRenderer', 'Vector3', 'Mesh'];
-    for (const className of requiredClasses) {
-      if (!(className in threeModule)) {
-        throw new Error(`Required Three.js class ${className} is not available`);
-      }
-    }
-
-    ({
-      Scene,
-      PerspectiveCamera,
-      WebGLRenderer,
-      sRGBEncoding,
-      Clock,
-      Box3,
-      Vector3,
-      MathUtils,
-      CylinderGeometry,
-      CircleGeometry,
-      BoxGeometry,
-      SphereGeometry,
-      PlaneGeometry,
-      TorusGeometry,
-      Mesh,
-      MeshStandardMaterial,
-      MeshBasicMaterial,
-      Group,
-      AmbientLight,
-      DirectionalLight,
-      HemisphereLight,
-      CanvasTexture,
-      DoubleSide,
-      BackSide,
-      SpriteMaterial,
-      Sprite,
-      AdditiveBlending,
-    } = threeModule);
-
-    // Validate GLTFLoader
-    if (!gltfModule.GLTFLoader) {
-      throw new Error('GLTFLoader is not available in the imported module');
-    }
-    GLTFLoader = gltfModule.GLTFLoader;
-
-    sodaGlbUrl = (sodaGlbModule.default as string) || '/res/Soda.glb';
-  } catch (importError) {
-    console.error('Failed to load Three.js dependencies:', importError);
-    // Return a fallback API that doesn't crash
-    return {
-      mount: async () => {},
-      unmount: () => {},
-      updateProgress: () => {},
-      spawnBubble: () => {},
-      setPaused: () => {},
-      setReducedMotion: () => {},
-    };
-  }
+  // Use static imports - no dynamic loading needed
+  const {
+    Scene,
+    PerspectiveCamera,
+    WebGLRenderer,
+    sRGBEncoding,
+    Clock,
+    Box3,
+    Vector3,
+    MathUtils,
+    CylinderGeometry,
+    CircleGeometry,
+    BoxGeometry,
+    SphereGeometry,
+    PlaneGeometry,
+    TorusGeometry,
+    Mesh,
+    MeshStandardMaterial,
+    MeshBasicMaterial,
+    Group,
+    AmbientLight,
+    DirectionalLight,
+    HemisphereLight,
+    CanvasTexture,
+    DoubleSide,
+    BackSide,
+    SpriteMaterial,
+    Sprite,
+    AdditiveBlending,
+  } = THREE;
 
   // Runtime locals
   let container: HTMLElement | null = null;
