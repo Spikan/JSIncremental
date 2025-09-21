@@ -2,6 +2,18 @@ import { defineConfig } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Vite plugin to strip "use client" directives from framer-motion ESM builds to silence
+// module-level directive warnings during bundling. This does not change behavior.
+const stripFramerMotionUseClient: any = {
+  name: 'strip-framer-motion-use-client',
+  enforce: 'pre',
+  transform(code: string, id: string) {
+    if (!id.includes('node_modules/framer-motion/dist/es/')) return null;
+    const stripped = code.replace(/^\s*["']use client["'];?\s*/m, '');
+    return { code: stripped, map: null };
+  },
+};
+
 // Helper function to get base path for deployment
 function getBasePath(): string {
   return (
@@ -67,6 +79,7 @@ export default defineConfig(({ mode }) => {
     base,
 
     plugins: [
+      stripFramerMotionUseClient,
       VitePWA({
         registerType: 'autoUpdate',
         workbox: {
