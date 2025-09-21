@@ -3,12 +3,12 @@
 import { useGameStore } from '../state/zustand-store';
 import * as ui from '../../ui/index';
 import { start as startLoop } from './loop-system';
-import { processDrinkFactory } from './drink-system';
+import { getProcessDrink } from './drink-system';
 import { FEATURE_UNLOCKS as unlockSystem } from '../../feature-unlocks';
 import { errorHandler } from '../error-handling/error-handler';
 
-// Create the processDrink function using the factory
-const processDrink = processDrinkFactory();
+// Lazily resolve processDrink to avoid TDZ with circular deps on Pages
+const processDrink = getProcessDrink();
 
 // Idempotent guards (module-local)
 let __domReadyInitialized = false;

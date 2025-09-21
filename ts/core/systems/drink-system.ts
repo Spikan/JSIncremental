@@ -89,4 +89,21 @@ export function processDrinkFactory({
 }
 
 // Unified modern drink system export - delegate to factory implementation
-export const processDrink = processDrinkFactory();
+// Lazily initialize to avoid TDZ issues from circular imports during module evaluation
+let __processDrinkMemo: (() => void) | null = null;
+
+export function getProcessDrink(): () => void {
+  if (!__processDrinkMemo) {
+    __processDrinkMemo = processDrinkFactory();
+  }
+  return __processDrinkMemo;
+}
+
+// Convenience export that defers to the memoized implementation
+export function processDrink(): void {
+  try {
+    getProcessDrink()();
+  } catch (error) {
+    errorHandler.handleError(error, 'processDrink', { critical: true });
+  }
+}
