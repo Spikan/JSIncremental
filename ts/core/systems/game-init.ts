@@ -154,7 +154,11 @@ export function initOnDomReady(): void {
     const mod = require('./game-init');
     gameInitSystemRef = mod && (mod as any).gameInitSystem;
   } catch (error) {
-    errorHandler.handleError(error, 'resolveGameInitSystem', { context: 'game-init' });
+    try {
+      // Avoid TDZ on error handler during module evaluation
+      // eslint-disable-next-line no-console
+      console.warn('[wireGameInit] resolveGameInitSystem failed', error);
+    } catch {}
     return;
   }
 
@@ -172,7 +176,11 @@ export function initOnDomReady(): void {
       errorHandler.handleError(error, 'pushDiagnosticInfo', { context: 'game-init' });
     }
   } catch (error) {
-    errorHandler.handleError(error, 'wireGameInitToGlobalApp', { critical: true });
+    try {
+      // Avoid TDZ on error handler during module evaluation
+      // eslint-disable-next-line no-console
+      console.warn('[wireGameInit] wireGameInitToGlobalApp failed', error);
+    } catch {}
   }
 })();
 
