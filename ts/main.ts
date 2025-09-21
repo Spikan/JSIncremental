@@ -13,7 +13,6 @@
 import { domQuery } from './services/dom-query';
 import { timerManager } from './services/timer-manager';
 import { getStoreActions } from './core/state/zustand-store';
-import { pwaService } from './services/pwa-service';
 import { errorHandler } from './core/error-handling/error-handler';
 
 import { config as GC } from './config';
@@ -73,33 +72,7 @@ function initGame() {
       return;
     }
 
-    // Initialize PWA service (skip in tests)
-    try {
-      if (!(typeof window !== 'undefined' && (window as any).__TEST_ENV__ === true)) {
-        pwaService.getStatus(); // This initializes the service
-
-        // Check PWA installability
-        const isInstallable = pwaService.checkInstallability();
-
-        if (!isInstallable) {
-          pwaService.getDetailedStatus();
-        }
-
-        // Add install button click handler
-        const installButton = document.getElementById('pwa-install-button');
-        if (installButton) {
-          installButton.addEventListener('click', async () => {
-            try {
-              await pwaService.installApp();
-            } catch (error) {
-              errorHandler.handleError(error, 'pwaInstallation', { action: 'install' });
-            }
-          });
-        }
-      }
-    } catch (error) {
-      errorHandler.handleError(error, 'pwaServiceInitialization');
-    }
+    // PWA disabled
     if (!GC || (typeof GC === 'object' && Object.keys(GC).length === 0)) {
       // GAME_CONFIG must be available - fail fast if not
       throw new Error('GAME_CONFIG not available - configuration must be loaded before initGame');

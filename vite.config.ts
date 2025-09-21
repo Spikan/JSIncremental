@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { VitePWA } from 'vite-plugin-pwa';
 
 // Vite plugin to strip "use client" directives from framer-motion ESM builds to silence
 // module-level directive warnings during bundling. This does not change behavior.
@@ -31,6 +30,15 @@ function createManualChunks(id: string): string {
     if (id.includes('zustand')) return 'vendor-zustand';
     if (id.includes('zod')) return 'vendor-zod';
     return 'vendor';
+  }
+
+  // Critical: ensure data-service lives with game systems to avoid UI<->systems circular deps
+  if (
+    id.includes('/services/data-service') ||
+    id.includes('\\services\\data-service') ||
+    id.includes('services/data-service')
+  ) {
+    return 'game-systems';
   }
 
   // Core game modules
@@ -78,78 +86,7 @@ export default defineConfig(({ mode }) => {
   return {
     base,
 
-    plugins: [
-      stripFramerMotionUseClient,
-      VitePWA({
-        registerType: 'autoUpdate',
-        workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3,glb,ttf}'],
-          runtimeCaching: [
-            {
-              urlPattern: /^https:\/\/cdn\.jsdelivr\.net/,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'cdn-cache',
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-                },
-              },
-            },
-            {
-              urlPattern: /^https:\/\/unpkg\.com/,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'unpkg-cache',
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-                },
-              },
-            },
-          ],
-        },
-        manifest: {
-          name: 'Soda Clicker Pro',
-          short_name: 'SodaClicker',
-          description: 'The Ultimate Soda Drinking Experience - An incremental idle game',
-          theme_color: '#1a1a2e',
-          background_color: '#16213e',
-          display: 'standalone',
-          orientation: 'portrait',
-          start_url: base,
-          scope: base,
-          icons: [
-            {
-              src: 'images/pwa-64x64.png',
-              sizes: '64x64',
-              type: 'image/png',
-            },
-            {
-              src: 'images/pwa-192x192.png',
-              sizes: '192x192',
-              type: 'image/png',
-            },
-            {
-              src: 'images/pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-            },
-            {
-              src: 'images/maskable-icon-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable',
-            },
-          ],
-          categories: ['games', 'entertainment'],
-          lang: 'en',
-          dir: 'ltr',
-          id: 'soda-clicker-pro',
-          display_override: ['window-controls-overlay', 'standalone'],
-        },
-      }),
-    ],
+    plugins: [stripFramerMotionUseClient],
 
     build: {
       target: 'esnext',
