@@ -102,7 +102,9 @@ function runOnceSafely(fn: (() => void | Promise<void>) | undefined) {
       // Handle async functions
       if (result && typeof result.then === 'function') {
         result.catch((error: any) => {
-          errorHandler.handleError(error, 'runFunctionSafelyAsync', { functionName: fn?.name || 'unknown' });
+          errorHandler.handleError(error, 'runFunctionSafelyAsync', {
+            functionName: fn?.name || 'unknown',
+          });
         });
       }
     }

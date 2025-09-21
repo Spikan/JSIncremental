@@ -364,7 +364,7 @@ function initGame() {
         if (startLoop) {
           startLoop({
             updateDrinkProgress: () => {},
-            processDrink: () => {},
+            processDrink: async () => {},
             updateStats: () => {},
             updateUI: () => {},
             updatePlayTime: () => {},

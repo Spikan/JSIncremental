@@ -67,9 +67,9 @@ export function startGameCore(): void {
               errorHandler.handleError(error, 'updateDrinkProgress', { critical: true });
             }
           },
-          processDrink: () => {
+          processDrink: async () => {
             try {
-              processDrink();
+              await processDrink();
             } catch (error) {
               errorHandler.handleError(error, 'processDrink', { critical: true });
             }
