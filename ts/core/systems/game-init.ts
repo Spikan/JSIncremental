@@ -147,13 +147,21 @@ export function initOnDomReady(): void {
 }
 
 // Best-effort wiring to global App if available (helps when import timing is odd on Pages)
-try {
-  // const w: any = window as any;
-  // App object construction - this is the only place where App.* should be used
-  // Game init system access modernized - using direct import
-  const { gameInitSystem } = require('./game-init');
-  if (gameInitSystem) {
-    Object.assign(gameInitSystem, {
+(() => {
+  let gameInitSystemRef: any;
+  try {
+    // Resolve reference without leaking block-scoped bindings into catch
+    const mod = require('./game-init');
+    gameInitSystemRef = mod && (mod as any).gameInitSystem;
+  } catch (error) {
+    errorHandler.handleError(error, 'resolveGameInitSystem', { context: 'game-init' });
+    return;
+  }
+
+  if (!gameInitSystemRef) return;
+
+  try {
+    Object.assign(gameInitSystemRef, {
       initSplashScreen,
       startGameCore,
       initOnDomReady,
@@ -163,10 +171,10 @@ try {
     } catch (error) {
       errorHandler.handleError(error, 'pushDiagnosticInfo', { context: 'game-init' });
     }
+  } catch (error) {
+    errorHandler.handleError(error, 'wireGameInitToGlobalApp', { critical: true });
   }
-} catch (error) {
-  errorHandler.handleError(error, 'wireGameInitToGlobalApp', { critical: true });
-}
+})();
 
 try {
   (window as any).__diag &&
