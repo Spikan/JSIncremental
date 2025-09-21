@@ -29,27 +29,72 @@ export async function createThreeSodaButton(targetSelector: string): Promise<Thr
   let GLTFLoader: any, sodaGlbUrl: string;
 
   try {
-    const [
-      threeModule,
-      { GLTFLoader: LoaderClass },
-      sodaGlbModule,
-    ] = await Promise.all([
-      import('three'), 
-      import('three/examples/jsm/loaders/GLTFLoader.js'),
-      import('../../res/Soda.glb?url').catch(() => ({ default: '/res/Soda.glb' }))
-    ]);
+    // Import Three.js with more explicit error handling for production
+    const threeModule = await import('three').catch((error) => {
+      console.error('Failed to load Three.js:', error);
+      throw new Error('Three.js module failed to load');
+    });
 
-    // Extract all Three.js classes
+    const gltfModule = await import('three/examples/jsm/loaders/GLTFLoader.js').catch((error) => {
+      console.error('Failed to load GLTFLoader:', error);
+      throw new Error('GLTFLoader module failed to load');
+    });
+
+    // Handle asset URL import with proper fallback
+    const sodaGlbModule = await import('../../res/Soda.glb?url').catch((error) => {
+      console.warn('Failed to load Soda.glb URL, using fallback:', error);
+      return { default: '/res/Soda.glb' };
+    });
+
+    // Extract all Three.js classes with explicit error checking
+    if (!threeModule || typeof threeModule !== 'object') {
+      throw new Error('Three.js module is invalid');
+    }
+
+    // Validate that essential classes are available
+    const requiredClasses = ['Scene', 'PerspectiveCamera', 'WebGLRenderer', 'Vector3', 'Mesh'];
+    for (const className of requiredClasses) {
+      if (!(className in threeModule)) {
+        throw new Error(`Required Three.js class ${className} is not available`);
+      }
+    }
+
     ({
-      Scene, PerspectiveCamera, WebGLRenderer, sRGBEncoding, Clock,
-      Box3, Vector3, MathUtils, CylinderGeometry, CircleGeometry,
-      BoxGeometry, SphereGeometry, PlaneGeometry, TorusGeometry, Mesh,
-      MeshStandardMaterial, MeshBasicMaterial, Group, AmbientLight,
-      DirectionalLight, HemisphereLight, CanvasTexture, DoubleSide,
-      BackSide, SpriteMaterial, Sprite, AdditiveBlending,
+      Scene,
+      PerspectiveCamera,
+      WebGLRenderer,
+      sRGBEncoding,
+      Clock,
+      Box3,
+      Vector3,
+      MathUtils,
+      CylinderGeometry,
+      CircleGeometry,
+      BoxGeometry,
+      SphereGeometry,
+      PlaneGeometry,
+      TorusGeometry,
+      Mesh,
+      MeshStandardMaterial,
+      MeshBasicMaterial,
+      Group,
+      AmbientLight,
+      DirectionalLight,
+      HemisphereLight,
+      CanvasTexture,
+      DoubleSide,
+      BackSide,
+      SpriteMaterial,
+      Sprite,
+      AdditiveBlending,
     } = threeModule);
 
-    GLTFLoader = LoaderClass;
+    // Validate GLTFLoader
+    if (!gltfModule.GLTFLoader) {
+      throw new Error('GLTFLoader is not available in the imported module');
+    }
+    GLTFLoader = gltfModule.GLTFLoader;
+    
     sodaGlbUrl = (sodaGlbModule.default as string) || '/res/Soda.glb';
   } catch (importError) {
     console.error('Failed to load Three.js dependencies:', importError);
