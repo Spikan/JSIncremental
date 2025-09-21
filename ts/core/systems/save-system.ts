@@ -218,7 +218,7 @@ export async function resetGameState() {
         console.warn('Button audio module failed to load, audio features will be disabled');
         return { initButtonAudioSystem: () => {}, updateButtonSoundsToggleButton: () => {} };
       });
-      
+
       const { initButtonAudioSystem, updateButtonSoundsToggleButton } = buttonAudioModule;
       initButtonAudioSystem?.();
       updateButtonSoundsToggleButton?.();

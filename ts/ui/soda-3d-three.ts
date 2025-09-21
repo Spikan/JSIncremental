@@ -30,18 +30,18 @@ export async function createThreeSodaButton(targetSelector: string): Promise<Thr
 
   try {
     // Import Three.js with more explicit error handling for production
-    const threeModule = await import('three').catch((error) => {
+    const threeModule = await import('three').catch(error => {
       console.error('Failed to load Three.js:', error);
       throw new Error('Three.js module failed to load');
     });
 
-    const gltfModule = await import('three/examples/jsm/loaders/GLTFLoader.js').catch((error) => {
+    const gltfModule = await import('three/examples/jsm/loaders/GLTFLoader.js').catch(error => {
       console.error('Failed to load GLTFLoader:', error);
       throw new Error('GLTFLoader module failed to load');
     });
 
     // Handle asset URL import with proper fallback
-    const sodaGlbModule = await import('../../res/Soda.glb?url').catch((error) => {
+    const sodaGlbModule = await import('../../res/Soda.glb?url').catch(error => {
       console.warn('Failed to load Soda.glb URL, using fallback:', error);
       return { default: '/res/Soda.glb' };
     });
@@ -94,7 +94,7 @@ export async function createThreeSodaButton(targetSelector: string): Promise<Thr
       throw new Error('GLTFLoader is not available in the imported module');
     }
     GLTFLoader = gltfModule.GLTFLoader;
-    
+
     sodaGlbUrl = (sodaGlbModule.default as string) || '/res/Soda.glb';
   } catch (importError) {
     console.error('Failed to load Three.js dependencies:', importError);
