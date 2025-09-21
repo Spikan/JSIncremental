@@ -6,7 +6,7 @@ let rafId: number | null = null;
 
 type StartArgs = {
   updateDrinkProgress?: () => void;
-  processDrink?: () => void;
+  processDrink?: () => Promise<void>;
   updateStats?: () => void;
   updatePlayTime?: () => void;
   updateLastSaveTime?: () => void;
@@ -30,14 +30,14 @@ export function start({
   }
   let lastStatsUpdate = 0;
 
-  function tick() {
+  async function tick() {
     try {
       if (updateDrinkProgress) updateDrinkProgress();
     } catch (error) {
       errorHandler.handleError(error, 'updateDrinkProgressInLoop');
     }
     try {
-      if (processDrink) processDrink();
+      if (processDrink) await processDrink();
     } catch (error) {
       errorHandler.handleError(error, 'processDrinkInLoop');
     }
@@ -95,9 +95,17 @@ export function stop() {
   }
 }
 
-function runOnceSafely(fn: (() => void) | undefined) {
+function runOnceSafely(fn: (() => void | Promise<void>) | undefined) {
   try {
-    if (fn) fn();
+    if (fn) {
+      const result = fn();
+      // Handle async functions
+      if (result && typeof result.then === 'function') {
+        result.catch((error: any) => {
+          errorHandler.handleError(error, 'runFunctionSafelyAsync', { functionName: fn?.name || 'unknown' });
+        });
+      }
+    }
   } catch (error) {
     errorHandler.handleError(error, 'runFunctionSafely', { functionName: fn?.name || 'unknown' });
   }

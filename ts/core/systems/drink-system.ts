@@ -8,9 +8,22 @@
 // Modern ES6 imports - proper module resolution
 import { toDecimal } from '../numbers/simplified';
 import { useGameStore } from '../state/zustand-store';
-import { hybridLevelSystem } from './hybrid-level-system';
 import { errorHandler } from '../error-handling/error-handler';
 import { recalcProduction } from './resources';
+
+// Lazy import hybridLevelSystem to avoid circular dependency
+let hybridLevelSystem: any = null;
+const getHybridLevelSystem = async () => {
+  if (!hybridLevelSystem) {
+    try {
+      const module = await import('./hybrid-level-system');
+      hybridLevelSystem = module.hybridLevelSystem;
+    } catch (error) {
+      console.warn('Failed to load hybrid level system:', error);
+    }
+  }
+  return hybridLevelSystem;
+};
 
 // Factory function for dependency injection (for tests)
 export function processDrinkFactory({
@@ -22,7 +35,7 @@ export function processDrinkFactory({
   getState?: () => any;
   setState?: (state: any) => void;
 } = {}) {
-  return function processDrink(): void {
+  return async function processDrink(): Promise<void> {
     try {
       // Get current state
       const state = getState();
@@ -31,8 +44,9 @@ export function processDrinkFactory({
       // Apply level bonuses from hybrid level system (defensive access)
       let levelBonuses = { sipMultiplier: 1.0, clickMultiplier: 1.0 };
       try {
-        if (hybridLevelSystem?.getCurrentLevelBonuses) {
-          levelBonuses = hybridLevelSystem.getCurrentLevelBonuses();
+        const levelSystem = await getHybridLevelSystem();
+        if (levelSystem?.getCurrentLevelBonuses) {
+          levelBonuses = levelSystem.getCurrentLevelBonuses();
         }
       } catch (error) {
         errorHandler.handleError(error, 'getLevelBonuses', { fallback: 'using defaults' });
@@ -90,9 +104,9 @@ export function processDrinkFactory({
 
 // Unified modern drink system export - delegate to factory implementation
 // Lazily initialize to avoid TDZ issues from circular imports during module evaluation
-let __processDrinkMemo: (() => void) | null = null;
+let __processDrinkMemo: (() => Promise<void>) | null = null;
 
-export function getProcessDrink(): () => void {
+export function getProcessDrink(): () => Promise<void> {
   if (!__processDrinkMemo) {
     __processDrinkMemo = processDrinkFactory();
   }
@@ -100,9 +114,9 @@ export function getProcessDrink(): () => void {
 }
 
 // Convenience export that defers to the memoized implementation
-export function processDrink(): void {
+export async function processDrink(): Promise<void> {
   try {
-    getProcessDrink()();
+    await getProcessDrink()();
   } catch (error) {
     errorHandler.handleError(error, 'processDrink', { critical: true });
   }

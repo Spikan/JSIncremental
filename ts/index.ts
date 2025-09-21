@@ -12,16 +12,16 @@ import { errorHandler } from './core/error-handling/error-handler';
 // ServiceLocator removed - using Zustand store directly
 // Decimal import removed - using toDecimal from simplified.ts
 import { toDecimal } from './core/numbers/simplified';
-// processDrinkFactory removed - using direct processDrink function
+// processDrinkFactory removed - using lazy initialization to avoid TDZ
 // DOM migration completed - using modern domQuery service
 import './god';
 // Static imports removed - using dynamic imports instead
-import { processDrinkFactory } from './core/systems/drink-system';
+import { getProcessDrink } from './core/systems/drink-system';
 import { useGameStore } from './core/state/zustand-store';
 import { systemInitializationManager } from './core/systems/system-initialization';
 
-// Create the processDrink function using the factory
-const processDrink = processDrinkFactory();
+// Lazily initialize processDrink to avoid TDZ issues from circular imports
+const processDrink = getProcessDrink();
 // Add all critical system imports to avoid dynamic import issues
 import * as storageModule from './services/storage';
 // System module imports removed - using direct imports instead
@@ -292,11 +292,11 @@ try {
             errorHandler.handleError(error, 'updateDrinkProgress', { critical: true });
           }
         },
-        processDrink: () => {
+        processDrink: async () => {
           // Note: processDrink is called from the main game loop, not here
           // This is just a wrapper to handle errors
           try {
-            processDrink();
+            await processDrink();
           } catch (error) {
             errorHandler.handleError(error, 'processDrink', { critical: true });
           }
