@@ -2,6 +2,7 @@
 // Enhanced for Decimal support
 
 // Direct Decimal access - no wrapper needed
+import Decimal from 'break_eternity.js';
 import { NumericValue } from '../numbers/simplified';
 
 export type GameOptions = {

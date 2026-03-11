@@ -1,11 +1,14 @@
 // Entry module providing a small public API surface and environment checks (TypeScript)
 
 // Module loading
+import './bootstrap-decimal';
 (window as any).__tsIndexLoaded = true;
 
 // import { useGameStore } from './core/state/zustand-store'; // Removed - using dynamic import instead
 import { optimizedEventBus } from './services/optimized-event-bus';
 import { performanceMonitor } from './services/performance';
+import './bootstrap-ui';
+import './vendor/model-viewer-element';
 import './config';
 import './core/constants';
 import { errorHandler } from './core/error-handling/error-handler';

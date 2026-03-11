@@ -1,5 +1,6 @@
 // Save system: queueing and performing saves via App.storage (TypeScript)
 
+import Decimal from 'break_eternity.js';
 import { useGameStore } from '../state/zustand-store';
 import * as ui from '../../ui/index';
 import { mobileInputHandler } from '../../ui/mobile-input';
