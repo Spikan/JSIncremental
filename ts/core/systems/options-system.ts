@@ -6,7 +6,7 @@ const OPTIONS_KEY = 'gameOptions';
 
 export type GameOptions = {
   autosaveEnabled: boolean;
-  autosaveInterval: number; // ms
+  autosaveInterval: number; // seconds
   clickSoundsEnabled: boolean;
   musicEnabled: boolean;
   musicStreamPreferences?: any;
