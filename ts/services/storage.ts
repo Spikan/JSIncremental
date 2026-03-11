@@ -21,7 +21,35 @@ export type StorageAPI = {
   setBoolean: (_key: string, _value: boolean) => boolean;
   getBoolean: (_key: string, _defaultValue?: boolean) => boolean;
   remove: (_key: string) => boolean;
+  clearAppStorage: () => string[];
 };
+
+function getAppStorageKeys(): string[] {
+  const keys: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith(STORAGE_PREFIX)) {
+      keys.push(key);
+    }
+  }
+  return keys;
+}
+
+export function clearAppStorage(): string[] {
+  const removedKeys: string[] = [];
+
+  try {
+    const appKeys = getAppStorageKeys();
+    appKeys.forEach(key => {
+      localStorage.removeItem(key);
+      removedKeys.push(key);
+    });
+  } catch (e) {
+    errorHandler.handleError(e, 'clearAppStorage', { critical: true });
+  }
+
+  return removedKeys;
+}
 
 export const AppStorage: StorageAPI = {
   loadGame: () => {
@@ -183,6 +211,8 @@ export const AppStorage: StorageAPI = {
       return false;
     }
   },
+
+  clearAppStorage: () => clearAppStorage(),
 };
 
 // Expose globally for legacy access
