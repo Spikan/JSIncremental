@@ -1,6 +1,7 @@
 // Enhanced Error Handling System (TypeScript)
 
 import { errorHandler } from '../core/error-handling/error-handler';
+import { clearAppStorage, AppStorage } from './storage';
 
 declare global {
   interface Window {
@@ -262,10 +263,24 @@ class ErrorReporter {
     try {
       switch (error.category) {
         case ErrorCategory.STORAGE:
-          // Try to clear corrupted storage
+          // Try to clear corrupted app storage only
           if (error.message.includes('localStorage') || error.message.includes('JSON')) {
             recoveryAction = 'clear_corrupted_storage';
-            localStorage.clear();
+
+            // Snapshot critical values before destructive recovery attempt
+            const saveSnapshot = AppStorage.loadGame();
+            const optionsSnapshot = AppStorage.getJSON('options');
+
+            const removedKeys = clearAppStorage();
+            console.warn('[error-recovery] Removed app storage keys:', removedKeys);
+
+            if (saveSnapshot) {
+              AppStorage.saveGame(saveSnapshot);
+            }
+            if (optionsSnapshot !== null && optionsSnapshot !== undefined) {
+              AppStorage.setJSON('options', optionsSnapshot);
+            }
+
             recoverySuccessful = true;
           }
           break;
