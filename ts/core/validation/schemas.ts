@@ -113,6 +113,7 @@ export type GameSave = {
   lastDrinkTime?: number;
   drinkProgress?: number;
   lastSaveTime?: number;
+  sessionStartTime?: number;
   totalPlayTime?: number;
   totalClicks?: number | string | any;
   totalSips?: any;
@@ -140,6 +141,7 @@ export const GameSaveSchema = z.object({
   lastDrinkTime: z.number().min(0).optional(),
   drinkProgress: z.number().min(0).optional(),
   lastSaveTime: z.number().optional(),
+  sessionStartTime: z.number().optional(),
   totalPlayTime: z.number().optional(),
   totalClicks: z
     .union([z.number().min(0), z.string()])

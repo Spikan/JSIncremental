@@ -21,10 +21,14 @@ export interface SaveGameData {
   suctionClickBonus?: number | string | any;
   totalClicks?: number | string | any;
   gameStartDate?: number | string | any;
+  sessionStartTime?: number | string | any;
   lastClickTime?: number | string | any;
+  lastSaveTime?: number | string | any;
   totalPlayTime?: number | string | any;
+  totalSipsEarned?: number | string | any;
   lastDrinkTime?: number | string | any;
   drinkProgress?: number | string | any;
+  drinkRate?: number | string | any;
   // SPD values for extreme value preservation
   spd?: number | string | any;
   strawSPD?: number | string | any;
@@ -185,10 +189,15 @@ export class SaveGameLoader {
   private loadLevelAndProgress(savegame: SaveGameData): void {
     try {
       // Level is now handled by hybrid level system, skip old level loading
-      // Only load totalClicks for progress tracking
+      // Load lifetime progress tracking values
       if (typeof savegame.totalClicks !== 'undefined') {
         const totalClicksValue = this.parseDecimalValue(savegame.totalClicks);
         getStoreActions().setTotalClicks(totalClicksValue);
+      }
+
+      if (typeof savegame.totalSipsEarned !== 'undefined') {
+        const totalSipsEarnedValue = this.parseDecimalValue(savegame.totalSipsEarned);
+        getStoreActions().setTotalSipsEarned(totalSipsEarnedValue);
       }
     } catch (error) {
       errorHandler.handleError(error, 'loadLevelAndProgress', { savegame });
@@ -200,14 +209,26 @@ export class SaveGameLoader {
    */
   private loadTimingData(savegame: SaveGameData): void {
     try {
-      if (typeof savegame.gameStartDate !== 'undefined') {
-        const gameStartDateValue = this.parseDecimalValue(savegame.gameStartDate);
+      const sessionStartTime =
+        typeof savegame.sessionStartTime !== 'undefined'
+          ? savegame.sessionStartTime
+          : savegame.gameStartDate;
+
+      if (typeof sessionStartTime !== 'undefined') {
+        const gameStartDateValue = this.parseDecimalValue(sessionStartTime);
         // Convert to number for timing compatibility
         const dateNum =
           typeof gameStartDateValue === 'number'
             ? gameStartDateValue
             : gameStartDateValue.toNumber();
         getStoreActions().setSessionStartTime(dateNum);
+      }
+
+      if (typeof savegame.lastSaveTime !== 'undefined') {
+        const lastSaveTimeValue = this.parseDecimalValue(savegame.lastSaveTime);
+        const saveTimeNum =
+          typeof lastSaveTimeValue === 'number' ? lastSaveTimeValue : lastSaveTimeValue.toNumber();
+        getStoreActions().setLastSaveTime(saveTimeNum);
       }
 
       if (typeof savegame.lastClickTime !== 'undefined') {
@@ -228,6 +249,31 @@ export class SaveGameLoader {
             ? totalPlayTimeValue
             : totalPlayTimeValue.toNumber();
         getStoreActions().setTotalPlayTime(playTimeNum);
+      }
+
+      if (typeof savegame.drinkRate !== 'undefined') {
+        const drinkRateValue = this.parseDecimalValue(savegame.drinkRate);
+        const drinkRateNum =
+          typeof drinkRateValue === 'number' ? drinkRateValue : drinkRateValue.toNumber();
+        getStoreActions().setDrinkRate(drinkRateNum);
+      }
+
+      if (typeof savegame.lastDrinkTime !== 'undefined') {
+        const lastDrinkTimeValue = this.parseDecimalValue(savegame.lastDrinkTime);
+        const lastDrinkTimeNum =
+          typeof lastDrinkTimeValue === 'number'
+            ? lastDrinkTimeValue
+            : lastDrinkTimeValue.toNumber();
+        getStoreActions().setLastDrinkTime(lastDrinkTimeNum);
+      }
+
+      if (typeof savegame.drinkProgress !== 'undefined') {
+        const drinkProgressValue = this.parseDecimalValue(savegame.drinkProgress);
+        const drinkProgressNum =
+          typeof drinkProgressValue === 'number'
+            ? drinkProgressValue
+            : drinkProgressValue.toNumber();
+        getStoreActions().setDrinkProgress(drinkProgressNum);
       }
     } catch (error) {
       errorHandler.handleError(error, 'loadTimingData', { savegame });

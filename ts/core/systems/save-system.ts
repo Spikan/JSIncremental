@@ -52,6 +52,7 @@ export function performSaveSnapshot(): any {
       lastDrinkTime: Number(state.lastDrinkTime || 0),
       drinkProgress: Number(state.drinkProgress || 0),
       lastSaveTime: Date.now(),
+      sessionStartTime: Number(state.sessionStartTime || 0),
       totalPlayTime: Number(state.totalPlayTime || 0),
       totalClicks: String(state.totalClicks || 0),
       // Click system state
