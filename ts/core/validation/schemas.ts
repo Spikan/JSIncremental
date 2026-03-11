@@ -114,7 +114,7 @@ export type GameSave = {
   drinkProgress?: number;
   lastSaveTime?: number;
   totalPlayTime?: number;
-  totalClicks?: number;
+  totalClicks?: number | string | any;
   totalSips?: any;
   level?: number | string | any; // any to allow Decimal objects
 };
@@ -141,7 +141,10 @@ export const GameSaveSchema = z.object({
   drinkProgress: z.number().min(0).optional(),
   lastSaveTime: z.number().optional(),
   totalPlayTime: z.number().optional(),
-  totalClicks: z.number().min(0).optional(),
+  totalClicks: z
+    .union([z.number().min(0), z.string()])
+    .transform((val: number | string) => (typeof val === 'string' ? toDecimal(val) : val))
+    .optional(),
   totalSips: z.any().optional(),
   level: z
     .union([z.number().min(1), z.string()])
