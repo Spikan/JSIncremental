@@ -53,7 +53,7 @@ export function performSaveSnapshot(): any {
       drinkProgress: Number(state.drinkProgress || 0),
       lastSaveTime: Date.now(),
       totalPlayTime: Number(state.totalPlayTime || 0),
-      totalClicks: Number(state.totalClicks || 0),
+      totalClicks: String(state.totalClicks || 0),
       // Click system state
       suctionClickBonus: String(state.suctionClickBonus || 0),
       // Save hybrid level system data (single source of truth for levels)
