@@ -168,17 +168,25 @@ export type GameOptions = {
   autosaveInterval: number;
   clickSoundsEnabled: boolean;
   musicEnabled: boolean;
-  musicStreamPreferences?: Record<string, boolean>;
+  musicStreamPreferences?: {
+    preferred: string;
+    fallbacks: string[];
+  };
   devToolsEnabled: boolean;
   secretsUnlocked: boolean;
   godTabEnabled: boolean;
 };
 export const GameOptionsSchema = z.object({
   autosaveEnabled: z.boolean(),
-  autosaveInterval: z.number().min(1000).max(60000),
+  autosaveInterval: z.number().min(1).max(60),
   clickSoundsEnabled: z.boolean(),
   musicEnabled: z.boolean(),
-  musicStreamPreferences: z.record(z.string(), z.boolean()).optional(),
+  musicStreamPreferences: z
+    .object({
+      preferred: z.string(),
+      fallbacks: z.array(z.string()),
+    })
+    .optional(),
   devToolsEnabled: z.boolean(),
   secretsUnlocked: z.boolean(),
   godTabEnabled: z.boolean(),
