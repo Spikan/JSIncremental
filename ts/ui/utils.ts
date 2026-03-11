@@ -307,7 +307,7 @@ export function updateCostDisplay(elementId: string, cost: any, isAffordable: bo
   if (!element || !(element as HTMLElement).classList) return;
 
   const formattedCost = formatCostNumber(cost);
-  element.innerHTML = formattedCost;
+  element.textContent = formattedCost;
   try {
     const cls = element.classList;
     cls.toggle('affordable', isAffordable);
