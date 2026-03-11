@@ -10,6 +10,7 @@
 // Ported inline from original main.js (TS-ified minimal changes)
 // Removed unused import
 
+import Decimal from 'break_eternity.js';
 import { domQuery } from './services/dom-query';
 import { timerManager } from './services/timer-manager';
 import { getStoreActions } from './core/state/zustand-store';

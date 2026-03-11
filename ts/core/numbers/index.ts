@@ -12,6 +12,7 @@
 // 4. isDecimal(value) - Type checking
 
 // Export simplified number system
+import Decimal from 'break_eternity.js';
 export * from './simplified';
 
 // Re-export for backward compatibility

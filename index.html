@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self'; media-src 'self';"
+    />
     <title>Soda Clicker Pro</title>
     <meta name="description" content="Soda Clicker Pro - The Ultimate Soda Drinking Experience" />
     <meta name="author" content="Spikan" />
@@ -13,42 +17,6 @@
     <!-- Icons -->
     <link rel="icon" href="images/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="images/apple-touch-icon-180x180.png" />
-
-    <!-- External Dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/break_eternity.js@2.1.2/dist/break_eternity.min.js"></script>
-    <script src="https://unpkg.com/zod@3.22.4/lib/index.umd.js"></script>
-    <script
-      type="module"
-      src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
-    ></script>
-
-    <script>
-      // Error handling
-      (function () {
-        try {
-          window.__diag = Array.isArray(window.__diag) ? window.__diag : [];
-          window.addEventListener('error', function (e) {
-            try {
-              window.__diag.push({ type: 'error', msg: e.message, src: e.filename, ln: e.lineno });
-            } catch {}
-          });
-          window.addEventListener('unhandledrejection', function (e) {
-            try {
-              var r = e && e.reason;
-              window.__diag.push({
-                type: 'unhandledrejection',
-                reason: (r && (r.message || r)) + '',
-              });
-            } catch {}
-          });
-        } catch {}
-      })();
-
-      // Game initialization
-      window.addEventListener('load', function () {
-        console.log('✅ Modern UI loaded, TypeScript will handle initialization');
-      });
-    </script>
   </head>
   <body class="theme-beach">
     <!-- Loading Screen -->
@@ -411,83 +379,5 @@
 
     <!-- TypeScript Entry Point -->
     <script type="module" src="ts/index.ts"></script>
-
-    <script>
-      // Initialize modern UI enhancements
-      document.addEventListener('DOMContentLoaded', function () {
-        // Hide loading screen after content loads
-        setTimeout(() => {
-          const loadingScreen = document.getElementById('loadingScreen');
-          const gameContent = document.getElementById('gameContent');
-
-          if (loadingScreen) {
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => {
-              loadingScreen.style.display = 'none';
-              if (gameContent) {
-                gameContent.style.display = 'block';
-                gameContent.style.opacity = '0';
-                requestAnimationFrame(() => {
-                  gameContent.style.transition = 'opacity 0.5s ease-out';
-                  gameContent.style.opacity = '1';
-                });
-              }
-            }, 300);
-          }
-        }, 1000);
-
-        // Add theme transition effects
-        let currentTheme = 'theme-beach';
-
-        // Authentic SDP theme switching (integrate with your hybrid level system)
-        window.switchTheme = function (newTheme) {
-          document.body.classList.add('theme-transition');
-          document.body.classList.remove(currentTheme);
-          document.body.classList.add(newTheme);
-          currentTheme = newTheme;
-
-          setTimeout(() => {
-            document.body.classList.remove('theme-transition');
-          }, 500);
-        };
-
-        // Example: Switch to different authentic SDP levels
-        // Available: theme-beach, theme-park, theme-weird-room, theme-space,
-        // theme-castle, theme-mouth, theme-convention, theme-empty-pool,
-        // theme-dark-woods, theme-county-fair
-
-        // Add click ripple effects
-        document.addEventListener('click', function (e) {
-          const button = e.target.closest('.btn, .suction-btn, .upgrade-btn, .soda-button');
-          if (button && !button.disabled) {
-            const ripple = document.createElement('div');
-            const rect = button.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-
-            ripple.className = 'click-ripple';
-            ripple.style.cssText = `
-              width: ${size}px;
-              height: ${size}px;
-              left: ${x}px;
-              top: ${y}px;
-            `;
-
-            button.style.position = 'relative';
-            button.style.overflow = 'hidden';
-            button.appendChild(ripple);
-
-            setTimeout(() => {
-              if (ripple.parentNode) {
-                ripple.parentNode.removeChild(ripple);
-              }
-            }, 700);
-          }
-        });
-
-        console.log('✅ Modern UI initialized with enhanced interactions');
-      });
-    </script>
   </body>
 </html>
