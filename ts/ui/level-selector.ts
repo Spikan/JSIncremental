@@ -144,36 +144,35 @@ export class LevelSelector {
       vivian: 'Vivian Clark',
     };
 
-    section.innerHTML = `
-      <h3 style="color: #3498db; margin: 0 0 10px 0; font-size: 16px; text-align: center;">
-        ${categoryTitles[categoryName as keyof typeof categoryTitles] || categoryName}
-      </h3>
-      <div class="category-levels" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
-      </div>
+    const title = document.createElement('h3');
+    title.style.cssText =
+      'color: #3498db; margin: 0 0 10px 0; font-size: 16px; text-align: center;';
+    title.textContent = categoryTitles[categoryName as keyof typeof categoryTitles] || categoryName;
+
+    const categoryGrid = document.createElement('div');
+    categoryGrid.className = 'category-levels';
+    categoryGrid.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 12px;
     `;
 
-    const categoryGrid = section.querySelector('.category-levels');
-    if (categoryGrid) {
-      (categoryGrid as HTMLElement).style.cssText = `
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-        gap: 12px;
-      `;
-      levels.forEach(level => {
-        const levelCard = this.createLevelCard(level, currentLevelId === level.id);
-        categoryGrid.appendChild(levelCard);
-      });
-    }
+    levels.forEach(level => {
+      const levelCard = this.createLevelCard(level, currentLevelId === level.id);
+      categoryGrid.appendChild(levelCard);
+    });
+
+    section.appendChild(title);
+    section.appendChild(categoryGrid);
 
     return section;
   }
 
   private createLevelCard(level: HybridLevel, isCurrent: boolean): HTMLElement {
     const isUnlocked = hybridLevelSystem.isLevelUnlocked(level.id);
+    const canUnlock = hybridLevelSystem.canUnlockLevel(level.id);
     const card = document.createElement('div');
     card.className = `level-card ${isUnlocked ? 'unlocked' : 'locked'} ${isCurrent ? 'current' : ''}`;
-
-    const canUnlock = hybridLevelSystem.canUnlockLevel(level.id);
 
     card.style.cssText = `
       background: ${
@@ -207,143 +206,157 @@ export class LevelSelector {
         ? 'Can Unlock'
         : 'Locked';
 
-    card.innerHTML = `
-      <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
-        <span style="font-size: 24px; margin-right: 12px; flex-shrink: 0;">${this.getCategoryIcon(level.category)}</span>
-        <div style="flex: 1; min-width: 0;">
-          <h4 style="margin: 0 0 4px 0; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; font-size: 16px; font-weight: bold; line-height: 1.2;">
-            Level ${level.id}: ${level.name}
-          </h4>
-          <span style="font-size: 12px; color: ${isUnlocked ? '#27ae60' : '#7f8c8d'}; font-weight: 500;">
-            ${statusIcon} ${statusText}
-          </span>
-        </div>
-      </div>
-      
-      <div style="flex: 1; margin-bottom: 12px;">
-        <p style="margin: 0 0 12px 0; font-size: 12px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; line-height: 1.4; word-wrap: break-word;">
-          ${level.description}
-        </p>
-        
-        <div style="margin-bottom: 8px;">
-          <div style="font-size: 11px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; margin-bottom: 4px; font-weight: 500;">
-            <strong>Bonuses:</strong> ${level.bonuses.sipMultiplier}x Sips, ${level.bonuses.clickMultiplier}x Clicks
-          </div>
-          ${
-            level.bonuses.specialEffect
-              ? `<div style="font-size: 11px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; font-weight: 500;">
-              <strong>Special:</strong> ${level.bonuses.specialEffect}
-            </div>`
-              : ''
-          }
-        </div>
-      </div>
-      
-      ${
-        !isUnlocked
-          ? `
-        <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 6px; padding: 10px; margin-bottom: 12px;">
-          <div style="font-size: 11px; color: #e74c3c; font-weight: bold; margin-bottom: 4px;">
-            🔒 Unlock Requirements:
-          </div>
-          <div style="font-size: 9px; color: ${canUnlock ? '#27ae60' : '#e74c3c'}; line-height: 1.3; text-align: center;">
-            <div style="margin-bottom: 2px;">
-              ${formatNumber(level.unlockRequirement.sips)} Sips
-            </div>
-            <div style="margin-bottom: 2px;">
-              ${level.unlockRequirement.clicks.toLocaleString()} Clicks
-            </div>
-            ${(level.unlockRequirement as any).level ? `<div style="font-size: 9px;">Level ${(level.unlockRequirement as any).level}</div>` : ''}
-          </div>
-        </div>
-      `
-          : ''
-      }
-      
-      <div style="margin-top: auto;">
-        ${
-          isUnlocked && !isCurrent
-            ? `
-          <button class="select-level-btn" style="
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            font-weight: bold;
-            width: 100%;
-            transition: all 0.2s ease;
-          ">
-            Select Level
-          </button>
-        `
-            : ''
-        }
-        
-        ${
-          !isUnlocked && canUnlock
-            ? `
-          <button class="unlock-level-btn" style="
-            background: #f39c12;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            font-weight: bold;
-            width: 100%;
-            transition: all 0.2s ease;
-          ">
-            Unlock Level
-          </button>
-        `
-            : ''
-        }
-        
-        ${
-          isCurrent
-            ? `
-          <div style="
-            background: rgba(243, 156, 18, 0.2);
-            color: #f39c12;
-            padding: 8px;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 12px;
-            border: 1px solid rgba(243, 156, 18, 0.3);
-          ">
-            🎯 Currently Active
-          </div>
-        `
-            : ''
-        }
-      </div>
-    `;
+    const headerRow = document.createElement('div');
+    headerRow.style.cssText = 'display: flex; align-items: flex-start; margin-bottom: 12px;';
 
-    // Add click handlers
+    const icon = document.createElement('span');
+    icon.style.cssText = 'font-size: 24px; margin-right: 12px; flex-shrink: 0;';
+    icon.textContent = this.getCategoryIcon(level.category);
+
+    const titleWrap = document.createElement('div');
+    titleWrap.style.cssText = 'flex: 1; min-width: 0;';
+
+    const title = document.createElement('h4');
+    title.style.cssText = `margin: 0 0 4px 0; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; font-size: 16px; font-weight: bold; line-height: 1.2;`;
+    title.textContent = `Level ${level.id}: ${level.name}`;
+
+    const status = document.createElement('span');
+    status.style.cssText = `font-size: 12px; color: ${isUnlocked ? '#27ae60' : '#7f8c8d'}; font-weight: 500;`;
+    status.textContent = `${statusIcon} ${statusText}`;
+
+    titleWrap.append(title, status);
+    headerRow.append(icon, titleWrap);
+
+    const body = document.createElement('div');
+    body.style.cssText = 'flex: 1; margin-bottom: 12px;';
+
+    const description = document.createElement('p');
+    description.style.cssText = `margin: 0 0 12px 0; font-size: 12px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; line-height: 1.4; word-wrap: break-word;`;
+    description.textContent = level.description;
+
+    const bonuses = document.createElement('div');
+    bonuses.style.marginBottom = '8px';
+
+    const bonusLine = document.createElement('div');
+    bonusLine.style.cssText = `font-size: 11px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; margin-bottom: 4px; font-weight: 500;`;
+    bonusLine.textContent = `Bonuses: ${level.bonuses.sipMultiplier}x Sips, ${level.bonuses.clickMultiplier}x Clicks`;
+
+    bonuses.appendChild(bonusLine);
+
+    if (level.bonuses.specialEffect) {
+      const special = document.createElement('div');
+      special.style.cssText = `font-size: 11px; color: ${isUnlocked ? '#2c3e50' : '#7f8c8d'}; font-weight: 500;`;
+      special.textContent = `Special: ${level.bonuses.specialEffect}`;
+      bonuses.appendChild(special);
+    }
+
+    body.append(description, bonuses);
+
+    card.append(headerRow, body);
+
+    if (!isUnlocked) {
+      const reqBox = document.createElement('div');
+      reqBox.style.cssText =
+        'background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 6px; padding: 10px; margin-bottom: 12px;';
+
+      const reqTitle = document.createElement('div');
+      reqTitle.style.cssText =
+        'font-size: 11px; color: #e74c3c; font-weight: bold; margin-bottom: 4px;';
+      reqTitle.textContent = '🔒 Unlock Requirements:';
+
+      const reqContent = document.createElement('div');
+      reqContent.style.cssText = `font-size: 9px; color: ${canUnlock ? '#27ae60' : '#e74c3c'}; line-height: 1.3; text-align: center;`;
+
+      const sipsReq = document.createElement('div');
+      sipsReq.style.marginBottom = '2px';
+      sipsReq.textContent = `${formatNumber(level.unlockRequirement.sips)} Sips`;
+
+      const clicksReq = document.createElement('div');
+      clicksReq.style.marginBottom = '2px';
+      clicksReq.textContent = `${level.unlockRequirement.clicks.toLocaleString()} Clicks`;
+
+      reqContent.append(sipsReq, clicksReq);
+
+      if ((level.unlockRequirement as any).level) {
+        const levelReq = document.createElement('div');
+        levelReq.style.fontSize = '9px';
+        levelReq.textContent = `Level ${(level.unlockRequirement as any).level}`;
+        reqContent.appendChild(levelReq);
+      }
+
+      reqBox.append(reqTitle, reqContent);
+      card.appendChild(reqBox);
+    }
+
+    const footer = document.createElement('div');
+    footer.style.marginTop = 'auto';
+
     if (isUnlocked && !isCurrent) {
-      const selectBtn = card.querySelector('.select-level-btn');
-      selectBtn?.addEventListener('click', e => {
+      const selectBtn = document.createElement('button');
+      selectBtn.className = 'select-level-btn';
+      selectBtn.style.cssText = `
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        font-weight: bold;
+        width: 100%;
+        transition: all 0.2s ease;
+      `;
+      selectBtn.textContent = 'Select Level';
+      selectBtn.addEventListener('click', e => {
         e.stopPropagation();
         this.selectLevel(level.id);
       });
+      footer.appendChild(selectBtn);
     }
 
     if (!isUnlocked && canUnlock) {
-      const unlockBtn = card.querySelector('.unlock-level-btn');
-      unlockBtn?.addEventListener('click', e => {
+      const unlockBtn = document.createElement('button');
+      unlockBtn.className = 'unlock-level-btn';
+      unlockBtn.style.cssText = `
+        background: #f39c12;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        font-weight: bold;
+        width: 100%;
+        transition: all 0.2s ease;
+      `;
+      unlockBtn.textContent = 'Unlock Level';
+      unlockBtn.addEventListener('click', e => {
         e.stopPropagation();
         this.unlockLevel(level.id);
       });
+      footer.appendChild(unlockBtn);
     }
 
-    // Add hover effects
+    if (isCurrent) {
+      const currentBadge = document.createElement('div');
+      currentBadge.style.cssText = `
+        background: rgba(243, 156, 18, 0.2);
+        color: #f39c12;
+        padding: 8px;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 12px;
+        border: 1px solid rgba(243, 156, 18, 0.3);
+      `;
+      currentBadge.textContent = '🎯 Currently Active';
+      footer.appendChild(currentBadge);
+    }
+
+    card.appendChild(footer);
+
     if (isUnlocked) {
       card.addEventListener('mouseenter', () => {
         if (!isCurrent) {
@@ -441,15 +454,23 @@ export class LevelSelector {
       animation: slideInRight 0.3s ease-out;
     `;
 
-    notification.innerHTML = `
-      <div style="display: flex; align-items: center;">
-        <span style="font-size: 20px; margin-right: 10px;">${this.getCategoryIcon(level.category)}</span>
-        <div>
-          <div style="font-weight: bold;">Level Changed!</div>
-          <div>Now in: ${level.name}</div>
-        </div>
-      </div>
-    `;
+    const row = document.createElement('div');
+    row.style.cssText = 'display: flex; align-items: center;';
+
+    const icon = document.createElement('span');
+    icon.style.cssText = 'font-size: 20px; margin-right: 10px;';
+    icon.textContent = this.getCategoryIcon(level.category);
+
+    const textContainer = document.createElement('div');
+    const title = document.createElement('div');
+    title.style.fontWeight = 'bold';
+    title.textContent = 'Level Changed!';
+    const subtitle = document.createElement('div');
+    subtitle.textContent = `Now in: ${level.name}`;
+
+    textContainer.append(title, subtitle);
+    row.append(icon, textContainer);
+    notification.appendChild(row);
 
     document.body.appendChild(notification);
 
@@ -482,15 +503,23 @@ export class LevelSelector {
       pointer-events: none;
     `;
 
-    notification.innerHTML = `
-      <div style="display: flex; align-items: center;">
-        <span style="font-size: 20px; margin-right: 10px;">🔓</span>
-        <div>
-          <div style="font-weight: bold;">New Level Unlocked!</div>
-          <div>${this.getCategoryIcon(level.category)} Level ${level.id}: ${level.name}</div>
-        </div>
-      </div>
-    `;
+    const row = document.createElement('div');
+    row.style.cssText = 'display: flex; align-items: center;';
+
+    const icon = document.createElement('span');
+    icon.style.cssText = 'font-size: 20px; margin-right: 10px;';
+    icon.textContent = '🔓';
+
+    const textContainer = document.createElement('div');
+    const title = document.createElement('div');
+    title.style.fontWeight = 'bold';
+    title.textContent = 'New Level Unlocked!';
+    const subtitle = document.createElement('div');
+    subtitle.textContent = `${this.getCategoryIcon(level.category)} Level ${level.id}: ${level.name}`;
+
+    textContainer.append(title, subtitle);
+    row.append(icon, textContainer);
+    notification.appendChild(row);
 
     document.body.appendChild(notification);
 

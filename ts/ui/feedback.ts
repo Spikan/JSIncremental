@@ -350,10 +350,14 @@ export function showPurchaseFeedback(
 ): void {
   const feedback = document.createElement('div');
   feedback.className = 'purchase-feedback';
-  feedback.innerHTML = `
-        <div class="purchase-item">${itemName}</div>
-        <div class="purchase-cost">-${prettify(cost)} sips</div>
-    `;
+  const itemDiv = document.createElement('div');
+  itemDiv.className = 'purchase-item';
+  itemDiv.textContent = itemName;
+  const costDiv = document.createElement('div');
+  costDiv.className = 'purchase-cost';
+  costDiv.textContent = `-${prettify(cost)} sips`;
+  feedback.appendChild(itemDiv);
+  feedback.appendChild(costDiv);
   feedback.setAttribute('role', 'status');
   feedback.setAttribute('aria-live', 'polite');
   feedback.setAttribute('aria-label', `Purchased ${itemName} for ${formatNumber(cost)} sips`);
@@ -432,10 +436,14 @@ export function showLevelUpFeedback(sipsGained: number): void {
   if (!levelUpDiv) return;
   const feedback = document.createElement('div');
   feedback.className = 'levelup-feedback';
-  feedback.innerHTML = `
-        <div class="levelup-title">🎉 LEVEL UP! 🎉</div>
-        <div class="levelup-bonus">+${prettify(sipsGained)} sips bonus!</div>
-    `;
+  const title = document.createElement('div');
+  title.className = 'levelup-title';
+  title.textContent = '🎉 LEVEL UP! 🎉';
+  const bonus = document.createElement('div');
+  bonus.className = 'levelup-bonus';
+  bonus.textContent = `+${prettify(sipsGained)} sips bonus!`;
+  feedback.appendChild(title);
+  feedback.appendChild(bonus);
   feedback.setAttribute('role', 'alert');
   feedback.setAttribute('aria-live', 'assertive');
   feedback.setAttribute('aria-label', `Level up! Gained ${prettify(sipsGained)} bonus sips`);
@@ -471,25 +479,55 @@ export function showLevelUpFeedback(sipsGained: number): void {
 export function showOfflineProgress(timeSeconds: number, earnings: number): void {
   const modal = document.createElement('div');
   modal.className = 'offline-progress-modal';
-  modal.innerHTML = `
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <h2>Welcome Back!</h2>
-            <div class="offline-stats">
-                <div class="offline-time">
-                    <span class="label">Time Away:</span>
-                    <span class="value">${formatTime(timeSeconds)}</span>
-                </div>
-                <div class="offline-earnings">
-                    <span class="label">Sips Earned:</span>
-                    <span class="value">+${formatNumber(earnings)}</span>
-                </div>
-            </div>
-            <button class="offline-continue-btn" onclick="this.closest('.offline-progress-modal').remove()">
-                Continue Playing
-            </button>
-        </div>
-    `;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+
+  const content = document.createElement('div');
+  content.className = 'modal-content';
+
+  const heading = document.createElement('h2');
+  heading.textContent = 'Welcome Back!';
+
+  const stats = document.createElement('div');
+  stats.className = 'offline-stats';
+
+  const timeRow = document.createElement('div');
+  timeRow.className = 'offline-time';
+  const timeLabel = document.createElement('span');
+  timeLabel.className = 'label';
+  timeLabel.textContent = 'Time Away:';
+  const timeValue = document.createElement('span');
+  timeValue.className = 'value';
+  timeValue.textContent = formatTime(timeSeconds);
+  timeRow.appendChild(timeLabel);
+  timeRow.appendChild(timeValue);
+
+  const earningsRow = document.createElement('div');
+  earningsRow.className = 'offline-earnings';
+  const earningsLabel = document.createElement('span');
+  earningsLabel.className = 'label';
+  earningsLabel.textContent = 'Sips Earned:';
+  const earningsValue = document.createElement('span');
+  earningsValue.className = 'value';
+  earningsValue.textContent = `+${formatNumber(earnings)}`;
+  earningsRow.appendChild(earningsLabel);
+  earningsRow.appendChild(earningsValue);
+
+  stats.appendChild(timeRow);
+  stats.appendChild(earningsRow);
+
+  const continueBtn = document.createElement('button');
+  continueBtn.className = 'offline-continue-btn';
+  continueBtn.textContent = 'Continue Playing';
+  continueBtn.addEventListener('click', () => modal.remove());
+
+  content.appendChild(heading);
+  content.appendChild(stats);
+  content.appendChild(continueBtn);
+  modal.appendChild(overlay);
+  modal.appendChild(content);
+
   modal.style.cssText = `
         position: fixed;
         top: 0;
@@ -501,9 +539,7 @@ export function showOfflineProgress(timeSeconds: number, earnings: number): void
         align-items: center;
         justify-content: center;
     `;
-  const overlay = modal.querySelector('.modal-overlay') as HTMLElement | null;
-  if (overlay) {
-    overlay.style.cssText = `
+  overlay.style.cssText = `
             position: absolute;
             top: 0;
             left: 0;
@@ -511,10 +547,7 @@ export function showOfflineProgress(timeSeconds: number, earnings: number): void
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
         `;
-  }
-  const content = modal.querySelector('.modal-content') as HTMLElement | null;
-  if (content) {
-    content.style.cssText = `
+  content.style.cssText = `
             position: relative;
             background: #111827;
             color: #E5E7EB;
@@ -526,35 +559,26 @@ export function showOfflineProgress(timeSeconds: number, earnings: number): void
             z-index: 1;
             text-align: left;
         `;
-    const h2 = content.querySelector('h2') as HTMLElement | null;
-    if (h2) {
-      h2.style.cssText = `
-                margin: 0 0 12px 0;
-                font-size: 20px;
-                color: #60A5FA;
-            `;
-    }
-    const stats = content.querySelector('.offline-stats') as HTMLElement | null;
-    if (stats) {
-      stats.style.cssText = `
-                display: grid;
-                gap: 8px;
-            `;
-    }
-    const btn = content.querySelector('.offline-continue-btn') as HTMLButtonElement | null;
-    if (btn) {
-      btn.style.cssText = `
-                margin-top: 16px;
-                background: #10B981;
-                color: #06281e;
-                border: none;
-                border-radius: 8px;
-                padding: 8px 12px;
-                font-weight: 600;
-                cursor: pointer;
-            `;
-    }
-  }
+  heading.style.cssText = `
+            margin: 0 0 12px 0;
+            font-size: 20px;
+            color: #60A5FA;
+        `;
+  stats.style.cssText = `
+            display: grid;
+            gap: 8px;
+        `;
+  continueBtn.style.cssText = `
+            margin-top: 16px;
+            background: #10B981;
+            color: #06281e;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 600;
+            cursor: pointer;
+        `;
+
   document.body.appendChild(modal);
   setTimeout(() => {
     if (modal.parentNode) {
