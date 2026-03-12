@@ -1,5 +1,29 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
+const mockPurchasesExecute = {
+  buyStraw: vi.fn(() => true),
+  buyCup: vi.fn(() => true),
+  buySuction: vi.fn(() => true),
+  buyFasterDrinks: vi.fn(() => true),
+  buyWiderStraws: vi.fn(() => true),
+  buyBetterCups: vi.fn(() => true),
+};
+
+const mockPlayButtonClickSound = vi.fn();
+const mockSetupSodaButtonGestures = vi.fn(() => Promise.resolve());
+
+vi.mock('../ts/core/systems/purchases-system', () => ({
+  execute: mockPurchasesExecute,
+}));
+
+vi.mock('../ts/core/systems/button-audio', () => ({
+  playButtonClickSound: mockPlayButtonClickSound,
+}));
+
+vi.mock('../ts/ui/soda-button-gestures', () => ({
+  setupSodaButtonGestures: mockSetupSodaButtonGestures,
+}));
+
 // Mock DOM elements and globals
 const createMockButton = (onclick: string | null = null, className: string = '') => ({
   getAttribute: vi.fn(() => onclick),
@@ -98,6 +122,9 @@ describe('Button System', () => {
     mockWindow.toggleButtonSounds = vi.fn();
     mockWindow.sendMessage = vi.fn();
     mockWindow.startGame = vi.fn();
+    mockPurchasesExecute.buyStraw.mockClear();
+    mockPlayButtonClickSound.mockClear();
+    mockSetupSodaButtonGestures.mockClear();
 
     // Import the button system
     buttonSystem = await import('../ts/ui/buttons.ts');
@@ -120,7 +147,7 @@ describe('Button System', () => {
       expect(BUTTON_CONFIG.types['sound-toggle-btn']).toBeDefined();
       expect(BUTTON_CONFIG.types['dev-btn']).toBeDefined();
       expect(BUTTON_CONFIG.types['chat-send-btn']).toBeDefined();
-      expect(BUTTON_CONFIG.types['splash-start-btn']).toBeDefined();
+      expect(BUTTON_CONFIG.types['unlock-btn']).toBeDefined();
     });
 
     it('should have all required actions mapped', () => {
@@ -130,10 +157,10 @@ describe('Button System', () => {
       expect(BUTTON_CONFIG.actions['buyStraw']).toBeDefined();
       expect(BUTTON_CONFIG.actions['buySuction']).toBeDefined();
       expect(BUTTON_CONFIG.actions['buyFasterDrinks']).toBeDefined();
-      expect(BUTTON_CONFIG.actions['levelUp']).toBeDefined();
+      expect(BUTTON_CONFIG.actions['unlockLevel']).toBeDefined();
       expect(BUTTON_CONFIG.actions['save']).toBeDefined();
       expect(BUTTON_CONFIG.actions['sendChat']).toBeDefined();
-      expect(BUTTON_CONFIG.actions['startGame']).toBeDefined();
+      expect(BUTTON_CONFIG.actions['toggleButtonSounds']).toBeDefined();
     });
 
     it('should have correct button type mappings', () => {
@@ -142,7 +169,7 @@ describe('Button System', () => {
       expect(BUTTON_CONFIG.actions['buyStraw'].type).toBe('shop-btn');
       expect(BUTTON_CONFIG.actions['buySuction'].type).toBe('clicking-upgrade-btn');
       expect(BUTTON_CONFIG.actions['buyFasterDrinks'].type).toBe('drink-speed-upgrade-btn');
-      expect(BUTTON_CONFIG.actions['levelUp'].type).toBe('level-up-btn');
+      expect(BUTTON_CONFIG.actions['unlockLevel'].type).toBe('unlock-btn');
       expect(BUTTON_CONFIG.actions['save'].type).toBe('save-btn');
     });
   });
@@ -164,10 +191,10 @@ describe('Button System', () => {
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
       expect(mockButtonElement.classList.add).toHaveBeenCalledWith('button-clicked');
-      expect(mockWindow.App.systems.purchases.execute.buyStraw).toHaveBeenCalled();
+      expect(mockPurchasesExecute.buyStraw).toHaveBeenCalled();
     });
 
-    it('should play purchase sound for shop buttons', () => {
+    it('should use the modern button audio helper for clickable actions', () => {
       const { handleButtonClick } = buttonSystem;
       const mockEvent = {
         preventDefault: vi.fn(),
@@ -180,7 +207,7 @@ describe('Button System', () => {
 
       handleButtonClick(mockEvent, mockButtonElement, actionName);
 
-      expect(mockWindow.App.systems.audio.button.playButtonPurchaseSound).toHaveBeenCalled();
+      expect(mockPlayButtonClickSound).toHaveBeenCalled();
     });
 
     it('should handle unknown button actions gracefully', () => {
@@ -266,7 +293,7 @@ describe('Button System', () => {
       );
     });
 
-    it('should set up soda button handler', async () => {
+    it('should delegate soda button setup to the gesture module', async () => {
       const { setupSpecialButtonHandlers } = buttonSystem;
 
       const mockSodaButton = createMockButton();
@@ -289,8 +316,7 @@ describe('Button System', () => {
       // Wait for async operations to complete
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      // The function should have attempted to set up the soda button
-      expect(mockSodaButton.addEventListener).toHaveBeenCalled();
+      expect(mockSetupSodaButtonGestures).toHaveBeenCalled();
     });
 
     it('should set up chat input handler', () => {

@@ -146,43 +146,11 @@ export function initOnDomReady(): void {
   }
 }
 
-// Best-effort wiring to global App if available (helps when import timing is odd on Pages)
-(() => {
-  let gameInitSystemRef: any;
-  try {
-    // Resolve reference without leaking block-scoped bindings into catch
-    const mod = require('./game-init');
-    gameInitSystemRef = mod && (mod as any).gameInitSystem;
-  } catch (error) {
-    try {
-      // Avoid TDZ on error handler during module evaluation
-      // eslint-disable-next-line no-console
-      console.warn('[wireGameInit] resolveGameInitSystem failed', error);
-    } catch {}
-    return;
-  }
-
-  if (!gameInitSystemRef) return;
-
-  try {
-    Object.assign(gameInitSystemRef, {
-      initSplashScreen,
-      startGameCore,
-      initOnDomReady,
-    });
-    try {
-      // Diagnostic logging removed - no longer needed
-    } catch (error) {
-      errorHandler.handleError(error, 'pushDiagnosticInfo', { context: 'game-init' });
-    }
-  } catch (error) {
-    try {
-      // Avoid TDZ on error handler during module evaluation
-      // eslint-disable-next-line no-console
-      console.warn('[wireGameInit] wireGameInitToGlobalApp failed', error);
-    } catch {}
-  }
-})();
+export const gameInitSystem = {
+  initSplashScreen,
+  startGameCore,
+  initOnDomReady,
+};
 
 try {
   (window as any).__diag &&
