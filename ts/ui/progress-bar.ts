@@ -33,16 +33,13 @@ export class ProgressBar {
   public initializeElements(containerId: string): void {
     if (typeof document === 'undefined') return;
 
-    console.log(`🔧 Initializing progress bar for container: ${containerId}`);
     this.container = document.getElementById(containerId);
     if (!this.container) {
-      console.warn(`Progress bar container not found: ${containerId}`);
       return;
     }
 
     // Create enhanced progress bar structure
     this.createProgressBarStructure();
-    console.log(`✅ Progress bar initialized for: ${containerId}`);
   }
 
   private createProgressBarStructure(): void {
@@ -69,8 +66,6 @@ export class ProgressBar {
     if (existingCountdown) {
       this.progressTime = existingCountdown;
     }
-
-    console.log('✅ Progress bar structure found (no modifications)');
   }
 
   public update(data: ProgressBarData): void {

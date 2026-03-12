@@ -9,6 +9,7 @@ export class SidebarNavigationManager {
   private isMobile: boolean = false;
   private initialized: boolean = false;
   private resizeListenerRegistered: boolean = false;
+  private missingElementsLogged = false;
 
   constructor() {
     this.initializeWhenReady();
@@ -33,10 +34,9 @@ export class SidebarNavigationManager {
     if (typeof document === 'undefined') return;
 
     this.initializeElements();
+    if (!this.sidebar || !this.mobileMenuToggle) return;
     this.setupEventListeners();
     this.initialized = true;
-
-    console.log('SidebarNavigationManager initialized successfully');
   }
 
   private initializeElements(): void {
@@ -45,59 +45,37 @@ export class SidebarNavigationManager {
     this.sidebar = document.querySelector('.game-sidebar');
     this.mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
 
-    // Debug: Check what elements exist
-    console.log('Available elements:', {
-      allButtons: document.querySelectorAll('button'),
-      mobileMenuToggle: document.querySelector('.mobile-menu-toggle'),
-      mobileMenuToggleById: document.getElementById('mobileMenuToggle'),
-      gameSidebar: document.querySelector('.game-sidebar'),
-    });
-
     if (!this.sidebar) {
-      console.warn('Sidebar element not found');
+      this.logMissingElements();
       return;
     }
 
     if (!this.mobileMenuToggle) {
-      console.warn('Mobile menu toggle button not found');
-      // Try alternative selectors
       this.mobileMenuToggle = document.getElementById('mobileMenuToggle');
-      if (this.mobileMenuToggle) {
-        console.log('Found mobile menu toggle by ID');
-      } else {
-        console.warn('Still not found by ID either');
+      if (!this.mobileMenuToggle) {
+        this.logMissingElements();
         return;
       }
     }
-
-    console.log('Mobile navigation initialized:', {
-      isMobile: this.isMobile,
-      windowWidth: window.innerWidth,
-      sidebar: this.sidebar,
-      mobileMenuToggle: this.mobileMenuToggle,
-    });
+    this.missingElementsLogged = false;
   }
 
   private setupEventListeners(): void {
     if (this.mobileMenuToggle) {
-      console.log('Setting up event listener for mobile menu toggle');
-
-      // Simple click handler
       this.mobileMenuToggle.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
         this.toggleMobileSidebar();
       });
     } else {
-      console.warn('Mobile menu toggle button not found for event listener setup');
-
-      // Try to find it again after a delay
       setTimeout(() => {
         if (typeof document === 'undefined') return;
         this.mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
         if (this.mobileMenuToggle) {
-          console.log('Found mobile menu toggle on retry');
+          this.missingElementsLogged = false;
           this.setupEventListeners();
+        } else {
+          this.logMissingElements();
         }
       }, 1000);
     }
@@ -165,7 +143,6 @@ export class SidebarNavigationManager {
       this.isMobile = window.innerWidth <= 768;
 
       if (wasMobile !== this.isMobile) {
-        console.log('Mobile state changed:', this.isMobile);
         this.updateSidebarState();
       }
     });
@@ -185,27 +162,15 @@ export class SidebarNavigationManager {
   }
 
   public toggleMobileSidebar(): void {
-    console.log('toggleMobileSidebar called:', {
-      sidebar: this.sidebar,
-      isMobile: this.isMobile,
-      windowWidth: window.innerWidth,
-    });
-
     if (!this.sidebar) {
-      console.warn('No sidebar found, trying to find it again...');
       this.sidebar = document.querySelector('.game-sidebar');
       if (!this.sidebar) {
-        console.error('Sidebar still not found!');
+        this.logMissingElements();
         return;
       }
     }
 
-    if (!this.isMobile) {
-      console.warn('Not on mobile, but toggling anyway for testing');
-    }
-
     const isOpen = this.sidebar.classList.contains('mobile-open');
-    console.log('Sidebar state:', { isOpen, classes: this.sidebar.className });
 
     if (isOpen) {
       this.closeMobileSidebar();
@@ -216,11 +181,9 @@ export class SidebarNavigationManager {
 
   public openMobileSidebar(): void {
     if (!this.sidebar) {
-      console.error('Cannot open sidebar - no sidebar element');
+      this.logMissingElements();
       return;
     }
-
-    console.log('Opening mobile sidebar...');
     this.sidebar.classList.add('mobile-open');
 
     // Add overlay
@@ -228,17 +191,13 @@ export class SidebarNavigationManager {
 
     // Prevent body scroll
     document.body.style.overflow = 'hidden';
-
-    console.log('Mobile sidebar opened');
   }
 
   public closeMobileSidebar(): void {
     if (!this.sidebar) {
-      console.error('Cannot close sidebar - no sidebar element');
+      this.logMissingElements();
       return;
     }
-
-    console.log('Closing mobile sidebar...');
     this.sidebar.classList.remove('mobile-open');
 
     // Remove overlay
@@ -246,8 +205,6 @@ export class SidebarNavigationManager {
 
     // Restore body scroll
     document.body.style.overflow = '';
-
-    console.log('Mobile sidebar closed');
   }
 
   private addSidebarOverlay(): void {
@@ -274,6 +231,11 @@ export class SidebarNavigationManager {
     if (!this.initialized) {
       this.initializeWhenReady();
     }
+  }
+
+  private logMissingElements(): void {
+    if (this.missingElementsLogged) return;
+    this.missingElementsLogged = true;
   }
 }
 

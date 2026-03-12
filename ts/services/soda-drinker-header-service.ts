@@ -4,11 +4,10 @@
 
 import { logger } from './logger';
 import { useGameStore } from '../core/state/zustand-store';
+import { hybridLevelSystem, type HybridLevel } from '../core/systems/hybrid-level-system';
 import { performanceMonitor } from './performance';
 import { HeaderPerformanceController, PerformanceMode } from './header/performance';
 import { HeaderAccessibilityController } from './header/accessibility';
-import type { HybridLevel } from '../core/systems/hybrid-level-system';
-import { hybridLevelSystem } from '../core/systems/hybrid-level-system';
 import { errorHandler } from '../core/error-handling/error-handler';
 
 export interface SodaDrinkerHeaderConfig {
@@ -71,9 +70,9 @@ export class SodaDrinkerHeaderService {
   /**
    * Initialize the Soda Drinker Pro header service
    */
-  public async initialize(): Promise<void> {
+  public initialize(): void {
     if (this.isInitialized) {
-      logger.warn('SodaDrinkerHeaderService already initialized');
+      logger.info('SodaDrinkerHeaderService already initialized');
       return;
     }
 
@@ -422,7 +421,7 @@ export class SodaDrinkerHeaderService {
 
     return {
       level: this.currentLevel,
-      theme: theme,
+      theme,
     };
   }
 
@@ -528,7 +527,6 @@ export class SodaDrinkerHeaderService {
     const levelRequirements = document.getElementById('settingsLevelRequirements');
 
     if (!levelList || !currentLevelName || !currentLevelNumber || !levelRequirements) {
-      console.warn('❌ Required elements not found for level selector');
       return;
     }
     // Populate level list
@@ -547,19 +545,13 @@ export class SodaDrinkerHeaderService {
   private populateSettingsLevelList(): void {
     const levelList = document.getElementById('settingsLevelList');
     if (!levelList) {
-      console.warn('❌ Level list element not found');
       return;
     }
 
     if (!this.levelSystem) {
-      console.warn('❌ Level system not available, trying to get it...');
-      // Try to get the level system again
-      // const w = window as any;
-      // Hybrid system access modernized - using direct import
       if (hybridLevelSystem) {
         this.levelSystem = hybridLevelSystem;
       } else {
-        console.warn('❌ Level system still not available');
         return;
       }
     }
@@ -735,15 +727,9 @@ export class SodaDrinkerHeaderService {
    */
   private switchToLevel(levelId: number): void {
     if (!this.levelSystem) {
-      console.warn('❌ Level system not available, trying to get it...');
-      // Try to get the level system again
-      // const w = window as any;
-      // Hybrid system access modernized - using direct import
       if (hybridLevelSystem) {
         this.levelSystem = hybridLevelSystem;
-        console.log('✅ Level system found and set');
       } else {
-        console.warn('❌ Level system still not available');
         return;
       }
     }
@@ -830,13 +816,11 @@ export class SodaDrinkerHeaderService {
    */
   public canUnlockLevel(levelId: number): boolean {
     if (!this.levelSystem) {
-      console.warn('❌ Level system not available for canUnlockLevel check');
       return false;
     }
 
     const requirements = this.getLevelUnlockRequirements(levelId);
     if (!requirements) {
-      console.warn('❌ No requirements found for level:', levelId);
       return false;
     }
 

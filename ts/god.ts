@@ -36,29 +36,23 @@ let bibleWordBank: string[] | null = null;
 export async function loadWordBank(): Promise<string[] | null> {
   if (!bibleWordBank) {
     try {
-      console.log('Loading word bank from word_bank.json...');
       let url: { href: string };
       try {
         url = new URL('../word_bank.json', import.meta.url);
       } catch (error) {
-        console.warn(
-          'Failed to create URL from import.meta.url, falling back to base path:',
-          error
-        );
         const base = (typeof window !== 'undefined' && (window as any).__BASE_PATH__) || '';
         url = { href: base ? `${base}word_bank.json` : 'word_bank.json' };
       }
       const response = await fetch(url.href);
       if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       const data = await response.json();
-      if (!data || !data.words || !Array.isArray(data.words))
+      const words = Array.isArray(data) ? data : data?.words;
+      if (!Array.isArray(words))
         throw new Error('Invalid word bank format - expected {words: [...]} structure');
-      bibleWordBank = data.words as string[];
-      console.log(`✅ Successfully loaded ${bibleWordBank.length} words from word_bank.json`);
+      bibleWordBank = words as string[];
     } catch (error) {
       errorHandler.handleError(error, 'loadWordBank', { critical: true });
       bibleWordBank = ['lord', 'god', 'jesus', 'christ', 'spirit', 'holy', 'heaven', 'earth'];
-      console.log('Using fallback word bank with', bibleWordBank.length, 'words');
     }
   }
   return bibleWordBank;
@@ -85,7 +79,8 @@ function generateBibleWords(): string {
   return words.join('\n');
 }
 
-export function getDivineResponse(_userMessage: string): string {
+export function getDivineResponse(userMessage: string): string {
+  void userMessage;
   if (!bibleWordBank || bibleWordBank.length === 0) {
     console.warn('Word bank not loaded yet, attempting to load...');
     loadWordBank()

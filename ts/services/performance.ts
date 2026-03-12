@@ -34,6 +34,7 @@ class PerformanceMonitor {
 
   private startTime: number;
   private isMonitoring = false;
+  private lowFpsLogged = false;
 
   constructor() {
     this.startTime = performance.now();
@@ -206,8 +207,9 @@ class PerformanceMonitor {
         this.logMetric('FPS', fps);
 
         // Warn if FPS is low
-        if (fps < 30) {
+        if (fps < 30 && this.shouldWarnAboutLowFps()) {
           console.warn(`Low FPS detected: ${fps}`);
+          this.lowFpsLogged = true;
         }
 
         frameCount = 0;
@@ -218,6 +220,12 @@ class PerformanceMonitor {
     };
 
     requestAnimationFrame(countFrames);
+  }
+
+  private shouldWarnAboutLowFps(): boolean {
+    if (this.lowFpsLogged) return false;
+    if (typeof document === 'undefined') return true;
+    return document.visibilityState === 'visible' && document.hasFocus();
   }
 
   private handlePerformanceError(operation: string, error: any): void {
@@ -232,7 +240,7 @@ class PerformanceMonitor {
       severity: ErrorSeverity.MEDIUM,
       context: {
         component: 'performance-monitor',
-        operation: operation,
+        operation,
         timestamp: Date.now(),
         stackTrace: error?.stack,
       },
@@ -356,6 +364,7 @@ class PerformanceMonitor {
       memoryUsage: null,
     };
     this.startTime = performance.now();
+    this.lowFpsLogged = false;
   }
 }
 

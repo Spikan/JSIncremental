@@ -118,7 +118,7 @@ function initGame() {
       errorHandler.handleError(error, 'setSessionStartTime', { gameStartTime });
     }
 
-    let gameStartDate = Date.now();
+    const gameStartDate = Date.now();
     try {
       const actions = getStoreActions();
       actions.setSessionStartTime(Number(gameStartDate));
@@ -255,7 +255,6 @@ function initGame() {
           100,
           'Retry display update - DOM not ready'
         );
-        return;
       }
       // DOM elements ready, updating displays
       // Modernized - UI updates handled by store
@@ -279,14 +278,7 @@ function initGame() {
 
     // Initialize Soda Drinker Pro header
     try {
-      sodaDrinkerHeaderService
-        .initialize()
-        .then(() => {
-          // Header initialized successfully
-        })
-        .catch(error => {
-          errorHandler.handleError(error, 'initializeSodaDrinkerProHeader');
-        });
+      sodaDrinkerHeaderService.initialize();
     } catch (error) {
       errorHandler.handleError(error, 'initializeSodaDrinkerProHeader');
     }

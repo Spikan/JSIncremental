@@ -16,7 +16,11 @@ export interface TouchValidationConfig {
 export class MobileInputHandler {
   private static instance: MobileInputHandler;
   private isInitialized = false;
-  private eventListeners: Array<{ element: Element; type: string; handler: EventListener }> = [];
+  private eventListeners: Array<{
+    element: Element;
+    type: string;
+    handler: EventListenerOrEventListenerObject;
+  }> = [];
   private touchValidationConfig: TouchValidationConfig = {
     movementThreshold: 15, // Allow moderate movement
     timeThreshold: 30, // Quick touches allowed
@@ -66,7 +70,6 @@ export class MobileInputHandler {
   private setupTouchHandling(): void {
     const sodaButton = this.getSodaButton();
     if (!sodaButton) {
-      console.warn('Soda button not found, will retry...');
       setTimeout(() => this.setupTouchHandling(), 100);
       return;
     }
@@ -112,7 +115,6 @@ export class MobileInputHandler {
     const moreTab = document.querySelector('[data-action="showMoreOptions"]');
 
     if (!moreOptionsModal) {
-      console.warn('More options modal not found');
       return;
     }
 
@@ -289,14 +291,21 @@ export class MobileInputHandler {
    * Simplified touch validation - if it's a touch, it's valid
    */
   public validateTouchForButton(
-    _startX: number,
-    _startY: number,
-    _endX: number,
-    _endY: number,
-    _duration: number,
-    _touchCount: number,
-    _scrollDelta: number = 0
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+    duration: number,
+    touchCount: number,
+    scrollDelta: number = 0
   ): boolean {
+    void startX;
+    void startY;
+    void endX;
+    void endY;
+    void duration;
+    void touchCount;
+    void scrollDelta;
     // Simplified: accept all touches for better user experience
     return true;
   }
@@ -320,8 +329,9 @@ export class MobileInputHandler {
    * Get recommended thresholds - simplified for better UX
    */
   public getRecommendedThresholds(
-    _useCase: 'strict' | 'balanced' | 'lenient' | 'gaming' | 'accessibility'
+    useCase: 'strict' | 'balanced' | 'lenient' | 'gaming' | 'accessibility'
   ): TouchValidationConfig {
+    void useCase;
     // Simplified: return balanced settings for all use cases
     return {
       movementThreshold: 20,
