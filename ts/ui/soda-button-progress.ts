@@ -21,9 +21,6 @@ export function isSodaButtonProgressEnabled(): boolean {
 
 export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonProgressAPI {
   let root: HTMLElement | null = null;
-  let liquid: HTMLElement | null = null;
-  let foam: HTMLElement | null = null;
-  let bubbles: HTMLElement | null = null;
   let label: HTMLElement | null = null;
   let reducedMotion =
     window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -43,165 +40,135 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
 .soda-progress-overlay {
   position: absolute;
   inset: 0;
+  display: grid;
+  place-items: center;
   pointer-events: none;
   z-index: 2;
+  --soda-progress: 0;
 }
-.soda-progress-cup {
+.soda-progress-halo {
   position: absolute;
-  left: 16%;
-  right: 16%;
-  top: 8%;
-  bottom: 8%;
-  filter: drop-shadow(0 16px 26px rgba(19, 12, 9, 0.15));
+  inset: 10%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 217, 117, 0.28), transparent 64%);
+  filter: blur(14px);
+  animation: sodaHaloPulse 3s ease-in-out infinite;
 }
-.soda-progress-rim {
+
+.soda-progress-ring {
   position: absolute;
-  left: 6%;
-  right: 6%;
-  top: 0;
-  height: 10%;
-  border-radius: 999px;
+  inset: 8%;
+  border-radius: 50%;
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.32)),
-    linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
-  border: 1px solid rgba(255,255,255,0.45);
-  box-shadow:
-    0 2px 0 rgba(255,255,255,0.22),
-    inset 0 -2px 4px rgba(87,57,33,0.18);
-  z-index: 3;
+    conic-gradient(
+      from -90deg,
+      rgba(255, 236, 186, 0.98) 0 calc(var(--soda-progress) * 1%),
+      rgba(255, 255, 255, 0.18) calc(var(--soda-progress) * 1%) 100%
+    );
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16);
 }
-.soda-progress-inner {
-  position: absolute;
-  inset: 6% 10% 4%;
-  overflow: hidden;
-  border-radius: 26px 26px 34px 34px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08) 16%, rgba(255,255,255,0.03) 100%);
-  border: 2px solid rgba(255, 246, 234, 0.58);
-  border-top-width: 3px;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.1),
-    inset 0 -12px 18px rgba(36, 21, 12, 0.1),
-    0 12px 20px rgba(14, 8, 5, 0.08);
-}
-.soda-progress-inner::before {
+
+.soda-progress-ring::after {
   content: '';
   position: absolute;
-  top: 10%;
-  bottom: 14%;
-  left: 12%;
-  width: 12%;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.02));
-  z-index: 2;
+  inset: 10%;
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08)),
+    rgba(255,255,255,0.04);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.14),
+    inset 0 12px 18px rgba(255,255,255,0.08);
 }
-.soda-progress-inner::after {
-  content: '';
+
+.soda-progress-core {
   position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: 4%;
-  height: 10%;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 72%);
+  inset: 22%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255,255,255,0.2), transparent 22%),
+    linear-gradient(180deg, #7a4219, #35190b 72%, #261108);
+  border: 1px solid rgba(255, 234, 198, 0.2);
+  box-shadow:
+    inset 0 14px 18px rgba(255,255,255,0.08),
+    inset 0 -14px 18px rgba(0,0,0,0.18),
+    0 16px 24px rgba(18,10,7,0.18);
+}
+
+.soda-progress-copy {
+  position: absolute;
+  inset: 28%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
   z-index: 1;
 }
-.soda-progress-liquid {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 0%;
-  background:
-    radial-gradient(circle at 22% 14%, rgba(255,255,255,0.24), transparent 22%),
-    linear-gradient(180deg, rgba(242,187,99,0.94), var(--cola-caramel) 22%, var(--cola-amber) 42%, var(--cola-dark) 100%);
-  will-change: height;
+
+.soda-progress-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  color: #fff4d3;
+  text-transform: uppercase;
 }
-.soda-progress-foam {
-  position: absolute;
-  left: 6%;
-  right: 6%;
-  height: 14px;
-  background:
-    radial-gradient(circle at 12% 58%, rgba(255,255,255,0.98), rgba(255,255,255,0.76) 54%, transparent 56%),
-    radial-gradient(circle at 34% 38%, rgba(255,255,255,1), rgba(255,255,255,0.82) 52%, transparent 53%),
-    radial-gradient(circle at 58% 44%, rgba(255,255,255,0.96), rgba(255,255,255,0.76) 52%, transparent 54%),
-    radial-gradient(circle at 84% 52%, rgba(255,255,255,0.96), rgba(255,255,255,0.74) 56%, transparent 58%);
-  filter: drop-shadow(0 2px 6px rgba(255,255,255,0.28));
-  bottom: 0;
-  z-index: 2;
+
+.soda-progress-subtitle {
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(255, 245, 224, 0.7);
+  text-transform: uppercase;
 }
-.soda-progress-bubbles {
-  position: absolute;
-  inset: 14% 10% 10%;
-  opacity: 0.42;
-}
-.soda-progress-bubble {
-  position: absolute;
-  bottom: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.88), rgba(255,255,255,0.18) 70%, transparent 72%);
-  animation: sodaBubbleRise 3.8s linear infinite;
-}
-.soda-progress-bubble:nth-child(1) { left: 22%; animation-delay: 0s; }
-.soda-progress-bubble:nth-child(2) { left: 48%; animation-delay: 1.1s; width: 6px; height: 6px; }
-.soda-progress-bubble:nth-child(3) { left: 70%; animation-delay: 2.3s; width: 7px; height: 7px; }
+
 .soda-progress-label {
   position: absolute;
   left: 50%;
-  bottom: 1%;
+  bottom: 12%;
   transform: translateX(-50%);
-  min-width: 96px;
-  padding: 6px 10px;
+  min-width: 104px;
+  padding: 7px 10px;
   border-radius: 999px;
   text-align: center;
   font-weight: 700;
-  font-size: 0.66rem;
-  letter-spacing: 0.1em;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
   color: #fff8ef;
   text-shadow: 0 1px 2px rgba(0,0,0,0.45);
-  background: linear-gradient(180deg, rgba(70,40,19,0.82), rgba(39,21,10,0.88));
+  background: linear-gradient(180deg, rgba(50,29,14,0.88), rgba(27,14,8,0.9));
   border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 8px 16px rgba(14,8,5,0.12);
+  box-shadow: 0 10px 18px rgba(14,8,5,0.16);
 }
 
-@keyframes sodaBubbleRise {
-  0% { transform: translateY(0) scale(0.8); opacity: 0; }
-  20% { opacity: 0.9; }
-  100% { transform: translateY(-120px) scale(1.1); opacity: 0; }
+@keyframes sodaHaloPulse {
+  0%, 100% { opacity: 0.7; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1.03); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .soda-progress-liquid { transition: none !important; }
-  .soda-progress-foam { transition: none !important; }
-  .soda-progress-bubble { animation: none !important; opacity: 0.18; }
+  .soda-progress-halo { animation: none !important; }
 }
 
 @media (max-width: 600px) {
-  .soda-progress-cup {
-    left: 14%;
-    right: 14%;
-    top: 8%;
-    bottom: 8%;
+  .soda-progress-core {
+    inset: 20%;
   }
-  .soda-progress-inner {
-    inset: 6% 8% 5%;
-  }
-  .soda-progress-foam {
-    left: 5%;
-    right: 5%;
-    height: 12px;
+  .soda-progress-copy {
+    inset: 26%;
   }
   .soda-progress-label {
-    bottom: 1%;
-    min-width: 84px;
+    bottom: 11%;
+    min-width: 92px;
     padding: 4px 8px;
     font-size: 0.58rem;
   }
-  .soda-progress-bubbles {
-    display: none;
+  .soda-progress-title {
+    font-size: 0.76rem;
+  }
+  .soda-progress-subtitle {
+    font-size: 0.52rem;
   }
 }
 `;
@@ -214,48 +181,43 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
       root = document.createElement('div');
       root.className = 'soda-progress-overlay';
 
-      const cup = document.createElement('div');
-      cup.className = 'soda-progress-cup';
+      const halo = document.createElement('div');
+      halo.className = 'soda-progress-halo';
 
-      const rim = document.createElement('div');
-      rim.className = 'soda-progress-rim';
+      const ring = document.createElement('div');
+      ring.className = 'soda-progress-ring';
 
-      const glass = document.createElement('div');
-      glass.className = 'soda-progress-inner';
+      const core = document.createElement('div');
+      core.className = 'soda-progress-core';
 
-      const liq = document.createElement('div');
-      liq.className = 'soda-progress-liquid';
+      const copy = document.createElement('div');
+      copy.className = 'soda-progress-copy';
 
-      const fm = document.createElement('div');
-      fm.className = 'soda-progress-foam';
+      const title = document.createElement('div');
+      title.className = 'soda-progress-title';
+      title.textContent = 'Drink';
 
-      const bubbleGroup = document.createElement('div');
-      bubbleGroup.className = 'soda-progress-bubbles';
-      for (let i = 0; i < 3; i++) {
-        const bubble = document.createElement('span');
-        bubble.className = 'soda-progress-bubble';
-        bubbleGroup.appendChild(bubble);
-      }
+      const subtitle = document.createElement('div');
+      subtitle.className = 'soda-progress-subtitle';
+      subtitle.textContent = 'Tap to Sip';
 
       const lbl = document.createElement('div');
       lbl.className = 'soda-progress-label';
       lbl.textContent = 'FILL 0%';
 
-      glass.appendChild(liq);
-      glass.appendChild(fm);
-      glass.appendChild(bubbleGroup);
-      cup.appendChild(rim);
-      cup.appendChild(glass);
-      root.appendChild(cup);
+      copy.appendChild(title);
+      copy.appendChild(subtitle);
+      root.appendChild(halo);
+      root.appendChild(ring);
+      root.appendChild(core);
+      root.appendChild(copy);
       root.appendChild(lbl);
 
-      liquid = liq;
-      foam = fm;
-      bubbles = bubbleGroup;
       label = lbl;
     }
     if (targetButton && root && !targetButton.contains(root)) {
       targetButton.style.position = targetButton.style.position || 'relative';
+      root.classList.toggle('reduced-motion', reducedMotion);
       targetButton.appendChild(root);
     }
   }
@@ -265,25 +227,16 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
   }
 
   function update(progressPercent: number) {
-    if (!root || !liquid || !foam || !label) return;
+    if (!root || !label) return;
     const pct = Math.min(Math.max(progressPercent, 0), 100);
-    liquid.style.height = `${pct}%`;
-    foam.style.bottom = `max(6%, calc(${pct}% - 7px))`;
+    root.style.setProperty('--soda-progress', pct.toFixed(2));
     label.textContent = `FILL ${Math.round(pct)}%`;
-    if (bubbles) {
-      bubbles.style.opacity = pct < 8 ? '0.12' : '0.42';
-    }
-    if (!reducedMotion) {
-      liquid.style.transition = 'height 150ms cubic-bezier(0.2, 0.8, 0.2, 1)';
-      foam.style.transition = 'bottom 150ms cubic-bezier(0.2, 0.8, 0.2, 1)';
-    } else {
-      liquid.style.transition = 'none';
-      foam.style.transition = 'none';
-    }
+    root.classList.toggle('reduced-motion', reducedMotion);
   }
 
   function setReducedMotion(value: boolean) {
     reducedMotion = value;
+    if (root) root.classList.toggle('reduced-motion', reducedMotion);
   }
 
   return { mount, unmount, update, setReducedMotion };

@@ -52,9 +52,10 @@
   min-width: 160px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background:
-    radial-gradient(circle at 50% 18%, rgba(255, 250, 228, 0.55), transparent 28%),
-    radial-gradient(circle at 50% 82%, rgba(106, 55, 22, 0.16), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.08));
+    radial-gradient(circle at 50% 18%, rgba(255, 249, 227, 0.42), transparent 28%),
+    radial-gradient(circle at 50% 100%, rgba(123, 65, 24, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+  border-radius: 50%;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     0 18px 34px rgba(16, 24, 38, 0.12);
@@ -66,10 +67,10 @@
 .soda-button::before {
   content: '';
   position: absolute;
-  inset: 6% 14% auto;
-  height: 22%;
-  border-radius: 999px 999px 42% 42%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
+  inset: 7% 18% auto;
+  height: 18%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0));
   pointer-events: none;
   z-index: 0;
 }
@@ -77,10 +78,10 @@
 .soda-button::after {
   content: '';
   position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: 5%;
-  height: 15%;
+  left: 14%;
+  right: 14%;
+  bottom: 2%;
+  height: 18%;
   border-radius: 999px;
   background: radial-gradient(circle, rgba(27, 12, 4, 0.16), transparent 72%);
   filter: blur(14px);
@@ -135,15 +136,15 @@
   }
 
   .soda-button::before {
-    inset: 7% 16% auto;
-    height: 18%;
+    inset: 8% 18% auto;
+    height: 16%;
   }
 
   .soda-button::after {
-    left: 18%;
-    right: 18%;
-    bottom: 6%;
-    height: 13%;
+    left: 14%;
+    right: 14%;
+    bottom: 3%;
+    height: 16%;
   }
 }
 
