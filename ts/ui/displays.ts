@@ -775,9 +775,10 @@ function updateNextGoalDisplay(state: any): void {
     featureName: string,
     eyebrow: string,
     title: string,
-    detail: string
+    detail: string,
+    ownedCount = 0
   ): GoalCardState | null => {
-    if (FEATURE_UNLOCKS.checkUnlock(featureName)) {
+    if (FEATURE_UNLOCKS.checkUnlock(featureName) || ownedCount > 0) {
       return null;
     }
     const unlockCost = FEATURE_UNLOCKS.getUnlockCost(featureName);
@@ -797,14 +798,15 @@ function updateNextGoalDisplay(state: any): void {
     'suction',
     'ACTIVE PATH',
     'Unlock Turbo Sip',
-    'Give clicks a real payoff before you pivot into automation.'
+    'Give clicks a real payoff before you pivot into automation.',
+    suctions
   );
   if (unlockSuctionGoal) {
     setNextGoalCard(unlockSuctionGoal);
     return;
   }
 
-  if (suctions < 2) {
+  if (suctions < 1) {
     setNextGoalCard(
       buildCostGoal(
         'ACTIVE PATH',
@@ -820,7 +822,8 @@ function updateNextGoalDisplay(state: any): void {
     'fasterDrinks',
     'RHYTHM PATH',
     'Unlock Quick Chug',
-    'Shorter drink cycles make the whole game feel less sluggish.'
+    'Shorter drink cycles make the whole game feel less sluggish.',
+    fasterDrinks
   );
   if (unlockFasterGoal) {
     setNextGoalCard(unlockFasterGoal);
