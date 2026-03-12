@@ -50,36 +50,36 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
 }
 .soda-progress-aura {
   position: absolute;
-  left: 17%;
-  right: 17%;
-  top: 18%;
-  bottom: 10%;
+  left: 22%;
+  right: 22%;
+  top: 22%;
+  bottom: 14%;
   border-radius: 42% 42% 26% 26%;
   background:
-    radial-gradient(circle at 50% 18%, rgba(255, 232, 194, 0.22), transparent 26%),
-    radial-gradient(circle at 50% 100%, rgba(83, 43, 18, 0.28), transparent 60%);
-  filter: blur(12px);
+    radial-gradient(circle at 50% 18%, rgba(255, 232, 194, 0.16), transparent 26%),
+    radial-gradient(circle at 50% 100%, rgba(83, 43, 18, 0.16), transparent 60%);
+  filter: blur(10px);
 }
 .soda-progress-cup {
   position: absolute;
-  left: 18%;
-  right: 18%;
-  top: 7%;
-  bottom: 14%;
+  left: 20%;
+  right: 20%;
+  top: 6%;
+  bottom: 12%;
 }
 .soda-progress-rim {
   position: absolute;
-  left: 10%;
-  right: 10%;
+  left: 8%;
+  right: 8%;
   top: 0;
-  height: 10%;
+  height: 9%;
   border-radius: 999px / 80%;
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.76), rgba(255,255,255,0.18)),
-    linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02));
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.22)),
+    linear-gradient(90deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
   box-shadow:
-    0 2px 0 rgba(255,255,255,0.2),
-    inset 0 -2px 4px rgba(87,57,33,0.22);
+    0 2px 0 rgba(255,255,255,0.22),
+    inset 0 -2px 4px rgba(87,57,33,0.18);
   z-index: 3;
 }
 .soda-progress-inner {
@@ -88,14 +88,14 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
   overflow: hidden;
   clip-path: polygon(16% 0, 84% 0, 72% 100%, 28% 100%);
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.04) 12%, rgba(93,61,35,0.14) 100%);
-  border: 2px solid rgba(255, 246, 234, 0.5);
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06) 18%, rgba(255,255,255,0.03) 100%);
+  border: 2px solid rgba(255, 246, 234, 0.58);
   border-top-width: 3px;
   border-bottom-width: 4px;
   box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.08),
-    inset 0 -18px 24px rgba(36, 21, 12, 0.18),
-    0 12px 20px rgba(14, 8, 5, 0.12);
+    inset 0 0 0 1px rgba(255,255,255,0.1),
+    inset 0 -10px 16px rgba(36, 21, 12, 0.08),
+    0 12px 20px rgba(14, 8, 5, 0.08);
 }
 .soda-progress-liquid {
   position: absolute;
@@ -112,7 +112,7 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
   position: absolute;
   left: 8%;
   right: 8%;
-  height: 12px;
+  height: 10px;
   background:
     radial-gradient(circle at 18% 50%, rgba(255,255,255,0.96), rgba(255,255,255,0.74) 56%, transparent 57%),
     radial-gradient(circle at 50% 42%, rgba(255,255,255,0.98), rgba(255,255,255,0.78) 54%, transparent 55%),
@@ -142,25 +142,25 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
 .soda-progress-badge {
   position: absolute;
   left: 50%;
-  top: 36%;
+  top: 34%;
   transform: translateX(-50%);
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 999px;
   font-weight: 800;
-  font-size: 0.7rem;
-  letter-spacing: 0.18em;
-  color: rgba(255, 247, 234, 0.92);
-  background: rgba(56, 29, 14, 0.5);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 6px 16px rgba(15, 8, 4, 0.18);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 247, 234, 0.86);
+  background: rgba(56, 29, 14, 0.24);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(15, 8, 4, 0.08);
   z-index: 3;
 }
 .soda-progress-shine {
   position: absolute;
-  top: 14%;
-  bottom: 12%;
-  left: 24%;
-  width: 12%;
+  top: 12%;
+  bottom: 14%;
+  left: 26%;
+  width: 10%;
   background: linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.04));
   border-radius: 999px;
   transform: skew(-8deg);
@@ -168,20 +168,20 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
 .soda-progress-label {
   position: absolute;
   left: 50%;
-  bottom: 4%;
+  bottom: 2%;
   transform: translateX(-50%);
-  min-width: 112px;
-  padding: 7px 12px;
+  min-width: 92px;
+  padding: 5px 9px;
   border-radius: 999px;
   text-align: center;
-  font-weight: 800;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
   color: #fff8ef;
   text-shadow: 0 1px 2px rgba(0,0,0,0.45);
-  background: linear-gradient(180deg, rgba(85,48,22,0.88), rgba(45,24,12,0.94));
-  border: 1px solid rgba(255,255,255,0.16);
-  box-shadow: 0 10px 20px rgba(14,8,5,0.2);
+  background: linear-gradient(180deg, rgba(85,48,22,0.7), rgba(45,24,12,0.78));
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 6px 14px rgba(14,8,5,0.12);
 }
 
 @keyframes sodaBubbleRise {
@@ -194,6 +194,39 @@ export function createSodaButtonProgress(targetButton: HTMLElement): SodaButtonP
   .soda-progress-liquid { transition: none !important; }
   .soda-progress-foam { transition: none !important; }
   .soda-progress-bubble { animation: none !important; opacity: 0.18; }
+}
+
+@media (max-width: 600px) {
+  .soda-progress-aura {
+    left: 26%;
+    right: 26%;
+    top: 24%;
+    bottom: 16%;
+    filter: blur(8px);
+  }
+  .soda-progress-cup {
+    left: 14%;
+    right: 14%;
+    top: 5%;
+    bottom: 10%;
+  }
+  .soda-progress-inner {
+    inset: 5% 7% 0;
+  }
+  .soda-progress-bubbles {
+    display: none;
+  }
+  .soda-progress-badge {
+    top: 30%;
+    font-size: 0.56rem;
+    padding: 2px 7px;
+  }
+  .soda-progress-label {
+    bottom: 1%;
+    min-width: 78px;
+    padding: 4px 8px;
+    font-size: 0.58rem;
+  }
 }
 `;
     document.head.appendChild(style);
