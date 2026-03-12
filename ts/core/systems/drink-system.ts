@@ -9,21 +9,8 @@
 import { toDecimal } from '../numbers/simplified';
 import { useGameStore } from '../state/zustand-store';
 import { errorHandler } from '../error-handling/error-handler';
+import { hybridLevelSystem } from './hybrid-level-system';
 import { recalcProduction } from './resources';
-
-// Lazy import hybridLevelSystem to avoid circular dependency
-let hybridLevelSystem: any = null;
-const getHybridLevelSystem = async () => {
-  if (!hybridLevelSystem) {
-    try {
-      const module = await import('./hybrid-level-system');
-      hybridLevelSystem = module.hybridLevelSystem;
-    } catch (error) {
-      console.warn('Failed to load hybrid level system:', error);
-    }
-  }
-  return hybridLevelSystem;
-};
 
 // Factory function for dependency injection (for tests)
 export function processDrinkFactory({
@@ -44,9 +31,8 @@ export function processDrinkFactory({
       // Apply level bonuses from hybrid level system (defensive access)
       let levelBonuses = { sipMultiplier: 1.0, clickMultiplier: 1.0 };
       try {
-        const levelSystem = await getHybridLevelSystem();
-        if (levelSystem?.getCurrentLevelBonuses) {
-          levelBonuses = levelSystem.getCurrentLevelBonuses();
+        if (hybridLevelSystem?.getCurrentLevelBonuses) {
+          levelBonuses = hybridLevelSystem.getCurrentLevelBonuses();
         }
       } catch (error) {
         errorHandler.handleError(error, 'getLevelBonuses', { fallback: 'using defaults' });
