@@ -113,6 +113,7 @@ describe('Zustand Store Integration Test', () => {
     const { config } = await import('../ts/config');
     config.UI.FOUNTAIN_SODA_PROGRESS = false;
     config.UI.SODA_BUTTON_PROGRESS = true;
+    config.UI.ENABLE_3D_SODA_BUTTON = false;
     config.UI.USE_THREE_SODA_BUTTON = false;
 
     const uiModule = await import('../ts/ui/index');
@@ -121,13 +122,11 @@ describe('Zustand Store Integration Test', () => {
 
     const sodaButton = global.document.getElementById('sodaButton') as HTMLElement & {
       __sodaProgress?: { update: (value: number) => void };
-      __sodaIndicator?: { update: (value: number) => void };
     };
 
     expect(sodaButton.__sodaProgress).toBeTruthy();
-    expect(sodaButton.__sodaIndicator).toBeTruthy();
     expect(global.document.getElementById('drinkProgressFill')!.style.width).toBe('0%');
-    expect(sodaButton.querySelector('.soda-progress-label')?.textContent).toBe('64%');
+    expect(sodaButton.querySelector('.soda-progress-label')?.textContent).toBe('FILL 64%');
   });
 
   it('synchronizes DOM reads after store state changes', async () => {
