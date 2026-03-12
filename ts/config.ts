@@ -8,7 +8,8 @@ export const config = {
   UI: {
     FOUNTAIN_SODA_PROGRESS: true,
     SODA_BUTTON_PROGRESS: true,
-    USE_THREE_SODA_BUTTON: true,
+    ENABLE_3D_SODA_BUTTON: false,
+    USE_THREE_SODA_BUTTON: false,
     USE_PROCEDURAL_CUP: true,
     EXPERIMENTAL_FLUID: false,
     EXPERIMENTAL_FLUID_SURFACE: false,

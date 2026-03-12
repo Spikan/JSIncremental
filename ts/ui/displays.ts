@@ -11,10 +11,10 @@ import { getUpgradesAndConfig } from '../core/systems/config-accessor';
 import { domQuery } from '../services/dom-query';
 import { isFountainEnabled, createFountainProgress } from './fountain-progress';
 import { isSodaButtonProgressEnabled, createSodaButtonProgress } from './soda-button-progress';
-import { isThreeSodaEnabled } from './soda-3d-three';
 import { createSodaButtonIndicator } from './soda-button-indicator';
 import { uiBatcher } from '../services/ui-batcher';
 import { errorHandler } from '../core/error-handling/error-handler';
+import { config } from '../config';
 // Logger import removed - not used in this file
 import {
   nextStrawCost,
@@ -121,7 +121,9 @@ export function updateTopSipsPerDrink(): void {
   // If enhanced TopInfoBar is present, avoid duplicate writes
   try {
     if (document.querySelector('.currency-display-section')) return;
-  } catch {}
+  } catch {
+    // Ignore DOM lookup failures in partial render environments.
+  }
 
   const topSipsPerDrinkElement: HTMLElement | null = domQuery.getById('topSipsPerDrink');
 
@@ -152,7 +154,9 @@ export function updateTopSipsPerSecond(): void {
   // If enhanced TopInfoBar is present, avoid duplicate writes
   try {
     if (document.querySelector('.currency-display-section')) return;
-  } catch {}
+  } catch {
+    // Ignore DOM lookup failures in partial render environments.
+  }
 
   const topSipsPerSecondElement: HTMLElement | null = domQuery.getById('topSipsPerSecond');
 
@@ -388,13 +392,15 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
 
   // Soda button progress overlay (highest priority)
   try {
-    if (isThreeSodaEnabled()) {
+    if (config.UI?.ENABLE_3D_SODA_BUTTON && config.UI?.USE_THREE_SODA_BUTTON) {
       // Feed Three.js button if present
       const api = (window as any).sodaThree;
       if (api && typeof currentProgress === 'number') {
         try {
           api.updateProgress(currentProgress);
-        } catch {}
+        } catch {
+          // Ignore optional renderer updates and keep the rest of the UI responsive.
+        }
       }
       // Ring indicator overlay
       const sodaBtnA = document.getElementById('sodaButton') as HTMLElement | null;
@@ -442,7 +448,9 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
           (host as any).__fountain = instance;
           try {
             if (host.id === 'drinkProgressBar') host.classList.add('fountain-host');
-          } catch {}
+          } catch {
+            // Ignore host decoration failures in constrained DOM environments.
+          }
         }
         if (typeof currentProgress === 'number') {
           instance.update(
@@ -493,7 +501,9 @@ export function updateTopSipCounter(): void {
   // If enhanced TopInfoBar is present, avoid duplicate writes
   try {
     if (document.querySelector('.currency-display-section')) return;
-  } catch {}
+  } catch {
+    // Ignore DOM lookup failures in partial render environments.
+  }
 
   const topSipElement = domQuery.getById('topSipValue');
 
@@ -737,10 +747,10 @@ function updateDrinkSpeedUpgradeDisplays(state: any): void {
 
   updateCostDisplay('fasterDrinksCostCompact', fasterCost, canAffordFasterDrinks);
   updateCostDisplay('fasterDrinksCost', fasterCost, canAffordFasterDrinks);
-  updateStatDisplay('currentDrinkSpeedCompact', (currentDrinkSpeed / 1000).toFixed(2) + 's');
+  updateStatDisplay('currentDrinkSpeedCompact', `${(currentDrinkSpeed / 1000).toFixed(2)}s`);
 
   // Update the new faster drinks button display
-  updateStatDisplay('currentDrinkSpeed', (currentDrinkSpeed / 1000).toFixed(2) + 's');
+  updateStatDisplay('currentDrinkSpeed', `${(currentDrinkSpeed / 1000).toFixed(2)}s`);
 }
 
 /**
@@ -807,7 +817,7 @@ function updateLevelUpDisplay(state: any): void {
       if (requirementsEl) {
         const sipsText = formatNumber(nextLevel.unlockRequirement.sips);
 
-        let requirementsText = `${sipsText} sips, ${nextLevel.unlockRequirement.clicks.toLocaleString()} clicks`;
+        const requirementsText = `${sipsText} sips, ${nextLevel.unlockRequirement.clicks.toLocaleString()} clicks`;
 
         requirementsEl.textContent = requirementsText;
         requirementsEl.style.color = canUnlock ? '#2ecc71' : '#ffffff';
@@ -870,7 +880,7 @@ function updateProductionSummaryDisplay(state: any): void {
  */
 function updateSodaStats(state: any): void {
   // Update click value - calculate total click value (base + suction bonuses)
-  let baseClickValue = 1;
+  const baseClickValue = 1;
   const suctionBonus = Number(state.suctionClickBonus || 0);
   const totalClickValue = baseClickValue + suctionBonus;
   updateStatDisplay('clickValue', totalClickValue.toFixed(1));

@@ -46,12 +46,49 @@
 
 /* 3D soda button enhancements - Optimized for visibility */
 .soda-button {
-  /* Ensure 3D button works with new layout */
   position: relative;
   z-index: var(--z-base);
-  /* Ensure button is prominent but reasonably sized */
   min-height: 160px;
   min-width: 160px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.22), transparent 38%),
+    radial-gradient(circle at 70% 78%, rgba(30, 18, 10, 0.55), transparent 32%),
+    linear-gradient(180deg, rgba(38, 20, 12, 0.96), rgba(18, 9, 5, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -18px 28px rgba(0, 0, 0, 0.24),
+    0 20px 40px rgba(12, 8, 5, 0.28);
+  isolation: isolate;
+  contain: layout paint;
+  touch-action: manipulation;
+}
+
+.soda-button::before {
+  content: '';
+  position: absolute;
+  inset: 8% 12% auto;
+  height: 24%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0));
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soda-button:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -18px 28px rgba(0, 0, 0, 0.28),
+    0 24px 44px rgba(12, 8, 5, 0.32);
+}
+
+.soda-button:active,
+.soda-button.soda-clicked {
+  transform: scale(0.97);
+  box-shadow:
+    inset 0 10px 24px rgba(255, 255, 255, 0.08),
+    inset 0 -12px 18px rgba(0, 0, 0, 0.26),
+    0 12px 24px rgba(12, 8, 5, 0.22);
 }
 
 /* Viewport-aware soda button sizing - More reasonable proportions */
@@ -89,6 +126,10 @@
   height: 100%;
   object-fit: contain;
   border-radius: var(--radius-2xl);
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.24));
+  transform: scale(0.94);
 }
 
 /* Settings modal specific styles */

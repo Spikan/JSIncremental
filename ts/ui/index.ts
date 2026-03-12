@@ -47,10 +47,9 @@ import {
 } from './enhanced-affordability';
 import { addThemeStyles } from './soda-drinker-pro-themes';
 import { initializeAuthenticSDP } from './authentic-sdp';
-import { createSoda3DButton } from './soda-3d-lightweight';
-import { isThreeSodaEnabled, createThreeSodaButton } from './soda-3d-three';
 import { initFPSMeter } from './fps-meter';
 import { konamiCodeDetector } from './konami-code';
+import { config } from '../config';
 // import { runFullLayoutValidation } from './layout-validation'; // Disabled - sections removed
 
 // Export all UI modules
@@ -330,12 +329,14 @@ export function updateEnhancedProgressBars(): void {
 }
 
 // Simple error severity levels
-enum ErrorSeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical',
-}
+const ERROR_SEVERITY = {
+  LOW: 'low',
+  MEDIUM: 'medium',
+  HIGH: 'high',
+  CRITICAL: 'critical',
+} as const;
+
+type ErrorSeverity = (typeof ERROR_SEVERITY)[keyof typeof ERROR_SEVERITY];
 
 // Event data types
 interface ClickSodaEventData {
@@ -363,7 +364,7 @@ interface PurchaseEventData {
 function reportUIError(
   error: Error | string | unknown,
   context: string,
-  severity: ErrorSeverity = ErrorSeverity.MEDIUM
+  severity: ErrorSeverity = ERROR_SEVERITY.MEDIUM
 ): void {
   try {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -444,19 +445,19 @@ export function initializeUI(): void {
     // Set up direct soda click handler as fallback
     setupDirectSodaClickHandler();
   } catch (error) {
-    reportUIError(error, 'initialize_ui_main', ErrorSeverity.CRITICAL);
+    reportUIError(error, 'initialize_ui_main', ERROR_SEVERITY.CRITICAL);
   }
 
   // Sync options UI on init
   try {
     updateAutosaveStatusOptimized();
   } catch (error) {
-    reportUIError(error, 'update_autosave_status_init', ErrorSeverity.LOW);
+    reportUIError(error, 'update_autosave_status_init', ERROR_SEVERITY.LOW);
   }
   try {
     // Modernized - audio button handled by store
   } catch (error) {
-    reportUIError(error, 'update_button_sounds_toggle_init', ErrorSeverity.LOW);
+    reportUIError(error, 'update_button_sounds_toggle_init', ERROR_SEVERITY.LOW);
   }
   // Check event system availability
   try {
@@ -492,7 +493,9 @@ export function initializeUI(): void {
           if (threeApi && typeof threeApi.spawnBubble === 'function') {
             threeApi.spawnBubble();
           }
-        } catch {}
+        } catch {
+          // Ignore optional 3D bubble effects for the default button path.
+        }
       }
 
       if (clickData && clickData.gained) {
@@ -575,7 +578,7 @@ export function initializeUI(): void {
       }
     });
   } catch (error) {
-    reportUIError(error, 'event_listener_setup', ErrorSeverity.HIGH);
+    reportUIError(error, 'event_listener_setup', ERROR_SEVERITY.HIGH);
   }
 
   // Modernized - event handling by store
@@ -604,7 +607,7 @@ export function initializeUI(): void {
       logger.warn('Failed to subscribe to level changes:', error);
     }
   } catch (error) {
-    reportUIError(error, 'event_listener_setup', ErrorSeverity.HIGH);
+    reportUIError(error, 'event_listener_setup', ERROR_SEVERITY.HIGH);
   }
 
   // Initialize enhanced UI components
@@ -629,31 +632,37 @@ export function initializeUI(): void {
     // Initialize authentic SDP experience
     initializeAuthenticSDP();
 
-    // Initialize lightweight 3D soda button with performance optimization
+    // Keep the primary click target native by default; 3D is an optional enhancement.
     try {
-      if (isThreeSodaEnabled()) {
-        createThreeSodaButton('#sodaButton')
-          .then(api => {
-            (window as any).sodaThree = api;
-            api.mount();
-            // Pause 3D when offscreen
-            try {
-              const btn = document.getElementById('sodaButton');
-              if (btn && 'IntersectionObserver' in window) {
-                const io = new IntersectionObserver(
-                  entries => {
-                    const e = entries[0];
-                    if (!e) return;
-                    api.setPaused?.(!e.isIntersecting);
-                  },
-                  { threshold: 0.01 }
-                );
-                io.observe(btn);
-              }
-            } catch {}
-          })
-          .catch(err => {
-            logger.error('Failed to initialize Three.js soda button, falling back:', err);
+      if (config.UI?.ENABLE_3D_SODA_BUTTON) {
+        void Promise.all([import('./soda-3d-lightweight'), import('./soda-3d-three')])
+          .then(([lightweightModule, threeModule]) => {
+            const { createSoda3DButton } = lightweightModule;
+
+            if (threeModule.isThreeSodaEnabled()) {
+              return threeModule.createThreeSodaButton('#sodaButton').then(api => {
+                (window as any).sodaThree = api;
+                api.mount();
+                // Pause 3D when offscreen
+                try {
+                  const btn = document.getElementById('sodaButton');
+                  if (btn && 'IntersectionObserver' in window) {
+                    const io = new IntersectionObserver(
+                      entries => {
+                        const e = entries[0];
+                        if (!e) return;
+                        api.setPaused?.(!e.isIntersecting);
+                      },
+                      { threshold: 0.01 }
+                    );
+                    io.observe(btn);
+                  }
+                } catch {
+                  // Ignore observer setup failures; the button still works without pausing.
+                }
+              });
+            }
+
             const soda3DButton = createSoda3DButton({
               containerSelector: '#sodaButton',
               size: 200,
@@ -663,23 +672,12 @@ export function initializeUI(): void {
               frameRateLimit: 30,
             });
             (window as any).soda3DButton = soda3DButton;
+            return undefined;
+          })
+          .catch(err => {
+            logger.error('Failed to initialize 3D soda button enhancement:', err);
           });
-      } else {
-        const soda3DButton = createSoda3DButton({
-          containerSelector: '#sodaButton',
-          size: 200,
-          rotationSpeed: 1.0,
-          hoverSpeedMultiplier: 2.0,
-          performanceMode: 'medium', // Start with balanced performance
-          frameRateLimit: 30, // 30fps default
-        });
-        (window as any).soda3DButton = soda3DButton;
       }
-
-      // Click handler is now built into the 3D button
-      // No need to add additional handlers
-
-      logger.info('Lightweight 3D soda button initialized with performance optimization');
     } catch (error) {
       logger.error('Failed to initialize 3D soda button:', error);
     }
@@ -713,7 +711,9 @@ export function initializeUI(): void {
           try {
             const handleSodaClick = (clicksSystem as any).handleSodaClickFactory();
             await handleSodaClick(1);
-          } catch {}
+          } catch {
+            // Ignore keyboard shortcut click failures and preserve input handling.
+          }
           return;
         }
         const num = Number(e.key);
@@ -724,7 +724,9 @@ export function initializeUI(): void {
           if (el) el.click();
         }
       });
-    } catch {}
+    } catch {
+      // Ignore keyboard shortcut registration failures in limited environments.
+    }
 
     // Layout validation disabled - sections were intentionally removed
     // try {
@@ -733,7 +735,7 @@ export function initializeUI(): void {
     //   console.warn('Layout validation failed:', error);
     // }
   } catch (error) {
-    reportUIError(error, 'initialize_enhanced_ui', ErrorSeverity.MEDIUM);
+    reportUIError(error, 'initialize_enhanced_ui', ERROR_SEVERITY.MEDIUM);
   }
 }
 
@@ -753,7 +755,9 @@ function initializeEnhancedUIComponents(): void {
     // Initialize enhanced audio manager (music disabled by request)
     try {
       enhancedAudioManager.stopBackgroundMusic?.();
-    } catch {}
+    } catch {
+      // Ignore audio teardown failures during UI initialization.
+    }
 
     // Initialize audio controls manager
     audioControlsManager.initialize();
@@ -890,10 +894,11 @@ export function updateAllDisplays(): void {
 // isMobileDevice function removed - no longer needed
 
 // Error Boundary Wrapper for Critical UI Operations
-export function withErrorBoundary<T extends (...args: unknown[]) => unknown>(
+// eslint-disable-next-line no-unused-vars
+export function withErrorBoundary<T extends (...params: unknown[]) => unknown>(
   fn: T,
   context: string,
-  severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+  severity: ErrorSeverity = ERROR_SEVERITY.MEDIUM,
   fallback?: () => void
 ): T {
   return ((...args: Parameters<T>) => {
@@ -907,7 +912,7 @@ export function withErrorBoundary<T extends (...args: unknown[]) => unknown>(
         try {
           fallback();
         } catch (fallbackError) {
-          reportUIError(fallbackError, `${context}_fallback`, ErrorSeverity.HIGH);
+          reportUIError(fallbackError, `${context}_fallback`, ERROR_SEVERITY.HIGH);
         }
       }
 
@@ -921,7 +926,7 @@ export function withErrorBoundary<T extends (...args: unknown[]) => unknown>(
 export const safeUpdateAllDisplays = withErrorBoundary(
   updateAllDisplays,
   'update_all_displays',
-  ErrorSeverity.HIGH,
+  ERROR_SEVERITY.HIGH,
   () => {
     // No fallback - fail fast instead
     throw new Error('Display update failed - no fallback available');
@@ -939,7 +944,7 @@ export function initializeErrorBoundaries(): void {
       // safeToggleSidebarSection removed - no longer needed
     }
   } catch (error) {
-    reportUIError(error, 'initialize_error_boundaries', ErrorSeverity.HIGH);
+    reportUIError(error, 'initialize_error_boundaries', ERROR_SEVERITY.HIGH);
   }
 }
 
