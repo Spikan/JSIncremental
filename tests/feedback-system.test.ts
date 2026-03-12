@@ -15,49 +15,71 @@ const mockElements = {
   },
 };
 
+const createMockElement = () => {
+  const element: any = {
+    className: '',
+    innerHTML: '',
+    textContent: '',
+    style: { cssText: '' },
+    children: [] as any[],
+    setAttribute: vi.fn(),
+    remove: vi.fn(),
+    parentNode: { removeChild: vi.fn() },
+    appendChild: vi.fn((child: any) => {
+      element.children.push(child);
+      const childText = child?.textContent ?? child?.innerHTML ?? '';
+      element.innerHTML += childText;
+      return child;
+    }),
+    addEventListener: vi.fn(),
+    querySelector: vi.fn((selector: string) => {
+      if (selector === '.modal-overlay') {
+        return { style: { cssText: '' } };
+      }
+      if (selector === '.modal-content') {
+        return {
+          style: { cssText: '' },
+          querySelector: vi.fn((nestedSelector: string) => {
+            if (nestedSelector === 'h2') {
+              return { style: { cssText: '' } };
+            }
+            if (nestedSelector === '.offline-stats') {
+              return { style: { cssText: '' } };
+            }
+            if (nestedSelector === '.offline-continue-btn') {
+              return { style: { cssText: '' } };
+            }
+            return null;
+          }),
+        };
+      }
+      return null;
+    }),
+  };
+
+  return element;
+};
+
 // Mock DOM
 (global as any).document = {
   getElementById: (id: string) => mockElements[id as keyof typeof mockElements] || null,
-  createElement: vi.fn((tag: string) => {
-    const element = {
-      className: '',
-      innerHTML: '',
-      textContent: '',
-      style: { cssText: '' },
-      setAttribute: vi.fn(),
-      remove: vi.fn(),
-      parentNode: { removeChild: vi.fn() },
-      querySelector: vi.fn((selector: string) => {
-        // Mock nested elements for modal testing
-        if (selector === '.modal-overlay') {
-          return { style: { cssText: '' } };
-        }
-        if (selector === '.modal-content') {
-          return {
-            style: { cssText: '' },
-            querySelector: vi.fn((nestedSelector: string) => {
-              if (nestedSelector === 'h2') {
-                return { style: { cssText: '' } };
-              }
-              if (nestedSelector === '.offline-stats') {
-                return { style: { cssText: '' } };
-              }
-              if (nestedSelector === '.offline-continue-btn') {
-                return { style: { cssText: '' } };
-              }
-              return null;
-            }),
-          };
-        }
-        return null;
-      }),
-    };
-    return element;
-  }),
+  createElement: vi.fn((_tag: string) => createMockElement()),
   body: {
+    appendChild: vi.fn((child: any) => {
+      child.parentNode = { removeChild: vi.fn() };
+      return child;
+    }),
+  },
+  head: {
     appendChild: vi.fn(),
   },
-  querySelector: vi.fn(),
+  querySelector: vi.fn((selector: string) => {
+    if (selector.startsWith('#')) {
+      const id = selector.slice(1);
+      return mockElements[id as keyof typeof mockElements] || null;
+    }
+    return null;
+  }),
 };
 
 // Mock window globals
@@ -76,6 +98,9 @@ const mockElements = {
     },
   },
   prettify: vi.fn((value: any) => value.toString()),
+  innerWidth: 1280,
+  innerHeight: 720,
+  requestAnimationFrame: vi.fn((_callback: FrameRequestCallback) => 1),
 };
 
 // Mock prettify function
@@ -90,6 +115,7 @@ const mockElements = {
 });
 
 (global as any).clearTimeout = vi.fn();
+(global as any).requestAnimationFrame = (global as any).window.requestAnimationFrame;
 
 describe('Feedback System', () => {
   let feedback: any;
@@ -136,7 +162,7 @@ describe('Feedback System', () => {
       const element = (document.createElement as any).mock.results[0].value;
       expect(element.setAttribute).toHaveBeenCalledWith(
         'aria-label',
-        'Critical hit! Gained 300 sips'
+        'Critical hit! Gained 300.00 sips'
       );
     });
 
@@ -239,8 +265,8 @@ describe('Feedback System', () => {
       feedback.showPurchaseFeedback('Test Item', 100);
 
       const element = (document.createElement as any).mock.results[0].value;
-      expect(element.innerHTML).toContain('Test Item');
-      expect(element.innerHTML).toContain('-100 sips');
+      expect(element.children[0]?.textContent).toBe('Test Item');
+      expect(element.children[1]?.textContent).toBe('-100.00 sips');
     });
 
     it('should set purchase feedback accessibility attributes', () => {
@@ -251,7 +277,7 @@ describe('Feedback System', () => {
       expect(element.setAttribute).toHaveBeenCalledWith('aria-live', 'polite');
       expect(element.setAttribute).toHaveBeenCalledWith(
         'aria-label',
-        'Purchased Test Item for 75 sips'
+        'Purchased Test Item for 75.00 sips'
       );
     });
 
@@ -309,8 +335,8 @@ describe('Feedback System', () => {
       feedback.showLevelUpFeedback(1000);
 
       const element = (document.createElement as any).mock.results[0].value;
-      expect(element.innerHTML).toContain('LEVEL UP!');
-      expect(element.innerHTML).toContain('+1,000 sips bonus!');
+      expect(element.children[0]?.textContent).toContain('LEVEL UP!');
+      expect(element.children[1]?.textContent).toBe('+1.00K sips bonus!');
     });
 
     it('should set level up feedback accessibility attributes', () => {
@@ -321,7 +347,7 @@ describe('Feedback System', () => {
       expect(element.setAttribute).toHaveBeenCalledWith('aria-live', 'assertive');
       expect(element.setAttribute).toHaveBeenCalledWith(
         'aria-label',
-        'Level up! Gained 750 bonus sips'
+        'Level up! Gained 750.00 bonus sips'
       );
     });
 
@@ -378,19 +404,21 @@ describe('Feedback System', () => {
       feedback.showOfflineProgress(3600, 1800);
 
       const element = (document.createElement as any).mock.results[0].value;
-      expect(element.innerHTML).toContain('Welcome Back!');
-      expect(element.innerHTML).toContain('1 hour 0 minutes');
-      expect(element.innerHTML).toContain('+1,800');
+      expect(element.children[1]?.children[0]?.textContent).toBe('Welcome Back!');
+      expect(element.children[1]?.children[1]?.children[0]?.children[1]?.textContent).toBe(
+        '1 hour 0 minutes'
+      );
+      expect(element.children[1]?.children[1]?.children[1]?.children[1]?.textContent).toBe(
+        '+1.80K'
+      );
     });
 
     it('should set modal accessibility attributes', () => {
       feedback.showOfflineProgress(900, 450);
 
       const element = (document.createElement as any).mock.results[0].value;
-      // The current implementation doesn't set accessibility attributes on the modal
-      // This test verifies the modal is created without throwing errors
-      expect(element.innerHTML).toContain('Welcome Back!');
-      expect(element.innerHTML).toContain('Continue Playing');
+      expect(element.children[1]?.children[0]?.textContent).toBe('Welcome Back!');
+      expect(element.children[1]?.children[2]?.textContent).toBe('Continue Playing');
     });
 
     it('should auto-close modal after 10 seconds', () => {

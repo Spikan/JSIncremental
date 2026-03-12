@@ -618,8 +618,11 @@ export const getStoreActions = () => useGameStore.getState().actions;
 // Legacy compatibility functions for tests
 export function createLegacyStore(initialState: any = {}) {
   return {
-    getState: () => ({ ...defaultState, ...initialState }),
-    setState: (partial: any) => useGameStore.setState(partial),
+    getState: () => ({ ...useGameStore.getState(), ...initialState }),
+    setState: (partial: any) => {
+      initialState = { ...initialState, ...partial };
+      useGameStore.setState(partial);
+    },
     subscribe: (callback: any) => useGameStore.subscribe(callback),
   };
 }
@@ -636,6 +639,9 @@ export const selectors = {
   cups: (state: any) => state.cups,
   level: (state: any) => state.level,
   spd: (state: any) => state.spd,
+  drinkProgress: (state: any) => state.drinkProgress,
+  drinkRate: (state: any) => state.drinkRate,
+  options: (state: any) => state.options,
 };
 
 export function migrateToZustand(oldState: any) {

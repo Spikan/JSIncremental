@@ -107,6 +107,27 @@ export function toDecimal(value: NumericValue): DecimalType {
 
   // Handle objects that might be corrupted Decimal objects
   if (typeof value === 'object' && value !== null) {
+    // Accept Decimal-like test doubles and other numeric wrappers.
+    try {
+      if (typeof (value as any).toString === 'function') {
+        const asString = (value as any).toString();
+        const candidate = new Decimal(asString);
+        const test = candidate.toString();
+        if (test !== 'NaN' && test !== 'Infinity' && test !== '-Infinity') {
+          return candidate;
+        }
+      }
+    } catch {}
+
+    try {
+      if (typeof (value as any).toNumber === 'function') {
+        const asNumber = (value as any).toNumber();
+        if (Number.isFinite(asNumber)) {
+          return new Decimal(asNumber);
+        }
+      }
+    } catch {}
+
     // Check if it looks like a corrupted Decimal object
     if ('sign' in value && 'mag' in value && 'layer' in value) {
       const signVal = (value as any).sign;

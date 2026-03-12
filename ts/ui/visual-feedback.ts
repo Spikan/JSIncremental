@@ -17,7 +17,10 @@ export class VisualFeedbackSystem {
   private ensureStylesInstalled(): void {
     if (this.stylesInstalled || typeof document === 'undefined') return;
     if (!document.head || typeof document.createElement !== 'function') return;
-    if (typeof document.querySelector === 'function' && document.querySelector('#visual-feedback-styles')) {
+    if (
+      typeof document.querySelector === 'function' &&
+      document.querySelector('#visual-feedback-styles')
+    ) {
       this.stylesInstalled = true;
       return;
     }

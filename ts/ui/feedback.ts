@@ -525,7 +525,11 @@ export function showOfflineProgress(timeSeconds: number, earnings: number): void
   const earningsValue = document.createElement('span');
   earningsValue.className = 'value';
   earningsValue.textContent = `+${formatNumber(earnings)}`;
-  if (!appendChildSafely(earningsRow, earningsLabel) || !appendChildSafely(earningsRow, earningsValue)) return;
+  if (
+    !appendChildSafely(earningsRow, earningsLabel) ||
+    !appendChildSafely(earningsRow, earningsValue)
+  )
+    return;
 
   if (!appendChildSafely(stats, timeRow) || !appendChildSafely(stats, earningsRow)) return;
 

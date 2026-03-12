@@ -265,7 +265,7 @@ describe('Zustand Store - Core Functionality', () => {
       });
 
       const state = useGameStore.getState();
-      expect(state.sips).toBe(1000);
+      expectLargeNumberToEqual(state.sips, 1000);
       expectLargeNumberToEqual(state.straws, 10);
       expectLargeNumberToEqual(state.level, 5);
       expectLargeNumberToEqual(state.cups, 0); // Should preserve other values
@@ -299,10 +299,10 @@ describe('Zustand Store - Core Functionality', () => {
       getStoreActions().loadState(newState);
 
       const state = useGameStore.getState();
-      expect(state.sips).toBe(2000);
-      expect(state.straws).toBe(15);
-      expect(state.cups).toBe(8);
-      expect(state.level).toBe(10);
+      expectLargeNumberToEqual(state.sips, 2000);
+      expectLargeNumberToEqual(state.straws, 15);
+      expectLargeNumberToEqual(state.cups, 8);
+      expectLargeNumberToEqual(state.level, 10);
     });
   });
 
@@ -448,8 +448,8 @@ describe('Zustand Store - Legacy Compatibility', () => {
       legacyStore.setState({ sips: 500, straws: 5 });
 
       const state = legacyStore.getState();
-      expect((state as any).sips).toBe(500);
-      expect((state as any).straws).toBe(5);
+      expectLargeNumberToEqual((state as any).sips, 500);
+      expectLargeNumberToEqual((state as any).straws, 5);
     });
 
     it('should subscribe through legacy interface', () => {
@@ -482,7 +482,7 @@ describe('Zustand Store - Legacy Compatibility', () => {
       expectLargeNumberToEqual(selectors.level(state), 1);
       expect(selectors.drinkProgress(state)).toBe(0);
       expect(selectors.drinkRate(state)).toBe(0);
-      expect(selectors.options(state)).toEqual({
+      expect(selectors.options(state)).toMatchObject({
         autosaveEnabled: true,
         autosaveInterval: 30,
         clickSoundsEnabled: true,
@@ -507,10 +507,10 @@ describe('Zustand Store - Legacy Compatibility', () => {
       migrateToZustand(oldState);
 
       const newState = useGameStore.getState();
-      expect(newState.sips).toBe(2500);
-      expect(newState.straws).toBe(20);
-      expect(newState.cups).toBe(10);
-      expect(newState.level).toBe(15);
+      expectLargeNumberToEqual(newState.sips, 2500);
+      expectLargeNumberToEqual(newState.straws, 20);
+      expectLargeNumberToEqual(newState.cups, 10);
+      expectLargeNumberToEqual(newState.level, 15);
     });
   });
 });

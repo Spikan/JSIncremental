@@ -37,7 +37,9 @@ class KonamiCodeDetector {
     if (typeof document === 'undefined') return;
 
     if (document.readyState === 'loading' && typeof document.addEventListener === 'function') {
-      document.addEventListener('DOMContentLoaded', () => this.initializeDetection(), { once: true });
+      document.addEventListener('DOMContentLoaded', () => this.initializeDetection(), {
+        once: true,
+      });
       return;
     }
 

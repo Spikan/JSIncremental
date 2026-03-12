@@ -1,214 +1,153 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { JSDOM } from 'jsdom';
 
-// Focused test to debug the UI update issue
 describe('UI Update Debug', () => {
   let dom: JSDOM;
-  let originalWindow: any;
-  let originalDocument: any;
+  let originalWindow: typeof global.window;
+  let originalDocument: typeof global.document;
+  let originalNavigator: typeof global.navigator;
+  let originalLocation: typeof global.location;
 
   beforeEach(() => {
-    // Create a minimal DOM environment
+    vi.resetModules();
+
     dom = new JSDOM(
       `
       <!DOCTYPE html>
       <html>
         <head><title>Test</title></head>
         <body>
-          <div id="sipCounter">0</div>
-          <div id="drinkProgressFill" style="width: 0%"></div>
+          <div id="sodaButton">Soda Button</div>
+          <div id="drinkProgressBar">
+            <div id="drinkProgressFill" style="width: 0%"></div>
+          </div>
+          <div id="topSipValue">0</div>
+          <div id="topSipsPerDrink">0</div>
         </body>
       </html>
     `,
-      {
-        url: 'https://spikan.github.io/JSIncremental/',
-      }
+      { url: 'https://spikan.github.io/JSIncremental/' }
     );
 
     originalWindow = global.window;
     originalDocument = global.document;
+    originalNavigator = global.navigator;
+    originalLocation = global.location;
 
     global.window = dom.window as any;
-    global.document = dom.window.document;
+    global.document = dom.window.document as any;
     global.navigator = dom.window.navigator as any;
     global.location = dom.window.location as any;
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    try {
+      const { domQuery } = await import('../ts/services/dom-query');
+      domQuery.clearCache();
+      domQuery.clearTimeouts();
+    } catch {}
+
     global.window = originalWindow;
     global.document = originalDocument;
+    global.navigator = originalNavigator;
+    global.location = originalLocation;
     vi.clearAllMocks();
   });
 
-  it('should test basic DOM manipulation', () => {
-    const sipCounter = global.document.getElementById('sipCounter');
-    const drinkProgressFill = global.document.getElementById('drinkProgressFill');
+  it('updates the current top-level UI elements from store state', async () => {
+    const { config } = await import('../ts/config');
+    config.UI.FOUNTAIN_SODA_PROGRESS = false;
+    config.UI.SODA_BUTTON_PROGRESS = false;
+    config.UI.USE_THREE_SODA_BUTTON = false;
 
-    expect(sipCounter).toBeTruthy();
-    expect(drinkProgressFill).toBeTruthy();
-
-    // Test basic DOM updates
-    sipCounter!.textContent = '5';
-    drinkProgressFill!.style.width = '50%';
-
-    expect(sipCounter!.textContent).toBe('5');
-    expect(drinkProgressFill!.style.width).toBe('50%');
-  });
-
-  it('should test UI update functions', async () => {
-    // Import the UI module
+    const { toDecimal } = await import('../ts/core/numbers/simplified');
+    const { useGameStore } = await import('../ts/core/state/zustand-store');
     const uiModule = await import('../ts/ui/index');
 
-    // Mock the App object
-    const mockApp = {
-      state: {
-        getState: () => ({
-          sips: { toString: () => '10' },
-          drinkProgress: 75.5,
-        }),
-      },
-      ui: uiModule,
-    };
-
-    (global.window as any).App = mockApp;
-
-    // Test updateTopSipCounter
-    if (uiModule.updateTopSipCounter) {
-      const sipCounter = global.document.getElementById('sipCounter');
-      uiModule.updateTopSipCounter();
-      expect(sipCounter!.textContent).toBe('10');
-    }
-
-    // Test updateDrinkProgress
-    if (uiModule.updateDrinkProgress) {
-      const drinkProgressFill = global.document.getElementById('drinkProgressFill');
-      uiModule.updateDrinkProgress();
-      expect(drinkProgressFill!.style.width).toBe('75.5%');
-    }
-  });
-
-  it('should test drink system integration', async () => {
-    // Import the drink system
-    const { processDrinkFactory } = await import('../ts/core/systems/drink-system');
-
-    // Create a simple mock
-    const mockSetSips = vi.fn();
-    const mockSetLastDrinkTime = vi.fn();
-
-    const processDrink = processDrinkFactory({
-      getNow: () => Date.now(),
-      getApp: () => ({
-        state: {
-          getState: () => ({
-            sips: { toString: () => '1' },
-            drinkRate: 1000,
-            lastDrinkTime: Date.now() - 2000,
-          }),
-          setState: vi.fn(),
-        },
-        stateBridge: {
-          setLastDrinkTime: vi.fn(),
-          setDrinkProgress: vi.fn(),
-        },
-      }),
-      getGameConfig: () => ({
-        BALANCE: { BASE_SIPS_PER_DRINK: 1 },
-      }),
-      getSips: () => ({ toString: () => '1' }),
-      setSips: mockSetSips,
-      getSipsPerDrink: () => ({ toString: () => '1' }),
-      getDrinkRate: () => 1000,
-      getLastDrinkTime: () => Date.now() - 2000,
-      setLastDrinkTime: mockSetLastDrinkTime,
-      getSpd: () => ({ toString: () => '1' }),
-      getTotalSipsEarned: () => ({ toString: () => '0' }),
-      getHighestSipsPerSecond: () => ({ toString: () => '0' }),
-      getLastAutosaveClockMs: () => Date.now(),
-      setLastAutosaveClockMs: vi.fn(),
+    useGameStore.setState({
+      sips: toDecimal(10),
+      spd: toDecimal(2),
+      drinkProgress: 75.5,
+      drinkRate: 1000,
     });
 
-    // Test drink processing
-    expect(() => processDrink()).not.toThrow();
+    uiModule.updateTopSipCounter();
+    uiModule.updateTopSipsPerDrink();
+    uiModule.updateDrinkProgress();
 
-    // Check if setSips was called
-    expect(mockSetSips).toHaveBeenCalled();
-    expect(mockSetLastDrinkTime).toHaveBeenCalled();
+    expect(global.document.getElementById('topSipValue')!.textContent).toBe('10.00');
+    expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('2.00');
+    expect(global.document.getElementById('drinkProgressFill')!.style.width).toBe('75.5%');
   });
 
-  it('should test the complete flow', async () => {
-    // This test simulates the exact flow from the production logs
+  it('processDrinkFactory updates store-shaped state through the injected setter', async () => {
+    const { toDecimal } = await import('../ts/core/numbers/simplified');
+    const { processDrinkFactory } = await import('../ts/core/systems/drink-system');
 
-    // 1. Set up the environment
-    const sipCounter = global.document.getElementById('sipCounter');
-    const drinkProgressFill = global.document.getElementById('drinkProgressFill');
+    const mockSetState = vi.fn();
+    const processDrink = processDrinkFactory({
+      getNow: () => 2000,
+      getState: () => ({
+        sips: toDecimal(0),
+        totalSipsEarned: toDecimal(0),
+        highestSipsPerSecond: toDecimal(0),
+        straws: 1,
+        cups: 0,
+        widerStraws: 0,
+        betterCups: 0,
+        drinkRate: 1000,
+        lastDrinkTime: 0,
+      }),
+      setState: mockSetState,
+    });
 
-    // 2. Import modules
+    await processDrink();
+
+    expect(mockSetState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        spd: expect.objectContaining({ toString: expect.any(Function) }),
+      })
+    );
+    expect(mockSetState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sips: expect.objectContaining({ toString: expect.any(Function) }),
+        totalSipsEarned: expect.objectContaining({ toString: expect.any(Function) }),
+        lastDrinkTime: 2000,
+        drinkProgress: 0,
+      })
+    );
+  });
+
+  it('keeps the UI in sync after a real drink cycle with the current store contract', async () => {
+    const { config } = await import('../ts/config');
+    config.UI.FOUNTAIN_SODA_PROGRESS = false;
+    config.UI.SODA_BUTTON_PROGRESS = false;
+    config.UI.USE_THREE_SODA_BUTTON = false;
+
+    const { toDecimal } = await import('../ts/core/numbers/simplified');
+    const { useGameStore } = await import('../ts/core/state/zustand-store');
+    const { processDrink } = await import('../ts/core/systems/drink-system');
     const uiModule = await import('../ts/ui/index');
-    const { processDrinkFactory } = await import('../ts/core/systems/drink-system');
 
-    // 3. Create the drink system
-    const processDrink = processDrinkFactory({
-      getNow: () => Date.now(),
-      getApp: () => ({
-        state: {
-          getState: () => ({
-            sips: { toString: () => '1' },
-            drinkRate: 1000,
-            lastDrinkTime: Date.now() - 2000,
-          }),
-          setState: vi.fn(),
-        },
-        stateBridge: {
-          setLastDrinkTime: vi.fn(),
-          setDrinkProgress: vi.fn(),
-        },
-      }),
-      getGameConfig: () => ({
-        BALANCE: { BASE_SIPS_PER_DRINK: 1 },
-      }),
-      getSips: () => ({ toString: () => '1' }),
-      setSips: vi.fn(),
-      getSipsPerDrink: () => ({ toString: () => '1' }),
-      getDrinkRate: () => 1000,
-      getLastDrinkTime: () => Date.now() - 2000,
-      setLastDrinkTime: vi.fn(),
-      getSpd: () => ({ toString: () => '1' }),
-      getTotalSipsEarned: () => ({ toString: () => '0' }),
-      getHighestSipsPerSecond: () => ({ toString: () => '0' }),
-      getLastAutosaveClockMs: () => Date.now(),
-      setLastAutosaveClockMs: vi.fn(),
+    useGameStore.setState({
+      sips: toDecimal(0),
+      spd: toDecimal(0),
+      totalSipsEarned: toDecimal(0),
+      highestSipsPerSecond: toDecimal(0),
+      straws: 1,
+      cups: 0,
+      widerStraws: 0,
+      betterCups: 0,
+      drinkRate: 1000,
+      drinkProgress: 50,
+      lastDrinkTime: 0,
     });
 
-    // 4. Mock the App object
-    const mockApp = {
-      state: {
-        getState: () => ({
-          sips: { toString: () => '5' },
-          drinkProgress: 50.0,
-        }),
-      },
-      ui: uiModule,
-    };
+    await processDrink();
+    uiModule.updateTopSipCounter();
+    uiModule.updateTopSipsPerDrink();
 
-    (global.window as any).App = mockApp;
-
-    // 5. Test the complete flow
-    console.log('Testing complete flow...');
-
-    // Process drink
-    processDrink();
-
-    // Update UI
-    if (uiModule.updateTopSipCounter) {
-      uiModule.updateTopSipCounter();
-      expect(sipCounter!.textContent).toBe('5');
-    }
-
-    if (uiModule.updateDrinkProgress) {
-      uiModule.updateDrinkProgress();
-      expect(drinkProgressFill!.style.width).toBe('50%');
-    }
-
-    console.log('Complete flow test passed');
+    expect(global.document.getElementById('topSipValue')!.textContent).toBe('3.00');
+    expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('3.00');
   });
 });

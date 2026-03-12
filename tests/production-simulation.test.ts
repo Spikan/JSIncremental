@@ -1,264 +1,166 @@
-import { describe, it, expect, vi, beforeEach, afterEach, fail } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock the production environment
-const mockProductionEnvironment = () => {
-  // Mock window object with production-like state
-  Object.defineProperty(window, 'location', {
-    value: {
-      origin: 'https://spikan.github.io',
-      pathname: '/JSIncremental/',
-    },
-    writable: true,
-  });
+async function loadRuntime() {
+  const storeModule = await import('../ts/core/state/zustand-store');
+  const loopModule = await import('../ts/core/systems/loop-system');
+  const drinkModule = await import('../ts/core/systems/drink-system');
+  const gameInitModule = await import('../ts/core/systems/game-init');
+  const uiModule = await import('../ts/ui/index');
 
-  // Mock GAME_CONFIG
-  (window as any).GAME_CONFIG = {
-    BAL: { BASE_SIPS_PER_DRINK: 1 },
-    TIMING: { DEFAULT_DRINK_RATE: 5000 },
+  return {
+    ...storeModule,
+    ...loopModule,
+    ...drinkModule,
+    ...gameInitModule,
+    ...uiModule,
   };
-
-  // Mock global variables
-  (window as any).sips = 0;
-  (window as any).sipsPerDrink = 1;
-  (window as any).drinkRate = 5000;
-  (window as any).lastDrinkTime = Date.now() - 5000;
-  (window as any).spd = 0;
-  (window as any).__lastAutosaveClockMs = 0;
-
-  // Mock Decimal
-  (window as any).Decimal = class MockDecimal {
-    constructor(value: any) {
-      this.value = value;
-    }
-    toNumber() {
-      return Number(this.value);
-    }
-    mul(other: any) {
-      return new MockDecimal(this.value * other.value);
-    }
-    div(other: any) {
-      return new MockDecimal(this.value / other.value);
-    }
-    add(other: any) {
-      return new MockDecimal(this.value + other.value);
-    }
-    sub(other: any) {
-      return new MockDecimal(this.value - other.value);
-    }
-    gt(other: any) {
-      return this.value > other.value;
-    }
-    lt(other: any) {
-      return this.value < other.value;
-    }
-    gte(other: any) {
-      return this.value >= other.value;
-    }
-    lte(other: any) {
-      return this.value <= other.value;
-    }
-    eq(other: any) {
-      return this.value === other.value;
-    }
-    toString() {
-      return String(this.value);
-    }
-  };
-};
+}
 
 describe('Production Environment Simulation', () => {
   beforeEach(() => {
-    // Clear all mocks
+    vi.resetModules();
     vi.clearAllMocks();
 
-    // Reset DOM
+    (window as any).__TEST_ENV__ = true;
+    (window as any).GAME_CONFIG = {
+      BAL: { BASE_SIPS_PER_DRINK: 1 },
+      TIMING: { DEFAULT_DRINK_RATE: 5000, CLICK_STREAK_WINDOW: 3000 },
+    };
+    (window as any).Decimal = (globalThis as any).Decimal;
+
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    Object.defineProperty(window, 'requestAnimationFrame', {
+      writable: true,
+      value: vi.fn(() => 1),
+    });
+
+    Object.defineProperty(window, 'cancelAnimationFrame', {
+      writable: true,
+      value: vi.fn(),
+    });
+
+    (globalThis as any).requestAnimationFrame = window.requestAnimationFrame;
+    (globalThis as any).cancelAnimationFrame = window.cancelAnimationFrame;
+
     document.body.innerHTML = `
-      <div id="splashScreen" style="display: block;"></div>
       <div id="gameContent" style="display: none;"></div>
       <button id="sodaButton">Soda</button>
+      <div id="topSipValue">0</div>
+      <div id="topSipsPerDrink">0</div>
+      <div id="topSipsPerSecond">0</div>
+      <div id="drinkProgressBar"><div id="drinkProgressFill" style="width: 0%"></div></div>
     `;
-
-    // Mock production environment
-    mockProductionEnvironment();
-
-    // Mock console methods to track calls
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    try {
+      const loopModule = await import('../ts/core/systems/loop-system');
+      loopModule.stop();
+    } catch {}
     vi.restoreAllMocks();
   });
 
-  it('should load ts/index.ts module without hanging', async () => {
-    // This test simulates the production module loading
-    const startTime = Date.now();
+  it('loads the production-facing runtime modules without errors', async () => {
+    const runtime = await loadRuntime();
 
-    try {
-      // Import the main module (this is what happens in production)
-      const module = await import('../ts/index.ts');
-
-      const loadTime = Date.now() - startTime;
-
-      // Should load within reasonable time (not hang)
-      expect(loadTime).toBeLessThan(5000);
-
-      // Should not throw errors
-      expect(module).toBeDefined();
-    } catch (error) {
-      fail(`Module loading failed: ${error}`);
-    }
+    expect(runtime.useGameStore).toBeDefined();
+    expect(typeof runtime.start).toBe('function');
+    expect(typeof runtime.stop).toBe('function');
+    expect(typeof runtime.getProcessDrink).toBe('function');
+    expect(typeof runtime.startGameCore).toBe('function');
+    expect(typeof runtime.updateTopSipCounter).toBe('function');
   });
 
-  it('should initialize App object with all required systems', async () => {
-    // Wait for module to load
-    await import('../ts/index.ts');
-
-    // Wait a bit for initialization
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    // Check that App object exists and has required properties
-    expect((window as any).App).toBeDefined();
-    expect((window as any).App.state).toBeDefined();
-    expect((window as any).App.systems).toBeDefined();
-    expect((window as any).App.systems.loop).toBeDefined();
-    expect((window as any).App.systems.drink).toBeDefined();
-    expect((window as any).App.ui).toBeDefined();
-  });
-
-  it('should start game loop and keep it running', async () => {
-    // Load module
-    await import('../ts/index.ts');
-
-    // Wait for initialization
-    await new Promise(resolve => setTimeout(resolve, 200));
-
-    const App = (window as any).App;
-    expect(App).toBeDefined();
-    expect(App.systems.loop).toBeDefined();
-    expect(App.systems.drink).toBeDefined();
-
-    // Mock requestAnimationFrame to track calls
+  it('runs the loop continuously until stopped', async () => {
+    const runtime = await loadRuntime();
     let rafCallCount = 0;
-    const originalRAF = window.requestAnimationFrame;
+
     window.requestAnimationFrame = vi.fn(callback => {
       rafCallCount++;
-      // Simulate the callback being called
-      setTimeout(callback, 16); // ~60fps
-      return 1;
+      return setTimeout(() => callback(performance.now()), 16) as unknown as number;
     });
+    window.cancelAnimationFrame = vi.fn(handle => clearTimeout(handle));
+    (globalThis as any).requestAnimationFrame = window.requestAnimationFrame;
+    (globalThis as any).cancelAnimationFrame = window.cancelAnimationFrame;
 
-    // Start the loop
-    App.systems.loop.start({
+    runtime.start({
       updateDrinkProgress: vi.fn(),
-      processDrink: vi.fn(),
+      processDrink: vi.fn(async () => {}),
       updateStats: vi.fn(),
       updateUI: vi.fn(),
     });
 
-    // Wait for multiple frames
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 200));
+    runtime.stop();
 
-    // Should have called requestAnimationFrame multiple times
     expect(rafCallCount).toBeGreaterThan(3);
-
-    // Restore original RAF
-    window.requestAnimationFrame = originalRAF;
   });
 
-  it('should process drinks when loop is running', async () => {
-    // Load module
-    await import('../ts/index.ts');
+  it('processes drinks through the real store-backed drink system', async () => {
+    const runtime = await loadRuntime();
+    const processDrink = runtime.getProcessDrink();
 
-    // Wait for initialization
-    await new Promise(resolve => setTimeout(resolve, 200));
-
-    const App = (window as any).App;
-    const processDrinkSpy = vi.fn();
-
-    // Start the loop with mocked processDrink
-    App.systems.loop.start({
-      updateDrinkProgress: vi.fn(),
-      processDrink: processDrinkSpy,
-      updateStats: vi.fn(),
-      updateUI: vi.fn(),
+    runtime.useGameStore.setState({
+      sips: new (globalThis as any).Decimal(0),
+      totalSipsEarned: new (globalThis as any).Decimal(0),
+      highestSipsPerSecond: new (globalThis as any).Decimal(0),
+      straws: new (globalThis as any).Decimal(1),
+      cups: new (globalThis as any).Decimal(0),
+      widerStraws: new (globalThis as any).Decimal(0),
+      betterCups: new (globalThis as any).Decimal(0),
+      drinkProgress: 0,
+      lastDrinkTime: Date.now() - 5000,
+      drinkRate: 5000,
     });
 
-    // Wait for multiple frames
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await processDrink();
 
-    // processDrink should have been called
-    expect(processDrinkSpy).toHaveBeenCalled();
+    const finalState = runtime.useGameStore.getState();
+    expect(finalState.sips.toNumber()).toBeGreaterThan(0);
+    expect(finalState.totalSipsEarned.toNumber()).toBeGreaterThan(0);
   });
 
-  it('should handle drink system import timeout gracefully', async () => {
-    // Mock a slow import that would timeout
-    const originalImport = (global as any).import;
-    let importCallCount = 0;
+  it('starts the game through the public game-init entrypoint', async () => {
+    const runtime = await loadRuntime();
 
-    (global as any).import = vi.fn((path: string) => {
-      importCallCount++;
-      if (path.includes('drink-system')) {
-        // Simulate a hanging import
-        return new Promise(() => {}); // Never resolves
-      }
-      return originalImport(path);
-    });
+    runtime.stop();
+    runtime.startGameCore();
 
-    const startTime = Date.now();
+    await new Promise(resolve => setTimeout(resolve, 50));
 
-    try {
-      // This should not hang forever
-      await Promise.race([
-        import('../ts/index.ts'),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Test timeout')), 2000)),
-      ]);
+    expect((window as any).__GAME_STARTED__).toBe(true);
+    expect(document.body.classList.contains('game-started')).toBe(true);
+    expect((document.getElementById('gameContent') as HTMLElement).style.display).toBe('block');
 
-      fail('Should have timed out');
-    } catch (error) {
-      const loadTime = Date.now() - startTime;
-      expect(loadTime).toBeLessThan(2500); // Should timeout quickly
-      expect(error.message).toContain('Test timeout');
-    }
-
-    // Restore original import
-    (global as any).import = originalImport;
+    runtime.stop();
   });
 
-  it('should maintain game state during loop execution', async () => {
-    // Load module
-    await import('../ts/index.ts');
+  it('keeps state mutations accessible through the real store', async () => {
+    const runtime = await loadRuntime();
 
-    // Wait for initialization
-    await new Promise(resolve => setTimeout(resolve, 200));
-
-    const App = (window as any).App;
-
-    // Set initial state
-    App.state.setState({ sips: 100, drinkProgress: 0 });
-
-    const updateDrinkProgressSpy = vi.fn();
-    const processDrinkSpy = vi.fn();
-
-    // Start the loop
-    App.systems.loop.start({
-      updateDrinkProgress: updateDrinkProgressSpy,
-      processDrink: processDrinkSpy,
-      updateStats: vi.fn(),
-      updateUI: vi.fn(),
+    runtime.useGameStore.getState().actions.setState({
+      sips: new (globalThis as any).Decimal(100),
+      drinkProgress: 50,
+      lastDrinkTime: Date.now() - 2500,
+      drinkRate: 5000,
     });
 
-    // Wait for multiple frames
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    // Both functions should have been called
-    expect(updateDrinkProgressSpy).toHaveBeenCalled();
-    expect(processDrinkSpy).toHaveBeenCalled();
-
-    // Game state should still be accessible
-    const state = App.state.getState();
-    expect(state).toBeDefined();
-    expect(state.sips).toBe(100);
+    const state = runtime.useGameStore.getState();
+    expect(state.sips.toNumber()).toBe(100);
+    expect(state.drinkProgress).toBe(50);
+    expect(state.drinkRate).toBe(5000);
   });
 });

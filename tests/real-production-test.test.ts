@@ -58,7 +58,9 @@ describe('Real Production Build Test', () => {
 
     Object.defineProperty(window, 'requestAnimationFrame', {
       writable: true,
-      value: vi.fn(callback => setTimeout(() => callback(performance.now()), 16) as unknown as number),
+      value: vi.fn(
+        callback => setTimeout(() => callback(performance.now()), 16) as unknown as number
+      ),
     });
 
     Object.defineProperty(window, 'cancelAnimationFrame', {

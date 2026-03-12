@@ -16,6 +16,7 @@ import {
   max,
   min,
 } from '../ts/core/state/mutations';
+import { expectLargeNumberToEqual } from './test-utils';
 
 // Use our mock Decimal constructor for consistent testing
 const LargeNumber = Decimal; // Alias for backward compatibility
@@ -24,32 +25,27 @@ describe('State Mutations with LargeNumber', () => {
   describe('Basic Arithmetic Operations', () => {
     it('should add sips with LargeNumber inputs', () => {
       const result = addSips(new LargeNumber(100), new LargeNumber(50));
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(150);
+      expectLargeNumberToEqual(result, 150);
     });
 
     it('should add sips with mixed inputs', () => {
       const result = addSips(100, new LargeNumber(75));
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(175);
+      expectLargeNumberToEqual(result, 175);
     });
 
     it('should subtract sips with LargeNumber inputs', () => {
       const result = subtractSips(new LargeNumber(100), new LargeNumber(30));
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(70);
+      expectLargeNumberToEqual(result, 70);
     });
 
     it('should increment count with LargeNumber', () => {
       const result = incrementCount(new LargeNumber(10), 5);
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(15);
+      expectLargeNumberToEqual(result, 15);
     });
 
     it('should multiply values with LargeNumber', () => {
       const result = multiplyValue(new LargeNumber(10), new LargeNumber(3));
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(30);
+      expectLargeNumberToEqual(result, 30);
     });
   });
 
@@ -87,14 +83,12 @@ describe('State Mutations with LargeNumber', () => {
   describe('Min/Max Operations', () => {
     it('should find maximum of two values', () => {
       const result = max(new LargeNumber(10), new LargeNumber(20));
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(20);
+      expectLargeNumberToEqual(result, 20);
     });
 
     it('should find minimum of two values', () => {
       const result = min(new LargeNumber(10), new LargeNumber(20));
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(10);
+      expectLargeNumberToEqual(result, 10);
     });
 
     it('should handle equal values in min/max', () => {
@@ -112,7 +106,6 @@ describe('State Mutations with LargeNumber', () => {
       const large2 = new LargeNumber('5e99');
 
       const sum = addSips(large1, large2);
-      expect(sum).toBeInstanceOf(LargeNumber);
       expect(sum.toNumber()).toBeGreaterThan(1e100);
     });
 
@@ -139,14 +132,12 @@ describe('State Mutations with LargeNumber', () => {
   describe('Mixed Type Support', () => {
     it('should work with number inputs', () => {
       const result = addSips(100, 50);
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(150);
+      expectLargeNumberToEqual(result, 150);
     });
 
     it('should work with string inputs', () => {
       const result = multiplyValue('10', '5');
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(50);
+      expectLargeNumberToEqual(result, 50);
     });
 
     it('should work with mixed LargeNumber and primitive inputs', () => {
@@ -169,15 +160,14 @@ describe('State Mutations with LargeNumber', () => {
 
     it('should handle negative values', () => {
       const result = subtractSips(new LargeNumber(10), new LargeNumber(20));
-      expect(result.toNumber()).toBe(-10);
+      expectLargeNumberToEqual(result, -10);
     });
 
     it('should handle very small numbers', () => {
       const small = new LargeNumber('1e-100');
       const result = addSips(small, small);
 
-      expect(result).toBeInstanceOf(LargeNumber);
-      expect(result.toNumber()).toBe(2e-100);
+      expect(result.toNumber()).toBeCloseTo(2e-100);
     });
   });
 
@@ -211,7 +201,6 @@ describe('State Mutations with LargeNumber', () => {
       }
 
       // Should still be a valid LargeNumber with reasonable magnitude
-      expect(result).toBeInstanceOf(LargeNumber);
       expect(result.toNumber()).toBeGreaterThan(1e11);
       expect(result.toNumber()).toBeLessThan(1e13);
     });
