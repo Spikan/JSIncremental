@@ -8,21 +8,29 @@ export class SidebarNavigationManager {
   private mobileMenuToggle: HTMLElement | null = null;
   private isMobile: boolean = false;
   private initialized: boolean = false;
+  private resizeListenerRegistered: boolean = false;
 
   constructor() {
+    this.initializeWhenReady();
+  }
+
+  private initializeWhenReady(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
     this.isMobile = window.innerWidth <= 768;
     this.setupResizeListener();
 
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.initialize());
-    } else {
-      this.initialize();
+    if (document.readyState === 'loading' && typeof document.addEventListener === 'function') {
+      document.addEventListener('DOMContentLoaded', () => this.initialize(), { once: true });
+      return;
     }
+
+    this.initialize();
   }
 
   private initialize(): void {
     if (this.initialized) return;
+    if (typeof document === 'undefined') return;
 
     this.initializeElements();
     this.setupEventListeners();
@@ -32,6 +40,8 @@ export class SidebarNavigationManager {
   }
 
   private initializeElements(): void {
+    if (typeof document === 'undefined') return;
+
     this.sidebar = document.querySelector('.game-sidebar');
     this.mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
 
@@ -146,6 +156,9 @@ export class SidebarNavigationManager {
   }
 
   private setupResizeListener(): void {
+    if (this.resizeListenerRegistered) return;
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
+
     window.addEventListener('resize', () => {
       const wasMobile = this.isMobile;
       this.isMobile = window.innerWidth <= 768;
@@ -155,6 +168,7 @@ export class SidebarNavigationManager {
         this.updateSidebarState();
       }
     });
+    this.resizeListenerRegistered = true;
   }
 
   private updateSidebarState(): void {
@@ -257,7 +271,7 @@ export class SidebarNavigationManager {
 
   public forceInitialize(): void {
     if (!this.initialized) {
-      this.initialize();
+      this.initializeWhenReady();
     }
   }
 }

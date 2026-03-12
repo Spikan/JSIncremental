@@ -23,12 +23,16 @@ export class ProgressBar {
   private progressPercentage: HTMLElement | null = null;
   private progressRate: HTMLElement | null = null;
   private progressTime: HTMLElement | null = null;
+  private containerId: string;
 
   constructor(containerId: string) {
+    this.containerId = containerId;
     this.initializeElements(containerId);
   }
 
   public initializeElements(containerId: string): void {
+    if (typeof document === 'undefined') return;
+
     console.log(`🔧 Initializing progress bar for container: ${containerId}`);
     this.container = document.getElementById(containerId);
     if (!this.container) {
@@ -43,6 +47,7 @@ export class ProgressBar {
 
   private createProgressBarStructure(): void {
     if (!this.container) return;
+    if (typeof this.container.querySelector !== 'function') return;
 
     // Find existing progress elements - just find them, don't modify them
     const existingFill = this.container.querySelector(
@@ -69,6 +74,9 @@ export class ProgressBar {
   }
 
   public update(data: ProgressBarData): void {
+    if (!this.container) {
+      this.initializeElements(this.containerId);
+    }
     if (!this.container) return;
 
     const percentage = Math.min(Math.max((data.progress / data.total) * 100, 0), 100);
@@ -131,12 +139,18 @@ export class ProgressBar {
   }
 
   public show(): void {
+    if (!this.container) {
+      this.initializeElements(this.containerId);
+    }
     if (this.container) {
       this.container.style.display = 'block';
     }
   }
 
   public hide(): void {
+    if (!this.container) {
+      this.initializeElements(this.containerId);
+    }
     if (this.container) {
       this.container.style.display = 'none';
     }

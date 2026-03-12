@@ -5,12 +5,66 @@
 
 export class VisualFeedbackSystem {
   private static instance: VisualFeedbackSystem;
+  private stylesInstalled = false;
 
   public static getInstance(): VisualFeedbackSystem {
     if (!VisualFeedbackSystem.instance) {
       VisualFeedbackSystem.instance = new VisualFeedbackSystem();
     }
     return VisualFeedbackSystem.instance;
+  }
+
+  private ensureStylesInstalled(): void {
+    if (this.stylesInstalled || typeof document === 'undefined') return;
+    if (!document.head || typeof document.createElement !== 'function') return;
+    if (typeof document.querySelector === 'function' && document.querySelector('#visual-feedback-styles')) {
+      this.stylesInstalled = true;
+      return;
+    }
+
+    const style = document.createElement('style');
+    if (!style) return;
+
+    style.id = 'visual-feedback-styles';
+    style.textContent = `
+      @keyframes floatUp {
+        0% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(0);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 0.3;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 0;
+        }
+      }
+    `;
+
+    if (typeof document.head.appendChild === 'function') {
+      document.head.appendChild(style);
+      this.stylesInstalled = true;
+    }
   }
 
   /**
@@ -106,6 +160,10 @@ export class VisualFeedbackSystem {
     color: string = '#00d97f',
     duration: number = 2000
   ): void {
+    if (typeof document === 'undefined' || !document.body) return;
+    if (typeof document.createElement !== 'function') return;
+    this.ensureStylesInstalled();
+
     const floatingText = document.createElement('div');
     floatingText.textContent = text;
     floatingText.style.cssText = `
@@ -121,6 +179,7 @@ export class VisualFeedbackSystem {
       animation: floatUp 2s ease-out forwards;
     `;
 
+    if (typeof document.body.appendChild !== 'function') return;
     document.body.appendChild(floatingText);
 
     // Remove after animation completes
@@ -136,6 +195,9 @@ export class VisualFeedbackSystem {
    */
   public addRippleEffect(element: HTMLElement, event: MouseEvent): void {
     if (!element) return;
+    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return;
+    if (typeof element.appendChild !== 'function') return;
+    this.ensureStylesInstalled();
 
     const rect = element.getBoundingClientRect();
     const ripple = document.createElement('div');
@@ -176,6 +238,9 @@ export class VisualFeedbackSystem {
    */
   public addPulseEffect(element: HTMLElement, color: string = '#00d97f'): void {
     if (!element) return;
+    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return;
+    if (typeof element.appendChild !== 'function') return;
+    this.ensureStylesInstalled();
 
     const pulse = document.createElement('div');
     pulse.style.cssText = `
@@ -210,43 +275,3 @@ export class VisualFeedbackSystem {
 
 // Global instance
 export const visualFeedback = VisualFeedbackSystem.getInstance();
-
-// Add CSS animations for floating text and ripple effects
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes floatUp {
-      0% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
-    }
-
-    @keyframes ripple {
-      0% {
-        transform: scale(0);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 0;
-      }
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0.3;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}

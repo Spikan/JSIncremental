@@ -420,8 +420,9 @@ if (typeof window !== 'undefined') {
   window.errorReporter = errorReporter;
 }
 
-(function attachErrorOverlay(): void {
+export function initErrorOverlay(): void {
   if (typeof window === 'undefined') return;
+  if (typeof document === 'undefined' || !document.body) return;
   if (window.__ERROR_OVERLAY_ATTACHED__) return;
   // Skip in test environments
   if ((window as any).__TEST_ENV__) return;
@@ -493,7 +494,7 @@ if (typeof window !== 'undefined') {
     overlay.style.display = 'none';
     list.innerHTML = '';
   });
-})();
+}
 
 // Circuit Breaker Pattern for Runtime Safety
 export class CircuitBreaker {

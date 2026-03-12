@@ -233,6 +233,7 @@ export function updateButtonState(buttonId: string, isAffordable: boolean, cost?
   if (typeof window === 'undefined') return;
   const button = findButton(buttonId);
   if (!button || !(button as HTMLElement).classList) return;
+  if (typeof (button as HTMLElement).getAttribute !== 'function') return;
 
   // Skip buttons that are in unlock mode (have data-action starting with "purchaseUnlock:")
   const dataAction = (button as HTMLElement).getAttribute('data-action');

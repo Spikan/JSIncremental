@@ -7,6 +7,17 @@ import { domQuery } from '../services/dom-query';
 import { timerManager } from '../services/timer-manager';
 import { errorHandler } from '../core/error-handling/error-handler';
 
+function canUseDocument(): boolean {
+  return typeof document !== 'undefined' && typeof document.createElement === 'function';
+}
+
+function appendChildSafely(parent: unknown, child: unknown): boolean {
+  if (!parent || !child) return false;
+  if (typeof (parent as { appendChild?: unknown }).appendChild !== 'function') return false;
+  (parent as { appendChild: (node: unknown) => void }).appendChild(child);
+  return true;
+}
+
 // Detect mobile device
 function isMobileDevice(): boolean {
   try {
@@ -81,6 +92,7 @@ function showMilestoneFeedback(
   type: 'straw' | 'cup' | 'global' = 'global'
 ): void {
   try {
+    if (!canUseDocument() || !document.body) return;
     const feedbackElement = document.createElement('div');
     feedbackElement.className = 'milestone-feedback';
     feedbackElement.textContent = message;
@@ -126,10 +138,10 @@ function showMilestoneFeedback(
           }
         }
       `;
-      document.head.appendChild(style);
+      appendChildSafely(document.head, style);
     }
 
-    document.body.appendChild(feedbackElement);
+    if (!appendChildSafely(document.body, feedbackElement)) return;
 
     // Remove after animation
     timerManager.setTimeout(
@@ -153,6 +165,7 @@ function showFeedbackAtCoordinates(
   clickX: number,
   clickY: number
 ): void {
+  if (!canUseDocument() || !document.body) return;
   const feedback = document.createElement('div');
   feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
   feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
@@ -209,7 +222,7 @@ function showFeedbackAtCoordinates(
         ${isMobile ? 'touch-action: none; -webkit-touch-callout: none;' : ''}
         ${isMobile ? 'will-change: transform, opacity;' : ''}
     `;
-  document.body.appendChild(feedback);
+  if (!appendChildSafely(document.body, feedback)) return;
   const startTime = Date.now();
   const animate = () => {
     const elapsed = Date.now() - startTime;
@@ -250,6 +263,7 @@ function showFeedbackWithContainer(
   isCritical: boolean,
   sodaContainer: HTMLElement
 ): void {
+  if (!canUseDocument() || !document.body) return;
   const feedback = document.createElement('div');
   feedback.className = isCritical ? 'click-feedback critical-feedback' : 'click-feedback';
   feedback.textContent = (isCritical ? '💥 CRITICAL! +' : '+') + prettify(sipsGained);
@@ -283,7 +297,7 @@ function showFeedbackWithContainer(
         ${isMobile ? 'touch-action: none; -webkit-touch-callout: none;' : ''}
         ${isMobile ? 'will-change: transform, opacity;' : ''}
     `;
-  document.body.appendChild(feedback);
+  if (!appendChildSafely(document.body, feedback)) return;
   const startTime = Date.now();
   const animate = () => {
     const elapsed = Date.now() - startTime;
@@ -348,6 +362,7 @@ export function showPurchaseFeedback(
   clickX: number | null = null,
   clickY: number | null = null
 ): void {
+  if (!canUseDocument() || !document.body) return;
   const feedback = document.createElement('div');
   feedback.className = 'purchase-feedback';
   const itemDiv = document.createElement('div');
@@ -356,8 +371,7 @@ export function showPurchaseFeedback(
   const costDiv = document.createElement('div');
   costDiv.className = 'purchase-cost';
   costDiv.textContent = `-${prettify(cost)} sips`;
-  feedback.appendChild(itemDiv);
-  feedback.appendChild(costDiv);
+  if (!appendChildSafely(feedback, itemDiv) || !appendChildSafely(feedback, costDiv)) return;
   feedback.setAttribute('role', 'status');
   feedback.setAttribute('aria-live', 'polite');
   feedback.setAttribute('aria-label', `Purchased ${itemName} for ${formatNumber(cost)} sips`);
@@ -393,7 +407,7 @@ export function showPurchaseFeedback(
         transform-origin: center center;
     `;
   feedback.style.transform = 'translate(-50%, -50%)';
-  document.body.appendChild(feedback);
+  if (!appendChildSafely(document.body, feedback)) return;
   const startTime = Date.now();
   const animate = () => {
     const elapsed = Date.now() - startTime;
@@ -432,6 +446,7 @@ export function showPurchaseFeedback(
 
 // Show level up feedback
 export function showLevelUpFeedback(sipsGained: number): void {
+  if (!canUseDocument() || !document.body) return;
   const levelUpDiv = domQuery.getById('levelUpDiv') as HTMLElement | undefined;
   if (!levelUpDiv) return;
   const feedback = document.createElement('div');
@@ -442,8 +457,7 @@ export function showLevelUpFeedback(sipsGained: number): void {
   const bonus = document.createElement('div');
   bonus.className = 'levelup-bonus';
   bonus.textContent = `+${prettify(sipsGained)} sips bonus!`;
-  feedback.appendChild(title);
-  feedback.appendChild(bonus);
+  if (!appendChildSafely(feedback, title) || !appendChildSafely(feedback, bonus)) return;
   feedback.setAttribute('role', 'alert');
   feedback.setAttribute('aria-live', 'assertive');
   feedback.setAttribute('aria-label', `Level up! Gained ${prettify(sipsGained)} bonus sips`);
@@ -464,7 +478,7 @@ export function showLevelUpFeedback(sipsGained: number): void {
         animation: levelUpPulse 3s ease-out forwards;
         box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
     `;
-  document.body.appendChild(feedback);
+  if (!appendChildSafely(document.body, feedback)) return;
   const configTiming2 = (window as unknown as { GAME_CONFIG?: { TIMING?: Record<string, number> } })
     .GAME_CONFIG?.TIMING;
   setTimeout(
@@ -477,6 +491,7 @@ export function showLevelUpFeedback(sipsGained: number): void {
 
 // Show offline progress modal
 export function showOfflineProgress(timeSeconds: number, earnings: number): void {
+  if (!canUseDocument() || !document.body) return;
   const modal = document.createElement('div');
   modal.className = 'offline-progress-modal';
 
@@ -500,8 +515,7 @@ export function showOfflineProgress(timeSeconds: number, earnings: number): void
   const timeValue = document.createElement('span');
   timeValue.className = 'value';
   timeValue.textContent = formatTime(timeSeconds);
-  timeRow.appendChild(timeLabel);
-  timeRow.appendChild(timeValue);
+  if (!appendChildSafely(timeRow, timeLabel) || !appendChildSafely(timeRow, timeValue)) return;
 
   const earningsRow = document.createElement('div');
   earningsRow.className = 'offline-earnings';
@@ -511,22 +525,24 @@ export function showOfflineProgress(timeSeconds: number, earnings: number): void
   const earningsValue = document.createElement('span');
   earningsValue.className = 'value';
   earningsValue.textContent = `+${formatNumber(earnings)}`;
-  earningsRow.appendChild(earningsLabel);
-  earningsRow.appendChild(earningsValue);
+  if (!appendChildSafely(earningsRow, earningsLabel) || !appendChildSafely(earningsRow, earningsValue)) return;
 
-  stats.appendChild(timeRow);
-  stats.appendChild(earningsRow);
+  if (!appendChildSafely(stats, timeRow) || !appendChildSafely(stats, earningsRow)) return;
 
   const continueBtn = document.createElement('button');
   continueBtn.className = 'offline-continue-btn';
   continueBtn.textContent = 'Continue Playing';
   continueBtn.addEventListener('click', () => modal.remove());
 
-  content.appendChild(heading);
-  content.appendChild(stats);
-  content.appendChild(continueBtn);
-  modal.appendChild(overlay);
-  modal.appendChild(content);
+  if (
+    !appendChildSafely(content, heading) ||
+    !appendChildSafely(content, stats) ||
+    !appendChildSafely(content, continueBtn) ||
+    !appendChildSafely(modal, overlay) ||
+    !appendChildSafely(modal, content)
+  ) {
+    return;
+  }
 
   modal.style.cssText = `
         position: fixed;
@@ -579,7 +595,7 @@ export function showOfflineProgress(timeSeconds: number, earnings: number): void
             cursor: pointer;
         `;
 
-  document.body.appendChild(modal);
+  if (!appendChildSafely(document.body, modal)) return;
   setTimeout(() => {
     if (modal.parentNode) {
       modal.remove();

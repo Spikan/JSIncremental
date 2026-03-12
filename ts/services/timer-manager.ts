@@ -4,7 +4,7 @@
 export interface TimerEntry {
   id: string;
   type: 'timeout' | 'interval';
-  timerId: number;
+  timerId: ReturnType<typeof globalThis.setTimeout>;
   callback: () => void;
   createdAt: number;
   description: string | undefined;
@@ -14,6 +14,28 @@ class TimerManager {
   private timers = new Map<string, TimerEntry>();
   private nextId = 1;
   private isDestroyed = false;
+  private unloadCleanupRegistered = false;
+
+  private getTimerHost(): Pick<typeof globalThis, 'setTimeout' | 'setInterval'> {
+    if (
+      typeof window !== 'undefined' &&
+      typeof window.setTimeout === 'function' &&
+      typeof window.setInterval === 'function'
+    ) {
+      return window;
+    }
+    return globalThis;
+  }
+
+  private ensureUnloadCleanup(): void {
+    if (this.unloadCleanupRegistered) return;
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
+
+    window.addEventListener('beforeunload', () => {
+      this.destroy();
+    });
+    this.unloadCleanupRegistered = true;
+  }
 
   /**
    * Create a timeout with automatic cleanup tracking
@@ -24,8 +46,10 @@ class TimerManager {
       return '';
     }
 
+    this.ensureUnloadCleanup();
+
     const id = `timeout_${this.nextId++}`;
-    const timerId = window.setTimeout(() => {
+    const timerId = this.getTimerHost().setTimeout(() => {
       this.timers.delete(id);
       callback();
     }, delay);
@@ -51,8 +75,10 @@ class TimerManager {
       return '';
     }
 
+    this.ensureUnloadCleanup();
+
     const id = `interval_${this.nextId++}`;
-    const timerId = window.setInterval(callback, interval);
+    const timerId = this.getTimerHost().setInterval(callback, interval);
 
     this.timers.set(id, {
       id,
@@ -236,13 +262,6 @@ if (typeof window !== 'undefined') {
   (window as any).createInterval = createInterval;
   (window as any).clearTimer = clearTimer;
   (window as any).clearAllTimers = clearAllTimers;
-}
-
-// Cleanup on page unload
-if (typeof window !== 'undefined' && window.addEventListener) {
-  window.addEventListener('beforeunload', () => {
-    timerManager.destroy();
-  });
 }
 
 export default timerManager;

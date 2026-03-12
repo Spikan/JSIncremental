@@ -12,6 +12,7 @@ import './vendor/model-viewer-element';
 import './config';
 import './core/constants';
 import { errorHandler } from './core/error-handling/error-handler';
+import { initErrorOverlay } from './services/error-overlay';
 // ServiceLocator removed - using Zustand store directly
 // Decimal import removed - using toDecimal from simplified.ts
 import { toDecimal } from './core/numbers/simplified';
@@ -446,6 +447,21 @@ try {
   installDomReadyBootstrap();
 } catch (error) {
   errorHandler.handleError(error, 'installDomReadyBootstrap');
+}
+
+// Attach the runtime error overlay explicitly instead of doing it as an import side effect.
+try {
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initErrorOverlay();
+      });
+    } else {
+      initErrorOverlay();
+    }
+  }
+} catch (error) {
+  errorHandler.handleError(error, 'initErrorOverlay');
 }
 
 // Initialize button audio system on first user interaction (prevents autoplay warnings)

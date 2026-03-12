@@ -13,6 +13,7 @@
 import Decimal from 'break_eternity.js';
 import { domQuery } from './services/dom-query';
 import { timerManager } from './services/timer-manager';
+import { AppStorage } from './services/storage';
 import { getStoreActions } from './core/state/zustand-store';
 import { errorHandler } from './core/error-handling/error-handler';
 
@@ -139,9 +140,6 @@ function initGame() {
     // Load save using storage service (validated)
     let savegame: any = null;
     try {
-      // top-level import to avoid await in non-async
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { AppStorage } = require('./services/storage');
       savegame = AppStorage.loadGame();
     } catch (e) {
       errorHandler.handleError(e, 'loadSave', { fallback: 'starting fresh' });

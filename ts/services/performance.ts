@@ -37,11 +37,12 @@ class PerformanceMonitor {
 
   constructor() {
     this.startTime = performance.now();
-    this.initializeMonitoring();
   }
 
-  private initializeMonitoring(): void {
+  public initializeMonitoring(): void {
     if (this.isMonitoring) return;
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
     this.isMonitoring = true;
 
     // Monitor Core Web Vitals
@@ -116,12 +117,16 @@ class PerformanceMonitor {
   }
 
   private monitorGamePerformance(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
     // Monitor game load time
-    window.addEventListener('load', () => {
-      const loadTime = performance.now() - this.startTime;
-      this.metrics.gameLoadTime = loadTime;
-      this.logMetric('Game Load Time', loadTime);
-    });
+    if (typeof window.addEventListener === 'function') {
+      window.addEventListener('load', () => {
+        const loadTime = performance.now() - this.startTime;
+        this.metrics.gameLoadTime = loadTime;
+        this.logMetric('Game Load Time', loadTime);
+      });
+    }
 
     // Monitor first render
     if (document.readyState === 'loading') {
@@ -186,6 +191,8 @@ class PerformanceMonitor {
   }
 
   private monitorFrameRate(): void {
+    if (typeof requestAnimationFrame !== 'function') return;
+
     let frameCount = 0;
     let lastTime = performance.now();
 
@@ -251,23 +258,28 @@ class PerformanceMonitor {
 
   // Public methods
   public getMetrics(): PerformanceMetrics {
+    this.initializeMonitoring();
     return { ...this.metrics };
   }
 
   public getGameLoadTime(): number | null {
+    this.initializeMonitoring();
     return this.metrics.gameLoadTime;
   }
 
   public getMemoryUsage(): MemoryInfo | null {
+    this.initializeMonitoring();
     return this.metrics.memoryUsage;
   }
 
   public getFPS(): number | null {
+    this.initializeMonitoring();
     // This would need to be implemented with a more sophisticated FPS counter
     return null;
   }
 
   public isPerformanceGood(): boolean {
+    this.initializeMonitoring();
     const { CLS, FID, FCP, LCP } = this.metrics;
 
     // Check if all metrics are within good thresholds
@@ -280,6 +292,7 @@ class PerformanceMonitor {
   }
 
   public getPerformanceScore(): number {
+    this.initializeMonitoring();
     let score = 100;
 
     // Deduct points for poor performance

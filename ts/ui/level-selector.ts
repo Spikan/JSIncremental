@@ -8,13 +8,27 @@ import { errorHandler } from '../core/error-handling/error-handler';
 export class LevelSelector {
   private container: HTMLElement | null = null;
   private isVisible: boolean = false;
+  private isInitialized: boolean = false;
+  private listenersRegistered: boolean = false;
+  private stylesInstalled: boolean = false;
 
   constructor() {
+    this.ensureInitialized();
+  }
+
+  private ensureInitialized(): void {
+    if (this.isInitialized) return;
+    if (typeof document === 'undefined' || !document.body || !document.head) return;
+
+    this.installStyles();
     this.createLevelSelector();
     this.setupEventListeners();
+    this.isInitialized = true;
   }
 
   private createLevelSelector(): void {
+    if (!document.body) return;
+
     // Create the level selector container
     const selector = document.createElement('div');
     selector.id = 'levelSelector';
@@ -87,6 +101,8 @@ export class LevelSelector {
   }
 
   private setupEventListeners(): void {
+    if (this.listenersRegistered || typeof document === 'undefined') return;
+
     // Add keyboard shortcut (L key)
     document.addEventListener('keydown', e => {
       if (e.key === 'l' || e.key === 'L') {
@@ -97,6 +113,36 @@ export class LevelSelector {
         this.hide();
       }
     });
+    this.listenersRegistered = true;
+  }
+
+  private installStyles(): void {
+    if (this.stylesInstalled || typeof document === 'undefined' || !document.head) return;
+
+    const style = document.createElement('style');
+    style.textContent = `
+  @keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+  
+  @keyframes slideInLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes slideOutLeft {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-100%); opacity: 0; }
+  }
+`;
+    document.head.appendChild(style);
+    this.stylesInstalled = true;
   }
 
   private renderLevels(): void {
@@ -541,6 +587,7 @@ export class LevelSelector {
   }
 
   public show(): void {
+    this.ensureInitialized();
     if (this.container) {
       this.renderLevels();
       this.container.style.display = 'block';
@@ -564,6 +611,7 @@ export class LevelSelector {
   }
 
   public hide(): void {
+    this.ensureInitialized();
     if (this.container) {
       this.container.style.display = 'none';
       this.isVisible = false;
@@ -575,6 +623,7 @@ export class LevelSelector {
   }
 
   public toggle(): void {
+    this.ensureInitialized();
     if (this.isVisible) {
       this.hide();
     } else {
@@ -584,6 +633,7 @@ export class LevelSelector {
 
   // Check for new level unlocks
   public checkForUnlocks(): void {
+    this.ensureInitialized();
     const newlyUnlocked = hybridLevelSystem.checkForUnlocks();
     if (newlyUnlocked.length > 0) {
       newlyUnlocked.forEach(levelId => {
@@ -592,30 +642,5 @@ export class LevelSelector {
     }
   }
 }
-
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-  
-  @keyframes slideOutRight {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-  }
-  
-  @keyframes slideInLeft {
-    from { transform: translateX(-100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-  
-  @keyframes slideOutLeft {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(-100%); opacity: 0; }
-  }
-`;
-document.head.appendChild(style);
 
 export const levelSelector = new LevelSelector();

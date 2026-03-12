@@ -42,10 +42,10 @@ class AnimationService {
   private activeAnimations = new Map<string, () => void>();
   private animationCounter = 0;
   private isPerformanceMode = false;
+  private cleanupRegistered = false;
 
   constructor() {
     this.detectPerformanceMode();
-    this.setupCleanup();
   }
 
   /**
@@ -78,10 +78,12 @@ class AnimationService {
    * Setup cleanup for page unload
    */
   private setupCleanup(): void {
-    if (typeof window !== 'undefined') {
+    if (this.cleanupRegistered) return;
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
       window.addEventListener('beforeunload', () => {
         this.cleanup();
       });
+      this.cleanupRegistered = true;
     }
   }
 
@@ -100,6 +102,8 @@ class AnimationService {
     const animId = this.generateAnimationId();
 
     try {
+      this.setupCleanup();
+
       // Create feedback element
       const feedback = document.createElement('div');
       feedback.textContent = `+${this.formatValue(config.value)}`;
@@ -189,6 +193,8 @@ class AnimationService {
     const animId = this.generateAnimationId();
 
     try {
+      this.setupCleanup();
+
       const fromValue = typeof config.from === 'string' ? parseFloat(config.from) : config.from;
       const toValue = typeof config.to === 'string' ? parseFloat(config.to) : config.to;
 
@@ -235,6 +241,8 @@ class AnimationService {
     const animId = this.generateAnimationId();
 
     try {
+      this.setupCleanup();
+
       const element = config.element;
       const originalTransform = element.style.transform || '';
 
@@ -302,6 +310,8 @@ class AnimationService {
     const animId = this.generateAnimationId();
 
     try {
+      this.setupCleanup();
+
       const celebration = document.createElement('div');
       celebration.innerHTML = `
         <div class="milestone-content">

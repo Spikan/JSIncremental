@@ -5,6 +5,8 @@
 
 import { useGameStore } from '../core/state/zustand-store';
 import { errorHandler } from '../core/error-handling/error-handler';
+import { saveOptions } from '../core/systems/options-system';
+import { sidebarNavigation } from './sidebar-navigation';
 
 // The Konami Code sequence
 const KONAMI_SEQUENCE = [
@@ -23,17 +25,33 @@ const KONAMI_SEQUENCE = [
 class KonamiCodeDetector {
   private sequence: string[] = [];
   private isActive: boolean = false;
+  private listenersRegistered: boolean = false;
 
   constructor() {
-    this.initializeDetection();
+    this.initializeWhenReady();
     // Check if secrets are already unlocked on page load
     this.checkAndUnlockGodTab();
   }
 
+  private initializeWhenReady(): void {
+    if (typeof document === 'undefined') return;
+
+    if (document.readyState === 'loading' && typeof document.addEventListener === 'function') {
+      document.addEventListener('DOMContentLoaded', () => this.initializeDetection(), { once: true });
+      return;
+    }
+
+    this.initializeDetection();
+  }
+
   private initializeDetection(): void {
+    if (this.listenersRegistered || typeof document === 'undefined') return;
+    if (typeof document.addEventListener !== 'function') return;
+
     document.addEventListener('keydown', event => {
       this.handleKeyPress(event.code);
     });
+    this.listenersRegistered = true;
   }
 
   private handleKeyPress(keyCode: string): void {
@@ -74,7 +92,6 @@ class KonamiCodeDetector {
 
         // Save to storage
         // Options system access modernized - using direct import
-        const { saveOptions } = require('../core/systems/options-system');
         saveOptions?.(newOptions);
 
         // Show celebration message
@@ -87,12 +104,8 @@ class KonamiCodeDetector {
         this.unlockGodTab();
 
         // Refresh navigation to show god tab
-        const navManager =
-          // Navigation manager access modernized - using direct import
-          require('../ui/sidebar-navigation').navigationManager ||
-          (window as any).navigationManager;
-        if (navManager?.refreshNavigation) {
-          navManager.refreshNavigation();
+        if (typeof (sidebarNavigation as any)?.forceInitialize === 'function') {
+          (sidebarNavigation as any).forceInitialize();
         }
       }
     } catch (error) {
@@ -101,6 +114,15 @@ class KonamiCodeDetector {
   }
 
   private showSecretUnlockedMessage(): void {
+    if (typeof document === 'undefined' || !document.head || !document.body) return;
+    if (typeof document.createElement !== 'function') return;
+    if (
+      typeof document.head.appendChild !== 'function' ||
+      typeof document.body.appendChild !== 'function'
+    ) {
+      return;
+    }
+
     // Create a fancy notification
     const notification = document.createElement('div');
     notification.style.cssText = `
@@ -164,6 +186,8 @@ class KonamiCodeDetector {
   }
 
   private updateSecretsUI(): void {
+    if (typeof document === 'undefined' || typeof document.querySelector !== 'function') return;
+
     // Update the secrets section if it exists
     const secretsSection = document.querySelector('.secrets-section');
     if (secretsSection) {
@@ -178,6 +202,8 @@ class KonamiCodeDetector {
   }
 
   private unlockGodTab(): void {
+    if (typeof document === 'undefined' || typeof document.querySelector !== 'function') return;
+
     // Show the God tab in settings modal
     const godTab = document.querySelector('.god-tab') as HTMLElement;
     if (godTab) {
@@ -221,4 +247,6 @@ class KonamiCodeDetector {
 export const konamiCodeDetector = new KonamiCodeDetector();
 
 // Make it accessible for debugging
-(window as any).konamiCodeDetector = konamiCodeDetector;
+if (typeof window !== 'undefined') {
+  (window as any).konamiCodeDetector = konamiCodeDetector;
+}
