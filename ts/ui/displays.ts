@@ -423,14 +423,6 @@ export function updateDrinkProgress(progress?: number, drinkRate?: number): void
           (sodaBtn as any).__sodaProgress = overlay;
         }
         if (typeof currentProgress === 'number') overlay.update(currentProgress);
-        // Ring indicator as well
-        let indicator: any = (sodaBtn as any).__sodaIndicator;
-        if (!indicator) {
-          indicator = createSodaButtonIndicator(sodaBtn);
-          indicator.mount();
-          (sodaBtn as any).__sodaIndicator = indicator;
-        }
-        if (typeof currentProgress === 'number') indicator.update(currentProgress);
       }
     } else if (isFountainEnabled()) {
       const panel = document.getElementById('fountainPanel') as HTMLElement | null;
