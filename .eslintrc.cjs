@@ -77,6 +77,12 @@ module.exports = {
       },
     },
     {
+      files: ['scripts/**/*.js'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
+    {
       // Configuration files
       files: ['*.config.js', '*.config.ts', 'vite.config.ts'],
       rules: {

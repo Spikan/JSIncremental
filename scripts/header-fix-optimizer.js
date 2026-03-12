@@ -9,99 +9,100 @@ const __dirname = path.dirname(__filename);
 const cssPath = path.join(__dirname, '..', 'css', 'style.css');
 const cssContent = fs.readFileSync(cssPath, 'utf8');
 
-// Header-fixed CSS optimization - preserves exact header layout
-function headerFixOptimizeCSS(css) {
-  let optimized = css;
+const criticalSelectors = [
+  '.game-header',
+  '.header-main-content',
+  '.level-indicator',
+  '.currency-display',
+  '.settings-cogwheel',
+  '.header-drink-progress',
+  '.level-box-clickable',
+  '.level-number',
+  '.level-label',
+  '.level-text',
+  '.level-up-info',
+  '.cost-number',
+  '.cost-currency',
+  '.level-up-label',
+  '.currency-display-compact',
+  '.currency-primary',
+  '.currency-secondary',
+  '.currency-item-compact',
+  '.currency-icon',
+  '.currency-value',
+  '.currency-value-small',
+  '.drink-progress-row',
+  '.drink-progress-info',
+  '.drink-countdown',
+  '.drink-progress-bar',
+  '.faster-drinks-btn',
+  '.settings-modal-header',
+];
 
-  // 1. Remove comments (biggest single win - 26KB)
-  optimized = optimized.replace(/\/\*[\s\S]*?\*\//g, '');
+function compactWhitespace(css) {
+  return css
+    .replace(/\n\s*\n\s*\n+/g, '\n\n')
+    .replace(/\s{3,}/g, ' ')
+    .replace(/\s+$/gm, '')
+    .replace(/^\s+/gm, '');
+}
 
-  // 2. Remove excessive whitespace (33KB potential)
-  optimized = optimized
-    .replace(/\n\s*\n\s*\n+/g, '\n\n') // Remove multiple empty lines
-    .replace(/\s{3,}/g, ' ') // Replace 3+ spaces with single space
-    .replace(/\s+$/gm, '') // Remove trailing whitespace
-    .replace(/^\s+/gm, ''); // Remove leading whitespace
+function isCriticalSelector(selector) {
+  return criticalSelectors.some(critical => selector.includes(critical));
+}
 
-  // 3. Remove duplicate CSS rules but preserve ALL header-related rules exactly
+function collectDeduplicatedRules(css) {
   const rules = new Map();
   const ruleRegex = /([^{}]+)\s*\{([^{}]+)\}/g;
   let match;
 
-  // Critical selectors that should never be merged or modified
-  const criticalSelectors = [
-    '.game-header',
-    '.header-main-content',
-    '.level-indicator',
-    '.currency-display',
-    '.settings-cogwheel',
-    '.header-drink-progress',
-    '.level-box-clickable',
-    '.level-number',
-    '.level-label',
-    '.level-text',
-    '.level-up-info',
-    '.cost-number',
-    '.cost-currency',
-    '.level-up-label',
-    '.currency-display-compact',
-    '.currency-primary',
-    '.currency-secondary',
-    '.currency-item-compact',
-    '.currency-icon',
-    '.currency-value',
-    '.currency-value-small',
-    '.drink-progress-row',
-    '.drink-progress-info',
-    '.drink-countdown',
-    '.drink-progress-bar',
-    '.faster-drinks-btn',
-    '.settings-modal-header',
-  ];
-
-  while ((match = ruleRegex.exec(optimized)) !== null) {
+  while ((match = ruleRegex.exec(css)) !== null) {
     const selector = match[1].trim();
     const properties = match[2].trim();
 
-    // Skip complex selectors, keyframes, media queries, and critical selectors
     if (
       selector.includes('@') ||
       selector.includes('/*') ||
       selector.includes(',') ||
-      criticalSelectors.some(critical => selector.includes(critical))
+      isCriticalSelector(selector)
     ) {
       continue;
     }
 
     if (rules.has(selector)) {
-      // Merge properties, removing duplicates
-      const existing = rules.get(selector);
-      const existingProps = existing.split(';').filter(p => p.trim());
-      const newProps = properties.split(';').filter(p => p.trim());
-
-      const allProps = [...existingProps, ...newProps];
-      const uniqueProps = new Map();
-
-      allProps.forEach(prop => {
-        const trimmed = prop.trim();
-        if (trimmed) {
-          const propName = trimmed.split(':')[0]?.trim();
-          if (propName) {
-            uniqueProps.set(propName, trimmed);
-          }
-        }
-      });
-
-      rules.set(selector, Array.from(uniqueProps.values()).join('; '));
-    } else {
-      rules.set(selector, properties);
+      mergeRuleProperties(rules, selector, properties);
+      continue;
     }
+
+    rules.set(selector, properties);
   }
 
-  // 4. Rebuild CSS - preserve ALL original rules for critical selectors
-  let rebuiltCSS = '';
+  return rules;
+}
 
-  // First, add ALL the critical rules from original CSS exactly as they are
+function mergeRuleProperties(rules, selector, properties) {
+  const existing = rules.get(selector);
+  const existingProps = existing.split(';').filter(p => p.trim());
+  const newProps = properties.split(';').filter(p => p.trim());
+  const allProps = [...existingProps, ...newProps];
+  const uniqueProps = new Map();
+
+  allProps.forEach(prop => {
+    const trimmed = prop.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const propName = trimmed.split(':')[0]?.trim();
+    if (propName) {
+      uniqueProps.set(propName, trimmed);
+    }
+  });
+
+  rules.set(selector, Array.from(uniqueProps.values()).join('; '));
+}
+
+function collectCriticalRules(css) {
   const criticalRules = [];
   const criticalRegex = /([^{}]+)\s*\{([^{}]+)\}/g;
   let criticalMatch;
@@ -111,7 +112,7 @@ function headerFixOptimizeCSS(css) {
     const properties = criticalMatch[2].trim();
 
     if (
-      criticalSelectors.some(critical => selector.includes(critical)) ||
+      isCriticalSelector(selector) ||
       selector.includes('@media') ||
       selector.includes('@keyframes') ||
       selector.includes('@font-face') ||
@@ -121,25 +122,39 @@ function headerFixOptimizeCSS(css) {
     }
   }
 
-  rebuiltCSS = `${criticalRules.join('\n\n')}\n\n`;
+  return criticalRules;
+}
 
-  // Then add the deduplicated rules
+function rebuildCSS(css, rules) {
+  const criticalRules = collectCriticalRules(css);
+  let rebuiltCSS = `${criticalRules.join('\n\n')}\n\n`;
+
   rules.forEach((properties, selector) => {
     rebuiltCSS += `${selector} {\n  ${properties.replace(/;/g, ';\n  ')};\n}\n\n`;
   });
 
-  // 5. Clean up formatting
-  rebuiltCSS = rebuiltCSS
-    .replace(/\n\s*\n\s*\n+/g, '\n\n') // Remove multiple empty lines
-    .replace(/\s+$/gm, '') // Remove trailing whitespace
-    .replace(/;\s*}/g, '}') // Remove semicolon before closing brace
-    .replace(/,\s+/g, ',') // Remove spaces after commas
-    .replace(/:\s+/g, ':') // Remove spaces after colons
-    .replace(/;\s+/g, ';') // Remove spaces after semicolons
-    .replace(/\{\s+/g, '{') // Remove spaces after opening brace
-    .replace(/\s+\}/g, '}'); // Remove spaces before closing brace
-
   return rebuiltCSS;
+}
+
+function normalizeCSSFormatting(css) {
+  return css
+    .replace(/\n\s*\n\s*\n+/g, '\n\n')
+    .replace(/\s+$/gm, '')
+    .replace(/;\s*}/g, '}')
+    .replace(/,\s+/g, ',')
+    .replace(/:\s+/g, ':')
+    .replace(/;\s+/g, ';')
+    .replace(/\{\s+/g, '{')
+    .replace(/\s+\}/g, '}');
+}
+
+// Header-fixed CSS optimization - preserves exact header layout
+function headerFixOptimizeCSS(css) {
+  const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const compactedCSS = compactWhitespace(withoutComments);
+  const rules = collectDeduplicatedRules(compactedCSS);
+  const rebuiltCSS = rebuildCSS(css, rules);
+  return normalizeCSSFormatting(rebuiltCSS);
 }
 
 // Create minified version
