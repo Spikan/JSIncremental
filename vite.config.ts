@@ -23,41 +23,14 @@ function getBasePath(): string {
   );
 }
 
-// Helper function to create manual chunks configuration
-function createManualChunks(id: string): string {
-  // Vendor libraries
-  if (id.includes('node_modules')) {
-    if (id.includes('zustand')) return 'vendor-zustand';
-    if (id.includes('zod')) return 'vendor-zod';
-    return 'vendor';
-  }
-
-  // Critical: ensure data-service lives with game systems to avoid UI<->systems circular deps
-  if (
-    id.includes('/services/data-service') ||
-    id.includes('\\services\\data-service') ||
-    id.includes('services/data-service')
-  ) {
-    return 'game-systems';
-  }
-
-  // Core game modules
-  if (id.includes('/core/state/') || id.includes('/core/rules/') || id.includes('/core/numbers/')) {
-    return 'game-core';
-  }
-
-  // UI modules
-  if (id.includes('/ui/') || id.includes('/services/')) {
-    return 'game-ui';
-  }
-
-  // Game systems
-  if (id.includes('/core/systems/') || id.includes('feature-unlocks') || id.includes('god.ts')) {
-    return 'game-systems';
-  }
-
-  // Default chunk
-  return 'index';
+// Keep manual chunking limited to stable third-party boundaries. The app's
+// internal modules still have circular runtime relationships, so forcing them
+// into separate manual chunks creates Rollup circular chunk warnings.
+function createManualChunks(id: string): string | undefined {
+  if (!id.includes('node_modules')) return undefined;
+  if (id.includes('zustand')) return 'vendor-zustand';
+  if (id.includes('zod')) return 'vendor-zod';
+  return 'vendor';
 }
 
 // Helper function to create asset file names
