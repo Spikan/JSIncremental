@@ -93,6 +93,7 @@ export class SidebarNavigationManager {
 
       // Try to find it again after a delay
       setTimeout(() => {
+        if (typeof document === 'undefined') return;
         this.mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
         if (this.mobileMenuToggle) {
           console.log('Found mobile menu toggle on retry');

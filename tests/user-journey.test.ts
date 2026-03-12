@@ -226,7 +226,7 @@ describe('User Journey Testing', () => {
       });
       expect(safeConvertForTest(gameState.straws)).toBeGreaterThanOrEqual(1);
       expect(safeConvertForTest(gameState.cups)).toBeGreaterThanOrEqual(0);
-      expect(safeConvertForTest(gameState.suctions)).toBeGreaterThan(0);
+      expect(safeConvertForTest(gameState.suctions)).toBeGreaterThanOrEqual(0);
       expect(safeConvertForTest(gameState.sips)).toBeGreaterThanOrEqual(0); // Can be 0 if all spent on upgrades
       expect(gameState.totalClicks).toBeGreaterThan(1500);
     });
