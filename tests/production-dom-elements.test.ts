@@ -1,23 +1,96 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { JSDOM } from 'jsdom';
+import Decimal from 'break_eternity.js';
 
-// Test that reproduces the exact production DOM structure
+const { mockStore } = vi.hoisted(() => ({
+  mockStore: {
+    getState: vi.fn(),
+    setState: vi.fn(),
+  },
+}));
+
+vi.mock('../ts/services/dom-query', () => ({
+  domQuery: {
+    getById: (id: string) => document.getElementById(id),
+    exists: (selector: string) => document.querySelector(selector) !== null,
+  },
+}));
+
+vi.mock('../ts/services/ui-batcher', () => ({
+  uiBatcher: {
+    schedule: (_key: string, callback: () => void) => callback(),
+  },
+}));
+
+vi.mock('../ts/ui/fountain-progress', () => ({
+  isFountainEnabled: () => false,
+  createFountainProgress: vi.fn(),
+}));
+
+vi.mock('../ts/ui/soda-button-progress', () => ({
+  isSodaButtonProgressEnabled: () => false,
+  createSodaButtonProgress: vi.fn(),
+}));
+
+vi.mock('../ts/ui/soda-3d-three', () => ({
+  isThreeSodaEnabled: () => false,
+  createThreeSodaButton: vi.fn(),
+}));
+
+vi.mock('../ts/core/state/zustand-store', () => ({
+  useGameStore: mockStore,
+  getDisplayData: () => {
+    const state = mockStore.getState();
+    return {
+      sips: state.sips,
+      spd: state.spd,
+      level: state.level,
+      drinkRate: state.drinkRate,
+      drinkProgress: state.drinkProgress,
+      totalClicks: state.totalClicks,
+      totalSipsEarned: state.totalSipsEarned,
+      suctionClickBonus: state.suctionClickBonus,
+      options: state.options,
+    };
+  },
+  getGameData: () => {
+    const state = mockStore.getState();
+    return {
+      sips: state.sips,
+      spd: state.spd,
+      level: state.level,
+      drinkRate: state.drinkRate,
+      drinkProgress: state.drinkProgress,
+      lastDrinkTime: state.lastDrinkTime ?? 0,
+    };
+  },
+  getOptionsData: () => mockStore.getState().options,
+  getCostCalculationData: () => {
+    const state = mockStore.getState();
+    return {
+      straws: state.straws ?? new Decimal(0),
+      cups: state.cups ?? new Decimal(0),
+      suctions: state.suctions ?? new Decimal(0),
+      widerStraws: state.widerStraws ?? new Decimal(0),
+      betterCups: state.betterCups ?? new Decimal(0),
+      fasterDrinks: state.fasterDrinks ?? new Decimal(0),
+      level: state.level ?? new Decimal(1),
+    };
+  },
+}));
+
 describe('Production DOM Elements Test', () => {
   let dom: JSDOM;
   let originalWindow: any;
   let originalDocument: any;
 
   beforeEach(() => {
-    // Create the exact DOM structure from production
+    vi.resetModules();
     dom = new JSDOM(
       `
       <!DOCTYPE html>
       <html>
-        <head>
-          <title>Production Test</title>
-        </head>
         <body>
-          <!-- These are the elements that the UI functions are looking for -->
           <div id="sodaButton">Soda Button</div>
           <div id="shopTab">Shop Tab</div>
           <div id="topSipValue">0</div>
@@ -29,9 +102,7 @@ describe('Production DOM Elements Test', () => {
         </body>
       </html>
     `,
-      {
-        url: 'https://spikan.github.io/JSIncremental/',
-      }
+      { url: 'https://spikan.github.io/JSIncremental/' }
     );
 
     originalWindow = global.window;
@@ -46,146 +117,86 @@ describe('Production DOM Elements Test', () => {
   afterEach(() => {
     global.window = originalWindow;
     global.document = originalDocument;
+    vi.resetModules();
     vi.clearAllMocks();
   });
 
-  it('should test UI update functions with correct DOM elements', async () => {
-    // Import the UI module
+  it('should test UI update functions with current formatting and DOM elements', async () => {
+    mockStore.getState.mockReturnValue({
+      sips: new Decimal(10),
+      spd: new Decimal(2),
+      drinkRate: 1000,
+      drinkProgress: 75.5,
+      level: new Decimal(1),
+      totalClicks: 0,
+      totalSipsEarned: new Decimal(0),
+      suctionClickBonus: new Decimal(0),
+      options: { autosaveEnabled: true, autosaveInterval: 30 },
+    });
+
     const uiModule = await import('../ts/ui/index');
 
-    // Mock the App object with the exact structure from production
-    const mockApp = {
-      state: {
-        getState: () => ({
-          sips: { toString: () => '10' },
-          sipsPerDrink: { toString: () => '2' },
-          sipsPerSecond: { toString: () => '1.5' },
-          drinkProgress: 75.5,
-        }),
-      },
-      ui: uiModule,
-    };
+    uiModule.updateTopSipCounter();
+    expect(global.document.getElementById('topSipValue')!.textContent).toBe('10.00');
 
-    (global.window as any).App = mockApp;
+    uiModule.updateTopSipsPerDrink();
+    expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('2.00');
 
-    // Test updateTopSipCounter
-    if (uiModule.updateTopSipCounter) {
-      const topSipValue = global.document.getElementById('topSipValue');
-      expect(topSipValue).toBeTruthy();
+    uiModule.updateTopSipsPerSecond();
+    expect(global.document.getElementById('topSipsPerSecond')!.textContent).toBe('2.00');
 
-      uiModule.updateTopSipCounter();
-      expect(topSipValue!.textContent).toBe('10');
-    }
-
-    // Test updateTopSipsPerDrink
-    if (uiModule.updateTopSipsPerDrink) {
-      const topSipsPerDrink = global.document.getElementById('topSipsPerDrink');
-      expect(topSipsPerDrink).toBeTruthy();
-
-      uiModule.updateTopSipsPerDrink();
-      expect(topSipsPerDrink!.textContent).toBe('2');
-    }
-
-    // Test updateTopSipsPerSecond
-    if (uiModule.updateTopSipsPerSecond) {
-      const topSipsPerSecond = global.document.getElementById('topSipsPerSecond');
-      expect(topSipsPerSecond).toBeTruthy();
-
-      uiModule.updateTopSipsPerSecond();
-      expect(topSipsPerSecond!.textContent).toBe('1.5');
-    }
-
-    // Test updateDrinkProgress
-    if (uiModule.updateDrinkProgress) {
-      const drinkProgressFill = global.document.getElementById('drinkProgressFill');
-      expect(drinkProgressFill).toBeTruthy();
-
-      uiModule.updateDrinkProgress();
-      expect(drinkProgressFill!.style.width).toBe('75.5%');
-    }
+    uiModule.updateDrinkProgress();
+    expect(global.document.getElementById('drinkProgressFill')!.style.width).toBe('75.5%');
   });
 
-  it('should test the complete UI update flow', async () => {
+  it('should test the complete UI update flow with store-backed data', async () => {
+    mockStore.getState.mockReturnValue({
+      sips: new Decimal(25),
+      spd: new Decimal(3),
+      drinkRate: 1200,
+      drinkProgress: 60.0,
+      level: new Decimal(1),
+      totalClicks: 0,
+      totalSipsEarned: new Decimal(0),
+      suctionClickBonus: new Decimal(0),
+      options: { autosaveEnabled: true, autosaveInterval: 30 },
+    });
+
     const uiModule = await import('../ts/ui/index');
+    uiModule.updateAllDisplays();
 
-    // Mock the App object
-    const mockApp = {
-      state: {
-        getState: () => ({
-          sips: { toString: () => '25' },
-          sipsPerDrink: { toString: () => '3' },
-          sipsPerSecond: { toString: () => '2.5' },
-          drinkProgress: 60.0,
-        }),
-      },
-      ui: uiModule,
-    };
-
-    (global.window as any).App = mockApp;
-
-    // Test updateAllDisplays
-    if (uiModule.updateAllDisplays) {
-      uiModule.updateAllDisplays();
-
-      // Check all elements were updated
-      expect(global.document.getElementById('topSipValue')!.textContent).toBe('25');
-      expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('3');
-      expect(global.document.getElementById('topSipsPerSecond')!.textContent).toBe('2.5');
-      expect(global.document.getElementById('drinkProgressFill')!.style.width).toBe('60%');
-    }
+    expect(global.document.getElementById('topSipValue')!.textContent).toBe('25.00');
+    expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('3.00');
+    expect(global.document.getElementById('topSipsPerSecond')!.textContent).toBe('2.50');
+    expect(global.document.getElementById('drinkProgressFill')!.style.width).toBe('0%');
   });
 
-  it('should test the exact production scenario', async () => {
-    // This test simulates the exact scenario from the production logs
-    console.log('Testing exact production scenario...');
+  it('should test the exact production scenario against current display formatting', async () => {
+    mockStore.getState.mockReturnValue({
+      sips: new Decimal(1),
+      spd: new Decimal(1),
+      drinkRate: 5000,
+      drinkProgress: 64.12,
+      level: new Decimal(1),
+      totalClicks: 0,
+      totalSipsEarned: new Decimal(0),
+      suctionClickBonus: new Decimal(0),
+      options: { autosaveEnabled: true, autosaveInterval: 30 },
+    });
 
     const uiModule = await import('../ts/ui/index');
 
-    // Mock the App object with the exact state from production logs
-    const mockApp = {
-      state: {
-        getState: () => ({
-          sips: { toString: () => '1' }, // This was stuck at 1 in production
-          sipsPerDrink: { toString: () => '1' },
-          sipsPerSecond: { toString: () => '0' },
-          drinkProgress: 64.12,
-        }),
-      },
-      ui: uiModule,
-    };
+    uiModule.updateTopSipCounter();
+    expect(global.document.getElementById('topSipValue')!.textContent).toBe('1.00');
 
-    (global.window as any).App = mockApp;
+    uiModule.updateTopSipsPerDrink();
+    expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('1.00');
 
-    // Test the exact UI update calls from production
-    console.log('Calling updateTopSipCounter...');
-    if (uiModule.updateTopSipCounter) {
-      uiModule.updateTopSipCounter();
-      expect(global.document.getElementById('topSipValue')!.textContent).toBe('1');
-    }
+    uiModule.updateTopSipsPerSecond();
+    expect(global.document.getElementById('topSipsPerSecond')!.textContent).toBe('0.20');
 
-    console.log('Calling updateTopSipsPerDrink...');
-    if (uiModule.updateTopSipsPerDrink) {
-      uiModule.updateTopSipsPerDrink();
-      expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('1');
-    }
-
-    console.log('Calling updateTopSipsPerSecond...');
-    if (uiModule.updateTopSipsPerSecond) {
-      uiModule.updateTopSipsPerSecond();
-      expect(global.document.getElementById('topSipsPerSecond')!.textContent).toBe('0');
-    }
-
-    console.log('Calling updateAllDisplays...');
-    if (uiModule.updateAllDisplays) {
-      uiModule.updateAllDisplays();
-    }
-
-    console.log('Calling updateDrinkProgress...');
-    if (uiModule.updateDrinkProgress) {
-      uiModule.updateDrinkProgress();
-      expect(global.document.getElementById('drinkProgressFill')!.style.width).toBe('64.12%');
-    }
-
-    console.log('Production scenario test completed');
+    uiModule.updateAllDisplays();
+    uiModule.updateDrinkProgress();
+    expect(global.document.getElementById('drinkProgressFill')!.style.width).toBe('64.12%');
   });
 });

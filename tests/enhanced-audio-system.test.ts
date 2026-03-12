@@ -1,5 +1,5 @@
 // Enhanced Audio System Tests
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { EnhancedAudioManager } from '../ts/services/enhanced-audio-manager';
 
 // Mock Howler
@@ -59,11 +59,22 @@ beforeEach(() => {
   };
 });
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe('Enhanced Audio System', () => {
   let audioManager: EnhancedAudioManager;
 
   beforeEach(() => {
     audioManager = EnhancedAudioManager.getInstance();
+    const state = audioManager.getAudioState();
+    if (state.muted) audioManager.toggleMute();
+    if (!state.musicEnabled) audioManager.toggleMusic();
+    if (!state.sfxEnabled) audioManager.toggleSFX();
+    audioManager.setMasterVolume(0.7);
+    audioManager.setMusicVolume(0.25);
+    audioManager.setSFXVolume(0.6);
   });
 
   describe('EnhancedAudioManager', () => {
@@ -107,18 +118,26 @@ describe('Enhanced Audio System', () => {
     });
 
     it('should play level up sounds', () => {
+      vi.useFakeTimers();
+
       expect(() => {
         audioManager.playSound('level-up');
       }).not.toThrow();
+
+      vi.runAllTimers();
 
       // Should create multiple oscillators for chord
       expect(mockAudioContext.createOscillator).toHaveBeenCalledTimes(3);
     });
 
     it('should play achievement sounds', () => {
+      vi.useFakeTimers();
+
       expect(() => {
         audioManager.playSound('achievement');
       }).not.toThrow();
+
+      vi.runAllTimers();
 
       // Should create multiple oscillators for melody
       expect(mockAudioContext.createOscillator).toHaveBeenCalledTimes(4);
@@ -129,7 +148,9 @@ describe('Enhanced Audio System', () => {
         audioManager.playSound('unknown-sound');
       }).not.toThrow();
 
-      expect(console.warn).toHaveBeenCalledWith('Unknown sound ID: unknown-sound');
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Unknown sound ID: unknown-sound')
+      );
     });
 
     it('should set master volume', () => {
@@ -196,7 +217,10 @@ describe('Enhanced Audio System', () => {
         audioManager.playSound('click');
       }).not.toThrow();
 
-      expect(console.warn).toHaveBeenCalledWith('Failed to play tone:', expect.any(Error));
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to play tone:'),
+        expect.any(Error)
+      );
     });
 
     it('should get current audio state', () => {

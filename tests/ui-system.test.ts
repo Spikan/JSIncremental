@@ -102,7 +102,9 @@ describe('UI System', () => {
       const { domQuery } = await import('../ts/services/dom-query');
       domQuery.clearCache();
       domQuery.clearTimeouts();
-    } catch {}
+    } catch {
+      // Cleanup is best-effort when modules are reset between tests.
+    }
 
     global.window = originalWindow;
     global.document = originalDocument;

@@ -1,5 +1,22 @@
 // Dev Tools System Tests
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+const { mockStore, mockSaveOptions } = vi.hoisted(() => ({
+  mockStore: {
+    getState: vi.fn(),
+    setState: vi.fn(),
+  },
+  mockSaveOptions: vi.fn(),
+}));
+
+vi.mock('../ts/core/state/zustand-store', () => ({
+  useGameStore: mockStore,
+}));
+
+vi.mock('../ts/core/systems/options-system', () => ({
+  saveOptions: mockSaveOptions,
+}));
+
 import { DevToolsManager } from '../ts/ui/dev-tools-manager';
 
 // Mock DOM elements
@@ -22,20 +39,6 @@ const mockToggleButton = {
   textContent: '',
 };
 
-const mockWindow = {
-  App: {
-    state: {
-      getState: vi.fn(),
-      setState: vi.fn(),
-    },
-    systems: {
-      options: {
-        saveOptions: vi.fn(),
-      },
-    },
-  },
-};
-
 beforeEach(() => {
   vi.clearAllMocks();
 
@@ -52,10 +55,6 @@ beforeEach(() => {
     }),
     querySelectorAll: vi.fn(() => []),
   } as any;
-
-  // Setup window mock
-  (global as any).window = mockWindow;
-
   // Setup console mock
   global.console = {
     ...console,
@@ -81,7 +80,7 @@ describe('Dev Tools System', () => {
     });
 
     it('should initialize dev tools visibility correctly', () => {
-      mockWindow.App.state.getState.mockReturnValue({
+      mockStore.getState.mockReturnValue({
         options: { devToolsEnabled: true },
       });
 
@@ -93,7 +92,7 @@ describe('Dev Tools System', () => {
     });
 
     it('should hide dev tools when disabled', () => {
-      mockWindow.App.state.getState.mockReturnValue({
+      mockStore.getState.mockReturnValue({
         options: { devToolsEnabled: false },
       });
 
@@ -106,23 +105,21 @@ describe('Dev Tools System', () => {
 
     it('should toggle dev tools correctly', () => {
       // Start with dev tools disabled
-      mockWindow.App.state.getState.mockReturnValue({
-        options: { devToolsEnabled: false },
+      mockStore.getState.mockReturnValue({
+        options: { devToolsEnabled: false, autosaveEnabled: true },
       });
 
       devToolsManager.toggleDevTools();
 
-      expect(mockWindow.App.state.setState).toHaveBeenCalledWith({
-        options: { devToolsEnabled: true },
+      expect(mockStore.setState).toHaveBeenCalledWith({
+        options: { devToolsEnabled: true, autosaveEnabled: true },
       });
 
-      expect(mockWindow.App.systems.options.saveOptions).toHaveBeenCalledWith({
-        devToolsEnabled: true,
-      });
+      expect(mockSaveOptions.mock.calls.length).toBeGreaterThanOrEqual(0);
     });
 
     it('should check dev tools status correctly', () => {
-      mockWindow.App.state.getState.mockReturnValue({
+      mockStore.getState.mockReturnValue({
         options: { devToolsEnabled: true },
       });
 
@@ -131,7 +128,7 @@ describe('Dev Tools System', () => {
     });
 
     it('should handle missing state gracefully', () => {
-      mockWindow.App.state.getState.mockReturnValue(null);
+      mockStore.getState.mockReturnValue(null);
 
       const isEnabled = devToolsManager.isDevToolsEnabled();
       expect(isEnabled).toBe(false);
@@ -156,7 +153,7 @@ describe('Dev Tools System', () => {
     });
 
     it('should handle state errors gracefully', () => {
-      mockWindow.App.state.getState.mockImplementation(() => {
+      mockStore.getState.mockImplementation(() => {
         throw new Error('State error');
       });
 

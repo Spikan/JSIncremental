@@ -1,4 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest';
+
+let lastRuntime: Awaited<ReturnType<typeof loadRealRuntime>> | null = null;
 
 async function loadRealRuntime() {
   const indexModule = await import('../ts/index.ts');
@@ -8,7 +10,7 @@ async function loadRealRuntime() {
   const clicksModule = await import('../ts/core/systems/clicks-system');
   const gameInitModule = await import('../ts/core/systems/game-init');
 
-  return {
+  lastRuntime = {
     indexModule,
     ...storeModule,
     ...loopModule,
@@ -16,6 +18,8 @@ async function loadRealRuntime() {
     ...clicksModule,
     ...gameInitModule,
   };
+
+  return lastRuntime;
 }
 
 describe('Real Production Build Test', () => {
@@ -68,6 +72,21 @@ describe('Real Production Build Test', () => {
       value: vi.fn(handle => clearTimeout(handle)),
     });
 
+    Object.defineProperty(globalThis, 'requestAnimationFrame', {
+      writable: true,
+      value: window.requestAnimationFrame,
+    });
+
+    Object.defineProperty(globalThis, 'cancelAnimationFrame', {
+      writable: true,
+      value: window.cancelAnimationFrame,
+    });
+
+    Object.defineProperty(globalThis, 'document', {
+      writable: true,
+      value: window.document,
+    });
+
     global.fetch = vi.fn().mockImplementation(url => {
       if (String(url).includes('word_bank.json')) {
         return Promise.resolve({
@@ -89,7 +108,31 @@ describe('Real Production Build Test', () => {
   });
 
   afterEach(() => {
+    lastRuntime?.stop?.();
+    lastRuntime = null;
+    document.body.innerHTML = '';
     vi.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    Object.defineProperty(globalThis, 'requestAnimationFrame', {
+      writable: true,
+      value: () => 0,
+    });
+    Object.defineProperty(globalThis, 'cancelAnimationFrame', {
+      writable: true,
+      value: () => {},
+    });
+    Object.defineProperty(globalThis, 'document', {
+      writable: true,
+      value: {
+        body: { innerHTML: '', classList: { contains: () => false } },
+        getElementById: () => null,
+        querySelectorAll: () => [],
+        querySelector: () => null,
+        addEventListener: () => {},
+      },
+    });
   });
 
   it('should actually load the real ts/index.ts module without errors', async () => {

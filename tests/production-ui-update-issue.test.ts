@@ -72,7 +72,9 @@ describe('Production UI Update Issue Reproduction', () => {
       const { domQuery } = await import('../ts/services/dom-query');
       domQuery.clearCache();
       domQuery.clearTimeouts();
-    } catch {}
+    } catch {
+      // Cleanup is best-effort for this DOM-heavy test harness.
+    }
 
     global.window = originalWindow;
     global.document = originalDocument;

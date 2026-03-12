@@ -41,7 +41,14 @@ Object.defineProperty(global, 'window', {
   value: {
     innerWidth: 1024,
     innerHeight: 768,
-    matchMedia: vi.fn(() => ({ matches: false })),
+    matchMedia: vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
     addEventListener: vi.fn(),
     requestAnimationFrame: vi.fn(cb => setTimeout(cb, 16)),
     setTimeout: vi.fn((cb, delay) => setTimeout(cb, delay)),
@@ -287,7 +294,14 @@ describe('Framer Motion Integration', () => {
   describe('Performance', () => {
     it('should respect reduced motion preference', () => {
       const originalMatchMedia = window.matchMedia;
-      window.matchMedia = vi.fn(() => ({ matches: true }));
+      window.matchMedia = vi.fn(() => ({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }));
 
       // Create new animation service instance (would detect reduced motion)
       const stats = enhancedDisplayManager.getStats();

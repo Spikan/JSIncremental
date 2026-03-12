@@ -2,7 +2,7 @@
 // Updated to use our mock Decimal constructor for consistent testing
 
 import { describe, it, expect } from 'vitest';
-import { Decimal } from './test-utils';
+import { Decimal, expectLargeNumberToEqual } from './test-utils';
 import {
   addSips,
   subtractSips,
@@ -16,7 +16,6 @@ import {
   max,
   min,
 } from '../ts/core/state/mutations';
-import { expectLargeNumberToEqual } from './test-utils';
 
 // Use our mock Decimal constructor for consistent testing
 const LargeNumber = Decimal; // Alias for backward compatibility

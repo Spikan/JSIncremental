@@ -57,7 +57,9 @@ describe('Zustand Store Integration Test', () => {
       const { domQuery } = await import('../ts/services/dom-query');
       domQuery.clearCache();
       domQuery.clearTimeouts();
-    } catch {}
+    } catch {
+      // Cleanup is best-effort when tests reset modules aggressively.
+    }
 
     global.window = originalWindow;
     global.document = originalDocument;

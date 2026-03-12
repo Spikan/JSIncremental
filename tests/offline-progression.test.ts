@@ -1,36 +1,38 @@
 // Offline Progression System Tests
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+const { mockStore, mockUi } = vi.hoisted(() => ({
+  mockStore: {
+    getState: vi.fn(),
+    setState: vi.fn(),
+  },
+  mockUi: {
+    updateTopSipsPerDrink: vi.fn(),
+    updateTopSipsPerSecond: vi.fn(),
+    updateAllStats: vi.fn(),
+  },
+}));
+
+vi.mock('../ts/core/state/zustand-store', () => ({
+  useGameStore: mockStore,
+}));
+
+vi.mock('../ts/ui/index', () => mockUi);
+
 import {
   calculateOfflineProgression,
   applyOfflineProgression,
   formatOfflineTime,
 } from '../ts/core/systems/offline-progression';
-import { Decimal } from './test-utils';
-
-// Mock window and global objects
-const mockWindow = {
-  App: {
-    state: {
-      getState: vi.fn(),
-      setState: vi.fn(),
-    },
-    ui: {
-      updateTopSipsPerDrink: vi.fn(),
-      updateTopSipsPerSecond: vi.fn(),
-      updateAllStats: vi.fn(),
-    },
-  },
-};
+import { Decimal } from '../ts/core/numbers/simplified';
 
 const mockState = {
   lastSaveTime: 0,
   drinkRate: 5000, // 5 seconds per drink
   spd: new Decimal(10), // 10 sips per drink
+  sips: new Decimal(100),
   totalSipsEarned: new Decimal(0),
 };
-
-// Mock globals
-let mockSips = new Decimal(100);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -38,16 +40,16 @@ beforeEach(() => {
   // Reset mocks
   mockState.lastSaveTime = Date.now() - 60 * 60 * 1000; // 1 hour ago
   mockState.spd = new Decimal(10);
-  mockSips = new Decimal(100);
+  mockState.sips = new Decimal(100);
+  mockState.totalSipsEarned = new Decimal(0);
 
-  // Setup window mock
   (global as any).window = {
-    ...mockWindow,
-    sips: mockSips,
     lastSaveTime: mockState.lastSaveTime,
+    drinkRate: mockState.drinkRate,
+    spd: mockState.spd,
   };
 
-  mockWindow.App.state.getState.mockReturnValue(mockState);
+  mockStore.getState.mockReturnValue(mockState);
 });
 
 describe('Offline Progression System', () => {
@@ -55,6 +57,7 @@ describe('Offline Progression System', () => {
     it('should calculate offline earnings correctly', () => {
       // Setup: Player was away for 1 hour with 10 SPD and 5-second drink rate
       const now = Date.now();
+      vi.spyOn(Date, 'now').mockReturnValue(now);
       mockState.lastSaveTime = now - 60 * 60 * 1000; // 1 hour ago
 
       const result = calculateOfflineProgression();
@@ -72,6 +75,7 @@ describe('Offline Progression System', () => {
     it('should respect minimum offline time', () => {
       // Setup: Player was away for only 30 seconds
       const now = Date.now();
+      vi.spyOn(Date, 'now').mockReturnValue(now);
       mockState.lastSaveTime = now - 30 * 1000; // 30 seconds ago
 
       const result = calculateOfflineProgression({ minOfflineMinutes: 1 });
@@ -84,6 +88,7 @@ describe('Offline Progression System', () => {
     it('should cap offline time correctly', () => {
       // Setup: Player was away for 12 hours, but cap at 8 hours
       const now = Date.now();
+      vi.spyOn(Date, 'now').mockReturnValue(now);
       mockState.lastSaveTime = now - 12 * 60 * 60 * 1000; // 12 hours ago
 
       const result = calculateOfflineProgression({ maxOfflineHours: 8 });
@@ -102,6 +107,7 @@ describe('Offline Progression System', () => {
     it('should handle efficiency multiplier', () => {
       // Setup: Player was away for 1 hour with 50% efficiency
       const now = Date.now();
+      vi.spyOn(Date, 'now').mockReturnValue(now);
       mockState.lastSaveTime = now - 60 * 60 * 1000; // 1 hour ago
 
       const result = calculateOfflineProgression({ offlineEfficiency: 0.5 });
@@ -117,6 +123,7 @@ describe('Offline Progression System', () => {
       mockState.spd = new Decimal(0);
 
       const now = Date.now();
+      vi.spyOn(Date, 'now').mockReturnValue(now);
       mockState.lastSaveTime = now - 60 * 60 * 1000; // 1 hour ago
 
       const result = calculateOfflineProgression();
@@ -141,20 +148,19 @@ describe('Offline Progression System', () => {
 
       expect(success).toBe(true);
 
-      // Should update sips: 100 + 1000 = 1100
-      expect((global as any).window.sips.toString()).toBe('1100');
-
       // Should update state
-      expect(mockWindow.App.state.setState).toHaveBeenCalledWith({
+      expect(mockStore.setState).toHaveBeenCalledWith({
         sips: expect.any(Decimal),
         totalSipsEarned: expect.any(Decimal),
         lastSaveTime: expect.any(Number),
       });
+      expect(mockStore.setState.mock.calls[0][0].sips.toString()).toBe('1100');
+      expect(mockStore.setState.mock.calls[0][0].totalSipsEarned.toString()).toBe('1000');
 
       // Should update UI
-      expect(mockWindow.App.ui.updateTopSipsPerDrink).toHaveBeenCalled();
-      expect(mockWindow.App.ui.updateTopSipsPerSecond).toHaveBeenCalled();
-      expect(mockWindow.App.ui.updateAllStats).toHaveBeenCalled();
+      expect(mockUi.updateTopSipsPerDrink).toHaveBeenCalled();
+      expect(mockUi.updateTopSipsPerSecond).toHaveBeenCalled();
+      expect(mockUi.updateAllStats).toHaveBeenCalled();
     });
 
     it('should not apply inactive offline progression', () => {
@@ -169,7 +175,7 @@ describe('Offline Progression System', () => {
       const success = applyOfflineProgression(offlineResult);
 
       expect(success).toBe(false);
-      expect(mockWindow.App.state.setState).not.toHaveBeenCalled();
+      expect(mockStore.setState).not.toHaveBeenCalled();
     });
   });
 

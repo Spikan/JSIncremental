@@ -10,8 +10,24 @@ import { nextStrawCost } from '../ts/core/rules/purchases';
 // Helper functions for backward compatibility
 const toLargeNumber = (value: any): Decimal => {
   if (value instanceof Decimal) return value;
-  if (value && typeof value.toNumber === 'function') return new Decimal(value.toNumber());
-  return new Decimal(value || 0);
+  if (value && typeof value.toNumber === 'function') {
+    const numericValue = value.toNumber();
+    return Number.isFinite(numericValue) ? new Decimal(numericValue) : new Decimal(0);
+  }
+
+  const normalizedValue = typeof value === 'string' ? value.trim() : value;
+
+  const numericValue = Number(normalizedValue);
+  if (
+    normalizedValue === '' ||
+    normalizedValue === null ||
+    normalizedValue === undefined ||
+    !Number.isFinite(numericValue)
+  ) {
+    return new Decimal(0);
+  }
+
+  return new Decimal(normalizedValue);
 };
 
 const toNumber = (value: any): number => {
@@ -22,13 +38,19 @@ const toNumber = (value: any): number => {
 
 const formatLargeNumber = (value: any): string => {
   const decimal = toLargeNumber(value);
-  return decimal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const raw = decimal.toString();
+  if (/e[+-]?\d+$/i.test(raw)) return raw;
+  return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
 const migrateStateToLargeNumber = (state: any): any => {
   const result: any = {};
   for (const [key, value] of Object.entries(state)) {
-    if (typeof value === 'number' || (value && typeof value.toNumber === 'function')) {
+    if (
+      typeof value === 'number' ||
+      (typeof value === 'string' && /^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(value.trim())) ||
+      (value && typeof value.toNumber === 'function')
+    ) {
       result[key] = toLargeNumber(value);
     } else {
       result[key] = value;
@@ -281,7 +303,7 @@ describe('Backward Compatibility', () => {
 
       // The function adds baseSipsPerDrink (1) to totalSPD (1e100)
       // Result should be 1 + 1e100 = 1e100 (since 1 is negligible compared to 1e100)
-      expect(result.toString()).toBe('1e+100');
+      expect(result.toString()).toMatch(/^1e\+?100$/);
     });
 
     it('should maintain calculation accuracy with large numbers', () => {
@@ -296,23 +318,23 @@ describe('Backward Compatibility', () => {
   describe('Number Formatting Compatibility', () => {
     it('should format regular numbers correctly', () => {
       expect(formatLargeNumber(1000)).toBe('1,000');
-      expect(formatLargeNumber(1000000)).toMatch(/1\.?0*e\+6|1000000/);
+      expect(formatLargeNumber(1000000)).toBe('1,000,000');
     });
 
     it('should format Decimal correctly', () => {
       expect(formatLargeNumber(new Decimal(1000))).toBe('1,000');
-      expect(formatLargeNumber(new Decimal(1000000))).toMatch(/1\.?0*e\+6|1000000/);
+      expect(formatLargeNumber(new Decimal(1000000))).toBe('1,000,000');
     });
 
     it('should format Decimal.js-like objects correctly', () => {
       expect(formatLargeNumber(new MockDecimal(1000))).toBe('1,000');
-      expect(formatLargeNumber(new MockDecimal(1000000))).toMatch(/1\.?0*e\+6|1000000/);
+      expect(formatLargeNumber(new MockDecimal(1000000))).toBe('1,000,000');
     });
 
     it('should handle very large numbers with scientific notation', () => {
       const veryLarge = new Decimal('1e100');
       const formatted = formatLargeNumber(veryLarge);
-      expect(formatted).toMatch(/1\.?0*e\+100|1e100/);
+      expect(formatted).toMatch(/^1e\+?100$/);
     });
   });
 
@@ -343,10 +365,10 @@ describe('Backward Compatibility', () => {
       const migrated = migrateStateToLargeNumber(corruptedSave);
 
       // Invalid values should default to 0
-      expect(migrated.sips ? migrated.sips.toNumber() : 0).toBe(0);
-      expect(migrated.straws ? migrated.straws.toNumber() : 0).toBe(0);
-      expect(migrated.cups ? migrated.cups.toNumber() : 0).toBe(0);
-      expect(migrated.level.toNumber()).toBe(0);
+      expect(toNumber(migrated.sips)).toBe(0);
+      expect(toNumber(migrated.straws)).toBe(0);
+      expect(toNumber(migrated.cups)).toBe(0);
+      expect(toNumber(migrated.level)).toBe(0);
     });
 
     it('should handle missing properties', () => {

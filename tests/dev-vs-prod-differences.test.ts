@@ -1,429 +1,198 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { JSDOM } from 'jsdom';
 
-// This test identifies specific differences between dev and production environments
+async function setupEnvironment(url: string) {
+  vi.resetModules();
+
+  const dom = new JSDOM(
+    `
+    <!DOCTYPE html>
+    <html>
+      <body>
+        <div id="sodaButton">Soda Button</div>
+        <div id="topSipValue">0</div>
+        <div id="topSipsPerDrink">0</div>
+        <div id="drinkProgressBar"><div id="drinkProgressFill" style="width: 0%"></div></div>
+      </body>
+    </html>
+  `,
+    { url }
+  );
+
+  global.window = dom.window as any;
+  global.document = dom.window.document as any;
+  global.navigator = dom.window.navigator as any;
+  global.location = dom.window.location as any;
+
+  (window as any).__TEST_ENV__ = true;
+
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+
+  const raf = vi.fn(
+    (callback: FrameRequestCallback) =>
+      setTimeout(() => callback(performance.now()), 16) as unknown as number
+  );
+  const caf = vi.fn((handle: number) => clearTimeout(handle));
+  Object.defineProperty(window, 'requestAnimationFrame', { writable: true, value: raf });
+  Object.defineProperty(window, 'cancelAnimationFrame', { writable: true, value: caf });
+  (globalThis as any).requestAnimationFrame = raf;
+  (globalThis as any).cancelAnimationFrame = caf;
+
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve({ words: ['test', 'word', 'bank'] }),
+  }) as any;
+
+  const { config } = await import('../ts/config');
+  config.UI.FOUNTAIN_SODA_PROGRESS = false;
+  config.UI.SODA_BUTTON_PROGRESS = false;
+  config.UI.USE_THREE_SODA_BUTTON = false;
+
+  return dom;
+}
+
 describe('Dev vs Production Differences', () => {
-  let devDom: JSDOM;
-  let prodDom: JSDOM;
   let originalWindow: any;
   let originalDocument: any;
+  let originalNavigator: any;
+  let originalLocation: any;
 
   beforeEach(() => {
-    // Create dev environment
-    devDom = new JSDOM(
-      `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Dev Test</title>
-        </head>
-        <body>
-          <div id="sodaButton">Soda Button</div>
-          <div id="sipCounter">0</div>
-        </body>
-      </html>
-    `,
-      {
-        url: 'http://localhost:5173/',
-        referrer: 'http://localhost:5173/',
-      }
-    );
-
-    // Create production environment
-    prodDom = new JSDOM(
-      `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Production Test</title>
-        </head>
-        <body>
-          <div id="sodaButton">Soda Button</div>
-          <div id="sipCounter">0</div>
-        </body>
-      </html>
-    `,
-      {
-        url: 'https://spikan.github.io/JSIncremental/',
-        referrer: 'https://github.com/Spikan/JSIncremental',
-      }
-    );
-
     originalWindow = global.window;
     originalDocument = global.document;
+    originalNavigator = global.navigator;
+    originalLocation = global.location;
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    try {
+      const { domQuery } = await import('../ts/services/dom-query');
+      domQuery.clearCache();
+      domQuery.clearTimeouts();
+    } catch {
+      // Cleanup is best-effort in these environment-switch tests.
+    }
     global.window = originalWindow;
     global.document = originalDocument;
-    vi.clearAllMocks();
+    global.navigator = originalNavigator;
+    global.location = originalLocation;
+    vi.restoreAllMocks();
   });
 
-  describe('Environment Detection', () => {
-    it('should detect dev environment correctly', () => {
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
-      global.location = devDom.window.location as any;
+  it('detects development and production URLs correctly', async () => {
+    const devDom = await setupEnvironment('http://localhost:5173/');
+    expect(devDom.window.location.hostname).toBe('localhost');
 
-      const isDev =
-        global.window.location.hostname === 'localhost' ||
-        global.window.location.hostname === '127.0.0.1' ||
-        global.window.location.port === '5173';
-
-      expect(isDev).toBe(true);
-    });
-
-    it('should detect production environment correctly', () => {
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-      global.location = prodDom.window.location as any;
-
-      const isProd =
-        global.window.location.hostname === 'spikan.github.io' &&
-        global.window.location.protocol === 'https:';
-
-      expect(isProd).toBe(true);
-    });
+    const prodDom = await setupEnvironment('https://spikan.github.io/JSIncremental/');
+    expect(prodDom.window.location.hostname).toBe('spikan.github.io');
+    expect(prodDom.window.location.protocol).toBe('https:');
   });
 
-  describe('Module Loading Differences', () => {
-    it('should test static imports in both environments', async () => {
-      // Test in dev environment
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
+  it('loads the same core modules in both environments', async () => {
+    await setupEnvironment('http://localhost:5173/');
+    const devDrink = await import('../ts/core/systems/drink-system');
+    const devUI = await import('../ts/ui/index');
 
-      let devImportSuccess = false;
-      try {
-        const { processDrinkFactory } = await import('../ts/core/systems/drink-system');
-        devImportSuccess = !!processDrinkFactory;
-      } catch (error) {
-        console.error('Dev import failed:', error);
-      }
+    await setupEnvironment('https://spikan.github.io/JSIncremental/');
+    const prodDrink = await import('../ts/core/systems/drink-system');
+    const prodUI = await import('../ts/ui/index');
 
-      // Test in production environment
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      let prodImportSuccess = false;
-      try {
-        const { processDrinkFactory } = await import('../ts/core/systems/drink-system');
-        prodImportSuccess = !!processDrinkFactory;
-      } catch (error) {
-        console.error('Prod import failed:', error);
-      }
-
-      expect(devImportSuccess).toBe(true);
-      expect(prodImportSuccess).toBe(true);
-    });
-
-    it('should test dynamic imports in both environments', async () => {
-      // Test in dev environment
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
-
-      let devDynamicImportSuccess = false;
-      try {
-        const uiModule = await import('../ts/ui/index');
-        devDynamicImportSuccess = !!uiModule.updateAllDisplays;
-      } catch (error) {
-        console.error('Dev dynamic import failed:', error);
-      }
-
-      // Test in production environment
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      let prodDynamicImportSuccess = false;
-      try {
-        const uiModule = await import('../ts/ui/index');
-        prodDynamicImportSuccess = !!uiModule.updateAllDisplays;
-      } catch (error) {
-        console.error('Prod dynamic import failed:', error);
-      }
-
-      expect(devDynamicImportSuccess).toBe(true);
-      expect(prodDynamicImportSuccess).toBe(true);
-    });
+    expect(typeof devDrink.processDrinkFactory).toBe('function');
+    expect(typeof prodDrink.processDrinkFactory).toBe('function');
+    expect(typeof devUI.updateAllDisplays).toBe('function');
+    expect(typeof prodUI.updateAllDisplays).toBe('function');
   });
 
-  describe('Console Behavior Differences', () => {
-    it('should test console behavior in dev environment', () => {
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
+  it('updates the current UI contract consistently in both environments', async () => {
+    const { toDecimal } = await import('../ts/core/numbers/simplified');
 
-      const consoleSpy = vi.spyOn(console, 'log');
-      console.log('Dev test message');
-
-      expect(consoleSpy).toHaveBeenCalledWith('Dev test message');
-    });
-
-    it('should test console behavior in production environment', () => {
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      const consoleSpy = vi.spyOn(console, 'log');
-      console.log('Prod test message');
-
-      // In production, console.log might be stripped or behave differently
-      expect(consoleSpy).toHaveBeenCalledWith('Prod test message');
-    });
-  });
-
-  describe('RequestAnimationFrame Differences', () => {
-    it('should test RAF behavior in dev environment', done => {
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
-
-      let rafCalled = false;
-      requestAnimationFrame(() => {
-        rafCalled = true;
-        expect(rafCalled).toBe(true);
-        done();
-      });
-    });
-
-    it('should test RAF behavior in production environment', done => {
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      let rafCalled = false;
-      requestAnimationFrame(() => {
-        rafCalled = true;
-        expect(rafCalled).toBe(true);
-        done();
-      });
-    });
-  });
-
-  describe('State Management Differences', () => {
-    it('should test Zustand store in dev environment', async () => {
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
-
+    for (const url of ['http://localhost:5173/', 'https://spikan.github.io/JSIncremental/']) {
+      await setupEnvironment(url);
       const { useGameStore } = await import('../ts/core/state/zustand-store');
-      const store = useGameStore.getState();
-
-      expect(store).toBeDefined();
-      expect(typeof store.sips).toBe('object');
-    });
-
-    it('should test Zustand store in production environment', async () => {
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      const { useGameStore } = await import('../ts/core/state/zustand-store');
-      const store = useGameStore.getState();
-
-      expect(store).toBeDefined();
-      expect(typeof store.sips).toBe('object');
-    });
-  });
-
-  describe('UI Update Function Differences', () => {
-    it('should test UI updates in dev environment', async () => {
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
-
       const uiModule = await import('../ts/ui/index');
-      const sipCounter = global.document.getElementById('sipCounter');
 
-      // Mock App object
-      const mockApp = {
-        state: {
-          getState: () => ({
-            sips: { toString: () => '5' },
-          }),
-        },
-        ui: uiModule,
-      };
-
-      (global.window as any).App = mockApp;
-
-      if (uiModule.updateTopSipCounter) {
-        uiModule.updateTopSipCounter();
-        expect(sipCounter!.textContent).toBe('5');
-      }
-    });
-
-    it('should test UI updates in production environment', async () => {
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      const uiModule = await import('../ts/ui/index');
-      const sipCounter = global.document.getElementById('sipCounter');
-
-      // Mock App object
-      const mockApp = {
-        state: {
-          getState: () => ({
-            sips: { toString: () => '5' },
-          }),
-        },
-        ui: uiModule,
-      };
-
-      (global.window as any).App = mockApp;
-
-      if (uiModule.updateTopSipCounter) {
-        uiModule.updateTopSipCounter();
-        expect(sipCounter!.textContent).toBe('5');
-      }
-    });
-  });
-
-  describe('Error Handling Differences', () => {
-    it('should test error handling in dev environment', () => {
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
-
-      const errorHandler = vi.fn();
-
-      try {
-        throw new Error('Dev test error');
-      } catch (error) {
-        errorHandler(error);
-      }
-
-      expect(errorHandler).toHaveBeenCalledWith(expect.any(Error));
-    });
-
-    it('should test error handling in production environment', () => {
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      const errorHandler = vi.fn();
-
-      try {
-        throw new Error('Prod test error');
-      } catch (error) {
-        errorHandler(error);
-      }
-
-      expect(errorHandler).toHaveBeenCalledWith(expect.any(Error));
-    });
-  });
-
-  describe('Performance Differences', () => {
-    it('should test performance in dev environment', () => {
-      global.window = devDom.window as any;
-      global.document = devDom.window.document;
-
-      const start = performance.now();
-
-      // Simulate some work
-      for (let i = 0; i < 1000; i++) {
-        Math.random();
-      }
-
-      const end = performance.now();
-      const duration = end - start;
-
-      expect(duration).toBeGreaterThan(0);
-    });
-
-    it('should test performance in production environment', () => {
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      const start = performance.now();
-
-      // Simulate some work
-      for (let i = 0; i < 1000; i++) {
-        Math.random();
-      }
-
-      const end = performance.now();
-      const duration = end - start;
-
-      expect(duration).toBeGreaterThan(0);
-    });
-  });
-
-  describe('Specific Production Issues', () => {
-    it('should reproduce the sips stuck at 1 issue', async () => {
-      global.window = prodDom.window as any;
-      global.document = prodDom.window.document;
-
-      // Import the drink system
-      const { processDrinkFactory } = await import('../ts/core/systems/drink-system');
-
-      // Create a mock that simulates the production issue
-      const mockServiceLocator = {
-        get: vi.fn((key: string) => {
-          switch (key) {
-            case 'sips':
-              return { toString: () => '1', add: (val: any) => ({ toString: () => '2' }) };
-            case 'sipsPerDrink':
-              return { toString: () => '1' };
-            case 'spd':
-              return { toString: () => '1' };
-            case 'totalSipsEarned':
-              return { toString: () => '0', add: (val: any) => ({ toString: () => '1' }) };
-            case 'highestSipsPerSecond':
-              return { toString: () => '0' };
-            case 'lastDrinkTime':
-              return Date.now() - 2000; // 2 seconds ago
-            case 'lastAutosaveClockMs':
-              return Date.now();
-            default:
-              return undefined;
-          }
-        }),
-        register: vi.fn(),
-      };
-
-      // Mock the service locator
-      vi.doMock('../ts/core/services/service-locator', () => ({
-        ServiceLocator: mockServiceLocator,
-      }));
-
-      // Create the processDrink function
-      const processDrink = processDrinkFactory({
-        getNow: () => Date.now(),
-        getApp: () => ({
-          state: {
-            getState: () => ({
-              sips: { toString: () => '1' },
-              drinkRate: 1000,
-              lastDrinkTime: Date.now() - 2000,
-            }),
-            setState: vi.fn(),
-          },
-          stateBridge: {
-            setLastDrinkTime: vi.fn(),
-            setDrinkProgress: vi.fn(),
-          },
-        }),
-        getGameConfig: () => ({
-          BALANCE: { BASE_SIPS_PER_DRINK: 1 },
-        }),
-        getSips: () => ({ toString: () => '1' }),
-        setSips: vi.fn(),
-        getSipsPerDrink: () => ({ toString: () => '1' }),
-        getDrinkRate: () => 1000,
-        getLastDrinkTime: () => Date.now() - 2000,
-        setLastDrinkTime: vi.fn(),
-        getSpd: () => ({ toString: () => '1' }),
-        getTotalSipsEarned: () => ({ toString: () => '0' }),
-        getHighestSipsPerSecond: () => ({ toString: () => '0' }),
-        getLastAutosaveClockMs: () => Date.now(),
-        setLastAutosaveClockMs: vi.fn(),
+      useGameStore.setState({
+        sips: toDecimal(5),
+        spd: toDecimal(2),
+        drinkProgress: 75.5,
+        drinkRate: 1000,
       });
 
-      // Test multiple drink processing calls
-      const initialSips = mockServiceLocator.get('sips');
-      expect(initialSips.toString()).toBe('1');
+      uiModule.updateTopSipCounter();
+      uiModule.updateDrinkProgress();
 
-      // Process drink multiple times
-      for (let i = 0; i < 5; i++) {
-        processDrink();
-        // Wait a bit to simulate timing
-        await new Promise(resolve => setTimeout(resolve, 10));
-      }
+      expect(document.getElementById('topSipValue')!.textContent).toBe('5.00');
+      expect(document.getElementById('drinkProgressFill')!.style.width).toBe('75.5%');
+    }
+  });
 
-      // Check if sips increased
-      const finalSips = mockServiceLocator.get('sips');
-      expect(finalSips.toString()).toBe('2'); // Should have increased
+  it('runs requestAnimationFrame in both environments without deprecated done callbacks', async () => {
+    const devDom = await setupEnvironment('http://localhost:5173/');
+    await new Promise<void>(resolve => {
+      devDom.window.requestAnimationFrame(() => resolve());
     });
+
+    const prodDom = await setupEnvironment('https://spikan.github.io/JSIncremental/');
+    await new Promise<void>(resolve => {
+      prodDom.window.requestAnimationFrame(() => resolve());
+    });
+  });
+
+  it('uses the same store shape in both environments', async () => {
+    await setupEnvironment('http://localhost:5173/');
+    const devStore = (await import('../ts/core/state/zustand-store')).useGameStore.getState();
+
+    await setupEnvironment('https://spikan.github.io/JSIncremental/');
+    const prodStore = (await import('../ts/core/state/zustand-store')).useGameStore.getState();
+
+    expect(devStore.sips).toBeDefined();
+    expect(prodStore.sips).toBeDefined();
+    expect(['object', 'string', 'number']).toContain(typeof devStore.sips);
+    expect(['object', 'string', 'number']).toContain(typeof prodStore.sips);
+    expect(typeof devStore.actions.setState).toBe('function');
+    expect(typeof prodStore.actions.setState).toBe('function');
+  });
+
+  it('reproduces the old drink-path symptom using the current injected processDrink seam', async () => {
+    await setupEnvironment('https://spikan.github.io/JSIncremental/');
+    const { toDecimal } = await import('../ts/core/numbers/simplified');
+    const { processDrinkFactory } = await import('../ts/core/systems/drink-system');
+
+    const setState = vi.fn();
+    const processDrink = processDrinkFactory({
+      getNow: () => 2_000,
+      getState: () => ({
+        sips: toDecimal(1),
+        totalSipsEarned: toDecimal(0),
+        highestSipsPerSecond: toDecimal(0),
+        straws: 1,
+        cups: 0,
+        widerStraws: 0,
+        betterCups: 0,
+        drinkRate: 1000,
+        lastDrinkTime: 0,
+      }),
+      setState,
+    });
+
+    await processDrink();
+
+    expect(setState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sips: expect.objectContaining({ toString: expect.any(Function) }),
+      })
+    );
   });
 });

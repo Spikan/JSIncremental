@@ -34,7 +34,6 @@ describe('Phase 3 Improvements - Integration Tests', () => {
 
       expect(uiIndex.withErrorBoundary).toBeDefined();
       expect(uiIndex.safeUpdateAllDisplays).toBeDefined();
-      expect(uiIndex.safeSwitchTab).toBeDefined();
     });
 
     it('should handle errors gracefully in error boundaries', async () => {

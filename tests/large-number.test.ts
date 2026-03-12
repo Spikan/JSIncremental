@@ -8,6 +8,7 @@ import { safeToNumber } from '../ts/core/numbers/safe-conversion';
 import { computeClick } from '../ts/core/rules/clicks';
 import { computeTotalSipsPerDrink } from '../ts/core/rules/economy';
 import { nextStrawCost } from '../ts/core/rules/purchases';
+import BreakDecimal from 'break_eternity.js';
 
 // Use our mock Decimal constructor for consistent testing
 const LargeNumber = Decimal; // Alias for backward compatibility
@@ -191,11 +192,11 @@ describe('LargeNumber', () => {
 
     // Test the add function used in Zustand store
     const result = add(largeValue1, largeValue2);
-    expect(result.toString()).toBe('1.5000000000000001e+100'); // 1e100 + 5e99 = 1.5e100 (break_eternity.js formatting)
+    expect(result.toString()).toMatch(/^1\.500000000000000[0-9]?e\+?100$/);
 
     // Test with mixed types
     const result2 = add(largeValue1, '1e99');
-    expect(result2.toString()).toBe('1.1e+100'); // 1e100 + 1e99 = 2e100 (break_eternity.js formatting)
+    expect(result2.toString()).toMatch(/^1\.1[0-9]*e\+?100$/);
   });
 
   it('should perform addition', () => {
@@ -299,12 +300,12 @@ describe('Core Rules with LargeNumber', () => {
   });
 
   it('should compute sips per drink with LargeNumber', () => {
-    const result = computeTotalSipsPerDrink(new LargeNumber(1), new LargeNumber(5));
+    const result = computeTotalSipsPerDrink(new BreakDecimal(1), new BreakDecimal(5));
     expect(result.toNumber()).toBe(6);
   });
 
   it('should compute purchase costs with LargeNumber', () => {
-    const cost = nextStrawCost(new LargeNumber(5), new LargeNumber(10), new LargeNumber(1.08));
+    const cost = nextStrawCost(new BreakDecimal(5), new BreakDecimal(10), new BreakDecimal(1.08));
     expect(cost.toNumber()).toBeGreaterThan(10);
   });
 });

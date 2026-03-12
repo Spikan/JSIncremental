@@ -1,10 +1,87 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+let runtime: Awaited<ReturnType<typeof loadRuntime>> | null = null;
+let animationHandles: ReturnType<typeof setTimeout>[] = [];
+
+function installAnimationFrameMocks() {
+  Object.defineProperty(window, 'requestAnimationFrame', {
+    writable: true,
+    value: vi.fn(callback => {
+      const handle = setTimeout(() => {
+        animationHandles = animationHandles.filter(activeHandle => activeHandle !== handle);
+        callback(performance.now());
+      }, 16);
+      animationHandles.push(handle);
+      return handle as unknown as number;
+    }),
+  });
+
+  Object.defineProperty(window, 'cancelAnimationFrame', {
+    writable: true,
+    value: vi.fn(handle => {
+      clearTimeout(handle);
+      animationHandles = animationHandles.filter(activeHandle => activeHandle !== handle);
+    }),
+  });
+
+  Object.defineProperty(globalThis, 'requestAnimationFrame', {
+    writable: true,
+    value: window.requestAnimationFrame,
+  });
+
+  Object.defineProperty(globalThis, 'cancelAnimationFrame', {
+    writable: true,
+    value: window.cancelAnimationFrame,
+  });
+}
+
+function clearAnimationFrameMocks() {
+  animationHandles.forEach(handle => clearTimeout(handle));
+  animationHandles = [];
+
+  Object.defineProperty(window, 'requestAnimationFrame', {
+    writable: true,
+    value: () => 0,
+  });
+
+  Object.defineProperty(window, 'cancelAnimationFrame', {
+    writable: true,
+    value: () => {},
+  });
+
+  Object.defineProperty(globalThis, 'requestAnimationFrame', {
+    writable: true,
+    value: window.requestAnimationFrame,
+  });
+
+  Object.defineProperty(globalThis, 'cancelAnimationFrame', {
+    writable: true,
+    value: window.cancelAnimationFrame,
+  });
+}
+
+async function loadRuntime() {
+  vi.resetModules();
+
+  const indexModule = await import('../ts/index.ts');
+  const loopModule = await import('../ts/core/systems/loop-system');
+  const drinkModule = await import('../ts/core/systems/drink-system');
+  const storeModule = await import('../ts/core/state/zustand-store');
+
+  runtime = {
+    indexModule,
+    ...loopModule,
+    ...drinkModule,
+    ...storeModule,
+  };
+
+  return runtime;
+}
 
 describe('Module Loading Order Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Mock production environment
     Object.defineProperty(window, 'location', {
       value: {
         origin: 'https://spikan.github.io',
@@ -13,276 +90,190 @@ describe('Module Loading Order Tests', () => {
       writable: true,
     });
 
+    (window as any).__TEST_ENV__ = true;
     (window as any).GAME_CONFIG = {
       BAL: { BASE_SIPS_PER_DRINK: 1 },
       TIMING: { DEFAULT_DRINK_RATE: 5000 },
     };
-
-    (window as any).sips = 0;
-    (window as any).sipsPerDrink = 1;
-    (window as any).drinkRate = 5000;
-    (window as any).lastDrinkTime = Date.now() - 5000;
-    (window as any).spd = 0;
     (window as any).__lastAutosaveClockMs = 0;
+    (window as any).Decimal = (globalThis as any).Decimal;
+    (globalThis as any).__zustandStore = undefined;
+    (globalThis as any).startGame = undefined;
+    (globalThis as any).initGame = undefined;
 
-    (window as any).Decimal = class MockDecimal {
-      constructor(value: any) {
-        this.value = value;
-      }
-      toNumber() {
-        return Number(this.value);
-      }
-      mul(other: any) {
-        return new MockDecimal(this.value * other.value);
-      }
-      div(other: any) {
-        return new MockDecimal(this.value / other.value);
-      }
-      add(other: any) {
-        return new MockDecimal(this.value + other.value);
-      }
-      sub(other: any) {
-        return new MockDecimal(this.value - other.value);
-      }
-      gt(other: any) {
-        return this.value > other.value;
-      }
-      lt(other: any) {
-        return this.value < other.value;
-      }
-      gte(other: any) {
-        return this.value >= other.value;
-      }
-      lte(other: any) {
-        return this.value <= other.value;
-      }
-      eq(other: any) {
-        return this.value === other.value;
-      }
-      toString() {
-        return String(this.value);
-      }
-    };
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
 
-    // Reset DOM
+    installAnimationFrameMocks();
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ words: ['test', 'word', 'bank'] }),
+    }) as any;
+
     document.body.innerHTML = `
       <div id="splashScreen" style="display: block;"></div>
       <div id="gameContent" style="display: none;"></div>
       <button id="sodaButton">Soda</button>
     `;
-
-    // Mock console methods
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
+    runtime?.stop?.();
+    runtime = null;
+    clearAnimationFrameMocks();
     vi.restoreAllMocks();
   });
 
-  it('should load drink system before tryBoot', async () => {
-    const loadOrder: string[] = [];
-
-    // Track the order of system loading
-    const originalImport = (global as any).import;
-    (global as any).import = vi.fn((path: string) => {
-      loadOrder.push(path);
-      return originalImport(path);
+  afterAll(() => {
+    clearAnimationFrameMocks();
+    Object.defineProperty(globalThis, 'document', {
+      writable: true,
+      value: {
+        body: { innerHTML: '', classList: { contains: () => false } },
+        getElementById: () => null,
+        querySelectorAll: () => [],
+        querySelector: () => null,
+        addEventListener: () => {},
+      },
     });
+  });
 
-    // Load the module
-    await import('../ts/index.ts');
+  it('should load core runtime modules without hanging', async () => {
+    const startTime = Date.now();
+    const loaded = await loadRuntime();
+    const loadTime = Date.now() - startTime;
 
-    // Wait for initialization
-    await new Promise(resolve => setTimeout(resolve, 200));
-
-    // Check that drink system is loaded before tryBoot
-    const drinkSystemIndex = loadOrder.findIndex(path => path.includes('drink-system'));
-    const tryBootIndex = loadOrder.findIndex(path => path.includes('tryBoot'));
-
-    // Drink system should be loaded before tryBoot
-    expect(drinkSystemIndex).toBeGreaterThan(-1);
-    expect(tryBootIndex).toBeGreaterThan(-1);
-    expect(drinkSystemIndex).toBeLessThan(tryBootIndex);
-
-    // Restore original import
-    (global as any).import = originalImport;
+    expect(loadTime).toBeLessThan(10000);
+    expect(loaded.indexModule).toBeDefined();
+    expect(typeof loaded.start).toBe('function');
+    expect(typeof loaded.stop).toBe('function');
+    expect(typeof loaded.getProcessDrink).toBe('function');
+    expect(typeof loaded.useGameStore.getState).toBe('function');
   });
 
   it('should have processDrink available when loop starts', async () => {
-    // Load the module
-    await import('../ts/index.ts');
-
-    // Wait for initialization
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    const App = (window as any).App;
-    expect(App).toBeDefined();
-    expect(App.systems).toBeDefined();
-    expect(App.systems.drink).toBeDefined();
-    expect(App.systems.drink.processDrink).toBeDefined();
-    expect(App.systems.loop).toBeDefined();
-
-    // Mock requestAnimationFrame to track loop execution
+    const loaded = await loadRuntime();
+    const processDrink = loaded.getProcessDrink();
     let rafCallCount = 0;
     let processDrinkCalled = false;
 
-    const originalRAF = window.requestAnimationFrame;
     window.requestAnimationFrame = vi.fn(callback => {
       rafCallCount++;
-      // Simulate callback execution
-      setTimeout(callback, 16);
-      return rafCallCount;
+      const handle = setTimeout(() => {
+        animationHandles = animationHandles.filter(activeHandle => activeHandle !== handle);
+        callback(performance.now());
+      }, 16);
+      animationHandles.push(handle);
+      return handle as unknown as number;
     });
+    globalThis.requestAnimationFrame = window.requestAnimationFrame;
 
-    // Start the loop
-    App.systems.loop.start({
+    loaded.start({
       updateDrinkProgress: vi.fn(),
-      processDrink: () => {
+      processDrink: async () => {
         processDrinkCalled = true;
-        // Verify processDrink function exists
-        expect(App.systems.drink.processDrink).toBeDefined();
-        expect(typeof App.systems.drink.processDrink).toBe('function');
+        await processDrink();
       },
       updateStats: vi.fn(),
       updateUI: vi.fn(),
     });
 
-    // Wait for multiple frames
     await new Promise(resolve => setTimeout(resolve, 100));
+    loaded.stop();
 
-    // Should have called RAF and processDrink
+    expect(typeof processDrink).toBe('function');
     expect(rafCallCount).toBeGreaterThan(0);
     expect(processDrinkCalled).toBe(true);
-
-    // Restore original RAF
-    window.requestAnimationFrame = originalRAF;
   });
 
   it('should not have loop system start and immediately stop', async () => {
-    // Load the module
-    await import('../ts/index.ts');
+    const loaded = await loadRuntime();
+    const cancelSpy = vi.fn();
+    let rafCallCount = 0;
 
-    // Wait for initialization
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    const App = (window as any).App;
-
-    // Track loop start/stop calls
-    let loopStartCalled = false;
-    let loopStopCalled = false;
-
-    const originalStart = App.systems.loop.start;
-    const originalStop = App.systems.loop.stop;
-
-    App.systems.loop.start = vi.fn((...args) => {
-      loopStartCalled = true;
-      return originalStart.apply(App.systems.loop, args);
-    });
-
-    App.systems.loop.stop = vi.fn(() => {
-      loopStopCalled = true;
-      return originalStop.apply(App.systems.loop);
-    });
-
-    // Mock requestAnimationFrame to prevent actual loop execution
-    const originalRAF = window.requestAnimationFrame;
     window.requestAnimationFrame = vi.fn(callback => {
-      // Don't call the callback to prevent loop from running
-      return 1;
+      rafCallCount++;
+      const handle = setTimeout(() => {
+        animationHandles = animationHandles.filter(activeHandle => activeHandle !== handle);
+        callback(performance.now());
+      }, 16);
+      animationHandles.push(handle);
+      return handle as unknown as number;
     });
+    window.cancelAnimationFrame = vi.fn(handle => {
+      cancelSpy(handle);
+      clearTimeout(handle);
+      animationHandles = animationHandles.filter(activeHandle => activeHandle !== handle);
+    });
+    globalThis.requestAnimationFrame = window.requestAnimationFrame;
+    globalThis.cancelAnimationFrame = window.cancelAnimationFrame;
 
-    // Start the loop
-    App.systems.loop.start({
+    loaded.start({
       updateDrinkProgress: vi.fn(),
-      processDrink: vi.fn(),
+      processDrink: vi.fn(async () => {}),
       updateStats: vi.fn(),
       updateUI: vi.fn(),
     });
 
-    // Wait a bit
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 50));
 
-    // Loop should have started but not stopped immediately
-    expect(loopStartCalled).toBe(true);
-    expect(loopStopCalled).toBe(false);
+    expect(rafCallCount).toBeGreaterThan(0);
+    expect(cancelSpy).not.toHaveBeenCalled();
 
-    // Restore originals
-    window.requestAnimationFrame = originalRAF;
+    loaded.stop();
+    expect(cancelSpy).toHaveBeenCalled();
   });
 
   it('should handle missing processDrink function gracefully', async () => {
-    // Load the module
-    await import('../ts/index.ts');
-
-    // Wait for initialization
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    const App = (window as any).App;
-
-    // Remove processDrink function to simulate the bug
-    delete App.systems.drink.processDrink;
-
-    // Mock requestAnimationFrame
+    const loaded = await loadRuntime();
     let rafCallCount = 0;
-    const originalRAF = window.requestAnimationFrame;
+
     window.requestAnimationFrame = vi.fn(callback => {
       rafCallCount++;
-      // Simulate callback execution
-      setTimeout(callback, 16);
-      return rafCallCount;
+      const handle = setTimeout(() => {
+        animationHandles = animationHandles.filter(activeHandle => activeHandle !== handle);
+        callback(performance.now());
+      }, 16);
+      animationHandles.push(handle);
+      return handle as unknown as number;
     });
+    globalThis.requestAnimationFrame = window.requestAnimationFrame;
 
-    // Start the loop - should not crash
     expect(() => {
-      App.systems.loop.start({
+      loaded.start({
         updateDrinkProgress: vi.fn(),
-        processDrink: vi.fn(),
         updateStats: vi.fn(),
         updateUI: vi.fn(),
       });
     }).not.toThrow();
 
-    // Wait a bit
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 50));
+    loaded.stop();
 
-    // Should have called RAF (loop is running)
     expect(rafCallCount).toBeGreaterThan(0);
-
-    // Restore original RAF
-    window.requestAnimationFrame = originalRAF;
   });
 
-  it('should verify all critical systems are loaded in correct order', async () => {
-    const systemLoadOrder: string[] = [];
+  it('should expose all critical systems through the current runtime contract', async () => {
+    const loaded = await loadRuntime();
 
-    // Track system loading
-    const originalImport = (global as any).import;
-    (global as any).import = vi.fn((path: string) => {
-      if (path.includes('drink-system') || path.includes('loop-system')) {
-        systemLoadOrder.push(path);
-      }
-      return originalImport(path);
-    });
-
-    // Load the module
-    await import('../ts/index.ts');
-
-    // Wait for initialization
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    // Check loading order
-    expect(systemLoadOrder).toContain('drink-system');
-    expect(systemLoadOrder).toContain('loop-system');
-
-    // Drink system should be loaded before loop system
-    const drinkIndex = systemLoadOrder.findIndex(path => path.includes('drink-system'));
-    const loopIndex = systemLoadOrder.findIndex(path => path.includes('loop-system'));
-
-    expect(drinkIndex).toBeLessThan(loopIndex);
-
-    // Restore original import
-    (global as any).import = originalImport;
+    expect(typeof loaded.start).toBe('function');
+    expect(typeof loaded.stop).toBe('function');
+    expect(typeof loaded.getProcessDrink()).toBe('function');
+    expect(typeof loaded.useGameStore.getState().actions.setState).toBe('function');
+    expect((globalThis as any).__zustandStore).toBe(loaded.useGameStore);
+    expect(typeof (globalThis as any).startGame).toBe('function');
+    expect(typeof (globalThis as any).initGame).toBe('function');
   });
 });

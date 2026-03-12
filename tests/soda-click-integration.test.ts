@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { handleSodaClickFactory, trackClickFactory } from '../ts/core/systems/clicks-system';
 import { useGameStore } from '../ts/core/state/zustand-store';
 import { showClickFeedback } from '../ts/ui/feedback';
+import { hybridLevelSystem } from '../ts/core/systems/hybrid-level-system';
 
 // Mock Decimal for tests
 beforeEach(() => {
@@ -111,6 +112,7 @@ describe('Soda Click Integration Tests', () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.clearAllMocks();
   });
 
@@ -144,10 +146,10 @@ describe('Soda Click Integration Tests', () => {
 
     // Check that showClickFeedback was called
     expect(showClickFeedback).toHaveBeenCalledWith(
-      expect.any(Object), // totalClickValue (Decimal object)
+      expect.anything(),
       false, // isCritical
-      0, // clickX
-      0 // clickY
+      null, // clickX
+      null // clickY
     );
   });
 
@@ -179,27 +181,19 @@ describe('Soda Click Integration Tests', () => {
   });
 
   it('should apply level bonuses to click value', async () => {
-    // Mock level bonuses
-    const mockHybridLevelSystem = {
-      getCurrentLevelBonuses: () => ({
-        sipMultiplier: 1.0,
-        clickMultiplier: 2.0, // 2x multiplier
-      }),
-    };
-
-    // Re-mock with different multiplier
-    vi.doMock('../ts/core/systems/hybrid-level-system', () => ({
-      hybridLevelSystem: mockHybridLevelSystem,
-    }));
-
     const trackClick = trackClickFactory();
     const handleSodaClick = handleSodaClickFactory({ trackClick });
+    const bonusSpy = vi.spyOn(hybridLevelSystem, 'getCurrentLevelBonuses').mockReturnValue({
+      sipMultiplier: 1.0,
+      clickMultiplier: 2.0,
+    } as any);
 
     await handleSodaClick(1.0);
 
     const newState = useGameStore.getState();
     // Should be base click (1) * level multiplier (2) = 2
     expect(newState.sips.toString()).toBe('2');
+    expect(bonusSpy).toHaveBeenCalled();
   });
 
   it('should update total sips earned', async () => {

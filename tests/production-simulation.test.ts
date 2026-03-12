@@ -69,7 +69,9 @@ describe('Production Environment Simulation', () => {
     try {
       const loopModule = await import('../ts/core/systems/loop-system');
       loopModule.stop();
-    } catch {}
+    } catch {
+      // Loop cleanup is best-effort for production simulation tests.
+    }
     vi.restoreAllMocks();
   });
 

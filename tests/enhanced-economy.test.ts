@@ -1,7 +1,7 @@
 // Tests for enhanced economy functions with very large numbers
 
 import { describe, it, expect } from 'vitest';
-import { Decimal } from './test-utils';
+import { Decimal } from '../ts/core/numbers/simplified';
 import {
   computeStrawSPD,
   computeCupSPD,
@@ -81,7 +81,7 @@ describe('Enhanced Economy Functions', () => {
       const result = computeInflationRate('1e50', 5000);
 
       expect(result).toBeInstanceOf(Decimal);
-      expect(result.toNumber()).toBeGreaterThan(0);
+      expect(result.toNumber()).toBe(1);
     });
 
     it('should calculate interest rate for large bank deposits', () => {

@@ -45,7 +45,9 @@ describe('UI Update Debug', () => {
       const { domQuery } = await import('../ts/services/dom-query');
       domQuery.clearCache();
       domQuery.clearTimeouts();
-    } catch {}
+    } catch {
+      // Cleanup is best-effort when the DOM query service was not loaded.
+    }
 
     global.window = originalWindow;
     global.document = originalDocument;

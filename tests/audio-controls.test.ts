@@ -41,6 +41,7 @@ const createMockSlider = (id: string, value: string) => {
   slider.type = 'range';
   slider.value = value;
   slider.style.setProperty = vi.fn();
+  slider.addEventListener = vi.fn();
   return slider;
 };
 
@@ -98,10 +99,8 @@ describe('Audio Controls Manager', () => {
     audioControlsManager.initialize();
 
     expect(document.getElementById).toHaveBeenCalledWith('masterVolumeSlider');
-    expect(document.getElementById).toHaveBeenCalledWith('musicVolumeSlider');
     expect(document.getElementById).toHaveBeenCalledWith('sfxVolumeSlider');
     expect(document.getElementById).toHaveBeenCalledWith('masterVolumeValue');
-    expect(document.getElementById).toHaveBeenCalledWith('musicVolumeValue');
     expect(document.getElementById).toHaveBeenCalledWith('sfxVolumeValue');
   });
 
@@ -151,10 +150,8 @@ describe('Audio Controls Manager', () => {
       writable: false,
     });
 
-    if (mockSlider.addEventListener) {
-      const handler = (mockSlider.addEventListener as any).mock.calls[0][1];
-      handler(inputEvent);
-    }
+    const handler = (mockSlider.addEventListener as any).mock.calls[0][1];
+    handler(inputEvent);
 
     expect(mockSlider.style.setProperty).toHaveBeenCalledWith('--slider-progress', '75%');
   });

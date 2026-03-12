@@ -12,6 +12,7 @@ import {
 } from '../ts/core/numbers/performance-utils';
 import { addSips, subtractSips, isGreaterOrEqual } from '../ts/core/state/mutations';
 import { computeStrawSPD, computeTotalSPD } from '../ts/core/rules/economy';
+import BreakDecimal from 'break_eternity.js';
 
 // Use our mock Decimal constructor for consistent testing
 const LargeNumber = Decimal; // Alias for backward compatibility
@@ -174,8 +175,8 @@ describe('LargeNumber Performance Benchmarks', () => {
       performanceMonitor.measureTime('economy-formulas', () => {
         for (let i = 1; i <= iterations; i++) {
           // Simulate economy calculations with increasing complexity
-          const straws = new LargeNumber(i * 100);
-          const baseSPD = new LargeNumber(0.5 + i * 0.1);
+          const straws = new BreakDecimal(i * 100);
+          const baseSPD = new BreakDecimal(0.5 + i * 0.1);
           const widerStraws = Math.floor(i / 10);
           const widerMultiplier = 0.1 + i * 0.01;
 
@@ -201,8 +202,8 @@ describe('LargeNumber Performance Benchmarks', () => {
 
       performanceMonitor.measureTime('large-economy', () => {
         // Test with very large values that would break regular numbers
-        const hugeStraws = new LargeNumber('1e50');
-        const hugeBaseSPD = new LargeNumber('1e30');
+        const hugeStraws = new BreakDecimal('1e50');
+        const hugeBaseSPD = new BreakDecimal('1e30');
         const hugeStrawSPD = computeStrawSPD(hugeStraws, hugeBaseSPD, 100, 0.5);
         const hugeTotalSPD = computeTotalSPD(hugeStraws, hugeStrawSPD, hugeStraws, hugeStrawSPD);
 
@@ -278,13 +279,8 @@ describe('LargeNumber Performance Benchmarks', () => {
 
           // Simulate economy calculations
           if (tick % 10 === 0) {
-            const strawSPD = computeStrawSPD(straws, new LargeNumber(0.1), 0, 0);
-            const totalSPD = computeTotalSPD(
-              straws,
-              strawSPD,
-              new LargeNumber(0),
-              new LargeNumber(0)
-            );
+            const strawSPD = computeStrawSPD(straws.toNumber(), 0.1, 0, 0);
+            const totalSPD = computeTotalSPD(straws.toNumber(), strawSPD, 0, 0);
             // Use results to ensure calculations aren't optimized away
             expect(strawSPD.toNumber()).toBeGreaterThan(0);
             expect(totalSPD.toNumber()).toBeGreaterThan(0);
