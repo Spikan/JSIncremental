@@ -30,8 +30,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Quality checks
-        run: npm run quality
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Test
+        run: npm test
 
       - name: Set Vite base path
         run: |
