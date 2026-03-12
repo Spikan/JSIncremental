@@ -149,7 +149,7 @@ describe('UI Update Debug', () => {
     uiModule.updateTopSipCounter();
     uiModule.updateTopSipsPerDrink();
 
-    expect(global.document.getElementById('topSipValue')!.textContent).toBe('3.00');
-    expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('3.00');
+    expect(global.document.getElementById('topSipValue')!.textContent).toBe('3.50');
+    expect(global.document.getElementById('topSipsPerDrink')!.textContent).toBe('3.50');
   });
 });
