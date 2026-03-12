@@ -155,12 +155,24 @@
 /* ===== THEME OVERRIDES ===== */
 /* These will be dynamically updated by the theme system */
 :root.theme-beach {
-  --color-primary: #87ceeb;
-  --color-primary-light: #b0e0e6;
-  --color-primary-dark: #5f9ea0;
-  --color-accent: #ffd700;
-  --color-accent-light: #ffed4e;
-  --color-accent-dark: #daa520;
+  --color-primary: #1f5b72;
+  --color-primary-light: #5f9eb1;
+  --color-primary-dark: #153b4a;
+  --color-accent: #f2c572;
+  --color-accent-light: #ffe0ab;
+  --color-accent-dark: #ca9440;
+  --color-background: linear-gradient(180deg, #9fcfe1 0%, #78b2c1 38%, #4d8796 100%);
+  --color-surface: rgba(8, 32, 42, 0.14);
+  --color-surface-hover: rgba(8, 32, 42, 0.22);
+  --color-surface-active: rgba(8, 32, 42, 0.28);
+  --color-text-primary: #f8fcff;
+  --color-text-secondary: rgba(248, 252, 255, 0.82);
+  --color-text-muted: rgba(248, 252, 255, 0.62);
+  --color-border: rgba(246, 234, 210, 0.24);
+  --color-border-hover: rgba(246, 234, 210, 0.38);
+  --glass-background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08));
+  --glass-border: 1px solid rgba(246, 234, 210, 0.22);
+  --glass-backdrop-filter: blur(18px) saturate(130%);
 }
 
 :root.theme-park {

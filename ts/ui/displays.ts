@@ -15,6 +15,7 @@ import { createSodaButtonIndicator } from './soda-button-indicator';
 import { uiBatcher } from '../services/ui-batcher';
 import { errorHandler } from '../core/error-handling/error-handler';
 import { config } from '../config';
+import { FEATURE_UNLOCKS } from '../feature-unlocks';
 // Logger import removed - not used in this file
 import {
   nextStrawCost,
@@ -705,9 +706,213 @@ function updateUpgradeDisplays(): void {
 
     // Update soda stats
     updateSodaStats(displayData);
+
+    // Surface a clear short-term objective
+    updateNextGoalDisplay(displayData);
   } catch (error) {
     errorHandler.handleError(error, 'updateUpgradeDisplays');
   }
+}
+
+type GoalCardState = {
+  eyebrow: string;
+  title: string;
+  detail: string;
+  meta: string;
+  progressPct: number;
+};
+
+function clampProgress(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+}
+
+function setNextGoalCard(goal: GoalCardState): void {
+  updateStatDisplay('nextGoalEyebrow', goal.eyebrow);
+  updateStatDisplay('nextGoalTitle', goal.title);
+  updateStatDisplay('nextGoalDetail', goal.detail);
+  updateStatDisplay('nextGoalMeta', goal.meta);
+
+  const progressFill = document.getElementById('nextGoalProgressFill');
+  if (progressFill) {
+    progressFill.style.width = `${clampProgress(goal.progressPct)}%`;
+  }
+}
+
+function updateNextGoalDisplay(state: any): void {
+  const hasGoalCard =
+    document.getElementById('nextGoalTitle') && document.getElementById('nextGoalProgressFill');
+  if (!hasGoalCard) return;
+
+  const costs = calculateAllCosts();
+  const currentSips = toDecimal(state.sips || 0);
+  const totalClicks = Number(state.totalClicks || 0);
+  const suctions = Number(state.suctions || 0);
+  const fasterDrinks = Number(state.fasterDrinks || 0);
+  const straws = Number(state.straws || 0);
+  const cups = Number(state.cups || 0);
+  const widerStraws = Number(state.widerStraws || 0);
+  const betterCups = Number(state.betterCups || 0);
+
+  const buildCostGoal = (
+    eyebrow: string,
+    title: string,
+    detail: string,
+    cost: Decimal | undefined
+  ): GoalCardState => {
+    const targetCost = cost ?? new Decimal(0);
+    const progressRatio = targetCost.gt(0) ? currentSips.div(targetCost).mul(100).toNumber() : 100;
+    return {
+      eyebrow,
+      title,
+      detail,
+      meta: `${formatNumber(currentSips)} / ${formatNumber(targetCost)} sips`,
+      progressPct: progressRatio,
+    };
+  };
+
+  const buildUnlockGoal = (
+    featureName: string,
+    eyebrow: string,
+    title: string,
+    detail: string
+  ): GoalCardState | null => {
+    if (FEATURE_UNLOCKS.checkUnlock(featureName)) {
+      return null;
+    }
+    const unlockCost = FEATURE_UNLOCKS.getUnlockCost(featureName);
+    if (unlockCost == null) return null;
+    const targetCost = toDecimal(unlockCost);
+    const progressRatio = targetCost.gt(0) ? currentSips.div(targetCost).mul(100).toNumber() : 100;
+    return {
+      eyebrow,
+      title,
+      detail,
+      meta: `${formatNumber(currentSips)} / ${formatNumber(targetCost)} sips`,
+      progressPct: progressRatio,
+    };
+  };
+
+  const unlockSuctionGoal = buildUnlockGoal(
+    'suction',
+    'ACTIVE PATH',
+    'Unlock Turbo Sip',
+    'Give clicks a real payoff before you pivot into automation.'
+  );
+  if (unlockSuctionGoal) {
+    setNextGoalCard(unlockSuctionGoal);
+    return;
+  }
+
+  if (suctions < 2) {
+    setNextGoalCard(
+      buildCostGoal(
+        'ACTIVE PATH',
+        'Buy Turbo Sip',
+        'Your taps should feel stronger immediately.',
+        costs['suction']
+      )
+    );
+    return;
+  }
+
+  const unlockFasterGoal = buildUnlockGoal(
+    'fasterDrinks',
+    'RHYTHM PATH',
+    'Unlock Quick Chug',
+    'Shorter drink cycles make the whole game feel less sluggish.'
+  );
+  if (unlockFasterGoal) {
+    setNextGoalCard(unlockFasterGoal);
+    return;
+  }
+
+  if (fasterDrinks < 1) {
+    setNextGoalCard(
+      buildCostGoal(
+        'RHYTHM PATH',
+        'Buy Quick Chug',
+        'Speed up the passive loop so progress never stalls.',
+        costs['fasterDrinks']
+      )
+    );
+    return;
+  }
+
+  if (straws < 3) {
+    setNextGoalCard(
+      buildCostGoal(
+        'PASSIVE PATH',
+        'Build Extra Straws',
+        'Start stacking passive sip production in the background.',
+        costs['straw']
+      )
+    );
+    return;
+  }
+
+  if (cups < 2) {
+    setNextGoalCard(
+      buildCostGoal(
+        'PASSIVE PATH',
+        'Buy Bigger Cups',
+        'Cups create chunkier jumps and make each cycle feel meaningful.',
+        costs['cup']
+      )
+    );
+    return;
+  }
+
+  if (widerStraws < 1) {
+    setNextGoalCard(
+      buildCostGoal(
+        'SYNERGY PATH',
+        'Upgrade Wider Straws',
+        'Lean into straws and make your passive engine scale harder.',
+        costs['widerStraws']
+      )
+    );
+    return;
+  }
+
+  if (betterCups < 1) {
+    setNextGoalCard(
+      buildCostGoal(
+        'SYNERGY PATH',
+        'Upgrade Better Cups',
+        'Push cup builds so your next level arrives sooner.',
+        costs['betterCups']
+      )
+    );
+    return;
+  }
+
+  const nextLevel = hybridLevelSystem?.getNextUnlockableLevel?.();
+  if (nextLevel) {
+    const sipProgress = nextLevel.unlockRequirement.sips
+      ? currentSips.div(nextLevel.unlockRequirement.sips).mul(100).toNumber()
+      : 100;
+    const clickProgress = nextLevel.unlockRequirement.clicks
+      ? (totalClicks / nextLevel.unlockRequirement.clicks) * 100
+      : 100;
+    setNextGoalCard({
+      eyebrow: 'LEVEL PUSH',
+      title: `Reach ${nextLevel.name}`,
+      detail: 'New levels should feel like short-term milestones, not distant wallpaper.',
+      meta: `${formatNumber(currentSips)} / ${formatNumber(nextLevel.unlockRequirement.sips)} sips, ${totalClicks.toLocaleString()} / ${nextLevel.unlockRequirement.clicks.toLocaleString()} clicks`,
+      progressPct: Math.min(sipProgress, clickProgress),
+    });
+    return;
+  }
+
+  setNextGoalCard(
+    buildCostGoal(
+      'BUILD',
+      'Keep Scaling',
+      'Stack whichever upgrade fits your current path best.',
+      costs['cup']
+    )
+  );
 }
 
 /**

@@ -42,19 +42,29 @@ body,
 
 /* Level 1: The Beach */
 .theme-beach {
-  --color-primary: #87ceeb; /* Sky blue from SDP */
-  --color-primary-light: #98fb98; /* Light green */
-  --color-primary-dark: #5f9ea0; /* Cadet blue */
-  --color-accent: #ffd700; /* Gold from SDP */
-  --color-accent-light: #ffed4e; /* Light gold */
-  --color-accent-dark: #daa520; /* Goldenrod */
-  --color-background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%);
-  --color-surface: rgba(255, 215, 0, 0.15);
-  --color-border: rgba(255, 215, 0, 0.3);
+  --color-primary: #1f5b72;
+  --color-primary-light: #5f9eb1;
+  --color-primary-dark: #153b4a;
+  --color-accent: #f2c572;
+  --color-accent-light: #ffe0ab;
+  --color-accent-dark: #ca9440;
+  --color-background:
+    radial-gradient(circle at top, rgba(255, 247, 220, 0.42), transparent 28%),
+    linear-gradient(180deg, #9fcfe1 0%, #78b2c1 38%, #4d8796 100%);
+  --color-surface: rgba(8, 32, 42, 0.14);
+  --color-surface-hover: rgba(8, 32, 42, 0.22);
+  --color-surface-active: rgba(8, 32, 42, 0.28);
+  --color-border: rgba(246, 234, 210, 0.24);
+  --color-border-hover: rgba(246, 234, 210, 0.38);
+  --color-text-primary: #f8fcff;
+  --color-text-secondary: rgba(248, 252, 255, 0.82);
+  --color-text-muted: rgba(248, 252, 255, 0.62);
 
   /* Beach-specific effects */
-  --shadow-glow: 0 0 30px rgba(255, 215, 0, 0.4);
-  --glass-backdrop-filter: blur(20px) saturate(160%) hue-rotate(10deg);
+  --shadow-glow: 0 0 26px rgba(242, 197, 114, 0.34);
+  --glass-background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08));
+  --glass-border: 1px solid rgba(246, 234, 210, 0.22);
+  --glass-backdrop-filter: blur(18px) saturate(130%);
 }
 
 /* Level 2: The Park */
@@ -251,9 +261,12 @@ body {
   color: var(--color-accent) !important;
 }
 
-.level-name-minimal,
-.currency-label-main {
+.level-name-minimal {
   color: var(--color-accent) !important;
+}
+
+.currency-label-main {
+  color: color-mix(in srgb, var(--color-primary) 68%, white 32%) !important;
 }
 
 /* Progress bars */
@@ -268,7 +281,6 @@ body {
 .level-polygon-container,
 .stat-polygon {
   border-color: var(--color-border) !important;
-  background: var(--color-surface) !important;
 }
 
 /* Focus states */

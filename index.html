@@ -100,22 +100,32 @@
               </div>
             </div>
 
+            <section class="next-goal-card" aria-live="polite">
+              <div class="next-goal-eyebrow" id="nextGoalEyebrow">NEXT TARGET</div>
+              <div class="next-goal-title" id="nextGoalTitle">Build your first upgrade path</div>
+              <div class="next-goal-detail" id="nextGoalDetail">
+                Get enough sips to start shaping your run.
+              </div>
+              <div class="next-goal-meta" id="nextGoalMeta">0 / 15 sips</div>
+              <div class="next-goal-progress">
+                <div class="next-goal-progress-fill" id="nextGoalProgressFill"></div>
+              </div>
+            </section>
+
             <!-- Action Buttons -->
             <div class="action-buttons stagger-in">
               <button class="suction-btn hover-lift" data-action="buySuction">
                 <div class="suction-icon">💨</div>
                 <div class="suction-info">
-                  <div class="suction-name">Suction</div>
-                  <div class="suction-cost"><span id="suctionCost">40</span> Sips</div>
+                  <div class="suction-name">Turbo Sip</div>
+                  <div class="suction-cost"><span id="suctionCost">10</span> Sips</div>
                 </div>
                 <div class="suction-effect">
                   <div class="click-power-display">
                     <span class="click-power-label">Click Power:</span>
                     <span class="click-power-value" id="clickValue">1.0</span>
                   </div>
-                  <div class="suction-bonus">
-                    +<span id="suctionClickBonus">1.0</span> per click
-                  </div>
+                  <div class="suction-bonus">+<span id="suctionClickBonus">1.0</span> per tap</div>
                 </div>
               </button>
 
@@ -126,8 +136,8 @@
               >
                 <div class="suction-icon">⚡</div>
                 <div class="suction-info">
-                  <div class="suction-name">Faster Drinks</div>
-                  <div class="suction-cost"><span id="fasterDrinksCost">200</span> Sips</div>
+                  <div class="suction-name">Quick Chug</div>
+                  <div class="suction-cost"><span id="fasterDrinksCost">45</span> Sips</div>
                 </div>
                 <div class="suction-effect">
                   <div class="click-power-display">
@@ -160,11 +170,11 @@
                   <div class="upgrade-icon">🥤</div>
                   <div class="upgrade-info">
                     <h4 class="upgrade-name">Extra Straw</h4>
-                    <p class="upgrade-description">Generate sips per drink</p>
+                    <p class="upgrade-description">Start your passive sip engine</p>
                   </div>
                 </div>
                 <button class="upgrade-btn" data-action="buyStraw">
-                  <span class="upgrade-cost"><span id="strawCost">5</span> Sips</span>
+                  <span class="upgrade-cost"><span id="strawCost">15</span> Sips</span>
                   <span>Buy</span>
                 </button>
                 <div class="upgrade-stats">
@@ -179,11 +189,11 @@
                   <div class="upgrade-icon">☕</div>
                   <div class="upgrade-info">
                     <h4 class="upgrade-name">Bigger Cup</h4>
-                    <p class="upgrade-description">Higher capacity production</p>
+                    <p class="upgrade-description">Bigger passive jumps per drink</p>
                   </div>
                 </div>
                 <button class="upgrade-btn" data-action="buyCup">
-                  <span class="upgrade-cost"><span id="cupCost">15</span> Sips</span>
+                  <span class="upgrade-cost"><span id="cupCost">60</span> Sips</span>
                   <span>Buy</span>
                 </button>
                 <div class="upgrade-stats">

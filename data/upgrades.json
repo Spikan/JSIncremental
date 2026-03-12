@@ -1,37 +1,37 @@
 {
   "straws": {
-    "baseCost": 25,
-    "scaling": 1.12,
-    "baseSPD": 2.0,
-    "multiplierPerLevel": 0.5
+    "baseCost": 15,
+    "scaling": 1.1,
+    "baseSPD": 2.5,
+    "multiplierPerLevel": 0.6
   },
   "widerStraws": {
-    "baseCost": 150,
-    "scaling": 1.18,
-    "multiplierPerLevel": 0.2
+    "baseCost": 120,
+    "scaling": 1.1,
+    "multiplierPerLevel": 0.25
   },
   "cups": {
-    "baseCost": 100,
-    "scaling": 1.15,
-    "baseSPD": 5.0,
-    "multiplierPerLevel": 1.0
+    "baseCost": 60,
+    "scaling": 1.12,
+    "baseSPD": 6.0,
+    "multiplierPerLevel": 1.2
   },
   "betterCups": {
-    "baseCost": 400,
-    "scaling": 1.22,
-    "multiplierPerLevel": 0.3
+    "baseCost": 275,
+    "scaling": 1.12,
+    "multiplierPerLevel": 0.35
   },
   "suction": {
     "baseCost": 10,
-    "scaling": 1.1
+    "scaling": 1.08
   },
   "fasterDrinks": {
-    "baseCost": 80,
-    "scaling": 1.2,
-    "upgradeBaseCost": 1500
+    "baseCost": 45,
+    "scaling": 1.08,
+    "upgradeBaseCost": 900
   },
   "criticalClick": {
-    "baseCost": 60,
-    "scaling": 1.22
+    "baseCost": 45,
+    "scaling": 1.1
   }
 }
