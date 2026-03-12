@@ -28,6 +28,17 @@ function getBasePath(): string {
 // into separate manual chunks creates Rollup circular chunk warnings.
 function createManualChunks(id: string): string | undefined {
   if (!id.includes('node_modules')) return undefined;
+  if (id.includes('/three/examples/jsm/')) return 'vendor-three-extras';
+  if (id.includes('/three/build/three.core.js')) return 'vendor-three-core';
+  if (id.includes('/three/')) return 'vendor-three';
+  if (
+    id.includes('/framer-motion/') ||
+    id.includes('/motion-dom/') ||
+    id.includes('/motion-utils/') ||
+    id.includes('/react/')
+  ) {
+    return 'vendor-motion';
+  }
   if (id.includes('zustand')) return 'vendor-zustand';
   if (id.includes('zod')) return 'vendor-zod';
   return 'vendor';
